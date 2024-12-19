@@ -1,22 +1,22 @@
 <template>
-  <div role="card" class="card">
+  <div role="card" class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all">
     <slot name="cardHeader" />
+      <div class="daisy-card-body daisy-p-4">
     <router-link
       :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
-      class="daisy-text-decoration-none"
+      class="daisy-no-underline"
     >
-      <div class="card-body">
-        <h5>
-          <NoteTitleWithLink v-bind="{ noteTopology }" class="card-title" />
+        <h5 class="daisy-card-title">
+          <NoteTitleWithLink v-bind="{ noteTopology }" />
         </h5>
-        <p v-if="noteTopology.shortDetails" class="note-short-details">
+        <p v-if="noteTopology.shortDetails" class="daisy-text-base">
           {{ noteTopology.shortDetails }}
         </p>
-      </div>
     </router-link>
-    <div class="card-footer" v-if="$slots.button">
+    <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
       <slot name="button" :note-title="noteTopology" />
     </div>
+      </div>
   </div>
 </template>
 
@@ -29,9 +29,3 @@ defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
 })
 </script>
-
-<style scoped>
-.card:hover {
-  background-color: #f8f9fa !important;
-}
-</style>
