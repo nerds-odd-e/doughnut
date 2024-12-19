@@ -4,7 +4,6 @@ import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_M
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.*;
-import com.theokanning.openai.function.FunctionDefinition;
 import java.util.List;
 
 public class AiToolFactory {
@@ -49,7 +48,7 @@ public class AiToolFactory {
 
       """
             .formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),
-        askSingleAnswerMultipleChoiceQuestion().getFunctionDefinition());
+        askSingleAnswerMultipleChoiceQuestion());
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {
@@ -69,11 +68,10 @@ please critically check if the following question makes sense and is possible to
 
     return new InstructionAndSchema(
         messageBody,
-        FunctionDefinition.<QuestionEvaluation>builder()
-            .name("evaluate_question")
-            .description("answer and evaluate the feasibility of the question")
-            .parametersDefinitionByClass(QuestionEvaluation.class)
-            .build());
+        new AiTool(
+            "evaluate_question",
+            "answer and evaluate the feasibility of the question",
+            QuestionEvaluation.class));
   }
 
   public static InstructionAndSchema questionRefineAiTool(MCQWithAnswer question) {
@@ -96,12 +94,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             .formatted(new ObjectMapper().valueToTree(mcq).toString());
 
     return new InstructionAndSchema(
-        messageBody,
-        FunctionDefinition.<MCQWithAnswer>builder()
-            .name("refine_question")
-            .description("refine the question")
-            .parametersDefinitionByClass(MCQWithAnswer.class)
-            .build());
+        messageBody, new AiTool("refine_question", "refine the question", MCQWithAnswer.class));
   }
 
   public static InstructionAndSchema transcriptionToTextAiTool(String transcriptionFromAudio) {
@@ -119,11 +112,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
              ------------
             """
             + transcriptionFromAudio,
-        FunctionDefinition.<NoteDetailsCompletion>builder()
-            .name(AiToolName.COMPLETE_NOTE_DETAILS.getValue())
-            .description("Convert audio transcription to text and append to the note details")
-            .parametersDefinitionByClass(NoteDetailsCompletion.class)
-            .build());
+        completeNoteDetails());
   }
 
   public static List<AiTool> getAllAssistantTools() {
