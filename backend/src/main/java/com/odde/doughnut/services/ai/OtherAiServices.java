@@ -74,7 +74,7 @@ public final class OtherAiServices {
                 "{\"previousNoteDetailsToAppendTo\": %s}",
                 new ObjectMapper().writeValueAsString(previousContent));
         chatAboutNoteRequestBuilder.addUserMessage(
-            "Previous content (in JSON format):\n" + jsonContent);
+            "Previous note details (in JSON format):\n" + jsonContent);
       } catch (JsonProcessingException e) {
         return Optional.empty();
       }
@@ -83,7 +83,7 @@ public final class OtherAiServices {
     AiToolList questionEvaluationAiTool =
         AiToolFactory.transcriptionToTextAiTool(transcriptionFromAudio);
     return openAiApiHandler
-        .requestAndGetFunctionCallArguments(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
+        .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
         .flatMap(
             jsonNode -> {
               try {

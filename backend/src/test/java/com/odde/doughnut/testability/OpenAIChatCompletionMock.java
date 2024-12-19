@@ -20,6 +20,20 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
         functionName, makeMe.openAiCompletionResult().toolCall(functionName, arguments).please());
   }
 
+  public void mockChatCompletionAndReturnJsonSchema(Object result) {
+    ChatCompletionResult toBeReturned =
+        MakeMe.makeMeWithoutFactoryService()
+            .openAiCompletionResult()
+            .choice(new ObjectMapper().valueToTree(result).toString())
+            .please();
+
+    Mockito.doReturn(Single.just(toBeReturned))
+        .when(openAiApi)
+        .createChatCompletion(
+            ArgumentMatchers.argThat(
+                request -> request.getTools() == null || request.getTools().isEmpty()));
+  }
+
   private void mockChatCompletion(String functionName, ChatCompletionResult toBeReturned) {
     Mockito.doReturn(Single.just(toBeReturned))
         .when(openAiApi)

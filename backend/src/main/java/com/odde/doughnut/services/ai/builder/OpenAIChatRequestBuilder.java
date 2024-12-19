@@ -6,7 +6,6 @@ import com.odde.doughnut.services.ai.tools.AiToolList;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class OpenAIChatRequestBuilder {
@@ -34,8 +33,23 @@ public class OpenAIChatRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder addTool(AiToolList tool) {
-    addChatTools(tool.getFunctions().values());
+    this.chatTools.addAll(tool.getFunctions().values().stream().map(ChatTool::new).toList());
     addUserMessage(tool.getMessageBody());
+    return this;
+  }
+
+  public OpenAIChatRequestBuilder responseJsonSchema(AiToolList tool) {
+    addUserMessage(tool.getMessageBody());
+    FunctionDefinition schemaDefinition = tool.getFunctions().values().stream().findFirst().get();
+    ResponseJsonSchema jsonSchema =
+        ResponseJsonSchema.builder()
+            .name(schemaDefinition.getName())
+            .schemaDefinition(schemaDefinition.getParametersDefinition())
+            .schemaClass((Class<Object>) schemaDefinition.getParametersDefinitionClass())
+            .strict(true)
+            .build();
+    ChatResponseFormat respFormat = ChatResponseFormat.jsonSchema(jsonSchema);
+    builder.responseFormat(respFormat);
     return this;
   }
 
@@ -72,9 +86,5 @@ public class OpenAIChatRequestBuilder {
     msg.setToolCalls(List.of(call));
     messages.add(msg);
     return this;
-  }
-
-  public void addChatTools(Collection<FunctionDefinition> values) {
-    this.chatTools.addAll(values.stream().map(ChatTool::new).toList());
   }
 }

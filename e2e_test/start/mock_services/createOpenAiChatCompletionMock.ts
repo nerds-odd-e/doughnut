@@ -66,7 +66,6 @@ const openAiChatCompletionStubber = (
           {
             id: 'tool-abc123',
             type: 'function',
-
             function: {
               name: functionName,
               arguments: argumentsString,
@@ -75,6 +74,16 @@ const openAiChatCompletionStubber = (
         ],
       },
       'function_call'
+    )
+  }
+
+  const stubJsonSchemaResponse = (argumentsString: string) => {
+    return stubChatCompletion(
+      {
+        role: 'assistant',
+        content: argumentsString,
+      },
+      'stop'
     )
   }
 
@@ -91,8 +100,7 @@ const openAiChatCompletionStubber = (
       })
     },
     stubAudioTranscriptToText(argumentsString: string) {
-      return stubSingleToolCall(
-        'complete_note_details',
+      return stubJsonSchemaResponse(
         JSON.stringify({
           completion: argumentsString,
           deleteFromEnd: 0,

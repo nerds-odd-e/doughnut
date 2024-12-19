@@ -48,9 +48,9 @@ class RestGlobalSettingsControllerTest {
     @Test
     void ShouldUseGpt35ByDefault() {
       GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getQuestionGenerationModel());
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getEvaluationModel());
-      assertEquals("gpt-3.5-turbo", currentModelVersions.getOthersModel());
+      assertEquals("gpt-4o-mini", currentModelVersions.getQuestionGenerationModel());
+      assertEquals("gpt-4o-mini", currentModelVersions.getEvaluationModel());
+      assertEquals("gpt-4o-mini", currentModelVersions.getOthersModel());
     }
 
     @Test

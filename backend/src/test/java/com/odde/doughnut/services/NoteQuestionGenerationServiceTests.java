@@ -128,7 +128,7 @@ class NoteQuestionGenerationServiceTests {
           ArgumentCaptor.forClass(RunCreateRequest.class);
       verify(openAiApi).createRun(anyString(), runRequestCaptor.capture());
 
-      assertThat(runRequestCaptor.getValue().getModel(), is("gpt-3.5-turbo"));
+      assertThat(runRequestCaptor.getValue().getModel(), is("gpt-4o-mini"));
     }
 
     @Test

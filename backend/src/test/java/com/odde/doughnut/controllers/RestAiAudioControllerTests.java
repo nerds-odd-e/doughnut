@@ -54,8 +54,7 @@ class RestAiAudioControllerTests {
   private void setupMocks() {
     NoteDetailsCompletion completion = new NoteDetailsCompletion(0, "test123");
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
-        completion, "complete_note_details");
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(completion);
     mockTranscriptionSrtResponse("test transcription");
   }
 
@@ -202,7 +201,8 @@ class RestAiAudioControllerTests {
                             .anyMatch(
                                 content ->
                                     content.contains(
-                                        "Previous content (in JSON format):\n" + expectedJson)),
+                                        "Previous note details (in JSON format):\n"
+                                            + expectedJson)),
                         equalTo(true));
                     return true;
                   }));

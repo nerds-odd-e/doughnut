@@ -233,13 +233,29 @@ public class OpenAiApiHandler {
   }
 
   public Optional<JsonNode> requestAndGetFunctionCallArguments(
-      AiToolList tool, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder1) {
-    ChatCompletionRequest chatRequest = chatAboutNoteRequestBuilder1.addTool(tool).build();
-    System.out.println(chatRequest);
+      AiToolList tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
+    ChatCompletionRequest chatRequest = openAIChatRequestBuilder.addTool(tool).build();
     return getFirstToolCallArguments(chatRequest);
   }
 
   public void cancelRun(String threadId, String runId) {
     openAiApi.cancelRun(threadId, runId).blockingGet();
+  }
+
+  public Optional<JsonNode> requestAndGetJsonSchemaResult(
+      AiToolList tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
+    ChatCompletionRequest chatRequest = openAIChatRequestBuilder.responseJsonSchema(tool).build();
+
+    return chatCompletion(chatRequest)
+        .map(ChatCompletionChoice::getMessage)
+        .map(AssistantMessage::getContent)
+        .map(
+            content -> {
+              try {
+                return new ObjectMapper().readTree(content);
+              } catch (JsonProcessingException e) {
+                return null;
+              }
+            });
   }
 }
