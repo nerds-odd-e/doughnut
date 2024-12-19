@@ -1,6 +1,6 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, errorMessage }">
-    <output :id="`${scopeName}-${field}`" role="radiogroup" class="daisy-join flex flex-wrap">
+    <output :id="`${scopeName}-${field}`" role="radiogroup" class="daisy-join daisy-flex daisy-flex-wrap">
       <template v-for="option in options" :key="option.value">
         <input
           class="daisy-join-item daisy-hidden"
