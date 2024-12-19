@@ -61,24 +61,6 @@ public class OpenAiApiHandler {
     return choices.getData().get(0).getB64Json();
   }
 
-  public Optional<JsonNode> getFirstToolCallArguments(ChatCompletionRequest chatRequest) {
-    return getFirstToolCalls(chatRequest)
-        .map(ChatToolCall::getFunction)
-        .map(ChatFunctionCall::getArguments);
-  }
-
-  private Optional<ChatToolCall> getFirstToolCalls(ChatCompletionRequest chatRequest) {
-    return chatCompletion(chatRequest)
-        //        .map(x->{
-        //          System.out.println(chatRequest);
-        //          System.out.println(x);
-        //          return x;
-        //        })
-        .map(ChatCompletionChoice::getMessage)
-        .map(AssistantMessage::getToolCalls)
-        .flatMap(x -> x.stream().findFirst());
-  }
-
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
     return blockGet(openAiApi.createChatCompletion(request)).getChoices().stream().findFirst();
   }
@@ -230,12 +212,6 @@ public class OpenAiApiHandler {
     VectorStoreFileRequest request = VectorStoreFileRequest.builder().fileId(fileId).build();
     blockGet(openAiApi.createVectorStoreFile(storeId, request)).getId();
     return storeId;
-  }
-
-  public Optional<JsonNode> requestAndGetFunctionCallArguments(
-      AiToolList tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
-    ChatCompletionRequest chatRequest = openAIChatRequestBuilder.addTool(tool).build();
-    return getFirstToolCallArguments(chatRequest);
   }
 
   public void cancelRun(String threadId, String runId) {
