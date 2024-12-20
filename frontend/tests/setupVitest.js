@@ -3,7 +3,9 @@ import createFetchMock from "vitest-fetch-mock";
 import { vi, expect } from "vitest";
 expect.extend(matchers);
 
-const fetchMock = createFetchMock(vi);
+const fetchMock = createFetchMock(vi, {
+  fallbackToNetwork: false
+});
 
 fetchMock.enableMocks();
 
