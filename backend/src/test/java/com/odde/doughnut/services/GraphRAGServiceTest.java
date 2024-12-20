@@ -41,7 +41,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result, RelationshipToFocusNote relationship, Note... expectedNotes) {
     List<BareNote> notes = getNotesWithRelationship(result, relationship);
     assertThat(notes, hasSize(expectedNotes.length));
-    assertThat(notes, containsInAnyOrder(expectedNotes));
+    assertThat(notes, containsInAnyOrder((Object[]) expectedNotes));
   }
 
   @Nested
