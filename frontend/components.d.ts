@@ -52,7 +52,6 @@ declare module 'vue' {
     LinkNobDialog: typeof import('./src/components/links/LinkNobDialog.vue')['default']
     LinkNoteDialog: typeof import('./src/components/links/LinkNoteDialog.vue')['default']
     LinkNoteFinalize: typeof import('./src/components/links/LinkNoteFinalize.vue')['default']
-    LinkNoteShow: typeof import('./src/components/links/LinkNoteShow.vue')['default']
     LinkOfNote: typeof import('./src/components/links/LinkOfNote.vue')['default']
     LinkTypeSelect: typeof import('./src/components/links/LinkTypeSelect.vue')['default']
     LinkTypeSelectCompact: typeof import('./src/components/links/LinkTypeSelectCompact.vue')['default']
@@ -242,7 +241,6 @@ declare module 'vue' {
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
-    WikidataButton: typeof import('./src/components/notes/core/WikidataButton.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   }
 }
