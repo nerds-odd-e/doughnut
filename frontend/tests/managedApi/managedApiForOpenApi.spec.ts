@@ -16,12 +16,15 @@ describe("managdApi", () => {
   describe("set the loading status", () => {
     it("should set the loading status", async () => {
       let interimStateLength = 0
-      fetchMock.mockResponse(() => {
-        interimStateLength = apiStatus.states.length
-        return Promise.resolve("")
-      }, {
-        url: `${baseUrl}/api/user`
-      })
+      fetchMock.mockResponse(
+        () => {
+          interimStateLength = apiStatus.states.length
+          return Promise.resolve("")
+        },
+        {
+          url: `${baseUrl}/api/user`,
+        }
+      )
       await managedApi.restUserController.getUserProfile()
       expect(interimStateLength).toBeGreaterThan(0)
       expect(apiStatus.states.length).toBe(0)
@@ -29,12 +32,15 @@ describe("managdApi", () => {
 
     it("should not set the loading status in silent mode", async () => {
       let interimStateLength = 0
-      fetchMock.mockResponse(() => {
-        interimStateLength = apiStatus.states.length
-        return Promise.resolve("")
-      }, {
-        url: `${baseUrl}/api/user`
-      })
+      fetchMock.mockResponse(
+        () => {
+          interimStateLength = apiStatus.states.length
+          return Promise.resolve("")
+        },
+        {
+          url: `${baseUrl}/api/user`,
+        }
+      )
       await managedApi.silent.restUserController.getUserProfile()
       expect(interimStateLength).toBe(0)
     })
@@ -45,7 +51,7 @@ describe("managdApi", () => {
       vitest.useFakeTimers()
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
-        status: 404
+        status: 404,
       })
     })
 
