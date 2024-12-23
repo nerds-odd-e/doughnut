@@ -19,7 +19,6 @@
 - [Vitest](https://vitest.dev/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [DaisyUI](https://daisyui.com/)
-- [Bootstrap 5](https://getbootstrap.com/docs/5.2/getting-started/introduction/) ***[WIP to be replaced by DaiyUI]***
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Github Actions](https://docs.github.com/en/actions)
 - [git-secret](https://git-secret.io)
