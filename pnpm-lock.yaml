@@ -10,6 +10,9 @@ overrides:
   body-parser@<1.20.3: '>=1.20.3'
   express@<4.19.2: '>=4.19.2'
   express@4.19.2>path-to-regexp: 0.1.10
+  nodemailer: 6.9.9
+  mailparser>nodemailer: 6.9.9
+  smtp-server>nodemailer: 6.9.9
 
 importers:
 
@@ -3540,12 +3543,8 @@ packages:
     resolution: {integrity: sha512-1uiY543L+N7Og4yswvlm5NCKgPKDEXd9AUR9Jh3gen6oOeBsesr6LqhXom1er3eRzSUcVRWXzhv8tSNrIfGHKw==}
     engines: {node: '>=18'}
 
-  nodemailer@6.9.3:
-    resolution: {integrity: sha512-fy9v3NgTzBngrMFkDsKEj0r02U7jm6XfC3b52eoNV+GCrGj+s8pt5OqhiJdWKuw51zCTdiNR/IUD1z33LIIGpg==}
-    engines: {node: '>=6.0.0'}
-
-  nodemailer@6.9.4:
-    resolution: {integrity: sha512-CXjQvrQZV4+6X5wP6ZIgdehJamI63MFoYFGGPtHudWym9qaEHDNdPzaj5bfMCvxG1vhAileSWW90q7nL0N36mA==}
+  nodemailer@6.9.9:
+    resolution: {integrity: sha512-dexTll8zqQoVJEZPwQAKzxxtFn0qTnjdQTchoU6Re9BUUGBJiOy3YMn/0ShTW6J5M0dfQ1NeDeRTTl4oIWgQMA==}
     engines: {node: '>=6.0.0'}
 
   nopt@7.2.1:
@@ -8469,7 +8468,7 @@ snapshots:
       libmime: 5.2.1
       linkify-it: 4.0.1
       mailsplit: 5.4.0
-      nodemailer: 6.9.3
+      nodemailer: 6.9.9
       tlds: 1.240.0
 
   mailsplit@5.4.0:
@@ -8607,7 +8606,7 @@ snapshots:
       jsonpath-plus: 10.2.0
       mailparser: 3.6.5
       mountebank-formatters: 0.0.2
-      nodemailer: 6.9.4
+      nodemailer: 6.9.9
       prom-client: 14.2.0
       proper-lockfile: 4.1.2
       safe-regex: 2.1.1
@@ -8653,9 +8652,7 @@ snapshots:
     dependencies:
       '@babel/parser': 7.26.3
 
-  nodemailer@6.9.3: {}
-
-  nodemailer@6.9.4: {}
+  nodemailer@6.9.9: {}
 
   nopt@7.2.1:
     dependencies:
@@ -9400,7 +9397,7 @@ snapshots:
     dependencies:
       base32.js: 0.1.0
       ipv6-normalize: 1.0.1
-      nodemailer: 6.9.4
+      nodemailer: 6.9.9
 
   source-map-js@1.2.1: {}
 
