@@ -7,6 +7,7 @@
             v-if="onToggleSidebar"
             role="button"
             class="daisy-btn daisy-btn-sm daisy-btn-ghost"
+            :class="{ 'sidebar-expanded': isSidebarExpanded }"
             title="toggle sidebar"
             @click="(e: MouseEvent) => onToggleSidebar?.(e)"
           >
@@ -21,9 +22,14 @@
               stroke-linejoin="round"
               class="w-4 h-4"
             >
-              <line x1="3" y1="6" x2="21" y2="6"></line>
-              <line x1="6" y1="12" x2="21" y2="12"></line>
-              <line x1="3" y1="18" x2="21" y2="18"></line>
+              <template v-if="isSidebarExpanded">
+                <path d="M19 12H5M12 19l-7-7 7-7"/>
+              </template>
+              <template v-else>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="6" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </template>
             </svg>
           </div>
           </button>
@@ -150,6 +156,7 @@ defineProps({
   },
   onToggleSidebar: { type: Function, required: false },
   isMinimized: { type: Boolean, default: false },
+  isSidebarExpanded: { type: Boolean, default: false },
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")

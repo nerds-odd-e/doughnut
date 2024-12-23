@@ -1,6 +1,10 @@
 export const noteSidebar = () => {
-  cy.findByRole('button', { name: 'toggle sidebar' }).click()
-  cy.get('aside').should('exist')
+  cy.findByRole('button', { name: 'toggle sidebar' }).then(($button) => {
+    if (!$button.hasClass('sidebar-expanded')) {
+      cy.wrap($button).click()
+    }
+  })
+  cy.get('aside').should('be.visible')
 
   return {
     expand: (noteTopology: string) => {
@@ -20,7 +24,7 @@ export const noteSidebar = () => {
     },
     expectOrderedNotes(expectedNotes: Record<string, string>[]) {
       cy.pageIsNotLoading()
-      cy.get('aside ul li .daisy-card-title').then(($els) => {
+      cy.get('aside ul li .title-text').then(($els) => {
         const actualNotes = Array.from($els, (el) => el.innerText)
         const expectedNoteTopics = expectedNotes.map(
           (note) => note['note-title']

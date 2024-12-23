@@ -12,6 +12,7 @@
             storageAccessor,
             onToggleSidebar: () => sidebarOpened = !sidebarOpened,
             isMinimized: isContentMinimized,
+            isSidebarExpanded: sidebarOpened,
           }"
         >
           <template #note-conversation="{ noteRealm }">
