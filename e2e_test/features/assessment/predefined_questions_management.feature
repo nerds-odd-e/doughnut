@@ -9,6 +9,7 @@ Feature: Quiz Question Management
       | Note Title   | Question             | Answer | One Wrong Choice |
       | The cow joke | What does a cow say? | moo    | woo              |
 
+
   Scenario: Manually add a question to the note successfully
     When I add the following question for the note "The cow joke":
       | Stem                                 | Choice 0    | Choice 1 | Choice 2 | Correct Choice Index |
