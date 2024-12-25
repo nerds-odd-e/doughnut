@@ -1,5 +1,5 @@
 <template>
-  <div class="position-relative">
+  <div class="daisy-relative">
     <QuestionDisplay
       v-bind="{
         bareQuestion: recallPrompt.bareQuestion,
@@ -9,14 +9,12 @@
       :disabled="isLoading"
     />
 
-    <div v-if="isLoading" class="loading-overlay">
-      <div class="loading-spinner">
-        <i class="fas fa-spinner fa-spin fa-2x"></i>
-      </div>
+    <div v-if="isLoading" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-flex daisy-justify-center daisy-items-center daisy-z-50">
+      <span class="daisy-loading daisy-loading-spinner daisy-loading-lg"></span>
     </div>
 
-    <div v-if="error" class="error-message alert alert-danger">
-      {{ error }}
+    <div v-if="error" class="daisy-alert daisy-alert-error daisy-mt-4">
+      <span>{{ error }}</span>
     </div>
   </div>
 </template>
@@ -67,20 +65,5 @@ const submitAnswer = async (answerData: AnswerDTO) => {
 </script>
 
 <style scoped>
-.loading-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255, 255, 255, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.error-message {
-  margin-top: 1rem;
-}
+/* All styles can be removed as they're replaced by Daisy UI classes */
 </style>
