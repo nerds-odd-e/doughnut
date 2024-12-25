@@ -1,13 +1,6 @@
 <template>
-  <ContentLoader class="loading-bar" />
+  <div class="daisy-loading daisy-loading-spinner daisy-loading-md"></div>
 </template>
 
-<script>
-import { ContentLoader } from "vue-content-loader"
-
-export default {
-  components: {
-    ContentLoader,
-  },
-}
+<script lang="ts" setup>
 </script>
