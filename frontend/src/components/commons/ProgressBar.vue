@@ -5,7 +5,7 @@
     </div>
     <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
       <div
-        :class="`daisy-progress-bar ${!!$slots.default ? 'thin' : ''}`"
+        :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
         v-if="toRepeatCount !== null"
       >
         <span
@@ -31,6 +31,11 @@ defineProps({
 })
 
 defineEmits(["resume", "showMore"])
+
+defineSlots<{
+  default?: () => Element | Element[]
+  buttons?: () => Element | Element[]
+}>()
 </script>
 
 <style lang="scss" scoped>
