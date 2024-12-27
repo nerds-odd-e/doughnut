@@ -12,6 +12,7 @@ import viteCompression from 'vite-plugin-compression'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
+import Inspector from 'unplugin-vue-inspector/vite'
 
 export default defineConfig({
   resolve: {
@@ -53,6 +54,9 @@ export default defineConfig({
           isCustomElement: (tag) => /^x-/.test(tag),
         },
       },
+    }),
+    Inspector({
+     launchEditor: 'cursor',
     }),
     VueRouter(),
     vueJsx(),
