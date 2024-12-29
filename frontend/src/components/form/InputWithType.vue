@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue"
-import { camelCase, startCase } from "lodash"
+import { camelCase, capitalize, words } from "es-toolkit"
 
 const props = defineProps({
   scopeName: String,
@@ -37,8 +37,10 @@ const props = defineProps({
   beforeLabel: { type: Boolean, default: false },
 })
 
+const startCase = (str: string) => words(str).map(capitalize).join(" ")
+
 const titlized = computed(() =>
-  props.title ? props.title : startCase(camelCase(props.field))
+  props.title ? props.title : startCase(camelCase(props.field ?? ""))
 )
 
 const controlId = computed(() => `${props.scopeName}-${props.field}`)
