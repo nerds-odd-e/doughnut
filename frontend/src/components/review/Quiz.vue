@@ -51,7 +51,6 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { AnsweredQuestion, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import _ from "lodash"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 

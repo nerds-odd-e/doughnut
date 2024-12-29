@@ -65,7 +65,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import _ from "lodash"
+import { shuffle } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
@@ -117,8 +117,8 @@ const loadMore = async (dueInDays?: number) => {
   if (toRepeat.value?.length === 0) {
     return response
   }
-  if (getEnvironment() !== "testing") {
-    toRepeat.value = _.shuffle(toRepeat.value)
+  if (getEnvironment() !== "testing" && toRepeat.value) {
+    toRepeat.value = shuffle(toRepeat.value)
   }
   return response
 }
