@@ -1,7 +1,0 @@
-dist
-vite.config.ts
-auto-imports.d.ts
-index.d.ts
-rest.d.ts
-tests/setupVitest.js
-src/components/svgs/**/*.vue
