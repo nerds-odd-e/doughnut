@@ -12,7 +12,8 @@
       "vite/client",
       "vitest/globals",
       "vitest-dom/extend-expect",
-      "node"
+      "node",
+      "es-toolkit"
     ],
     "paths": {
       "@/*": ["src/*"],

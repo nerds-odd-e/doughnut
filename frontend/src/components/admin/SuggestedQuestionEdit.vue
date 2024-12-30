@@ -56,7 +56,7 @@
 <script lang="ts">
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
-import _ from "lodash"
+import { cloneDeep } from "es-toolkit"
 import type {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
@@ -86,7 +86,7 @@ export default defineComponent({
   emits: ["update:modelValue"],
   data() {
     return {
-      suggestionParams: <QuestionSuggestionParams>_.cloneDeep(this.modelValue),
+      suggestionParams: <QuestionSuggestionParams>cloneDeep(this.modelValue),
       errors: {
         preservedQuestion: {
           stem: "",
@@ -111,7 +111,7 @@ export default defineComponent({
     validateSuggestedQuestion(
       params: QuestionSuggestionParams
     ): QuestionSuggestionParams | undefined {
-      const validated = _.cloneDeep(params)
+      const validated = cloneDeep(params)
       validated.preservedQuestion.multipleChoicesQuestion.choices =
         validated.preservedQuestion.multipleChoicesQuestion.choices
           .map((choice) => choice?.trim())

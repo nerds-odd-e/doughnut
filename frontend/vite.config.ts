@@ -97,7 +97,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown'],
+    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown', 'es-toolkit'],
     exclude: ['fsevents']
   }
 })
