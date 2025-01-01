@@ -1,13 +1,18 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],
-    "types": ["cypress", "jquery"],
+    "types": [
+      "cypress",
+      "node",
+      "jquery",
+      "@testing-library/cypress",
+      "@badeball/cypress-cucumber-preprocessor"
+    ],
     "typeRoots": [
       "types",
       "../node_modules/@types",
@@ -18,18 +23,18 @@
       "*": ["../node_modules/*"],
       "@badeball/cypress-cucumber-preprocessor": [
         "../node_modules/@badeball/cypress-cucumber-preprocessor"
-      ],
-      "@badeball/cypress-cucumber-preprocessor/esbuild": [
-        "../node_modules/@badeball/cypress-cucumber-preprocessor/dist/subpath-entrypoints/esbuild"
       ]
-    }
+    },
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
-  "exclude": [
+  "include": [
+    "**/*.ts",
+    "**/*.js",
     "cypress.config.ts",
-    "config/ci.ts",
-    "config/common.ts",
-    "cypress",
-    "node_modules"
+    "**/*.feature",
+    "cypress/**/*.ts",
+    "cypress/support/**/*.js"
   ],
-  "include": ["**/*.ts", "**/*.js", "**/*.cjs"]
+  "exclude": ["node_modules"]
 }
