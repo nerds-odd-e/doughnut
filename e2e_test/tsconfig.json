@@ -29,6 +29,7 @@
     "noUnusedParameters": false
   },
   "include": [
+    "../cypress.d.ts",
     "**/*.ts",
     "**/*.js",
     "cypress.config.ts",
