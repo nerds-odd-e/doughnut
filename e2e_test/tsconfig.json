@@ -32,9 +32,9 @@
     "**/*.ts",
     "**/*.js",
     "cypress.config.ts",
-    "**/*.feature",
     "cypress/**/*.ts",
-    "cypress/support/**/*.js"
+    "cypress/support/**/*.js",
+    "**/*.feature"
   ],
   "exclude": ["node_modules"]
 }
