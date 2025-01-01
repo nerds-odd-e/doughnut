@@ -16,7 +16,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "isolatedModules": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "removeComments": true,
+    "allowUnreachableCode": false
   },
   "exclude": [
     "node_modules",

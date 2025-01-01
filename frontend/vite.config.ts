@@ -1,24 +1,23 @@
 /// <reference types="vitest" />
 import { URL, fileURLToPath } from 'node:url'
+import { defineConfig as defineViteConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
-import { defineConfig } from 'vite'
-import checker from 'vite-plugin-checker'
 import viteCompression from 'vite-plugin-compression'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import Inspector from 'unplugin-vue-inspector/vite'
 
-export default defineConfig({
+export default defineViteConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@tests': fileURLToPath(new URL('./tests', import.meta.url))
+      '@tests': fileURLToPath(new URL('./tests', import.meta.url)),
     }
   },
   test: {
@@ -45,9 +44,6 @@ export default defineConfig({
   },
   plugins: [
     tsconfigPaths(),
-    checker({
-      vueTsc: true,
-    }),
     vue({
       template: {
         compilerOptions: {
@@ -77,6 +73,14 @@ export default defineConfig({
   },
   base: '/',
   build: {
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      },
+    },
+    reportCompressedSize: false,
     outDir: '../backend/src/main/resources/static/',
     chunkSizeWarningLimit: 1000,
     sourcemap: true,
@@ -89,8 +93,8 @@ export default defineConfig({
           'vue-vendor': ['vue', 'vue-router'],
           'ui-vendor': ['quill', 'gsap', 'marked', 'turndown']
         },
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'main.css') return 'assets/main.css';
+        assetFileNames: ({ name }) => {
+          if (name === 'main.css') return 'assets/main.css';
           return 'assets/[name]-[hash][extname]';
         },
       },
