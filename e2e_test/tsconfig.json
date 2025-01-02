@@ -6,30 +6,13 @@
     "resolveJsonModule": true,
     "baseUrl": "../e2e_test",
     "lib": ["dom", "dom.iterable", "ESNext"],
-    "types": [
-      "cypress",
-      "node",
-      "jquery",
-      "@testing-library/cypress",
-      "@badeball/cypress-cucumber-preprocessor"
-    ],
-    "typeRoots": [
-      "types",
-      "../node_modules/@types",
-      "../node_modules/@testing-library",
-      "../node_modules/@badeball/cypress-cucumber-preprocessor"
-    ],
-    "paths": {
-      "*": ["../node_modules/*"],
-      "@badeball/cypress-cucumber-preprocessor": [
-        "../node_modules/@badeball/cypress-cucumber-preprocessor"
-      ]
-    },
+    "types": ["cypress", "node", "jquery", "@testing-library/cypress"],
+    "typeRoots": ["types", "../node_modules/@types"],
     "noUnusedLocals": false,
     "noUnusedParameters": false
   },
   "include": [
-    "../cypress.d.ts",
+    "types/**/*.d.ts",
     "**/*.ts",
     "**/*.js",
     "cypress.config.ts",

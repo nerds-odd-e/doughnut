@@ -28,7 +28,13 @@
       "mysql",
       "secrets_public_keys",
       "training_data",
-      "e2e_test/support/index.d.ts"
+      "e2e_test/support/index.d.ts",
+      "**/cypress/screenshots/**",
+      "**/cypress/videos/**",
+      "**/cypress/downloads/**",
+      "**/*.feature",
+      "**/cucumber-json-formatter",
+      "**/cucumber-messages.ndjson"
     ],
     "ignoreUnknown": true
   },
@@ -58,7 +64,7 @@
         "useArrowFunction": "off",
         "useLiteralKeys": "error",
         "useRegexLiterals": "error",
-        "useSimplifiedLogicExpression": "warn"
+        "useSimplifiedLogicExpression": "error"
       },
       "correctness": {
         "noConstAssign": "error",
@@ -87,7 +93,9 @@
         "useArrayLiterals": "off",
         "useIsNan": "error",
         "useValidForDirection": "error",
-        "useYield": "error"
+        "useYield": "error",
+        "useHookAtTopLevel": "error",
+        "noUnusedPrivateClassMembers": "error"
       },
       "security": { "noGlobalEval": "error" },
       "style": {
@@ -102,6 +110,8 @@
         "useDefaultParameterLast": "error",
         "useShorthandAssign": "error",
         "useSingleVarDeclarator": "warn",
+        "useImportType": "warn",
+        "useExportType": "warn",
         "useTemplate": "error"
       },
       "suspicious": {
@@ -133,7 +143,10 @@
         "noUnsafeNegation": "error",
         "useDefaultSwitchClauseLast": "error",
         "useGetterReturn": "error",
-        "useValidTypeof": "error"
+        "useValidTypeof": "error",
+        "noConfusingVoidType": "warn",
+        "noImplicitAnyLet": "warn",
+        "noRedundantUseStrict": "warn"
       }
     }
   },
@@ -156,8 +169,17 @@
       "after",
       "afterEach",
       "CyEventEmitter",
-      "JQuery"
-    ]
+      "JQuery",
+      "Given",
+      "When",
+      "Then",
+      "And",
+      "But",
+      "DataTable"
+    ],
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
   },
   "overrides": [
     {
@@ -165,22 +187,58 @@
       "linter": {
         "rules": {
           "style": {
+            "noArguments": "error",
             "noNonNullAssertion": "off"
           },
           "suspicious": {
-            "noExplicitAny": "off"
+            "noExplicitAny": "off",
+            "noArrayIndexKey": "off",
+            "noAsyncPromiseExecutor": "off",
+            "noImplicitAnyLet": "off"
           },
           "complexity": {
-            "noForEach": "off"
+            "noForEach": "off",
+            "useOptionalChain": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "warn",
+            "noUnusedImports": "warn"
           }
         }
       }
     },
     {
-      "include": ["**/e2e_test/**/*.feature"],
-      "formatter": {
-        "enabled": false
+      "include": ["**/e2e_test/step_definitions/**/*.{ts,js}"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "warn",
+            "useBlockStatements": "warn",
+            "noInferrableTypes": "warn"
+          },
+          "correctness": {
+            "noUnusedVariables": "warn",
+            "noUnusedImports": "warn",
+            "noInvalidUseBeforeDeclaration": "warn"
+          },
+          "suspicious": {
+            "noExplicitAny": "off",
+            "noEmptyBlockStatements": "error",
+            "noImplicitAnyLet": "off"
+          }
+        }
       }
     }
-  ]
+  ],
+  "json": {
+    "parser": {
+      "allowComments": true
+    },
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "indentWidth": 2,
+      "lineWidth": 80
+    }
+  }
 }
