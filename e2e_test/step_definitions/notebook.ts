@@ -7,7 +7,7 @@ import {
   Given,
   Then,
   When,
-  DataTable,
+  type DataTable,
 } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 

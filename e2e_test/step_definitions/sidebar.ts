@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { DataTable, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { type DataTable, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 Then('I am on a window {int} * {int}', (width: number, height: number) => {

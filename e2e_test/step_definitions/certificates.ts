@@ -1,7 +1,7 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import '../support/string_util'
 import start from '../start'
-import { DataTable } from '@cucumber/cucumber'
+import type { DataTable } from '@cucumber/cucumber'
 
 When('I have a notebook with the name {string}', (noteTopology: string) => {
   start.routerToNotebooksPage().creatingNotebook(noteTopology)

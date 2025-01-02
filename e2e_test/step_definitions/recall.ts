@@ -3,7 +3,7 @@
 // @ts-check
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { DataTable } from '@cucumber/cucumber'
+import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Then('I assimilate these in sequence:', (data: DataTable) => {

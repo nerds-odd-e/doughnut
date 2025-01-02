@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 import {
-  DataTable,
+  type DataTable,
   Given,
   Then,
   When,

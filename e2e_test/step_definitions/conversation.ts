@@ -1,6 +1,6 @@
 import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
-import { DataTable } from '@cucumber/cucumber'
+import type { DataTable } from '@cucumber/cucumber'
 
 Then(
   'I reply {string} to the conversation {string}',

@@ -1,5 +1,5 @@
 import {
-  DataTable,
+  type DataTable,
   Given,
   Then,
   When,

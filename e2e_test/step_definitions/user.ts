@@ -4,7 +4,7 @@
 // @ts-check
 
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
-import { DataTable } from '@cucumber/cucumber'
+import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
 Given('I am logged in as {string}', (externalIdentifier: string) => {
