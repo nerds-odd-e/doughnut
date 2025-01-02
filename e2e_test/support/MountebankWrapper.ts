@@ -1,6 +1,6 @@
 /// <reference types="cypress" />
 // @ts-check
-import { Imposter, Mountebank, Stub } from '@anev/ts-mountebank'
+import { Imposter, Mountebank, type Stub } from '@anev/ts-mountebank'
 import request from 'superagent'
 
 class MountebankWrapper {

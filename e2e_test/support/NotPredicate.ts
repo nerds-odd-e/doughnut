@@ -1,4 +1,4 @@
-import { Predicate } from '@anev/ts-mountebank'
+import type { Predicate } from '@anev/ts-mountebank'
 
 interface PredicateJSON {
   not: unknown

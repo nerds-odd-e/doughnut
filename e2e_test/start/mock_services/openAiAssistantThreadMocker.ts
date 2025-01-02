@@ -1,5 +1,5 @@
-import ServiceMocker from '../../support/ServiceMocker'
-import { MessageToMatch } from './MessageToMatch'
+import type ServiceMocker from '../../support/ServiceMocker'
+import type { MessageToMatch } from './MessageToMatch'
 import openAiAssistantCreatedRunMocker from './openAiAssistantCreatedRunMocker'
 
 const openAiAssistantThreadMocker = (

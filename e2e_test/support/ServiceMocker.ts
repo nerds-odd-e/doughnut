@@ -1,11 +1,11 @@
 /// <reference types="cypress" />
 import {
+  type Predicate,
+  type Stub,
   DefaultPredicate,
   FlexiPredicate,
   HttpMethod,
   Operator,
-  Predicate,
-  Stub,
 } from '@anev/ts-mountebank'
 import MountebankStubBuilder from './MountebankStubBuilder'
 import MountebankWrapper from './MountebankWrapper'

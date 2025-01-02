@@ -1,7 +1,7 @@
 import { FlexiPredicate, HttpMethod, Operator } from '@anev/ts-mountebank'
+import type { MessageToMatch } from './MessageToMatch'
 import ServiceMocker from '../../support/ServiceMocker'
 import testability from '../testability'
-import { MessageToMatch } from './MessageToMatch'
 import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
 import openAiAssistantThreadMocker from './openAiAssistantThreadMocker'
 import {

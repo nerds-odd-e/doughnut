@@ -330,19 +330,19 @@ When(
 Then(
   'I should see {string} is {string} than {string}',
   (left: string, aging: string, right: string) => {
-    let leftColor
+    let leftColor = ''
     cy.pageIsNotLoading()
     start.jumpToNotePage(left)
     cy.get('.note-recent-update-indicator')
       .invoke('css', 'color')
       .then((val) => {
-        leftColor = val
+        leftColor = val as unknown as string
       })
     start.jumpToNotePage(right)
     cy.get('.note-recent-update-indicator')
       .invoke('css', 'color')
       .then((val) => {
-        const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
+        const leftColorIndex = parseInt(leftColor.match(/\d+/)![0])
         const rightColorIndex = parseInt(
           JSON.stringify(val).match(/\d+/)?.[0] ?? ''
         )

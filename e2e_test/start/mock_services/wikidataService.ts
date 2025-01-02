@@ -1,6 +1,6 @@
 import ServiceMocker from '../../support/ServiceMocker'
 import WikidataEntitiesBuilder, {
-  Claim,
+  type Claim,
 } from '../../support/json/WikidataEntitiesBuilder'
 import testability from '../testability'
 

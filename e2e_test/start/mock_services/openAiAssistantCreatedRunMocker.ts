@@ -1,6 +1,6 @@
-import ServiceMocker from '../../support/ServiceMocker'
+import type ServiceMocker from '../../support/ServiceMocker'
+import type { MessageToMatch } from './MessageToMatch'
 import { createRequiresActionRun } from './openAiMessageComposer'
-import { MessageToMatch } from './MessageToMatch'
 
 const openAiAssistantCreatedRunMocker = (
   serviceMocker: ServiceMocker,

@@ -1,10 +1,10 @@
 /// <reference types="cypress" />
 // @ts-check
 import {
+  type HttpMethod,
+  type Predicate,
   FlexiPredicate,
-  HttpMethod,
   Operator,
-  Predicate,
   Response,
   Stub,
 } from '@anev/ts-mountebank'
