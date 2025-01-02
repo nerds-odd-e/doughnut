@@ -37,12 +37,7 @@
     "tests/**/*.ts",
     "tests/**/*.d.ts",
     "postcss.config.ts",
-    "tailwind.config.ts",
-    "src/components/form/markdownizer.ts",
-    "src/managedApi/BindingHttpRequest.ts",
-    "src/managedApi/ApiStatusHandler.ts",
-    "src/models/audio/parseTimestamp.ts",
-    "src/models/audio/rawSamples/createAudioFile.ts"
+    "tailwind.config.ts"
   ],
   "exclude": [
     "node_modules",
