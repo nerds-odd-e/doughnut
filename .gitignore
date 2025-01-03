@@ -10,8 +10,8 @@
 .svn/
 .bash_profile
 
-# cypress screenshots & videos
-e2e_test/downloads/
+# cypress
+e2e_test/tsconfig.tsbuildinfo
 e2e_test/downloads/
 e2e_test/screenshots/
 e2e_test/videos/
@@ -59,6 +59,7 @@ backend/out
 # nodejs
 node_modules/
 **/package-lock.json
+**/tsconfig.tsbuildinfo
 
 # git-secret
 .git
@@ -90,6 +91,7 @@ infra/ssl/
 # Frontend Vue/Vite related
 frontend/node_modules
 frontend/dist/
+frontend/tsconfig.tsbuildinfo
 backend/src/main/resources/static/favicon.ico
 backend/src/main/resources/static/odd-e.ico
 backend/src/main/resources/static/index.html
@@ -107,10 +109,10 @@ frontend/app.*.map.json
 
 # local nix env related e.g. MySQL DB instance folder/files
 .direnv/
-.wireit/
 install-nix
-mysql/
 nixInstall.sh
+mysql/
+**/mysql/
 
 # gitpod inteliij-projector
 **/.jetbrains
