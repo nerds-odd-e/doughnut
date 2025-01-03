@@ -22,8 +22,7 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
-    "jsx": "preserve",
-    "incremental": true
+    "jsx": "preserve"
   },
   "compileOnSave": true,
   "typeAcquisition": {

@@ -19,7 +19,8 @@
     "noImplicitAny": false,
     "noImplicitReturns": true,
     "removeComments": true,
-    "allowUnreachableCode": false
+    "allowUnreachableCode": false,
+    "incremental": true
   },
   "exclude": [
     "node_modules",
