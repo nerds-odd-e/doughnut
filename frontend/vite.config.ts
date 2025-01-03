@@ -1,6 +1,8 @@
 /// <reference types="vitest" />
+/// <reference types="vite/client" />
 import { URL, fileURLToPath } from 'node:url'
-import { defineConfig as defineViteConfig } from 'vite'
+import { defineConfig } from 'vitest/config'
+
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -13,7 +15,7 @@ import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import Inspector from 'unplugin-vue-inspector/vite'
 
-export default defineViteConfig({
+const config = defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -105,3 +107,5 @@ export default defineViteConfig({
     exclude: ['fsevents']
   }
 })
+
+export default config
