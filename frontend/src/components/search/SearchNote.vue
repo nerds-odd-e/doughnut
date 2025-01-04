@@ -8,7 +8,7 @@
       v-focus
     />
     <SearchResults v-bind="{ noteId, inputSearchKey }">
-      <template #button="{ noteTopology }">
+      <template v-if="noteId" #button="{ noteTopology }">
         <div class="daisy-join daisy-join-horizontal">
           <button
             class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-join-item"
