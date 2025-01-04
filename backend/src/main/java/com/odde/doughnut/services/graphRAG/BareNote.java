@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import lombok.Getter;
 
@@ -87,10 +88,30 @@ public class BareNote {
   }
 
   private static String truncateDetails(String details) {
-    if (details == null || details.length() <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
+    if (details == null) {
+      return null;
+    }
+
+    byte[] bytes = details.getBytes(StandardCharsets.UTF_8);
+    if (bytes.length <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
       return details;
     }
-    return details.substring(0, RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "...";
+
+    // Binary search to find the right character position
+    int low = 0;
+    int high = details.length();
+
+    while (low < high) {
+      int mid = (low + high + 1) / 2;
+      if (details.substring(0, mid).getBytes(StandardCharsets.UTF_8).length
+          <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
+        low = mid;
+      } else {
+        high = mid - 1;
+      }
+    }
+
+    return details.substring(0, low) + "...";
   }
 
   @Override

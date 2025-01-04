@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
@@ -838,6 +839,80 @@ public class GraphRAGServiceTest {
           getNotesWithRelationship(
               result, RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild),
           empty());
+    }
+  }
+
+  @Nested
+  class TruncateDetailsTests {
+    @Test
+    void shouldTruncateASCIICharactersCorrectly() {
+      String longDetails = "a".repeat(2000);
+      Note note = makeMe.aNote().titleConstructor("Test Note").details(longDetails).please();
+      Note child = makeMe.aNote().under(note).please();
+
+      GraphRAGResult result = graphRAGService.retrieve(child, 1000);
+
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      assertThat(
+          result.getRelatedNotes().get(0).getDetails(),
+          equalTo("a".repeat(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) + "..."));
+    }
+
+    @Test
+    void shouldTruncateCJKCharactersCorrectly() {
+      // Each CJK character takes 3 bytes in UTF-8
+      String cjkText = "你好世界".repeat(500); // 2000 bytes (500 * 4 chars * 3 bytes)
+      Note note = makeMe.aNote().titleConstructor("Test Note").details(cjkText).please();
+      Note child = makeMe.aNote().under(note).please();
+
+      GraphRAGResult result = graphRAGService.retrieve(child, 1000);
+
+      assertThat(result.getRelatedNotes(), hasSize(1));
+
+      String truncated = result.getRelatedNotes().get(0).getDetails();
+
+      // Verify it ends with "..."
+      assertThat(truncated, endsWith("..."));
+
+      // Verify byte length is within limit
+      byte[] truncatedBytes =
+          truncated.substring(0, truncated.length() - 3).getBytes(StandardCharsets.UTF_8);
+      assertThat(truncatedBytes.length, lessThanOrEqualTo(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH));
+
+      // Verify we didn't cut in the middle of a CJK character
+      String withoutEllipsis = truncated.substring(0, truncated.length() - 3);
+      assertThat(
+          withoutEllipsis.chars().filter(ch -> ch >= 0x4E00 && ch <= 0x9FFF).count() * 3
+              + withoutEllipsis.chars().filter(ch -> ch < 0x80).count(),
+          lessThanOrEqualTo((long) RELATED_NOTE_DETAILS_TRUNCATE_LENGTH));
+    }
+
+    @Test
+    void shouldTruncateMixedASCIIAndCJKCorrectly() {
+      // Mix of ASCII (1 byte) and CJK (3 bytes)
+      String mixedText = "Hello你好World世界".repeat(200);
+      Note note = makeMe.aNote().titleConstructor("Test Note").details(mixedText).please();
+      Note child = makeMe.aNote().under(note).please();
+
+      GraphRAGResult result = graphRAGService.retrieve(child, 1000);
+
+      assertThat(result.getRelatedNotes(), hasSize(1));
+      String truncated = result.getRelatedNotes().get(0).getDetails();
+      byte[] truncatedBytes = truncated.getBytes(StandardCharsets.UTF_8);
+
+      // Verify the byte length is correct (excluding "...")
+      assertThat(
+          truncatedBytes.length, lessThanOrEqualTo(RELATED_NOTE_DETAILS_TRUNCATE_LENGTH + 3));
+
+      // Verify the string ends with "..."
+      assertThat(truncated, endsWith("..."));
+
+      // Verify we didn't cut in the middle of a CJK character
+      String withoutEllipsis = truncated.substring(0, truncated.length() - 3);
+      assertThat(
+          withoutEllipsis.chars().filter(ch -> ch >= 0x4E00 && ch <= 0x9FFF).count() * 3
+              + withoutEllipsis.chars().filter(ch -> ch < 0x80).count(),
+          lessThanOrEqualTo((long) RELATED_NOTE_DETAILS_TRUNCATE_LENGTH));
     }
   }
 }
