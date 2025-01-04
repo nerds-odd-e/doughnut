@@ -69,11 +69,10 @@ onMounted(() => {
 <style scoped>
 .seamless-editor {
   outline: none;
-  white-space: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin; /* For Firefox */
-  -ms-overflow-style: -ms-autohiding-scrollbar; /* For IE/Edge */
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
 }
 
 /* Show webkit scrollbar (Chrome, Safari, newer Edge) */
