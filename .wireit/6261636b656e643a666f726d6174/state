@@ -1,0 +1,1 @@
+{"cacheable":false,"platform":"darwin","arch":"arm64","nodeVersion":"v16.15.0","command":"backend/gradlew -p backend spotlessApply","clean":true,"files":{},"output":[],"dependencies":{}}

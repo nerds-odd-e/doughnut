@@ -72,6 +72,7 @@
                 />
                 <NoteAccessoryAsync
                   v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
+                  :key="noteRealm.id"
                 />
                 <NoteRecentUpdateIndicator
                   v-bind="{

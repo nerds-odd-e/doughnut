@@ -1,0 +1,1 @@
+{"fullyTracked":false,"platform":"darwin","arch":"arm64","nodeVersion":"v18.12.1","command":"yarn --frozen-lockfile --silent install && eslint e2e_test --fix","extraArgs":[],"clean":true,"files":{},"output":[],"dependencies":{},"env":{}}
