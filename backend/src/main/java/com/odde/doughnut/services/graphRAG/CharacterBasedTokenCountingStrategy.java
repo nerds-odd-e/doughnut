@@ -10,6 +10,7 @@ public class CharacterBasedTokenCountingStrategy implements TokenCountingStrateg
   @Override
   public int estimateTokens(BareNote bareNote) {
     String jsonString = objectMapper.writeValueAsString(bareNote);
-    return (int) Math.ceil(jsonString.length() / 3.75);
+    byte[] utf8Bytes = jsonString.getBytes("UTF-8");
+    return (int) Math.ceil(utf8Bytes.length / 3.75);
   }
 }
