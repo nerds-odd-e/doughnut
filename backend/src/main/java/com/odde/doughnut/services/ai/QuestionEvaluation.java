@@ -17,7 +17,9 @@ public class QuestionEvaluation {
   @JsonProperty(required = true)
   public boolean feasibleQuestion;
 
-  @JsonPropertyDescription("Explains why the question is not feasible.")
+  @JsonPropertyDescription(
+      "Explains why the question is not feasible. Leave empty if the question is feasible.")
+  @JsonProperty(required = true)
   public String comment;
 
   public static Optional<QuestionEvaluation> getQuestionEvaluation(JsonNode jsonNode) {
