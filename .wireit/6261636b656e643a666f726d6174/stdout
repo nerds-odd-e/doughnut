@@ -1,7 +1,0 @@
-> Task :spotlessInternalRegisterDependencies UP-TO-DATE
-> Task :spotlessJava
-> Task :spotlessJavaApply
-> Task :spotlessApply
-
-BUILD SUCCESSFUL in 1s
-3 actionable tasks: 2 executed, 1 up-to-date

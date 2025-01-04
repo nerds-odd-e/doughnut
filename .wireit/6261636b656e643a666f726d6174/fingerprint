@@ -1,1 +1,0 @@
-{"fullyTracked":false,"platform":"darwin","arch":"arm64","nodeVersion":"v18.12.1","command":"backend/gradlew -p backend spotlessApply","extraArgs":[],"clean":true,"files":{},"output":[],"dependencies":{},"env":{}}

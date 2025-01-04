@@ -1,1 +1,0 @@
-{"cacheable":false,"platform":"darwin","arch":"arm64","nodeVersion":"v16.15.0","command":"yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint --fix","clean":true,"files":{},"output":[],"dependencies":{}}
