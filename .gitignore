@@ -58,6 +58,7 @@ backend/out
 
 # nodejs
 node_modules/
+.wireit/
 **/package-lock.json
 **/tsconfig.tsbuildinfo
 
