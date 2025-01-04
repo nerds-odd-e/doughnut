@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 import lombok.SneakyThrows;
 
 public class CharacterBasedTokenCountingStrategy implements TokenCountingStrategy {
@@ -10,7 +11,7 @@ public class CharacterBasedTokenCountingStrategy implements TokenCountingStrateg
   @Override
   public int estimateTokens(BareNote bareNote) {
     String jsonString = objectMapper.writeValueAsString(bareNote);
-    byte[] utf8Bytes = jsonString.getBytes("UTF-8");
+    byte[] utf8Bytes = jsonString.getBytes(StandardCharsets.UTF_8);
     return (int) Math.ceil(utf8Bytes.length / 3.75);
   }
 }

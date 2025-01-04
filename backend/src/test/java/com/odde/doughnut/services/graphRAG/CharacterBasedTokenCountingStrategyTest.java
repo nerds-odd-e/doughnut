@@ -39,17 +39,20 @@ class CharacterBasedTokenCountingStrategyTest {
   void shouldHandleUTF8CharactersProperly() {
     CharacterBasedTokenCountingStrategy strategy = new CharacterBasedTokenCountingStrategy();
     Note note1 = new Note();
-    note1.setDetails("hello"); // 5 ASCII chars = 5 bytes
+    note1.setDetails("hello world ".repeat(10));
     BareNote bareNote1 = BareNote.fromNote(note1, RelationshipToFocusNote.Parent);
 
     Note note2 = new Note();
-    note2.setDetails("你好"); // 2 Chinese chars = 6 bytes
+    note2.setDetails("你好世界 ".repeat(10));
     BareNote bareNote2 = BareNote.fromNote(note2, RelationshipToFocusNote.Parent);
 
     int tokens1 = strategy.estimateTokens(bareNote1);
     int tokens2 = strategy.estimateTokens(bareNote2);
 
     assertTrue(
-        tokens2 > tokens1, "Chinese characters should result in more tokens due to UTF-8 encoding");
+        tokens2 > tokens1,
+        String.format(
+            "Chinese characters should result in more tokens. Got tokens1=%d, tokens2=%d",
+            tokens1, tokens2));
   }
 }
