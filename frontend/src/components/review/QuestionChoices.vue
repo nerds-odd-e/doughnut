@@ -1,5 +1,5 @@
 <template>
-  <ol class="choices  daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
+  <ol class="choices daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
     <li
       class="choice daisy-w-[46%] daisy-min-h-[80px] daisy-m-[2%] sm:daisy-w-full"
       v-for="(choice, index) in choices"
