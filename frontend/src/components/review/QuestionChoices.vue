@@ -61,6 +61,14 @@ export default defineComponent({
     },
     async submitAnswer(answerData: AnswerDTO) {
       this.$emit("answer", answerData)
+
+      // This ensures that any tapped button is blurred
+      this.$nextTick(() => {
+        const active = document.activeElement
+        if (active && active instanceof HTMLElement) {
+          active.blur()
+        }
+      })
     },
     getChoiceHtml(choice: string) {
       return markdownizer.markdownToHtml(choice)
