@@ -24,16 +24,16 @@
       :storage-accessor="storageAccessor"
     />
     <div v-else class="daisy-flex daisy-flex-col daisy-gap-4">
-    <RecallPromptComponent
-      :recall-prompt="currentQuestion"
-      @answered="onAnswered($event)"
-    />
+      <RecallPromptComponent
+        :recall-prompt="currentQuestion"
+        @answered="onAnswered($event)"
+      />
       <a
         role="button"
         title="Doesn't make sense?"
         id="try-again"
         v-if="currentQuestion"
-        class="btn daisy-btn daisy-btn-ghost daisy-btn-sm"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         @click="contest"
       >
         <SvgContest />
