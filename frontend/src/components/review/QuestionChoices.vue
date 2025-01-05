@@ -65,7 +65,7 @@ export default defineComponent({
       // This ensures that any tapped button is blurred
       this.$nextTick(() => {
         const active = document.activeElement
-        if (active && active instanceof HTMLElement) {
+        if (active instanceof HTMLElement) {
           active.blur()
         }
       })
@@ -100,9 +100,9 @@ export default defineComponent({
   font-weight: bold
   background-color: orange !important
 
-button
+button, a, input
   border: 0
-  -webkit-tap-highlight-color: transparent
+  -webkit-tap-highlight-color: rgba(0,0,0,0)
   -webkit-touch-callout: none
   -webkit-user-select: none
 </style>
