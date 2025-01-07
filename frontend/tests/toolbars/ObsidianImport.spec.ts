@@ -28,7 +28,7 @@ describe("ObsidianImport", () => {
       getNote: vi.fn(),
       getNotes: vi.fn(),
       searchNotes: vi.fn(),
-    }
+    } as unknown as StorageAccessor
 
     wrapper = mount(NoteToolbar, {
       global: {
