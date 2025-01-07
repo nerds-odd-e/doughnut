@@ -2,7 +2,7 @@
 /// <reference types="@testing-library/cypress" />
 /// <reference types="../support" />
 
-import { Given } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
@@ -12,16 +12,26 @@ import start from '../start'
 // })
 
 Given('I have a notebook titled {string}', (notebookTitle: string) => {
-  start.testability().createNotebook(notebookTitle)
+  // Following the pattern from note.ts where notes are injected
+  start.testability().injectNotes([{ Title: notebookTitle }])
 })
 
 Given('the notebook contains the following notes', (notesTable: DataTable) => {
   const notes = notesTable.hashes()
-  notes.forEach(note => {
-    start.testability().createNote({
-      title: note.Title,
-      content: note.Content,
-      notebookId: Cypress.env('currentNotebookId')
-    })
-  })
+  // Using the injectNotes pattern from note.ts
+  start.testability().injectNotes(notes)
+})
+
+// Additional steps needed for the feature
+When('I select the {string} notebook', (notebookTitle: string) => {
+  start.jumpToNotePage(notebookTitle)
+})
+
+When('I click on the download for Obsidian option', () => {
+  // Implementation needed based on your UI
+  cy.findByText('Download for Obsidian').click()
+})
+
+Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
+  start.testability().injectNotes([{ Title: notebookTitle }])
 }) 

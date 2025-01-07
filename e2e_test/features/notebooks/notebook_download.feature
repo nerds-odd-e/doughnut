@@ -1,6 +1,5 @@
 @ignore
 Feature: Notebook download for Obsidian
-
   Background:
     Given I am logged in as an existing user
     And I have a notebook titled "Medical Notes"
@@ -21,6 +20,7 @@ Feature: Notebook download for Obsidian
     And the zip file should not contain any subdirectories
     And each markdown file should maintain its original content
 
+  @ignore
   Scenario: Download notebook with special characters in title
     Given I have a notebook titled "Pediatrics (2024)"
     When I select the "Pediatrics (2024)" notebook
@@ -28,6 +28,7 @@ Feature: Notebook download for Obsidian
     Then I should receive a zip file with sanitized filenames
     And all markdown files should be at the root level of the zip
 
+  @ignore
   Scenario: Download empty notebook
     Given I have an empty notebook titled "Empty Notes"
     When I select the "Empty Notes" notebook
