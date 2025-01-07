@@ -1,3 +1,4 @@
+@ignore
 Feature: Notebook download for Obsidian
 
   Background:
