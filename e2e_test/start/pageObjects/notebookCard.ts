@@ -22,4 +22,7 @@ export const notebookCard = (notebook: string) => ({
     findNotebookCardButton(notebook, 'Edit notebook settings').click()
     return notebookSettingsPopup()
   },
+  downloadForObsidian() {
+    findNotebookCardButton(notebook, 'Download for Obsidian').click()
+  },
 })

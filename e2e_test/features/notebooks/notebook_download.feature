@@ -1,4 +1,3 @@
-@ignore
 Feature: Notebook download for Obsidian
   Background:
     Given I am logged in as an existing user
@@ -8,10 +7,10 @@ Feature: Notebook download for Obsidian
       | Patient Care    | Basic patient care notes   |
       | Medications     | Common medications list    |
       | Procedures      | Standard procedures guide  |
-
+  @ignore
   Scenario: Download notebook as a flat zip file for Obsidian
-    When I select the "Medical Notes" notebook
-    And I click on the download for Obsidian option
+    When I go to Notebook page
+    And I click on the download for Obsidian option on notebook "Medical Notes"
     Then I should receive a zip file containing
       | Filename           | Format |
       | Patient Care.md    | md     |

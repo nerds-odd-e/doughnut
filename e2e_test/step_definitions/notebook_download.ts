@@ -2,9 +2,10 @@
 /// <reference types="@testing-library/cypress" />
 /// <reference types="../support" />
 
-import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
+import { notebookCard } from '../start/pageObjects/notebookCard'
 
 // First step already exists in user.ts:
 // Given('I am logged in as an existing user', () => {
@@ -27,11 +28,15 @@ When('I select the {string} notebook', (notebookTitle: string) => {
   start.jumpToNotePage(notebookTitle)
 })
 
-When('I click on the download for Obsidian option', () => {
-  // Implementation needed based on your UI
-  cy.findByText('Download for Obsidian').click()
+When('I click on the download for Obsidian option on notebook {string}', (notebookTitle: string) => {
+  notebookCard(notebookTitle).downloadForObsidian()
 })
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
   start.testability().injectNotes([{ Title: notebookTitle }])
 })
+
+When('I go to Notebook page', () => {
+  // Using the same navigation function but without parameters
+  start.routerToNotebooksPage()
+}) 
