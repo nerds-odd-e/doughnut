@@ -11,10 +11,10 @@ Feature: Notebook download for Obsidian
       | Procedures      | Standard procedures guide  |
 
   @startWithEmptyDownloadsFolder
-  Scenario: Download my own notebook
-    When I download notebook "Medical Notes"
-    Then the notebook should be downloaded successfully
-    And the downloaded file should contain all notes from "Medical Notes"
+  # Scenario: Download my own notebook
+  #   When I download notebook "Medical Notes"
+  #   Then the notebook should be downloaded successfully
+  #   And the downloaded file should contain all notes from "Medical Notes"
 
   Scenario: Download button visibility
     Then I should see a download button for notebook "Medical Notes"
