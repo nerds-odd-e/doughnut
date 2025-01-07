@@ -2,7 +2,7 @@
 /// <reference types="@testing-library/cypress" />
 /// <reference types="../support" />
 
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 import { notebookCard } from '../start/pageObjects/notebookCard'
@@ -28,9 +28,12 @@ When('I select the {string} notebook', (notebookTitle: string) => {
   start.jumpToNotePage(notebookTitle)
 })
 
-When('I click on the download for Obsidian option on notebook {string}', (notebookTitle: string) => {
-  notebookCard(notebookTitle).downloadForObsidian()
-})
+When(
+  'I click on the download for Obsidian option on notebook {string}',
+  (notebookTitle: string) => {
+    notebookCard(notebookTitle).downloadForObsidian()
+  }
+)
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
   start.testability().injectNotes([{ Title: notebookTitle }])
@@ -39,4 +42,4 @@ Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
 When('I go to Notebook page', () => {
   // Using the same navigation function but without parameters
   start.routerToNotebooksPage()
-}) 
+})
