@@ -10,5 +10,7 @@ Feature: Notebook Import
       | note 2  | note 1       |
 
   Scenario: Import notes from Obsidian
+
     Then I should see "note 1" with these children
-      | note 2  |
+      | note-title|
+      | note 2    |
