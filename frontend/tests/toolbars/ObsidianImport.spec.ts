@@ -14,11 +14,13 @@ describe('ObsidianImport', () => {
   beforeEach(() => {
     const router = createRouter({
       history: createWebHistory(),
-      routes: []
+      routes: [
+        { path: '/', component: {} }
+      ]
     })
 
     note = {
-      id: '1'
+      id: 1
     } as Note
 
     storageAccessor = {
