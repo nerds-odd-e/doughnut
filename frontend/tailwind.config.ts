@@ -9,8 +9,11 @@ export default {
   },
   plugins: [daisyui],
   daisyui: {
-    // Let's use dark theme while we are converting to daisyui.
-    // Dark theme helps to see where in the current design need to be changed.
-    themes: ["dark"],
+    themes: ["light", "dark"],
+    darkTheme: "dark",
+    base: true,
+    styled: true,
+    utils: true,
+    themeRoot: ":root",
   },
 } satisfies Config

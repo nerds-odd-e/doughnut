@@ -9,7 +9,7 @@
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Previous Question Contested ...</h3>
       <p>{{ q.badQuestionReason }}</p>
-      <QuestionDisplay :bare-question="q.quizeQuestion.bareQuestion" :disabled="true" />
+      <QuestionDisplay :bare-question="q.quizeQuestion.bareQuestion" :disabled="true" :key="q.quizeQuestion.id"/>
     </div>
   </div>
   <p v-if="currentQuestionLegitMessage" class="daisy-text-warning daisy-mb-4">
@@ -24,16 +24,16 @@
       :storage-accessor="storageAccessor"
     />
     <div v-else class="daisy-flex daisy-flex-col daisy-gap-4">
-    <RecallPromptComponent
-      :recall-prompt="currentQuestion"
-      @answered="onAnswered($event)"
-    />
+      <RecallPromptComponent
+        :recall-prompt="currentQuestion"
+        @answered="onAnswered($event)"
+      />
       <a
         role="button"
         title="Doesn't make sense?"
         id="try-again"
         v-if="currentQuestion"
-        class="btn daisy-btn daisy-btn-ghost daisy-btn-sm"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         @click="contest"
       >
         <SvgContest />

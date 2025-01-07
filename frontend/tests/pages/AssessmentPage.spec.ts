@@ -105,5 +105,26 @@ describe("assessment page", () => {
         helper.managedApi.restAssessmentController.submitAssessmentResult
       ).toBeCalledWith(assessmentAttempt.id)
     })
+
+    it("should explicitly blur the button after clicking an answer", async () => {
+      const wrapper = helper
+        .component(AssessmentPage)
+        .withProps({ notebookId: notebook.id })
+        .render()
+      await flushPromises()
+
+      // Spy on the blur method
+      const blurSpy = vi.spyOn(HTMLElement.prototype, "blur")
+
+      const answerButton = await wrapper.findByRole("button", {
+        name: "answer1",
+      })
+      await answerButton.click()
+      await flushPromises()
+
+      // Verify our explicit blur logic was called
+      expect(blurSpy).toHaveBeenCalled()
+      blurSpy.mockRestore()
+    })
   })
 })

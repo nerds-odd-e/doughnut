@@ -1,5 +1,5 @@
 <template>
-  <ol class="choices  daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
+  <ol class="choices daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
     <li
       class="choice daisy-w-[46%] daisy-min-h-[80px] daisy-m-[2%] sm:daisy-w-full"
       v-for="(choice, index) in choices"
@@ -61,6 +61,14 @@ export default defineComponent({
     },
     async submitAnswer(answerData: AnswerDTO) {
       this.$emit("answer", answerData)
+
+      // This ensures that any tapped button is blurred
+      this.$nextTick(() => {
+        const active = document.activeElement
+        if (active instanceof HTMLElement) {
+          active.blur()
+        }
+      })
     },
     getChoiceHtml(choice: string) {
       return markdownizer.markdownToHtml(choice)
@@ -92,9 +100,9 @@ export default defineComponent({
   font-weight: bold
   background-color: orange !important
 
-button
+button, a, input
   border: 0
-  -webkit-tap-highlight-color: transparent
+  -webkit-tap-highlight-color: rgba(0,0,0,0)
   -webkit-touch-callout: none
   -webkit-user-select: none
 </style>
