@@ -2,7 +2,7 @@
 /// <reference types="@testing-library/cypress" />
 /// <reference types="../support" />
 
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
@@ -34,4 +34,4 @@ When('I click on the download for Obsidian option', () => {
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
   start.testability().injectNotes([{ Title: notebookTitle }])
-}) 
+})
