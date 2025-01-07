@@ -184,6 +184,23 @@
             </PopButton>
           </li>
           <li>
+            <PopButton
+              btn-class="daisy-w-full"
+              title="Import from Obsidian"
+            >
+              <template #button_face>
+                <SvgObsidian />
+                <span class="ms-2">Import from Obsidian</span>
+              </template>
+              <template #default="{ closer }">
+                <ObsidianImportDialog
+                  v-bind="{ note, storageAccessor }"
+                  @close-dialog="closer"
+                />
+              </template>
+            </PopButton>
+          </li>
+          <li>
             <NoteDeleteButton
               class="daisy-w-full"
               v-bind="{ noteId: note.id, storageAccessor }"
@@ -232,6 +249,8 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
+import SvgObsidian from "../../svgs/SvgObsidian.vue"
+import ObsidianImportDialog from "../ObsidianImportDialog.vue"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
