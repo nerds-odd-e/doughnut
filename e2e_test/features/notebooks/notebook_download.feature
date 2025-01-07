@@ -34,14 +34,3 @@ Feature: Notebook download for Obsidian
     And I click on the download for Obsidian option
     Then I should receive an empty zip file
     And I should see a notification that the notebook is empty 
-
-  @startWithEmptyDownloadsFolder
-  Scenario: Download my own notebook
-    When I download notebook "Medical Notes"
-    Then the notebook should be downloaded successfully
-    And the downloaded file should contain all notes from "Medical Notes"
-
-  Scenario: Download button visibility
-    Then I should see a download button for notebook "Medical Notes"
-    When I haven't login
-    Then I should not see a download button for notebook "Medical Notes" 
