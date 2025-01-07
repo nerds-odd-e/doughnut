@@ -1,4 +1,3 @@
-@ignore
 Feature: Notebook download for Obsidian
   Background:
     Given I am logged in as an existing user
