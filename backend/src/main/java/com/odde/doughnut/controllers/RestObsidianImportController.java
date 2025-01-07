@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,12 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api")
 public class RestObsidianImportController {
 
-    public RestObsidianImportController() {
-    }
+  public RestObsidianImportController() {}
 
-    @PostMapping("/obsidian/{parentNoteId}/import")
-    public NoteRealm importObsidianNotes(MultipartFile file, @PathVariable Integer parentNoteId) throws UnexpectedNoAccessRightException {
-        // Implementation will be added later
-        return null;
-    }
+  @PostMapping("/obsidian/{parentNoteId}/import")
+  public NoteRealm importObsidianNotes(MultipartFile file, @PathVariable Integer parentNoteId)
+      throws UnexpectedNoAccessRightException {
+    // Implementation will be added later
+    return null;
+  }
 }

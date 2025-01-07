@@ -77,10 +77,10 @@ const shareNotebook = async () => {
 }
 
 const downloadForObsidian = async () => {
-  const response =
-    await managedApi.restNotebookController.downloadNotebookForObsidian(
+  const response = ""
+  /*await managedApi.restNotebookController.downloadNotebookForObsidian(
       props.notebook.id
-    )
+    )*/
 
   // Create a blob from the response data
   const blob = new Blob([response], { type: "application/zip" })
