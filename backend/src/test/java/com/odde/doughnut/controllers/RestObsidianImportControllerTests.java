@@ -30,7 +30,7 @@ class RestObsidianImportControllerTests {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new RestObsidianImportController(modelFactoryService, obsidianImportService);
+        controller = new RestObsidianImportController();
         parentNote = makeMe.aNote().creatorAndOwner(userModel).please();
     }
 
@@ -54,7 +54,7 @@ class RestObsidianImportControllerTests {
         MultipartFile zipFile = createMockZipFile("Note 2.md", "# Note 2\nSome content");
 
         // Attempt to import under a note the user doesn't have access to
-        assertThrows(UnexpectedNoAccessRightException.class, () -> 
+        assertThrows(UnexpectedNoAccessRightException.class, () ->
             controller.importObsidianNotes(zipFile, otherUsersNote.getId())
         );
     }
@@ -77,4 +77,4 @@ class RestObsidianImportControllerTests {
             baos.toByteArray()
         );
     }
-} 
+}
