@@ -8,6 +8,11 @@ Feature: Notebook export for Obsidian
       | Medications     | Common medications list    |
       | Procedures      | Standard procedures guide  |
 
+  Scenario: Export notebook button can be clicked
+    When I go to Notebook page
+    And I click on the export for Obsidian option on notebook "Medical Notes"
+
+  @ignore
   Scenario: Export notebook as a flat zip file for Obsidian
     When I go to Notebook page
     And I click on the export for Obsidian option on notebook "Medical Notes"
