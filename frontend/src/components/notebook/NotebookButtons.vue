@@ -34,8 +34,8 @@
     </button>
     <button
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-      @click="downloadForObsidian"
-      title="Download notebook for Obsidian"
+      @click="exportForObsidian"
+      title="Export notebook for Obsidian"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 256 256" class="fill-current">
         <path d="M128 20.2L28.8 86.4v83.2L128 235.8l99.2-66.2V86.4L128 20.2zm0 23.8l71.8 48L128 140.2 56.2 92l71.8-48zm-85.2 55l78.2 52.3v77.5l-78.2-52.3v-77.5zm170.4 0v77.5l-78.2 52.3v-77.5l78.2-52.3z"/>
@@ -75,7 +75,7 @@ const shareNotebook = async () => {
   }
 }
 
-const downloadForObsidian = async () => {
+const exportForObsidian = async () => {
   const response = await managedApi.restNotebookController.downloadForObsidian(
     props.notebook.id
   )

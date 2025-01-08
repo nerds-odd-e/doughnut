@@ -27,6 +27,7 @@ Given('the notebook contains the following notes', (notesTable: DataTable) => {
 When('I select the {string} notebook', (notebookTitle: string) => {
   start.jumpToNotePage(notebookTitle)
 })
+
 When(
   'I click on the export for Obsidian option on notebook {string}',
   (notebookTitle: string) => {
@@ -35,8 +36,8 @@ When(
       .should('be.visible')
       .parents('.daisy-card')
       .within(() => {
-        // 直接點擊具有特定 title 的下載按鈕
-        cy.get('button[title="Download notebook for Obsidian"]')
+        // Click the export button with specific title
+        cy.get('button[title="Export notebook for Obsidian"]')
           .should('be.visible')
           .click()
       })
