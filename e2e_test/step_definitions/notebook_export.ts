@@ -5,7 +5,6 @@
 import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
-import { notebookCard } from '../start/pageObjects/notebookCard'
 
 // First step already exists in user.ts:
 // Given('I am logged in as an existing user', () => {
@@ -32,7 +31,7 @@ When(
   'I click on the export for Obsidian option on notebook {string}',
   (notebookTitle: string) => {
     // Wait and ensure element is fully loaded
-    cy.findByText(notebookTitle, {selector: '.notebook-card *'})
+    cy.findByText(notebookTitle, { selector: '.notebook-card *'})
       .should('be.visible')
       .parents('.daisy-card')
       .within(() => {
@@ -51,4 +50,4 @@ Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
 When('I go to Notebook page', () => {
   // Using the same navigation function but without parameters
   start.routerToNotebooksPage()
-}) 
+})
