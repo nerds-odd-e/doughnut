@@ -1,14 +1,14 @@
 package com.odde.doughnut.controllers;
+
+import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import org.springframework.web.bind.annotation.*;
-import io.swagger.v3.oas.annotations.media.Schema;
-import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.models.NoteViewer;
-import java.io.IOException;
+import com.odde.doughnut.models.UserModel;
+import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import com.odde.doughnut.entities.Note;
 
 @RestController
 @RequestMapping("/api")
@@ -24,19 +24,17 @@ public class RestObsidianImportController {
       @RequestParam("file") MultipartFile file,
       @PathVariable("parentNoteId") @Schema(type = "integer") Integer parentNoteId)
       throws UnexpectedNoAccessRightException {
-      currentUser.assertLoggedIn();
+    currentUser.assertLoggedIn();
 
-      Notebook notebook = currentUser.getEntity()
-          .getOwnership()
-          .getNotebooks()
-          .stream()
-          .filter(n -> n.getId().equals(parentNoteId))
-          .findFirst()
-          .orElseThrow(() -> new UnexpectedNoAccessRightException());
+    Notebook notebook =
+        currentUser.getEntity().getOwnership().getNotebooks().stream()
+            .filter(n -> n.getId().equals(parentNoteId))
+            .findFirst()
+            .orElseThrow(() -> new UnexpectedNoAccessRightException());
 
-      // TODO: Process zip file content
-      // For now, just return the head note
-      Note note = notebook.getHeadNote();
-      return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
+    // TODO: Process zip file content
+    // For now, just return the head note
+    Note note = notebook.getHeadNote();
+    return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
 }
