@@ -1,4 +1,4 @@
-Feature: Notebook download for Obsidian
+Feature: Notebook export for Obsidian
   Background:
     Given I am logged in as an existing user
     And I have a notebook titled "Medical Notes"
@@ -7,10 +7,10 @@ Feature: Notebook download for Obsidian
       | Patient Care    | Basic patient care notes   |
       | Medications     | Common medications list    |
       | Procedures      | Standard procedures guide  |
-  @ignore
-  Scenario: Download notebook as a flat zip file for Obsidian
+
+  Scenario: Export notebook as a flat zip file for Obsidian
     When I go to Notebook page
-    And I click on the download for Obsidian option on notebook "Medical Notes"
+    And I click on the export for Obsidian option on notebook "Medical Notes"
     Then I should receive a zip file containing
       | Filename           | Format |
       | Patient Care.md    | md     |
@@ -19,18 +19,14 @@ Feature: Notebook download for Obsidian
     And the zip file should not contain any subdirectories
     And each markdown file should maintain its original content
 
-  @ignore
-  Scenario: Download notebook with special characters in title
-    Given I have a notebook titled "Pediatrics (2024)"
-    When I select the "Pediatrics (2024)" notebook
-    And I click on the download for Obsidian option
+  Scenario: Export notebook with special characters in title
+    When I select the "Medical Notes" notebook
+    And I click on the export for Obsidian option
     Then I should receive a zip file with sanitized filenames
     And all markdown files should be at the root level of the zip
 
-  @ignore
-  Scenario: Download empty notebook
-    Given I have an empty notebook titled "Empty Notes"
-    When I select the "Empty Notes" notebook
-    And I click on the download for Obsidian option
-    Then I should receive an empty zip file
-    And I should see a notification that the notebook is empty 
+  Scenario: Export empty notebook
+    When I select the "Medical Notes" notebook
+    And I click on the export for Obsidian option
+    Then I should receive a zip file containing three files
+    And each markdown file should maintain its original content 

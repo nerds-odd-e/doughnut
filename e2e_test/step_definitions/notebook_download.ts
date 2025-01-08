@@ -29,7 +29,7 @@ When('I select the {string} notebook', (notebookTitle: string) => {
 })
 
 When(
-  'I click on the download for Obsidian option on notebook {string}',
+  'I click on the export for Obsidian option on notebook {string}',
   (notebookTitle: string) => {
     notebookCard(notebookTitle).downloadForObsidian()
   }
