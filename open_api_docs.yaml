@@ -814,16 +814,16 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/obsidian/{parentNoteId}/import:
+  /api/obsidian/{notebookId}/import:
     post:
       tags:
       - rest-obsidian-import-controller
       summary: Import Obsidian file
       operationId: importObsidian
       parameters:
-      - name: parentNoteId
+      - name: notebookId
         in: path
-        description: Parent note ID
+        description: Notebook ID
         required: true
         schema:
           type: integer
@@ -849,10 +849,6 @@ paths:
                 type: string
         "200":
           description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
@@ -3676,6 +3672,28 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
+    NoteCreationDTO:
+      required:
+      - newTitle
+      type: object
+      properties:
+        newTitle:
+          maxLength: 150
+          minLength: 1
+          type: string
+        wikidataId:
+          pattern: ^$|Q\d+
+          type: string
+    NoteCreationRresult:
+      required:
+      - created
+      - parent
+      type: object
+      properties:
+        created:
+          $ref: "#/components/schemas/NoteRealm"
+        parent:
+          $ref: "#/components/schemas/NoteRealm"
     NoteRealm:
       required:
       - id
@@ -3699,28 +3717,6 @@ components:
             $ref: "#/components/schemas/Note"
         notebook:
           $ref: "#/components/schemas/Notebook"
-    NoteCreationDTO:
-      required:
-      - newTitle
-      type: object
-      properties:
-        newTitle:
-          maxLength: 150
-          minLength: 1
-          type: string
-        wikidataId:
-          pattern: ^$|Q\d+
-          type: string
-    NoteCreationRresult:
-      required:
-      - created
-      - parent
-      type: object
-      properties:
-        created:
-          $ref: "#/components/schemas/NoteRealm"
-        parent:
-          $ref: "#/components/schemas/NoteRealm"
     WikidataAssociationCreation:
       required:
       - wikidataId
