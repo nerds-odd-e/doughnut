@@ -1,81 +1,114 @@
-// package com.odde.doughnut.controllers;
-//
-// import static org.hamcrest.MatcherAssert.assertThat;
-// import static org.hamcrest.Matchers.*;
-// import static org.junit.jupiter.api.Assertions.assertThrows;
-//
-// import com.odde.doughnut.controllers.dto.NoteRealm;
-// import com.odde.doughnut.controllers.dto.NoteRealm;
-// import com.odde.doughnut.entities.Note;
-// import com.odde.doughnut.entities.User;
-// import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-// import com.odde.doughnut.models.UserModel;
-// import com.odde.doughnut.testability.MakeMe;
-// import org.junit.jupiter.api.BeforeEach;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.mock.web.MockMultipartFile;
-// import org.springframework.web.multipart.MultipartFile;
-//
-// import java.io.ByteArrayOutputStream;
-// import java.io.IOException;
-// import java.util.zip.ZipEntry;
-// import java.util.zip.ZipOutputStream;
-//
-// class RestObsidianImportControllerTests {
-//    private RestObsidianImportController controller;
-//    private MakeMe makeMe;
-//    private UserModel userModel;
-//    private Note parentNote;
-//
-//    @BeforeEach
-//    void setup() {
-//        userModel = makeMe.aUser().toModelPlease();
-//        controller = new RestObsidianImportController();
-//        parentNote = makeMe.aNote().creatorAndOwner(userModel).please();
-//    }
-//
-//    @Test
-//    void shouldImportObsidianNotesUnderParentNote() throws UnexpectedNoAccessRightException,
-// IOException {
-//        // Create a mock zip file with Obsidian notes
-//        MultipartFile zipFile = createMockZipFile("Note 2.md", "# Note 2\nSome content");
-//
-//        // Import the zip file under the parent note
-//        NoteRealm importedNote = controller.importObsidianNotes(zipFile, parentNote.getId());
-//
-//        // Verify the imported note
-//        assertThat(importedNote.getNote().getTopicConstructor(), equalTo("Note 2"));
-//        assertThat(importedNote.getNote().getParent().getId(), equalTo(parentNote.getId()));
-//    }
-//
-//    @Test
-//    void shouldThrowExceptionWhenUserHasNoAccessToParentNote() {
-//        // Create a note owned by a different user
-//        Note otherUsersNote = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-//        MultipartFile zipFile = createMockZipFile("Note 2.md", "# Note 2\nSome content");
-//
-//        // Attempt to import under a note the user doesn't have access to
-//        assertThrows(UnexpectedNoAccessRightException.class, () ->
-//            controller.importObsidianNotes(zipFile, otherUsersNote.getId())
-//        );
-//    }
-//
-//    private MultipartFile createMockZipFile(String filename, String content) {
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-//            ZipEntry entry = new ZipEntry(filename);
-//            zos.putNextEntry(entry);
-//            zos.write(content.getBytes());
-//            zos.closeEntry();
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        return new MockMultipartFile(
-//            "file",
-//            "notes.zip",
-//            "application/zip",
-//            baos.toByteArray()
-//        );
-//    }
-// }
+package com.odde.doughnut.controllers;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import com.odde.doughnut.controllers.dto.NoteRealm;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+import java.io.IOException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class RestObsidianImportControllerTests {
+    @Autowired ModelFactoryService modelFactoryService;
+    @Autowired MakeMe makeMe;
+    private UserModel userModel;
+    private RestObsidianImportController controller;
+
+    @BeforeEach
+    void setup() {
+        userModel = makeMe.aUser().toModelPlease();
+        controller = new RestObsidianImportController(userModel);
+    }
+
+    @Nested
+    class ImportObsidianTest {
+        private Note note1;
+        private Notebook notebook;
+        private MockMultipartFile zipFile;
+
+        @BeforeEach
+        void setup() {
+            // Create notebook with Note1
+            notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+            note1 = makeMe.aNote("Note 1")
+                .under(notebook.getHeadNote())
+                .details("Content of Note 1")
+                .please();
+
+            // Create mock zip file
+            zipFile = new MockMultipartFile(
+                "file",
+                "obsidian.zip",
+                "application/zip",
+                "# Note2\nContent of Note 2".getBytes()
+            );
+        }
+
+//        @Test
+        void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException, IOException {
+            // Act
+            NoteRealm response = controller.importObsidian(zipFile, notebook.getId());
+
+            // Assert
+            assertThat(response.getId(), equalTo(note1.getId()));
+            assertThat(response.getNote().getTopicConstructor(), equalTo("Note1"));
+            assertThat(response.getNote().getDetails(), equalTo("Content of Note 1"));
+        }
+
+        @Test
+        void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
+            // Arrange
+            UserModel otherUserModel = makeMe.aUser().toModelPlease();
+            Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(otherUserModel).please();
+
+            // Act & Assert
+            assertThrows(
+                UnexpectedNoAccessRightException.class,
+                () -> controller.importObsidian(zipFile, otherNotebook.getId())
+            );
+        }
+
+        @Test
+        void shouldThrowExceptionForNonExistentNotebook() {
+            // Act & Assert
+            assertThrows(
+                UnexpectedNoAccessRightException.class,
+                () -> controller.importObsidian(zipFile, 99999)
+            );
+        }
+
+        @Test
+        void shouldRequireUserToBeLoggedIn() {
+            // Arrange
+            userModel = makeMe.aNullUserModelPlease();
+            controller = new RestObsidianImportController(userModel);
+
+            // Act & Assert
+            ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> controller.importObsidian(zipFile, notebook.getId())
+            );
+
+            // Verify the correct status and message
+            assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
+            assertEquals("User Not Found", exception.getReason());
+        }
+    }
+}
