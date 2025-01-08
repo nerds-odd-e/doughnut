@@ -14,6 +14,7 @@ Feature: Export Notebook to GitHub
       | Functions     | How to define functions    | Python       |
 
   Scenario: Successfully export notebook to GitHub
-    When I export notebook "Programming" to GitHub
+    When I go to Notebook page
+    And I export notebook "Programming" to GitHub
     And I input repository name "study-notes"
     Then I should see a success message "Notebook exported to GitHub successfully" 
