@@ -1,18 +1,11 @@
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-// No need to implement "Given I am logged in as an existing user"
-// as it's already implemented in user.ts
-
-Given('I have authorized Doughnut to access my GitHub account', () => {
-  // Mock GitHub OAuth authorization
-  start.testability().mockGithubAuth({
-    authorized: true,
-    token: 'mock-github-token',
-  })
+When('I export notebook {string} to GitHub', (notebookTitle: string) => {
+  start.routerToNotebooksPage().notebookCard(notebookTitle).exportToGithub()
 })
 
-Given('I have a GitHub repository {string}', (repoName: string) => {
+When('I input repository name {string}', (repoName: string) => {
   // Mock GitHub repository data
   start.testability().mockGithubRepos([
     {
@@ -21,18 +14,8 @@ Given('I have a GitHub repository {string}', (repoName: string) => {
       permissions: { push: true },
     },
   ])
-})
 
-When(
-  'I choose to export notebook {string} to GitHub',
-  (notebookTitle: string) => {
-    start.routerToNotebooksPage().notebookCard(notebookTitle).exportToGithub()
-  }
-)
-
-When('I select repository {string}', (repoName: string) => {
   cy.findByLabelText('Select Repository').click().findByText(repoName).click()
-
   cy.findByRole('button', { name: 'Export' }).click()
 })
 

@@ -14,8 +14,6 @@ Feature: Export Notebook to GitHub
       | Functions     | How to define functions    | Python       |
 
   Scenario: Successfully export notebook to GitHub
-    Given I have authorized Doughnut to access my GitHub account
-    And I have a GitHub repository "study-notes"
-    When I choose to export notebook "Programming" to GitHub
-    And I select repository "study-notes"
+    When I export notebook "Programming" to GitHub
+    And I input repository name "study-notes"
     Then I should see a success message "Notebook exported to GitHub successfully" 
