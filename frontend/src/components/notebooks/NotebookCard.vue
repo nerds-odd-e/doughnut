@@ -1,5 +1,5 @@
 <template>
-  <div role="card" class="daisy-card notebook-card">
+  <div role="card" class="daisy-card notebook-card" data-cy="notebook-card">
     <div class="notebook-binding"></div>
     <slot name="cardHeader" />
     <router-link

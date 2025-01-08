@@ -2,11 +2,14 @@ import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When('I export notebook {string} to GitHub', (notebookTitle: string) => {
-  start.notebookCard(notebookTitle).exportToGithub()
+  cy.findByText(notebookTitle)
+    .closest('[data-cy="notebook-card"]')
+    .findByRole('button', { name: /Export to GitHub/i })
+    .click()
 })
 
 When('I input repository name {string}', (repoName: string) => {
-  // Mock GitHub repository data
+  // Mock GitHub repository data`
   start.testability().mockGithubRepos([
     {
       name: repoName,

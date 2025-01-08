@@ -9,7 +9,7 @@ Feature: Export Notebook to GitHub
     Given I am logged in as an existing user
     And I have a notebook with head note "Programming" and notes:
       | Title          | Details                    | Parent Title |
-      | Python         | A programming language     | Programming  |
+      | Python         | A programming language     | Programming  |@
       | Data Types    | Basic Python data types    | Python       |
       | Functions     | How to define functions    | Python       |
 
