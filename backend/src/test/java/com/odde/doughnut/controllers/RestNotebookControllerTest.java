@@ -327,8 +327,13 @@ class RestNotebookControllerTest {
         }
 
         assertThat(fileNames, hasSize(3));
+        String notebookTitle = notebook.getTitle();
         assertThat(
-            fileNames, hasItems("title2.md", "title2/First Note.md", "title2/Second Note.md"));
+            fileNames,
+            hasItems(
+                notebookTitle + ".md",
+                notebookTitle + "/First Note.md",
+                notebookTitle + "/Second Note.md"));
       }
     }
   }
