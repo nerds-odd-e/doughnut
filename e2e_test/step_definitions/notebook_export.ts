@@ -2,7 +2,7 @@
 /// <reference types="@testing-library/cypress" />
 /// <reference types="../support" />
 
-import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
@@ -29,19 +29,15 @@ When('I select the {string} notebook', (notebookTitle: string) => {
 
 When(
   'I click on the export for Obsidian option on notebook {string}',
-  (notebookTitle: string) => {
-    // Wait and ensure element is fully loaded
-    cy.findByText(notebookTitle, { selector: '.notebook-card *' })
-      .should('be.visible')
-      .parents('.daisy-card')
-      .within(() => {
-        // Click the export button with specific title
-        cy.get('button[title="Export notebook for Obsidian"]')
-          .should('be.visible')
-          .click()
-      })
+  (notebook: string) => {
+    start.routerToNotebooksPage().notebookCard(notebook).exportForObsidian()
   }
 )
+
+Then('I should receive a zip file containing', (table: DataTable) => {
+  // 需要實作檢查下載的 zip 檔案內容
+  cy.task('checkDownloadedZipContent', table.hashes())
+})
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
   start.testability().injectNotes([{ Title: notebookTitle }])
