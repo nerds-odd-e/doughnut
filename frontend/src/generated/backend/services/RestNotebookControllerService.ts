@@ -173,6 +173,25 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
+     * @returns string OK
+     * @throws ApiError
+     */
+    public downloadNotebookForObsidian(
+        notebook: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}/obsidian',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
      * @returns Note OK
      * @throws ApiError
      */
@@ -201,25 +220,6 @@ export class RestNotebookControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/notebooks/{notebook}/dump',
-            path: {
-                'notebook': notebook,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param notebook
-     * @returns string OK
-     * @throws ApiError
-     */
-    public downloadForObsidian(
-        notebook: number,
-    ): CancelablePromise<string> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/notebooks/{notebook}/download-zip',
             path: {
                 'notebook': notebook,
             },
