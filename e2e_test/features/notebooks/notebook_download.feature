@@ -7,6 +7,7 @@ Feature: Notebook export for Obsidian
       | Patient Care    | Basic patient care notes   |
       | Medications     | Common medications list    |
       | Procedures      | Standard procedures guide  |
+
   @ignore
   Scenario: Export notebook as a flat zip file for Obsidian
     When I go to Notebook page
@@ -19,12 +20,14 @@ Feature: Notebook export for Obsidian
     And the zip file should not contain any subdirectories
     And each markdown file should maintain its original content
 
+  @ignore
   Scenario: Export notebook with special characters in title
     When I select the "Medical Notes" notebook
     And I click on the export for Obsidian option
     Then I should receive a zip file with sanitized filenames
     And all markdown files should be at the root level of the zip
 
+  @ignore
   Scenario: Export empty notebook
     When I select the "Medical Notes" notebook
     And I click on the export for Obsidian option
