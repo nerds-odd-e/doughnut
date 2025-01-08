@@ -31,7 +31,7 @@ When(
   'I click on the export for Obsidian option on notebook {string}',
   (notebookTitle: string) => {
     // Wait and ensure element is fully loaded
-    cy.findByText(notebookTitle, { selector: '.notebook-card *'})
+    cy.findByText(notebookTitle, { selector: '.notebook-card *' })
       .should('be.visible')
       .parents('.daisy-card')
       .within(() => {
