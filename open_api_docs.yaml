@@ -2727,6 +2727,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BareNote"
+  /api/notebooks/{notebook}/download-zip:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: downloadNotebookAsZip
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:

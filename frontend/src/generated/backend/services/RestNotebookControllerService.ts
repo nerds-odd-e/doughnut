@@ -209,4 +209,23 @@ export class RestNotebookControllerService {
             },
         });
     }
+    /**
+     * @param notebook
+     * @returns string OK
+     * @throws ApiError
+     */
+    public downloadNotebookAsZip(
+        notebook: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/{notebook}/download-zip',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

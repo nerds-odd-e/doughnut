@@ -1,27 +1,27 @@
-//package com.odde.doughnut.controllers;
+// package com.odde.doughnut.controllers;
 //
-//import static org.hamcrest.MatcherAssert.assertThat;
-//import static org.hamcrest.Matchers.*;
-//import static org.junit.jupiter.api.Assertions.assertThrows;
+// import static org.hamcrest.MatcherAssert.assertThat;
+// import static org.hamcrest.Matchers.*;
+// import static org.junit.jupiter.api.Assertions.assertThrows;
 //
-//import com.odde.doughnut.controllers.dto.NoteRealm;
-//import com.odde.doughnut.controllers.dto.NoteRealm;
-//import com.odde.doughnut.entities.Note;
-//import com.odde.doughnut.entities.User;
-//import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-//import com.odde.doughnut.models.UserModel;
-//import com.odde.doughnut.testability.MakeMe;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.mock.web.MockMultipartFile;
-//import org.springframework.web.multipart.MultipartFile;
+// import com.odde.doughnut.controllers.dto.NoteRealm;
+// import com.odde.doughnut.controllers.dto.NoteRealm;
+// import com.odde.doughnut.entities.Note;
+// import com.odde.doughnut.entities.User;
+// import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+// import com.odde.doughnut.models.UserModel;
+// import com.odde.doughnut.testability.MakeMe;
+// import org.junit.jupiter.api.BeforeEach;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.mock.web.MockMultipartFile;
+// import org.springframework.web.multipart.MultipartFile;
 //
-//import java.io.ByteArrayOutputStream;
-//import java.io.IOException;
-//import java.util.zip.ZipEntry;
-//import java.util.zip.ZipOutputStream;
+// import java.io.ByteArrayOutputStream;
+// import java.io.IOException;
+// import java.util.zip.ZipEntry;
+// import java.util.zip.ZipOutputStream;
 //
-//class RestObsidianImportControllerTests {
+// class RestObsidianImportControllerTests {
 //    private RestObsidianImportController controller;
 //    private MakeMe makeMe;
 //    private UserModel userModel;
@@ -35,7 +35,8 @@
 //    }
 //
 //    @Test
-//    void shouldImportObsidianNotesUnderParentNote() throws UnexpectedNoAccessRightException, IOException {
+//    void shouldImportObsidianNotesUnderParentNote() throws UnexpectedNoAccessRightException,
+// IOException {
 //        // Create a mock zip file with Obsidian notes
 //        MultipartFile zipFile = createMockZipFile("Note 2.md", "# Note 2\nSome content");
 //
@@ -77,4 +78,4 @@
 //            baos.toByteArray()
 //        );
 //    }
-//}
+// }

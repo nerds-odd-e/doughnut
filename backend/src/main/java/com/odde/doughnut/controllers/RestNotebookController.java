@@ -16,7 +16,12 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -152,5 +157,31 @@ class RestNotebookController {
 
     currentUser.assertAuthorization(notebook);
     return modelFactoryService.notebookAiAssistantRepository.findByNotebookId(notebook.getId());
+  }
+
+  @GetMapping("/{notebook}/download-zip")
+  public byte[] downloadNotebookAsZip(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException, IOException {
+
+    currentUser.assertAuthorization(notebook);
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+      List<Note> notesToExport =
+          notebook.getNotes().stream()
+              .filter(note -> !note.equals(notebook.getHeadNote()))
+              .toList();
+
+      for (Note note : notesToExport) {
+        ZipEntry entry = new ZipEntry(note.getTopicConstructor() + ".md");
+        zos.putNextEntry(entry);
+        byte[] noteContent = note.getDetails().getBytes(StandardCharsets.UTF_8);
+        zos.write(noteContent);
+        zos.closeEntry();
+      }
+    }
+
+    return baos.toByteArray();
   }
 }

@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -16,8 +17,12 @@ import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
+import java.io.ByteArrayInputStream;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -274,6 +279,53 @@ class RestNotebookControllerTest {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getAiAssistant(note.getNotebook()));
+    }
+  }
+
+  @Nested
+  class DownloadNotebookAsZip {
+    private Notebook notebook;
+    private Note note1;
+    private Note note2;
+
+    @BeforeEach
+    void setup() {
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      note1 =
+          makeMe.aNote("First Note").under(notebook.getHeadNote()).details("Content 1").please();
+      note2 =
+          makeMe.aNote("Second Note").under(notebook.getHeadNote()).details("Content 2").please();
+      makeMe.refresh(notebook);
+    }
+
+    @Test
+    void whenNotAuthorized() {
+      User anotherUser = makeMe.aUser().please();
+      controller =
+          new RestNotebookController(
+              modelFactoryService,
+              modelFactoryService.toUserModel(anotherUser),
+              testabilitySettings);
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookAsZip(notebook));
+    }
+
+    @Test
+    void whenAuthorizedShouldReturnZipWithMarkdownFiles() throws Exception {
+      byte[] zipContent = controller.downloadNotebookAsZip(notebook);
+
+      try (ByteArrayInputStream bais = new ByteArrayInputStream(zipContent);
+          ZipInputStream zis = new ZipInputStream(bais)) {
+
+        ZipEntry entry;
+        List<String> fileNames = new ArrayList<>();
+        while ((entry = zis.getNextEntry()) != null) {
+          fileNames.add(entry.getName());
+        }
+
+        assertThat(fileNames, hasSize(2));
+        assertThat(fileNames, hasItems("First Note.md", "Second Note.md"));
+      }
     }
   }
 }
