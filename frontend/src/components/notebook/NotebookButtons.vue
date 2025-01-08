@@ -87,7 +87,6 @@ import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import NotebookGithubExportDialog from "./NotebookGithubExportDialog.vue"
 import SvgGithub from "@/components/svgs/SvgGithub.vue"
 
@@ -98,7 +97,6 @@ const { popups } = usePopups()
 const props = defineProps<{
   notebook: Notebook
   user?: User
-  storageAccessor: StorageAccessor
 }>()
 
 const shareNotebook = async () => {
@@ -123,9 +121,10 @@ const handleObsidianImport = async (event: Event) => {
   if (!file) return
 
   try {
-    await props.storageAccessor
-      .storedApi()
-      .importObsidianZip(props.notebook.id, file)
+    await managedApi.restNotebookController.importObsidianZip(
+      props.notebook.id,
+      file
+    )
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
   } catch (error) {
