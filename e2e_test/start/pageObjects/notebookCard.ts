@@ -12,7 +12,9 @@ interface NotebookCard {
   importObsidianData(filename: string): void
 }
 
-export const notebookCard = (notebook: string): NotebookCard & ReturnType<typeof notebookList> => ({
+export const notebookCard = (
+  notebook: string
+): NotebookCard & ReturnType<typeof notebookList> => ({
   ...notebookList(),
   shareNotebookToBazaar() {
     findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
@@ -45,5 +47,5 @@ export const notebookCard = (notebook: string): NotebookCard & ReturnType<typeof
         )
       })
     cy.pageIsNotLoading()
-  }
+  },
 })

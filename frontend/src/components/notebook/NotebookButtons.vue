@@ -106,7 +106,9 @@ const handleObsidianImport = async (event: Event) => {
   if (!file) return
 
   try {
-    await props.storageAccessor.storedApi().importObsidianZip(props.notebook.id, file)
+    await props.storageAccessor
+      .storedApi()
+      .importObsidianZip(props.notebook.id, file)
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
   } catch (error) {
