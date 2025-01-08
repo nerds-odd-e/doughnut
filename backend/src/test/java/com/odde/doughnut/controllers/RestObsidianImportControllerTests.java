@@ -64,11 +64,11 @@ class RestObsidianImportControllerTests {
     void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException {
       // Act
       NoteRealm response = controller.importObsidian(zipFile, notebook);
-      var expectedNoteId = notebook.getHeadNoteId();
+      var expectedNote = notebook.getHeadNote();
       // Assert
-      assertThat(response.getId(), equalTo(expectedNoteId));
-      assertThat(response.getNote().getTopicConstructor(), equalTo("title1"));
-      assertThat(response.getNote().getDetails(), equalTo("descrption"));
+      assertThat(response.getId(), equalTo(expectedNote.getId()));
+      assertThat(response.getNote().getTopicConstructor(), equalTo(notebook.getTitle()));
+      assertThat(response.getNote().getDetails(), equalTo(notebook.getShortDetails()));
     }
 
     @Test
