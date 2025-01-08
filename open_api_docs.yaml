@@ -2710,6 +2710,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
+  /api/notebooks/{notebook}/obsidian:
+    get:
+      tags:
+      - rest-notebook-controller
+      operationId: downloadNotebookForObsidian
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
   /api/notebooks/{notebook}/notes:
     get:
       tags:
@@ -2762,31 +2787,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BareNote"
-  /api/notebooks/{notebook}/download-zip:
-    get:
-      tags:
-      - rest-notebook-controller
-      operationId: downloadForObsidian
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:
