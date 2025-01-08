@@ -176,7 +176,10 @@ Then('I should get immediate feedback by showing the wrong answer', () => {
 When(
   'I Import Obsidian data {string} to note {string}',
   (filename: string, noteTitle: string) => {
-    start.jumpToNotePage(noteTitle).importObsidianData(filename)
+    start
+      .routerToNotebooksPage()
+      .notebookCard(noteTitle)
+      .importObsidianData(filename)
   }
 )
 

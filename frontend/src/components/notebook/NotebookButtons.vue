@@ -32,6 +32,19 @@
     >
       <SvgBazaarShare />
     </button>
+    <label 
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      title="Import from Obsidian"
+    >
+      <input
+        type="file"
+        accept=".zip"
+        class="!hidden"
+        style="display: none !important"
+        @change="handleObsidianImport"
+      />
+      <SvgObsidian />
+    </label>
     <button
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
       @click="exportForObsidian"
@@ -52,12 +65,14 @@ import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
 import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
 import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
+import SvgObsidian from "@/components/svgs/SvgObsidian.vue"
 import type { Notebook, User } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
@@ -66,6 +81,7 @@ const { popups } = usePopups()
 const props = defineProps<{
   notebook: Notebook
   user?: User
+  storageAccessor: StorageAccessor
 }>()
 
 const shareNotebook = async () => {
@@ -83,5 +99,19 @@ const exportForObsidian = () => {
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)
+}
+
+const handleObsidianImport = async (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+
+  try {
+    await props.storageAccessor.storedApi().importObsidianZip(props.notebook.id, file)
+    // Clear file input for reuse
+    ;(event.target as HTMLInputElement).value = ""
+  } catch (error) {
+    alert("Failed to import file")
+    console.error("Import error:", error)
+  }
 }
 </script>

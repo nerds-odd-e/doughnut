@@ -6,7 +6,7 @@
     <main>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
         <template #default="{ notebook }">
-          <NotebookButtons v-bind="{ notebook, user }" />
+          <NotebookButtons v-bind="{ notebook, user, storageAccessor }" />
         </template>
       </NotebookCardsWithButtons>
     </main>
@@ -31,12 +31,21 @@ import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithBut
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
+import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { PropType } from "vue"
 
 const { managedApi } = useLoadingApi()
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const subscriptions = ref<Subscription[] | undefined>(undefined)
 const notebooks = ref<Notebook[] | undefined>(undefined)
+
+defineProps({
+  storageAccessor: {
+    type: Object as PropType<StorageAccessor>,
+    required: true,
+  },
+})
 
 const fetchData = async () => {
   const res = await managedApi.restNotebookController.myNotebooks()
