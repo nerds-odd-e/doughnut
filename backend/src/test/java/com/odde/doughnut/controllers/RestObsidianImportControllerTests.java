@@ -1,14 +1,13 @@
 package com.odde.doughnut.controllers;
 
-import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -20,6 +19,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -29,10 +30,11 @@ class RestObsidianImportControllerTests {
   private UserModel userModel;
   private RestObsidianImportController controller;
 
+    private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestObsidianImportController(userModel);
+    controller = new RestObsidianImportController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -52,14 +54,18 @@ class RestObsidianImportControllerTests {
               .details("Content of Note 1")
               .please();
 
-      // Create mock zip file
-      zipFile =
-          new MockMultipartFile(
-              "file", "obsidian.zip", "application/zip", "# Note2\nContent of Note 2".getBytes());
+      // Create mock zip file from actual test resource
+      try {
+        byte[] zipContent = getClass().getResourceAsStream("/import-one-child.zip").readAllBytes();
+        zipFile = new MockMultipartFile(
+            "file", "obsidian.zip", "application/zip", zipContent);
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to read test zip file", e);
+      }
     }
 
     @Test
-    void shouldSucceedWhenUserHasAccess() throws UnexpectedNoAccessRightException {
+    void shouldSucceedWhenUserHasAccess() throws UnexpectedNoAccessRightException, IOException {
       // Act & Assert - should not throw exception
       controller.importObsidian(zipFile, notebook);
     }
@@ -80,7 +86,7 @@ class RestObsidianImportControllerTests {
     void shouldRequireUserToBeLoggedIn() {
       // Arrange
       userModel = makeMe.aNullUserModelPlease();
-      controller = new RestObsidianImportController(userModel);
+      controller = new RestObsidianImportController(modelFactoryService,userModel, testabilitySettings);
 
       // Act & Assert
       ResponseStatusException exception =
