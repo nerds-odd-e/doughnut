@@ -50,4 +50,4 @@ Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
 When('I go to Notebook page', () => {
   // Using the same navigation function but without parameters
   start.routerToNotebooksPage()
-})
+}) 
