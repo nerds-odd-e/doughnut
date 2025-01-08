@@ -9,18 +9,18 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Entity
 @Table(name = "notebook")
@@ -203,22 +203,22 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   public byte[] generateObsidianExport() throws IOException {
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     try (ZipOutputStream zos = new ZipOutputStream(baos)) {
-        for (Note note : getNotes()) {
-            String fileName = sanitizeFileName(note.getTopicConstructor()) + ".md";
-            ZipEntry entry = new ZipEntry(fileName);
-            zos.putNextEntry(entry);
-            
-            // Create markdown content
-            StringBuilder markdown = new StringBuilder();
-            markdown.append("# ").append(note.getTopicConstructor()).append("\n\n");
-            if (note.getDetails() != null) {
-                markdown.append(note.getDetails()).append("\n");
-            }
-            
-            byte[] content = markdown.toString().getBytes(StandardCharsets.UTF_8);
-            zos.write(content);
-            zos.closeEntry();
+      for (Note note : getNotes()) {
+        String fileName = sanitizeFileName(note.getTopicConstructor()) + ".md";
+        ZipEntry entry = new ZipEntry(fileName);
+        zos.putNextEntry(entry);
+
+        // Create markdown content
+        StringBuilder markdown = new StringBuilder();
+        markdown.append("# ").append(note.getTopicConstructor()).append("\n\n");
+        if (note.getDetails() != null) {
+          markdown.append(note.getDetails()).append("\n");
         }
+
+        byte[] content = markdown.toString().getBytes(StandardCharsets.UTF_8);
+        zos.write(content);
+        zos.closeEntry();
+      }
     }
     return baos.toByteArray();
   }

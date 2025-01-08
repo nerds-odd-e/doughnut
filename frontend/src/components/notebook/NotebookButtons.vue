@@ -76,8 +76,8 @@ const shareNotebook = async () => {
 }
 
 const exportForObsidian = () => {
-  const link = document.createElement('a')
-  link.style.display = 'none'
+  const link = document.createElement("a")
+  link.style.display = "none"
   link.href = `/api/notebooks/${props.notebook.id}/obsidian`
   link.download = `${props.notebook.title}-obsidian.zip`
   document.body.appendChild(link)

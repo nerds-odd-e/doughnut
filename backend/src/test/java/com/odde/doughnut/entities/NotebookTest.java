@@ -4,20 +4,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.testability.MakeMe;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -65,17 +62,17 @@ class NotebookTest {
 
     // Verify zip contents
     try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
-         ZipInputStream zis = new ZipInputStream(bais)) {
-        
-        ZipEntry entry;
-        int fileCount = 0;
-        while ((entry = zis.getNextEntry()) != null) {
-            fileCount++;
-            String content = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
-            assertTrue(content.startsWith("# "));
-            assertTrue(content.contains("Content"));
-        }
-        assertEquals(3, fileCount); // Head note + 2 child notes
+        ZipInputStream zis = new ZipInputStream(bais)) {
+
+      ZipEntry entry;
+      int fileCount = 0;
+      while ((entry = zis.getNextEntry()) != null) {
+        fileCount++;
+        String content = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
+        assertTrue(content.startsWith("# "));
+        assertTrue(content.contains("Content"));
+      }
+      assertEquals(3, fileCount); // Head note + 2 child notes
     }
   }
 }

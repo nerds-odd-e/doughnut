@@ -161,18 +161,19 @@ class RestNotebookController {
   public ResponseEntity<byte[]> downloadNotebookForObsidian(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
-      currentUser.assertAuthorization(notebook);
-      
-      byte[] zipBytes = notebook.generateObsidianExport();
-      
-      return ResponseEntity.ok()
-          .header(HttpHeaders.CONTENT_DISPOSITION, 
-                  "attachment; filename=\"" + sanitizeFileName(notebook.getTitle()) + "-obsidian.zip\"")
-          .header(HttpHeaders.CONTENT_TYPE, "application/zip")
-          .body(zipBytes);
+    currentUser.assertAuthorization(notebook);
+
+    byte[] zipBytes = notebook.generateObsidianExport();
+
+    return ResponseEntity.ok()
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + sanitizeFileName(notebook.getTitle()) + "-obsidian.zip\"")
+        .header(HttpHeaders.CONTENT_TYPE, "application/zip")
+        .body(zipBytes);
   }
 
   private String sanitizeFileName(String fileName) {
-      return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
+    return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
   }
 }
