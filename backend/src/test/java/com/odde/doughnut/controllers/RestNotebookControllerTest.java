@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -17,18 +16,13 @@ import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
-import java.io.ByteArrayInputStream;
 import java.time.Period;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -310,31 +304,6 @@ class RestNotebookControllerTest {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
-    }
-
-    @Test
-    void whenAuthorizedShouldReturnZipWithMarkdownFiles() throws Exception {
-      ResponseEntity<byte[]> response = controller.downloadNotebookForObsidian(notebook);
-      byte[] zipContent = response.getBody();
-
-      try (ByteArrayInputStream bais = new ByteArrayInputStream(zipContent);
-          ZipInputStream zis = new ZipInputStream(bais)) {
-
-        ZipEntry entry;
-        List<String> fileNames = new ArrayList<>();
-        while ((entry = zis.getNextEntry()) != null) {
-          fileNames.add(entry.getName());
-        }
-
-        assertThat(fileNames, hasSize(3));
-        String notebookTitle = notebook.getTitle();
-        assertThat(
-            fileNames,
-            hasItems(
-                notebookTitle + ".md",
-                notebookTitle + "/First Note.md",
-                notebookTitle + "/Second Note.md"));
-      }
     }
   }
 }

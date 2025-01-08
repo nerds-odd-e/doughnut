@@ -1,12 +1,16 @@
 package com.odde.doughnut.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.testability.MakeMe;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,10 +55,13 @@ class NotebookTest {
   }
 
   @Test
-  void generateObsidianExportShouldCreateValidZipFile() throws IOException {
-    // Create test notes
-    Note note1 = makeMe.aNote("Test Note 1").under(headNote).details("Content 1").please();
-    Note note2 = makeMe.aNote("Test Note 2").under(headNote).details("Content 2").please();
+  void generateObsidianExportShouldCreateValidZipFileWithIndexFiles() throws IOException {
+    // Create test notes with hierarchy
+    headNote.setTopicConstructor("Root Note");
+    headNote.setDetails("Root Content");
+    Note note1 = makeMe.aNote("Parent Note").under(headNote).details("Parent Content").please();
+    Note note2 = makeMe.aNote("Child Note").under(note1).details("Child Content").please();
+    Note note3 = makeMe.aNote("Leaf Note").under(note1).details("Leaf Content").please();
     makeMe.refresh(notebook);
 
     // Generate export
@@ -64,17 +71,36 @@ class NotebookTest {
     try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
         ZipInputStream zis = new ZipInputStream(bais)) {
 
+      Map<String, String> zipContents = new HashMap<>();
       ZipEntry entry;
-      int fileCount = 0;
       while ((entry = zis.getNextEntry()) != null) {
-        fileCount++;
-        String content = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
-        assertTrue(content.startsWith("# "));
-        if (entry.getName().contains("Test Note")) {
-          assertTrue(content.contains("Content"));
-        }
+        byte[] content = zis.readAllBytes();
+        zipContents.put(entry.getName(), new String(content, StandardCharsets.UTF_8));
       }
-      assertEquals(3, fileCount); // Head note + 2 child notes
+
+      // Verify the structure and content
+      assertThat(
+          zipContents.keySet(),
+          hasItems(
+              "Root Note/__index.md",
+              "Root Note/Parent Note/__index.md",
+              "Root Note/Parent Note/Child Note.md",
+              "Root Note/Parent Note/Leaf Note.md"));
+
+      // Verify content of files
+      assertTrue(zipContents.get("Root Note/__index.md").contains("# Root Note\nRoot Content"));
+      assertTrue(
+          zipContents
+              .get("Root Note/Parent Note/__index.md")
+              .contains("# Parent Note\nParent Content"));
+      assertTrue(
+          zipContents
+              .get("Root Note/Parent Note/Child Note.md")
+              .contains("# Child Note\nChild Content"));
+      assertTrue(
+          zipContents
+              .get("Root Note/Parent Note/Leaf Note.md")
+              .contains("# Leaf Note\nLeaf Content"));
     }
   }
 }
