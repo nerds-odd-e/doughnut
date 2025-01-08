@@ -184,24 +184,6 @@
             </PopButton>
           </li>
           <li>
-            <label 
-              class="daisy-menu-item flex items-center gap-2 w-full"
-              title="Import from Obsidian"
-            >
-              <input
-                type="file"
-                accept=".zip"
-                class="!hidden"
-                style="display: none !important"
-                @change="handleObsidianImport"
-              />
-              <div class="flex items-center gap-2">
-                <SvgObsidian class="me-1" />
-                <span>Import from Obsidian</span>
-              </div>
-            </label>
-          </li>
-          <li>
             <NoteDeleteButton
               class="daisy-w-full"
               v-bind="{ noteId: note.id, storageAccessor }"
@@ -250,13 +232,8 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
-import SvgObsidian from "../../svgs/SvgObsidian.vue"
 
-const {
-  storageAccessor,
-  note,
-  notebookId = 0,
-} = defineProps<{
+const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
   note: Note
   notebookId?: number
@@ -275,20 +252,5 @@ const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
     emit("note-accessory-updated", na)
   }
   closer()
-}
-
-const handleObsidianImport = async (event: Event) => {
-  const file = (event.target as HTMLInputElement).files?.[0]
-  if (!file) return
-
-  try {
-    await storageAccessor.storedApi().importObsidianZip(notebookId, file)
-
-    // 清除檔案選擇，這樣同一個檔案可以再次選擇
-    ;(event.target as HTMLInputElement).value = ""
-  } catch (error) {
-    alert("Failed to import file")
-    console.error("Import error:", error)
-  }
 }
 </script>
