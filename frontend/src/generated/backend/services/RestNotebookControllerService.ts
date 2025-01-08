@@ -214,7 +214,7 @@ export class RestNotebookControllerService {
      * @returns string OK
      * @throws ApiError
      */
-    public downloadNotebookAsZip(
+    public downloadForObsidian(
         notebook: number,
     ): CancelablePromise<string> {
         return this.httpRequest.request({

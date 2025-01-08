@@ -814,6 +814,41 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
+  /api/obsidian/{parentNoteId}/import:
+    post:
+      tags:
+      - rest-obsidian-import-controller
+      operationId: importObsidian
+      parameters:
+      - name: parentNoteId
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteRealm"
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
@@ -2731,7 +2766,7 @@ paths:
     get:
       tags:
       - rest-notebook-controller
-      operationId: downloadNotebookAsZip
+      operationId: downloadForObsidian
       parameters:
       - name: notebook
         in: path
@@ -3637,28 +3672,6 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
-    NoteCreationDTO:
-      required:
-      - newTitle
-      type: object
-      properties:
-        newTitle:
-          maxLength: 150
-          minLength: 1
-          type: string
-        wikidataId:
-          pattern: ^$|Q\d+
-          type: string
-    NoteCreationRresult:
-      required:
-      - created
-      - parent
-      type: object
-      properties:
-        created:
-          $ref: "#/components/schemas/NoteRealm"
-        parent:
-          $ref: "#/components/schemas/NoteRealm"
     NoteRealm:
       required:
       - id
@@ -3682,6 +3695,28 @@ components:
             $ref: "#/components/schemas/Note"
         notebook:
           $ref: "#/components/schemas/Notebook"
+    NoteCreationDTO:
+      required:
+      - newTitle
+      type: object
+      properties:
+        newTitle:
+          maxLength: 150
+          minLength: 1
+          type: string
+        wikidataId:
+          pattern: ^$|Q\d+
+          type: string
+    NoteCreationRresult:
+      required:
+      - created
+      - parent
+      type: object
+      properties:
+        created:
+          $ref: "#/components/schemas/NoteRealm"
+        parent:
+          $ref: "#/components/schemas/NoteRealm"
     WikidataAssociationCreation:
       required:
       - wikidataId

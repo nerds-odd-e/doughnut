@@ -5,7 +5,6 @@
 import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
-import { notebookCard } from '../start/pageObjects/notebookCard'
 
 // First step already exists in user.ts:
 // Given('I am logged in as an existing user', () => {
@@ -29,9 +28,18 @@ When('I select the {string} notebook', (notebookTitle: string) => {
 })
 
 When(
-  'I click on the download for Obsidian option on notebook {string}',
+  'I click on the export for Obsidian option on notebook {string}',
   (notebookTitle: string) => {
-    notebookCard(notebookTitle).downloadForObsidian()
+    // Wait and ensure element is fully loaded
+    cy.findByText(notebookTitle, { selector: '.notebook-card *' })
+      .should('be.visible')
+      .parents('.daisy-card')
+      .within(() => {
+        // Click the export button with specific title
+        cy.get('button[title="Export notebook for Obsidian"]')
+          .should('be.visible')
+          .click()
+      })
   }
 )
 

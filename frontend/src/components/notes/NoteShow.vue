@@ -50,6 +50,7 @@
               v-if="!readonly"
               v-bind="{
                 note: noteRealm.note,
+                notebookId: noteRealm.notebook?.id ?? 0,
                 storageAccessor,
                 asMarkdown,
                 conversationButton: noConversationButton,

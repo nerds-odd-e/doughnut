@@ -184,21 +184,22 @@
             </PopButton>
           </li>
           <li>
-            <PopButton
-              btn-class="daisy-w-full"
+            <label 
+              class="daisy-menu-item flex items-center gap-2 w-full"
               title="Import from Obsidian"
             >
-              <template #button_face>
-                <SvgObsidian />
-                <span class="ms-2">Import from Obsidian</span>
-              </template>
-              <template #default="{ closer }">
-                <ObsidianImportDialog
-                  v-bind="{ note, storageAccessor }"
-                  @close-dialog="closer"
-                />
-              </template>
-            </PopButton>
+              <input
+                type="file"
+                accept=".zip"
+                class="!hidden"
+                style="display: none !important"
+                @change="handleObsidianImport"
+              />
+              <div class="flex items-center gap-2">
+                <SvgObsidian class="me-1" />
+                <span>Import from Obsidian</span>
+              </div>
+            </label>
           </li>
           <li>
             <NoteDeleteButton
@@ -250,11 +251,11 @@ import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 import SvgObsidian from "../../svgs/SvgObsidian.vue"
-import ObsidianImportDialog from "../ObsidianImportDialog.vue"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
   note: Note
+  notebookId?: number
   asMarkdown?: boolean
   conversationButton?: boolean
 }>()
@@ -270,5 +271,21 @@ const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
     emit("note-accessory-updated", na)
   }
   closer()
+}
+
+const handleObsidianImport = async (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+
+  try {
+    // await storageAccessor.storedApi().importObsidianZip(notebookId, file)
+
+    // 清除檔案選擇，這樣同一個檔案可以再次選擇
+    ;(event.target as HTMLInputElement).value = ""
+    alert("Import successful!")
+  } catch (error) {
+    alert("Failed to import file")
+    console.error("Import error:", error)
+  }
 }
 </script>

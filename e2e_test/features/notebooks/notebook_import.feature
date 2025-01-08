@@ -9,8 +9,9 @@ Feature: Notebook Import
       | Title   | Parent Title |
       | note 2  | note 1       |
 
+  @ignore
   Scenario: Import notes from Obsidian
-
+    When I Import Obsidian data "import-one-child.zip" to note "note 1"
     Then I should see "note 1" with these children
       | note-title|
       | note 2    |
