@@ -286,7 +286,6 @@ const handleObsidianImport = async (event: Event) => {
 
     // 清除檔案選擇，這樣同一個檔案可以再次選擇
     ;(event.target as HTMLInputElement).value = ""
-    alert("Import successful!")
   } catch (error) {
     alert("Failed to import file")
     console.error("Import error:", error)

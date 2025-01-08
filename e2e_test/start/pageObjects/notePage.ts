@@ -385,10 +385,6 @@ export const assumeNotePage = (noteTopology?: string) => {
         )
       })
       cy.pageIsNotLoading()
-      // Wait for success message in alert
-      cy.on('window:alert', (text) => {
-        expect(text).to.equal('Import successful!')
-      })
       return this
     },
   }

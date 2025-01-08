@@ -179,3 +179,10 @@ When(
     start.jumpToNotePage(noteTitle).importObsidianData(filename)
   }
 )
+
+Then('I should see popup {string}', (message: string) => {
+  // Wait for and verify alert message
+  cy.on('window:alert', (text) => {
+    expect(text).to.equal(message)
+  })
+})
