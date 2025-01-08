@@ -11,6 +11,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
@@ -43,5 +51,31 @@ class NotebookTest {
   void creatorId() {
     assertThat(notebook.getCreatorId())
         .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
+  }
+
+  @Test
+  void generateObsidianExportShouldCreateValidZipFile() throws IOException {
+    // Create test notes
+    Note note1 = makeMe.aNote("Test Note 1").under(headNote).details("Content 1").please();
+    Note note2 = makeMe.aNote("Test Note 2").under(headNote).details("Content 2").please();
+    makeMe.refresh(notebook);
+
+    // Generate export
+    byte[] zipBytes = notebook.generateObsidianExport();
+
+    // Verify zip contents
+    try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
+         ZipInputStream zis = new ZipInputStream(bais)) {
+        
+        ZipEntry entry;
+        int fileCount = 0;
+        while ((entry = zis.getNextEntry()) != null) {
+            fileCount++;
+            String content = new String(zis.readAllBytes(), StandardCharsets.UTF_8);
+            assertTrue(content.startsWith("# "));
+            assertTrue(content.contains("Content"));
+        }
+        assertEquals(3, fileCount); // Head note + 2 child notes
+    }
   }
 }

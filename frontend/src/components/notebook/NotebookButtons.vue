@@ -76,29 +76,13 @@ const shareNotebook = async () => {
   }
 }
 
-const downloadForObsidian = async () => {
-  const response = ""
-  /*await managedApi.restNotebookController.downloadNotebookForObsidian(
-      props.notebook.id
-    )*/
-
-  // Create a blob from the response data
-  const blob = new Blob([response], { type: "application/zip" })
-
-  // Create a temporary URL for the blob
-  const url = window.URL.createObjectURL(blob)
-
-  // Create a temporary link element
-  const link = document.createElement("a")
-  link.href = url
-  link.download = `${props.notebook.title}.zip` // Set the download filename
-
-  // Trigger the download
+const downloadForObsidian = () => {
+  const link = document.createElement('a')
+  link.style.display = 'none'
+  link.href = `/api/notebooks/${props.notebook.id}/obsidian`
+  link.download = `${props.notebook.title}-obsidian.zip`
   document.body.appendChild(link)
   link.click()
-
-  // Clean up
   document.body.removeChild(link)
-  window.URL.revokeObjectURL(url)
 }
 </script>

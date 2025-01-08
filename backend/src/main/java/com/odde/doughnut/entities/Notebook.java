@@ -16,6 +16,11 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @Entity
 @Table(name = "notebook")
@@ -192,5 +197,33 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     notebookAssistant.setCreatedAt(currentUTCTimestamp);
     notebookAssistant.setAssistantId(id);
     return notebookAssistant;
+  }
+
+  @JsonIgnore
+  public byte[] generateObsidianExport() throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try (ZipOutputStream zos = new ZipOutputStream(baos)) {
+        for (Note note : getNotes()) {
+            String fileName = sanitizeFileName(note.getTopicConstructor()) + ".md";
+            ZipEntry entry = new ZipEntry(fileName);
+            zos.putNextEntry(entry);
+            
+            // Create markdown content
+            StringBuilder markdown = new StringBuilder();
+            markdown.append("# ").append(note.getTopicConstructor()).append("\n\n");
+            if (note.getDetails() != null) {
+                markdown.append(note.getDetails()).append("\n");
+            }
+            
+            byte[] content = markdown.toString().getBytes(StandardCharsets.UTF_8);
+            zos.write(content);
+            zos.closeEntry();
+        }
+    }
+    return baos.toByteArray();
+  }
+
+  private String sanitizeFileName(String fileName) {
+    return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
   }
 }
