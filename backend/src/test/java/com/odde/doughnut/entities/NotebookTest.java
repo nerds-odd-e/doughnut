@@ -2,8 +2,8 @@ package com.odde.doughnut.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasItems;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.testability.MakeMe;
@@ -89,16 +89,19 @@ class NotebookTest {
               "Root Note/Parent Note/Leaf Note.md"));
 
       // Verify content of files
-      assertThat(zipContents.get("Root Note/__index.md"), 
-          containsString("# Root Note\nRoot Content"));
+      assertThat(
+          zipContents.get("Root Note/__index.md"), containsString("# Root Note\nRoot Content"));
 
-      assertThat(zipContents.get("Root Note/Parent Note/__index.md"),
-          containsString("# Parent Note\nParent Content")); 
+      assertThat(
+          zipContents.get("Root Note/Parent Note/__index.md"),
+          containsString("# Parent Note\nParent Content"));
 
-      assertThat(zipContents.get("Root Note/Parent Note/Child Note.md"),
+      assertThat(
+          zipContents.get("Root Note/Parent Note/Child Note.md"),
           containsString("# Child Note\nChild Content"));
 
-      assertThat(zipContents.get("Root Note/Parent Note/Leaf Note.md"), 
+      assertThat(
+          zipContents.get("Root Note/Parent Note/Leaf Note.md"),
           containsString("# Leaf Note\nLeaf Content"));
     }
   }
