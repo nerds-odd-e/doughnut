@@ -121,9 +121,9 @@ const handleObsidianImport = async (event: Event) => {
   if (!file) return
 
   try {
-    await managedApi.restNotebookController.importObsidianZip(
+    await managedApi.restObsidianImportController.importObsidian(
       props.notebook.id,
-      file
+      { file }
     )
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
