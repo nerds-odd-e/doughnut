@@ -32,15 +32,10 @@ public class RestObsidianImportController {
       @Parameter(description = "Parent note ID")
           @PathVariable("parentNoteId")
           @Schema(type = "integer")
-          Integer parentNoteId)
+          Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-
-    Notebook notebook =
-        currentUser.getEntity().getOwnership().getNotebooks().stream()
-            .filter(n -> n.getId().equals(parentNoteId))
-            .findFirst()
-            .orElseThrow(() -> new UnexpectedNoAccessRightException());
+    currentUser.assertReadAuthorization(notebook);
 
     // TODO: Process zip file content
     // For now, just return the head note

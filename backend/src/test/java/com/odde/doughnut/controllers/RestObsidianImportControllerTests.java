@@ -60,15 +60,15 @@ class RestObsidianImportControllerTests {
               "file", "obsidian.zip", "application/zip", "# Note2\nContent of Note 2".getBytes());
     }
 
-    //    @Test
+    @Test
     void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException {
       // Act
-      NoteRealm response = controller.importObsidian(zipFile, notebook.getId());
-
+      NoteRealm response = controller.importObsidian(zipFile, notebook);
+      var expectedNoteId = notebook.getHeadNoteId();
       // Assert
-      assertThat(response.getId(), equalTo(note1.getId()));
-      assertThat(response.getNote().getTopicConstructor(), equalTo("Note1"));
-      assertThat(response.getNote().getDetails(), equalTo("Content of Note 1"));
+      assertThat(response.getId(), equalTo(expectedNoteId));
+      assertThat(response.getNote().getTopicConstructor(), equalTo("title1"));
+      assertThat(response.getNote().getDetails(), equalTo("descrption"));
     }
 
     @Test
@@ -80,14 +80,7 @@ class RestObsidianImportControllerTests {
       // Act & Assert
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.importObsidian(zipFile, otherNotebook.getId()));
-    }
-
-    @Test
-    void shouldThrowExceptionForNonExistentNotebook() {
-      // Act & Assert
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.importObsidian(zipFile, 99999));
+          () -> controller.importObsidian(zipFile, otherNotebook));
     }
 
     @Test
@@ -99,8 +92,7 @@ class RestObsidianImportControllerTests {
       // Act & Assert
       ResponseStatusException exception =
           assertThrows(
-              ResponseStatusException.class,
-              () -> controller.importObsidian(zipFile, notebook.getId()));
+              ResponseStatusException.class, () -> controller.importObsidian(zipFile, notebook));
 
       // Verify the correct status and message
       assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
