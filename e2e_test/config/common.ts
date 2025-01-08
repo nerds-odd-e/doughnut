@@ -2,6 +2,9 @@ import { existsSync, rmdir } from 'node:fs'
 import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor'
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
+import fs from 'fs'
+import path from 'path'
+import AdmZip from 'adm-zip'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -62,6 +65,61 @@ const commonConfig = {
             })
           }
           return checker(retryCount)
+        },
+        checkDownloadedZipContent(expectedFiles) {
+          const downloadsFolder = config.downloadsFolder || 'cypress/downloads'
+          const files = fs.readdirSync(downloadsFolder)
+          const zipFile = files.find((file) => file.endsWith('.zip'))
+
+          if (!zipFile) {
+            throw new Error('No zip file found in downloads folder')
+          }
+
+          const zip = new AdmZip(path.join(downloadsFolder, zipFile))
+          const zipEntries = zip.getEntries()
+
+          // 驗證文件列表
+          const actualFiles = zipEntries.map((entry) => ({
+            Filename: entry.entryName,
+            Format: path.extname(entry.entryName).slice(1),
+            Content: entry.getData().toString('utf8'),
+          }))
+
+          // 驗證沒有超過一級的子目錄
+          const hasInvalidSubdirectories = zipEntries.some((entry) => {
+            const pathParts = entry.entryName.split('/')
+            return pathParts.length > 2
+          })
+
+          if (hasInvalidSubdirectories) {
+            throw new Error(
+              'Zip file contains nested subdirectories (more than one level)'
+            )
+          }
+
+          // 比較實際文件和預期文件
+          const expectedFilesArray = expectedFiles.map((file) => ({
+            Filename: file.Filename,
+            Format: file.Format,
+            Content: file.Content,
+          }))
+
+          const matchesExpected = expectedFilesArray.every((expected) =>
+            actualFiles.some(
+              (actual) =>
+                actual.Filename === expected.Filename &&
+                actual.Format === expected.Format &&
+                (expected.Content ? actual.Content === expected.Content : true)
+            )
+          )
+
+          if (!matchesExpected) {
+            throw new Error(
+              `File content mismatch. Expected: ${JSON.stringify(expectedFilesArray)}, Got: ${JSON.stringify(actualFiles)}`
+            )
+          }
+
+          return true
         },
       })
 
