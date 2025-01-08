@@ -5,24 +5,19 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.services.NoteConstructionService;
-import com.odde.doughnut.services.WikidataService;
-import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.io.IOException;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 @RestController
 @SessionScope
@@ -31,14 +26,16 @@ public class RestObsidianImportController {
   private final UserModel currentUser;
   private final NoteConstructionService noteConstructionService;
 
-  public RestObsidianImportController(ModelFactoryService modelFactoryService,
-                                      UserModel currentUser,
-                                      TestabilitySettings testabilitySettings) {
+  public RestObsidianImportController(
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings) {
     this.currentUser = currentUser;
-    this.noteConstructionService = new NoteConstructionService(
-                currentUser.getEntity(),
-                testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService);
+    this.noteConstructionService =
+        new NoteConstructionService(
+            currentUser.getEntity(),
+            testabilitySettings.getCurrentUTCTimestamp(),
+            modelFactoryService);
   }
 
   @Operation(summary = "Import Obsidian file")
@@ -59,10 +56,11 @@ public class RestObsidianImportController {
       ZipEntry entry;
 
       // Find Note1 in the notebook
-      Note note1 = notebook.getHeadNote().getChildren().stream()
-          .filter(note -> note.getTopicConstructor().equals("Note 1"))
-          .findFirst()
-          .orElseThrow(() -> new UnexpectedNoAccessRightException());
+      Note note1 =
+          notebook.getHeadNote().getChildren().stream()
+              .filter(note -> note.getTopicConstructor().equals("Note 1"))
+              .findFirst()
+              .orElseThrow(() -> new UnexpectedNoAccessRightException());
 
       while ((entry = zipIn.getNextEntry()) != null) {
         String entryName = entry.getName();
@@ -72,7 +70,7 @@ public class RestObsidianImportController {
           continue;
         }
 
-//        System.out.println("Importing " + entryName);
+        //        System.out.println("Importing " + entryName);
 
         // Process directory or file
         String[] pathParts = entryName.split("/");
@@ -81,44 +79,44 @@ public class RestObsidianImportController {
         // Create notes for each directory in the path
         for (int i = 1; i < pathParts.length; i++) {
           String part = pathParts[i];
-            System.out.println("Importing " + part);
+          System.out.println("Importing " + part);
 
-//
-//          // Skip empty parts and .md extension
-//          if (part.isEmpty() || part.equals(".md")) {
-//            continue;
-//          }
-//
-//          // Remove .md extension if it's a file
-//          if (part.endsWith(".md")) {
-//            part = part.substring(0, part.length() - 3);
-//          }
+          //
+          //          // Skip empty parts and .md extension
+          //          if (part.isEmpty() || part.equals(".md")) {
+          //            continue;
+          //          }
+          //
+          //          // Remove .md extension if it's a file
+          //          if (part.endsWith(".md")) {
+          //            part = part.substring(0, part.length() - 3);
+          //          }
 
-//          // Check if note already exists under current parent
-//          Note existingNote = currentParent.getChildren().stream()
-//              .filter(note -> note.getNoteTitle().equals(part))
-//              .findFirst()
-//              .orElse(null);
-//
-//          if (existingNote == null) {
-//            // Create new note
-//            NoteCreationDTO noteCreation = new NoteCreationDTO();
-//            noteCreation.setNewTitle(part);
-//
-//            // If it's a file (last part), add the content
-//            if (!entry.isDirectory() && i == pathParts.length - 1) {
-//              noteCreation.setDetails(new String(zipIn.readAllBytes()));
-//            }
-//
-//            Note newNote = noteConstructionService.createNote(
-//                currentParent,
-//                noteCreation,
-//                currentUser.getEntity(),
-//                null);
-//            currentParent = newNote;
-//          } else {
-//            currentParent = existingNote;
-//          }
+          //          // Check if note already exists under current parent
+          //          Note existingNote = currentParent.getChildren().stream()
+          //              .filter(note -> note.getNoteTitle().equals(part))
+          //              .findFirst()
+          //              .orElse(null);
+          //
+          //          if (existingNote == null) {
+          //            // Create new note
+          //            NoteCreationDTO noteCreation = new NoteCreationDTO();
+          //            noteCreation.setNewTitle(part);
+          //
+          //            // If it's a file (last part), add the content
+          //            if (!entry.isDirectory() && i == pathParts.length - 1) {
+          //              noteCreation.setDetails(new String(zipIn.readAllBytes()));
+          //            }
+          //
+          //            Note newNote = noteConstructionService.createNote(
+          //                currentParent,
+          //                noteCreation,
+          //                currentUser.getEntity(),
+          //                null);
+          //            currentParent = newNote;
+          //          } else {
+          //            currentParent = existingNote;
+          //          }
         }
       }
     }
