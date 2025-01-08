@@ -160,7 +160,7 @@ class RestNotebookController {
   }
 
   @GetMapping("/{notebook}/download-zip")
-  public byte[] downloadNotebookAsZip(
+  public byte[] downloadForObsidian(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
 

@@ -283,7 +283,7 @@ class RestNotebookControllerTest {
   }
 
   @Nested
-  class DownloadNotebookAsZip {
+  class DownloadForObsidian {
     private Notebook notebook;
     private Note note1;
     private Note note2;
@@ -307,12 +307,12 @@ class RestNotebookControllerTest {
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings);
       assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookAsZip(notebook));
+          UnexpectedNoAccessRightException.class, () -> controller.downloadForObsidian(notebook));
     }
 
     @Test
     void whenAuthorizedShouldReturnZipWithMarkdownFiles() throws Exception {
-      byte[] zipContent = controller.downloadNotebookAsZip(notebook);
+      byte[] zipContent = controller.downloadForObsidian(notebook);
 
       try (ByteArrayInputStream bais = new ByteArrayInputStream(zipContent);
           ZipInputStream zis = new ZipInputStream(bais)) {
