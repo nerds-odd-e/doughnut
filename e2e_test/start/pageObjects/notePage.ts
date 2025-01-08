@@ -380,13 +380,15 @@ export const assumeNotePage = (noteTopology?: string) => {
       // Find the label containing "Import from Obsidian" text
       cy.contains('label', 'Import from Obsidian').within(() => {
         cy.get('input[type="file"]').selectFile(
-          `cypress/fixtures/${filename}`,
+          `e2e_test/fixtures/${filename}`,
           { force: true }
         )
       })
       cy.pageIsNotLoading()
-      // Wait for success message
-      cy.contains('Import successful!')
+      // Wait for success message in alert
+      cy.on('window:alert', (text) => {
+        expect(text).to.equal('Import successful!')
+      })
       return this
     },
   }
