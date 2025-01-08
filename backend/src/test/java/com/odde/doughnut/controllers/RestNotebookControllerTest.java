@@ -314,7 +314,6 @@ class RestNotebookControllerTest {
     }
 
     @Test
-    @Disabled("Temporarily disabled")
     void whenAuthorizedShouldReturnZipWithMarkdownFiles() throws Exception {
       ResponseEntity<byte[]> response = controller.downloadNotebookForObsidian(notebook);
       byte[] zipContent = response.getBody();
@@ -328,8 +327,8 @@ class RestNotebookControllerTest {
           fileNames.add(entry.getName());
         }
 
-        assertThat(fileNames, hasSize(2));
-        assertThat(fileNames, hasItems("First Note.md", "Second Note.md"));
+        assertThat(fileNames, hasSize(3));
+        assertThat(fileNames, hasItems("title2.md", "title2/First Note.md", "title2/Second Note.md"));
       }
     }
   }
