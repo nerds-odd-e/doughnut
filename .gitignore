@@ -33,6 +33,7 @@ cypress/
 *.nar
 *.ear
 *.zip
+!e2e_test/fixtures/*.zip
 *.tar.gz
 *.rar
 
