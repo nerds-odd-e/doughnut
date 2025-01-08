@@ -9,6 +9,7 @@
           type="text"
           placeholder="Enter repository name"
           class="daisy-input daisy-input-bordered daisy-w-full"
+          data-cy="repository-input"
           required
         />
       </div>

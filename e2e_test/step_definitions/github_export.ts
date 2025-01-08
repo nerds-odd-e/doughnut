@@ -1,5 +1,4 @@
 import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import start from '../start'
 
 When('I export notebook {string} to GitHub', (notebookTitle: string) => {
   cy.findByText(notebookTitle)
@@ -9,16 +8,11 @@ When('I export notebook {string} to GitHub', (notebookTitle: string) => {
 })
 
 When('I input repository name {string}', (repoName: string) => {
-  // Mock GitHub repository data`
-  start.testability().mockGithubRepos([
-    {
-      name: repoName,
-      full_name: `test-user/${repoName}`,
-      permissions: { push: true },
-    },
-  ])
+  // Input repository name in the text field
+  cy.get('[data-cy="repository-input"]')
+    .type(repoName)
+    .should('have.value', repoName)
 
-  cy.findByLabelText('Select Repository').click().findByText(repoName).click()
   cy.findByRole('button', { name: 'Export' }).click()
 })
 
