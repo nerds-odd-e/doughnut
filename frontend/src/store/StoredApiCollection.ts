@@ -76,6 +76,8 @@ export interface StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDTO
   ): Promise<void>
+
+  importObsidianZip(notebookId: number, file: File): Promise<void>
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
@@ -313,6 +315,13 @@ export default class StoredApiCollection implements StoredApi {
         targetId,
         data
       )
+    )
+  }
+
+  async importObsidianZip(notebookId: number, file: File): Promise<void> {
+    await this.managedApi.restObsidianImportController.importObsidian(
+      notebookId,
+      { file }
     )
   }
 }

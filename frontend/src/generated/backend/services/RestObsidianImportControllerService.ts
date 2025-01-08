@@ -25,8 +25,8 @@ export class RestObsidianImportControllerService {
             path: {
                 'parentNoteId': parentNoteId,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: requestBody,
+            mediaType: 'multipart/form-data',
             errors: {
                 500: `Internal Server Error`,
             },

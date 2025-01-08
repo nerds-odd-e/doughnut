@@ -252,7 +252,11 @@ import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 import SvgObsidian from "../../svgs/SvgObsidian.vue"
 
-const { storageAccessor, note } = defineProps<{
+const {
+  storageAccessor,
+  note,
+  notebookId = 0,
+} = defineProps<{
   storageAccessor: StorageAccessor
   note: Note
   notebookId?: number
@@ -278,7 +282,7 @@ const handleObsidianImport = async (event: Event) => {
   if (!file) return
 
   try {
-    // await storageAccessor.storedApi().importObsidianZip(notebookId, file)
+    await storageAccessor.storedApi().importObsidianZip(notebookId, file)
 
     // 清除檔案選擇，這樣同一個檔案可以再次選擇
     ;(event.target as HTMLInputElement).value = ""
