@@ -375,5 +375,19 @@ export const assumeNotePage = (noteTopology?: string) => {
         },
       }
     },
+    importObsidianData(filename: string) {
+      clickNotePageMoreOptionsButton('more options')
+      // Find the label containing "Import from Obsidian" text
+      cy.contains('label', 'Import from Obsidian').within(() => {
+        cy.get('input[type="file"]').selectFile(
+          `cypress/fixtures/${filename}`,
+          { force: true }
+        )
+      })
+      cy.pageIsNotLoading()
+      // Wait for success message
+      cy.contains('Import successful!')
+      return this
+    },
   }
 }

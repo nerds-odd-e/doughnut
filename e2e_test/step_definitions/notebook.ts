@@ -172,3 +172,10 @@ Then('I should get immediate feedback by showing the wrong answer', () => {
     .assumeWrongAnswerPage()
     .highlightCurrentChoice('europe')
 })
+
+When(
+  'I Import Obsidian data {string} to note {string}',
+  (filename: string, noteTitle: string) => {
+    start.jumpToNotePage(noteTitle).importObsidianData(filename)
+  }
+)
