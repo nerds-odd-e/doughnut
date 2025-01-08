@@ -27,11 +27,19 @@ Given('the notebook contains the following notes', (notesTable: DataTable) => {
 When('I select the {string} notebook', (notebookTitle: string) => {
   start.jumpToNotePage(notebookTitle)
 })
-
 When(
   'I click on the export for Obsidian option on notebook {string}',
   (notebookTitle: string) => {
-    notebookCard(notebookTitle).downloadForObsidian()
+    // Wait and ensure element is fully loaded
+    cy.findByText(notebookTitle, {selector: '.notebook-card *'})
+      .should('be.visible')
+      .parents('.daisy-card')
+      .within(() => {
+        // 直接點擊具有特定 title 的下載按鈕
+        cy.get('button[title="Download notebook for Obsidian"]')
+          .should('be.visible')
+          .click()
+      })
   }
 )
 
