@@ -61,10 +61,10 @@ class RestObsidianImportControllerTests {
               "file", "obsidian.zip", "application/zip", "# Note2\nContent of Note 2".getBytes());
     }
 
-    //        @Test
-    void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException, IOException {
+    @Test
+    void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException {
       // Act
-      NoteRealm response = controller.importObsidian(zipFile, notebook.getId());
+      var response = controller.importObsidian(zipFile, notebook.getId());
 
       // Assert
       assertThat(response.getId(), equalTo(note1.getId()));

@@ -818,16 +818,19 @@ paths:
     post:
       tags:
       - rest-obsidian-import-controller
+      summary: Import Obsidian file
       operationId: importObsidian
       parameters:
       - name: parentNoteId
         in: path
+        description: Parent note ID
         required: true
         schema:
           type: integer
+          format: int32
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               required:
               - file
@@ -835,6 +838,7 @@ paths:
               properties:
                 file:
                   type: string
+                  description: Obsidian zip file to import
                   format: binary
       responses:
         "500":

@@ -8,14 +8,18 @@ import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestObsidianImportControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
-     * @param parentNoteId
-     * @param requestBody
+     * Import Obsidian file
+     * @param parentNoteId Parent note ID
+     * @param formData
      * @returns NoteRealm OK
      * @throws ApiError
      */
     public importObsidian(
         parentNoteId: number,
-        requestBody?: {
+        formData?: {
+            /**
+             * Obsidian zip file to import
+             */
             file: Blob;
         },
     ): CancelablePromise<NoteRealm> {
@@ -25,8 +29,8 @@ export class RestObsidianImportControllerService {
             path: {
                 'parentNoteId': parentNoteId,
             },
-            body: requestBody,
-            mediaType: 'application/json',
+            formData: formData,
+            mediaType: 'multipart/form-data',
             errors: {
                 500: `Internal Server Error`,
             },
