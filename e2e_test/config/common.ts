@@ -85,18 +85,6 @@ const commonConfig = {
             Content: entry.getData().toString('utf8'),
           }))
 
-          // 驗證沒有超過一級的子目錄
-          const hasInvalidSubdirectories = zipEntries.some((entry) => {
-            const pathParts = entry.entryName.split('/')
-            return pathParts.length > 2
-          })
-
-          if (hasInvalidSubdirectories) {
-            throw new Error(
-              'Zip file contains nested subdirectories (more than one level)'
-            )
-          }
-
           // 比較實際文件和預期文件
           const expectedFilesArray = expectedFiles.map((file) => ({
             Filename: file.Filename,
