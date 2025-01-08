@@ -25,6 +25,7 @@ import { RestNotebookCertificateApprovalControllerService } from './services/Res
 import { RestNotebookControllerService } from './services/RestNotebookControllerService';
 import { RestNoteControllerService } from './services/RestNoteControllerService';
 import { RestNoteCreationControllerService } from './services/RestNoteCreationControllerService';
+import { RestObsidianImportControllerService } from './services/RestObsidianImportControllerService';
 import { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 import { RestRecallPromptControllerService } from './services/RestRecallPromptControllerService';
 import { RestRecallsControllerService } from './services/RestRecallsControllerService';
@@ -55,6 +56,7 @@ export class DoughnutApi {
     public readonly restNotebookController: RestNotebookControllerService;
     public readonly restNoteController: RestNoteControllerService;
     public readonly restNoteCreationController: RestNoteCreationControllerService;
+    public readonly restObsidianImportController: RestObsidianImportControllerService;
     public readonly restPredefinedQuestionController: RestPredefinedQuestionControllerService;
     public readonly restRecallPromptController: RestRecallPromptControllerService;
     public readonly restRecallsController: RestRecallsControllerService;
@@ -96,6 +98,7 @@ export class DoughnutApi {
         this.restNotebookController = new RestNotebookControllerService(this.request);
         this.restNoteController = new RestNoteControllerService(this.request);
         this.restNoteCreationController = new RestNoteCreationControllerService(this.request);
+        this.restObsidianImportController = new RestObsidianImportControllerService(this.request);
         this.restPredefinedQuestionController = new RestPredefinedQuestionControllerService(this.request);
         this.restRecallPromptController = new RestRecallPromptControllerService(this.request);
         this.restRecallsController = new RestRecallsControllerService(this.request);

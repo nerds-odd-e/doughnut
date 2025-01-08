@@ -165,6 +165,7 @@ export { RestNotebookCertificateApprovalControllerService } from './services/Res
 export { RestNotebookControllerService } from './services/RestNotebookControllerService';
 export { RestNoteControllerService } from './services/RestNoteControllerService';
 export { RestNoteCreationControllerService } from './services/RestNoteCreationControllerService';
+export { RestObsidianImportControllerService } from './services/RestObsidianImportControllerService';
 export { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 export { RestRecallPromptControllerService } from './services/RestRecallPromptControllerService';
 export { RestRecallsControllerService } from './services/RestRecallsControllerService';
