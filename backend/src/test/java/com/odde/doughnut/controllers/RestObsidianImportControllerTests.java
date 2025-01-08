@@ -11,7 +11,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -61,10 +60,10 @@ class RestObsidianImportControllerTests {
               "file", "obsidian.zip", "application/zip", "# Note2\nContent of Note 2".getBytes());
     }
 
-//    @Test
+    //@Test
     void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException {
       // Act
-      var response = controller.importObsidian(zipFile, notebook.getId());
+      NoteRealm response = controller.importObsidian(zipFile, notebook.getId());
 
       // Assert
       assertThat(response.getId(), equalTo(note1.getId()));
