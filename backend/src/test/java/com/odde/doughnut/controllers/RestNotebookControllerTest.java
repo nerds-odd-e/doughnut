@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -328,7 +327,8 @@ class RestNotebookControllerTest {
         }
 
         assertThat(fileNames, hasSize(3));
-        assertThat(fileNames, hasItems("title2.md", "title2/First Note.md", "title2/Second Note.md"));
+        assertThat(
+            fileNames, hasItems("title2.md", "title2/First Note.md", "title2/Second Note.md"));
       }
     }
   }
