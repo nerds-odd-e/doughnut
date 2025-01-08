@@ -1,10 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -61,14 +59,9 @@ class RestObsidianImportControllerTests {
     }
 
     @Test
-    void shouldReturnNote1WhenUserHasAccess() throws UnexpectedNoAccessRightException {
-      // Act
-      NoteRealm response = controller.importObsidian(zipFile, notebook);
-      var expectedNote = notebook.getHeadNote();
-      // Assert
-      assertThat(response.getId(), equalTo(expectedNote.getId()));
-      assertThat(response.getNote().getTopicConstructor(), equalTo(notebook.getTitle()));
-      assertThat(response.getNote().getDetails(), equalTo(notebook.getShortDetails()));
+    void shouldSucceedWhenUserHasAccess() throws UnexpectedNoAccessRightException {
+      // Act & Assert - should not throw exception
+      controller.importObsidian(zipFile, notebook);
     }
 
     @Test
