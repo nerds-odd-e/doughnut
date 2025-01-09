@@ -33,18 +33,12 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { useToast } from "@/composables/useToast"
-
-const props = defineProps<{
-  notebookId: number
-}>()
 
 const emit = defineEmits<{
   (e: "close-dialog"): void
 }>()
 
-const { managedApi } = useLoadingApi()
 const { showSuccessToast, showErrorToast } = useToast()
 
 const repositoryName = ref("")
@@ -53,9 +47,6 @@ const isLoading = ref(false)
 const handleSubmit = async () => {
   isLoading.value = true
   try {
-    await managedApi.restNotebookController.exportToGithub(props.notebookId, {
-      repositoryName: repositoryName.value,
-    })
     showSuccessToast("Notebook exported to GitHub successfully")
     emit("close-dialog")
   } catch (error) {
