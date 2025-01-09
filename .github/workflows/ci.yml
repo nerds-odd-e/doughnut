@@ -55,7 +55,7 @@ jobs:
           mysql_db_instance: ${{ env.MYSQL_UT_DB }}
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
-      - uses: ./.github/setup_jdk_with_cache
+      - uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
@@ -133,13 +133,21 @@ jobs:
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
       - name: Setup JDK with cache
-        uses: ./.github/setup_jdk_with_cache
+        uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs
+      - uses: actions/setup-node@v4
         with:
-          node_version: ${{ vars.NODE_VERSION }}
-          pnpm_version: ${{ vars.PNPM_VERSION }}
+          node-version: ${{ vars.NODE_VERSION }}
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ vars.PNPM_VERSION }}
+          run_install: false
+      # Force install dependencies and Cypress
+      - name: Install dependencies and Cypress
+        run: |
+          pnpm install --frozen-lockfile
+          npx cypress install --force
       - uses: cypress-io/github-action@v6
         with:
           browser: chrome
@@ -149,7 +157,7 @@ jobs:
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
-          install: true
+          install: false
         env:
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
       - uses: actions/upload-artifact@v4
