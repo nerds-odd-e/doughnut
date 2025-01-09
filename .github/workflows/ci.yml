@@ -79,7 +79,7 @@ jobs:
     runs-on: ${{ vars.RUNNER }}
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/setup_jdk_with_cache
+      - uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
       - uses: ./.github/setup_nodejs
