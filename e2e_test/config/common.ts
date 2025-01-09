@@ -77,15 +77,13 @@ const commonConfig = {
 
           const zip = new AdmZip(path.join(downloadsFolder, zipFile))
           const zipEntries = zip.getEntries()
-
-          // 驗證文件列表
+          
           const actualFiles = zipEntries.map((entry) => ({
             Filename: entry.entryName,
             Format: path.extname(entry.entryName).slice(1),
             Content: entry.getData().toString('utf8'),
           }))
 
-          // 比較實際文件和預期文件
           const expectedFilesArray = expectedFiles.map((file) => ({
             Filename: file.Filename,
             Format: file.Format,
