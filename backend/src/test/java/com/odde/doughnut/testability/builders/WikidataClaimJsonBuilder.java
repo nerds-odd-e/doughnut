@@ -59,9 +59,11 @@ public class WikidataClaimJsonBuilder {
   private void addClaimsOfWikiBaseEntityIds(String property, List<String> ids) {
     List<String> wikibaseIds =
         ids.stream()
-            .map("""
+            .map(
+                """
                 { "id": "%s" }
-                """::formatted)
+                """
+                    ::formatted)
             .toList();
     this.addClaimToTheSamePropertyOfTheSameType(property, "wikibase-entityid", wikibaseIds);
   }
