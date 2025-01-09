@@ -1,24 +1,21 @@
-# Read Me First
+# Doughnut Backend
 
-The following was discovered as part of building this project:
+## Initial Setup Note
 
-* The original package name 'com.odd-e.doughnut' is invalid and this project uses 'com.odde.doughnut' instead.
+The original package name 'com.odd-e.doughnut' is invalid and this project uses 'com.odde.doughnut' instead.
 
-# Getting Started
-
-### Reference Documentation
+## Reference Documentation
 
 For further reference, please consider the following sections:
 
 * [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/docs/2.7.2/gradle-plugin/reference/html/)
-* [Create an OCI image](https://docs.spring.io/spring-boot/docs/2.7.2/gradle-plugin/reference/html/#build-image)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/docs/2.7.2/reference/htmlsingle/#using-boot-devtools)
-* [Spring Web](https://docs.spring.io/spring-boot/docs/2.7.2/reference/htmlsingle/#boot-features-developing-web-applications)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/docs/2.7.2/reference/htmlsingle/#boot-features-jpa-and-spring-data)
-* [Flyway Migration](https://docs.spring.io/spring-boot/docs/2.7.2/reference/htmlsingle/#howto-execute-flyway-database-migrations-on-startup)
+* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/3.3/gradle-plugin/index.html)
+* [Spring Boot DevTools](https://docs.spring.io/spring-boot/3.3/reference/using/devtools.html)
+* [Spring Web](https://docs.spring.io/spring-boot/3.3/reference/web/index.html)
+* [Spring Data JPA](https://docs.spring.io/spring-boot/3.3/how-to/data-access.html)
+* [Flyway Migration](https://docs.spring.io/spring-boot/3.3/how-to/data-initialization.html#howto.data-initialization.migration-tool.flyway)
 
-### Guides
+## Guides
 
 The following guides illustrate how to use some features concretely:
 
@@ -27,8 +24,6 @@ The following guides illustrate how to use some features concretely:
 * [Building REST services with Spring](https://spring.io/guides/tutorials/bookmarks/)
 * [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
 
-### Additional Links
-
-These additional references should also help you:
+## Additional Links
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
