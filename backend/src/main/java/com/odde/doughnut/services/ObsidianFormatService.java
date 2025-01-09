@@ -28,7 +28,8 @@ public class ObsidianFormatService {
     zos.write(fileContent.getBytes());
 
     for (Note child : note.getChildren()) {
-      String newPath = path.isEmpty() ? note.getTopicConstructor() : path + "/" + note.getTopicConstructor();
+      String newPath =
+          path.isEmpty() ? note.getTopicConstructor() : path + "/" + note.getTopicConstructor();
       writeNoteToZip(child, zos, newPath);
     }
   }
