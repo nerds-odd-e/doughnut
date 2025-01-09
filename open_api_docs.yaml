@@ -1131,6 +1131,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebook}/github-export:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: exportToGithub
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
   /api/notebooks/{notebookId}/obsidian:
     post:
       tags:

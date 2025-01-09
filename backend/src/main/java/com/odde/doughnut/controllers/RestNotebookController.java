@@ -203,4 +203,16 @@ class RestNotebookController {
     currentUser.assertReadAuthorization(notebook);
     obsidianFormatService.importFromObsidian(file, notebook);
   }
+
+  @PostMapping("/{notebook}/github-export")
+  @Transactional
+  public List<Note> exportToGithub(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+
+    // TODO: Implement GitHub export functionality
+
+    return notebook.getNotes();
+  }
 }

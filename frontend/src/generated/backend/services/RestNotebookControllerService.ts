@@ -77,6 +77,25 @@ export class RestNotebookControllerService {
         });
     }
     /**
+     * @param notebook
+     * @returns Note OK
+     * @throws ApiError
+     */
+    public exportToGithub(
+        notebook: number,
+    ): CancelablePromise<Array<Note>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notebooks/{notebook}/github-export',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param requestBody
      * @returns RedirectToNoteResponse OK
      * @throws ApiError

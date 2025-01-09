@@ -32,11 +32,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, inject } from "vue"
 import { useToast } from "@/composables/useToast"
+import type ManagedApi from "@/managedApi/ManagedApi"
 
 const emit = defineEmits(["close-dialog"])
 const { showSuccessToast, showErrorToast } = useToast()
+const managedApi = inject("managedApi") as ManagedApi
+
+const props = defineProps<{
+  notebookId: number
+}>()
 
 const repositoryName = ref("")
 const isLoading = ref(false)
@@ -44,8 +50,17 @@ const isLoading = ref(false)
 const handleSubmit = async () => {
   isLoading.value = true
   try {
-    showSuccessToast("Notebook exported to GitHub successfully")
-    emit("close-dialog")
+    const response = await managedApi.restNotebookController.exportToGithub(
+      props.notebookId
+    )
+    if (response) {
+      showSuccessToast("Notebook exported to GitHub successfully")
+      emit("close-dialog")
+    } else {
+      showErrorToast(
+        `Failed·to·export·to·GitHub:·${response.data?.message || "Unknown·error"}`
+      )
+    }
   } catch (error) {
     showErrorToast(
       error instanceof Error ? error.message : "Failed to export to GitHub"
