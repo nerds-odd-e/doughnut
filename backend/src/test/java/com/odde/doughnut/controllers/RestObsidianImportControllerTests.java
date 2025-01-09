@@ -35,16 +35,12 @@ class RestObsidianImportControllerTests {
   private RestObsidianImportController controller;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-  private RestNotebookController readController;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestObsidianImportController(modelFactoryService, userModel, testabilitySettings);
-    readController =
-        new RestNotebookController(
-            modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
   }
 
   @Nested
