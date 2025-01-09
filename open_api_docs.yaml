@@ -1142,6 +1142,11 @@ paths:
         required: true
         schema:
           type: integer
+      - name: repositoryName
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         "500":
           description: Internal Server Error

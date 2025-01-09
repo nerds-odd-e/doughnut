@@ -51,15 +51,14 @@ const handleSubmit = async () => {
   isLoading.value = true
   try {
     const response = await managedApi.restNotebookController.exportToGithub(
-      props.notebookId
+      props.notebookId,
+      repositoryName.value
     )
     if (response) {
       showSuccessToast("Notebook exported to GitHub successfully")
       emit("close-dialog")
     } else {
-      showErrorToast(
-        `Failed·to·export·to·GitHub:·${response.data?.message || "Unknown·error"}`
-      )
+      showErrorToast("Failed to export to GitHub")
     }
   } catch (error) {
     showErrorToast(

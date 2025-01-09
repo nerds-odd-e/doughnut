@@ -207,7 +207,8 @@ class RestNotebookController {
   @PostMapping("/{notebook}/github-export")
   @Transactional
   public List<Note> exportToGithub(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
+      @RequestParam("repositoryName") String repositoryName)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
 

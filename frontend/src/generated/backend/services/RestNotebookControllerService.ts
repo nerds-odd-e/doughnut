@@ -78,11 +78,13 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
+     * @param repositoryName
      * @returns Note OK
      * @throws ApiError
      */
     public exportToGithub(
         notebook: number,
+        repositoryName: string,
     ): CancelablePromise<Array<Note>> {
         return this.httpRequest.request({
             method: 'POST',
@@ -90,6 +92,38 @@ export class RestNotebookControllerService {
             path: {
                 'notebook': notebook,
             },
+            query: {
+                'repositoryName': repositoryName,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * Import Obsidian file
+     * @param notebookId Notebook ID
+     * @param formData
+     * @returns any OK
+     * @throws ApiError
+     */
+    public importObsidian(
+        notebookId: number,
+        formData?: {
+            /**
+             * Obsidian zip file to import
+             */
+            file: Blob;
+        },
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notebooks/{notebookId}/obsidian',
+            path: {
+                'notebookId': notebookId,
+            },
+            formData: formData,
+            mediaType: 'multipart/form-data',
             errors: {
                 500: `Internal Server Error`,
             },
