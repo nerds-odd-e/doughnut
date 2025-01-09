@@ -1,5 +1,7 @@
 import { existsSync, rmdir } from 'node:fs'
-import { addCucumberPreprocessorPlugin } from '@badeball/cypress-cucumber-preprocessor'
+const {
+  addCucumberPreprocessorPlugin,
+} = require('@badeball/cypress-cucumber-preprocessor')
 import { createEsbuildPlugin } from '@badeball/cypress-cucumber-preprocessor/esbuild'
 import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import fs from 'fs'

@@ -46,7 +46,10 @@
     "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format"
   },
   "cypress-cucumber-preprocessor": {
-    "stepDefinitions": "e2e_test/step_definitions/**/*.ts"
+    "stepDefinitions": "e2e_test/step_definitions/**/*.ts",
+    "nonGlobalStepDefinitions": false,
+    "filterSpecs": true,
+    "omitFiltered": true
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.8.0",
