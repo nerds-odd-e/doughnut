@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -29,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 class RestObsidianImportControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired ObsidianFormatService obsidianFormatService;
   private UserModel userModel;
   private RestObsidianImportController controller;
 
@@ -40,6 +42,9 @@ class RestObsidianImportControllerTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestObsidianImportController(modelFactoryService, userModel, testabilitySettings);
+    readController =
+        new RestNotebookController(
+            modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
   }
 
   @Nested
