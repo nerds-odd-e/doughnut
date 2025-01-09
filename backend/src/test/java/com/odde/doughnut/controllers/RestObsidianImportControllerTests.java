@@ -40,8 +40,6 @@ class RestObsidianImportControllerTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestObsidianImportController(modelFactoryService, userModel, testabilitySettings);
-    readController =
-        new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
