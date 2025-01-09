@@ -107,6 +107,7 @@ backend/src/main/resources/static/*.map
 frontend/app.*.symbols
 
 # Obfuscation related
+**/index.html.br
 frontend/app.*.map.json
 
 # local nix env related e.g. MySQL DB instance folder/files
