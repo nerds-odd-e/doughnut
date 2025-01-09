@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,12 +26,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ObsidianFormatServiceTest {
   @Autowired private MakeMe makeMe;
-  @Autowired private ObsidianFormatService obsidianFormatService;
+  @Autowired ModelFactoryService modelFactoryService;
+
+  private ObsidianFormatService obsidianFormatService;
   private Note headNote;
 
   @BeforeEach
   void setup() {
+    var user = makeMe.aUser().please();
     headNote = makeMe.aNote().please();
+    obsidianFormatService = new ObsidianFormatService(user, modelFactoryService);
   }
 
   @Test
