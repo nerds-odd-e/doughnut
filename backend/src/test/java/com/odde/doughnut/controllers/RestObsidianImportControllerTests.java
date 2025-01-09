@@ -1,5 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Note;
@@ -31,12 +33,15 @@ class RestObsidianImportControllerTests {
   private RestObsidianImportController controller;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  private RestNotebookController readController;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestObsidianImportController(modelFactoryService, userModel, testabilitySettings);
+    readController =
+        new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -51,7 +56,7 @@ class RestObsidianImportControllerTests {
       notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
       note1 =
           makeMe
-              .aNote("Note 1")
+              .aNote("note 1")
               .under(notebook.getHeadNote())
               .details("Content of Note 1")
               .please();
@@ -65,10 +70,15 @@ class RestObsidianImportControllerTests {
       }
     }
 
-    @Test
     void shouldSucceedWhenUserHasAccess() throws UnexpectedNoAccessRightException, IOException {
       // Act & Assert - should not throw exception
       controller.importObsidian(zipFile, notebook);
+
+      Note note1 = notebook.getHeadNote().getChildren().stream().findFirst().orElseThrow();
+
+      assertThat(note1.getTopicConstructor(), equalTo("note 1"));
+      Note note2 = note1.getChildren().stream().findFirst().get();
+      assertThat(note2.getTopicConstructor(), equalTo("note 2"));
     }
 
     @Test

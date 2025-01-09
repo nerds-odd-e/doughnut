@@ -16,6 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,12 +27,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class RestObsidianImportController {
   private final UserModel currentUser;
   private final NoteConstructionService noteConstructionService;
+  private final ModelFactoryService modelFactoryService;
 
   public RestObsidianImportController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
     this.currentUser = currentUser;
+    this.modelFactoryService = modelFactoryService;
     this.noteConstructionService =
         new NoteConstructionService(
             currentUser.getEntity(),
@@ -44,6 +47,7 @@ public class RestObsidianImportController {
       value = "/obsidian/{notebookId}/import",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.OK)
+  @Transactional
   public void importObsidian(
       @Parameter(description = "Obsidian zip file to import") @RequestParam("file")
           MultipartFile file,
@@ -57,13 +61,9 @@ public class RestObsidianImportController {
       ZipEntry entry;
 
       // Find Note1 in the notebook
-      Note note1 =
-          notebook.getHeadNote().getChildren().stream()
-              .filter(note -> note.getTopicConstructor().equals("Note 1"))
-              .findFirst()
-              .orElseThrow(() -> new UnexpectedNoAccessRightException());
 
       while ((entry = zipIn.getNextEntry()) != null) {
+        Note currentParent = notebook.getHeadNote();
         String entryName = entry.getName();
 
         // Skip hidden files/directories (starting with .)
@@ -71,11 +71,9 @@ public class RestObsidianImportController {
           continue;
         }
 
-        //        System.out.println("Importing " + entryName);
-
         // Process directory or file
         String[] pathParts = entryName.split("/");
-        Note currentParent = note1;
+        //        Note currentParent = note1;
 
         // Create notes for each directory in the path
         for (int i = 1; i < pathParts.length; i++) {
@@ -103,19 +101,14 @@ public class RestObsidianImportController {
           if (existingNote == null) {
             // Create new note
             NoteCreationDTO noteCreation = new NoteCreationDTO();
-            noteCreation.setNewTitle(part);
+            noteCreation.setNewTitle(finalPart);
 
-            // If it's a file (last part), add the content
-            //                      if (!entry.isDirectory() && i == pathParts.length - 1) {
-            //                        noteCreation.setDetails(new String(zipIn.readAllBytes()));
-            //                      }
-
-            //                      Note newNote = noteConstructionService.createNote(
-            //                          currentParent,
-            //                          noteCreation,
-            //                          currentUser.getEntity(),
-            //                          null);
-            //                      currentParent = newNote;
+            Note newNote = noteConstructionService.createNote(currentParent, finalPart);
+            if (!entry.isDirectory() && i == pathParts.length - 1) {
+              newNote.prependDescription(new String(zipIn.readAllBytes()));
+              modelFactoryService.save(newNote);
+            }
+            currentParent = newNote;
           } else {
             currentParent = existingNote;
           }
