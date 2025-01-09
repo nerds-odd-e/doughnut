@@ -92,19 +92,55 @@ const commonConfig = {
             Content: file.Content,
           }))
 
-          const matchesExpected = expectedFilesArray.every((expected) =>
-            actualFiles.some(
-              (actual) =>
-                actual.Filename === expected.Filename &&
-                actual.Format === expected.Format &&
-                (expected.Content ? actual.Content === expected.Content : true)
-            )
-          )
+          const mismatches = []
 
-          if (!matchesExpected) {
-            throw new Error(
-              `File content mismatch. Expected: ${JSON.stringify(expectedFilesArray)}, Got: ${JSON.stringify(actualFiles)}`
+          // Check for missing files
+          expectedFilesArray.forEach((expected) => {
+            const actual = actualFiles.find(file => file.Filename === expected.Filename)
+            if (!actual) {
+              mismatches.push(`Missing file: ${expected.Filename}`)
+              return
+            }
+
+            if (actual.Format !== expected.Format) {
+              mismatches.push(
+                `Format mismatch in ${expected.Filename}:\n` +
+                `  Expected: ${expected.Format}\n` +
+                `  Actual  : ${actual.Format}`
+              )
+            }
+
+            if (expected.Content && actual.Content !== expected.Content) {
+              mismatches.push(
+                `Content mismatch in ${expected.Filename}:\n` +
+                `  Expected: ${expected.Content}\n` +
+                `  Actual  : ${actual.Content}`
+              )
+            }
+          })
+
+          // Check for unexpected files
+          actualFiles.forEach((actual) => {
+            const isExpected = expectedFilesArray.some(
+              expected => expected.Filename === actual.Filename
             )
+            if (!isExpected) {
+              mismatches.push(`Unexpected file found: ${actual.Filename}`)
+            }
+          })
+
+          if (mismatches.length > 0) {
+            const errorMessage = [
+              'ZIP Archive Content Validation Failed:',
+              '----------------------------------------',
+              ...mismatches,
+              '----------------------------------------',
+              'Summary:',
+              `Expected files: ${expectedFilesArray.map(f => f.Filename).join(', ')}`,
+              `Actual files  : ${actualFiles.map(f => f.Filename).join(', ')}`
+            ].join('\n')
+
+            throw new Error(errorMessage)
           }
 
           return true
