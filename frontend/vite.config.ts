@@ -9,7 +9,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
-import viteCompression from 'vite-plugin-compression'
+import { compression } from 'vite-plugin-compression2'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
@@ -54,7 +54,7 @@ const config = defineConfig({
       },
     }),
     Inspector({
-     launchEditor: 'cursor',
+      launchEditor: 'cursor',
     }),
     VueRouter(),
     vueJsx(),
@@ -63,7 +63,9 @@ const config = defineConfig({
       dts: true,
     }),
     Components({}),
-    viteCompression(),
+    compression({
+      algorithm: 'brotliCompress', 
+    }),
   ],
   server: {
     proxy: {
