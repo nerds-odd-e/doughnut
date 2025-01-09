@@ -118,8 +118,8 @@ in mkShell {
       [[ -d $HOME/.cache/Cypress ]] || pnpx cypress install --force
     fi
 
-    corepack prepare pnpm@9.15.2 --activate
-    corepack use pnpm@9.15.2
+    corepack prepare pnpm@10.0.0 --activate
+    corepack use pnpm@10.0.0
     pnpm --frozen-lockfile recursive install
     # start biome daemon-server
     pnpm biome stop && pnpm biome start
