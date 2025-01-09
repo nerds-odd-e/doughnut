@@ -1,0 +1,23 @@
+name: "Setup JDK"
+description: "Setup JDK"
+inputs:
+  java_version:
+    description: "JDK Version"
+    required: true
+  distribution:
+    description: "JDK Type e.g. Zulu, Adopt, OpenJDK"
+    required: true
+    default: "zulu"
+  architecture:
+    description: "x86 or x64"
+    required: true
+    default: "x64"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ inputs.java_version }}
+        distribution: ${{ inputs.distribution }}
+        architecture: ${{ inputs.architecture }}
