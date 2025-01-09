@@ -4,7 +4,6 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
-import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.testability.MakeMe;
 import java.io.ByteArrayInputStream;
@@ -15,6 +14,7 @@ import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,51 +35,67 @@ class NotebookTest {
     notebook = headNote.getNotebook();
   }
 
-  @Test
-  void aNotebookWithHeadNoteAndAChild() {
-    makeMe.aNote().under(headNote).please();
-    makeMe.refresh(notebook);
-    assertEquals(2, notebook.getNotes().size());
+  @Nested
+  class NotesManagementTests {
+    @Test
+    void shouldIncludeAllNonDeletedNotesInNotebook() {
+      makeMe.aNote().under(headNote).please();
+      makeMe.refresh(notebook);
+      assertThat(notebook.getNotes().size()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldExcludeSoftDeletedNotesFromNotebook() {
+      makeMe.aNote().under(headNote).softDeleted().please();
+      makeMe.refresh(notebook);
+      assertThat(notebook.getNotes().size()).isEqualTo(1);
+    }
   }
 
-  @Test
-  void aNotebookWithHeadNoteAndADeletedChild() {
-    makeMe.aNote().under(headNote).softDeleted().please();
-    makeMe.refresh(notebook);
-    assertEquals(1, notebook.getNotes().size());
+  @Nested
+  class NotebookMetadataTests {
+    @Test
+    void shouldReturnCorrectCreatorId() {
+      assertThat(notebook.getCreatorId())
+          .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
+    }
   }
 
-  @Test
-  void creatorId() {
-    assertThat(notebook.getCreatorId())
-        .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
-  }
+  @Nested
+  class ObsidianExportTests {
+    @Test
+    void shouldGenerateValidZipFileWithCorrectStructureAndContent() throws IOException {
+      // Arrange
+      headNote.setTopicConstructor("Root Note");
+      headNote.setDetails("Root Content");
+      Note note1 = makeMe.aNote("Parent Note").under(headNote).details("Parent Content").please();
+      Note note2 = makeMe.aNote("Child Note").under(note1).details("Child Content").please();
+      Note note3 = makeMe.aNote("Leaf Note").under(note1).details("Leaf Content").please();
+      makeMe.refresh(notebook);
 
-  @Test
-  void generateObsidianExportShouldCreateValidZipFileWithIndexFiles() throws IOException {
-    // Create test notes with hierarchy
-    headNote.setTopicConstructor("Root Note");
-    headNote.setDetails("Root Content");
-    Note note1 = makeMe.aNote("Parent Note").under(headNote).details("Parent Content").please();
-    Note note2 = makeMe.aNote("Child Note").under(note1).details("Child Content").please();
-    Note note3 = makeMe.aNote("Leaf Note").under(note1).details("Leaf Content").please();
-    makeMe.refresh(notebook);
+      // Act
+      byte[] zipBytes = notebook.generateObsidianExport();
 
-    // Generate export
-    byte[] zipBytes = notebook.generateObsidianExport();
+      // Assert
+      Map<String, String> zipContents = extractZipContents(zipBytes);
+      verifyZipStructure(zipContents);
+      verifyZipContents(zipContents);
+    }
 
-    // Verify zip contents
-    try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
-        ZipInputStream zis = new ZipInputStream(bais)) {
-
+    private Map<String, String> extractZipContents(byte[] zipBytes) throws IOException {
       Map<String, String> zipContents = new HashMap<>();
-      ZipEntry entry;
-      while ((entry = zis.getNextEntry()) != null) {
-        byte[] content = zis.readAllBytes();
-        zipContents.put(entry.getName(), new String(content, StandardCharsets.UTF_8));
+      try (ByteArrayInputStream bais = new ByteArrayInputStream(zipBytes);
+          ZipInputStream zis = new ZipInputStream(bais)) {
+        ZipEntry entry;
+        while ((entry = zis.getNextEntry()) != null) {
+          byte[] content = zis.readAllBytes();
+          zipContents.put(entry.getName(), new String(content, StandardCharsets.UTF_8));
+        }
       }
+      return zipContents;
+    }
 
-      // Verify the structure and content
+    private void verifyZipStructure(Map<String, String> zipContents) {
       assertThat(
           zipContents.keySet(),
           hasItems(
@@ -87,8 +103,9 @@ class NotebookTest {
               "Root Note/Parent Note/__index.md",
               "Root Note/Parent Note/Child Note.md",
               "Root Note/Parent Note/Leaf Note.md"));
+    }
 
-      // Verify content of files
+    private void verifyZipContents(Map<String, String> zipContents) {
       assertThat(
           zipContents.get("Root Note/__index.md"), containsString("# Root Note\nRoot Content"));
 
