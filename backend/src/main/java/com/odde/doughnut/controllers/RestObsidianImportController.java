@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -81,42 +82,43 @@ public class RestObsidianImportController {
           String part = pathParts[i];
           System.out.println("Importing " + part);
 
-          //
-          //          // Skip empty parts and .md extension
-          //          if (part.isEmpty() || part.equals(".md")) {
-          //            continue;
-          //          }
-          //
-          //          // Remove .md extension if it's a file
-          //          if (part.endsWith(".md")) {
-          //            part = part.substring(0, part.length() - 3);
-          //          }
+          // Skip empty parts and .md extension
+          if (part.isEmpty() || part.equals(".md")) {
+            continue;
+          }
 
-          //          // Check if note already exists under current parent
-          //          Note existingNote = currentParent.getChildren().stream()
-          //              .filter(note -> note.getNoteTitle().equals(part))
-          //              .findFirst()
-          //              .orElse(null);
-          //
-          //          if (existingNote == null) {
-          //            // Create new note
-          //            NoteCreationDTO noteCreation = new NoteCreationDTO();
-          //            noteCreation.setNewTitle(part);
-          //
-          //            // If it's a file (last part), add the content
-          //            if (!entry.isDirectory() && i == pathParts.length - 1) {
-          //              noteCreation.setDetails(new String(zipIn.readAllBytes()));
-          //            }
-          //
-          //            Note newNote = noteConstructionService.createNote(
-          //                currentParent,
-          //                noteCreation,
-          //                currentUser.getEntity(),
-          //                null);
-          //            currentParent = newNote;
-          //          } else {
-          //            currentParent = existingNote;
-          //          }
+          // Remove .md extension if it's a file
+          if (part.endsWith(".md")) {
+            part = part.substring(0, part.length() - 3);
+          }
+
+          // Check if note already exists under current parent
+          String finalPart = part;
+          Note existingNote =
+              currentParent.getChildren().stream()
+                  .filter(note -> note.getNoteTitle().matches(finalPart))
+                  .findFirst()
+                  .orElse(null);
+
+          if (existingNote == null) {
+            // Create new note
+            NoteCreationDTO noteCreation = new NoteCreationDTO();
+            noteCreation.setNewTitle(part);
+
+            // If it's a file (last part), add the content
+            //                      if (!entry.isDirectory() && i == pathParts.length - 1) {
+            //                        noteCreation.setDetails(new String(zipIn.readAllBytes()));
+            //                      }
+
+            //                      Note newNote = noteConstructionService.createNote(
+            //                          currentParent,
+            //                          noteCreation,
+            //                          currentUser.getEntity(),
+            //                          null);
+            //                      currentParent = newNote;
+          } else {
+            currentParent = existingNote;
+          }
         }
       }
     }
