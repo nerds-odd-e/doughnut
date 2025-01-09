@@ -90,6 +90,7 @@ const commonConfig = {
             Filename: file.Filename,
             Format: file.Format,
             Content: file.Content,
+            validateMetadata: file.validateMetadata,
           }))
 
           const mismatches = []
@@ -110,7 +111,13 @@ const commonConfig = {
               )
             }
 
-            if (expected.Content && actual.Content !== expected.Content) {
+            const contentMatch = expected.Content ? actual.Content.includes(expected.Content) : true
+              
+            const hasFrontmatter = expected.validateMetadata ? actual.Content.match(
+              /^---\n(?:note_id: \d+\ncreated_at: .+\nupdated_at: .+\n)---\n/
+            ) : true
+
+            if (!contentMatch || !hasFrontmatter) {
               mismatches.push(
                 `Content mismatch in ${expected.Filename}:\n` +
                 `  Expected: ${expected.Content}\n` +

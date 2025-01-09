@@ -35,8 +35,14 @@ When(
 )
 
 Then('I should receive a zip file containing', (table: DataTable) => {
-  // 需要實作檢查下載的 zip 檔案內容
-  cy.task('checkDownloadedZipContent', table.hashes())
+  const expectedFiles = table.hashes().map(file => ({
+    Filename: file.Filename,
+    Format: file.Format,
+    Content: file.Content,
+    validateMetadata: true  // Add flag to check for metadata
+  }))
+
+  cy.task('checkDownloadedZipContent', expectedFiles)
 })
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
