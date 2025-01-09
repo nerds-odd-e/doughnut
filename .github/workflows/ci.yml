@@ -136,7 +136,7 @@ jobs:
         uses: ./.github/setup_jdk_with_cache
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs
+      - uses: ./.github/setup_nodejs_with_cache
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
