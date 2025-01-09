@@ -96,7 +96,7 @@ class RestObsidianImportControllerTests {
       Note importedNote = note1.getChildren().stream().findFirst().orElseThrow();
 
       assertThat(importedNote.getTopicConstructor(), equalTo("note 2"));
-      assertThat(importedNote.getDetails(), equalTo("Content of Note 2"));
+      assertThat(importedNote.getDetails(), equalTo("note 2"));
     }
 
     @Test
