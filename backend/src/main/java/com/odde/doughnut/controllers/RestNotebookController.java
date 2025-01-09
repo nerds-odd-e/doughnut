@@ -14,21 +14,28 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.annotation.SessionScope;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@SessionScope
 @RequestMapping("/api/notebooks")
 class RestNotebookController {
   private final ModelFactoryService modelFactoryService;
-  private UserModel currentUser;
+  private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -38,12 +45,12 @@ class RestNotebookController {
   public RestNotebookController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings,
-      ObsidianFormatService obsidianFormatService) {
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.obsidianFormatService = obsidianFormatService;
+    this.obsidianFormatService =
+        new ObsidianFormatService(currentUser.getEntity(), modelFactoryService);
   }
 
   @GetMapping("")
@@ -180,5 +187,20 @@ class RestNotebookController {
 
   private String sanitizeFileName(String fileName) {
     return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
+  }
+
+  @Operation(summary = "Import Obsidian file")
+  @PostMapping(value = "/{notebookId}/obsidian", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @ResponseStatus(HttpStatus.OK)
+  @Transactional
+  public void importObsidian(
+      @Parameter(description = "Obsidian zip file to import") @RequestParam("file")
+          MultipartFile file,
+      @Parameter(description = "Notebook ID") @PathVariable("notebookId") @Schema(type = "integer")
+          Notebook notebook)
+      throws UnexpectedNoAccessRightException, IOException {
+    currentUser.assertLoggedIn();
+    currentUser.assertReadAuthorization(notebook);
+    obsidianFormatService.importFromObsidian(file, notebook);
   }
 }

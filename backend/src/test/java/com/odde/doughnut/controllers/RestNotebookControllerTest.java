@@ -12,11 +12,11 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
+import java.io.IOException;
 import java.time.Period;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +24,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
 
 @SpringBootTest
@@ -33,20 +37,21 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestNotebookControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired ObsidianFormatService obsidianFormatService;
   @Autowired MakeMe makeMe;
   private UserModel userModel;
   private Note topNote;
   RestNotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired WebApplicationContext webApplicationContext;
 
   @BeforeEach
   void setup() {
+    // Setup MockMvc
+    MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
     userModel = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
-    controller =
-        new RestNotebookController(
-            modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
+    controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -54,9 +59,7 @@ class RestNotebookControllerTest {
     @Test
     void whenNotLogin() {
       userModel = modelFactoryService.toUserModel(null);
-      controller =
-          new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -65,9 +68,7 @@ class RestNotebookControllerTest {
       User user = new User();
       userModel = modelFactoryService.toUserModel(user);
       List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
-      controller =
-          new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
@@ -132,8 +133,7 @@ class RestNotebookControllerTest {
           new RestNotebookController(
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
-              testabilitySettings,
-              obsidianFormatService);
+              testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
     }
@@ -172,18 +172,14 @@ class RestNotebookControllerTest {
 
     @Test
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
-      controller =
-          new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
 
     @Test
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
-      controller =
-          new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
@@ -312,11 +308,108 @@ class RestNotebookControllerTest {
           new RestNotebookController(
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
-              testabilitySettings,
-              obsidianFormatService);
+              testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
+    }
+  }
+
+  @Nested
+  class ImportObsidianTest {
+    private Note note1;
+    private Notebook notebook;
+    private MockMultipartFile zipFile;
+
+    @BeforeEach
+    void setup() {
+      // Create notebook with Note1
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      note1 =
+          makeMe
+              .aNote("note 1")
+              .under(notebook.getHeadNote())
+              .details("Content of Note 1")
+              .please();
+
+      // Create mock zip file from actual test resource
+      try {
+        byte[] zipContent = getClass().getResourceAsStream("/import-one-child.zip").readAllBytes();
+        zipFile = new MockMultipartFile("file", "obsidian.zip", "application/zip", zipContent);
+      } catch (IOException e) {
+        throw new RuntimeException("Failed to read test zip file", e);
+      }
+    }
+
+    @Test
+    void shouldPreserveExistingNoteContent() throws UnexpectedNoAccessRightException, IOException {
+      // Act
+      controller.importObsidian(zipFile, notebook);
+
+      // Assert
+      Note existingNote =
+          notebook.getHeadNote().getChildren().stream()
+              .filter(n -> n.getTopicConstructor().equals("note 1"))
+              .findFirst()
+              .orElseThrow();
+
+      assertThat(existingNote.getTopicConstructor(), equalTo("note 1"));
+      assertThat(existingNote.getDetails(), equalTo("Content of Note 1"));
+    }
+
+    @Test
+    void shouldImportNewNoteWithCorrectContent()
+        throws UnexpectedNoAccessRightException, IOException {
+      // Act
+      controller.importObsidian(zipFile, notebook);
+      makeMe.refresh(note1);
+
+      // Assert
+      Note importedNote = note1.getChildren().stream().findFirst().orElseThrow();
+
+      assertThat(importedNote.getTopicConstructor(), equalTo("note 2"));
+      assertThat(importedNote.getDetails(), equalTo("note 2"));
+    }
+
+    @Test
+    void shouldEstablishCorrectHierarchy() throws UnexpectedNoAccessRightException, IOException {
+      // Act
+      controller.importObsidian(zipFile, notebook);
+      makeMe.refresh(note1);
+
+      // Assert
+      Note note2 = note1.getChildren().stream().findFirst().orElseThrow();
+
+      assertThat(note2.getParent(), equalTo(note1));
+      assertThat(note1.getChildren().size(), equalTo(1));
+    }
+
+    @Test
+    void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
+      // Arrange
+      UserModel otherUserModel = makeMe.aUser().toModelPlease();
+      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(otherUserModel).please();
+
+      // Act & Assert
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.importObsidian(zipFile, otherNotebook));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      // Arrange
+      userModel = makeMe.aNullUserModelPlease();
+      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+
+      // Act & Assert
+      ResponseStatusException exception =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.importObsidian(zipFile, notebook));
+
+      // Verify the correct status and message
+      assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
+      assertEquals("User Not Found", exception.getReason());
     }
   }
 }
