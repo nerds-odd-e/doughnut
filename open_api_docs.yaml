@@ -814,41 +814,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/obsidian/{notebookId}/import:
-    post:
-      tags:
-      - rest-obsidian-import-controller
-      summary: Import Obsidian file
-      operationId: importObsidian
-      parameters:
-      - name: notebookId
-        in: path
-        description: Notebook ID
-        required: true
-        schema:
-          type: integer
-          format: int32
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              required:
-              - file
-              type: object
-              properties:
-                file:
-                  type: string
-                  description: Obsidian zip file to import
-                  format: binary
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
@@ -1166,6 +1131,41 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebookId}/obsidian:
+    post:
+      tags:
+      - rest-obsidian-import-controller
+      summary: Import Obsidian file
+      operationId: importObsidian
+      parameters:
+      - name: notebookId
+        in: path
+        description: Notebook ID
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - file
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: Obsidian zip file to import
+                  format: binary
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/notebooks/create:
     post:
       tags:

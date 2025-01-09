@@ -69,15 +69,47 @@ class RestObsidianImportControllerTests {
       }
     }
 
-    void shouldSucceedWhenUserHasAccess() throws UnexpectedNoAccessRightException, IOException {
-      // Act & Assert - should not throw exception
+    @Test
+    void shouldPreserveExistingNoteContent() throws UnexpectedNoAccessRightException, IOException {
+      // Act
       controller.importObsidian(zipFile, notebook);
 
-      Note note1 = notebook.getHeadNote().getChildren().stream().findFirst().orElseThrow();
+      // Assert
+      Note existingNote =
+          notebook.getHeadNote().getChildren().stream()
+              .filter(n -> n.getTopicConstructor().equals("note 1"))
+              .findFirst()
+              .orElseThrow();
 
-      assertThat(note1.getTopicConstructor(), equalTo("note 1"));
-      Note note2 = note1.getChildren().stream().findFirst().get();
-      assertThat(note2.getTopicConstructor(), equalTo("note 2"));
+      assertThat(existingNote.getTopicConstructor(), equalTo("note 1"));
+      assertThat(existingNote.getDetails(), equalTo("Content of Note 1"));
+    }
+
+    @Test
+    void shouldImportNewNoteWithCorrectContent()
+        throws UnexpectedNoAccessRightException, IOException {
+      // Act
+      controller.importObsidian(zipFile, notebook);
+      makeMe.refresh(note1);
+
+      // Assert
+      Note importedNote = note1.getChildren().stream().findFirst().orElseThrow();
+
+      assertThat(importedNote.getTopicConstructor(), equalTo("note 2"));
+      assertThat(importedNote.getDetails(), equalTo("Content of Note 2"));
+    }
+
+    @Test
+    void shouldEstablishCorrectHierarchy() throws UnexpectedNoAccessRightException, IOException {
+      // Act
+      controller.importObsidian(zipFile, notebook);
+      makeMe.refresh(note1);
+
+      // Assert
+      Note note2 = note1.getChildren().stream().findFirst().orElseThrow();
+
+      assertThat(note2.getParent(), equalTo(note1));
+      assertThat(note1.getChildren().size(), equalTo(1));
     }
 
     @Test

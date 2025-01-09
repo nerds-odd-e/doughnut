@@ -24,7 +24,7 @@ export class RestObsidianImportControllerService {
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/obsidian/{notebookId}/import',
+            url: '/api/notebooks/{notebookId}/obsidian',
             path: {
                 'notebookId': notebookId,
             },

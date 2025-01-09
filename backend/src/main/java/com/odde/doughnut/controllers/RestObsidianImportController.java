@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @SessionScope
-@RequestMapping("/api")
+@RequestMapping("/api/notebooks")
 public class RestObsidianImportController {
   private final UserModel currentUser;
   private final NoteConstructionService noteConstructionService;
@@ -43,9 +43,7 @@ public class RestObsidianImportController {
   }
 
   @Operation(summary = "Import Obsidian file")
-  @PostMapping(
-      value = "/obsidian/{notebookId}/import",
-      consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/{notebookId}/obsidian", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
   public void importObsidian(
