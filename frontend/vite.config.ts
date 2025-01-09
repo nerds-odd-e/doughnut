@@ -64,7 +64,7 @@ const config = defineConfig({
     }),
     Components({}),
     compression({
-      algorithm: 'brotliCompress', 
+      algorithm: 'brotliCompress',
     }),
   ],
   server: {
