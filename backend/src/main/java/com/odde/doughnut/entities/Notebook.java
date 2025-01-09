@@ -9,14 +9,10 @@ import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.NonNull;
@@ -196,56 +192,5 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     notebookAssistant.setCreatedAt(currentUTCTimestamp);
     notebookAssistant.setAssistantId(id);
     return notebookAssistant;
-  }
-
-  @JsonIgnore
-  public byte[] generateObsidianExport() throws IOException {
-
-    try (var baos = new ByteArrayOutputStream();
-        var zos = new ZipOutputStream(baos)) {
-
-      writeNoteToZip(this.getHeadNote(), zos, "");
-
-      zos.close();
-      return baos.toByteArray();
-    }
-  }
-
-  private void writeNoteToZip(Note note, ZipOutputStream zos, String path) throws IOException {
-    // 檢查是否有子筆記
-    boolean hasChildren = !note.getChildren().isEmpty();
-
-    // �建檔案路徑
-    String filePath;
-    if (hasChildren) {
-      // 如果有子筆記，使用 __index.md
-      filePath =
-          path.isEmpty()
-              ? note.getTopicConstructor() + "/__index.md"
-              : path + "/" + note.getTopicConstructor() + "/__index.md";
-    } else {
-      // 如果沒有子筆記，使用原來的命名方式
-      filePath =
-          path.isEmpty()
-              ? note.getTopicConstructor() + ".md"
-              : path + "/" + note.getTopicConstructor() + ".md";
-    }
-
-    // 建立檔案內容
-    String fileContent = "# " + note.getTopicConstructor() + "\n" + note.getDetails();
-    zos.putNextEntry(new ZipEntry(filePath));
-    zos.write(fileContent.getBytes());
-
-    // 遞迴處理子筆記
-    for (Note child : note.getChildren()) {
-      writeNoteToZip(
-          child,
-          zos,
-          path.isEmpty() ? note.getTopicConstructor() : path + "/" + note.getTopicConstructor());
-    }
-  }
-
-  private String sanitizeFileName(String fileName) {
-    return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
   }
 }
