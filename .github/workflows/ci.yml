@@ -132,21 +132,16 @@ jobs:
           mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
-      - name: Setup JDK with cache
+      - name: Setup JDK
         uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - uses: actions/setup-node@v4
+      - name: Setup E2E Cypress dependencies
+        uses: ./.github/setup_nodejs
         with:
-          node-version: ${{ vars.NODE_VERSION }}
-      - uses: pnpm/action-setup@v4
-        with:
-          run_install: false
-      # Force install dependencies and Cypress
-      - name: Install dependencies and Cypress
-        run: |
-          pnpm install --frozen-lockfile
-          npx cypress install --force
+          node_version: ${{ vars.NODE_VERSION }}
+          pnpm_version: ${{ vars.PNPM_VERSION }}
+          force_install: 'true'
       - uses: cypress-io/github-action@v6
         with:
           browser: chrome

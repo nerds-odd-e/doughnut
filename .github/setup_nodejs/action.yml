@@ -7,6 +7,10 @@ inputs:
   pnpm_version:
     description: "PNPM Version"
     required: true
+  force_install:
+    description: "Force install dependencies and Cypress"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -20,3 +24,7 @@ runs:
         run_install: |
           - recursive: true
             args: [--frozen-lockfile, --strict-peer-dependencies]
+    - name: Force install Cypress
+      if: inputs.force_install == 'true'
+      shell: bash
+      run: pnpx cypress install --force
