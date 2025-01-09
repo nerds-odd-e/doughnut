@@ -21,8 +21,7 @@ public class ObsidianFormatService {
   }
 
   private void writeNoteToZip(Note note, ZipOutputStream zos, String path) throws IOException {
-    boolean hasChildren = !note.getChildren().isEmpty();
-    String filePath = generateFilePath(path, note.getTopicConstructor(), hasChildren);
+    String filePath = generateFilePath(path, note);
     String fileContent = generateMarkdownContent(note);
     zos.putNextEntry(new ZipEntry(filePath));
     zos.write(fileContent.getBytes());
@@ -34,9 +33,10 @@ public class ObsidianFormatService {
     }
   }
 
-  private String generateFilePath(String path, String topic, boolean hasChildren) {
-    String sanitizedTopic = sanitizeFileName(topic);
-    String fileName = hasChildren ? sanitizedTopic + "/__index.md" : sanitizedTopic + ".md";
+  private String generateFilePath(String path, Note note) {
+    String sanitizedTopic = sanitizeFileName(note.getTopicConstructor());
+    String fileName =
+        note.getChildren().isEmpty() ? sanitizedTopic + ".md" : sanitizedTopic + "/__index.md";
     return path.isEmpty() ? fileName : path + "/" + fileName;
   }
 
