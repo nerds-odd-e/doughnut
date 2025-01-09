@@ -8,7 +8,7 @@ import java.util.zip.ZipOutputStream;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ObsidianExportService {
+public class ObsidianFormatService {
   public byte[] exportToObsidian(Note headNote) throws IOException {
     try (var baos = new ByteArrayOutputStream();
         var zos = new ZipOutputStream(baos)) {

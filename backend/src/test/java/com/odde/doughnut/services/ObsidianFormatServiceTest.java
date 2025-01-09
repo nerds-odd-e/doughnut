@@ -23,9 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class ObsidianExportServiceTest {
+class ObsidianFormatServiceTest {
   @Autowired private MakeMe makeMe;
-  @Autowired private ObsidianExportService obsidianExportService;
+  @Autowired private ObsidianFormatService obsidianFormatService;
   private Note headNote;
 
   @BeforeEach
@@ -44,7 +44,7 @@ class ObsidianExportServiceTest {
     makeMe.refresh(headNote.getNotebook());
 
     // Act
-    byte[] zipBytes = obsidianExportService.exportToObsidian(headNote);
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(headNote);
 
     // Assert
     Map<String, String> zipContents = extractZipContents(zipBytes);

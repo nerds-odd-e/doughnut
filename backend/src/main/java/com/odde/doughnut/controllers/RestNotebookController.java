@@ -11,7 +11,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ObsidianExportService;
+import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -33,17 +33,17 @@ class RestNotebookController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private final ObsidianExportService obsidianExportService;
+  private final ObsidianFormatService obsidianFormatService;
 
   public RestNotebookController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
-      ObsidianExportService obsidianExportService) {
+      ObsidianFormatService obsidianFormatService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.obsidianExportService = obsidianExportService;
+    this.obsidianFormatService = obsidianFormatService;
   }
 
   @GetMapping("")
@@ -168,7 +168,7 @@ class RestNotebookController {
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertAuthorization(notebook);
 
-    byte[] zipBytes = obsidianExportService.exportToObsidian(notebook.getHeadNote());
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook.getHeadNote());
 
     return ResponseEntity.ok()
         .header(

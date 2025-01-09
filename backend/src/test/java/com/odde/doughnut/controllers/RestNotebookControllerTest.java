@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ObsidianExportService;
+import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -33,7 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestNotebookControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired ObsidianExportService obsidianExportService;
+  @Autowired ObsidianFormatService obsidianFormatService;
   @Autowired MakeMe makeMe;
   private UserModel userModel;
   private Note topNote;
@@ -46,7 +46,7 @@ class RestNotebookControllerTest {
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     controller =
         new RestNotebookController(
-            modelFactoryService, userModel, testabilitySettings, obsidianExportService);
+            modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
   }
 
   @Nested
@@ -56,7 +56,7 @@ class RestNotebookControllerTest {
       userModel = modelFactoryService.toUserModel(null);
       controller =
           new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianExportService);
+              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -67,7 +67,7 @@ class RestNotebookControllerTest {
       List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
       controller =
           new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianExportService);
+              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
@@ -133,7 +133,7 @@ class RestNotebookControllerTest {
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
-              obsidianExportService);
+              obsidianFormatService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
     }
@@ -174,7 +174,7 @@ class RestNotebookControllerTest {
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller =
           new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianExportService);
+              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
@@ -183,7 +183,7 @@ class RestNotebookControllerTest {
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
       controller =
           new RestNotebookController(
-              modelFactoryService, userModel, testabilitySettings, obsidianExportService);
+              modelFactoryService, userModel, testabilitySettings, obsidianFormatService);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
@@ -313,7 +313,7 @@ class RestNotebookControllerTest {
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
-              obsidianExportService);
+              obsidianFormatService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
