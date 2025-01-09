@@ -77,7 +77,7 @@ const commonConfig = {
 
           const zip = new AdmZip(path.join(downloadsFolder, zipFile))
           const zipEntries = zip.getEntries()
-          
+
           const actualFiles = zipEntries.map((entry) => ({
             Filename: entry.entryName,
             Format: path.extname(entry.entryName).slice(1),
