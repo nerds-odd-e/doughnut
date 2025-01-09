@@ -17,7 +17,7 @@ When('I input repository name {string}', (repoName: string) => {
 })
 
 Then('I should see a success message {string}', (message: string) => {
-  cy.get('[data-testid="toast-message"]')
+  cy.get('.Vue-Toastification__toast-body', { timeout: 10000 })
     .should('be.visible')
     .and('contain', message)
 })
