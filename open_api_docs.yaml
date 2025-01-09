@@ -1160,7 +1160,7 @@ paths:
   /api/notebooks/{notebookId}/obsidian:
     post:
       tags:
-      - rest-obsidian-import-controller
+      - rest-notebook-controller
       summary: Import Obsidian file
       operationId: importObsidian
       parameters:
