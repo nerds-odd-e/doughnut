@@ -130,35 +130,6 @@ export class RestNotebookControllerService {
         });
     }
     /**
-     * Import Obsidian file
-     * @param notebookId Notebook ID
-     * @param formData
-     * @returns any OK
-     * @throws ApiError
-     */
-    public importObsidian(
-        notebookId: number,
-        formData?: {
-            /**
-             * Obsidian zip file to import
-             */
-            file: Blob;
-        },
-    ): CancelablePromise<any> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notebooks/{notebookId}/obsidian',
-            path: {
-                'notebookId': notebookId,
-            },
-            formData: formData,
-            mediaType: 'multipart/form-data',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param requestBody
      * @returns RedirectToNoteResponse OK
      * @throws ApiError
