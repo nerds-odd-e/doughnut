@@ -37,7 +37,7 @@ public class ObsidianFormatService {
   private String generateFilePath(String path, String topic, boolean hasChildren) {
     String sanitizedTopic = sanitizeFileName(topic);
     String fileName = hasChildren ? sanitizedTopic + "/__index.md" : sanitizedTopic + ".md";
-    return path.isEmpty() ? fileName : sanitizeFileName(path) + "/" + fileName;
+    return path.isEmpty() ? fileName : path + "/" + fileName;
   }
 
   private String generateMarkdownContent(Note note) {
