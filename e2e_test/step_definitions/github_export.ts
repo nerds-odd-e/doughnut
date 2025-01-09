@@ -17,5 +17,7 @@ When('I input repository name {string}', (repoName: string) => {
 })
 
 Then('I should see a success message {string}', (message: string) => {
-  cy.findByText(message).should('be.visible')
+  cy.get('[data-testid="toast-message"]')
+    .should('be.visible')
+    .and('contain', message)
 })

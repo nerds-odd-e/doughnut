@@ -1,4 +1,3 @@
-@ignore
 @usingMockedGithubService
 Feature: Export Notebook to GitHub
   As a learner,
@@ -12,7 +11,7 @@ Feature: Export Notebook to GitHub
       | Python         | A programming language     | Programming  |@
       | Data Types    | Basic Python data types    | Python       |
       | Functions     | How to define functions    | Python       |
-
+  @ignore
   Scenario: Successfully export notebook to GitHub
     When I go to Notebook page
     And I export notebook "Programming" to GitHub

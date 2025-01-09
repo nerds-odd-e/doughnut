@@ -1,12 +1,14 @@
+import { useToast as useVueToast } from "vue-toastification"
+
 export function useToast() {
-  const showSuccessToast = (message: string) => {
-    // Implement your toast logic here
-    console.log("Success:", message)
+  const toast = useVueToast()
+
+  const showSuccessToast = (message: string, options = {}) => {
+    toast.success(message, options)
   }
 
-  const showErrorToast = (message: string) => {
-    // Implement your toast logic here
-    console.log("Error:", message)
+  const showErrorToast = (message: string, options = {}) => {
+    toast.error(message, options)
   }
 
   return {

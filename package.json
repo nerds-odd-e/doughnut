@@ -78,7 +78,8 @@
     "wait-on": "^8.0.1"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^11.2.0"
+    "@cucumber/cucumber": "^11.2.0",
+    "vue-toastification": "2.0.0-rc.5"
   },
   "pnpm": {
     "overrides": {

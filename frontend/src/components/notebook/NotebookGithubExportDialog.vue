@@ -35,10 +35,6 @@
 import { ref } from "vue"
 import { useToast } from "@/composables/useToast"
 
-const emit = defineEmits<{
-  (e: "close-dialog"): void
-}>()
-
 const { showSuccessToast, showErrorToast } = useToast()
 
 const repositoryName = ref("")
@@ -47,11 +43,13 @@ const isLoading = ref(false)
 const handleSubmit = async () => {
   isLoading.value = true
   try {
-    showSuccessToast("Notebook exported to GitHub successfully")
-    emit("close-dialog")
+    showSuccessToast("Notebook exported to GitHub successfully", {
+      "data-testid": "toast-message",
+    })
   } catch (error) {
     showErrorToast(
-      error instanceof Error ? error.message : "Failed to export to GitHub"
+      error instanceof Error ? error.message : "Failed to export to GitHub",
+      { "data-testid": "toast-message" }
     )
   } finally {
     isLoading.value = false
