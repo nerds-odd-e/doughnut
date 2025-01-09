@@ -57,13 +57,21 @@ public class ObsidianFormatService {
   }
 
   private String generateMarkdownContent(Note note) {
-    return "---\n" +
-           "note_id: " + note.getId() + "\n" +
-           "created_at: " + note.getCreatedAt() + "\n" +
-           "updated_at: " + note.getUpdatedAt() + "\n" +
-           "---\n" +
-           "# " + note.getTopicConstructor() + "\n" + 
-           note.getDetails();
+    return "---\n"
+        + "note_id: "
+        + note.getId()
+        + "\n"
+        + "created_at: "
+        + note.getCreatedAt()
+        + "\n"
+        + "updated_at: "
+        + note.getUpdatedAt()
+        + "\n"
+        + "---\n"
+        + "# "
+        + note.getTopicConstructor()
+        + "\n"
+        + note.getDetails();
   }
 
   private String sanitizeFileName(String fileName) {

@@ -35,11 +35,11 @@ When(
 )
 
 Then('I should receive a zip file containing', (table: DataTable) => {
-  const expectedFiles = table.hashes().map(file => ({
+  const expectedFiles = table.hashes().map((file) => ({
     Filename: file.Filename,
     Format: file.Format,
     Content: file.Content,
-    validateMetadata: true  // Add flag to check for metadata
+    validateMetadata: true, // Add flag to check for metadata
   }))
 
   cy.task('checkDownloadedZipContent', expectedFiles)

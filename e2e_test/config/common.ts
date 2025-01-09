@@ -97,7 +97,9 @@ const commonConfig = {
 
           // Check for missing files
           expectedFilesArray.forEach((expected) => {
-            const actual = actualFiles.find(file => file.Filename === expected.Filename)
+            const actual = actualFiles.find(
+              (file) => file.Filename === expected.Filename
+            )
             if (!actual) {
               mismatches.push(`Missing file: ${expected.Filename}`)
               return
@@ -106,22 +108,26 @@ const commonConfig = {
             if (actual.Format !== expected.Format) {
               mismatches.push(
                 `Format mismatch in ${expected.Filename}:\n` +
-                `  Expected: ${expected.Format}\n` +
-                `  Actual  : ${actual.Format}`
+                  `  Expected: ${expected.Format}\n` +
+                  `  Actual  : ${actual.Format}`
               )
             }
 
-            const contentMatch = expected.Content ? actual.Content.includes(expected.Content) : true
-              
-            const hasFrontmatter = expected.validateMetadata ? actual.Content.match(
-              /^---\n(?:note_id: \d+\ncreated_at: .+\nupdated_at: .+\n)---\n/
-            ) : true
+            const contentMatch = expected.Content
+              ? actual.Content.includes(expected.Content)
+              : true
 
-            if (!contentMatch || !hasFrontmatter) {
+            const hasFrontmatter = expected.validateMetadata
+              ? actual.Content.match(
+                  /^---\n(?:note_id: \d+\ncreated_at: .+\nupdated_at: .+\n)---\n/
+                )
+              : true
+
+            if (!(contentMatch && hasFrontmatter)) {
               mismatches.push(
                 `Content mismatch in ${expected.Filename}:\n` +
-                `  Expected: ${expected.Content}\n` +
-                `  Actual  : ${actual.Content}`
+                  `  Expected: ${expected.Content}\n` +
+                  `  Actual  : ${actual.Content}`
               )
             }
           })
@@ -129,7 +135,7 @@ const commonConfig = {
           // Check for unexpected files
           actualFiles.forEach((actual) => {
             const isExpected = expectedFilesArray.some(
-              expected => expected.Filename === actual.Filename
+              (expected) => expected.Filename === actual.Filename
             )
             if (!isExpected) {
               mismatches.push(`Unexpected file found: ${actual.Filename}`)
@@ -143,8 +149,8 @@ const commonConfig = {
               ...mismatches,
               '----------------------------------------',
               'Summary:',
-              `Expected files: ${expectedFilesArray.map(f => f.Filename).join(', ')}`,
-              `Actual files  : ${actualFiles.map(f => f.Filename).join(', ')}`
+              `Expected files: ${expectedFilesArray.map((f) => f.Filename).join(', ')}`,
+              `Actual files  : ${actualFiles.map((f) => f.Filename).join(', ')}`,
             ].join('\n')
 
             throw new Error(errorMessage)
