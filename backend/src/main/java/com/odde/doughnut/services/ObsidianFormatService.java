@@ -22,25 +22,25 @@ public class ObsidianFormatService {
 
   private void writeNoteToZip(Note note, ZipOutputStream zos, String path) throws IOException {
     boolean hasChildren = !note.getChildren().isEmpty();
-    String filePath = generateFilePath(path, note.getTopicConstructor(), hasChildren);
-    String fileContent = generateMarkdownContent(note);
+    String sanitizedTopic = sanitizeFileName(note.getTopicConstructor());
+
+    String filePath;
+    if (hasChildren) {
+      filePath =
+          path.isEmpty()
+              ? sanitizedTopic + "/__index.md"
+              : path + "/" + sanitizedTopic + "/__index.md";
+    } else {
+      filePath = path.isEmpty() ? sanitizedTopic + ".md" : path + "/" + sanitizedTopic + ".md";
+    }
+
+    String fileContent = "# " + note.getTopicConstructor() + "\n" + note.getDetails();
     zos.putNextEntry(new ZipEntry(filePath));
     zos.write(fileContent.getBytes());
 
     for (Note child : note.getChildren()) {
-      String newPath = path.isEmpty() ? note.getTopicConstructor() : path + "/" + note.getTopicConstructor();
-      writeNoteToZip(child, zos, newPath);
+      writeNoteToZip(child, zos, path.isEmpty() ? sanitizedTopic : path + "/" + sanitizedTopic);
     }
-  }
-
-  private String generateFilePath(String path, String topic, boolean hasChildren) {
-    String sanitizedTopic = sanitizeFileName(topic);
-    String fileName = hasChildren ? sanitizedTopic + "/__index.md" : sanitizedTopic + ".md";
-    return path.isEmpty() ? fileName : sanitizeFileName(path) + "/" + fileName;
-  }
-
-  private String generateMarkdownContent(Note note) {
-    return "# " + note.getTopicConstructor() + "\n" + note.getDetails();
   }
 
   private String sanitizeFileName(String fileName) {
