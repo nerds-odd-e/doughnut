@@ -136,7 +136,7 @@ jobs:
         uses: ./.github/setup_jdk_with_cache
         with:
           java_version: ${{ vars.JAVA_VERSION }}
-      - uses: ./.github/setup_nodejs_with_cache
+      - uses: ./.github/setup_nodejs
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
@@ -149,7 +149,7 @@ jobs:
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
-          install: false
+          install: true
         env:
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
       - uses: actions/upload-artifact@v4
