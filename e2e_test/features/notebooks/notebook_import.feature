@@ -11,6 +11,6 @@ Feature: Notebook Import
 
   Scenario: Import notes from Obsidian
     When I Import Obsidian data "import-one-child.zip" to note "title 1"
-    Then I should see "title 1" with these children
-      | note-title|
-      | note 1    |
+    Then I should see "title 1/note 1" with these children
+      | note-title |
+      | note 2   |
