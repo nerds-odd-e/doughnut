@@ -7,7 +7,7 @@ import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import fs from 'fs'
 import path from 'path'
 import AdmZip from 'adm-zip'
-import { ExpectedFile } from '../start/downloadChecker'
+import type { ExpectedFile } from '../start/downloadChecker'
 
 const commonConfig = {
   chromeWebSecurity: false,

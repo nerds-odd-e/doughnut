@@ -19,4 +19,4 @@ const downloadChecker = () => {
   }
 }
 
-export default downloadChecker 
+export default downloadChecker
