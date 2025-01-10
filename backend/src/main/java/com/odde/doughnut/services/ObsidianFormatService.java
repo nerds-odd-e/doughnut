@@ -79,55 +79,83 @@ public class ObsidianFormatService {
   }
 
   public void importFromObsidian(MultipartFile file, Notebook notebook) throws IOException {
-
     try (ZipInputStream zipIn = new ZipInputStream(file.getInputStream())) {
-      ZipEntry entry;
-
-      while ((entry = zipIn.getNextEntry()) != null) {
-        Note currentParent = notebook.getHeadNote();
-        String entryName = entry.getName();
-
-        if (entryName.startsWith(".") || entryName.contains("/.")) {
-          continue;
-        }
-
-        String[] pathParts = entryName.split("/");
-
-        // Create notes for each directory in the path
-        for (int i = 1; i < pathParts.length; i++) {
-          String part = pathParts[i];
-
-          // Skip empty parts and .md extension
-          if (part.isEmpty() || part.equals(".md")) {
-            continue;
-          }
-
-          // Remove .md extension if it's a file
-          if (part.endsWith(".md")) {
-            part = part.substring(0, part.length() - 3);
-          }
-
-          // Check if note already exists under current parent
-          String finalPart = part;
-          Note existingNote =
-              currentParent.getChildren().stream()
-                  .filter(note -> note.getNoteTitle().matches(finalPart))
-                  .findFirst()
-                  .orElse(null);
-
-          if (existingNote == null) {
-            // Create new note
-            Note newNote = noteConstructionService.createNote(currentParent, finalPart);
-            if (!entry.isDirectory() && i == pathParts.length - 1) {
-              newNote.prependDescription(new String(zipIn.readAllBytes()));
-              modelFactoryService.save(newNote);
-            }
-            currentParent = newNote;
-          } else {
-            currentParent = existingNote;
-          }
-        }
-      }
+        processZipEntries(zipIn, notebook);
     }
+  }
+
+  private void processZipEntries(ZipInputStream zipIn, Notebook notebook) throws IOException {
+    ZipEntry entry;
+    while ((entry = zipIn.getNextEntry()) != null) {
+        if (isHiddenFile(entry.getName())) {
+            continue;
+        }
+        processEntry(entry, notebook, zipIn);
+    }
+  }
+
+  private boolean isHiddenFile(String entryName) {
+    return entryName.startsWith(".") || entryName.contains("/.");
+  }
+
+  private void processEntry(ZipEntry entry, Notebook notebook, ZipInputStream zipIn) throws IOException {
+    Note currentParent = notebook.getHeadNote();
+    String[] pathParts = entry.getName().split("/");
+
+    for (int i = 1; i < pathParts.length; i++) {
+        String part = pathParts[i];
+        
+        if (shouldSkipPart(part)) {
+            continue;
+        }
+
+        String noteName = removeMarkdownExtension(part);
+        currentParent = processNotePart(currentParent, noteName, entry, zipIn, i == pathParts.length - 1);
+    }
+  }
+
+  private boolean shouldSkipPart(String part) {
+    return part.isEmpty() || part.equals(".md");
+  }
+
+  private String removeMarkdownExtension(String fileName) {
+    return fileName.endsWith(".md") 
+        ? fileName.substring(0, fileName.length() - 3) 
+        : fileName;
+  }
+
+  private Note processNotePart(
+    Note currentParent, 
+    String noteName, 
+    ZipEntry entry, 
+    ZipInputStream zipIn,
+    boolean isLastPart
+  ) throws IOException {
+    Note existingNote = findExistingNote(currentParent, noteName);
+    
+    if (existingNote != null) {
+        return existingNote;
+    }
+
+    Note newNote = noteConstructionService.createNote(currentParent, noteName);
+    
+    if (!entry.isDirectory() && isLastPart) {
+        addContentToNote(newNote, zipIn);
+    }
+    
+    return newNote;
+  }
+
+  private Note findExistingNote(Note parent, String noteName) {
+    return parent.getChildren().stream()
+        .filter(note -> note.getNoteTitle().matches(noteName))
+        .findFirst()
+        .orElse(null);
+  }
+
+  private void addContentToNote(Note note, ZipInputStream zipIn) throws IOException {
+    String content = new String(zipIn.readAllBytes());
+    note.prependDescription(content);
+    modelFactoryService.save(note);
   }
 }
