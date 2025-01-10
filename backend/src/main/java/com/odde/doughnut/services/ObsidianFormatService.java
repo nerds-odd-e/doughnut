@@ -67,20 +67,15 @@ public class ObsidianFormatService {
            created_at: %s
            updated_at: %s
            ---
-           """.formatted(
-           note.getId(),
-           note.getCreatedAt(),
-           note.getUpdatedAt()
-    );
+           """
+        .formatted(note.getId(), note.getCreatedAt(), note.getUpdatedAt());
   }
 
   private String generateNoteContent(Note note) {
     return """
            # %s
-           %s""".formatted(
-           note.getTopicConstructor(),
-           note.getDetails()
-    );
+           %s"""
+        .formatted(note.getTopicConstructor(), note.getDetails());
   }
 
   private String sanitizeFileName(String fileName) {
