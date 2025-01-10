@@ -87,6 +87,12 @@ in mkShell {
     echo "                                                                                "
     echo "###################################################################################################################"
 
+    corepack prepare pnpm@10.0.0 --activate
+    corepack use pnpm@10.0.0
+    pnpm --frozen-lockfile recursive install
+    # start biome daemon-server
+    pnpm biome stop && pnpm biome start
+
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR
 
@@ -117,11 +123,5 @@ in mkShell {
     if [[ "$USER" = @(codespace|gitpod) ]]; then
       [[ -d $HOME/.cache/Cypress ]] || pnpx cypress install --force
     fi
-
-    corepack prepare pnpm@10.0.0 --activate
-    corepack use pnpm@10.0.0
-    pnpm --frozen-lockfile recursive install
-    # start biome daemon-server
-    pnpm biome stop && pnpm biome start
   '';
 }
