@@ -105,27 +105,27 @@ public class ObsidianFormatService {
   private void processEntry(ZipEntry entry, Notebook notebook, ZipInputStream zipIn)
       throws IOException {
     if (!entry.getName().endsWith(".md")) {
-        return;
+      return;
     }
 
     Note currentParent = notebook.getHeadNote();
     String[] pathParts = entry.getName().split("/");
-    
+
     boolean isIndexFile = pathParts[pathParts.length - 1].equals("__index.md");
     int lastPartIndex = isIndexFile ? pathParts.length - 2 : pathParts.length - 1;
 
     for (int i = 0; i < lastPartIndex; i++) {
-        String part = pathParts[i];
-        if (shouldSkipPart(part)) {
-            continue;
-        }
-        currentParent = processNotePart(currentParent, part, entry, zipIn, false);
+      String part = pathParts[i];
+      if (shouldSkipPart(part)) {
+        continue;
+      }
+      currentParent = processNotePart(currentParent, part, entry, zipIn, false);
     }
 
     if (!isIndexFile) {
-        String lastPart = pathParts[lastPartIndex];
-        String noteName = removeMarkdownExtension(lastPart);
-        processNotePart(currentParent, noteName, entry, zipIn, true);
+      String lastPart = pathParts[lastPartIndex];
+      String noteName = removeMarkdownExtension(lastPart);
+      processNotePart(currentParent, noteName, entry, zipIn, true);
     }
   }
 
@@ -164,21 +164,21 @@ public class ObsidianFormatService {
 
   private void addContentToNote(Note note, ZipInputStream zipIn) throws IOException {
     String content = new String(zipIn.readAllBytes());
-    
+
     String[] parts = content.split("---", 3);
     if (parts.length == 3) {
-        String frontmatter = parts[1].trim();
-        
-        String markdownContent = parts[2].trim();
-        if (markdownContent.startsWith("# ")) {
-            int nextLineIndex = markdownContent.indexOf('\n');
-            if (nextLineIndex != -1) {
-                markdownContent = markdownContent.substring(nextLineIndex).trim();
-            }
+      String frontmatter = parts[1].trim();
+
+      String markdownContent = parts[2].trim();
+      if (markdownContent.startsWith("# ")) {
+        int nextLineIndex = markdownContent.indexOf('\n');
+        if (nextLineIndex != -1) {
+          markdownContent = markdownContent.substring(nextLineIndex).trim();
         }
-        note.prependDescription(markdownContent);
+      }
+      note.prependDescription(markdownContent);
     } else {
-        note.prependDescription(content);
+      note.prependDescription(content);
     }
     modelFactoryService.save(note);
   }
