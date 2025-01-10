@@ -55,19 +55,16 @@
       </svg>
     </button>
     <PopButton
-      btn-class="daisy-btn daisy-btn-sm"
       title="Export to GitHub"
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
     >
-      <template #default="{ closer }">
-        <NotebookGithubExportDialog
-          :notebook-id="notebook.id"
-          @close-dialog="closer"
-        />
+      <template #button_face>
+        <SvgGithub />
       </template>
-      <template #button-content>
-        <SvgGithub class="daisy-w-4 daisy-h-4" />
-        Export to GitHub
-      </template>
+      <NotebookGithubExportDialog
+        :notebook-id="notebook.id"
+        @close-dialog="closer"
+      />
     </PopButton>
   </div>
 </template>
