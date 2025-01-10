@@ -5,7 +5,6 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
-import type { ExpectedFile } from '../start/downloadChecker'
 
 // First step already exists in user.ts:
 // Given('I am logged in as an existing user', () => {
@@ -37,12 +36,13 @@ When(
 
 Then('I should receive a zip file containing', (table: DataTable) => {
   const expectedFiles = table.hashes().map((file) => ({
-    Filename: file.Filename || '',
-    Format: file.Format || '',
-    Content: file.Content || '',
-    validateMetadata: true
+    Filename: file.Filename,
+    Format: file.Format,
+    Content: file.Content,
+    validateMetadata: true, // Add flag to check for metadata
   }))
-  start.checkDownloadFiles().hasZipFileWith(expectedFiles)
+
+  cy.task('checkDownloadedZipContent', expectedFiles)
 })
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
