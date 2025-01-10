@@ -104,7 +104,7 @@ public class ObsidianFormatService {
 
     for (int i = 1; i < pathParts.length; i++) {
         String part = pathParts[i];
-        
+
         if (shouldSkipPart(part)) {
             continue;
         }
@@ -119,36 +119,36 @@ public class ObsidianFormatService {
   }
 
   private String removeMarkdownExtension(String fileName) {
-    return fileName.endsWith(".md") 
-        ? fileName.substring(0, fileName.length() - 3) 
+    return fileName.endsWith(".md")
+        ? fileName.substring(0, fileName.length() - 3)
         : fileName;
   }
 
   private Note processNotePart(
-    Note currentParent, 
-    String noteName, 
-    ZipEntry entry, 
+    Note currentParent,
+    String noteName,
+    ZipEntry entry,
     ZipInputStream zipIn,
     boolean isLastPart
   ) throws IOException {
     Note existingNote = findExistingNote(currentParent, noteName);
-    
+
     if (existingNote != null) {
         return existingNote;
     }
 
     Note newNote = noteConstructionService.createNote(currentParent, noteName);
-    
+
     if (!entry.isDirectory() && isLastPart) {
         addContentToNote(newNote, zipIn);
     }
-    
+
     return newNote;
   }
 
   private Note findExistingNote(Note parent, String noteName) {
     return parent.getChildren().stream()
-        .filter(note -> note.getNoteTitle().matches(noteName))
+           .filter(note -> note.getTopicConstructor().equals(noteName))
         .findFirst()
         .orElse(null);
   }
