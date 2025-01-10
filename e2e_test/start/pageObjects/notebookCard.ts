@@ -8,7 +8,7 @@ interface NotebookCard {
   unsubscribe(): void
   openNotebookQuestions(): ReturnType<typeof notebookQuestionsList>
   editNotebookSettings(): ReturnType<typeof notebookSettingsPopup>
-  downloadForObsidian(): void
+  exportForObsidian(): void
   importObsidianData(filename: string): void
   exportToGitHub(): void
   inputGitHubRepository(repoName: string): void
