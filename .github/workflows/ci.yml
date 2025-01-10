@@ -202,8 +202,9 @@ jobs:
     if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@v3
+        id: conclusion
       - uses: 8398a7/action-slack@v3
-        if: env.WORKFLOW_CONCLUSION == 'failure'
+        if: steps.conclusion.outputs.conclusion == 'failure'
         with:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
