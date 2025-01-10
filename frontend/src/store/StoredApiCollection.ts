@@ -77,7 +77,7 @@ export interface StoredApi {
     data: NoteMoveDTO
   ): Promise<void>
 
-  // importObsidianZip(notebookId: number, file: File): Promise<void>
+  importObsidianZip(notebookId: number, file: File): Promise<void>
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
@@ -318,10 +318,9 @@ export default class StoredApiCollection implements StoredApi {
     )
   }
 
-  // async importObsidianZip(notebookId: number, file: File): Promise<void> {
-  // await this.managedApi.restObsidianImportController.importObsidian(
-  //   notebookId,
-  //   { file }
-  // )
-  // }
+  async importObsidianZip(notebookId: number, file: File): Promise<void> {
+    await this.managedApi.restNotebookController.importObsidian(notebookId, {
+      file,
+    })
+  }
 }

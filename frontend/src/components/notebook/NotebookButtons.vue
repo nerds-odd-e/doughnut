@@ -32,7 +32,7 @@
     >
       <SvgBazaarShare />
     </button>
-    <label 
+    <label
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
       title="Import from Obsidian"
     >
@@ -121,10 +121,9 @@ const handleObsidianImport = async (event: Event) => {
   if (!file) return
 
   try {
-    // await managedApi.restObsidianImportController.importObsidian(
-    //   props.notebook.id,
-    //   { file }
-    // )
+    await managedApi.restNotebookController.importObsidian(props.notebook.id, {
+      file,
+    })
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
   } catch (error) {
