@@ -10,9 +10,6 @@ const fetchMock = createFetchMock(vi, {
 fetchMock.enableMocks();
 
 if(process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
-
-  // Throw errors when a `console.error` or `console.warn` happens
-  // by overriding the functions
   const CONSOLE_FAIL_TYPES = ["error", "warn", "log"];
 
   CONSOLE_FAIL_TYPES.forEach((type) => {
