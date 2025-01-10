@@ -28,7 +28,8 @@
     "turndown": "^7.2.0",
     "vue": "3.5.13",
     "vue-content-loader": "2.0.1",
-    "vue-router": "4.5.0"
+    "vue-router": "4.5.0",
+    "vue-toastification": "2.0.0-rc.5"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
