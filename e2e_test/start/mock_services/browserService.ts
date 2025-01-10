@@ -24,39 +24,65 @@ const browser = {
         // In the future, we should be able to use them in cypress directly
         // and make the test more realistic.
 
-        class MockAudioContext {
+        class MockAudioContext implements Partial<AudioContext> {
           audioWorklet = {
             addModule: cy.stub().resolves(),
           }
-          createMediaStreamSource() {
-            return {
-              // Implement stubs for connect and disconnect
-              connect: () => {
-                // Stub implementation for connecting audio nodes
-                return undefined
-              },
-              disconnect: () => {
-                // Stub implementation for disconnecting audio nodes
-                return undefined
-              },
-            }
+          createMediaStreamSource(_mediaStream: MediaStream) {
+            const node = {
+              connect: () => ({}) as AudioNode,
+              disconnect: () => undefined,
+              channelCount: 2,
+              channelCountMode: 'explicit' as const,
+              channelInterpretation: 'speakers' as const,
+              context: this,
+              numberOfInputs: 1,
+              numberOfOutputs: 1,
+              mediaStream: _mediaStream,
+            } as unknown as MediaStreamAudioSourceNode
+            return node
           }
-          get destination() {
-            return {}
+          get destination(): AudioDestinationNode {
+            return {
+              maxChannelCount: 2,
+              channelCount: 2,
+              channelCountMode: 'explicit',
+              channelInterpretation: 'speakers',
+              context: this,
+              numberOfInputs: 1,
+              numberOfOutputs: 0,
+            } as unknown as AudioDestinationNode
+          }
+          baseLatency = 0
+          outputLatency = 0
+          close() {
+            return Promise.resolve()
           }
         }
-        // Remove biome-ignore as we're adding proper type annotation
-        ;(win as Window & typeof globalThis).AudioContext = MockAudioContext
+        ;(win as Window & typeof globalThis).AudioContext =
+          MockAudioContext as unknown as typeof AudioContext
 
-        class MockAudioWorkletNode {
-          // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-          port: any
-          constructor() {
-            this.port = {}
+        class MockAudioWorkletNode implements Partial<AudioWorkletNode> {
+          port: MessagePort = {
+            onmessage: null,
+            onmessageerror: null,
+            postMessage: (
+              _message: MessageEventInit,
+              _transfer?: Transferable[]
+            ) => undefined,
+            start: () => undefined,
+            close: () => undefined,
+            addEventListener: (_type: string, _listener: EventListener) =>
+              undefined,
+            removeEventListener: (_type: string, _listener: EventListener) =>
+              undefined,
+            dispatchEvent: (_event: Event) => false,
+          } as unknown as MessagePort
+          parameters = new Map()
+          onprocessorerror = null
+          constructor(_context: BaseAudioContext, _name: string) {
             Object.defineProperty(this.port, 'onmessage', {
-              get: () => {
-                return browser.audioWorletPort.onmessage
-              },
+              get: () => browser.audioWorletPort.onmessage,
               set: (handler) => {
                 browser.audioWorletPort.onmessage = handler
               },
@@ -65,14 +91,14 @@ const browser = {
             })
           }
           connect() {
-            return undefined
+            return {} as AudioNode
           }
           disconnect() {
             return undefined
           }
         }
         ;(win as Window & typeof globalThis).AudioWorkletNode =
-          MockAudioWorkletNode
+          MockAudioWorkletNode as unknown as typeof AudioWorkletNode
 
         resolve()
       })
@@ -126,12 +152,12 @@ const browser = {
       const rightIndex = Math.ceil(index)
       const interpolationFactor = index - leftIndex
 
-      if (rightIndex >= audioBuffer.length) {
-        result[i] = audioBuffer[leftIndex]
+      if (rightIndex >= audioBuffer.length || leftIndex === undefined) {
+        result[i] = audioBuffer[leftIndex] ?? 0
       } else {
         result[i] =
-          (1 - interpolationFactor) * audioBuffer[leftIndex] +
-          interpolationFactor * audioBuffer[rightIndex]
+          (1 - interpolationFactor) * (audioBuffer[leftIndex] ?? 0) +
+          interpolationFactor * (audioBuffer[rightIndex] ?? 0)
       }
     }
 
