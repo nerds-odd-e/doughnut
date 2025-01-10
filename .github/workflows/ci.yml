@@ -209,7 +209,7 @@ jobs:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
       # - uses: nobrayner/discord-webhook@v1
-      #   if: env.WORKFLOW_CONCLUSION == 'failure'
+      #   if: steps.conclusion.outputs.conclusion == 'failure'
       #   with:
       #     github-token: ${{ env.GITHUB_TOKEN }}
       #     discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
