@@ -96,6 +96,14 @@ const props = defineProps<{
   user?: User
 }>()
 
+const emit = defineEmits<{
+  (e: "close-dialog"): void
+}>()
+
+const closer = () => {
+  emit("close-dialog")
+}
+
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
     await managedApi.restNotebookController.shareNotebook(props.notebook.id)
