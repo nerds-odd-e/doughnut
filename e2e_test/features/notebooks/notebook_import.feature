@@ -5,7 +5,7 @@ Feature: Notebook Import
 
   Background:
     Given I am logged in as an existing user
-  
+
 
   Scenario: Import zip from Obsidian with one new child
     Given  I have a notebook with head note "title 1" and notes:
@@ -15,6 +15,7 @@ Feature: Notebook Import
     Then I should see "title 1/note 1" with these children
       | note-title |
       | note 2     |
+    And I should see note "title 1/note 1/note 2" has details "content of note 2"
 
   Scenario: Import zip from Obsidian with two nested new child
     Given I have a notebook with head note "title 1" and notes:
@@ -33,4 +34,3 @@ Feature: Notebook Import
       | note-title |
       | note 2     |
 
-  

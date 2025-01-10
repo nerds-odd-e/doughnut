@@ -506,3 +506,13 @@ When(
       .createNoteWithAttributes(data.hashes()[0]!)
   }
 )
+
+Then(
+  'I should see note {notepath} has details {string}',
+  (notePath: NotePath, expectedDetails: string) => {
+    start
+      .routerToNotebooksPage()
+      .navigateToPath(notePath)
+      .findNoteDetails(expectedDetails)
+  }
+)
