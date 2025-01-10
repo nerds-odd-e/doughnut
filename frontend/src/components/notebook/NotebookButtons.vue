@@ -56,7 +56,7 @@
     </button>
     <PopButton
       title="Export to GitHub"
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
     >
       <template #button_face>
         <SvgGithub />
