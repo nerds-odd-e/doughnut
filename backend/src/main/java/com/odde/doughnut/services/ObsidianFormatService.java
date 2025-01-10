@@ -7,6 +7,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -167,13 +169,33 @@ public class ObsidianFormatService {
 
     String[] parts = content.split("---", 3);
     if (parts.length == 3) {
-      String frontmatter = parts[1].trim();
-
-      String markdownContent = parts[2].trim();
-      if (markdownContent.startsWith("# ")) {
-        int nextLineIndex = markdownContent.indexOf('\n');
-        if (nextLineIndex != -1) {
-          markdownContent = markdownContent.substring(nextLineIndex).trim();
+        // Parse frontmatter
+        String frontmatter = parts[1].trim();
+        Map<String, String> metadata = parseFrontmatter(frontmatter);
+        
+        // Check if note with this ID exists
+        if (metadata.containsKey("note_id")) {
+            Integer noteId = Integer.parseInt(metadata.get("note_id"));
+            Note existingNote = modelFactoryService.noteRepository.findById(noteId).orElse(null);
+            
+            if (existingNote != null) {
+                // Update existing note instead of creating new one
+                updateExistingNote(existingNote, parts[2].trim(), note.getTopicConstructor());
+                // Copy the children to the existing note
+                note.getChildren().forEach(child -> child.setParentNote(existingNote));
+                // Remove the temporary note
+                modelFactoryService.remove(note);
+                return;
+            }
+        }
+        
+        // Process content for new note
+        String markdownContent = parts[2].trim();
+        if (markdownContent.startsWith("# ")) {
+            int nextLineIndex = markdownContent.indexOf('\n');
+            if (nextLineIndex != -1) {
+                markdownContent = markdownContent.substring(nextLineIndex).trim();
+            }
         }
       }
       note.prependDescription(markdownContent);
@@ -181,5 +203,29 @@ public class ObsidianFormatService {
       note.prependDescription(content);
     }
     modelFactoryService.save(note);
+  }
+
+  private Map<String, String> parseFrontmatter(String frontmatter) {
+    Map<String, String> metadata = new HashMap<>();
+    String[] lines = frontmatter.split("\n");
+    for (String line : lines) {
+        String[] parts = line.split(":", 2);
+        if (parts.length == 2) {
+            metadata.put(parts[0].trim(), parts[1].trim());
+        }
+    }
+    return metadata;
+  }
+
+  private void updateExistingNote(Note existingNote, String content, String newTitle) {
+    existingNote.setTopicConstructor(newTitle);
+    if (content.startsWith("# ")) {
+        int nextLineIndex = content.indexOf('\n');
+        if (nextLineIndex != -1) {
+            content = content.substring(nextLineIndex).trim();
+        }
+    }
+    existingNote.prependDescription(content);
+    modelFactoryService.save(existingNote);
   }
 }
