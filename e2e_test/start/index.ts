@@ -7,6 +7,7 @@ import { assimilation } from './pageObjects/assimilationPage'
 import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
 import { notebookCard } from './pageObjects/notebookCard'
+import downloadChecker from './downloadChecker'
 
 const start = {
   ...basicActions,
@@ -17,6 +18,7 @@ const start = {
   recall,
   assumeCirclePage,
   notebookCard,
+  ...downloadChecker(),
   expectToast(message: string) {
     cy.get('.Vue-Toastification__toast-body', { timeout: 10000 })
       .should('be.visible')

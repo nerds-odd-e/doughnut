@@ -7,13 +7,7 @@ import createBundler from '@bahmutov/cypress-esbuild-preprocessor'
 import fs from 'fs'
 import path from 'path'
 import AdmZip from 'adm-zip'
-
-interface ExpectedFile {
-  Filename: string
-  Format: string
-  Content?: string
-  validateMetadata?: boolean
-}
+import { ExpectedFile } from '../start/downloadChecker'
 
 const commonConfig = {
   chromeWebSecurity: false,
@@ -76,7 +70,7 @@ const commonConfig = {
           return checker(retryCount)
         },
         checkDownloadedZipContent(expectedFiles: ExpectedFile[]) {
-          const downloadsFolder = config.downloadsFolder || 'cypress/downloads'
+          const downloadsFolder = config.downloadsFolder
           const files = fs.readdirSync(downloadsFolder)
           const zipFile = files.find((file) => file.endsWith('.zip'))
 
