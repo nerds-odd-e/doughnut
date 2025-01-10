@@ -8,6 +8,13 @@ import fs from 'fs'
 import path from 'path'
 import AdmZip from 'adm-zip'
 
+interface ExpectedFile {
+  Filename: string
+  Format: string
+  Content?: string
+  validateMetadata?: boolean
+}
+
 const commonConfig = {
   chromeWebSecurity: false,
   screenshotOnRunFailure: true,
@@ -68,7 +75,7 @@ const commonConfig = {
           }
           return checker(retryCount)
         },
-        checkDownloadedZipContent(expectedFiles) {
+        checkDownloadedZipContent(expectedFiles: ExpectedFile[]) {
           const downloadsFolder = config.downloadsFolder || 'cypress/downloads'
           const files = fs.readdirSync(downloadsFolder)
           const zipFile = files.find((file) => file.endsWith('.zip'))
@@ -93,7 +100,7 @@ const commonConfig = {
             validateMetadata: file.validateMetadata,
           }))
 
-          const mismatches = []
+          const mismatches: string[] = []
 
           // Check for missing files
           expectedFilesArray.forEach((expected) => {
