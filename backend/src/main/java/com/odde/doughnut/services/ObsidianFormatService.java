@@ -116,7 +116,7 @@ public class ObsidianFormatService {
     boolean isIndexFile = pathParts[pathParts.length - 1].equals("__index.md");
     int lastPartIndex = isIndexFile ? pathParts.length - 2 : pathParts.length - 1;
 
-    for (int i = 0; i < lastPartIndex; i++) {
+    for (int i = 1; i < lastPartIndex; i++) {
       String part = pathParts[i];
       if (shouldSkipPart(part)) {
         continue;
@@ -142,6 +142,7 @@ public class ObsidianFormatService {
   private Note processNotePart(
       Note currentParent, String noteName, ZipEntry entry, ZipInputStream zipIn, boolean isLastPart)
       throws IOException {
+    currentParent = modelFactoryService.findNoteById(currentParent.getId());
     Note existingNote = findExistingNote(currentParent, noteName);
 
     if (existingNote != null) {
@@ -149,11 +150,18 @@ public class ObsidianFormatService {
     }
 
     Note newNote = noteConstructionService.createNote(currentParent, noteName);
+    newNote = modelFactoryService.save(newNote);
+
+    // Force a flush to ensure the relationship is persisted
+    modelFactoryService.entityManager.flush();
+
+    // Refresh both entities to get the latest state
+    modelFactoryService.entityManager.refresh(newNote);
+    modelFactoryService.entityManager.refresh(currentParent);
 
     if (!entry.isDirectory() && isLastPart) {
       addContentToNote(newNote, zipIn);
     }
-
     return newNote;
   }
 

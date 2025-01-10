@@ -164,4 +164,10 @@ public class ModelFactoryService {
       toMemoryTrackerModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
     }
   }
+
+  public Note findNoteById(Integer id) {
+    return noteRepository
+        .findById(id)
+        .orElseThrow(() -> new RuntimeException("Note not found with id: " + id));
+  }
 }
