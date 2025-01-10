@@ -6,6 +6,7 @@ import testability from './testability'
 import { assimilation } from './pageObjects/assimilationPage'
 import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
+import { notebookCard } from './pageObjects/notebookCard'
 
 const start = {
   ...basicActions,
@@ -15,6 +16,12 @@ const start = {
   assimilation,
   recall,
   assumeCirclePage,
+  notebookCard,
+  expectToast(message: string) {
+    cy.get('.Vue-Toastification__toast-body', { timeout: 10000 })
+      .should('be.visible')
+      .and('contain', message)
+  },
 }
 export default start
 export { mock_services }

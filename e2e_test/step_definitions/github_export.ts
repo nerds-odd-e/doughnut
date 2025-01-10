@@ -1,23 +1,15 @@
 import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import start from '../start'
 
 When('I export notebook {string} to GitHub', (notebookTitle: string) => {
-  cy.findByText(notebookTitle)
-    .closest('[data-cy="notebook-card"]')
-    .findByRole('button', { name: /Export to GitHub/i })
-    .click()
+  start.routerToNotebooksPage()
+  start.notebookCard(notebookTitle).exportToGitHub()
 })
 
 When('I input repository name {string}', (repoName: string) => {
-  // Input repository name in the text field
-  cy.get('[data-cy="repository-input"]')
-    .type(repoName)
-    .should('have.value', repoName)
-
-  cy.findByRole('button', { name: 'Export' }).click()
+  start.notebookCard('').inputGitHubRepository(repoName)
 })
 
 Then('I should see a success message {string}', (message: string) => {
-  cy.get('.Vue-Toastification__toast-body', { timeout: 10000 })
-    .should('be.visible')
-    .and('contain', message)
+  start.expectToast(message)
 })

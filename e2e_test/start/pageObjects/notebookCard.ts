@@ -10,6 +10,8 @@ interface NotebookCard {
   editNotebookSettings(): ReturnType<typeof notebookSettingsPopup>
   downloadForObsidian(): void
   importObsidianData(filename: string): void
+  exportToGitHub(): void
+  inputGitHubRepository(repoName: string): void
 }
 
 export const notebookCard = (
@@ -47,5 +49,14 @@ export const notebookCard = (
         )
       })
     cy.pageIsNotLoading()
+  },
+  exportToGitHub() {
+    findNotebookCardButton(notebook, 'Export to GitHub').click()
+  },
+  inputGitHubRepository(repoName: string) {
+    cy.get('[data-cy="repository-input"]')
+      .type(repoName)
+      .should('have.value', repoName)
+    cy.findByRole('button', { name: 'Export' }).click()
   },
 })
