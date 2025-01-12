@@ -2,21 +2,7 @@ import { findNotebookCardButton, notebookList } from './NotebookList'
 import notebookQuestionsList from './notebookQuestionsList'
 import notebookSettingsPopup from './notebookSettingsPopup'
 
-interface NotebookCard {
-  shareNotebookToBazaar(): void
-  updateSubscription(): void
-  unsubscribe(): void
-  openNotebookQuestions(): ReturnType<typeof notebookQuestionsList>
-  editNotebookSettings(): ReturnType<typeof notebookSettingsPopup>
-  exportForObsidian(): void
-  importObsidianData(filename: string): void
-  exportToGitHub(): void
-  inputGitHubRepository(repoName: string): void
-}
-
-export const notebookCard = (
-  notebook: string
-): NotebookCard & ReturnType<typeof notebookList> => ({
+export const notebookCard = (notebook: string) => ({
   ...notebookList(),
   shareNotebookToBazaar() {
     findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
@@ -49,14 +35,5 @@ export const notebookCard = (
         )
       })
     cy.pageIsNotLoading()
-  },
-  exportToGitHub() {
-    findNotebookCardButton(notebook, 'Export to GitHub').click()
-  },
-  inputGitHubRepository(repoName: string) {
-    cy.get('[data-cy="repository-input"]')
-      .type(repoName)
-      .should('have.value', repoName)
-    cy.findByRole('button', { name: 'Export' }).click()
   },
 })

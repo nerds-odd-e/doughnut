@@ -19,11 +19,6 @@ const start = {
   assumeCirclePage,
   notebookCard,
   ...downloadChecker(),
-  expectToast(message: string) {
-    cy.get('.Vue-Toastification__toast-body', { timeout: 10000 })
-      .should('be.visible')
-      .and('contain', message)
-  },
 }
 export default start
 export { mock_services }
