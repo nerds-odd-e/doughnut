@@ -3,18 +3,17 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
-    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
           inherit system;
           config = {
             allowUnfree = true;
-            permittedInsecurePackages = [ "nodejs-16.20.2" "openssl-1.1.1w" ];
+            permittedInsecurePackages = [];
           };
           overlays = [
             (final: prev: {
@@ -25,11 +24,6 @@
               };
             })
           ];
-        };
-
-        unstable = import nixpkgs-unstable {
-          inherit system;
-          config.allowUnfree = true;
         };
 
         inherit (pkgs) stdenv lib;
