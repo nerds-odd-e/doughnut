@@ -2,9 +2,10 @@
 
 set -eo pipefail
 
-export NIXPKGS_ALLOW_UNFREE=1
-export unameOut="$(uname -s)"
-export os_type=Unsupported
+NIXPKGS_ALLOW_UNFREE=1
+unameOut="$(uname -s)"
+os_type=Unsupported
+export NIXPKGS_ALLOW_UNFREE unameOut os_type
 
 get_os_type() {
   case "${unameOut}" in
