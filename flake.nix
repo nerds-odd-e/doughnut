@@ -48,6 +48,7 @@
               mysql80
               mysql-client
               mysql_jdbc
+              process-compose
               google-cloud-sdk
               yamllint
               nixfmt-classic
@@ -63,95 +64,89 @@
             ];
 
           shellHook = ''
-            #!/usr/bin/env bash
+            # Export MySQL configuration
+            # Define and export logging function
+            log() {
+              echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
+            }
+            export -f log
+
+            # Export core paths first
+            export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
+            export NODE_PATH="$(dirname $(dirname $(readlink -f $(which node))))"
+            export PNPM_HOME="$(dirname $(dirname $(readlink -f $(which pnpm))))"
+            export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
+            export POETRY_PATH="$(dirname $(dirname $(readlink -f $(which poetry))))"
+            export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$PATH
+
+            # Export MySQL configuration
+            export MYSQL_BASEDIR=${pkgs.mysql80}
+            export MYSQL_HOME="$PWD/mysql"
+            export MYSQL_DATADIR="$MYSQL_HOME/data"
+            export MYSQL_UNIX_SOCKET="$MYSQL_HOME/mysql.sock"
+            export MYSQLX_UNIX_SOCKET="$MYSQL_HOME/mysqlx.sock"
+            export MYSQL_PID_FILE="$MYSQL_HOME/mysql.pid"
+            export MYSQL_TCP_PORT=3309
+            export MYSQLX_TCP_PORT=33090
+
+            # Make script compatible with both bash and zsh
+            if [ -n "''${ZSH_VERSION:-}" ]; then
+              emulate -L bash
+              setopt pipefail
+            else
+              set -euo pipefail
+            fi
 
             # Add git push script alias
-            alias g='./git_push.sh'
+            alias g='./scripts/git_push.sh'
 
             # Deactivate nvm if exists
             command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 
-            export PS1="(nix)$PS1"
-            export GPG_TTY=$(tty)
-            export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-            export PNPM_HOME="$(readlink -e $(type -p pnpm) | sed -e 's/\/bin\/pnpm//g')"
-            export NODE_PATH="$(readlink -e $(type -p node) | sed  -e 's/\/bin\/node//g')"
-            export PYTHON_PATH="$(readlink -e $(type -p python) | sed  -e 's/\/bin\/python//g')"
-            export POETRY_PATH="$(readlink -e $(type -p poetry) | sed  -e 's/\/bin\/poetry//g')"
-            export PUB_CACHE="''${PUB_CACHE:-$PWD/.pub-cache}"
-            export OPENAI_API_TOKEN="''${AI_TOKEN}"
+            # Set core environment variables
+            if [ -n "''${ZSH_VERSION:-}" ]; then
+              export PS1="(nix)''${PS1:-%# }"
+            else
+              export PS1="(nix)''${PS1:-$ }"
+            fi
 
-            export MYSQL_BASEDIR=${pkgs.mysql80}
-            export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
-            export MYSQL_DATADIR="''${MYSQL_DATADIR:-$MYSQL_HOME/data}"
-            export MYSQL_UNIX_SOCKET=$MYSQL_HOME/mysql.sock
-            export MYSQLX_UNIX_SOCKET=$MYSQL_HOME/mysqlx.sock
-            export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
-            export MYSQL_TCP_PORT=3309
-            export MYSQLX_TCP_PORT=33090
+            # General settings
             export LANG="en_US.UTF-8"
             export SOURCE_REPO_NAME="''${PWD##*/}"
-            export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
 
-            echo "###################################################################################################################"
-            echo "                                                                                "
-            echo "##   !! $SOURCE_REPO_NAME NIX DEVELOPMENT ENVIRONMENT !!"
-            echo "##   NIX VERSION: `nix --version`                       "
-            echo "##   JAVA_HOME: $JAVA_HOME                              "
-            echo "##   NODE_PATH: $NODE_PATH                              "
-            echo "##   PNPM_HOME: $PNPM_HOME                              "
-            echo "##   PYTHON_PATH: $PYTHON_PATH                          "
-            echo "##   POETRY_PATH: $POETRY_PATH                          "
-            echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                      "
-            echo "##   MYSQL_HOME: $MYSQL_HOME                            "
-            echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                      "
-            echo "##   JAVA VERSION: `javac --version`                    "
-            echo "##   NODE VERSION: `node --version`                     "
-            echo "##   PNPM VERSION: `pnpm --version`                     "
-            echo "##   BIOME VERSION: `pnpm biome --version`              "
-            echo "##   PYTHON VERSION: `python --version`                 "
-            echo "##   POETRY VERSION: `poetry --version`                 "
-            echo "                                                                                "
-            echo "###################################################################################################################"
-
-            # Configure pnpm and start Biome
-            corepack prepare pnpm@10.0.0 --activate
-            corepack use pnpm@10.0.0
-            pnpm --frozen-lockfile recursive install
-            # start biome daemon-server
-            pnpm biome stop && pnpm biome start
-            mkdir -p $MYSQL_HOME
-            mkdir -p $MYSQL_DATADIR
-
-            cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
-            CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
-            CREATE USER IF NOT EXISTS 'doughnut'@'127.0.0.1' IDENTIFIED BY 'doughnut';
-            CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-            CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-            CREATE DATABASE IF NOT EXISTS doughnut_e2e_test    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-            GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
-            GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
-            GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
-            GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'127.0.0.1';
-            GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'127.0.0.1';
-            GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
-            FLUSH PRIVILEGES;
+            # Pretty environment info
+            cat << 'EOF'
+            ╔════════════════════════════════════════════════════════════════════════════════════╗
+            ║                         NIX DEVELOPMENT ENVIRONMENT                                ║
+            ╚════════════════════════════════════════════════════════════════════════════════════╝
             EOF
 
-            # Initialize and start MySQL if not running
-            export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
-            if [[ -z "$MYSQLD_PID" ]]; then
-              [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --port=$MYSQL_TCP_PORT --user=`whoami` --datadir=$MYSQL_DATADIR --tls-version=TLSv1.2 --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
-              mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --port=$MYSQL_TCP_PORT --socket=$MYSQL_UNIX_SOCKET --mysqlx-socket=$MYSQLX_UNIX_SOCKET --mysqlx_port=$MYSQLX_TCP_PORT --tls-version=TLSv1.2 &
-              export MYSQLD_PID=$!
+            printf "\n%s\n" "🚀 Project: $SOURCE_REPO_NAME"
+            printf "📦 Versions:\n"
+            printf "  • Nix:    %s\n" "$(nix --version)"
+            printf "  • Java:   %s\n" "$(javac --version)"
+            printf "  • Node:   %s\n" "$(node --version)"
+            printf "  • PNPM:   %s\n" "$(pnpm --version)"
+            printf "  • Biome:  %s\n" "$(pnpm biome --version)"
+            printf "  • Python: %s\n" "$(python --version)"
+            printf "  • Poetry: %s\n" "$(poetry --version)"
 
-              sleep 6 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
-            fi
+            printf "\n📂 Paths:\n"
+            printf "  • JAVA_HOME:     %s\n" "$JAVA_HOME"
+            printf "  • NODE_PATH:     %s\n" "$NODE_PATH"
+            printf "  • PNPM_HOME:     %s\n" "$PNPM_HOME"
+            printf "  • PYTHON_PATH:   %s\n" "$PYTHON_PATH"
+            printf "  • MYSQL_HOME:    %s\n" "$MYSQL_HOME"
+            printf "  • MYSQL_DATADIR: %s\n" "$MYSQL_DATADIR"
+            printf "\n"
 
-            # Setup Cypress for Codespace/Gitpod environments
-            if [[ "$USER" = @(codespace|gitpod) ]]; then
-              [[ -d $HOME/.cache/Cypress ]] || pnpx cypress install --force
-            fi
+            log "Environment setup complete! 🎉"
+
+            # Start process-compose and wait for it to be ready
+            mkdir -p "$MYSQL_HOME"
+            process-compose up -f process-compose.yaml --detached
+
+            return 0
           '';
         };
       });
