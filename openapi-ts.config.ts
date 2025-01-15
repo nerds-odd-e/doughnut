@@ -6,7 +6,7 @@ module.exports = defineConfig({
 
   output: {
     path: path.resolve('./frontend/src/generated/backend'),
-    client: '@hey-api/client-fetch/fetch',
+    client: 'fetch',
     name: 'DoughnutApi',
     clean: true,
   },
