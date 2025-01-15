@@ -14,6 +14,6 @@ module.exports = defineConfig({
   typescript: {
     style: 'PascalCase',
     module: 'CommonJS',
-    tsconfig: path.resolve('./tsconfig.openapi.json')
-  }
+    tsconfig: path.resolve('./tsconfig.openapi.json'),
+  },
 })
