@@ -1,6 +1,6 @@
 # WSL2 development environment setup
 
-### :warning: 🚨 **DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!!** Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
+## :warning: 🚨 **DO NOT CLONE doughnut source to a MS Windows directory (e.g. `/mnt/c/`)!!!** Instead, in your WSL2 session, `cd ~` then `git clone git@github.com:nerds-odd-e/doughnut.git`
 
 ### 1. Ensure you install WSL2g with Ubuntu-23.04 from official Microsoft Store
 
@@ -29,7 +29,7 @@ Add `-ac` option right after the closing double quote in the Target field - i.e.
 
 If you still failed to open cypress after following above instructions, you may try replace `DISPLAY` by below commands in `.bashrc`.
 
-```
+```bash
 export DISPLAY=$(route.exe print | grep 0.0.0.0 | head -1 | awk '{print $4}'):0.0
 ```
 

@@ -1,6 +1,7 @@
 # Technology Stack
 
 - [Lix](https://lix.systems/)
+- [process-compose](https://f1bonacc1.github.io/process-compose/)
 - [direnv](https://direnv.net/)
 - [Azul Zulu OpenJDK 23](https://docs.azul.com/core/release/22-ga/release-notes)
 - [Spring Boot](https://spring.io/guides)

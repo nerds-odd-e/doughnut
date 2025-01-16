@@ -1,6 +1,6 @@
-## GCP Production environment
+# GCP Production environment
 
-### 1. Interacting with gcloud CLI for cloud infrastructure management
+## 1. Interacting with gcloud CLI for cloud infrastructure management
 
 - [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
 - [Create App Server in GCloud Compute](infra/scripts/create-gcloud-app-compute.sh)

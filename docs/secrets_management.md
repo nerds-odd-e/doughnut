@@ -1,16 +1,16 @@
-## Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
+# Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
 
-### 1. Generate your local GnuPG key
+## 1. Generate your local GnuPG key
 
 - Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog):
 
-```
+```bash
 gpg --full-generate-key
 ```
 
 - Export your GnuPG public key:
 
-```
+```bash
 gpg --export --armor <your_email>@odd-e.com > <your_email>_public_gpg_key.gpg
 ```
 

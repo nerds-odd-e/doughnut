@@ -2,9 +2,9 @@
 
 Launch your IntelliJ IDE from your host OS.
 
-### Setup IntelliJ IDEA with JDK22 SDK
+## Setup IntelliJ IDEA with JDK22 SDK
 
-- Locate your `nix develop` installed JDK path location from the header printout on entering ` nix develop` ($JAVA_HOME is printed to stdout on entering `nix develop`).
+- Locate your `nix develop` installed JDK path location from the header printout on entering `nix develop` ($JAVA_HOME is printed to stdout on entering `nix develop`).
   - e.g. On macOS this could look like `/nix/store/2ybgy9h6qh3b7r7j6pmdm0l5j1qfyy39-zulu-ca-jdk-22.0.0/zulu-22.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
   - Enter the full path of above (e.g. `/nix/store/2ybgy9h6qh3b7r7j6pmdm0l5j1qfyy39-zulu-ca-jdk-22.0.0/zulu-22.jdk/Contents/Home`).
@@ -12,7 +12,7 @@ Launch your IntelliJ IDE from your host OS.
   - Ensure JDK level is set to LTS version 22
     ![Project Structure -> Project SDK -> Language Level](./images/jdk22_language_level.png "Language Level Setting")
 
-### Run a single targetted JUnit5 test in IntelliJ IDEA
+## Run a single targetted JUnit5 test in IntelliJ IDEA
 
 - Setup IntelliJ in Gradle perspective -> Gradle Settings (Wrench Icon) -> Run tests with -> IntelliJ IDEA
   - ![Gradle Settings](./images/gradle_settings.png "Gradle Settings")
