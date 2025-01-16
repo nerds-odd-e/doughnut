@@ -1,36 +1,41 @@
 version: "0.5"
 processes:
   mysql:
-    command: scripts/init_mysql.sh
+    command: ${PWD}/scripts/init_mysql.sh
     environment:
-    - MYSQL_BASEDIR=${MYSQL_BASEDIR}
-    - MYSQL_HOME=${PWD}/mysql
-    - MYSQL_DATADIR=${PWD}/mysql/data
-    - MYSQL_UNIX_SOCKET=${PWD}/mysql/mysql.sock
-    - MYSQL_PID_FILE=${PWD}/mysql/mysql.pid
-    - MYSQL_TCP_PORT=3309
-    - MYSQLX_TCP_PORT=33090
-    - MYSQLX_UNIX_SOCKET=${PWD}/mysql/mysqlx.sock
-    - PATH=${PATH}
+    - MYSQL_BASEDIR
+    - MYSQL_HOME
+    - MYSQL_DATADIR
+    - MYSQL_UNIX_SOCKET
+    - MYSQL_PID_FILE
+    - MYSQL_TCP_PORT
+    - MYSQLX_TCP_PORT
+    - MYSQLX_UNIX_SOCKET
+    - MYSQL_LOG_FILE
+    - PATH
     availability:
       restart: "always"
       backoff:
-        initial_delay: 1s
-        max_delay: 10s
+        initial_delay: 5s
+        max_delay: 30s
     readiness_probe:
       exec:
-        command: mysqladmin -u root -S ${PWD}/mysql/mysql.sock ping
-      initial_delay: 2s
-      period: 1s
-      timeout: 1s
+        command: ${MYSQL_BASEDIR}/bin/mysqladmin ping -u root -S ${MYSQL_HOME}/mysql.sock --silent
+      initial_delay: 1s
+      period: 2s
+      timeout: 2s
       success_threshold: 1
       failure_threshold: 10
     shutdown:
-      command: mysqladmin -u root -S ${PWD}/mysql/mysql.sock shutdown
-      timeout_seconds: 5
+      command: |
+        lsof -i :${MYSQL_TCP_PORT} -sTCP:LISTEN | awk 'NR > 1 {print $2}' | xargs kill -SIGTERM
+        rm -f ${MYSQL_PID_FILE} ${MYSQL_UNIX_SOCKET} ${MYSQLX_UNIX_SOCKET}
+      timeout_seconds: 30
+    limits:
+      memory: 1GB
 
   init:
-    command: scripts/init_env.sh
+    command: ${PWD}/scripts/init_env.sh
     depends_on:
       mysql:
         condition: service_healthy
