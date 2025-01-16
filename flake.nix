@@ -49,7 +49,6 @@
               mysql-client
               mysql_jdbc
               process-compose
-              google-cloud-sdk
               yamllint
               nixfmt-classic
               hclfmt
