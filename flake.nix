@@ -139,8 +139,7 @@
             # Start process-compose and wait for it to be ready
             (
               mkdir -p "$MYSQL_HOME"
-              nohup process-compose up -f process-compose.yaml --detached >/dev/null 2>&1 &
-              disown
+              process-compose up -f process-compose.yaml --detached >/dev/null 2>&1
             )
 
             return 0
