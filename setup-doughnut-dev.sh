@@ -2,6 +2,12 @@
 
 set -eo pipefail
 
+readonly NIX_CONF_DIR="${HOME}/.config/nix"
+readonly NIX_CONF="${NIX_CONF_DIR}/nix.conf"
+readonly NIXPKGS_CONF_DIR="${HOME}/.config/nixpkgs"
+readonly NIXPKGS_CONF="${NIXPKGS_CONF_DIR}/config.nix"
+readonly TEMP_DIR="$(mktemp -d)"
+
 # Check bash version (we need 4.0+ for some features)
 if ((BASH_VERSINFO[0] < 4)); then
   echo "Error: Bash 4.0 or higher is required"
@@ -11,20 +17,24 @@ fi
 # Enable debug mode if DEBUG env var is set
 [[ -n "${DEBUG}" ]] && set -x
 
-# Error handling
-trap 'echo "Error: Script failed on line $LINENO"' ERR
+# Error handling with cleanup
+cleanup() {
+  [[ -d "${TEMP_DIR}" ]] && rm -rf "${TEMP_DIR}"
+}
+trap 'echo "Error: Script failed on line $LINENO"; cleanup' ERR
+trap cleanup EXIT
+trap cleanup SIGTERM SIGINT SIGHUP
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+  trap cleanup SIGTERM SIGINT SIGHUP EXIT
+fi
 
-# Logging function
 log() {
   echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
 }
 
 # Global variables
-declare -x NIXPKGS_ALLOW_UNFREE=1
-declare -x unameOut
-declare -x os_type="Unsupported"
-
-unameOut="$(uname -s)"
+declare -r unameOut="$(uname -s)"
+declare os_type="Unsupported"
 
 get_os_type() {
   case "${unameOut}" in
@@ -32,6 +42,16 @@ get_os_type() {
     Darwin*) os_type="Mac" ;;
     *)       log "Error: Unknown OS ${unameOut}"; exit 1 ;;
   esac
+}
+
+check_wsl2() {
+  if [[ "${os_type}" == "Linux" ]] && grep -qi microsoft /proc/version; then
+    if ! grep -qi "wsl2" /proc/version; then
+      log "Error: WSL1 detected. Please upgrade to WSL2 for better performance"
+      exit 1
+    fi
+    log "WSL2 environment detected"
+  fi
 }
 
 download_nixpkg_manager_install_script() {
@@ -47,18 +67,17 @@ download_nixpkg_manager_install_script() {
   fi
 
   rm -f ./install-nix
-  if ! curl -sSf -L -o install-nix https://install.lix.systems/lix; then
+  if ! curl -sSf -L -o "${TEMP_DIR}/install-nix" https://install.lix.systems/lix; then
     log "Failed to download nix installer"
     exit 1
   fi
-  chmod +x ./install-nix || {
+  chmod +x "${TEMP_DIR}/install-nix" || {
     log "Failed to make installer executable"
     exit 1
   }
 }
 
 configure_nix_flakes() {
-  local nix_conf="${HOME}/.config/nix/nix.conf"
   local flakes_config="experimental-features = nix-command flakes"
 
   # Check if we have write permission to config directory
@@ -67,20 +86,18 @@ configure_nix_flakes() {
     exit 1
   fi
 
-  touch "${nix_conf}"
+  touch "${NIX_CONF}"
 
-  if ! grep -Fxq "${flakes_config}" "${nix_conf}"; then
+  if ! grep -Fxq "${flakes_config}" "${NIX_CONF}"; then
     log "Configuring nix flakes"
-    echo "${flakes_config}" > "${nix_conf}"
+    echo "${flakes_config}" > "${NIX_CONF}"
   fi
 }
 
 allow_nix_unfree() {
-  local nixpkgs_conf="${HOME}/.config/nixpkgs/config.nix"
-
-  mkdir -p "${HOME}/.config/nixpkgs"
+  mkdir -p "${NIXPKGS_CONF_DIR}"
   log "Enabling unfree packages"
-  echo '{ allowUnfree = true; }' > "${nixpkgs_conf}"
+  echo '{ allowUnfree = true; }' > "${NIXPKGS_CONF}"
 }
 
 install_nixpkg_manager() {
@@ -97,7 +114,7 @@ install_nixpkg_manager() {
   touch "${HOME}/.bash_profile"
 
   if [[ "${os_type}" == "Mac" || "${os_type}" == "Linux" ]]; then
-    ./install-nix -s -- install
+    "${TEMP_DIR}/install-nix" -s -- install
   else
     log "Error: Unsupported OS Platform for Nix development environment"
     exit 1
@@ -108,18 +125,30 @@ install_nixpkg_manager() {
   log "Nix installation completed successfully"
 }
 
-# Cleanup on script exit
-trap 'rm -f ./install-nix' EXIT
-
 main() {
   local rc=0
+
+  # Prevent running as root
+  if [[ $EUID -eq 0 ]]; then
+    log "Error: This script should not be run as root"
+    exit 1
+  fi
+
   log "Starting doughnut development environment setup"
+  check_wsl2
   install_nixpkg_manager || rc=$?
 
-  log "------------------------------------------ CONGRATS !!! ----------------------------------------------------"
-  log "  doughnut basic nix development environment tooling setup complete."
-  log "  Please exit this shell terminal and start a new one in doughnut root directory then execute 'nix develop'."
-  log "------------------------------------------    END       ----------------------------------------------------"
+  if [[ $rc -eq 0 ]]; then
+    log "------------------------------------------ CONGRATS !!! ----------------------------------------------------"
+    log "  doughnut basic nix development environment tooling setup completed successfully."
+    log "  Please exit this shell terminal and start a new one in doughnut root directory then execute 'nix develop'."
+    log "------------------------------------------    END       ----------------------------------------------------"
+  else
+    log "------------------------------------------ WARNING !!! ----------------------------------------------------"
+    log "  Installation FAILED with warnings or errors. Please check the logs above."
+    log "  You may need to manually verify the installation or try again."
+    log "------------------------------------------    END       ----------------------------------------------------"
+  fi
 
   exit $rc
 }
