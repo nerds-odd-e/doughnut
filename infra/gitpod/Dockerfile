@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.12.1
+# syntax=docker.io/docker/dockerfile:1.13.0
 
 ARG TARGET_PLATFORM=linux/amd64
 
