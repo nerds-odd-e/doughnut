@@ -36,7 +36,6 @@ const config = defineConfig({
       'node_modules/**/*.test.js',
       'node_modules/**/test.js',
     ],
-    testTimeout: 10000,
     fakeTimers: {
       toFake: [
         "Date",
@@ -44,14 +43,7 @@ const config = defineConfig({
         "clearTimeout",
         "setInterval",
         "clearInterval",
-        "requestAnimationFrame",
-        "cancelAnimationFrame",
-        "requestIdleCallback",
-        "cancelIdleCallback",
       ],
-    },
-    deps: {
-      inline: ['vue-router']
     },
   },
   css: {
@@ -93,6 +85,11 @@ const config = defineConfig({
       '/testability': 'http://localhost:9081',
     },
   },
+  optimizeDeps: {
+    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown', 'es-toolkit'],
+    exclude: ['fsevents'],
+    force: true
+  },
   base: '/',
   build: {
     minify: 'terser',
@@ -122,10 +119,6 @@ const config = defineConfig({
       },
     },
   },
-  optimizeDeps: {
-    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown', 'es-toolkit'],
-    exclude: ['fsevents']
-  }
 })
 
 export default config
