@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: OpenAPI definition
   version: v0
@@ -1180,14 +1180,14 @@ paths:
         content:
           multipart/form-data:
             schema:
-              required:
-              - file
               type: object
               properties:
                 file:
                   type: string
-                  description: Obsidian zip file to import
                   format: binary
+                  description: Obsidian zip file to import
+              required:
+              - file
       responses:
         "500":
           description: Internal Server Error
@@ -3271,18 +3271,18 @@ paths:
 components:
   schemas:
     Circle:
-      required:
-      - id
-      - name
       type: object
       properties:
         id:
           type: integer
           format: int32
         name:
+          type: string
           maxLength: 255
           minLength: 1
-          type: string
+      required:
+      - id
+      - name
     Ownership:
       type: object
       properties:
@@ -3294,10 +3294,6 @@ components:
         ownerName:
           type: string
     User:
-      required:
-      - externalIdentifier
-      - id
-      - name
       type: object
       properties:
         id:
@@ -3316,6 +3312,10 @@ components:
           type: string
         admin:
           type: boolean
+      required:
+      - externalIdentifier
+      - id
+      - name
     TimeTravelRelativeToNow:
       type: object
       properties:
@@ -3340,10 +3340,6 @@ components:
           type: integer
           format: int32
     MCQWithAnswer:
-      required:
-      - correctChoiceIndex
-      - multipleChoicesQuestion
-      - strictChoiceOrder
       type: object
       properties:
         multipleChoicesQuestion:
@@ -3353,10 +3349,11 @@ components:
           format: int32
         strictChoiceOrder:
           type: boolean
-    MultipleChoicesQuestion:
       required:
-      - choices
-      - stem
+      - correctChoiceIndex
+      - multipleChoicesQuestion
+      - strictChoiceOrder
+    MultipleChoicesQuestion:
       type: object
       properties:
         stem:
@@ -3365,10 +3362,10 @@ components:
           type: array
           items:
             type: string
-    QuestionSuggestionParams:
       required:
-      - preservedQuestion
-      - realCorrectAnswers
+      - choices
+      - stem
+    QuestionSuggestionParams:
       type: object
       properties:
         comment:
@@ -3381,14 +3378,17 @@ components:
           type: boolean
         realCorrectAnswers:
           type: string
+      required:
+      - preservedQuestion
+      - realCorrectAnswers
     SuggestedQuestionsData:
       type: object
       properties:
         examples:
           type: array
-          writeOnly: true
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
+          writeOnly: true
     NoteTestData:
       type: object
       properties:
@@ -3411,9 +3411,9 @@ components:
       properties:
         noteTestData:
           type: array
-          writeOnly: true
           items:
             $ref: "#/components/schemas/NoteTestData"
+          writeOnly: true
         externalIdentifier:
           type: string
           writeOnly: true
@@ -3445,18 +3445,15 @@ components:
           items:
             $ref: "#/components/schemas/PredefinedQuestionTestData"
     BareQuestion:
-      required:
-      - multipleChoicesQuestion
       type: object
       properties:
         checkSpell:
           type: boolean
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
-    PredefinedQuestion:
       required:
-      - bareQuestion
-      - id
+      - multipleChoicesQuestion
+    PredefinedQuestion:
       type: object
       properties:
         id:
@@ -3469,6 +3466,9 @@ components:
           format: int32
         approved:
           type: boolean
+      required:
+      - bareQuestion
+      - id
     SubscriptionDTO:
       type: object
       properties:
@@ -3476,11 +3476,6 @@ components:
           type: integer
           format: int32
     Note:
-      required:
-      - createdAt
-      - id
-      - noteTopology
-      - updatedAt
       type: object
       properties:
         noteTopology:
@@ -3505,10 +3500,12 @@ components:
           readOnly: true
         wikidataId:
           type: string
-    NoteTopology:
       required:
+      - createdAt
       - id
-      - titleOrPredicate
+      - noteTopology
+      - updatedAt
+    NoteTopology:
       type: object
       properties:
         id:
@@ -3540,13 +3537,10 @@ components:
           $ref: "#/components/schemas/NoteTopology"
         parentOrSubjectNoteTopology:
           $ref: "#/components/schemas/NoteTopology"
-    Notebook:
       required:
-      - headNoteId
       - id
-      - notebookSettings
-      - title
-      - updated_at
+      - titleOrPredicate
+    Notebook:
       type: object
       properties:
         id:
@@ -3570,6 +3564,12 @@ components:
         updated_at:
           type: string
           format: date-time
+      required:
+      - headNoteId
+      - id
+      - notebookSettings
+      - title
+      - updated_at
     NotebookSettings:
       type: object
       properties:
@@ -3580,11 +3580,9 @@ components:
           format: int32
         certificateExpiry:
           type: string
-          example: 1y 6m
           default: 1y
+          example: 1y 6m
     Subscription:
-      required:
-      - id
       type: object
       properties:
         headNote:
@@ -3603,6 +3601,9 @@ components:
           $ref: "#/components/schemas/Notebook"
         fromDTO:
           $ref: "#/components/schemas/SubscriptionDTO"
+          writeOnly: true
+      required:
+      - id
     GlobalAiModelSettings:
       type: object
       properties:
@@ -3613,9 +3614,6 @@ components:
         othersModel:
           type: string
     RecallPrompt:
-      required:
-      - bareQuestion
-      - id
       type: object
       properties:
         id:
@@ -3625,6 +3623,9 @@ components:
           $ref: "#/components/schemas/BareQuestion"
         notebook:
           $ref: "#/components/schemas/Notebook"
+      required:
+      - bareQuestion
+      - id
     QuestionContestResult:
       type: object
       properties:
@@ -3641,9 +3642,6 @@ components:
           type: integer
           format: int32
     Answer:
-      required:
-      - correct
-      - id
       type: object
       properties:
         id:
@@ -3656,11 +3654,10 @@ components:
           format: int32
         correct:
           type: boolean
-    AnsweredQuestion:
       required:
-      - answer
-      - predefinedQuestion
-      - recallPromptId
+      - correct
+      - id
+    AnsweredQuestion:
       type: object
       properties:
         note:
@@ -3674,6 +3671,10 @@ components:
         recallPromptId:
           type: integer
           format: int32
+      required:
+      - answer
+      - predefinedQuestion
+      - recallPromptId
     QuestionSuggestionCreationParams:
       type: object
       properties:
@@ -3682,9 +3683,6 @@ components:
         isPositiveFeedback:
           type: boolean
     SuggestedQuestionForFineTuning:
-      required:
-      - id
-      - preservedQuestion
       type: object
       properties:
         id:
@@ -3703,32 +3701,32 @@ components:
           format: date-time
         positiveFeedback:
           type: boolean
-    NoteCreationDTO:
       required:
-      - newTitle
+      - id
+      - preservedQuestion
+    NoteCreationDTO:
       type: object
       properties:
         newTitle:
+          type: string
           maxLength: 150
           minLength: 1
-          type: string
         wikidataId:
-          pattern: ^$|Q\d+
           type: string
-    NoteCreationRresult:
+          pattern: ^$|Q\d+
       required:
-      - created
-      - parent
+      - newTitle
+    NoteCreationRresult:
       type: object
       properties:
         created:
           $ref: "#/components/schemas/NoteRealm"
         parent:
           $ref: "#/components/schemas/NoteRealm"
-    NoteRealm:
       required:
-      - id
-      - note
+      - created
+      - parent
+    NoteRealm:
       type: object
       properties:
         id:
@@ -3748,16 +3746,17 @@ components:
             $ref: "#/components/schemas/Note"
         notebook:
           $ref: "#/components/schemas/Notebook"
-    WikidataAssociationCreation:
       required:
-      - wikidataId
+      - id
+      - note
+    WikidataAssociationCreation:
       type: object
       properties:
         wikidataId:
           type: string
-    SearchTerm:
       required:
-      - searchKey
+      - wikidataId
+    SearchTerm:
       type: object
       properties:
         searchKey:
@@ -3766,6 +3765,8 @@ components:
           type: boolean
         allMyCircles:
           type: boolean
+      required:
+      - searchKey
     RecallSetting:
       type: object
       properties:
@@ -3783,9 +3784,6 @@ components:
           type: integer
           format: int32
     NotebookCertificateApproval:
-      required:
-      - id
-      - notebook
       type: object
       properties:
         id:
@@ -3796,6 +3794,9 @@ components:
         lastApprovalTime:
           type: string
           format: date-time
+      required:
+      - id
+      - notebook
     SelfEvaluation:
       type: object
       properties:
@@ -3803,10 +3804,6 @@ components:
           type: integer
           format: int32
     MemoryTracker:
-      required:
-      - id
-      - nextRecallAt
-      - note
       type: object
       properties:
         id:
@@ -3831,9 +3828,11 @@ components:
           format: int32
         removedFromTracking:
           type: boolean
-    LinkCreation:
       required:
-      - linkType
+      - id
+      - nextRecallAt
+      - note
+    LinkCreation:
       type: object
       properties:
         linkType:
@@ -3854,15 +3853,14 @@ components:
           - before
           - similar to
           - confused with
+      required:
+      - linkType
     NoteMoveDTO:
       type: object
       properties:
         asFirstChild:
           type: boolean
     ConversationMessage:
-      required:
-      - id
-      - message
       type: object
       properties:
         id:
@@ -3877,6 +3875,9 @@ components:
         createdAt:
           type: string
           format: date-time
+      required:
+      - id
+      - message
     SseEmitter:
       type: object
       properties:
@@ -3884,9 +3885,6 @@ components:
           type: integer
           format: int64
     AssessmentQuestionInstance:
-      required:
-      - bareQuestion
-      - id
       type: object
       properties:
         id:
@@ -3896,11 +3894,10 @@ components:
           $ref: "#/components/schemas/BareQuestion"
         answer:
           $ref: "#/components/schemas/Answer"
-    Conversation:
       required:
-      - createdAt
+      - bareQuestion
       - id
-      - updatedAt
+    Conversation:
       type: object
       properties:
         id:
@@ -3923,6 +3920,10 @@ components:
         lastAiAssistantThreadSync:
           type: string
           format: date-time
+      required:
+      - createdAt
+      - id
+      - updatedAt
     ConversationSubject:
       type: object
       properties:
@@ -3933,19 +3934,15 @@ components:
         answeredQuestion:
           $ref: "#/components/schemas/AnsweredQuestion"
     CircleJoiningByInvitation:
-      required:
-      - invitationCode
       type: object
       properties:
         invitationCode:
+          type: string
           maxLength: 20
           minLength: 10
-          type: string
-    Certificate:
       required:
-      - expiryDate
-      - id
-      - startDate
+      - invitationCode
+    Certificate:
       type: object
       properties:
         id:
@@ -3963,10 +3960,11 @@ components:
           format: date-time
         creatorName:
           type: string
-    BazaarNotebook:
       required:
+      - expiryDate
       - id
-      - notebook
+      - startDate
+    BazaarNotebook:
       type: object
       properties:
         id:
@@ -3974,6 +3972,9 @@ components:
           format: int32
         notebook:
           $ref: "#/components/schemas/Notebook"
+      required:
+      - id
+      - notebook
     AudioUploadDTO:
       type: object
       properties:
@@ -3987,9 +3988,6 @@ components:
         isMidSpeech:
           type: boolean
     NoteDetailsCompletion:
-      required:
-      - completion
-      - deleteFromEnd
       type: object
       properties:
         deleteFromEnd:
@@ -3997,6 +3995,9 @@ components:
           format: int32
         completion:
           type: string
+      required:
+      - completion
+      - deleteFromEnd
     TextFromAudioWithCallInfo:
       type: object
       properties:
@@ -4015,9 +4016,6 @@ components:
         skipMemoryTracking:
           type: boolean
     AssessmentAttempt:
-      required:
-      - id
-      - notebookId
       type: object
       properties:
         id:
@@ -4045,6 +4043,9 @@ components:
             $ref: "#/components/schemas/AssessmentQuestionInstance"
         certifiable:
           type: boolean
+      required:
+      - id
+      - notebookId
     SuggestedTitleDTO:
       type: object
       properties:
@@ -4061,12 +4062,6 @@ components:
         b64encoded:
           type: string
     NotebookAssistant:
-      required:
-      - assistantId
-      - createdAt
-      - creator
-      - id
-      - notebook
       type: object
       properties:
         id:
@@ -4081,30 +4076,36 @@ components:
         createdAt:
           type: string
           format: date-time
-    UserDTO:
       required:
-      - name
+      - assistantId
+      - createdAt
+      - creator
+      - id
+      - notebook
+    UserDTO:
       type: object
       properties:
         name:
+          type: string
           maxLength: 100
           minLength: 1
-          type: string
         dailyAssimilationCount:
           type: integer
           format: int32
         spaceIntervals:
-          pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
           type: string
-    NoteUpdateTitleDTO:
+          pattern: "^\\d+((,\\s*\\d+){1,1000})*$"
       required:
-      - newTitle
+      - name
+    NoteUpdateTitleDTO:
       type: object
       properties:
         newTitle:
+          type: string
           maxLength: 150
           minLength: 1
-          type: string
+      required:
+      - newTitle
     NoteUpdateDetailsDTO:
       type: object
       properties:
@@ -4118,8 +4119,8 @@ components:
         imageUrl:
           type: string
         imageMask:
-          pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
           type: string
+          pattern: "^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$"
         useParentImage:
           type: boolean
         uploadImage:
@@ -4133,8 +4134,6 @@ components:
         imageMask:
           type: string
     NoteAccessory:
-      required:
-      - id
       type: object
       properties:
         id:
@@ -4150,14 +4149,14 @@ components:
           type: boolean
         imageWithMask:
           $ref: "#/components/schemas/ImageWithMask"
+      required:
+      - id
     UpdateAiAssistantRequest:
       type: object
       properties:
         additionalInstructions:
           type: string
     NotebookAiAssistant:
-      required:
-      - id
       type: object
       properties:
         id:
@@ -4173,9 +4172,9 @@ components:
         updatedAt:
           type: string
           format: date-time
-    WikidataSearchEntity:
       required:
-      - label
+      - id
+    WikidataSearchEntity:
       type: object
       properties:
         id:
@@ -4184,16 +4183,18 @@ components:
           type: string
         description:
           type: string
-    WikidataEntityData:
       required:
-      - WikidataTitleInEnglish
-      - WikipediaEnglishUrl
+      - label
+    WikidataEntityData:
       type: object
       properties:
         WikidataTitleInEnglish:
           type: string
         WikipediaEnglishUrl:
           type: string
+      required:
+      - WikidataTitleInEnglish
+      - WikipediaEnglishUrl
     CurrentUserInfo:
       type: object
       properties:
@@ -4202,9 +4203,6 @@ components:
         externalIdentifier:
           type: string
     DueMemoryTrackers:
-      required:
-      - toRepeatCount
-      - totalAssimilatedCount
       type: object
       properties:
         toRepeatCount:
@@ -4224,10 +4222,10 @@ components:
         dueInDays:
           type: integer
           format: int32
-    RecallStatus:
       required:
       - toRepeatCount
       - totalAssimilatedCount
+    RecallStatus:
       type: object
       properties:
         toRepeatCount:
@@ -4239,10 +4237,10 @@ components:
         recallWindowEndAt:
           type: string
           format: date-time
-    NoteInfo:
       required:
-      - createdAt
-      - note
+      - toRepeatCount
+      - totalAssimilatedCount
+    NoteInfo:
       type: object
       properties:
         memoryTracker:
@@ -4254,6 +4252,9 @@ components:
           format: date-time
         recallSetting:
           $ref: "#/components/schemas/RecallSetting"
+      required:
+      - createdAt
+      - note
     BareNote:
       type: object
       properties:
@@ -4366,8 +4367,6 @@ components:
           items:
             $ref: "#/components/schemas/BareNote"
     NotebooksViewedByUser:
-      required:
-      - notebooks
       type: object
       properties:
         notebooks:
@@ -4378,11 +4377,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Subscription"
-    FailureReport:
       required:
-      - createDatetime
-      - errorDetail
-      - errorName
+      - notebooks
+    FailureReport:
       type: object
       properties:
         id:
@@ -4400,6 +4397,10 @@ components:
           format: date-time
         githubIssue:
           $ref: "#/components/schemas/GithubIssue"
+      required:
+      - createDatetime
+      - errorDetail
+      - errorName
     FailureReportForView:
       type: object
       properties:
@@ -4415,12 +4416,6 @@ components:
         body:
           type: string
     CircleForUserView:
-      required:
-      - id
-      - invitationCode
-      - members
-      - name
-      - notebooks
       type: object
       properties:
         id:
@@ -4436,6 +4431,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/UserForOtherUserView"
+      required:
+      - id
+      - invitationCode
+      - members
+      - name
+      - notebooks
     UserForOtherUserView:
       type: object
       properties:
@@ -4500,7 +4501,6 @@ components:
           items:
             type: string
     CodeInterpreterTool:
-      type: object
       allOf:
       - $ref: "#/components/schemas/Tool"
     Delta:
@@ -4601,8 +4601,6 @@ components:
         ranking_options:
           $ref: "#/components/schemas/FileSearchRankingOptions"
     FileSearchRankingOptions:
-      required:
-      - score_threshold
       type: object
       properties:
         ranker:
@@ -4610,6 +4608,8 @@ components:
         score_threshold:
           type: number
           format: double
+      required:
+      - score_threshold
     FileSearchResources:
       type: object
       properties:
@@ -4622,7 +4622,6 @@ components:
           items:
             $ref: "#/components/schemas/VectorStore"
     FileSearchTool:
-      type: object
       allOf:
       - $ref: "#/components/schemas/Tool"
       - type: object
@@ -4635,7 +4634,6 @@ components:
         name:
           type: string
     FunctionTool:
-      type: object
       allOf:
       - $ref: "#/components/schemas/Tool"
       - type: object
@@ -4908,21 +4906,21 @@ components:
           items:
             $ref: "#/components/schemas/Annotation"
     TitleReplacement:
-      required:
-      - newTitle
       type: object
       properties:
         newTitle:
+          type: string
           maxLength: 150
           minLength: 1
-          type: string
+      required:
+      - newTitle
     Tool:
       type: object
+      discriminator:
+        propertyName: type
       properties:
         type:
           type: string
-      discriminator:
-        propertyName: type
     ToolCall:
       type: object
       properties:
