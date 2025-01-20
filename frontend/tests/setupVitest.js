@@ -35,4 +35,3 @@ global.FormData = function () {
     },
   };
 }
-

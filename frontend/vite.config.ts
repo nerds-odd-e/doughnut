@@ -24,6 +24,11 @@ const config = defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
+    environmentOptions: {
+      jsdom: {
+        url: 'http://localhost/',
+      },
+    },
     setupFiles: ['./tests/setupVitest.js'],
     exclude: [
       'packages/template/*',
@@ -31,6 +36,23 @@ const config = defineConfig({
       'node_modules/**/*.test.js',
       'node_modules/**/test.js',
     ],
+    testTimeout: 10000,
+    fakeTimers: {
+      toFake: [
+        "Date",
+        "setTimeout",
+        "clearTimeout",
+        "setInterval",
+        "clearInterval",
+        "requestAnimationFrame",
+        "cancelAnimationFrame",
+        "requestIdleCallback",
+        "cancelIdleCallback",
+      ],
+    },
+    deps: {
+      inline: ['vue-router']
+    },
   },
   css: {
     devSourcemap: true,

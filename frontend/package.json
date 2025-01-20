@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "file-saver": "^2.0.5",
-    "gsap": "^3.12.5",
+    "gsap": "^3.12.7",
     "intersection-observer": "^0.12.2",
     "marked": "^15.0.6",
     "mini-debounce": "^1.0.8",
@@ -33,9 +33,9 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@testing-library/user-event": "^14.5.2",
+    "@testing-library/user-event": "^14.6.0",
     "@testing-library/vue": "^8.1.0",
-    "@types/node": "^22.10.6",
+    "@types/node": "^22.10.7",
     "@types/turndown": "^5.0.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vitejs/plugin-vue-jsx": "^4.1.1",
@@ -55,7 +55,7 @@
     "unplugin-vue-router": "^0.10.9",
     "vite": "6.0.7",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "2.1.8",
+    "vitest": "3.0.2",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.3",
     "vue-tsc": "2.2.0"
