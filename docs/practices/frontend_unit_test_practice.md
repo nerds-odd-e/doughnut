@@ -1,5 +1,8 @@
 # Frontend Unit Test Practices
 
+* The front end code is at `frontend/src/` and test code is at `frontend/tests/`
+* The test framework is `vitest` with TypeScript
+
 ## Core Principles
 
 1. **Focus on Component Behavior**
