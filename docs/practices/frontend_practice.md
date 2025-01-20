@@ -1,9 +1,31 @@
-# Frontend Unit Test Practices
+# Frontend Practices
 
 * The front end code is at `frontend/src/` and test code is at `frontend/tests/`
 * The test framework is `vitest` with TypeScript
+* 
 
-## Core Principles
+## Backend API access
+
+* The backend API code for the frontend is generated automatically from the OpenAPI specification of the backend
+* The generated code is at `frontend/src/generated/backend`
+* There is a helper `managedApi` in `useLoadingApi` to access the backend API
+
+Example of api call:
+
+```typescript
+import useLoadingApi from "@/managedApi/useLoadingApi"
+
+const { managedApi } = useLoadingApi()
+
+const notebooks = ref<BazaarNotebook[] | undefined>(undefined)
+
+const fetchData = async () => {
+  notebooks.value = await managedApi.restBazaarController.bazaar()
+}
+
+```
+
+## Core Unit Test Principles
 
 1. **Focus on Component Behavior**
    - Test component behavior through user interactions
