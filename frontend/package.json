@@ -52,10 +52,10 @@
     "unplugin-auto-import": "^19.0.0",
     "unplugin-vue-components": "^28.0.0",
     "unplugin-vue-inspector": "^2.3.1",
-    "unplugin-vue-router": "^0.10.9",
-    "vite": "6.0.10",
+    "unplugin-vue-router": "^0.11.1",
+    "vite": "6.0.11",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "3.0.2",
+    "vitest": "3.0.3",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.3",
     "vue-tsc": "2.2.0"
