@@ -1,19 +1,17 @@
-const { defineConfig } = require('@hey-api/openapi-ts')
-const path = require('path')
+import { defineConfig } from '@hey-api/openapi-ts'
+import path from 'path'
 
-module.exports = defineConfig({
+export default defineConfig({
   input: path.resolve('./open_api_docs.yaml'),
-
+  client: 'legacy/fetch',
   output: {
     path: path.resolve('./frontend/src/generated/backend'),
-    client: 'fetch',
     name: 'DoughnutApi',
     clean: true,
   },
-
   typescript: {
     style: 'PascalCase',
-    module: 'CommonJS',
+    module: 'ESNext',
     tsconfig: path.resolve('./tsconfig.openapi.json'),
   },
 })
