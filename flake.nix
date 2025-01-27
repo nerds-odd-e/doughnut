@@ -64,16 +64,46 @@
             ];
 
           shellHook = ''
+            # Make script compatible with both bash and zsh
+            # Set core environment variables
+            if [ -n "''${ZSH_VERSION:-}" ]; then
+              emulate -L bash
+              setopt pipefail
+              export PS1="(nix)''${PS1:-%# }"
+            else
+              set -euo pipefail
+              export PS1="(nix)''${PS1:-$ }"
+            fi
+
+            # Configure fzf
+            export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+            if [ -n "''${ZSH_VERSION:-}" ]; then
+              if [ -e "${pkgs.fzf}/share/fzf/key-bindings.zsh" ]; then
+                source ${pkgs.fzf}/share/fzf/key-bindings.zsh
+              fi
+              if [ -e "${pkgs.fzf}/share/fzf/completion.zsh" ]; then
+                source ${pkgs.fzf}/share/fzf/completion.zsh
+              fi
+            else
+              if [ -e "${pkgs.fzf}/share/fzf/key-bindings.bash" ]; then
+                source ${pkgs.fzf}/share/fzf/key-bindings.bash
+              fi
+              if [ -e "${pkgs.fzf}/share/fzf/completion.bash" ]; then
+                source ${pkgs.fzf}/share/fzf/completion.bash
+              fi
+            fi
+
             # Define and export logging function
             log() {
               echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
             }
             export -f log
 
-            # Configure fzf
-            export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
-            source ${pkgs.fzf}/share/fzf/key-bindings.bash
-            source ${pkgs.fzf}/share/fzf/completion.bash
+            # Add git push script alias
+            alias g='./scripts/git_push.sh'
+
+            # Deactivate nvm if exists
+            command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 
             # General settings
             export LANG="en_US.UTF-8"
@@ -97,23 +127,6 @@
             export MYSQL_TCP_PORT="3309"
             export MYSQLX_TCP_PORT="33090"
             export MYSQL_LOG_FILE="''${MYSQL_HOME}/mysql.log"
-
-            # Make script compatible with both bash and zsh
-            # Set core environment variables
-            if [ -n "''${ZSH_VERSION:-}" ]; then
-              emulate -L bash
-              setopt pipefail
-              export PS1="(nix)''${PS1:-%# }"
-            else
-              set -euo pipefail
-              export PS1="(nix)''${PS1:-$ }"
-            fi
-
-            # Add git push script alias
-            alias g='./scripts/git_push.sh'
-
-            # Deactivate nvm if exists
-            command -v nvm >/dev/null 2>&1 && { nvm deactivate; }
 
             cat << 'EOF'
             ╔════════════════════════════════════════════════════════════════════════════════════╗
