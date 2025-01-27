@@ -77,30 +77,6 @@ export class RestNotebookControllerService {
         });
     }
     /**
-     * @param notebook
-     * @param repositoryName
-     * @returns Note OK
-     * @throws ApiError
-     */
-    public exportToGithub(
-        notebook: number,
-        repositoryName: string,
-    ): CancelablePromise<Array<Note>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notebooks/{notebook}/github-export',
-            path: {
-                'notebook': notebook,
-            },
-            query: {
-                'repositoryName': repositoryName,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * Import Obsidian file
      * @param notebookId Notebook ID
      * @param formData

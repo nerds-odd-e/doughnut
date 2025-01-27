@@ -43,7 +43,3 @@ Then('I should receive a zip file containing', (table: DataTable) => {
   }))
   start.checkDownloadFiles().hasZipFileWith(expectedFiles)
 })
-
-Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
-  start.testability().injectNotes([{ Title: notebookTitle }])
-})

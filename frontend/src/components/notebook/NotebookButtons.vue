@@ -54,18 +54,6 @@
         <path d="M128 20.2L28.8 86.4v83.2L128 235.8l99.2-66.2V86.4L128 20.2zm0 23.8l71.8 48L128 140.2 56.2 92l71.8-48zm-85.2 55l78.2 52.3v77.5l-78.2-52.3v-77.5zm170.4 0v77.5l-78.2 52.3v-77.5l78.2-52.3z"/>
       </svg>
     </button>
-    <PopButton
-      title="Export to GitHub"
-      btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-    >
-      <template #button_face>
-        <SvgGithub />
-      </template>
-      <NotebookGithubExportDialog
-        :notebook-id="notebook.id"
-        @close-dialog="closer"
-      />
-    </PopButton>
   </div>
 </template>
 
@@ -84,8 +72,6 @@ import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
-import NotebookGithubExportDialog from "./NotebookGithubExportDialog.vue"
-import SvgGithub from "@/components/svgs/SvgGithub.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
