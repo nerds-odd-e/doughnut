@@ -28,7 +28,7 @@ When('I select the {string} notebook', (notebookTitle: string) => {
 })
 
 When(
-  'I click on the export for Obsidian option on notebook {string}',
+  'I export notebook {string} to Obsidian markdown zip file',
   (notebook: string) => {
     start.routerToNotebooksPage().notebookCard(notebook).exportForObsidian()
   }
@@ -46,9 +46,4 @@ Then('I should receive a zip file containing', (table: DataTable) => {
 
 Given('I have an empty notebook titled {string}', (notebookTitle: string) => {
   start.testability().injectNotes([{ Title: notebookTitle }])
-})
-
-When('I go to Notebook page', () => {
-  // Using the same navigation function but without parameters
-  start.routerToNotebooksPage()
 })

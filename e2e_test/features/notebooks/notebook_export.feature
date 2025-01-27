@@ -9,8 +9,7 @@ Feature: Notebook export for Obsidian
       | Leaf Note    | Leaf Content    | Parent Note  |
 
   Scenario: Export notebook as a hierarchical zip file for Obsidian
-    When I go to Notebook page
-    And I click on the export for Obsidian option on notebook "Root Note"
+    When I export notebook "Root Note" to Obsidian markdown zip file
     Then I should receive a zip file containing
       | Filename                                | Format | Content                    |
       | Root Note/__index.md                    | md     | # Root Note\nnull  |
