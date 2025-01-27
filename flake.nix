@@ -52,6 +52,7 @@
               yamllint
               nixfmt-classic
               hclfmt
+              fzf
             ] ++ lib.optionals stdenv.isDarwin [ sequelpro ]
             ++ lib.optionals (!stdenv.isDarwin) [
               sequeler
@@ -68,6 +69,11 @@
               echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
             }
             export -f log
+
+            # Configure fzf
+            export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+            source ${pkgs.fzf}/share/fzf/key-bindings.bash
+            source ${pkgs.fzf}/share/fzf/completion.bash
 
             # General settings
             export LANG="en_US.UTF-8"
