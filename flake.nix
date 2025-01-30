@@ -128,6 +128,32 @@
             export MYSQLX_TCP_PORT="33090"
             export MYSQL_LOG_FILE="''${MYSQL_HOME}/mysql.log"
 
+            # Configure pnpm and start Biome
+            log "Setting up PNPM and Biome..."
+            (
+              set +e
+              corepack prepare pnpm@10.0.0 --activate >/dev/null 2>&1
+              corepack use pnpm@10.0.0 >/dev/null 2>&1
+              set -e
+              pnpm --frozen-lockfile recursive install
+
+              # Setup Cypress with specific version
+              log "Setting up Cypress..."
+              CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress")
+              if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
+                pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
+              fi
+
+              # Stop and start Biome server
+              pnpm biome stop >/dev/null 2>&1 || true
+              nohup pnpm biome start >/dev/null 2>&1 &
+              disown
+            )
+
+            # Start process-compose for MySQL only
+            mkdir -p "$MYSQL_HOME"
+            process-compose up -f process-compose.yaml --detached >/dev/null 2>&1
+
             cat << 'EOF'
             ╔════════════════════════════════════════════════════════════════════════════════════╗
             ║                         NIX DEVELOPMENT ENVIRONMENT                                ║
@@ -154,13 +180,6 @@
             printf "\n"
 
             log "Environment setup complete! 🎉"
-
-            # Start process-compose and wait for it to be ready
-            (
-              mkdir -p "$MYSQL_HOME"
-              process-compose up -f process-compose.yaml --detached >/dev/null 2>&1
-            )
-
             return 0
           '';
         };

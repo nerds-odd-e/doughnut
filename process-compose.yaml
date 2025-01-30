@@ -33,9 +33,3 @@ processes:
       timeout_seconds: 30
     limits:
       memory: 1GB
-
-  init:
-    command: ${PWD}/scripts/init_env.sh
-    depends_on:
-      mysql:
-        condition: service_healthy
