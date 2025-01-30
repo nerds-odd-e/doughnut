@@ -151,7 +151,7 @@ jobs:
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
-          install: false
+          install: true
         env:
           GITHUB_FOR_ISSUES_API_TOKEN: ${{ env.GITHUB_FOR_ISSUES_API_TOKEN }}
       - uses: actions/upload-artifact@v4
