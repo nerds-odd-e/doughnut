@@ -14,16 +14,17 @@ processes:
     - MYSQL_LOG_FILE
     - PATH
     availability:
-      restart: "always"
+      restart: on_failure
+      max_restarts: 5
       backoff:
         initial_delay: 5s
         max_delay: 30s
     readiness_probe:
       exec:
         command: ${MYSQL_BASEDIR}/bin/mysqladmin ping -u root -S ${MYSQL_HOME}/mysql.sock --silent
-      initial_delay: 1s
-      period: 2s
-      timeout: 2s
+      initial_delay: 2s
+      period: 3s
+      timeout: 3s
       success_threshold: 1
       failure_threshold: 10
     shutdown:
