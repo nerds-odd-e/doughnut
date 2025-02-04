@@ -236,7 +236,6 @@ import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
   note: Note
-  notebookId?: number
   asMarkdown?: boolean
   conversationButton?: boolean
 }>()
