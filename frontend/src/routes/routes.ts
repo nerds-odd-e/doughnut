@@ -33,7 +33,6 @@ const routes = [
     path: "/d/notebooks",
     name: "notebooks",
     component: NotebooksPage,
-    meta: { useNoteStorageAccessor: true },
   },
   {
     path: `/n:noteId`,
