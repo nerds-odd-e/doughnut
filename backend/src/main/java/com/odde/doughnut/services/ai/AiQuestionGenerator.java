@@ -53,12 +53,19 @@ public record AiQuestionGenerator(
   }
 
   public QuestionContestResult getQuestionContestResult(PredefinedQuestion predefinedQuestion) {
-    return forNote(
-            predefinedQuestion.getNote(),
-            globalSettingsService.globalSettingEvaluation().getValue())
-        .evaluateQuestion(predefinedQuestion.getMcqWithAnswer())
-        .map(e -> e.getQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
-        .orElse(null);
+    NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
+        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+    NoteQuestionGenerationService service =
+        notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(
+            predefinedQuestion.getNote());
+    try {
+      return service
+          .evaluateQuestion(predefinedQuestion.getMcqWithAnswer())
+          .map(e -> e.getQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
+          .orElse(null);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   // Temporary method until we migrate all functionality

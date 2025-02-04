@@ -11,14 +11,6 @@ import java.util.Optional;
 public record AiQuestionGeneratorForNote(
     OpenAiApiHandler openAiApiHandler, OpenAIChatRequestBuilder chatAboutNoteRequestBuilder) {
 
-  public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question) {
-    InstructionAndSchema questionEvaluationAiTool =
-        AiToolFactory.questionEvaluationAiTool(question);
-    return openAiApiHandler
-        .requestAndGetJsonSchemaResult(questionEvaluationAiTool, chatAboutNoteRequestBuilder)
-        .flatMap(QuestionEvaluation::getQuestionEvaluation);
-  }
-
   public Optional<MCQWithAnswer> refineQuestion(MCQWithAnswer question) {
     InstructionAndSchema questionEvaluationAiTool = AiToolFactory.questionRefineAiTool(question);
     return openAiApiHandler

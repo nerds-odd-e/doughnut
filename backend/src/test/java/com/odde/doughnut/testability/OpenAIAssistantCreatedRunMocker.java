@@ -31,6 +31,15 @@ public record OpenAIAssistantCreatedRunMocker(OpenAiApi openAiApi, String thread
     return new OpenAIAssistantRunMocker(openAiApi, threadId, run);
   }
 
+  public OpenAIAssistantRunMocker aRunWithNoToolCalls() {
+    Run retrievedRun = getRun("requires_action");
+    retrievedRun.setRequiredAction(
+        RequiredAction.builder()
+            .submitToolOutputs(SubmitToolOutputs.builder().toolCalls(List.of()).build())
+            .build());
+    return new OpenAIAssistantRunMocker(openAiApi, threadId, retrievedRun);
+  }
+
   private Run getRun(String status) {
     Run run = new Run();
     run.setId(runId);

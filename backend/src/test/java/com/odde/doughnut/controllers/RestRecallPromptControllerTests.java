@@ -25,7 +25,6 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -247,29 +246,47 @@ class RestRecallPromptControllerTests {
 
     @Test
     void rejected() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
     }
 
     @Test
     void useTheRightModel() {
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
       GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
+
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
       controller.contest(recallPrompt);
-      ArgumentCaptor<ChatCompletionRequest> argumentCaptor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi, times(1)).createChatCompletion(argumentCaptor.capture());
+
+      ArgumentCaptor<RunCreateRequest> argumentCaptor =
+          ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRun(any(), argumentCaptor.capture());
       assertThat(argumentCaptor.getValue().getModel(), equalTo("gpt-new"));
     }
 
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
+
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertFalse(contest.rejected);
     }
