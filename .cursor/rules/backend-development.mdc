@@ -1,0 +1,164 @@
+---
+description: Backend development guildelines
+globs: backend/**/*.*
+---
+# Backend Unit Test Practices
+
+## Core Principles
+
+1. **Focus on Behavior, Not Implementation**
+   - Tests verify system behavior through pre/post state transitions
+   - Tests should be resilient to internal code structure changes
+   - Example from RestNoteControllerTests.java:
+   ```java
+   @Test
+   void shouldBeAbleToSaveNoteWhenValid() throws UnexpectedNoAccessRightException {
+     Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+     final NoteRealm noteRealm = controller.show(note);
+     assertThat(noteRealm.getId(), equalTo(note.getId()));
+   }
+   ```
+
+2. **Test at Appropriate Level**
+   - Prefer testing through controllers when possible
+   - Test services/algorithms directly only when they are independent
+   - Example from ClozeDescriptionTest.java shows testing an independent algorithm:
+   ```java
+   @ParameterizedTest
+   @CsvSource({
+     "moon,            partner of earth,                    partner of earth",
+     "Sedition,        word sedition means this,           word [...] means this"
+   })
+   void clozeDescription(String title, String details, String expectedClozeDescription) {
+     assertThat(
+         new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails(),
+         containsString(expectedClozeDescription));
+   }
+   ```
+
+3. **Keep Tests Small and Focused**
+   - Each test should be less than 10 lines of code
+   - One behavior per test
+   - Use descriptive test names that explain the behavior being tested
+
+4. **Use Real Database**
+   - Tests use actual database interactions (@Transactional)
+   - Provides confidence in database operations
+   - Example setup from RestNoteControllerTests.java:
+   ```java
+   @SpringBootTest
+   @ActiveProfiles("test")
+   @Transactional
+   class RestNoteControllerTests {
+     // ...
+   }
+   ```
+
+## Data Builder Pattern
+
+1. **MakeMe Factory**
+   - Central factory class for creating test data
+   - Provides fluent builders for all entities
+   - Example:
+   ```java
+   Note note = makeMe.aNote()
+                    .creatorAndOwner(userModel)
+                    .titleConstructor("title")
+                    .details("description")
+                    .please();
+   ```
+
+2. **Builder Classes**
+   - Each entity has its own builder (e.g., NoteBuilder, ConversationBuilder)
+   - Builders handle relationships and dependencies
+   - Use method chaining for readability
+   - End with `please()` to build the object
+   - `please(boolean needPersist)` controls database persistence
+
+3. **Complex Object Graphs**
+   - Builders handle creating related entities automatically
+   - Example from NoteBuilder.java:
+   ```java
+   protected void beforeCreate(boolean needPersist) {
+     if (entity.getCreator() == null) {
+       creator(makeMe.aUser().please(needPersist));
+     }
+     if (entity.getNotebook() == null) {
+       asHeadNoteOfANotebook(entity.getCreator().getOwnership());
+     }
+     // ...
+   }
+   ```
+
+## Test Organization
+
+1. **Nested Test Classes**
+   - Group related tests using @Nested
+   - Provides context and better organization
+   - Example from RestNoteControllerTests.java:
+   ```java
+   @Nested
+   class createNoteTest {
+     Note parent;
+     NoteCreationDTO noteCreation;
+
+     @BeforeEach
+     void setup() {
+       // ...
+     }
+
+     @Test
+     void shouldBeAbleToSaveNoteWhenValid() {
+       // ...
+     }
+   }
+   ```
+
+2. **Setup Methods**
+   - Use @BeforeEach for common test setup
+   - Keep setup minimal and relevant to the test group
+   - Initialize test data using MakeMe builders
+
+3. **Mocking**
+   - Use mocking sparingly, primarily for external services
+   - Example from RestAiControllerTest.java:
+   ```java
+   @Test
+   void generateImage() {
+     when(openAiApi.createImage(Mockito.any()))
+         .thenReturn(buildImageResult("this is supposed to be a base64 image"));
+     final String aiImage = controller.generateImage("create an image").b64encoded();
+     assertEquals("this is supposed to be a base64 image", aiImage);
+   }
+   ```
+
+## Best Practices
+
+1. **Assertion Style**
+   - Use assertThat with descriptive matchers
+   - Makes test failures more readable
+   - Example:
+   ```java
+   assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
+   assertThat(noteRealm.getFromBazaar(), is(true));
+   ```
+
+2. **Exception Testing**
+   - Test both happy path and error cases
+   - Use assertThrows for exception testing
+   - Example:
+   ```java
+   assertThrows(
+       UnexpectedNoAccessRightException.class,
+       () -> controller.show(note));
+   ```
+
+3. **Parameterized Tests**
+   - Use @ParameterizedTest for testing multiple scenarios
+   - Improves test coverage with less code
+   - Example from ClozeDescriptionTest.java using @CsvSource
+
+4. **Test Data Independence**
+   - Each test should create its own data
+   - Avoid sharing mutable state between tests
+   - Use fresh instances through @BeforeEach

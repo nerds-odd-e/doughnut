@@ -1,5 +1,5 @@
 ---
-description: Rules and guidelines for Vue.js frontend development in the Doughnut project
+description: Vue.js frontend development in the Doughnut project
 globs: frontend/**/*.{vue,ts}, frontend/tests/**/*.{ts,js}, frontend/src/**/*.{ts,vue}
 ---
 
