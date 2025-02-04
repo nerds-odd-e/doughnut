@@ -5,7 +5,7 @@ log "Setting up PNPM and Biome..."
 corepack prepare pnpm@10.0.0 --activate >/dev/null 2>&1
 corepack use pnpm@10.0.0 >/dev/null 2>&1
 
-set -euo pipefail
+set -uo pipefail
 pnpm --frozen-lockfile recursive install
 
 # Setup Cypress with specific version
