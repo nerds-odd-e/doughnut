@@ -142,6 +142,7 @@ public class ObsidianFormatService {
   private Note processNotePart(
       Note currentParent, String noteName, ZipEntry entry, ZipInputStream zipIn, boolean isLastPart)
       throws IOException {
+    currentParent = modelFactoryService.noteRepository.findById(currentParent.getId()).orElse(null);
     Note existingNote = findExistingNote(currentParent, noteName);
 
     if (existingNote != null) {
