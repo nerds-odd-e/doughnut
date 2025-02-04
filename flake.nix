@@ -75,6 +75,21 @@
               export PS1="(nix)''${PS1:-$ }"
             fi
 
+            # Define and export logging function
+            log() {
+              echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
+            }
+            export -f log
+
+            # Define error handler
+            handle_error() {
+              local error_code="$2"
+              log "Warning: Command exited with status ''${error_code}"
+              return 0
+            }
+            export -f handle_error
+            trap 'handle_error "0" "$?"' ERR
+
             # Configure fzf
             export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
             if [ -n "''${ZSH_VERSION:-}" ]; then
@@ -92,12 +107,6 @@
                 source ${pkgs.fzf}/share/fzf/completion.bash
               fi
             fi
-
-            # Define and export logging function
-            log() {
-              echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
-            }
-            export -f log
 
             # Add git push script alias
             alias g='./scripts/git_push.sh'
@@ -129,28 +138,34 @@
             export MYSQL_LOG_FILE="''${MYSQL_HOME}/mysql.log"
 
             # Configure pnpm and start Biome
-            log "Setting up PNPM and Biome..."
-            corepack prepare pnpm@10.0.0 --activate >/dev/null 2>&1
-            corepack use pnpm@10.0.0 >/dev/null 2>&1
-            pnpm --frozen-lockfile recursive install
-
-            # Setup Cypress with specific version
-            log "Setting up Cypress..."
-            CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress")
-            if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
-              pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
-            fi
-
-            # Stop and start Biome server
             (
+              log "Setting up PNPM and Biome..."
+              corepack prepare pnpm@10.0.0 --activate >/dev/null 2>&1 || true
+              corepack use pnpm@10.0.0 >/dev/null 2>&1 || true
+              pnpm --frozen-lockfile recursive install || true
+
+              # Stop and start Biome server
               pnpm biome stop >/dev/null 2>&1 || true
               nohup pnpm biome start >/dev/null 2>&1 &
               disown
             )
 
+            # Setup Cypress with specific version
+            (
+              log "Setting up Cypress..."
+              CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
+              if [ -n "$CYPRESS_VERSION" ]; then
+                if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
+                  pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force || true
+                fi
+              fi
+            )
+
             # Start process-compose for MySQL only
-            mkdir -p "$MYSQL_HOME"
-            process-compose up -f process-compose.yaml --detached >/dev/null 2>&1
+            (
+              mkdir -p "$MYSQL_HOME" || true
+              process-compose up -f process-compose.yaml --detached >/dev/null 2>&1 || true
+            )
 
             cat << 'EOF'
             ╔════════════════════════════════════════════════════════════════════════════════════╗

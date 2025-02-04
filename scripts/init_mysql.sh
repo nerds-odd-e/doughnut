@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -uo pipefail
+trap 'handle_error "${LINENO}" "$?"' ERR
 
 # MySQL initialization function
 init_mysql() {
@@ -9,8 +10,8 @@ init_mysql() {
 
   # Only initialize if data directory doesn't exist
   if [ ! -d "${MYSQL_DATADIR}" ]; then
-    mkdir -p "${MYSQL_DATADIR}"
-    chmod 750 "${MYSQL_DATADIR}"
+    mkdir -p "${MYSQL_DATADIR}" || true
+    chmod 750 "${MYSQL_DATADIR}" || true
 
     log "Initializing MySQL server base & data directory..."
     "${MYSQL_BASEDIR}/bin/mysqld" \
@@ -19,7 +20,7 @@ init_mysql() {
       --datadir="${MYSQL_DATADIR}" \
       --tls-version=TLSv1.2 \
       --basedir="${MYSQL_BASEDIR}" \
-      --explicit_defaults_for_timestamp || return 1
+      --explicit_defaults_for_timestamp || return 0
   fi
 
   log "Starting MySQL server..."
@@ -49,4 +50,4 @@ init_mysql() {
   fi
 }
 
-init_mysql
+init_mysql || true
