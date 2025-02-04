@@ -76,7 +76,6 @@ export interface StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDTO
   ): Promise<void>
-
 }
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
