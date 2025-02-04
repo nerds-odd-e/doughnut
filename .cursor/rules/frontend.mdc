@@ -1,0 +1,135 @@
+---
+description: Rules and guidelines for Vue.js frontend development in the Doughnut project
+globs: frontend/**/*.{vue,ts}, frontend/tests/**/*.{ts,js}, frontend/src/**/*.{ts,vue}
+---
+
+# Frontend Development Cursor Rules
+
+## File Organization
+
+- Frontend code lives in `frontend/src/`
+- Test code lives in `frontend/tests/`
+- Generated backend API code is in `frontend/src/generated/backend`
+
+## Core Technologies
+
+- Vue 3 with TypeScript
+- DaisyUI + Tailwind for styling, with "daisy-" prefix
+- Vitest for testing
+- Biome for linting/formatting
+
+## Component Rules
+
+### Naming Conventions
+
+- Component files should use PascalCase (e.g., `NoteShow.vue`, `GlobalBar.vue`)
+- Test files should match component names with `.spec.ts` suffix
+- Use `.vue` extension for components
+- Use `.ts` extension for TypeScript files
+
+### Component Structure
+
+```vue
+<script setup lang="ts">
+// imports first
+import { ref } from "vue"
+
+// props/emits
+const props = defineProps<{
+  value: string
+}>()
+const emit = defineEmits<{
+  (e: 'update:value', value: string): void
+}>()
+
+// composables/setup
+const { managedApi } = useLoadingApi()
+
+// refs/reactive state
+const loading = ref(false)
+
+// computed
+const displayValue = computed(() => props.value.toUpperCase())
+
+// methods
+const handleClick = () => {
+  emit('update:value', 'new value')
+}
+
+// lifecycle hooks last
+onMounted(() => {
+  // ...
+})
+</script>
+
+<template>
+  <div class="daisy-component">
+    <!-- template content -->
+  </div>
+</template>
+
+<style scoped lang="scss">
+// scoped styles
+</style>
+```
+
+### CSS/Styling Rules
+
+- Use DaisyUI classes with `daisy-` prefix (e.g., `daisy-btn`, `daisy-alert`)
+- Avoid Bootstrap classes
+- Choose theme-neutral colors
+- Use scoped styles with SCSS
+- Follow mobile-first responsive design
+
+### Testing Guidelines
+
+1. Focus on Component Behavior
+   - Test through user interactions
+   - Avoid testing implementation details
+   - Use data-testid for test selectors
+
+2. Minimal Mocking
+   - Mock only external dependencies (API calls)
+   - Use real component instances when possible
+   - Use helper.managedApi for API mocks
+
+3. Test Organization
+   - Group related tests in describe blocks
+   - Use descriptive test names
+   - Create helper functions for repeated operations
+
+### API Integration
+
+- Use `managedApi` from `useLoadingApi()` for API calls
+- Handle loading states appropriately
+- Use proper error handling with try/catch
+- Follow the API types from generated code
+
+### State Management
+
+- Use composition API with `ref`/`reactive`
+- Prefer `ref` for primitive values
+- Use `reactive` for complex objects
+- Use `provide`/`inject` for deep prop passing
+
+### Performance
+
+- Use `v-show` for frequent toggles
+- Use `v-if` for conditional rendering
+- Implement proper cleanup in `onUnmounted`
+- Use `computed` for derived values
+- Avoid unnecessary watchers
+
+### Accessibility
+
+- Include proper ARIA attributes
+- Ensure keyboard navigation works
+- Test with screen readers
+- Use semantic HTML elements
+
+### Error Handling
+
+- Use try/catch for API calls
+- Display user-friendly error messages
+- Log errors appropriately
+- Handle edge cases gracefully
