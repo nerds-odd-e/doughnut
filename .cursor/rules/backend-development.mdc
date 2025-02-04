@@ -4,6 +4,14 @@ globs: backend/**/*.*
 ---
 # Backend Unit Test Practices
 
+## Run Test in Terminal
+
+If starting a new terminal, please wait for the `nix develop` to be loaded by `direnv` first. And if `direnv` isn't configured, please run `nix develop` first. Then, to run the tests:
+
+```
+pnpm backend:verify
+```
+
 ## Core Principles
 
 1. **Focus on Behavior, Not Implementation**
