@@ -14,12 +14,12 @@
     <!-- Sidebar -->
     <aside
       :class="[
-        'daisy-bg-base-200 daisy-h-full daisy-w-72 daisy-transition-all daisy-ease-in-out',
+        'daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-overflow-y-auto',
         isMdOrLarger
           ? (sidebarOpened ? 'daisy-relative' : 'daisy-hidden')
           : (sidebarOpened
-              ? 'daisy-translate-x-0 daisy-absolute daisy-top-0 daisy-left-0 daisy-z-40'
-              : '-daisy-translate-x-full daisy-absolute daisy-top-0 daisy-left-0')
+              ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full'
+              : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-h-full')
       ]"
     >
       <NoteSidebar
@@ -33,7 +33,7 @@
 
     <!-- Main Content -->
     <main
-      class="daisy-flex-1 daisy-p-4 daisy-container daisy-mx-auto daisy-overflow-visible"
+      class="daisy-flex-1 daisy-p-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
     >
       <NoteShow
         v-bind="{
@@ -138,9 +138,26 @@ watch(
 </script>
 
 <style scoped>
-/* Ensure the sidebar and main content stretch full height */
-.daisy-flex {
+/* Ensure the root container takes full height */
+.note-show-page {
   height: 100%;
+  display: flex;
+  overflow: hidden;
+}
+
+/* Set max height for both sidebar and main content to enable independent scrolling */
+aside {
+  max-height: 100%;
+}
+
+main {
+  max-height: 100%;
+}
+
+/* Ensure the conversation wrapper takes remaining height */
+.conversation-wrapper {
+  max-height: 100%;
+  overflow: hidden;
 }
 
 /* Extra convenience to override base daisyUI for transitions. */
