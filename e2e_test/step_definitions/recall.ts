@@ -200,16 +200,6 @@ Then('the choice {string} should be incorrect', (choice: string) => {
 })
 
 When(
-  "I've got the following question for the note {string}:",
-  (noteTitle: string, question: DataTable) => {
-    start
-      .questionGenerationService()
-      .resetAndStubAskingMCQ(question.hashes()[0] ?? {})
-    start.jumpToNotePage(noteTitle).testMe()
-  }
-)
-
-When(
   'I have the true false question {string} rated as a good example',
   (questionStem: string) => {
     start.testability().injectSuggestedQuestion(questionStem, true)

@@ -46,6 +46,16 @@ Given('OpenAI now generates this question:', (questionTable: DataTable) => {
   start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])
 })
 
+When(
+  "I've got the following question for the note {string}:",
+  (noteTitle: string, question: DataTable) => {
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMCQ(question.hashes()[0] ?? {})
+    start.jumpToNotePage(noteTitle).testMe()
+  }
+)
+
 Given('OpenAI evaluates the question as legitamate', () => {
   start
     .questionGenerationService()
