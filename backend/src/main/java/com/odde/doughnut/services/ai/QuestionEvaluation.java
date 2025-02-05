@@ -3,6 +3,8 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class QuestionEvaluation {
   @JsonPropertyDescription("Indices of the correct choices. 0-based.")
@@ -24,8 +26,8 @@ public class QuestionEvaluation {
         && correctChoices[0] == correctChoiceIndex;
   }
 
-  public QuestionContestResult getQuestionContestResult(Integer correctAnswerIndex) {
-    if (feasibleQuestion && indisputableAnswer(correctAnswerIndex)) {
+  public QuestionContestResult getQuestionContestResult(Integer correctChoiceIndex) {
+    if (feasibleQuestion && indisputableAnswer(correctChoiceIndex)) {
       QuestionContestResult result = new QuestionContestResult();
       result.reason = "This seems to be a legitimate question. Please answer it.";
       result.rejected = true;
@@ -33,8 +35,19 @@ public class QuestionEvaluation {
     }
     QuestionContestResult result = new QuestionContestResult();
     result.reason = explanation == null ? "" : explanation;
-    if (!indisputableAnswer(correctAnswerIndex)) {
-      result.reason += " Uncleared answer detected.";
+    if (!indisputableAnswer(correctChoiceIndex)) {
+      String correctChoicesStr =
+          correctChoices == null
+              ? "none"
+              : Arrays.stream(correctChoices)
+                  .mapToObj(String::valueOf)
+                  .collect(Collectors.joining(", "));
+      result.reason +=
+          "\nUnclear answer detected. The original question assume one correct choice index "
+              + correctChoiceIndex
+              + ". however, the re-evaluation of the question showes that "
+              + correctChoicesStr
+              + " are correct to the question.";
     }
     return result;
   }
