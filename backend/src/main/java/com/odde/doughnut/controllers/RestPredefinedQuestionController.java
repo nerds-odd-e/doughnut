@@ -5,7 +5,9 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -37,7 +39,12 @@ class RestPredefinedQuestionController {
     this.testabilitySettings = testabilitySettings;
     this.predefinedQuestionService =
         new PredefinedQuestionService(
-            openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
+            modelFactoryService,
+            testabilitySettings.getRandomizer(),
+            new AiQuestionGenerator(
+                openAiApi,
+                new GlobalSettingsService(modelFactoryService),
+                testabilitySettings.getRandomizer()));
   }
 
   @PostMapping("/generate-question-without-save")

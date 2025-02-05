@@ -7,10 +7,10 @@ import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
@@ -19,12 +19,12 @@ public class PredefinedQuestionService {
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public PredefinedQuestionService(
-      OpenAiApi openAiApi, ModelFactoryService modelFactoryService, Randomizer randomizer) {
+      ModelFactoryService modelFactoryService,
+      Randomizer randomizer,
+      AiQuestionGenerator aiQuestionGenerator) {
     this.modelFactoryService = modelFactoryService;
     this.randomizer = randomizer;
-    this.aiQuestionGenerator =
-        new AiQuestionGenerator(
-            openAiApi, new GlobalSettingsService(modelFactoryService), randomizer);
+    this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
   public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {
@@ -58,9 +58,9 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAQuestionOfRandomType(
-      Note note, User user, QuestionContestResult contestResult) {
+      Note note, User user, AiQuestionFactory aiQuestionFactory) {
     PredefinedQuestion result =
-        generateAQuestionOfRandomTypeWithoutSaving(note, user, contestResult);
+        generateAQuestionOfRandomTypeWithoutSaving(note, user, aiQuestionFactory);
     if (result == null) {
       return null;
     }
@@ -69,14 +69,14 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAQuestionOfRandomTypeWithoutSaving(Note note, User user) {
-    return generateAQuestionOfRandomTypeWithoutSaving(note, user, null);
+    return generateAQuestionOfRandomTypeWithoutSaving(
+        note, user, new AiQuestionFactory(note, aiQuestionGenerator));
   }
 
   public PredefinedQuestion generateAQuestionOfRandomTypeWithoutSaving(
-      Note note, User user, QuestionContestResult contestResult) {
+      Note note, User user, AiQuestionFactory aiQuestionFactory) {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(
-        aiQuestionGenerator, contestResult);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionFactory);
   }
 }

@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
-import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
@@ -12,8 +11,7 @@ public class AiQuestionFactory extends PredefinedQuestionFactory {
   private final Note note;
   AiQuestionGenerator aiQuestionGenerator;
 
-  public AiQuestionFactory(
-      Note note, AiQuestionGenerator questionGenerator, QuestionContestResult contestResult) {
+  public AiQuestionFactory(Note note, AiQuestionGenerator questionGenerator) {
     this.note = note;
     this.aiQuestionGenerator = questionGenerator;
   }

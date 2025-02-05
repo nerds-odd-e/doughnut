@@ -4,29 +4,45 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 
 public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
   private final ModelFactoryService modelFactoryService;
+  private final AiQuestionGenerator aiQuestionGenerator;
 
   public RecallQuestionService(
       OpenAiApi openAiApi, ModelFactoryService modelFactoryService, Randomizer randomizer) {
     this.modelFactoryService = modelFactoryService;
+    aiQuestionGenerator =
+        new AiQuestionGenerator(
+            openAiApi, new GlobalSettingsService(modelFactoryService), randomizer);
     this.predefinedQuestionService =
-        new PredefinedQuestionService(openAiApi, modelFactoryService, randomizer);
+        new PredefinedQuestionService(modelFactoryService, randomizer, aiQuestionGenerator);
   }
 
   public RecallPrompt generateAQuestionOfRandomType(Note note, User user) {
-    return generateAQuestionOfRandomType(note, user, null);
+    PredefinedQuestion question =
+        predefinedQuestionService.generateAQuestionOfRandomType(
+            note, user, new AiQuestionFactory(note, aiQuestionGenerator));
+    if (question == null) {
+      return null;
+    }
+    RecallPrompt recallPrompt = new RecallPrompt();
+    recallPrompt.setPredefinedQuestion(question);
+    return modelFactoryService.save(recallPrompt);
   }
 
-  public RecallPrompt generateAQuestionOfRandomType(
-      Note note, User user, QuestionContestResult contestResult) {
+  public RecallPrompt regenerateAQuestionOfRandomType(
+      PredefinedQuestion predefinedQuestion, User user, QuestionContestResult contestResult) {
+    Note note = predefinedQuestion.getNote();
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
     PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(note, user, contestResult);
+        predefinedQuestionService.generateAQuestionOfRandomType(note, user, aiQuestionFactory);
     if (question == null) {
       return null;
     }

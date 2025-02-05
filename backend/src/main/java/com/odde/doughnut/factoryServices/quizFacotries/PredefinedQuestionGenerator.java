@@ -1,24 +1,19 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
-import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import java.util.List;
 import java.util.Optional;
 
 public record PredefinedQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  public PredefinedQuestion generateAQuestionOfRandomType(
-      AiQuestionGenerator questionGenerator, QuestionContestResult contestResult) {
-    List<PredefinedQuestionFactory> factories =
-        getPredefinedQuestionFactories(
-            new AiQuestionFactory(note, questionGenerator, contestResult));
+  public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionFactory aiQuestionFactory) {
+    List<PredefinedQuestionFactory> factories = getPredefinedQuestionFactories(aiQuestionFactory);
     return generateAQuestionOfFirstPossibleType(randomizer.shuffle(factories));
   }
 

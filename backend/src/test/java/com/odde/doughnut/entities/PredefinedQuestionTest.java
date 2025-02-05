@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -76,6 +77,7 @@ class PredefinedQuestionTest {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(
             userModel.getEntity(), note, randomizer, makeMe.modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator, null);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(
+        new AiQuestionFactory(predefinedQuestionGenerator.note(), aiQuestionGenerator));
   }
 }
