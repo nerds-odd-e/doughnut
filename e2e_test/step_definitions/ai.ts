@@ -64,12 +64,10 @@ When('I test myself for the note {string}', (noteTitle: string) => {
 Given(
   'OpenAI evaluates the question as legitamate for assistant thread {string}',
   (threadId: string) => {
-    start
-      .questionGenerationService()
-      .stubEvaluationQuestion(threadId, {
-        feasibleQuestion: true,
-        correctChoices: [0],
-      })
+    start.questionGenerationService().stubEvaluationQuestion(threadId, {
+      feasibleQuestion: true,
+      correctChoices: [0],
+    })
   }
 )
 

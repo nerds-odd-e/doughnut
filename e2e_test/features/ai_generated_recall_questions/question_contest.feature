@@ -22,5 +22,5 @@ Feature: User Contests Question generation by AI
 
     Examples:
     | Legitimate Question | Old Question Status | Current Question                                    |
-    # | legitamate          | enabled             | What is the most common scuba diving certification? |
+    | legitamate          | enabled             | What is the most common scuba diving certification? |
     | not legitamate      | disabled            | What is scuba diving?                               |
