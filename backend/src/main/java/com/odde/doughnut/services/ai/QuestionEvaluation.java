@@ -2,11 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import java.util.Optional;
 
 public class QuestionEvaluation {
   @JsonPropertyDescription("Indices of the correct choices. 0-based.")
@@ -21,14 +17,6 @@ public class QuestionEvaluation {
       "Explains why the question is not feasible. Leave empty if the question is feasible.")
   @JsonProperty(required = true)
   public String comment;
-
-  public static Optional<QuestionEvaluation> getQuestionEvaluation(JsonNode jsonNode) {
-    try {
-      return Optional.of(new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class));
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   private boolean indisputableAnswer(int correctChoiceIndex) {
     return correctChoices != null
