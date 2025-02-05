@@ -44,10 +44,10 @@ public class NoteQuestionGenerationService {
               .role("user")
               .content(
                   """
-                  Previous question:
+                  Previously generated non-feasible question:
                   %s
 
-                  Contest reason:
+                  Non-feasible reason:
                   %s
 
                   Please regenerate or refine the question based on the above feedback."""

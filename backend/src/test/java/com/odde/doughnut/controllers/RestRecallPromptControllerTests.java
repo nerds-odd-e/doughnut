@@ -253,7 +253,7 @@ class RestRecallPromptControllerTests {
           lastMessage,
           allOf(
               containsString("\"stem\" : \"<p>descrption</p>\\n\""),
-              containsString("Contest reason:"),
+              containsString("Non-feasible reason:"),
               containsString("test"),
               containsString(
                   "Please regenerate or refine the question based on the above feedback.")));
