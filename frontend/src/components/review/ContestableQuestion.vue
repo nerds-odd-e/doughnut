@@ -21,10 +21,10 @@
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
       :conversation-button="true"
-      :storage-accessor="storageAccessor"
     />
-    <div v-else class="daisy-flex daisy-flex-col daisy-gap-4">
+    <div v-else class="daisy-flex daisy-flex-col daisy-gap-4" :class="{ 'daisy-opacity-50 daisy-pointer-events-none': contesting }">
       <RecallPromptComponent
+        v-if="currentQuestion"
         :recall-prompt="currentQuestion"
         @answered="onAnswered($event)"
       />
@@ -66,6 +66,7 @@ const props = defineProps({
 })
 const emit = defineEmits(["need-scroll", "answered"])
 const regenerating = ref(false)
+const contesting = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
 const currentQuestion = ref(props.recallPrompt)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
@@ -82,25 +83,33 @@ const scrollToBottom = () => {
 
 const contest = async () => {
   currentQuestionLegitMessage.value = ""
-  const contestResult = await managedApi.restRecallPromptController.contest(
-    currentQuestion.value.id
-  )
+  contesting.value = true
+  try {
+    const contestResult = await managedApi.restRecallPromptController.contest(
+      currentQuestion.value.id
+    )
 
-  if (!contestResult.rejected) {
-    regenerating.value = true
-    prevQuestions.value.push({
-      quizeQuestion: currentQuestion.value,
-      badQuestionReason: contestResult.reason,
-    })
-    currentQuestion.value =
-      await managedApi.restRecallPromptController.regenerate(
-        currentQuestion.value.id
-      )
-  } else {
-    currentQuestionLegitMessage.value = contestResult.reason
+    if (!contestResult.rejected) {
+      regenerating.value = true
+      prevQuestions.value.push({
+        quizeQuestion: currentQuestion.value,
+        badQuestionReason: contestResult.reason,
+      })
+      try {
+        currentQuestion.value =
+          await managedApi.restRecallPromptController.regenerate(
+            currentQuestion.value.id
+          )
+      } finally {
+        regenerating.value = false
+      }
+    } else {
+      currentQuestionLegitMessage.value = contestResult.reason
+    }
+  } finally {
+    contesting.value = false
+    scrollToBottom()
   }
-  regenerating.value = false
-  scrollToBottom()
 }
 
 const onAnswered = (answer: AnsweredQuestion) => {

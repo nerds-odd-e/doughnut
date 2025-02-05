@@ -18,6 +18,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
 import scrollToElement from "../commons/scrollToElement"
+import ContestableQuestion from "../review/ContestableQuestion.vue"
 
 const { managedApi } = useLoadingApi()
 const { selectedNote, storageAccessor } = defineProps({
