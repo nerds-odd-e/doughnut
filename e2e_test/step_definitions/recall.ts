@@ -202,10 +202,11 @@ Then('the choice {string} should be incorrect', (choice: string) => {
 When(
   "I've got the following question for a note with title {string}:",
   (noteTitle: string, question: DataTable) => {
-    start.stubOpenAIQuestionGenerationAndSeeTheQuestion(
-      noteTitle,
-      question.hashes()[0] ?? {}
-    )
+    start.testability().injectNotes([{ Title: noteTitle }])
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMCQ(question.hashes()[0] ?? {})
+    start.jumpToNotePage(noteTitle).testMe()
   }
 )
 
