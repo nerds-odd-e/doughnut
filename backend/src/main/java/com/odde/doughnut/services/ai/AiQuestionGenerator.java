@@ -19,12 +19,17 @@ public record AiQuestionGenerator(
     com.odde.doughnut.models.Randomizer randomizer) {
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note) {
+    return getAiGeneratedQuestion(note, null, null);
+  }
+
+  public MCQWithAnswer getAiGeneratedQuestion(
+      Note note, PredefinedQuestion oldQuestion, QuestionContestResult contestResult) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      MCQWithAnswer original = service.generateQuestion();
+      MCQWithAnswer original = service.generateQuestion(oldQuestion, contestResult);
       if (original != null && !original.isStrictChoiceOrder()) {
         return shuffleChoices(original);
       }

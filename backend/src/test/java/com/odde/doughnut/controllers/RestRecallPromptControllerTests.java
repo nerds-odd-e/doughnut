@@ -23,9 +23,12 @@ import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
+import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
+import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -213,6 +216,42 @@ class RestRecallPromptControllerTests {
       Assertions.assertThat(
               regeneratedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
+    }
+
+    @Test
+    void shouldPassOldQuestionAndContestResultToOpenAiApi() {
+      MCQWithAnswer jsonQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+
+      // Mock the assistant API calls
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      QuestionContestResult contestResult = new QuestionContestResult();
+      contestResult.reason = "test";
+      controller.regenerate(recallPrompt, contestResult);
+
+      ArgumentCaptor<RunCreateRequest> argumentCaptor =
+          ArgumentCaptor.forClass(RunCreateRequest.class);
+      verify(openAiApi).createRun(any(), argumentCaptor.capture());
+      ArgumentCaptor<ThreadRequest> messagesCaptor = ArgumentCaptor.forClass(ThreadRequest.class);
+      verify(openAiApi).createThread(messagesCaptor.capture());
+
+      List<MessageRequest> messages = messagesCaptor.getValue().getMessages();
+      assertThat(
+          messages.get(1).getContent().toString(), containsString("test")); // Contest result reason
+      assertThat(
+          messages.get(1).getContent().toString(),
+          containsString(
+              recallPrompt
+                  .getPredefinedQuestion()
+                  .getMcqWithAnswer()
+                  .getMultipleChoicesQuestion()
+                  .getStem())); // Old question stem
     }
   }
 

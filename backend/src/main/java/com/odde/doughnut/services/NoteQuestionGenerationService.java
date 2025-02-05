@@ -1,6 +1,8 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -21,11 +23,30 @@ public class NoteQuestionGenerationService {
   }
 
   public MCQWithAnswer generateQuestion() throws JsonProcessingException {
+    return generateQuestion(null, null);
+  }
+
+  public MCQWithAnswer generateQuestion(
+      PredefinedQuestion oldQuestion, QuestionContestResult contestResult)
+      throws JsonProcessingException {
     MessageRequest message =
         MessageRequest.builder()
             .role("user")
             .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
             .build();
+
+    if (oldQuestion != null && contestResult != null) {
+      message =
+          MessageRequest.builder()
+              .role("user")
+              .content(
+                  AiToolFactory.mcqWithAnswerAiTool().getMessageBody()
+                      + "\nPrevious question: "
+                      + oldQuestion.getMcqWithAnswer().getMultipleChoicesQuestion().getStem()
+                      + "\nContest reason: "
+                      + contestResult.reason)
+              .build();
+    }
 
     MCQWithAnswer question =
         notebookAssistantForNoteService

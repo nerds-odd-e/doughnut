@@ -40,7 +40,8 @@ public class RecallQuestionService {
   public RecallPrompt regenerateAQuestionOfRandomType(
       PredefinedQuestion predefinedQuestion, User user, QuestionContestResult contestResult) {
     Note note = predefinedQuestion.getNote();
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
+    AiQuestionFactory aiQuestionFactory =
+        new AiQuestionFactory(note, aiQuestionGenerator, predefinedQuestion, contestResult);
     PredefinedQuestion question =
         predefinedQuestionService.generateAQuestionOfRandomType(note, user, aiQuestionFactory);
     if (question == null) {
