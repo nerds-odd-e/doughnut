@@ -36,16 +36,6 @@ Given('An OpenAI response is unavailable', () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
-Given('OpenAI now generates this question:', (questionTable: DataTable) => {
-  const hashes = questionTable.hashes()
-  if (hashes.length !== 1 || !hashes[0]) {
-    throw new Error(
-      `Expected exactly one row in the data table, but got ${hashes.length}`
-    )
-  }
-  start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])
-})
-
 Given(
   'OpenAI generates this question for assistant thread {string}:',
   (threadId: string, questionTable: DataTable) => {

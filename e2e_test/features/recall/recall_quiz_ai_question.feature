@@ -12,7 +12,8 @@ Feature: Repetition Quiz
 
   @usingMockedOpenAiService
   Scenario Outline: AI generated question
-    Given OpenAI now generates this question:
+    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question"
+    And OpenAI generates this question for assistant thread "thread-first-question":
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And I learned one note "sedition" on day 1

@@ -8,13 +8,15 @@ Feature: Question generation by AI
 
   Scenario Outline: testing myself with generated question for a note
     Given I have a notebook with the head note "Scuba Diving"
-    And OpenAI now generates this question:
+    And OpenAI assistant will create these thread ids in sequence: "thread-first-question"
+    And OpenAI generates this question for assistant thread "thread-first-question":
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     And I test myself for the note "Scuba Diving"
     Then I should be asked "What is the most common scuba diving certification?"
     And the choice "<option>" should be <expectedResult>
     And my question should not be included in the admin's fine-tuning data
+
     Examples:
       | option       | expectedResult |
       | Rescue Diver | correct        |
