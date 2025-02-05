@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries.factories;
 
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
@@ -8,10 +9,11 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 
 public class AiQuestionFactory extends PredefinedQuestionFactory {
-  private Note note;
+  private final Note note;
   AiQuestionGenerator aiQuestionGenerator;
 
-  public AiQuestionFactory(Note note, AiQuestionGenerator questionGenerator) {
+  public AiQuestionFactory(
+      Note note, AiQuestionGenerator questionGenerator, QuestionContestResult contestResult) {
     this.note = note;
     this.aiQuestionGenerator = questionGenerator;
   }

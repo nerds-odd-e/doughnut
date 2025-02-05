@@ -76,6 +76,6 @@ class PredefinedQuestionTest {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(
             userModel.getEntity(), note, randomizer, makeMe.modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator, null);
   }
 }

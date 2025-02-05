@@ -57,10 +57,6 @@ public class PredefinedQuestionService {
     return aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
   }
 
-  public PredefinedQuestion generateAQuestionOfRandomType(Note note, User user) {
-    return generateAQuestionOfRandomType(note, user, null);
-  }
-
   public PredefinedQuestion generateAQuestionOfRandomType(
       Note note, User user, QuestionContestResult contestResult) {
     PredefinedQuestion result =

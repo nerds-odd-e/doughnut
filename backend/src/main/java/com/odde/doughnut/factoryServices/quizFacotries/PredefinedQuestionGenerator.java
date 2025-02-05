@@ -14,13 +14,11 @@ import java.util.Optional;
 public record PredefinedQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-  public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
-    return generateAQuestionOfRandomType(questionGenerator, null);
-  }
-
   public PredefinedQuestion generateAQuestionOfRandomType(
       AiQuestionGenerator questionGenerator, QuestionContestResult contestResult) {
-    List<PredefinedQuestionFactory> factories = getPredefinedQuestionFactories(questionGenerator);
+    List<PredefinedQuestionFactory> factories =
+        getPredefinedQuestionFactories(
+            new AiQuestionFactory(note, questionGenerator, contestResult));
     return generateAQuestionOfFirstPossibleType(randomizer.shuffle(factories));
   }
 
@@ -43,8 +41,7 @@ public record PredefinedQuestionGenerator(
   }
 
   private List<PredefinedQuestionFactory> getPredefinedQuestionFactories(
-      AiQuestionGenerator questionGenerator) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, questionGenerator);
+      AiQuestionFactory aiQuestionFactory) {
     if (!note.isLink()) {
       return List.of(aiQuestionFactory, new SpellingPredefinedFactory(note));
     }
