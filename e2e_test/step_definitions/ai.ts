@@ -47,6 +47,19 @@ Given('OpenAI now generates this question:', (questionTable: DataTable) => {
 })
 
 Given(
+  'OpenAI generates this question for assistant thread {string}:',
+  (threadId: string, questionTable: DataTable) => {
+    const hashes = questionTable.hashes()
+    if (hashes.length !== 1 || !hashes[0]) {
+      throw new Error(
+        `Expected exactly one row in the data table, but got ${hashes.length}`
+      )
+    }
+    start.questionGenerationService().stubAskingMCQ(threadId, hashes[0])
+  }
+)
+
+Given(
   'OpenAI assistant will create these thread ids in sequence: {string}',
   (threadIds: string) => {
     const threadIdsArray = threadIds.split(',').map((id) => id.trim())

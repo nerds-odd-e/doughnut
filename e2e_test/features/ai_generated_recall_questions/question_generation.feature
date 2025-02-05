@@ -7,9 +7,11 @@ Feature: Question generation by AI
     Given I am logged in as an existing user
 
   Scenario Outline: testing myself with generated question for a note
-    Given I've got the following question for a note with title "Scuba Diving":
+    Given I have a notebook with the head note "Scuba Diving"
+    And OpenAI now generates this question:
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
+    And I test myself for the note "Scuba Diving"
     Then I should be asked "What is the most common scuba diving certification?"
     And the choice "<option>" should be <expectedResult>
     And my question should not be included in the admin's fine-tuning data

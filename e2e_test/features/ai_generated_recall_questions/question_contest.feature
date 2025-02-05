@@ -5,12 +5,12 @@ Feature: User Contests Question generation by AI
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Scuba Diving"
-    And OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-evaluate, thread-second-question"
-    Given OpenAI now generates this question:
+    And OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-second-question"
+    Given OpenAI generates this question for assistant thread "thread-first-question":
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     And I test myself for the note "Scuba Diving"
-    Given OpenAI now generates this question:
+    Given OpenAI generates this question for assistant thread "thread-second-question":
       | Question Stem         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
 
