@@ -4,7 +4,8 @@ Feature: User Contests Question generation by AI
 
   Background:
     Given I am logged in as an existing user
-    And I've got the following question for a note with title "Scuba Diving":
+    And I have a notebook with the head note "Scuba Diving"
+    And I've got the following question for the note "Scuba Diving":
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
     Given OpenAI now generates this question:

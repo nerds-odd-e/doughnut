@@ -200,9 +200,8 @@ Then('the choice {string} should be incorrect', (choice: string) => {
 })
 
 When(
-  "I've got the following question for a note with title {string}:",
+  "I've got the following question for the note {string}:",
   (noteTitle: string, question: DataTable) => {
-    start.testability().injectNotes([{ Title: noteTitle }])
     start
       .questionGenerationService()
       .resetAndStubAskingMCQ(question.hashes()[0] ?? {})
