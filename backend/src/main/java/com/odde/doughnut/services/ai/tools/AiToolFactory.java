@@ -56,10 +56,20 @@ public class AiToolFactory {
 
     String messageBody =
         """
-        Please assume the role of a learner, who has learned the note of focus as well as many other notes.
-        Only the top-level of the contextual path is visible to you.
-        Without the specific note of focus and its more detailed contexts revealed to you,
-        please critically check if the following question makes sense and is possible to you:
+        You are an AI assistant evaluating a memory recall question for a user’s personal knowledge management (PKM) system. The user has provided a hierarchical knowledge graph centered around a focus note along with a multiple-choice question that is meant to test their recollection of that focus note. However, the user does not know which note is the focus note when answering.
+
+        Your task is to analyze the provided question and determine whether it effectively tests the user’s memory of the focus note while adhering to the following evaluation criteria:
+            1.	Selecting Correct Answers: Try to select all correct answers from the given choices.
+            2.	Feasibility of the Question: Consider whether the question, without revealing the focus note title, is logically understandable and answerable based on what a user should reasonably remember.
+            3.	Logical Consistency: Ensure that the question logically follows from the focus note and its knowledge graph without assuming misleading or incorrect relationships.
+            4.	Relevance to the Focus Note: The question should not just be related to the extended knowledge graph; it should be closely tied to the focus note itself and not merely any related concepts.
+            5.	Avoiding Simplicity or Obviousness: The question should not be too trivial or easily guessable without requiring meaningful recall of the focus note.
+
+        Output Requirements:
+            •	If the question fails any of the above criteria, set the field "feasibleQuestion": false in the response.
+            •	Provide a clear explanation of why the question is not feasible and what could be improved.
+
+        Here is the question to evaluate:
 
         %s
 

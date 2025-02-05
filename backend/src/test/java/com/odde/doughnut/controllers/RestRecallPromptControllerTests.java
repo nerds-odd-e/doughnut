@@ -221,7 +221,7 @@ class RestRecallPromptControllerTests {
     void setUp() {
       questionEvaluation.correctChoices = new int[] {0};
       questionEvaluation.feasibleQuestion = true;
-      questionEvaluation.comment = "what a horrible question!";
+      questionEvaluation.explanation = "what a horrible question!";
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();

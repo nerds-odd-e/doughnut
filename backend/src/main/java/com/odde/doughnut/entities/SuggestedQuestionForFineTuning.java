@@ -107,7 +107,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private QuestionEvaluation getQuestionEvaluation() {
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
-    questionEvaluation.comment = comment;
+    questionEvaluation.explanation = comment;
     questionEvaluation.feasibleQuestion = isPositiveFeedback;
     questionEvaluation.correctChoices = getRealCorrectAnswerIndice();
     return questionEvaluation;

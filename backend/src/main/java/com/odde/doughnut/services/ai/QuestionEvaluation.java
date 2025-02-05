@@ -7,7 +7,7 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 public class QuestionEvaluation {
   @JsonPropertyDescription("Indices of the correct choices. 0-based.")
   @JsonProperty(required = true)
-  public int correctChoices[];
+  public int[] correctChoices;
 
   @JsonPropertyDescription("Whether the question is feasible.")
   @JsonProperty(required = true)
@@ -16,7 +16,7 @@ public class QuestionEvaluation {
   @JsonPropertyDescription(
       "Explains why the question is not feasible. Leave empty if the question is feasible.")
   @JsonProperty(required = true)
-  public String comment;
+  public String explanation;
 
   private boolean indisputableAnswer(int correctChoiceIndex) {
     return correctChoices != null
@@ -32,7 +32,7 @@ public class QuestionEvaluation {
       return result;
     }
     QuestionContestResult result = new QuestionContestResult();
-    result.reason = comment;
+    result.reason = explanation == null ? "" : explanation;
     if (!indisputableAnswer(correctAnswerIndex)) {
       result.reason += " Uncleared answer detected.";
     }

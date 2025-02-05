@@ -11,7 +11,7 @@ class QuestionEvaluationTest {
   void getQuestionContestResult() {
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
     questionEvaluation.feasibleQuestion = true;
-    questionEvaluation.comment = "what a horrible question!";
+    questionEvaluation.explanation = "what a horrible question!";
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(0);
     assertThat(result.reason, containsString("what a horrible question!"));
     assertThat(result.reason, containsString("Uncleared answer detected."));

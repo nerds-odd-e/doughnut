@@ -35,7 +35,9 @@ class SuggestedQuestionForFineTuningTest {
 
     ChatMessageForFineTuning secondMessage = getSecondMessage();
     assertThat(secondMessage.getRole(), equalTo("user"));
-    assertThat(secondMessage.getContent(), containsString("Please assume the role of a learner"));
+    assertThat(
+        secondMessage.getContent(),
+        containsString("You are an AI assistant evaluating a memory recall question"));
     assertThat(secondMessage.getContent(), containsString("a default question stem"));
 
     ChatMessageForFineTuning thirdMessage = getThirdMessage();
@@ -48,7 +50,7 @@ class SuggestedQuestionForFineTuningTest {
   @Test
   void testFunctionCall() {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
-    assertThat(questionEvaluation.comment, equalTo("a comment"));
+    assertThat(questionEvaluation.explanation, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(false));
     assertThat(questionEvaluation.correctChoices, equalTo(new int[] {1, 2}));
   }
