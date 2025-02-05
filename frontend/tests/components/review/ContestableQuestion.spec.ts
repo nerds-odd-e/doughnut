@@ -3,6 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi, expect } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import type { RecallPrompt } from "@/generated/backend"
 
 describe("ContestableQuestion", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
@@ -56,12 +57,14 @@ describe("ContestableQuestion", () => {
     })
 
     it("disables the component during contest", async () => {
-      let resolveContest: (value: any) => void
-      const contestPromise = new Promise((resolve) => {
-        resolveContest = resolve
-      })
-      let resolveRegenerate: (value: any) => void
-      const regeneratePromise = new Promise((resolve) => {
+      let resolveContest: (value: { rejected: boolean; reason: string }) => void
+      const contestPromise = new Promise<{ rejected: boolean; reason: string }>(
+        (resolve) => {
+          resolveContest = resolve
+        }
+      )
+      let resolveRegenerate: (value: RecallPrompt) => void
+      const regeneratePromise = new Promise<RecallPrompt>((resolve) => {
         resolveRegenerate = resolve
       })
       mockedContestCall.mockReturnValue(contestPromise)
