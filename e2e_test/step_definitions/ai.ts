@@ -46,15 +46,17 @@ Given('OpenAI now generates this question:', (questionTable: DataTable) => {
   start.questionGenerationService().resetAndStubAskingMCQ(hashes[0])
 })
 
-When(
-  "I've got the following question for the note {string}:",
-  (noteTitle: string, question: DataTable) => {
-    start
-      .questionGenerationService()
-      .resetAndStubAskingMCQ(question.hashes()[0] ?? {})
-    start.jumpToNotePage(noteTitle).testMe()
+Given(
+  'OpenAI assistant will create these thread ids in sequence: {string}',
+  (threadIds: string) => {
+    const threadIdsArray = threadIds.split(',').map((id) => id.trim())
+    mock_services.openAi().stubCreateThreads(threadIdsArray)
   }
 )
+
+When('I test myself for the note {string}', (noteTitle: string) => {
+  start.jumpToNotePage(noteTitle).testMe()
+})
 
 Given('OpenAI evaluates the question as legitamate', () => {
   start
