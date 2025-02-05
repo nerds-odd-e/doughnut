@@ -8,7 +8,6 @@ You are a full stack developer who prefer to change backend code and frontend co
 
 * The backend API code for the frontend is generated automatically from the OpenAPI specification of the backend
 * The generated code is at `frontend/src/generated/backend`
-* There is a helper `managedApi` in `useLoadingApi` to access the backend API for the Vue code
 
 
 ## Command to re-generate the backend API call code for frontend
@@ -20,3 +19,8 @@ If starting a new terminal, please wait for the `nix develop` to be loaded by `d
 ```
 pnpm generateTypeScript
 ```
+
+## detecting related changed
+
+* Don't change the generated code direct. If a change in API is needed, go make the change properly in the backend and run the command in terminal to update the generated code
+* When a backend controller signature is changed or the related data types are changed, not only run the terminal command to regenerate the frontend code, but also check if it affected any usage in the frontend code. The best way to ensure it is by run all the frontend unit test. It should tell where are the affected place.
