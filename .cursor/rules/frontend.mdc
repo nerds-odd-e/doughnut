@@ -5,6 +5,14 @@ globs: frontend/**/*.{vue,ts}, frontend/tests/**/*.{ts,js}, frontend/src/**/*.{t
 
 # Frontend Development Cursor Rules
 
+## Run Test in Terminal
+
+If starting a new terminal, please wait for the `nix develop` to be loaded by `direnv` first. And if `direnv` isn't configured, please run `nix develop` first. Then, to run the tests:
+
+```
+pnpm frontend:test
+```
+
 ## File Organization
 
 - Frontend code lives in `frontend/src/`
