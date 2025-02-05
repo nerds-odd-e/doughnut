@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.List;
@@ -56,11 +55,7 @@ public class NoteQuestionGenerationService {
     QuestionEvaluation evaluation =
         notebookAssistantForNoteService
             .createThreadWithNoteInfo1(List.of(message))
-            .withTool(
-                new AiTool(
-                    "evaluate_question",
-                    "answer and evaluate the feasibility of the question",
-                    QuestionEvaluation.class))
+            .withTool(AiToolFactory.evaluateQuestion())
             .withModelName(globalSettingsService.globalSettingEvaluation().getValue())
             .run()
             .getRunResult()

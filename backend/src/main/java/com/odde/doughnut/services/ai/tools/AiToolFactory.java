@@ -56,14 +56,14 @@ public class AiToolFactory {
 
     String messageBody =
         """
-Please assume the role of a learner, who has learned the note of focus as well as many other notes.
-Only the top-level of the contextual path is visible to you.
-Without the specific note of focus and its more detailed contexts revealed to you,
-please critically check if the following question makes sense and is possible to you:
+        Please assume the role of a learner, who has learned the note of focus as well as many other notes.
+        Only the top-level of the contextual path is visible to you.
+        Without the specific note of focus and its more detailed contexts revealed to you,
+        please critically check if the following question makes sense and is possible to you:
 
-%s
+        %s
 
-"""
+        """
             .formatted(new ObjectMapper().valueToTree(mcq).toString());
 
     return new InstructionAndSchema(
@@ -117,7 +117,10 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
   public static List<AiTool> getAllAssistantTools() {
     return List.of(
-        completeNoteDetails(), suggestNoteTitle(), askSingleAnswerMultipleChoiceQuestion());
+        completeNoteDetails(),
+        suggestNoteTitle(),
+        askSingleAnswerMultipleChoiceQuestion(),
+        evaluateQuestion());
   }
 
   public static AiTool suggestNoteTitle() {
@@ -132,5 +135,12 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         AiToolName.COMPLETE_NOTE_DETAILS.getValue(),
         "Text completion for the details of the note of focus",
         NoteDetailsCompletion.class);
+  }
+
+  public static AiTool evaluateQuestion() {
+    return new AiTool(
+        "evaluate_question",
+        "answer and evaluate the question to check its quality",
+        QuestionEvaluation.class);
   }
 }

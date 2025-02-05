@@ -62,7 +62,7 @@ class AssistantCreationServiceTest {
     void getAiSuggestion_givenAString_returnsAiSuggestionObject() {
       assertThat(assistantRequest.getName(), is("Notebook assistant"));
       assertThat(assistantRequest.getInstructions(), containsString("PKM system"));
-      assertThat(assistantRequest.getTools(), hasSize(3));
+      assertThat(assistantRequest.getTools(), hasSize(4));
     }
 
     @Test

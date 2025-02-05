@@ -155,7 +155,7 @@ class RestAiAssistantCreationControllerTest {
       verify(openAiApi).createAssistant(captor.capture());
       assertThat(captor.getValue().getName()).startsWith("Assistant for notebook ");
       assertThat(captor.getValue().getTools().getFirst().getType()).startsWith("function");
-      assertThat(captor.getValue().getTools().get(3).getType()).startsWith("file_search");
+      assertThat(captor.getValue().getTools().get(4).getType()).startsWith("file_search");
       assertThat(
               captor.getValue().getToolResources().getFileSearch().getVectorStoreIds().getFirst())
           .isEqualTo("new-vector-store-id");
