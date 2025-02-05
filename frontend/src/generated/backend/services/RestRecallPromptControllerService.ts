@@ -12,11 +12,13 @@ export class RestRecallPromptControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param recallPrompt
+     * @param requestBody
      * @returns RecallPrompt OK
      * @throws ApiError
      */
     public regenerate(
         recallPrompt: number,
+        requestBody: QuestionContestResult,
     ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'POST',
@@ -24,6 +26,8 @@ export class RestRecallPromptControllerService {
             path: {
                 'recallPrompt': recallPrompt,
             },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

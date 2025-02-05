@@ -560,6 +560,12 @@ paths:
         required: true
         schema:
           type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionContestResult"
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -3582,6 +3588,13 @@ components:
           type: string
         othersModel:
           type: string
+    QuestionContestResult:
+      type: object
+      properties:
+        reason:
+          type: string
+        rejected:
+          type: boolean
     RecallPrompt:
       type: object
       properties:
@@ -3595,13 +3608,6 @@ components:
       required:
       - bareQuestion
       - id
-    QuestionContestResult:
-      type: object
-      properties:
-        reason:
-          type: string
-        rejected:
-          type: boolean
     AnswerDTO:
       type: object
       properties:

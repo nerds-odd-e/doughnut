@@ -58,10 +58,11 @@ class RestRecallPromptController {
   @PostMapping("/{recallPrompt}/regenerate")
   @Transactional
   public RecallPrompt regenerate(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
+      @RequestBody QuestionContestResult contestResult) {
     currentUser.assertLoggedIn();
     return recallQuestionService.generateAQuestionOfRandomType(
-        recallPrompt.getPredefinedQuestion().getNote(), currentUser.getEntity());
+        recallPrompt.getPredefinedQuestion().getNote(), currentUser.getEntity(), contestResult);
   }
 
   @PostMapping("/{recallPrompt}/contest")

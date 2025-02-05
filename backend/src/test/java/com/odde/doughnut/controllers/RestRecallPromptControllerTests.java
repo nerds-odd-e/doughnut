@@ -187,7 +187,9 @@ class RestRecallPromptControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
-            restAiController.regenerate(recallPrompt);
+            QuestionContestResult contestResult = new QuestionContestResult();
+            contestResult.reason = "test";
+            restAiController.regenerate(recallPrompt, contestResult);
           });
     }
 
@@ -204,7 +206,9 @@ class RestRecallPromptControllerTests {
           .mockRetrieveRun()
           .mockCancelRun("my-run-id");
 
-      RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt);
+      QuestionContestResult contestResult = new QuestionContestResult();
+      contestResult.reason = "test";
+      RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
 
       Assertions.assertThat(
               regeneratedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem())

@@ -20,8 +20,13 @@ public class RecallQuestionService {
   }
 
   public RecallPrompt generateAQuestionOfRandomType(Note note, User user) {
+    return generateAQuestionOfRandomType(note, user, null);
+  }
+
+  public RecallPrompt generateAQuestionOfRandomType(
+      Note note, User user, QuestionContestResult contestResult) {
     PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(note, user);
+        predefinedQuestionService.generateAQuestionOfRandomType(note, user, contestResult);
     if (question == null) {
       return null;
     }

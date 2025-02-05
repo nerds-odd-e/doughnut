@@ -53,7 +53,10 @@ describe("ContestableQuestion", () => {
       await wrapper.find("#try-again").trigger("click")
 
       expect(mockedContestCall).toHaveBeenCalledWith(recallPrompt.id)
-      expect(mockedRegenerateCall).toHaveBeenCalledWith(recallPrompt.id)
+      expect(mockedRegenerateCall).toHaveBeenCalledWith(recallPrompt.id, {
+        rejected: false,
+        reason: "Bad question",
+      })
     })
 
     it("disables the component during contest", async () => {

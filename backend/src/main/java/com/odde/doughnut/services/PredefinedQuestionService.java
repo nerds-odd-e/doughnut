@@ -58,7 +58,13 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAQuestionOfRandomType(Note note, User user) {
-    PredefinedQuestion result = generateAQuestionOfRandomTypeWithoutSaving(note, user);
+    return generateAQuestionOfRandomType(note, user, null);
+  }
+
+  public PredefinedQuestion generateAQuestionOfRandomType(
+      Note note, User user, QuestionContestResult contestResult) {
+    PredefinedQuestion result =
+        generateAQuestionOfRandomTypeWithoutSaving(note, user, contestResult);
     if (result == null) {
       return null;
     }
@@ -67,8 +73,14 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAQuestionOfRandomTypeWithoutSaving(Note note, User user) {
+    return generateAQuestionOfRandomTypeWithoutSaving(note, user, null);
+  }
+
+  public PredefinedQuestion generateAQuestionOfRandomTypeWithoutSaving(
+      Note note, User user, QuestionContestResult contestResult) {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(aiQuestionGenerator);
+    return predefinedQuestionGenerator.generateAQuestionOfRandomType(
+        aiQuestionGenerator, contestResult);
   }
 }

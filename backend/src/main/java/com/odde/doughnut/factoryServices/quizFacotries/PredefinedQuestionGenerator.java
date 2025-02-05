@@ -1,5 +1,6 @@
 package com.odde.doughnut.factoryServices.quizFacotries;
 
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -14,6 +15,11 @@ public record PredefinedQuestionGenerator(
     User user, Note note, Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
   public PredefinedQuestion generateAQuestionOfRandomType(AiQuestionGenerator questionGenerator) {
+    return generateAQuestionOfRandomType(questionGenerator, null);
+  }
+
+  public PredefinedQuestion generateAQuestionOfRandomType(
+      AiQuestionGenerator questionGenerator, QuestionContestResult contestResult) {
     List<PredefinedQuestionFactory> factories = getPredefinedQuestionFactories(questionGenerator);
     return generateAQuestionOfFirstPossibleType(randomizer.shuffle(factories));
   }

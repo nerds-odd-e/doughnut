@@ -98,7 +98,8 @@ const contest = async () => {
       try {
         currentQuestion.value =
           await managedApi.restRecallPromptController.regenerate(
-            currentQuestion.value.id
+            currentQuestion.value.id,
+            contestResult
           )
       } finally {
         regenerating.value = false
