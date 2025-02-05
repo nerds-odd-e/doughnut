@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -42,10 +43,19 @@ public class NoteQuestionGenerationService {
           MessageRequest.builder()
               .role("user")
               .content(
-                  "Previous question: "
-                      + oldQuestion.getMcqWithAnswer().getMultipleChoicesQuestion().getStem()
-                      + "\nContest reason: "
-                      + contestResult.reason)
+                  """
+                  Previous question:
+                  %s
+
+                  Contest reason:
+                  %s
+
+                  Please regenerate or refine the question based on the above feedback."""
+                      .formatted(
+                          new ObjectMapper()
+                              .writerWithDefaultPrettyPrinter()
+                              .writeValueAsString(oldQuestion.getMcqWithAnswer()),
+                          contestResult.reason))
               .build());
     }
 

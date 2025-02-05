@@ -248,13 +248,15 @@ class RestRecallPromptControllerTests {
       assertThat(
           messages.get(1).getContent().toString(),
           containsString(AiToolFactory.mcqWithAnswerAiTool().getMessageBody()));
+      String lastMessage = messages.get(2).getContent().toString();
       assertThat(
-          messages.get(2).getContent().toString(),
+          lastMessage,
           allOf(
+              containsString("\"stem\" : \"<p>descrption</p>\\n\""),
+              containsString("Contest reason:"),
+              containsString("test"),
               containsString(
-                  "Previous question: "
-                      + recallPrompt.getBareQuestion().getMultipleChoicesQuestion().getStem()),
-              containsString("Contest reason: test")));
+                  "Please regenerate or refine the question based on the above feedback.")));
     }
   }
 
