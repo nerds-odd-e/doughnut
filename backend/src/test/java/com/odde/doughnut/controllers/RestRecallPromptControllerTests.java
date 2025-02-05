@@ -17,6 +17,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
@@ -242,16 +243,18 @@ class RestRecallPromptControllerTests {
       verify(openAiApi).createThread(messagesCaptor.capture());
 
       List<MessageRequest> messages = messagesCaptor.getValue().getMessages();
-      assertThat(
-          messages.get(1).getContent().toString(), containsString("test")); // Contest result reason
+      assertThat(messages.size(), equalTo(3));
+      assertThat(messages.get(0).getRole(), equalTo("assistant"));
       assertThat(
           messages.get(1).getContent().toString(),
-          containsString(
-              recallPrompt
-                  .getPredefinedQuestion()
-                  .getMcqWithAnswer()
-                  .getMultipleChoicesQuestion()
-                  .getStem())); // Old question stem
+          containsString(AiToolFactory.mcqWithAnswerAiTool().getMessageBody()));
+      assertThat(
+          messages.get(2).getContent().toString(),
+          allOf(
+              containsString(
+                  "Previous question: "
+                      + recallPrompt.getBareQuestion().getMultipleChoicesQuestion().getStem()),
+              containsString("Contest reason: test")));
     }
   }
 

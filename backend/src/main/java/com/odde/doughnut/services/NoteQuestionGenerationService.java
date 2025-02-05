@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
@@ -29,28 +30,28 @@ public class NoteQuestionGenerationService {
   public MCQWithAnswer generateQuestion(
       PredefinedQuestion oldQuestion, QuestionContestResult contestResult)
       throws JsonProcessingException {
-    MessageRequest message =
+    List<MessageRequest> messages = new ArrayList<>();
+    messages.add(
         MessageRequest.builder()
             .role("user")
             .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
-            .build();
+            .build());
 
     if (oldQuestion != null && contestResult != null) {
-      message =
+      messages.add(
           MessageRequest.builder()
               .role("user")
               .content(
-                  AiToolFactory.mcqWithAnswerAiTool().getMessageBody()
-                      + "\nPrevious question: "
+                  "Previous question: "
                       + oldQuestion.getMcqWithAnswer().getMultipleChoicesQuestion().getStem()
                       + "\nContest reason: "
                       + contestResult.reason)
-              .build();
+              .build());
     }
 
     MCQWithAnswer question =
         notebookAssistantForNoteService
-            .createThreadWithNoteInfo1(List.of(message))
+            .createThreadWithNoteInfo1(messages)
             .withTool(AiToolFactory.askSingleAnswerMultipleChoiceQuestion())
             //            .withFileSearch()
             .withModelName(globalSettingsService.globalSettingQuestionGeneration().getValue())
