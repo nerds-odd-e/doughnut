@@ -32,6 +32,13 @@ const openAiAssistantCreatedRunMocker = (
               'ask_single_answer_multiple_choice_question',
               JSON.parse(hash.arguments!)
             )
+          case 'evaluate_question':
+            return createRequiresActionRun(
+              runId,
+              threadId,
+              'evaluate_question',
+              JSON.parse(hash.arguments!)
+            )
           case 'complete note details':
             return createRequiresActionRun(
               runId,

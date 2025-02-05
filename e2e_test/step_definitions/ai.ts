@@ -61,19 +61,28 @@ When('I test myself for the note {string}', (noteTitle: string) => {
   start.jumpToNotePage(noteTitle).testMe()
 })
 
-Given('OpenAI evaluates the question as legitamate', () => {
-  start
-    .questionGenerationService()
-    .stubEvaluationQuestion({ feasibleQuestion: true, correctChoices: [0] })
-})
+Given(
+  'OpenAI evaluates the question as legitamate for assistant thread {string}',
+  (threadId: string) => {
+    start
+      .questionGenerationService()
+      .stubEvaluationQuestion(threadId, {
+        feasibleQuestion: true,
+        correctChoices: [0],
+      })
+  }
+)
 
-Given('OpenAI evaluates the question as not legitamate', () => {
-  start.questionGenerationService().stubEvaluationQuestion({
-    feasibleQuestion: false,
-    correctChoices: [0],
-    comment: "AI plainly doesn't like it.",
-  })
-})
+Given(
+  'OpenAI evaluates the question as not legitamate for assistant thread {string}',
+  (threadId: string) => {
+    start.questionGenerationService().stubEvaluationQuestion(threadId, {
+      feasibleQuestion: false,
+      correctChoices: [0],
+      comment: "AI plainly doesn't like it.",
+    })
+  }
+)
 
 Then('I contest the question', () => {
   cy.findByRole('button', { name: "Doesn't make sense?" }).click()
