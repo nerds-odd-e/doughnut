@@ -63,7 +63,7 @@ class AiQuestionGeneratorTests {
     // another note is needed, otherwise the note will be the only note in the notebook
     makeMe.aNote().under(note).please();
 
-    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note);
+    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
     assertThat(
         result.getMultipleChoicesQuestion().getStem(),
@@ -85,7 +85,7 @@ class AiQuestionGeneratorTests {
         .mockRetrieveRun()
         .mockCancelRun("my-run-id");
 
-    aiQuestionGenerator.getAiGeneratedQuestion(note);
+    aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
     // Capture the actual request
     ArgumentCaptor<RunCreateRequest> runRequestCaptor =
@@ -123,7 +123,7 @@ class AiQuestionGeneratorTests {
         .mockCancelRun("my-run-id");
 
     // Act
-    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note);
+    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
     // Assert
     assertThat(

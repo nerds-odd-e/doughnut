@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.controllers.dto.Randomization;
@@ -198,7 +199,7 @@ class RestRecallPromptControllerTests {
     }
 
     @Test
-    void createQuizQuestion() {
+    void createQuizQuestion() throws JsonProcessingException {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
@@ -220,7 +221,7 @@ class RestRecallPromptControllerTests {
     }
 
     @Test
-    void shouldPassOldQuestionAndContestResultToOpenAiApi() {
+    void shouldPassOldQuestionAndContestResultToOpenAiApi() throws JsonProcessingException {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 

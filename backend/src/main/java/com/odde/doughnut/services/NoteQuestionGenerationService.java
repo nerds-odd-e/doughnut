@@ -1,9 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -52,29 +49,6 @@ public class NoteQuestionGenerationService {
       return question;
     }
     return null;
-  }
-
-  public MCQWithAnswer reGenerateQuestion(
-      PredefinedQuestion oldQuestion, QuestionContestResult contestResult)
-      throws JsonProcessingException {
-    return generateQuestion(
-        MessageRequest.builder()
-            .role("user")
-            .content(
-                """
-                  Previously generated non-feasible question:
-                  %s
-
-                  Non-feasible reason:
-                  %s
-
-                  Please regenerate or refine the question based on the above feedback."""
-                    .formatted(
-                        new ObjectMapper()
-                            .writerWithDefaultPrettyPrinter()
-                            .writeValueAsString(oldQuestion.getMcqWithAnswer()),
-                        contestResult.reason))
-            .build());
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question)

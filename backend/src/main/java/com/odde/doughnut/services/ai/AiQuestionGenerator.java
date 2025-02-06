@@ -9,6 +9,7 @@ import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,23 +19,13 @@ public record AiQuestionGenerator(
     GlobalSettingsService globalSettingsService,
     com.odde.doughnut.models.Randomizer randomizer) {
 
-  public MCQWithAnswer getAiGeneratedQuestion(Note note) {
-    return getAiGeneratedQuestion(note, null, null);
-  }
-
-  public MCQWithAnswer getAiGeneratedQuestion(
-      Note note, PredefinedQuestion oldQuestion, QuestionContestResult contestResult) {
+  public MCQWithAnswer getAiGeneratedQuestion(Note note, MessageRequest additionalMessage) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      MCQWithAnswer original;
-      if (oldQuestion == null) {
-        original = service.generateQuestion(null);
-      } else {
-        original = service.reGenerateQuestion(oldQuestion, contestResult);
-      }
+      MCQWithAnswer original = service.generateQuestion(additionalMessage);
       if (original != null && !original.isStrictChoiceOrder()) {
         return shuffleChoices(original);
       }

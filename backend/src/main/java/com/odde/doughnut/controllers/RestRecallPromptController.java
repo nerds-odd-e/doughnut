@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
@@ -59,7 +60,8 @@ class RestRecallPromptController {
   @Transactional
   public RecallPrompt regenerate(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
-      @RequestBody QuestionContestResult contestResult) {
+      @RequestBody QuestionContestResult contestResult)
+      throws JsonProcessingException {
     currentUser.assertLoggedIn();
     return recallQuestionService.regenerateAQuestionOfRandomType(
         recallPrompt.getPredefinedQuestion(), contestResult);
