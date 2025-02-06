@@ -70,7 +70,7 @@ class NoteQuestionGenerationServiceTests {
       mockSuccessfulQuestionGeneration(jsonQuestion);
 
       // Execute
-      MCQWithAnswer generatedQuestion = service.generateQuestion();
+      MCQWithAnswer generatedQuestion = service.generateQuestion(null);
 
       // Verify
       assertThat(
@@ -92,7 +92,7 @@ class NoteQuestionGenerationServiceTests {
       mockSuccessfulQuestionGeneration(mcqWithAnswer);
 
       // Execute
-      service.generateQuestion();
+      service.generateQuestion(null);
 
       // Verify
       ArgumentCaptor<ThreadRequest> messagesCaptor = ArgumentCaptor.forClass(ThreadRequest.class);
@@ -121,7 +121,7 @@ class NoteQuestionGenerationServiceTests {
       mockSuccessfulQuestionGeneration(mcqWithAnswer);
 
       // Act
-      service.generateQuestion();
+      service.generateQuestion(null);
 
       // Verify
       ArgumentCaptor<RunCreateRequest> runRequestCaptor =
@@ -140,7 +140,7 @@ class NoteQuestionGenerationServiceTests {
           .mockRetrieveRun();
 
       // Execute and verify
-      MCQWithAnswer result = service.generateQuestion();
+      MCQWithAnswer result = service.generateQuestion(null);
 
       // Verify that a completed run returns null
       assertThat(result, is(nullValue()));

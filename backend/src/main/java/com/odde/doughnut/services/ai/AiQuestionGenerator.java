@@ -29,7 +29,12 @@ public record AiQuestionGenerator(
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      MCQWithAnswer original = service.generateQuestion(oldQuestion, contestResult);
+      MCQWithAnswer original;
+      if (oldQuestion == null) {
+        original = service.generateQuestion(null);
+      } else {
+        original = service.reGenerateQuestion(oldQuestion, contestResult);
+      }
       if (original != null && !original.isStrictChoiceOrder()) {
         return shuffleChoices(original);
       }

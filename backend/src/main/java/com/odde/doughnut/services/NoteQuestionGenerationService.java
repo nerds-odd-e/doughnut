@@ -24,12 +24,7 @@ public class NoteQuestionGenerationService {
     this.notebookAssistantForNoteService = notebookAssistantForNoteService;
   }
 
-  public MCQWithAnswer generateQuestion() throws JsonProcessingException {
-    return generateQuestion(null, null);
-  }
-
-  public MCQWithAnswer generateQuestion(
-      PredefinedQuestion oldQuestion, QuestionContestResult contestResult)
+  public MCQWithAnswer generateQuestion(MessageRequest additionalMessage)
       throws JsonProcessingException {
     List<MessageRequest> messages = new ArrayList<>();
     messages.add(
@@ -38,25 +33,8 @@ public class NoteQuestionGenerationService {
             .content(AiToolFactory.mcqWithAnswerAiTool().getMessageBody())
             .build());
 
-    if (oldQuestion != null && contestResult != null) {
-      messages.add(
-          MessageRequest.builder()
-              .role("user")
-              .content(
-                  """
-                  Previously generated non-feasible question:
-                  %s
-
-                  Non-feasible reason:
-                  %s
-
-                  Please regenerate or refine the question based on the above feedback."""
-                      .formatted(
-                          new ObjectMapper()
-                              .writerWithDefaultPrettyPrinter()
-                              .writeValueAsString(oldQuestion.getMcqWithAnswer()),
-                          contestResult.reason))
-              .build());
+    if (additionalMessage != null) {
+      messages.add(additionalMessage);
     }
 
     MCQWithAnswer question =
@@ -74,6 +52,29 @@ public class NoteQuestionGenerationService {
       return question;
     }
     return null;
+  }
+
+  public MCQWithAnswer reGenerateQuestion(
+      PredefinedQuestion oldQuestion, QuestionContestResult contestResult)
+      throws JsonProcessingException {
+    return generateQuestion(
+        MessageRequest.builder()
+            .role("user")
+            .content(
+                """
+                  Previously generated non-feasible question:
+                  %s
+
+                  Non-feasible reason:
+                  %s
+
+                  Please regenerate or refine the question based on the above feedback."""
+                    .formatted(
+                        new ObjectMapper()
+                            .writerWithDefaultPrettyPrinter()
+                            .writeValueAsString(oldQuestion.getMcqWithAnswer()),
+                        contestResult.reason))
+            .build());
   }
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question)
