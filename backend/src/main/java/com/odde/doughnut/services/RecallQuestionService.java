@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -38,15 +39,17 @@ public class RecallQuestionService {
   }
 
   public RecallPrompt regenerateAQuestionOfRandomType(
-      PredefinedQuestion predefinedQuestion, User user, QuestionContestResult contestResult) {
+      PredefinedQuestion predefinedQuestion, QuestionContestResult contestResult) {
     Note note = predefinedQuestion.getNote();
     AiQuestionFactory aiQuestionFactory =
         new AiQuestionFactory(note, aiQuestionGenerator, predefinedQuestion, contestResult);
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(note, user, aiQuestionFactory);
-    if (question == null) {
+    PredefinedQuestion question = null;
+    try {
+      question = aiQuestionFactory.buildValidPredefinedQuestion();
+    } catch (PredefinedQuestionNotPossibleException e) {
       return null;
     }
+    modelFactoryService.save(question);
     RecallPrompt recallPrompt = new RecallPrompt();
     recallPrompt.setPredefinedQuestion(question);
     return modelFactoryService.save(recallPrompt);

@@ -62,7 +62,7 @@ class RestRecallPromptController {
       @RequestBody QuestionContestResult contestResult) {
     currentUser.assertLoggedIn();
     return recallQuestionService.regenerateAQuestionOfRandomType(
-        recallPrompt.getPredefinedQuestion(), currentUser.getEntity(), contestResult);
+        recallPrompt.getPredefinedQuestion(), contestResult);
   }
 
   @PostMapping("/{recallPrompt}/contest")
