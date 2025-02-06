@@ -1,15 +1,14 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
@@ -31,14 +30,11 @@ public class RecallQuestionService {
 
   public RecallPrompt generateAQuestionOfRandomType(Note note, User user) {
     PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(
-            note, user, new AiQuestionFactory(note, aiQuestionGenerator));
+        predefinedQuestionService.generateAQuestionOfRandomType(note, user);
     if (question == null) {
       return null;
     }
-    RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setPredefinedQuestion(question);
-    return modelFactoryService.save(recallPrompt);
+    return createARecallPromptFromQuestion(question);
   }
 
   public RecallPrompt regenerateAQuestionOfRandomType(
@@ -46,23 +42,7 @@ public class RecallQuestionService {
       throws JsonProcessingException {
     Note note = predefinedQuestion.getNote();
     MessageRequest additionalMessage =
-        MessageRequest.builder()
-            .role("user")
-            .content(
-                """
-                  Previously generated non-feasible question:
-                  %s
-
-                  Non-feasible reason:
-                  %s
-
-                  Please regenerate or refine the question based on the above feedback."""
-                    .formatted(
-                        new ObjectMapper()
-                            .writerWithDefaultPrettyPrinter()
-                            .writeValueAsString(predefinedQuestion.getMcqWithAnswer()),
-                        contestResult.reason))
-            .build();
+        AiToolFactory.buildRegenerateQuestionMessage(predefinedQuestion, contestResult);
     MCQWithAnswer MCQWithAnswer =
         aiQuestionGenerator.getAiGeneratedQuestion(note, additionalMessage);
     if (MCQWithAnswer == null) {
@@ -70,6 +50,10 @@ public class RecallQuestionService {
     }
     PredefinedQuestion question = PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
     modelFactoryService.save(question);
+    return createARecallPromptFromQuestion(question);
+  }
+
+  private RecallPrompt createARecallPromptFromQuestion(PredefinedQuestion question) {
     RecallPrompt recallPrompt = new RecallPrompt();
     recallPrompt.setPredefinedQuestion(question);
     return modelFactoryService.save(recallPrompt);

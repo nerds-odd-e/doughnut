@@ -2,8 +2,12 @@ package com.odde.doughnut.services.ai.tools;
 
 import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.*;
+import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.List;
 
 public class AiToolFactory {
@@ -152,5 +156,27 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         "evaluate_question",
         "answer and evaluate the question to check its quality",
         QuestionEvaluation.class);
+  }
+
+  public static MessageRequest buildRegenerateQuestionMessage(
+      PredefinedQuestion predefinedQuestion, QuestionContestResult contestResult)
+      throws JsonProcessingException {
+    return MessageRequest.builder()
+        .role("user")
+        .content(
+            """
+                    Previously generated non-feasible question:
+                    %s
+
+                    Non-feasible reason:
+                    %s
+
+                    Please regenerate or refine the question based on the above feedback."""
+                .formatted(
+                    new ObjectMapper()
+                        .writerWithDefaultPrettyPrinter()
+                        .writeValueAsString(predefinedQuestion.getMcqWithAnswer()),
+                    contestResult.reason))
+        .build();
   }
 }
