@@ -26,7 +26,7 @@ const props = defineProps<{
 
 // Emits
 defineEmits<{
-  (e: "levelChanged", value: any): void
+  (e: "levelChanged", value: unknown): void
 }>()
 
 // Reactive state
