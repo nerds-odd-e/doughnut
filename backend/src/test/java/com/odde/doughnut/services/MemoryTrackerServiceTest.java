@@ -1,9 +1,12 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,15 +20,18 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class MemoryTrackerModelTest {
+public class MemoryTrackerServiceTest {
   @Autowired MakeMe makeMe;
+  @Autowired ModelFactoryService modelFactoryService;
   UserModel userModel;
   Timestamp day1;
+  MemoryTrackerService memoryTrackerService;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
+    memoryTrackerService = new MemoryTrackerService(modelFactoryService);
   }
 
   @Nested
@@ -34,11 +40,14 @@ public class MemoryTrackerModelTest {
     @Test
     void assimilatingShouldSetBothInitialAndLastReviewAt() {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      MemoryTrackerModel memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(userModel).toModelPlease();
-      memoryTracker.assimilate(day1, userModel.getEntity());
-      assertThat(memoryTracker.getEntity().getAssimilatedAt(), equalTo(day1));
-      assertThat(memoryTracker.getEntity().getLastRecalledAt(), equalTo(day1));
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+      initialInfo.skipMemoryTracking = false;
+
+      var memoryTracker = memoryTrackerService.assimilate(initialInfo, userModel.getEntity(), day1);
+
+      assertThat(memoryTracker.getAssimilatedAt(), equalTo(day1));
+      assertThat(memoryTracker.getLastRecalledAt(), equalTo(day1));
     }
   }
 }
