@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/memory-trackers")
 class RestMemoryTrackerController {
   private final ModelFactoryService modelFactoryService;
+  private final MemoryTrackerService memoryTrackerService;
   private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -30,6 +32,7 @@ class RestMemoryTrackerController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
   }
 
   @GetMapping("/{memoryTracker}")
@@ -60,9 +63,7 @@ class RestMemoryTrackerController {
     if (memoryTracker == null || memoryTracker.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The memory tracker does not exist.");
     }
-    modelFactoryService
-        .toMemoryTrackerModel(memoryTracker)
-        .updateForgettingCurve(selfEvaluation.adjustment);
+    memoryTrackerService.updateForgettingCurve(memoryTracker, selfEvaluation.adjustment);
     return memoryTracker;
   }
 

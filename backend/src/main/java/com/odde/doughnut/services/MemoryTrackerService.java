@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.MemoryTrackerModel;
 import java.sql.Timestamp;
 
 public class MemoryTrackerService {
@@ -22,8 +21,16 @@ public class MemoryTrackerService {
             modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
     memoryTracker.setRemovedFromTracking(initialInfo.skipMemoryTracking);
 
-    MemoryTrackerModel memoryTrackerModel = modelFactoryService.toMemoryTrackerModel(memoryTracker);
-    memoryTrackerModel.assimilate(currentTime, currentUser);
-    return memoryTrackerModel.getEntity();
+    memoryTracker.setUser(currentUser);
+    memoryTracker.setAssimilatedAt(currentTime);
+    memoryTracker.setLastRecalledAt(currentTime);
+    updateForgettingCurve(memoryTracker, 0);
+    return memoryTracker;
+  }
+
+  public void updateForgettingCurve(MemoryTracker memoryTracker, int adjustment) {
+    memoryTracker.setForgettingCurveIndex(memoryTracker.getForgettingCurveIndex() + adjustment);
+    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+    modelFactoryService.save(memoryTracker);
   }
 }
