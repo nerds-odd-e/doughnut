@@ -8,40 +8,37 @@
     <h6>Memory Tracker</h6>
     <NoteInfoMemoryTracker
       v-model="memoryTracker"
-      @update:model-value="onSelfEvaluated($event)"
+      @update:model-value="onSelfEvaluated"
     />
   </template>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { NoteInfo, MemoryTracker } from "@/generated/backend"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+import { ref, computed } from "vue"
 import RecallSettingForm from "../review/RecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
-export default defineComponent({
-  props: {
-    noteInfo: { type: Object as PropType<NoteInfo>, required: true },
-  },
-  emits: ["levelChanged"],
-  data() {
-    return {
-      memoryTracker: this.noteInfo.memoryTracker,
-    }
-  },
-  computed: {
-    recallSetting() {
-      return this.noteInfo.recallSetting
-    },
-  },
-  components: { RecallSettingForm, NoteInfoMemoryTracker },
-  methods: {
-    onSelfEvaluated(memoryTracker: MemoryTracker) {
-      this.memoryTracker = memoryTracker
-    },
-  },
-})
+// Props
+const props = defineProps<{
+  noteInfo: NoteInfo
+}>()
+
+// Emits
+defineEmits<{
+  (e: "levelChanged", value: any): void
+}>()
+
+// Reactive state
+const memoryTracker = ref(props.noteInfo.memoryTracker)
+
+// Computed
+const recallSetting = computed(() => props.noteInfo.recallSetting)
+
+// Methods
+const onSelfEvaluated = (newMemoryTracker: MemoryTracker) => {
+  memoryTracker.value = newMemoryTracker
+}
 </script>
 
 <style lang="scss" scoped>

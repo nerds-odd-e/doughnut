@@ -7,7 +7,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -28,7 +27,6 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   UserModel anotherUser;
-  private Randomizer randomizer = new NonRandomizer();
 
   @BeforeEach
   void setup() {
