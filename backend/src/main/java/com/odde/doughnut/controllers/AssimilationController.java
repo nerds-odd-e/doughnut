@@ -4,9 +4,9 @@ import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.MemoryTrackerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssimilationService;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
@@ -22,6 +22,7 @@ import org.springframework.web.context.annotation.SessionScope;
 class AssimilationController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
+  private final MemoryTrackerService memoryTrackerService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -33,6 +34,7 @@ class AssimilationController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService, testabilitySettings);
   }
 
   @GetMapping("/assimilating")
@@ -51,15 +53,7 @@ class AssimilationController {
   @Transactional
   public MemoryTracker assimilate(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
-    MemoryTracker memoryTracker =
-        MemoryTracker.buildMemoryTrackerForNote(
-            modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
-    memoryTracker.setRemovedFromTracking(initialInfo.skipMemoryTracking);
-
-    MemoryTrackerModel memoryTrackerModel = modelFactoryService.toMemoryTrackerModel(memoryTracker);
-    memoryTrackerModel.assimilate(
-        testabilitySettings.getCurrentUTCTimestamp(), currentUser.getEntity());
-    return memoryTrackerModel.getEntity();
+    return memoryTrackerService.assimilate(initialInfo, currentUser.getEntity());
   }
 
   @GetMapping("/count")
