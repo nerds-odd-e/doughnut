@@ -34,7 +34,7 @@ class AssimilationController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService, testabilitySettings);
+    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
   }
 
   @GetMapping("/assimilating")
@@ -53,7 +53,8 @@ class AssimilationController {
   @Transactional
   public MemoryTracker assimilate(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
-    return memoryTrackerService.assimilate(initialInfo, currentUser.getEntity());
+    return memoryTrackerService.assimilate(
+        initialInfo, currentUser.getEntity(), testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/count")
