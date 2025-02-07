@@ -6,33 +6,30 @@
   />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { NoteInfo } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { defineComponent } from "vue"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
+import { ref, onMounted } from "vue"
 
-export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
-  props: { noteId: { type: Number, required: true } },
-  emits: ["levelChanged"],
-  components: { NoteInfoComponent },
-  data() {
-    return { noteInfo: undefined as undefined | NoteInfo }
-  },
-  methods: {
-    fetchData() {
-      this.managedApi.restNoteController
-        .getNoteInfo(this.noteId)
-        .then((articles) => {
-          this.noteInfo = articles
-        })
-    },
-  },
-  mounted() {
-    this.fetchData()
-  },
+const props = defineProps<{
+  noteId: number
+}>()
+
+defineEmits<{
+  (e: "levelChanged", value: unknown): void
+}>()
+
+const { managedApi } = useLoadingApi()
+const noteInfo = ref<NoteInfo | undefined>(undefined)
+
+const fetchData = () => {
+  managedApi.restNoteController.getNoteInfo(props.noteId).then((articles) => {
+    noteInfo.value = articles
+  })
+}
+
+onMounted(() => {
+  fetchData()
 })
 </script>

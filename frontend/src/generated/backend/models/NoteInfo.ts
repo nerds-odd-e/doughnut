@@ -6,7 +6,7 @@ import type { MemoryTracker } from './MemoryTracker';
 import type { NoteRealm } from './NoteRealm';
 import type { RecallSetting } from './RecallSetting';
 export type NoteInfo = {
-    memoryTracker?: MemoryTracker;
+    memoryTrackers?: Array<MemoryTracker>;
     note: NoteRealm;
     createdAt: string;
     recallSetting?: RecallSetting;

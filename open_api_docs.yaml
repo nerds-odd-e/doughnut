@@ -4220,8 +4220,10 @@ components:
     NoteInfo:
       type: object
       properties:
-        memoryTracker:
-          $ref: "#/components/schemas/MemoryTracker"
+        memoryTrackers:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoryTracker"
         note:
           $ref: "#/components/schemas/NoteRealm"
         createdAt:
