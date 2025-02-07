@@ -67,10 +67,6 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public MemoryTrackerModel toMemoryTrackerModel(MemoryTracker memoryTracker) {
-    return new MemoryTrackerModel(memoryTracker, this);
-  }
-
   public CircleModel toCircleModel(Circle circle) {
     return new CircleModel(circle, this);
   }
@@ -154,14 +150,5 @@ public class ModelFactoryService {
     Answer answer = answerableQuestionInstance.buildAnswer(answerDTO);
     save(answerableQuestionInstance);
     return answer;
-  }
-
-  public void updateMemoryTrackerAfterAnsweringQuestion(
-      User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
-    MemoryTracker memoryTracker =
-        toUserModel(user).getMemoryTrackerFor(recallPrompt.getPredefinedQuestion().getNote());
-    if (memoryTracker != null) {
-      toMemoryTrackerModel(memoryTracker).markAsRepeated(currentUTCTimestamp, correct);
-    }
   }
 }

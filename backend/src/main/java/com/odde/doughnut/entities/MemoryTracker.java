@@ -102,4 +102,13 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(calculateNextRecallAt());
   }
+
+  public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {
+    setRepetitionCount(getRepetitionCount() + 1);
+    if (successful) {
+      reviewedSuccessfully(currentUTCTimestamp);
+    } else {
+      reviewFailed(currentUTCTimestamp);
+    }
+  }
 }

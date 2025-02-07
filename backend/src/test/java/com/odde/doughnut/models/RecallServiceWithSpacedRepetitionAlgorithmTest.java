@@ -112,19 +112,13 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       })
       void aMemoryTrackerHasBeenReviewedStrictly(
           int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
-        MemoryTrackerModel memoryTracker =
-            makeMe
-                .aMemoryTrackerFor(note)
-                .by(userModel)
-                .afterNthStrictRepetition(ntimes)
-                .toModelPlease();
-        memoryTracker.markAsRepeated(
+        MemoryTracker memoryTracker =
+            makeMe.aMemoryTrackerFor(note).by(userModel).afterNthStrictRepetition(ntimes).please();
+        Timestamp currentUTCTimestamp =
             TimestampOperations.addHoursToTimestamp(
-                memoryTracker.getEntity().getNextRecallAt(), daysDelay * 24),
-            true);
-        assertThat(
-            memoryTracker.getEntity().getForgettingCurveIndex(),
-            equalTo(expectedForgettingCurveIndex));
+                memoryTracker.getNextRecallAt(), daysDelay * 24);
+        memoryTracker.markAsRepeated(currentUTCTimestamp, true);
+        assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
       }
     }
   }

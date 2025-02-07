@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.models.MemoryTrackerModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -35,10 +34,6 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
       entity.reviewedSuccessfully(entity.getNextRecallAt());
     }
     return this;
-  }
-
-  public MemoryTrackerModel toModelPlease() {
-    return makeMe.modelFactoryService.toMemoryTrackerModel(please());
   }
 
   @Override

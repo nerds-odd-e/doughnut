@@ -73,9 +73,8 @@ class RestMemoryTrackerController {
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestParam("successful") boolean successful) {
     currentUser.assertLoggedIn();
-    modelFactoryService
-        .toMemoryTrackerModel(memoryTracker)
-        .markAsRepeated(testabilitySettings.getCurrentUTCTimestamp(), successful);
+    memoryTrackerService.markAsRepeated(
+        testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker);
     return memoryTracker;
   }
 
