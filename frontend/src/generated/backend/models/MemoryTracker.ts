@@ -12,5 +12,6 @@ export type MemoryTracker = {
     repetitionCount?: number;
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
+    spelling?: boolean;
 };
 

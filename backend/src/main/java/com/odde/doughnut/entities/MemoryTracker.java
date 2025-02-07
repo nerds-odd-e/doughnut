@@ -72,6 +72,11 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Setter
   private Boolean removedFromTracking = false;
 
+  @Column(name = "spelling")
+  @Getter
+  @Setter
+  private Boolean spelling = false;
+
   private MemoryTracker() {}
 
   public Timestamp calculateNextRecallAt() {

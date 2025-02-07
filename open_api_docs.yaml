@@ -3803,6 +3803,8 @@ components:
           format: int32
         removedFromTracking:
           type: boolean
+        spelling:
+          type: boolean
       required:
       - id
       - nextRecallAt
