@@ -2,12 +2,8 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionServant;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
-import com.odde.doughnut.services.LinkQuestionType;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,20 +130,6 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public RecallPromptBuilder theRecallPrompt(RecallPrompt recallPrompt) {
     return new RecallPromptBuilder(this, recallPrompt);
-  }
-
-  public PredefinedQuestion buildAQuestionForLinkingNote(
-      LinkQuestionType linkQuestionType, Note linkingNote, User user) {
-    PredefinedQuestionServant servant =
-        new PredefinedQuestionServant(user, new NonRandomizer(), modelFactoryService);
-    try {
-      return linkQuestionType
-          .factoryForLinkingNote
-          .apply(linkingNote, servant)
-          .buildValidPredefinedQuestion();
-    } catch (PredefinedQuestionNotPossibleException e) {
-      return null;
-    }
   }
 
   public FailureReportBuilder aFailureReport() {
