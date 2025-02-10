@@ -19,10 +19,6 @@ public class MakeMeWithoutDB {
     return new FakeBindingResult(false);
   }
 
-  public BindingResult failedBindingResult() {
-    return new FakeBindingResult(true);
-  }
-
   public TimestampBuilder aTimestamp() {
     return new TimestampBuilder();
   }

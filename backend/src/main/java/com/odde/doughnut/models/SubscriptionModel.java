@@ -15,7 +15,6 @@ public class SubscriptionModel implements ReviewScope {
     this.modelFactoryService = modelFactoryService;
   }
 
-  @Override
   public int getUnassimilatedNoteCount() {
     return modelFactoryService.noteReviewRepository.countByAncestorWhereThereIsNoMemoryTracker(
         entity.getUser().getId(), entity.getNotebook().getId());

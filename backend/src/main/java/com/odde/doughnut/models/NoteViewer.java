@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.entities.*;
-import java.util.stream.Stream;
 
 public class NoteViewer {
 
@@ -20,12 +19,6 @@ public class NoteViewer {
     nvb.setFromBazaar(viewer == null || !viewer.owns(note.getNotebook()));
 
     return nvb;
-  }
-
-  public Stream<Note> linksOfTypeThroughReverse(LinkType linkType) {
-    return note.getInboundReferences().stream()
-        .filter(l -> l.getLinkType().equals(linkType))
-        .filter(l -> allowed(l));
   }
 
   private boolean allowed(Note l) {

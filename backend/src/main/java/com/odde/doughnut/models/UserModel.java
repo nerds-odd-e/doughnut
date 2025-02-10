@@ -39,7 +39,6 @@ public class UserModel implements ReviewScope {
     modelFactoryService.save(entity);
   }
 
-  @Override
   public int getUnassimilatedNoteCount() {
     return modelFactoryService.noteReviewRepository.countByOwnershipWhereThereIsNoMemoryTracker(
         entity.getId(), entity.getOwnership().getId());

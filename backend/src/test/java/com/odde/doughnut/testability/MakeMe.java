@@ -51,10 +51,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new NotebookBuilder(notebook, this);
   }
 
-  public NoteBuilder aNote(String title, String details) {
-    return aNote().titleConstructor(title).details(details);
-  }
-
   public NoteBuilder theNote(Note note) {
     return new NoteBuilder(note, this);
   }
