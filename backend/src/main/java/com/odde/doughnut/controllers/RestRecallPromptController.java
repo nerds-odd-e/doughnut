@@ -39,14 +39,6 @@ class RestRecallPromptController {
             openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
   }
 
-  @PostMapping("/generate-question")
-  @Transactional
-  public RecallPrompt generateQuestion(
-      @RequestParam(value = "note") @Schema(type = "integer") Note note) {
-    currentUser.assertLoggedIn();
-    return recallQuestionService.generateAQuestionOfRandomType(note, currentUser.getEntity());
-  }
-
   @GetMapping("/{memoryTracker}/random-question")
   @Transactional
   public RecallPrompt generateRandomQuestion(
