@@ -10,16 +10,6 @@ import {
 import start, { mock_services } from '../start'
 
 Given(
-  "my question should not be included in the admin's fine-tuning data",
-  () => {
-    start
-      .loginAsAdminAndGoToAdminDashboard()
-      .goToFineTuningData()
-      .expectFineTuningExamplesCount(0)
-  }
-)
-
-Given(
   'the admin modifies the question suggested {string} to:',
   (originalQuestionStem: string, newQuestion: DataTable) => {
     start
