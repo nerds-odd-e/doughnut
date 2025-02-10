@@ -116,21 +116,6 @@
           </li>
 
           <li>
-            <PopButton title="Test me" sidebar="right">
-              <template #button_face>
-                <SvgRobot />
-                <span class="ms-2">Test me</span>
-              </template>
-              <template #default="{ closer }">
-                <NoteTestMeDialog
-                  v-bind="{ selectedNote: note, storageAccessor }"
-                  @close-dialog="closer"
-                />
-              </template>
-            </PopButton>
-          </li>
-
-          <li>
             <PopButton
               btn-class="daisy-w-full"
               title="Generate Image with DALL-E"
@@ -215,7 +200,6 @@ import SvgCog from "../../svgs/SvgCog.vue"
 import NoteDeleteButton from "./NoteDeleteButton.vue"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
-import NoteTestMeDialog from "../NoteTestMeDialog.vue"
 import Questions from "../Questions.vue"
 import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
