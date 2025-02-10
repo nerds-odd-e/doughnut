@@ -183,6 +183,13 @@ Then('choose to remove the last memory tracker from recalls', () => {
 })
 
 When(
+  'I have the true false question {string} rated as a good example',
+  (questionStem: string) => {
+    start.testability().injectSuggestedQuestion(questionStem, true)
+  }
+)
+
+When(
   'I have the true false question {string} rated as a bad example',
   (questionStem: string) => {
     start.testability().injectSuggestedQuestion(questionStem, false)
