@@ -129,13 +129,6 @@ Then(
   }
 )
 
-Then(
-  'I should be asked link question {string} {string} with options {string}',
-  (noteTopology: string, linkType: string, options: string) => {
-    cy.shouldSeeQuizWithOptions([noteTopology, linkType], options)
-  }
-)
-
 Then('I type my answer {string}', (answer: string) => {
   cy.pageIsNotLoading()
   cy.replaceFocusedTextAndEnter(answer)

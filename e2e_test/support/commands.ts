@@ -259,18 +259,6 @@ Cypress.Commands.add('routerToRoot', () => {
   cy.routerPush('/', 'root', {})
 })
 
-Cypress.Commands.add(
-  'shouldSeeQuizWithOptions',
-  (questionParts: string[], options: string) => {
-    questionParts.forEach((part) => {
-      cy.get('.quiz-instruction').contains(part)
-    })
-    commonSenseSplit(options, ',').forEach((option: string) =>
-      cy.findByText(option)
-    )
-  }
-)
-
 Cypress.Commands.add('formField', (label) => {
   return cy.findByLabelText(label)
 })

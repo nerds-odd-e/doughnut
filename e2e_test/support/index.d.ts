@@ -33,7 +33,6 @@ declare namespace Cypress {
     replaceFocusedTextAndEnter(test: any): Chainable<any>
     routerPush(fallback: any, name: any, params: any): Chainable<any>
     routerToRoot(): Chainable<any>
-    shouldSeeQuizWithOptions(questionParts: any, options: any): Chainable<any>
     startSearching(): Chainable<any>
     undoLast(undoThpe: string): Chainable<any>
     yesIRemember(): Chainable<any>
