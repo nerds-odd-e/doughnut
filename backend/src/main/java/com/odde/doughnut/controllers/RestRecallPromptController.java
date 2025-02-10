@@ -44,8 +44,7 @@ class RestRecallPromptController {
   public RecallPrompt askAQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     currentUser.assertLoggedIn();
-    return recallQuestionService.generateAQuestionOfRandomType(
-        memoryTracker.getNote(), currentUser.getEntity());
+    return recallQuestionService.generateAQuestion(memoryTracker, currentUser.getEntity());
   }
 
   @PostMapping("/{recallPrompt}/regenerate")

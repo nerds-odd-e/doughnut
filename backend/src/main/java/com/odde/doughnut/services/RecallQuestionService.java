@@ -28,9 +28,8 @@ public class RecallQuestionService {
         new PredefinedQuestionService(modelFactoryService, randomizer, aiQuestionGenerator);
   }
 
-  public RecallPrompt generateAQuestionOfRandomType(Note note, User user) {
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestionOfRandomType(note, user);
+  public RecallPrompt generateAQuestion(MemoryTracker memoryTracker, User user) {
+    PredefinedQuestion question = predefinedQuestionService.generateAQuestion(memoryTracker, user);
     if (question == null) {
       return null;
     }

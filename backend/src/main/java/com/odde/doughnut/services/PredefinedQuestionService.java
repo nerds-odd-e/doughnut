@@ -1,10 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
@@ -57,8 +54,8 @@ public class PredefinedQuestionService {
     return aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
   }
 
-  public PredefinedQuestion generateAQuestionOfRandomType(Note note, User user) {
-    PredefinedQuestion result = generateAQuestionOfRandomTypeWithoutSaving(note, user);
+  public PredefinedQuestion generateAQuestion(MemoryTracker memoryTracker, User user) {
+    PredefinedQuestion result = generateAQuestionWithoutSaving(memoryTracker.getNote(), user);
     if (result == null) {
       return null;
     }
@@ -66,7 +63,7 @@ public class PredefinedQuestionService {
     return result;
   }
 
-  public PredefinedQuestion generateAQuestionOfRandomTypeWithoutSaving(Note note, User user) {
+  public PredefinedQuestion generateAQuestionWithoutSaving(Note note, User user) {
     PredefinedQuestionGenerator predefinedQuestionGenerator =
         new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
     return predefinedQuestionGenerator.generateAQuestionOfRandomType(

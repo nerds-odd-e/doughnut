@@ -51,8 +51,7 @@ class RestPredefinedQuestionController {
   public PredefinedQuestion generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return predefinedQuestionService.generateAQuestionOfRandomTypeWithoutSaving(
-        note, currentUser.getEntity());
+    return predefinedQuestionService.generateAQuestionWithoutSaving(note, currentUser.getEntity());
   }
 
   @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")
