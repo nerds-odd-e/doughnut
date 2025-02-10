@@ -55,7 +55,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.8.0",
-    "@badeball/cypress-cucumber-preprocessor": "^22.0.0",
+    "@badeball/cypress-cucumber-preprocessor": "^22.0.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.4",
     "@biomejs/biome": "1.9.4",
     "@hey-api/openapi-ts": "^0.64.1",
