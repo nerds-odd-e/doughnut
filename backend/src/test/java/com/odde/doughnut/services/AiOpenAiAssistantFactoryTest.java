@@ -8,7 +8,6 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.assistant.FunctionTool;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
@@ -24,12 +23,10 @@ import org.mockito.*;
 class AiOpenAiAssistantFactoryTest {
 
   @Mock private OpenAiApi openAiApi;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
   }
 
   @Nested

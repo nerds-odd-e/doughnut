@@ -77,7 +77,7 @@ class AssimilationControllerTests {
       InitialInfo initialInfo = new InitialInfo();
       initialInfo.noteId = note.getId();
 
-      MemoryTracker memoryTracker = controller.assimilate(initialInfo);
+      controller.assimilate(initialInfo);
 
       List<MemoryTracker> memoryTrackers =
           modelFactoryService.memoryTrackerRepository.findLast100ByUser(

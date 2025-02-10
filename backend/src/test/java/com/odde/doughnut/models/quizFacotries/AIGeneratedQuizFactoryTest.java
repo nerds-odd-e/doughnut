@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -26,13 +25,11 @@ import org.springframework.transaction.annotation.Transactional;
 class AIGeneratedQuizFactoryTest {
 
   @Autowired MakeMe makeMe;
-  UserModel userModel;
   Note note;
   MCQWithAnswer mcqWithAnswer;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
     note = makeMe.aNote("saying").details("Rome is not built in a day").please();
     mcqWithAnswer =
         makeMe

@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.assistants.assistant.FileSearchTool;
 import com.theokanning.openai.assistants.assistant.Tool;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
@@ -36,11 +35,6 @@ public class AssistantThread {
   public AssistantThread withTool(AiTool tool) {
     this.tools.add(tool);
     this.mappedTools.add(tool.getTool());
-    return this;
-  }
-
-  public AssistantThread withFileSearch() {
-    this.mappedTools.add(new FileSearchTool());
     return this;
   }
 

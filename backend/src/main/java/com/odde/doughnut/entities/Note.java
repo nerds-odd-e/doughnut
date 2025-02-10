@@ -11,7 +11,6 @@ import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -124,11 +123,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Embedded @JsonIgnore @Getter private RecallSetting recallSetting = new RecallSetting();
 
   @JsonIgnore
-  public String getUriAndTitle() {
-    return String.format("[%s](%s)", getTopicConstructor(), getUri());
-  }
-
-  @JsonIgnore
   public List<Note> getChildren() {
     return filterDeletedUnmodifiableNoteList(children);
   }
@@ -139,24 +133,12 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private List<Note> getNoneLinkChildren() {
-    return getChildren().stream().filter(c -> !c.isLink()).toList();
-  }
-
-  @JsonIgnore
   public List<Note> getInboundReferences() {
     return filterDeletedUnmodifiableNoteList(inboundReferences);
   }
 
   public static <T extends Note> List<T> filterDeletedUnmodifiableNoteList(List<T> notes) {
     return notes.stream().filter(n -> n.getDeletedAt() == null).toList();
-  }
-
-  @JsonIgnore
-  public boolean targetVisibleAsSourceOrTo(User viewer) {
-    if (getParent().getNotebook() == getTargetNote().getNotebook()) return true;
-    if (viewer == null) return false;
-    return viewer.canReferTo(getTargetNote().getNotebook());
   }
 
   @JsonIgnore
@@ -266,21 +248,8 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  private ContextualPathItem toContextualPathItem() {
-    return new ContextualPathItem(getTopicConstructor(), getUri());
-  }
-
-  @JsonIgnore
   public boolean matchAnswer(String spellingAnswer) {
     return getNoteTitle().matches(spellingAnswer);
-  }
-
-  @JsonIgnore
-  public List<Note> getNoneLinkSiblings() {
-    if (getParent() == null) {
-      return new ArrayList<>();
-    }
-    return getParent().getNoneLinkChildren();
   }
 
   @JsonIgnore
@@ -348,16 +317,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     return getTargetNote() != null;
   }
 
-  public static class ContextualPathItem {
-    public String title;
-    public String uri;
-
-    public ContextualPathItem(String title, String uri) {
-      this.title = title;
-      this.uri = uri;
-    }
-  }
-
   @JsonIgnore
   public String getNoteDescription() {
     String prettyString =
@@ -390,21 +349,5 @@ public class Note extends EntityIdentifiedByIdOnly {
     notebook.setOwnership(ownership);
     notebook.setHeadNote(this);
     setNotebook(notebook);
-  }
-
-  public NoteViewer targetNoteViewer(User user) {
-    return new NoteViewer(user, getTargetNote());
-  }
-
-  @JsonIgnore
-  public Stream<Note> getSiblingLinksOfSameLinkType(User user) {
-    return targetNoteViewer(user)
-        .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.equals(this));
-  }
-
-  @JsonIgnore
-  public List<Note> getLinkedSiblingsOfSameLinkType(User user) {
-    return getSiblingLinksOfSameLinkType(user).map(Note::getParent).toList();
   }
 }

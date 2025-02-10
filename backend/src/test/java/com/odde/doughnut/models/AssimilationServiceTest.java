@@ -27,7 +27,6 @@ public class AssimilationServiceTest {
   UserModel userModel;
   UserModel anotherUser;
   Timestamp day1;
-  Timestamp day0;
   AssimilationService assimilationService;
 
   @BeforeEach
@@ -35,7 +34,6 @@ public class AssimilationServiceTest {
     userModel = makeMe.aUser().toModelPlease();
     anotherUser = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    day0 = makeMe.aTimestamp().of(0, 8).fromShanghai().please();
     assimilationService =
         new AssimilationService(
             userModel, makeMe.modelFactoryService, day1, ZoneId.of("Asia/Shanghai"));
@@ -248,12 +246,11 @@ public class AssimilationServiceTest {
 
   @Nested
   class NotesInCircle {
-    Note top;
 
     @BeforeEach
     void setup() {
       Circle please = makeMe.aCircle().hasMember(userModel).please();
-      top = makeMe.aNote().inCircle(please).please();
+      makeMe.aNote().inCircle(please).please();
       makeMe.refresh(userModel.getEntity());
     }
 

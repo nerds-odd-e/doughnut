@@ -16,7 +16,6 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/settings")
 public class RestGlobalSettingsController {
 
-  private final ModelFactoryService modelFactoryService;
   private final GlobalSettingsService globalSettingsService;
 
   @Resource(name = "testabilitySettings")
@@ -28,7 +27,6 @@ public class RestGlobalSettingsController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {
-    this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.globalSettingsService = new GlobalSettingsService(modelFactoryService);
     this.testabilitySettings = testabilitySettings;

@@ -8,8 +8,6 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.services.ai.AssistantCreationService;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
-import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.assistant.Assistant;
 import com.theokanning.openai.assistants.assistant.AssistantRequest;
 import com.theokanning.openai.assistants.assistant.FunctionTool;
@@ -20,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,14 +28,11 @@ import org.springframework.transaction.annotation.Transactional;
 class AssistantCreationServiceTest {
 
   private AssistantCreationService assistantCreationService;
-  @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;
-  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     assistantCreationService = new AssistantCreationService(openAiApi);
   }
 

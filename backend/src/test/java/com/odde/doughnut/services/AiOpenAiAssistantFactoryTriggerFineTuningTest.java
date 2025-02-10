@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
@@ -34,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class AiOpenAiAssistantFactoryTriggerFineTuningTest {
-  @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   @Mock private OpenAiApi openAiApi;
   private OtherAiServices otherAiServices;
