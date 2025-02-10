@@ -633,30 +633,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/recall-prompts/generate-question:
-    post:
-      tags:
-      - rest-recall-prompt-controller
-      operationId: generateQuestion
-      parameters:
-      - name: note
-        in: query
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallPrompt"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -2575,11 +2551,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/recall-prompts/{memoryTracker}/random-question:
+  /api/recall-prompts/{memoryTracker}/question:
     get:
       tags:
       - rest-recall-prompt-controller
-      operationId: generateRandomQuestion
+      operationId: askAQuestion
       parameters:
       - name: memoryTracker
         in: path

@@ -362,7 +362,7 @@ class RestRecallPromptControllerTests {
       makeMe.aNote().under(note).please();
       MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
 
-      RecallPrompt recallPrompt = controller.generateRandomQuestion(rp);
+      RecallPrompt recallPrompt = controller.askAQuestion(rp);
 
       assertThat(recallPrompt.getId(), notNullValue());
     }

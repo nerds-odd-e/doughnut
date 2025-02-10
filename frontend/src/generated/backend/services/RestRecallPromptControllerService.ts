@@ -76,25 +76,6 @@ export class RestRecallPromptControllerService {
         });
     }
     /**
-     * @param note
-     * @returns RecallPrompt OK
-     * @throws ApiError
-     */
-    public generateQuestion(
-        note: number,
-    ): CancelablePromise<RecallPrompt> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/recall-prompts/generate-question',
-            query: {
-                'note': note,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param recallPrompt
      * @returns AnsweredQuestion OK
      * @throws ApiError
@@ -118,12 +99,12 @@ export class RestRecallPromptControllerService {
      * @returns RecallPrompt OK
      * @throws ApiError
      */
-    public generateRandomQuestion(
+    public askAQuestion(
         memoryTracker: number,
     ): CancelablePromise<RecallPrompt> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/recall-prompts/{memoryTracker}/random-question',
+            url: '/api/recall-prompts/{memoryTracker}/question',
             path: {
                 'memoryTracker': memoryTracker,
             },
