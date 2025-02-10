@@ -5,10 +5,10 @@ Feature: Repetition Quiz
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Title            | Details                        | Skip Memory Tracking| Parent Title|
-      | sedition         | Sedition means incite violence | false      | English     |
-      | sedation         | Put to sleep is sedation       | false      | English     |
-      | medical          |                                | true       | English     |
+      | Title    | Details                        | Skip Memory Tracking | Parent Title |
+      | sedition | Sedition means incite violence | false                | English      |
+      | sedation | Put to sleep is sedation       | false                | English      |
+      | medical  |                                | true                 | English      |
 
   @usingMockedOpenAiService
   Scenario Outline: AI generated question
@@ -21,7 +21,8 @@ Feature: Repetition Quiz
     Then I should be asked "What is the meaning of sedition?"
     When I choose answer "<answer>"
     Then I should see that my answer <result>
+
     Examples:
-      | answer             | result                  |
-      | to sleep           | "to sleep" is incorrect |
-      | to incite violence | is correct              |
+      | answer             | result                          |
+      | to sleep           | "to sleep" is incorrect         |
+      | to incite violence | is correct as the last question |

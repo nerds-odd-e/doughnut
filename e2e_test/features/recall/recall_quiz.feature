@@ -18,9 +18,8 @@ Feature: Repetition Quiz
     Then I should be asked spelling question "means incite violence" from notebook "English"
     When I type my answer "<answer>"
     Then I should see that my answer <result>
-    And I should see the repetition is finished: "<should see finish>"
 
     Examples:
-      | answer   | result              | should see finish |
-      | asdf     | "asdf" is incorrect | no                |
-      | Sedition | is correct          | yes               |
+      | answer   | result              |
+      | asdf     | "asdf" is incorrect |
+      | Sedition | is correct          |

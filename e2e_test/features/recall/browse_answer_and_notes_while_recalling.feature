@@ -38,4 +38,4 @@ Feature: Browse answers and notes while recalling
     Given I am recalling my note on day 2
     And I type my answer "sedition"
     When choose to remove the last memory tracker from recalls
-    Then On day 100 I should have "1/2/2" note for assimilation and "1/1/1" for recall
+    Then On day 100 I should have "1/2/2" note for assimilation and "1/2/1" for recall

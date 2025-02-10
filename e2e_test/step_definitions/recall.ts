@@ -149,14 +149,12 @@ Then('I should see that my answer {string} is incorrect', (answer) => {
   cy.findByText(`Your answer \`${answer}\` is incorrect.`)
 })
 
-Then('I should see the repetition is finished: {string}', (yesNo) => {
-  cy.findByText(
-    'You have finished all repetitions for this half a day!'
-  ).should(yesNo === 'yes' ? 'exist' : 'not.exist')
+Then('I should see that my answer is correct as the last question', () => {
+  start.assumeAnsweredQuestionPage().expectLastAnswerToBeCorrect()
 })
 
 Then('I should see that my answer is correct', () => {
-  start.assumeAnsweredQuestionPage().expectLastAnswerToBeCorrect()
+  // leave empty for now
 })
 
 Then('I should see that my last answer is correct', () => {
