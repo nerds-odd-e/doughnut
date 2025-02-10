@@ -18,11 +18,38 @@ public class MemoryTrackerService {
 
   public MemoryTracker assimilate(
       InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
+    Note note = modelFactoryService.entityManager.find(Note.class, initialInfo.noteId);
     MemoryTracker memoryTracker =
-        MemoryTracker.buildMemoryTrackerForNote(
-            modelFactoryService.entityManager.find(Note.class, initialInfo.noteId));
-    memoryTracker.setRemovedFromTracking(initialInfo.skipMemoryTracking);
+        createMemoryTracker(
+            note,
+            currentUser,
+            currentTime,
+            initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
+            false);
 
+    if (note.getRecallSetting().getRememberSpelling()) {
+      MemoryTracker spellingTracker =
+          createMemoryTracker(
+              note,
+              currentUser,
+              currentTime,
+              initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
+              true);
+      modelFactoryService.save(spellingTracker);
+    }
+
+    return memoryTracker;
+  }
+
+  private MemoryTracker createMemoryTracker(
+      Note note,
+      User currentUser,
+      Timestamp currentTime,
+      boolean skipMemoryTracking,
+      boolean isSpelling) {
+    MemoryTracker memoryTracker = MemoryTracker.buildMemoryTrackerForNote(note);
+    memoryTracker.setRemovedFromTracking(skipMemoryTracking);
+    memoryTracker.setSpelling(isSpelling);
     memoryTracker.setUser(currentUser);
     memoryTracker.setAssimilatedAt(currentTime);
     memoryTracker.setLastRecalledAt(currentTime);

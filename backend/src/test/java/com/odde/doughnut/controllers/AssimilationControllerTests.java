@@ -67,6 +67,27 @@ class AssimilationControllerTests {
       InitialInfo info = new InitialInfo();
       assertThrows(ResponseStatusException.class, () -> nullUserController().assimilate(info));
     }
+
+    @Test
+    void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      note.getRecallSetting().setRememberSpelling(true);
+      modelFactoryService.noteRepository.save(note);
+
+      InitialInfo initialInfo = new InitialInfo();
+      initialInfo.noteId = note.getId();
+
+      MemoryTracker memoryTracker = controller.assimilate(initialInfo);
+
+      List<MemoryTracker> memoryTrackers =
+          modelFactoryService.memoryTrackerRepository.findLast100ByUser(
+              currentUser.getEntity().getId());
+      assertThat(
+          memoryTrackers.stream().filter(mt -> mt.getNote().getId().equals(note.getId())).count(),
+          equalTo(2L));
+      assertThat(memoryTrackers.stream().filter(mt -> mt.getSpelling()).count(), equalTo(1L));
+      assertThat(memoryTrackers.stream().filter(mt -> !mt.getSpelling()).count(), equalTo(1L));
+    }
   }
 
   @Nested

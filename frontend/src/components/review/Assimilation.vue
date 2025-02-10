@@ -8,7 +8,7 @@
     <NoteInfoBar
       :note-id="note.id"
       :key="note.id"
-      @level-changed="$emit('reloadNeeded', $event)"
+      @level-changed="$emit('reloadNeeded')"
     />
     <AssimilationButtons
       :key="buttonKey"
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, MemoryTracker } from "@/generated/backend"
+import type { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -37,8 +37,8 @@ const { note } = defineProps<{
 
 // Emits
 const emit = defineEmits<{
-  (e: "reloadNeeded", data: MemoryTracker): void
-  (e: "initialReviewDone", data: MemoryTracker): void
+  (e: "reloadNeeded"): void
+  (e: "initialReviewDone"): void
 }>()
 
 // Composables
@@ -60,7 +60,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
-  const data = await managedApi.assimilationController.assimilate({
+  await managedApi.assimilationController.assimilate({
     noteId: note.id,
     skipMemoryTracking,
   })
@@ -70,9 +70,9 @@ const processForm = async (skipMemoryTracking: boolean) => {
   }
 
   if (skipMemoryTracking) {
-    emit("reloadNeeded", data)
+    emit("reloadNeeded")
   } else {
-    emit("initialReviewDone", data)
+    emit("initialReviewDone")
   }
 }
 </script>
