@@ -4,7 +4,6 @@ import audioToolsPage from './audioToolsPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
-import { assumeQuestionPage } from './QuizQuestionPage'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { noteSidebar } from './noteSidebar'
 
@@ -233,11 +232,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
-    },
-    testMe() {
-      clickNotePageMoreOptionsButton('Test me')
-      cy.pageIsNotLoading() // wait for the response
-      return assumeQuestionPage()
     },
     sendMessageToNoteOwner(message: string) {
       this.toolbarButton('Star a conversation about this note').click()

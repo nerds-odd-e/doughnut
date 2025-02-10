@@ -57,10 +57,6 @@ Given(
   }
 )
 
-When('I test myself for the note {string}', (noteTitle: string) => {
-  start.jumpToNotePage(noteTitle).testMe()
-})
-
 Given(
   'OpenAI evaluates the question as legitamate for assistant thread {string}',
   (threadId: string) => {

@@ -15,7 +15,8 @@ Feature: User Contests Question generation by AI
     And OpenAI generates this question for assistant thread "thread-second-question":
       | Question Stem         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
-    When I test myself for the note "Scuba Diving"
+    And I learned one note "Scuba Diving" on day 1
+    When I am recalling my note on day 2
     And I contest the question
     Then I should see the question "What is the most common scuba diving certification?" is <Old Question Status>
     And I should be asked "<Current Question>"
