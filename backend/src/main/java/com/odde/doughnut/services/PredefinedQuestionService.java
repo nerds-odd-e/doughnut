@@ -56,19 +56,17 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAQuestion(MemoryTracker memoryTracker, User user) {
-    PredefinedQuestion result = generateAQuestionWithoutSaving(memoryTracker.getNote(), user);
+    Note note = memoryTracker.getNote();
+    PredefinedQuestionGenerator predefinedQuestionGenerator =
+        new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
+    PredefinedQuestion result =
+        predefinedQuestionGenerator.generateAQuestionOfRandomType(
+            new AiQuestionFactory(note, aiQuestionGenerator));
     if (result == null) {
       return null;
     }
     modelFactoryService.save(result);
     return result;
-  }
-
-  public PredefinedQuestion generateAQuestionWithoutSaving(Note note, User user) {
-    PredefinedQuestionGenerator predefinedQuestionGenerator =
-        new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(
-        new AiQuestionFactory(note, aiQuestionGenerator));
   }
 
   public PredefinedQuestion generateAQuestionForNote(Note note) {

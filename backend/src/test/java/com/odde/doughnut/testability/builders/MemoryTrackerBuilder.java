@@ -54,4 +54,9 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
     entity.setNextRecallAt(timestamp);
     return this;
   }
+
+  public MemoryTrackerBuilder spelling() {
+    entity.setSpelling(true);
+    return this;
+  }
 }

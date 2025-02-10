@@ -84,6 +84,7 @@ public class MakeMe extends MakeMeWithoutDB {
     MemoryTracker memoryTracker = MemoryTracker.buildMemoryTrackerForNote(note);
     MemoryTrackerBuilder memoryTrackerBuilder = new MemoryTrackerBuilder(memoryTracker, this);
     memoryTrackerBuilder.entity.setNote(note);
+    memoryTrackerBuilder.by(note.getCreator());
     return memoryTrackerBuilder;
   }
 

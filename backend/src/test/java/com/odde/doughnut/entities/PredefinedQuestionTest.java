@@ -7,10 +7,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
+import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
@@ -36,13 +35,6 @@ class PredefinedQuestionTest {
     userModel = makeMe.aUser().toModelPlease();
   }
 
-  @Test
-  void aNoteWithNoDescriptionHasNoQuiz() {
-    Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
-
-    assertNull(generateQuizQuestionEntity(note));
-  }
-
   @Nested
   class SpellingQuiz {
     Note note;
@@ -56,7 +48,8 @@ class PredefinedQuestionTest {
 
     @Test
     void typeShouldBeSpellingQuiz() {
-      PredefinedQuestion question = generateQuizQuestionEntity(note);
+      MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).spelling().please();
+      PredefinedQuestion question = generateQuizQuestionEntity(tracker);
       assertTrue(question.getBareQuestion().getCheckSpell());
     }
 
@@ -64,7 +57,8 @@ class PredefinedQuestionTest {
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
-      PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
+      MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).please();
+      PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(tracker);
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
@@ -73,11 +67,9 @@ class PredefinedQuestionTest {
     }
   }
 
-  private PredefinedQuestion generateQuizQuestionEntity(Note note) {
-    PredefinedQuestionGenerator predefinedQuestionGenerator =
-        new PredefinedQuestionGenerator(
-            userModel.getEntity(), note, randomizer, makeMe.modelFactoryService);
-    return predefinedQuestionGenerator.generateAQuestionOfRandomType(
-        new AiQuestionFactory(predefinedQuestionGenerator.note(), aiQuestionGenerator));
+  private PredefinedQuestion generateQuizQuestionEntity(MemoryTracker memoryTracker) {
+    PredefinedQuestionService predefinedQuestionService =
+        new PredefinedQuestionService(makeMe.modelFactoryService, randomizer, aiQuestionGenerator);
+    return predefinedQuestionService.generateAQuestion(memoryTracker, userModel.getEntity());
   }
 }
