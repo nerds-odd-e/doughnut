@@ -48,7 +48,6 @@
               mysql80
               mysql-client
               mysql_jdbc
-              process-compose
               yamllint
               nixfmt-classic
               hclfmt
@@ -76,18 +75,12 @@
             fi
 
             # Define and export logging function
-            log() {
-              echo "[$(date +'%Y-%m-%d %H:%M:%S')] $*"
-            }
-            export -f log
+            export LOG_FUNCTION='log() { echo "[$(date +"%Y-%m-%d %H:%M:%S")] $*"; }'
+            eval "$LOG_FUNCTION"
 
             # Define error handler
-            handle_error() {
-              local error_code="$2"
-              log "Warning: Command exited with status ''${error_code}"
-              return 0
-            }
-            export -f handle_error
+            export ERROR_HANDLER='handle_error() { local error_code="$2"; log "Warning: Command exited with status $error_code"; return 0; }'
+            eval "$ERROR_HANDLER"
             trap 'handle_error "0" "$?"' ERR
 
             # Configure fzf
@@ -162,10 +155,7 @@
             )
 
             # Start process-compose for MySQL only
-            (
-              mkdir -p "$MYSQL_HOME" || true
-              process-compose up -f process-compose.yaml --detached >/dev/null 2>&1 || true
-            )
+            ./scripts/init_mysql.sh &
 
             cat << 'EOF'
             ╔════════════════════════════════════════════════════════════════════════════════════╗
