@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
+import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -68,5 +69,14 @@ public class PredefinedQuestionService {
         new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
     return predefinedQuestionGenerator.generateAQuestionOfRandomType(
         new AiQuestionFactory(note, aiQuestionGenerator));
+  }
+
+  public PredefinedQuestion generateAQuestionForNote(Note note) {
+    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
+    try {
+      return aiQuestionFactory.buildValidPredefinedQuestion();
+    } catch (PredefinedQuestionNotPossibleException e) {
+      return null;
+    }
   }
 }
