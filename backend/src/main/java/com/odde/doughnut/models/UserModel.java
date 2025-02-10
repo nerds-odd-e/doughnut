@@ -65,8 +65,13 @@ public class UserModel implements ReviewScope {
 
   public MemoryTracker getMemoryTrackerFor(Note note) {
     if (entity == null) return null;
-    return modelFactoryService.memoryTrackerRepository.findByUserAndNote(
-        entity.getId(), note.getId());
+
+    List<MemoryTracker> memoryTrackers =
+        modelFactoryService.memoryTrackerRepository.findByUserAndNote(entity.getId(), note.getId());
+    return memoryTrackers.stream()
+        .filter(tracker -> !Boolean.TRUE.equals(tracker.getSpelling()))
+        .findFirst()
+        .orElse(null);
   }
 
   public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {

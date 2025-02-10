@@ -25,7 +25,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
       Integer userId, @Param("nextRecallAt") Timestamp nextRecallAt);
 
   @Query(value = "SELECT * " + byUserId + "AND rp.note_id =:noteId", nativeQuery = true)
-  MemoryTracker findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);
+  List<MemoryTracker> findByUserAndNote(Integer userId, @Param("noteId") Integer noteId);
 
   @Query(
       value =
