@@ -35,10 +35,8 @@ public class RecallService {
   }
 
   private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(int dueInDays) {
-    return userModel
-        .getMemoryTrackerNeedToRepeat(
-            TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone)
-        .filter(tracker -> !Boolean.TRUE.equals(tracker.getSpelling()));
+    return userModel.getMemoryTrackerNeedToRepeat(
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
   public RecallStatus getRecallStatus() {
