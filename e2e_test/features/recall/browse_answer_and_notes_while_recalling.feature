@@ -1,3 +1,4 @@
+@mockBrowserTime
 @usingMockedOpenAiService
 Feature: Browse answers and notes while recalling
   As a learner, I want to browse answers and notes while recalling
@@ -16,7 +17,6 @@ Feature: Browse answers and notes while recalling
     And I am assimilating new note on day 1
     And I have selected the choice "Remember Spelling"
 
-  @ignore
   Scenario: View last result when the quiz answer was correct
     Given I learned one note "sedation" on day 1
     When I am recalling my note on day 2
@@ -37,7 +37,6 @@ Feature: Browse answers and notes while recalling
     And I go to the recalls page
     Then I should see that my answer "riot" is incorrect
 
-  @mockBrowserTime
   Scenario: I can remove a note from further recalls
     Given I am recalling my note on day 2
     And I skip one question
