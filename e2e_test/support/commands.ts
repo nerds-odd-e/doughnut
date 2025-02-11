@@ -51,7 +51,7 @@ Cypress.Commands.add('clearFocusedText', () => {
   // Invoking it twice seems to solve the problem.
   cy.focused()
     .should('be.visible')
-    .should('match', 'input, textarea')
+    .should('match', 'input, textarea, [contenteditable="true"]')
     .clear()
     .clear()
 })
