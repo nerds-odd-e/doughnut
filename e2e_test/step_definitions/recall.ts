@@ -93,6 +93,7 @@ Then(
 
 Then('I am recalling my note on day {int}', (day: number) => {
   start.testability().backendTimeTravelTo(day, 8)
+  cy.reload()
   start.recall().goToRecallPage()
 })
 
