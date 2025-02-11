@@ -4,8 +4,8 @@ import jakarta.validation.constraints.NotNull;
 
 public class AnsweredQuestion {
   public Note note;
-  @NotNull public PredefinedQuestion predefinedQuestion;
+  public PredefinedQuestion predefinedQuestion;
   @NotNull public Answer answer;
   public String answerDisplay;
-  @NotNull public Integer recallPromptId;
+  public Integer recallPromptId;
 }

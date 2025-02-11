@@ -1,7 +1,4 @@
 <template>
-  <div v-if="recallPrompt.notebook" class="notebook-source daisy-mb-4">
-    <NotebookLink :notebook="recallPrompt.notebook" />
-  </div>
   <div v-for="(q, index) in prevQuestions"
     :key="index"
     class="daisy-card daisy-shadow-sm daisy-mb-4"

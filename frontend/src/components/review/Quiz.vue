@@ -11,23 +11,28 @@
           @reviewed="onAnswered($event)"
         />
       </div>
-      <SpellingQuestionDisplay
-        v-else-if="currentRecallPrompt && (!currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices || currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0)"
-        v-bind="{
-          bareQuestion: currentRecallPrompt.bareQuestion,
-        }"
-        @answer="onSpellingAnswered($event)"
-        :key="`spelling-${currentRecallPrompt.id}`"
-      />
-      <ContestableQuestion
-        v-else
-        v-bind="{
-          recallPrompt: currentRecallPrompt,
-          storageAccessor,
-        }"
-        @answered="onAnswered($event)"
-        :key="currentRecallPrompt.id"
-      />
+      <template v-else>
+        <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
+          <NotebookLink :notebook="currentRecallPrompt.notebook" />
+        </div>
+        <SpellingQuestionDisplay
+          v-if="currentRecallPrompt && (!currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices || currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0)"
+          v-bind="{
+            bareQuestion: currentRecallPrompt.bareQuestion,
+          }"
+          @answer="onSpellingAnswered($event)"
+          :key="`spelling-${currentRecallPrompt.id}`"
+        />
+        <ContestableQuestion
+          v-else
+          v-bind="{
+            recallPrompt: currentRecallPrompt,
+            storageAccessor,
+          }"
+          @answered="onAnswered($event)"
+          :key="currentRecallPrompt.id"
+        />
+      </template>
       <button
         v-if="canMoveToEnd"
         class="daisy-btn daisy-btn-ghost daisy-btn-circle"
