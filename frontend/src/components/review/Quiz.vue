@@ -71,6 +71,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
+import NotebookLink from "../notes/NotebookLink.vue"
 
 // Interface definitions for better type safety
 interface QuizProps {
