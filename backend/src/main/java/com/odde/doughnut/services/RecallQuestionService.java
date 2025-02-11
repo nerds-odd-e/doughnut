@@ -74,9 +74,11 @@ public class RecallQuestionService {
 
   public AnsweredQuestion answerSpelling(
       RecallPrompt recallPrompt,
-      AnswerSpellingDTO answerDTO,
+      AnswerSpellingDTO answerSpellingDTO,
       User user,
       Timestamp currentUTCTimestamp) {
-    return null;
+    AnswerDTO answerDTO = new AnswerDTO();
+    answerDTO.setSpellingAnswer(answerSpellingDTO.getSpellingAnswer());
+    return answerQuestion(recallPrompt, answerDTO, user, currentUTCTimestamp);
   }
 }

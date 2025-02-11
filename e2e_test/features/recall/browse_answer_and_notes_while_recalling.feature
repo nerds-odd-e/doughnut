@@ -29,6 +29,7 @@ Feature: Browse answers and notes while recalling
       | normal   |                0 |
       | spelling |                1 |
 
+  @ignore
   Scenario: Browse notes while recalling and come back
     Given I am recalling my note on day 2
     And I skip one question

@@ -5,7 +5,7 @@
       v-bind="{
         bareQuestion: recallPrompt.bareQuestion,
       }"
-      @answer="submitAnswer($event)"
+      @answer="submitSpellingAnswer($event)"
       :key="`spelling-${recallPrompt.id}`"
     />
     <QuestionDisplay
@@ -13,7 +13,7 @@
       v-bind="{
         bareQuestion: recallPrompt.bareQuestion,
       }"
-      @answer="submitAnswer($event)"
+      @answer="submitQuizAnswer($event)"
       :key="`choice-${recallPrompt.id}`"
       :disabled="isLoading"
     />
@@ -31,7 +31,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type { AnswerDTO, RecallPrompt } from "@/generated/backend"
+import type {
+  AnswerDTO,
+  RecallPrompt,
+  AnswerSpellingDTO,
+} from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"
@@ -52,7 +56,36 @@ const props = defineProps({
 
 const emits = defineEmits(["answered"])
 
-const submitAnswer = async (answerData: AnswerDTO) => {
+const handleError = async () => {
+  error.value = "Failed to submit answer. Please try again."
+  await popups.alert(
+    "This memory tracker doesn't exist any more or is being skipped now. Moving on to the next memory tracker..."
+  )
+}
+
+const submitSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
+  if (answerData.spellingAnswer === undefined) return
+
+  isLoading.value = true
+  error.value = ""
+
+  try {
+    const answerResult =
+      await managedApi.restRecallPromptController.answerSpelling(
+        props.recallPrompt.id,
+        { spellingAnswer: answerData.spellingAnswer }
+      )
+    emits("answered", answerResult)
+  } catch (e) {
+    await handleError()
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const submitQuizAnswer = async (answerData: AnswerDTO) => {
+  if (answerData.choiceIndex === undefined) return
+
   isLoading.value = true
   error.value = ""
 
@@ -61,13 +94,9 @@ const submitAnswer = async (answerData: AnswerDTO) => {
       props.recallPrompt.id,
       answerData
     )
-
     emits("answered", answerResult)
   } catch (e) {
-    error.value = "Failed to submit answer. Please try again."
-    await popups.alert(
-      "This memory tracker doesn't exist any more or is being skipped now. Moving on to the next memory tracker..."
-    )
+    await handleError()
   } finally {
     isLoading.value = false
   }

@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { AnswerDTO } from '../models/AnswerDTO';
 import type { AnsweredQuestion } from '../models/AnsweredQuestion';
+import type { AnswerSpellingDTO } from '../models/AnswerSpellingDTO';
 import type { QuestionContestResult } from '../models/QuestionContestResult';
 import type { RecallPrompt } from '../models/RecallPrompt';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -65,6 +66,29 @@ export class RestRecallPromptControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/recall-prompts/{recallPrompt}/answer',
+            path: {
+                'recallPrompt': recallPrompt,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param recallPrompt
+     * @param requestBody
+     * @returns AnsweredQuestion OK
+     * @throws ApiError
+     */
+    public answerSpelling(
+        recallPrompt: number,
+        requestBody: AnswerSpellingDTO,
+    ): CancelablePromise<AnsweredQuestion> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/recall-prompts/{recallPrompt}/answer-spelling',
             path: {
                 'recallPrompt': recallPrompt,
             },

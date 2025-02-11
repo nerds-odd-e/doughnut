@@ -15,6 +15,7 @@ export type { Annotation } from './models/Annotation';
 export type { Answer } from './models/Answer';
 export type { AnswerDTO } from './models/AnswerDTO';
 export type { AnsweredQuestion } from './models/AnsweredQuestion';
+export type { AnswerSpellingDTO } from './models/AnswerSpellingDTO';
 export type { AssessmentAttempt } from './models/AssessmentAttempt';
 export type { AssessmentQuestionInstance } from './models/AssessmentQuestionInstance';
 export type { AssimilationCountDTO } from './models/AssimilationCountDTO';

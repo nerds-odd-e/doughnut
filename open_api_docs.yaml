@@ -633,6 +633,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
+  /api/recall-prompts/{recallPrompt}/answer-spelling:
+    post:
+      tags:
+      - rest-recall-prompt-controller
+      operationId: answerSpelling
+      parameters:
+      - name: recallPrompt
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerSpellingDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -3626,6 +3656,11 @@ components:
       - answer
       - predefinedQuestion
       - recallPromptId
+    AnswerSpellingDTO:
+      type: object
+      properties:
+        spellingAnswer:
+          type: string
     QuestionSuggestionCreationParams:
       type: object
       properties:
