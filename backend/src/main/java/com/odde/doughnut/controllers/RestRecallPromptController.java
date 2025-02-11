@@ -80,7 +80,7 @@ class RestRecallPromptController {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  @PostMapping("/{recallPrompt}/answer")
+  @PostMapping("/{recallPrompt}/answer-spelling")
   @Transactional
   public AnsweredQuestion answerSpelling(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
