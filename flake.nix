@@ -131,17 +131,14 @@
             export MYSQL_LOG_FILE="''${MYSQL_HOME}/mysql.log"
 
             # Configure pnpm and start Biome
-            (
-              log "Setting up PNPM and Biome..."
-              corepack prepare pnpm@10.0.0 --activate >/dev/null 2>&1 || true
-              corepack use pnpm@10.0.0 >/dev/null 2>&1 || true
-              pnpm --frozen-lockfile recursive install || true
+            log "Setting up PNPM and Biome..."
+            corepack prepare pnpm@10.0 --activate
+            corepack use pnpm@10.0
+            pnpm --frozen-lockfile recursive install
 
-              # Stop and start Biome server
-              pnpm biome stop >/dev/null 2>&1 || true
-              nohup pnpm biome start >/dev/null 2>&1 &
-              disown
-            )
+            # Stop and start Biome server
+            pnpm biome stop
+            pnpm biome start
 
             # Setup Cypress with specific version
             (
@@ -149,7 +146,7 @@
               CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
               if [ -n "$CYPRESS_VERSION" ]; then
                 if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
-                  pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force || true
+                  pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
                 fi
               fi
             )
