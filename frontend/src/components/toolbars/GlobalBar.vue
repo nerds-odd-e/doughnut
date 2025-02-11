@@ -15,11 +15,7 @@
       </PopButton>
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
-    <ApiStatus
-      v-if="user"
-      :api-status="apiStatus"
-      @clear-error-message="$emit('clearErrorMessage')"
-    />
+    <LoadingThinBar v-if="apiStatus.states.length > 0" />
   </nav>
 </template>
 
@@ -28,6 +24,7 @@ import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
+import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
 
 defineProps({
   storageAccessor: {
@@ -37,7 +34,7 @@ defineProps({
   apiStatus: { type: Object as PropType<ApiStatus>, required: true },
   user: { type: Object as PropType<User> },
 })
-defineEmits(["updateUser", "clearErrorMessage"])
+defineEmits(["updateUser"])
 </script>
 
 <style scoped lang="scss">
