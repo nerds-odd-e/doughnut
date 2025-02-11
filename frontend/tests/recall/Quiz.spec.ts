@@ -58,4 +58,53 @@ describe("repeat page", () => {
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith(3)
     })
   })
+
+  describe("spelling questions", () => {
+    it("shows spelling question input when question has no choices", async () => {
+      const recallPromptWithoutChoices = makeMe.aRecallPrompt
+        .withQuestionStem("Spell the word 'cat'")
+        .please()
+      mockedRandomQuestionCall.mockResolvedValue(recallPromptWithoutChoices)
+
+      const wrapper = await mountPage([1], 1)
+
+      expect(
+        wrapper.findComponent({ name: "SpellingQuestionDisplay" }).exists()
+      ).toBe(true)
+      expect(
+        wrapper.findComponent({ name: "ContestableQuestion" }).exists()
+      ).toBe(false)
+    })
+
+    it("submits spelling answer correctly", async () => {
+      const recallPromptWithoutChoices = makeMe.aRecallPrompt
+        .withQuestionStem("Spell the word 'cat'")
+        .please()
+      mockedRandomQuestionCall.mockResolvedValue(recallPromptWithoutChoices)
+
+      const answerResult = makeMe.anAnsweredQuestion
+        .answerCorrect(true)
+        .please()
+      helper.managedApi.restRecallPromptController.answerSpelling = vi
+        .fn()
+        .mockResolvedValue(answerResult)
+
+      const wrapper = await mountPage([1], 1)
+
+      await wrapper
+        .findComponent({ name: "SpellingQuestionDisplay" })
+        .vm.$emit("answer", { spellingAnswer: "cat" })
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restRecallPromptController.answerSpelling
+      ).toHaveBeenCalledWith(recallPromptWithoutChoices.id, {
+        spellingAnswer: "cat",
+      })
+
+      const emitted = wrapper.emitted()
+      expect(emitted.answered).toBeTruthy()
+      expect(emitted.answered![0]).toEqual([answerResult])
+    })
+  })
 })

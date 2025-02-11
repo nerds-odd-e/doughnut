@@ -11,6 +11,14 @@
           @reviewed="onAnswered($event)"
         />
       </div>
+      <SpellingQuestionDisplay
+        v-else-if="currentRecallPrompt && (!currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices || currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0)"
+        v-bind="{
+          bareQuestion: currentRecallPrompt.bareQuestion,
+        }"
+        @answer="onSpellingAnswered($event)"
+        :key="`spelling-${currentRecallPrompt.id}`"
+      />
       <ContestableQuestion
         v-else
         v-bind="{
@@ -48,11 +56,16 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type { AnsweredQuestion, RecallPrompt } from "@/generated/backend"
+import type {
+  AnsweredQuestion,
+  RecallPrompt,
+  AnswerSpellingDTO,
+} from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
+import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
 
 // Interface definitions for better type safety
 interface QuizProps {
@@ -118,6 +131,7 @@ const useQuestionFetching = (props: QuizProps) => {
 
 // Use the composable
 const { recallPromptCache, fetchQuestion } = useQuestionFetching(props)
+const { managedApi } = useLoadingApi()
 
 // Computed properties with better naming
 const currentMemoryTrackerId = computed(() =>
@@ -142,6 +156,22 @@ const memoryTrackerIdAt = (index: number): number | undefined => {
     return props.memoryTrackers[index]
   }
   return undefined
+}
+
+const onSpellingAnswered = async (answerData: AnswerSpellingDTO) => {
+  if (answerData.spellingAnswer === undefined || !currentRecallPrompt.value)
+    return
+
+  try {
+    const answerResult =
+      await managedApi.restRecallPromptController.answerSpelling(
+        currentRecallPrompt.value.id,
+        { spellingAnswer: answerData.spellingAnswer }
+      )
+    emit("answered", answerResult)
+  } catch (e) {
+    // Error handling is already done in the component
+  }
 }
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
