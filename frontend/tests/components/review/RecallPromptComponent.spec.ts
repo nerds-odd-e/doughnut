@@ -4,8 +4,6 @@ import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 
 describe("RecallPromptComponent", () => {
-  const recallPrompt = makeMe.aRecallPrompt.please()
-
   beforeEach(() => {
     vi.useFakeTimers()
     helper.managedApi.restRecallPromptController.answerQuiz = vi.fn()
@@ -15,7 +13,14 @@ describe("RecallPromptComponent", () => {
     vi.useRealTimers()
   })
 
-  const mountComponent = () => {
+  const mountComponent = (withChoices = true) => {
+    const recallPrompt = withChoices
+      ? makeMe.aRecallPrompt
+          .withQuestionStem("Test question")
+          .withChoices(["A", "B", "C"])
+          .please()
+      : makeMe.aRecallPrompt.withQuestionStem("Test question").please()
+
     return helper
       .component(RecallPromptComponent)
       .withProps({ recallPrompt })
@@ -23,7 +28,7 @@ describe("RecallPromptComponent", () => {
   }
 
   describe("answer submission", () => {
-    it("shows loading state while submitting answer", async () => {
+    it("shows loading state while submitting answer for multiple choice", async () => {
       // Setup API to delay response
       helper.managedApi.restRecallPromptController.answerQuiz = vi
         .fn()
@@ -31,12 +36,40 @@ describe("RecallPromptComponent", () => {
           () => new Promise((resolve) => setTimeout(resolve, 100))
         )
 
-      const wrapper = mountComponent()
+      const wrapper = mountComponent(true)
 
       // Submit an answer
       await wrapper
         .findComponent({ name: "QuestionDisplay" })
         .vm.$emit("answer", { choiceIndex: 0 })
+
+      // Verify loading overlay is shown
+      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
+      expect(
+        wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
+      ).toBe(true)
+
+      vi.runAllTimers()
+      await flushPromises()
+
+      // Verify loading state is removed after response
+      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(false)
+    })
+
+    it("shows loading state while submitting answer for spelling", async () => {
+      // Setup API to delay response
+      helper.managedApi.restRecallPromptController.answerQuiz = vi
+        .fn()
+        .mockImplementation(
+          () => new Promise((resolve) => setTimeout(resolve, 100))
+        )
+
+      const wrapper = mountComponent(false)
+
+      // Submit an answer
+      await wrapper
+        .findComponent({ name: "SpellingQuestionDisplay" })
+        .vm.$emit("answer", { spellingAnswer: "test" })
 
       // Verify loading overlay is shown
       expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
@@ -58,7 +91,7 @@ describe("RecallPromptComponent", () => {
         .mockRejectedValueOnce(new Error("API Error"))
         .mockResolvedValueOnce({ correct: true })
 
-      const wrapper = mountComponent()
+      const wrapper = mountComponent(true)
 
       // Submit first answer (will fail)
       await wrapper
@@ -88,7 +121,7 @@ describe("RecallPromptComponent", () => {
         .fn()
         .mockResolvedValue(answerResult)
 
-      const wrapper = mountComponent()
+      const wrapper = mountComponent(true)
 
       await wrapper
         .findComponent({ name: "QuestionDisplay" })

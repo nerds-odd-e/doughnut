@@ -1,11 +1,20 @@
 <template>
   <div class="daisy-relative">
-    <QuestionDisplay
+    <SpellingQuestionDisplay
+      v-if="!recallPrompt.bareQuestion.multipleChoicesQuestion.choices || recallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0"
       v-bind="{
         bareQuestion: recallPrompt.bareQuestion,
       }"
       @answer="submitAnswer($event)"
-      :key="recallPrompt.id"
+      :key="`spelling-${recallPrompt.id}`"
+    />
+    <QuestionDisplay
+      v-else
+      v-bind="{
+        bareQuestion: recallPrompt.bareQuestion,
+      }"
+      @answer="submitAnswer($event)"
+      :key="`choice-${recallPrompt.id}`"
       :disabled="isLoading"
     />
 
@@ -25,7 +34,8 @@ import type { PropType } from "vue"
 import type { AnswerDTO, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
-import QuestionDisplay from "../review/QuestionDisplay.vue"
+import QuestionDisplay from "./QuestionDisplay.vue"
+import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()

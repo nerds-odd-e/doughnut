@@ -26,25 +26,6 @@ describe("QuestionDisplay", () => {
     expect(choices[2]?.text()).toBe("Rome")
   })
 
-  it("renders spelling question when no choices are provided", async () => {
-    const bareQuestion = makeMe.aBareQuestion
-      .withStem("Spell the word 'cat'")
-      .please()
-
-    const wrapper = helper
-      .component(QuestionDisplay)
-      .withProps({ bareQuestion })
-      .mount()
-
-    await flushPromises()
-
-    // Check for input form elements
-    expect(
-      wrapper.find("input[placeholder='put your answer here']").exists()
-    ).toBe(true)
-    expect(wrapper.find("input[type='submit']").exists()).toBe(true)
-  })
-
   it("renders markdown in stem correctly", async () => {
     const markdownStem = "# What is 2 + 2?\n\nChoose the *correct* answer:"
     const bareQuestion = makeMe.aBareQuestion
