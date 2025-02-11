@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -uo pipefail
 trap 'handle_error "${LINENO}" "$?"' ERR
 
 # Format code

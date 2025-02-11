@@ -40,7 +40,7 @@ init_mysql() {
     export MYSQL_READY
     MYSQL_READY=$("${MYSQL_BASEDIR}/bin/mysqladmin" ping -u root -S "${MYSQL_UNIX_SOCKET}")
     echo "${MYSQL_READY}"
-    "${MYSQL_BASEDIR}/bin/mysql" -u root -S "${MYSQL_UNIX_SOCKET}" < "${PWD}/scripts/mysql/init_doughnut_db.sql"
+    "${MYSQL_BASEDIR}/bin/mysql" -u root -S "${MYSQL_UNIX_SOCKET}" < "${PWD}/scripts/sql/init_doughnut_db.sql"
   fi
 }
 

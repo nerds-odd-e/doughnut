@@ -54,10 +54,7 @@
               fzf
             ] ++ lib.optionals stdenv.isDarwin [ sequelpro ]
             ++ lib.optionals (!stdenv.isDarwin) [
-              sequeler
-              ungoogled-chromium
               psmisc
-              x11vnc
               xclip
               xvfb-run
             ];
@@ -67,10 +64,8 @@
             # Set core environment variables
             if [ -n "''${ZSH_VERSION:-}" ]; then
               emulate -L bash
-              setopt pipefail
               export PS1="(nix)''${PS1:-%# }"
             else
-              set -uo pipefail
               export PS1="(nix)''${PS1:-$ }"
             fi
 
