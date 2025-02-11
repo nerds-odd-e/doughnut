@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest"
-import { mount } from "@vue/test-utils"
 import ContestableQuestion from "@/components/review/ContestableQuestion.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
