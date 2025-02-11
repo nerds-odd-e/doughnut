@@ -1,3 +1,5 @@
+import { useToast } from "vue-toastification"
+
 export type ApiError = {
   id: number
   message: string
@@ -10,7 +12,7 @@ export type ApiStatus = {
 
 export default class ApiStatusHandler {
   apiStatus: ApiStatus
-
+  private toast = useToast()
   private silentMode?: boolean
 
   constructor(apiStatus: ApiStatus, silent?: boolean) {
@@ -28,12 +30,7 @@ export default class ApiStatusHandler {
   }
 
   addError(message: string): void {
-    const id = Date.now()
-    this.apiStatus.errors.push({ message, id })
-    setTimeout(() => {
-      this.apiStatus.errors = this.apiStatus.errors.filter(
-        (error) => error.id !== id
-      )
-    }, 2000)
+    if (this.silentMode) return
+    this.toast.error(message)
   }
 }

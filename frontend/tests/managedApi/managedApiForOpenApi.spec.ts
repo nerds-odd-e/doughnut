@@ -1,6 +1,15 @@
 import "vitest-fetch-mock"
 import type { ApiStatus } from "@/managedApi/ManagedApi"
 import ManagedApi from "@/managedApi/ManagedApi"
+import { vi } from "vitest"
+
+const mockToast = {
+  error: vi.fn(),
+}
+
+vi.mock("vue-toastification", () => ({
+  useToast: () => mockToast,
+}))
 
 describe("managdApi", () => {
   const apiStatus: ApiStatus = { states: [], errors: [] }
@@ -11,6 +20,7 @@ describe("managdApi", () => {
     fetchMock.resetMocks()
     apiStatus.states = []
     apiStatus.errors = []
+    mockToast.error.mockClear()
   })
 
   describe("set the loading status", () => {
@@ -46,9 +56,8 @@ describe("managdApi", () => {
     })
   })
 
-  describe("collect error msg", () => {
+  describe("error handling", () => {
     beforeEach(() => {
-      vitest.useFakeTimers()
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 404,
@@ -63,15 +72,18 @@ describe("managdApi", () => {
       }
     }
 
-    it("should render note with one child", async () => {
+    it("should show error toast", async () => {
       await callApiAndIgnoreError()
-      expect(apiStatus.errors).toHaveLength(1)
+      expect(mockToast.error).toHaveBeenCalled()
     })
 
-    it("disappear in 2 seconds", async () => {
-      await callApiAndIgnoreError()
-      vitest.advanceTimersByTime(2000)
-      expect(apiStatus.errors).toHaveLength(0)
+    it("should not show error toast in silent mode", async () => {
+      try {
+        await managedApi.silent.restUserController.getUserProfile()
+      } catch (_e) {
+        // ignore
+      }
+      expect(mockToast.error).not.toHaveBeenCalled()
     })
   })
 })

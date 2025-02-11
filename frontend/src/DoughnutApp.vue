@@ -19,8 +19,8 @@ interface RouteViewProps {
 }
 
 const apiStatus: Ref<ApiStatus> = ref({
-  errors: [],
   states: [],
+  errors: [],
 })
 const managedApi = new ManagedApi(apiStatus.value)
 provide("managedApi", managedApi)
@@ -46,10 +46,6 @@ const routeViewProps = computed(() => {
   }
   return props
 })
-
-const clearErrorMessage = (_id: number) => {
-  apiStatus.value.errors = []
-}
 
 onMounted(async () => {
   environment.value = getEnvironment()
@@ -78,7 +74,6 @@ onMounted(async () => {
         <GlobalBar
           v-bind="{ storageAccessor, user, apiStatus }"
           @update-user="user = $event"
-          @clear-error-message="clearErrorMessage($event)"
         />
       </div>
       <div class="daisy-flex-grow daisy-overflow-y-auto main-content">

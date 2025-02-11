@@ -301,5 +301,5 @@ Cypress.Commands.add('expectAMapTo', (latitude: string, longitude: string) => {
 })
 
 Cypress.Commands.add('dismissLastErrorMessage', () => {
-  cy.get('.last-error-message').click({ force: true })
+  cy.get('.Vue-Toastification__close-button').click()
 })
