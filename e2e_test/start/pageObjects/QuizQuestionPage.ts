@@ -15,6 +15,7 @@ const assumeQuestionPage = (stem?: string) => {
       question().find('ol button').should('not.be.disabled')
     },
     skipQuestion() {
+      cy.pageIsNotLoading()
       cy.findByRole('button', { name: 'Move to end of list' }).click()
     },
   }
