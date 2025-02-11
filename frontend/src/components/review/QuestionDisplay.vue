@@ -18,7 +18,7 @@ import type { Answer, AnswerDTO, BareQuestion } from "@/generated/backend"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 
-const props = defineProps({
+defineProps({
   bareQuestion: {
     type: Object as PropType<BareQuestion>,
     required: true,
