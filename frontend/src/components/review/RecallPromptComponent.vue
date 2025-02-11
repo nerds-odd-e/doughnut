@@ -73,7 +73,3 @@ const submitAnswer = async (answerData: AnswerDTO) => {
   }
 }
 </script>
-
-<style scoped>
-/* All styles can be removed as they're replaced by Daisy UI classes */
-</style>
