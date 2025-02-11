@@ -74,8 +74,7 @@ public class MemoryTrackerService {
         .filter(
             tracker -> {
               Boolean trackerSpelling = tracker.getSpelling();
-              return (checkSpell == null && trackerSpelling == null)
-                  || (checkSpell != null && checkSpell.equals(trackerSpelling));
+              return Boolean.TRUE.equals(checkSpell) == Boolean.TRUE.equals(trackerSpelling);
             })
         .findFirst()
         .ifPresent(memoryTracker -> markAsRepeated(currentUTCTimestamp, correct, memoryTracker));
