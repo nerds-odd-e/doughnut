@@ -8,15 +8,14 @@ Feature: Browse answers and notes while recalling
     Given I am logged in as an existing user
     And I have a notebook with the head note "English" which skips review
     And there are some notes:
-      | Title            | Details                        | Skip Memory Tracking| Parent Title|
-      | sedition         | Sedition means incite violence | false      | English     |
-      | sedation         | Put to sleep is sedation       | false      | English     |
-      | medical          |                                | true       | English     |
+      | Title    | Details                        | Skip Memory Tracking | Parent Title |
+      | sedition | Sedition means incite violence | false                | English      |
+      | sedation | Put to sleep is sedation       | false                | English      |
+      | medical  |                                | true                 | English      |
     And the OpenAI service is unavailable due to invalid system token
     And I am assimilating new note on day 1
     And I have selected the choice "Remember Spelling"
 
-  @ignore
   Scenario: View last result when the quiz answer was correct
     Given I learned one note "sedation" on day 1
     When I am recalling my note on day 2
@@ -24,8 +23,9 @@ Feature: Browse answers and notes while recalling
     And I type my answer "sedition"
     Then I should see that my last answer is correct
     And I should see the memory tracker info of note "sedition"
-      | Repetition Count |
-      | 1                |
+      | type     | Repetition Count |
+      | normal   |                0 |
+      | spelling |                1 |
 
   Scenario: Browse notes while recalling and come back
     Given I am recalling my note on day 2

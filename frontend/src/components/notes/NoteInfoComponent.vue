@@ -4,13 +4,26 @@
     v-bind="{ noteId: noteInfo.note.id, recallSetting }"
     @level-changed="$emit('levelChanged', $event)"
   />
-  <template v-for="memoryTracker in memoryTrackers" :key="memoryTracker.id">
-    <h6>Memory Tracker</h6>
-    <NoteInfoMemoryTracker
-      :model-value="memoryTracker"
-      @update:model-value="updateMemoryTracker($event)"
-    />
-  </template>
+  <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
+  <table v-if="memoryTrackers.length" class="daisy-table daisy-table-bordered">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Repetition Count</th>
+        <th>Forgetting Curve Index</th>
+        <th>Next Recall</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="memoryTracker in memoryTrackers" :key="memoryTracker.id">
+        <NoteInfoMemoryTracker
+          :model-value="memoryTracker"
+          @update:model-value="updateMemoryTracker($event)"
+        />
+      </tr>
+    </tbody>
+  </table>
 </template>
 
 <script setup lang="ts">

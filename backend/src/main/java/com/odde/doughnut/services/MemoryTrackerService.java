@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class MemoryTrackerService {
   private final ModelFactoryService modelFactoryService;
@@ -65,14 +66,19 @@ public class MemoryTrackerService {
 
   public void updateMemoryTrackerAfterAnsweringQuestion(
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
-    MemoryTracker memoryTracker =
-        new UserModel(user, modelFactoryService)
-            .getMemoryTrackerFor(
-                recallPrompt.getPredefinedQuestion().getNote(),
-                recallPrompt.getPredefinedQuestion().getBareQuestion().getCheckSpell());
-    if (memoryTracker != null) {
-      markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
-    }
+    UserModel userModel = new UserModel(user, modelFactoryService);
+    Boolean checkSpell = recallPrompt.getPredefinedQuestion().getBareQuestion().getCheckSpell();
+    List<MemoryTracker> memoryTrackers =
+        userModel.getMemoryTrackersFor(recallPrompt.getPredefinedQuestion().getNote());
+    memoryTrackers.stream()
+        .filter(
+            tracker -> {
+              Boolean trackerSpelling = tracker.getSpelling();
+              return (checkSpell == null && trackerSpelling == null)
+                  || (checkSpell != null && checkSpell.equals(trackerSpelling));
+            })
+        .findFirst()
+        .ifPresent(memoryTracker -> markAsRepeated(currentUTCTimestamp, correct, memoryTracker));
   }
 
   public void markAsRepeated(

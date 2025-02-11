@@ -1,50 +1,44 @@
 <template>
-  <div class="alert alert-danger" v-if="localMemoryTracker.removedFromTracking">
-    This memory tracker has been removed from tracking.
-  </div>
-  <label
-    >Repetition Count:
-    <span class="statistics-value">{{
-      localMemoryTracker.repetitionCount
-    }}</span></label
-  >
-  <label
-    >Forgetting Curive Index:
-    <span class="statistics-value">{{
-      localMemoryTracker.forgettingCurveIndex
-    }}</span></label
-  >
-  <label
-    >Next Recall:
-    <span class="statistics-value">{{
-      new Date(localMemoryTracker.nextRecallAt).toLocaleString()
-    }}</span></label
-  >
-  <div class="btn-group" role="group" aria-label="First group">
-    <button
-      class="btn"
-      name="sad"
-      @click="selfEvaluate(-5)"
-      title="reduce next repeat interval (days) by half"
-    >
-      <SvgSad />
-    </button>
-    <button
-      class="btn"
-      name="happy"
-      @click="selfEvaluate(5)"
-      title="add to next repeat interval (days) by half"
-    >
-      <SvgHappy />
-    </button>
-    <button
-      class="btn"
-      title="remove this note from review"
-      @click="removeFromReview"
-    >
-      <SvgNoReview />
-    </button>
-  </div>
+  <td>{{ localMemoryTracker.spelling ? 'spelling' : 'normal' }}</td>
+  <td>
+    <span class="statistics-value">{{ localMemoryTracker.repetitionCount }}</span>
+    <div class="alert alert-danger" v-if="localMemoryTracker.removedFromTracking">
+      This memory tracker has been removed from tracking.
+    </div>
+  </td>
+  <td>
+    <span class="statistics-value">{{ localMemoryTracker.forgettingCurveIndex }}</span>
+  </td>
+  <td>
+    <span class="statistics-value">{{ new Date(localMemoryTracker.nextRecallAt).toLocaleString() }}</span>
+  </td>
+  <td>
+    <div class="btn-group" role="group" aria-label="First group">
+      <button
+        class="btn"
+        name="sad"
+        @click="selfEvaluate(-5)"
+        title="reduce next repeat interval (days) by half"
+      >
+        <SvgSad />
+      </button>
+      <button
+        class="btn"
+        name="happy"
+        @click="selfEvaluate(5)"
+        title="add to next repeat interval (days) by half"
+      >
+        <SvgHappy />
+      </button>
+      <button
+        class="btn"
+        title="remove this note from review"
+        @click="removeFromReview"
+      >
+        <SvgNoReview />
+      </button>
+    </div>
+  </td>
 </template>
 
 <script setup lang="ts">

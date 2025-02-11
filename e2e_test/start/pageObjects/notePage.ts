@@ -310,17 +310,23 @@ export const assumeNotePage = (noteTopology?: string) => {
     memoryTracker() {
       clickNotePageMoreOptionsButton('Note Recall Settings')
       return {
-        expectMemoryTrackerInfo(attrs: { [key: string]: string }) {
-          for (const k in attrs) {
-            cy.contains(k)
-              .findByText(attrs[k] ?? '')
-              .should('be.visible')
+        expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
+          for (const k in expected) {
+            cy.contains('tr', expected[k]?.type ?? '').within(() => {
+              for (const attr in expected[k]) {
+                if (expected[k][attr] !== undefined) {
+                  cy.contains('td', expected[k][attr])
+                }
+              }
+            })
           }
         },
-        removeMemoryTrackerFromReview() {
-          cy.findByRole('button', {
-            name: 'remove this note from review',
-          }).click()
+        removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
+          cy.contains('tr', type).within(() => {
+            cy.findByRole('button', {
+              name: 'remove this note from review',
+            }).click()
+          })
           cy.findByRole('button', { name: 'OK' }).click()
           cy.findByText('This memory tracker has been removed from tracking.')
         },

@@ -62,20 +62,11 @@ public class UserModel implements ReviewScope {
         .findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(entity.getId(), timestamp);
   }
 
-  public MemoryTracker getMemoryTrackerFor(Note note, Boolean checkSpell) {
-    if (entity == null) return null;
+  public List<MemoryTracker> getMemoryTrackersFor(Note note) {
+    if (entity == null) return List.of();
 
-    List<MemoryTracker> memoryTrackers =
-        modelFactoryService.memoryTrackerRepository.findByUserAndNote(entity.getId(), note.getId());
-    return memoryTrackers.stream()
-        .filter(
-            tracker -> {
-              Boolean trackerSpelling = tracker.getSpelling();
-              return (checkSpell == null && trackerSpelling == null)
-                  || (checkSpell != null && checkSpell.equals(trackerSpelling));
-            })
-        .findFirst()
-        .orElse(null);
+    return modelFactoryService.memoryTrackerRepository.findByUserAndNote(
+        entity.getId(), note.getId());
   }
 
   public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {

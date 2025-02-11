@@ -110,8 +110,7 @@ class RestNoteController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
-    MemoryTracker memoryTracker = currentUser.getMemoryTrackerFor(note, false);
-    noteInfo.setMemoryTrackers(memoryTracker != null ? List.of(memoryTracker) : List.of());
+    noteInfo.setMemoryTrackers(currentUser.getMemoryTrackersFor(note));
     noteInfo.setNote(new NoteViewer(currentUser.getEntity(), note).toJsonObject());
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());

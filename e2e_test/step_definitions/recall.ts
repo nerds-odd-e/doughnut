@@ -174,7 +174,7 @@ Then(
     start
       .assumeAnsweredQuestionPage()
       .showMemoryTracker(noteTopology)
-      .expectMemoryTrackerInfo(data.hashes()[0] ?? {})
+      .expectMemoryTrackerInfo(data.hashes())
   }
 )
 
@@ -183,7 +183,7 @@ Then('choose to remove the last memory tracker from recalls', () => {
     .assumeAnsweredQuestionPage()
     .goToLastResult()
     .showMemoryTracker()
-    .removeMemoryTrackerFromReview()
+    .removeMemoryTrackerFromReview('normal')
 })
 
 When(
