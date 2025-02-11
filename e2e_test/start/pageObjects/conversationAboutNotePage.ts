@@ -6,7 +6,7 @@ export class ConversationAboutNotePage {
   }
 
   replyToConversationAndInviteAiToReply(msg: string) {
-    cy.findByRole('textbox').focus().type(msg)
+    cy.focused().type(msg)
     cy.findByRole('button', {
       name: 'Send message and invite AI to reply',
     }).click()
