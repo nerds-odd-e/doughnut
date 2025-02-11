@@ -67,7 +67,9 @@ public class MemoryTrackerService {
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     MemoryTracker memoryTracker =
         new UserModel(user, modelFactoryService)
-            .getMemoryTrackerFor(recallPrompt.getPredefinedQuestion().getNote());
+            .getMemoryTrackerFor(
+                recallPrompt.getPredefinedQuestion().getNote(),
+                recallPrompt.getPredefinedQuestion().getBareQuestion().getCheckSpell());
     if (memoryTracker != null) {
       markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
     }

@@ -91,6 +91,7 @@ class RestRecallPromptControllerTests {
               .aMemoryTrackerFor(answerNote)
               .by(currentUser)
               .forgettingCurveAndNextRecallAt(200)
+              .spelling()
               .please();
       recallPrompt = makeMe.aRecallPrompt().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());

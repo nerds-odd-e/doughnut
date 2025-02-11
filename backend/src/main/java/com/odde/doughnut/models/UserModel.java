@@ -62,13 +62,18 @@ public class UserModel implements ReviewScope {
         .findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(entity.getId(), timestamp);
   }
 
-  public MemoryTracker getMemoryTrackerFor(Note note) {
+  public MemoryTracker getMemoryTrackerFor(Note note, Boolean checkSpell) {
     if (entity == null) return null;
 
     List<MemoryTracker> memoryTrackers =
         modelFactoryService.memoryTrackerRepository.findByUserAndNote(entity.getId(), note.getId());
     return memoryTrackers.stream()
-        .filter(tracker -> !Boolean.TRUE.equals(tracker.getSpelling()))
+        .filter(
+            tracker -> {
+              Boolean trackerSpelling = tracker.getSpelling();
+              return (checkSpell == null && trackerSpelling == null)
+                  || (checkSpell != null && checkSpell.equals(trackerSpelling));
+            })
         .findFirst()
         .orElse(null);
   }

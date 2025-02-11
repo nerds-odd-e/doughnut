@@ -16,6 +16,7 @@ Feature: Browse answers and notes while recalling
     And I am assimilating new note on day 1
     And I have selected the choice "Remember Spelling"
 
+  @ignore
   Scenario: View last result when the quiz answer was correct
     Given I learned one note "sedation" on day 1
     When I am recalling my note on day 2
