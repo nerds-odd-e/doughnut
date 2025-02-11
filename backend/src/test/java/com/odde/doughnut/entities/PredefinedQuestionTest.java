@@ -8,7 +8,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -27,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
-  NonRandomizer randomizer = new NonRandomizer();
   AiQuestionGenerator aiQuestionGenerator = mock(AiQuestionGenerator.class);
 
   @BeforeEach
@@ -69,7 +67,7 @@ class PredefinedQuestionTest {
 
   private PredefinedQuestion generateQuizQuestionEntity(MemoryTracker memoryTracker) {
     PredefinedQuestionService predefinedQuestionService =
-        new PredefinedQuestionService(makeMe.modelFactoryService, randomizer, aiQuestionGenerator);
+        new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
     return predefinedQuestionService.generateAQuestion(memoryTracker, userModel.getEntity());
   }
 }

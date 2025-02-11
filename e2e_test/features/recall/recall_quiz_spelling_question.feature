@@ -15,6 +15,7 @@ Feature: Repetition Quiz
     Given I am assimilating new note on day 1
     And I have selected the choice "Remember Spelling"
     When I am recalling my note on day 2
+    And I skip one question
     Then I should be asked spelling question "means incite violence" from notebook "English"
     When I type my answer "<answer>"
     Then I should see that my answer <result>

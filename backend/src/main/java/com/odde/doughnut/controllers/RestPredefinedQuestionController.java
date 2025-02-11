@@ -40,7 +40,6 @@ class RestPredefinedQuestionController {
     this.predefinedQuestionService =
         new PredefinedQuestionService(
             modelFactoryService,
-            testabilitySettings.getRandomizer(),
             new AiQuestionGenerator(
                 openAiApi,
                 new GlobalSettingsService(modelFactoryService),

@@ -122,6 +122,10 @@ Then('I choose yes I remember', () => {
   cy.yesIRemember()
 })
 
+Then('I skip one question', () => {
+  start.assumeQuestionPage().skipQuestion()
+})
+
 Then(
   'I should be asked spelling question {string} from notebook {string}',
   (question: string, notebook: string) => {

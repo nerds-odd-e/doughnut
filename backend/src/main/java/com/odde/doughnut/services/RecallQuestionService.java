@@ -25,7 +25,7 @@ public class RecallQuestionService {
         new AiQuestionGenerator(
             openAiApi, new GlobalSettingsService(modelFactoryService), randomizer);
     this.predefinedQuestionService =
-        new PredefinedQuestionService(modelFactoryService, randomizer, aiQuestionGenerator);
+        new PredefinedQuestionService(modelFactoryService, aiQuestionGenerator);
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker, User user) {

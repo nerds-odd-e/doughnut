@@ -3,25 +3,20 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionGenerator;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
-import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
-  private final Randomizer randomizer;
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public PredefinedQuestionService(
-      ModelFactoryService modelFactoryService,
-      Randomizer randomizer,
-      AiQuestionGenerator aiQuestionGenerator) {
+      ModelFactoryService modelFactoryService, AiQuestionGenerator aiQuestionGenerator) {
     this.modelFactoryService = modelFactoryService;
-    this.randomizer = randomizer;
     this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
@@ -57,11 +52,12 @@ public class PredefinedQuestionService {
 
   public PredefinedQuestion generateAQuestion(MemoryTracker memoryTracker, User user) {
     Note note = memoryTracker.getNote();
-    PredefinedQuestionGenerator predefinedQuestionGenerator =
-        new PredefinedQuestionGenerator(user, note, randomizer, modelFactoryService);
-    PredefinedQuestion result =
-        predefinedQuestionGenerator.generateAQuestionOfRandomType(
-            new AiQuestionFactory(note, aiQuestionGenerator));
+    PredefinedQuestion result;
+    if (!memoryTracker.getSpelling()) {
+      result = generateAQuestionForNote(note);
+    } else {
+      result = new SpellingPredefinedFactory(note).buildSpellingQuestion();
+    }
     if (result == null) {
       return null;
     }
