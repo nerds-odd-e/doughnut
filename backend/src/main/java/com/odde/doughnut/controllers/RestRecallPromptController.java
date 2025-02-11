@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -72,8 +73,20 @@ class RestRecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     currentUser.assertLoggedIn();
-
     return recallQuestionService.answerQuestion(
+        recallPrompt,
+        answerDTO,
+        currentUser.getEntity(),
+        testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  @PostMapping("/{recallPrompt}/answer")
+  @Transactional
+  public AnsweredQuestion answerSpelling(
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
+      @Valid @RequestBody AnswerSpellingDTO answerDTO) {
+    currentUser.assertLoggedIn();
+    return recallQuestionService.answerSpelling(
         recallPrompt,
         answerDTO,
         currentUser.getEntity(),

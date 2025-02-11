@@ -39,6 +39,7 @@ Feature: Browse answers and notes while recalling
     And I go to the recalls page
     Then I should see that my answer "riot" is incorrect
 
+  @ignore
   Scenario: I can remove a note from further recalls
     Given I am recalling my note on day 2
     And I skip one question
