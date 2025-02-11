@@ -2,7 +2,6 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -41,14 +40,7 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
   }
 
   public PredefinedQuestionBuilder useFactory(SpellingPredefinedFactory predefinedQuestionFactory) {
-    try {
-      this.entity = predefinedQuestionFactory.buildValidPredefinedQuestion();
-    } catch (PredefinedQuestionNotPossibleException e) {
-      throw new RuntimeException(
-          "Failed to generate a question of type "
-              + predefinedQuestionFactory.getClass().getSimpleName()
-              + ", perhaps no enough data.");
-    }
+    this.entity = predefinedQuestionFactory.buildSpellingQuestion();
     return this;
   }
 }

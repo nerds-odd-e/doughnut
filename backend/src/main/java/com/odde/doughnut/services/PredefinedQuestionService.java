@@ -3,8 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.AiQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -66,11 +64,10 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAQuestionForNote(Note note) {
-    AiQuestionFactory aiQuestionFactory = new AiQuestionFactory(note, aiQuestionGenerator);
-    try {
-      return aiQuestionFactory.buildValidPredefinedQuestion();
-    } catch (PredefinedQuestionNotPossibleException e) {
+    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+    if (MCQWithAnswer == null) {
       return null;
     }
+    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 }
