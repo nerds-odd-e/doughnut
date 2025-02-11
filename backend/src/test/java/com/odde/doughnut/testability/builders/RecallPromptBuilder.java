@@ -3,7 +3,7 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
+import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -43,7 +43,7 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     return this;
   }
 
-  public RecallPromptBuilder useFactory(PredefinedQuestionFactory predefinedQuestionFactory) {
+  public RecallPromptBuilder useFactory(SpellingPredefinedFactory predefinedQuestionFactory) {
     this.predefinedQuestionBuilder.useFactory(predefinedQuestionFactory);
 
     return this;

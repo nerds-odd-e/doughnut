@@ -2,7 +2,6 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionFactory;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -41,7 +40,7 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     return this;
   }
 
-  public PredefinedQuestionBuilder useFactory(PredefinedQuestionFactory predefinedQuestionFactory) {
+  public PredefinedQuestionBuilder useFactory(SpellingPredefinedFactory predefinedQuestionFactory) {
     try {
       this.entity = predefinedQuestionFactory.buildValidPredefinedQuestion();
     } catch (PredefinedQuestionNotPossibleException e) {

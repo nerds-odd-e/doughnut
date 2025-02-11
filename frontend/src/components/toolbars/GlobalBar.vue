@@ -15,16 +15,16 @@
       </PopButton>
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
-    <LoadingThinBar v-if="apiStatus.states.length > 0" />
+    <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
   </nav>
 </template>
 
 <script setup lang="ts">
 import type { User } from "@/generated/backend"
 import { type ApiStatus } from "@/managedApi/ManagedApi"
+import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
-import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
 
 defineProps({
   storageAccessor: {
