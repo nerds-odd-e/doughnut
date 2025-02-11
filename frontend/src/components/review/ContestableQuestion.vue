@@ -24,9 +24,17 @@
     />
     <div v-else class="daisy-flex daisy-flex-col daisy-gap-4" :class="{ 'daisy-opacity-50 daisy-pointer-events-none': contesting }">
       <RecallPromptComponent
-        v-if="currentQuestion"
+        v-if="currentQuestion && currentQuestion.bareQuestion.multipleChoicesQuestion.choices && currentQuestion.bareQuestion.multipleChoicesQuestion.choices.length > 0"
         :recall-prompt="currentQuestion"
         @answered="onAnswered($event)"
+      />
+      <SpellingQuestionDisplay
+        v-else-if="currentQuestion"
+        v-bind="{
+          bareQuestion: currentQuestion.bareQuestion,
+        }"
+        @answer="onSpellingAnswered($event)"
+        :key="`spelling-${currentQuestion.id}`"
       />
       <a
         role="button"
@@ -43,7 +51,11 @@
 </template>
 
 <script setup lang="ts">
-import type { AnsweredQuestion, RecallPrompt } from "@/generated/backend"
+import type {
+  AnsweredQuestion,
+  RecallPrompt,
+  AnswerSpellingDTO,
+} from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
@@ -52,6 +64,7 @@ import NotebookLink from "../notes/NotebookLink.vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
+import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -116,6 +129,22 @@ const contest = async () => {
 const onAnswered = (answer: AnsweredQuestion) => {
   answeredQuestion.value = answer
   emit("answered", answeredQuestion.value)
+}
+
+const onSpellingAnswered = async (answerData: AnswerSpellingDTO) => {
+  if (answerData.spellingAnswer === undefined) return
+
+  try {
+    const answerResult =
+      await managedApi.restRecallPromptController.answerSpelling(
+        currentQuestion.value.id,
+        { spellingAnswer: answerData.spellingAnswer }
+      )
+    answeredQuestion.value = answerResult
+    emit("answered", answerResult)
+  } catch (e) {
+    // Error handling is already done in the component
+  }
 }
 </script>
 

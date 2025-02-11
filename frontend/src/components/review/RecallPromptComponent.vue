@@ -1,15 +1,6 @@
 <template>
   <div class="daisy-relative">
-    <SpellingQuestionDisplay
-      v-if="!recallPrompt.bareQuestion.multipleChoicesQuestion.choices || recallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0"
-      v-bind="{
-        bareQuestion: recallPrompt.bareQuestion,
-      }"
-      @answer="submitSpellingAnswer($event)"
-      :key="`spelling-${recallPrompt.id}`"
-    />
     <QuestionDisplay
-      v-else
       v-bind="{
         bareQuestion: recallPrompt.bareQuestion,
       }"
@@ -31,15 +22,10 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type {
-  AnswerDTO,
-  RecallPrompt,
-  AnswerSpellingDTO,
-} from "@/generated/backend"
+import type { AnswerDTO, RecallPrompt } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"
-import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
 
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
@@ -61,26 +47,6 @@ const handleError = async () => {
   await popups.alert(
     "This memory tracker doesn't exist any more or is being skipped now. Moving on to the next memory tracker..."
   )
-}
-
-const submitSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
-  if (answerData.spellingAnswer === undefined) return
-
-  isLoading.value = true
-  error.value = ""
-
-  try {
-    const answerResult =
-      await managedApi.restRecallPromptController.answerSpelling(
-        props.recallPrompt.id,
-        { spellingAnswer: answerData.spellingAnswer }
-      )
-    emits("answered", answerResult)
-  } catch (e) {
-    await handleError()
-  } finally {
-    isLoading.value = false
-  }
 }
 
 const submitQuizAnswer = async (answerData: AnswerDTO) => {

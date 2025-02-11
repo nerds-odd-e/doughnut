@@ -6,7 +6,10 @@ import helper from "@tests/helpers"
 import type { RecallPrompt } from "@/generated/backend"
 
 describe("ContestableQuestion", () => {
-  const recallPrompt = makeMe.aRecallPrompt.please()
+  const recallPrompt = makeMe.aRecallPrompt
+    .withQuestionStem("Test question")
+    .withChoices(["A", "B", "C"])
+    .please()
   const mockedContestCall = vi.fn()
   const mockedRegenerateCall = vi.fn()
 
@@ -17,23 +20,26 @@ describe("ContestableQuestion", () => {
       mockedRegenerateCall
   })
 
-  const mountComponent = async () => {
+  const mountComponent = async (customRecallPrompt = recallPrompt) => {
     const wrapper = helper
       .component(ContestableQuestion)
       .withRouter()
       .withStorageProps({
-        recallPrompt,
+        recallPrompt: customRecallPrompt,
       })
       .mount()
     await flushPromises()
     return wrapper
   }
 
-  it("renders the recall prompt", async () => {
+  it("renders the recall prompt component for multiple choice questions", async () => {
     const wrapper = await mountComponent()
     expect(
       wrapper.findComponent({ name: "RecallPromptComponent" }).exists()
     ).toBe(true)
+    expect(
+      wrapper.findComponent({ name: "SpellingQuestionDisplay" }).exists()
+    ).toBe(false)
   })
 
   it("shows contest button", async () => {
@@ -114,9 +120,73 @@ describe("ContestableQuestion", () => {
     })
   })
 
+  describe("spelling questions", () => {
+    it("shows spelling question input when question has no choices", async () => {
+      const recallPromptWithoutChoices = makeMe.aRecallPrompt
+        .withQuestionStem("Spell the word 'cat'")
+        .please()
+
+      const wrapper = helper
+        .component(ContestableQuestion)
+        .withRouter()
+        .withStorageProps({
+          recallPrompt: recallPromptWithoutChoices,
+        })
+        .mount()
+      await flushPromises()
+
+      expect(
+        wrapper.findComponent({ name: "SpellingQuestionDisplay" }).exists()
+      ).toBe(true)
+      expect(
+        wrapper.findComponent({ name: "RecallPromptComponent" }).exists()
+      ).toBe(false)
+    })
+
+    it("submits spelling answer correctly", async () => {
+      const recallPromptWithoutChoices = makeMe.aRecallPrompt
+        .withQuestionStem("Spell the word 'cat'")
+        .please()
+
+      const answerResult = makeMe.anAnsweredQuestion
+        .answerCorrect(true)
+        .please()
+      helper.managedApi.restRecallPromptController.answerSpelling = vi
+        .fn()
+        .mockResolvedValue(answerResult)
+
+      const wrapper = helper
+        .component(ContestableQuestion)
+        .withRouter()
+        .withStorageProps({
+          recallPrompt: recallPromptWithoutChoices,
+        })
+        .mount()
+      await flushPromises()
+
+      await wrapper
+        .findComponent({ name: "SpellingQuestionDisplay" })
+        .vm.$emit("answer", { spellingAnswer: "cat" })
+      await flushPromises()
+
+      expect(
+        helper.managedApi.restRecallPromptController.answerSpelling
+      ).toHaveBeenCalledWith(recallPromptWithoutChoices.id, {
+        spellingAnswer: "cat",
+      })
+
+      const emitted = wrapper.emitted()
+      expect(emitted.answered).toBeTruthy()
+      expect(emitted.answered![0]).toEqual([answerResult])
+    })
+  })
+
   it("emits answered event when question is answered", async () => {
     const wrapper = await mountComponent()
-    const answeredQuestion = makeMe.anAnsweredQuestion.please()
+    const answeredQuestion = makeMe.anAnsweredQuestion
+      .withChoiceIndex(0)
+      .answerCorrect(true)
+      .please()
 
     await wrapper
       .findComponent({ name: "RecallPromptComponent" })

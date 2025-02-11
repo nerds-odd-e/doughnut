@@ -13,13 +13,11 @@ describe("RecallPromptComponent", () => {
     vi.useRealTimers()
   })
 
-  const mountComponent = (withChoices = true) => {
-    const recallPrompt = withChoices
-      ? makeMe.aRecallPrompt
-          .withQuestionStem("Test question")
-          .withChoices(["A", "B", "C"])
-          .please()
-      : makeMe.aRecallPrompt.withQuestionStem("Test question").please()
+  const mountComponent = () => {
+    const recallPrompt = makeMe.aRecallPrompt
+      .withQuestionStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
 
     return helper
       .component(RecallPromptComponent)
@@ -28,7 +26,7 @@ describe("RecallPromptComponent", () => {
   }
 
   describe("answer submission", () => {
-    it("shows loading state while submitting answer for multiple choice", async () => {
+    it("shows loading state while submitting answer", async () => {
       // Setup API to delay response
       helper.managedApi.restRecallPromptController.answerQuiz = vi
         .fn()
@@ -36,40 +34,12 @@ describe("RecallPromptComponent", () => {
           () => new Promise((resolve) => setTimeout(resolve, 100))
         )
 
-      const wrapper = mountComponent(true)
+      const wrapper = mountComponent()
 
       // Submit an answer
       await wrapper
         .findComponent({ name: "QuestionDisplay" })
         .vm.$emit("answer", { choiceIndex: 0 })
-
-      // Verify loading overlay is shown
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
-      expect(
-        wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
-      ).toBe(true)
-
-      vi.runAllTimers()
-      await flushPromises()
-
-      // Verify loading state is removed after response
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(false)
-    })
-
-    it("shows loading state while submitting answer for spelling", async () => {
-      // Setup API to delay response
-      helper.managedApi.restRecallPromptController.answerQuiz = vi
-        .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(resolve, 100))
-        )
-
-      const wrapper = mountComponent(false)
-
-      // Submit an answer
-      await wrapper
-        .findComponent({ name: "SpellingQuestionDisplay" })
-        .vm.$emit("answer", { spellingAnswer: "test" })
 
       // Verify loading overlay is shown
       expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
@@ -91,7 +61,7 @@ describe("RecallPromptComponent", () => {
         .mockRejectedValueOnce(new Error("API Error"))
         .mockResolvedValueOnce({ correct: true })
 
-      const wrapper = mountComponent(true)
+      const wrapper = mountComponent()
 
       // Submit first answer (will fail)
       await wrapper
@@ -121,7 +91,7 @@ describe("RecallPromptComponent", () => {
         .fn()
         .mockResolvedValue(answerResult)
 
-      const wrapper = mountComponent(true)
+      const wrapper = mountComponent()
 
       await wrapper
         .findComponent({ name: "QuestionDisplay" })
