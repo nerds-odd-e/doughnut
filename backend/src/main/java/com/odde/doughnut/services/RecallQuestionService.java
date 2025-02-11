@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -70,13 +69,5 @@ public class RecallQuestionService {
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();
-  }
-
-  public AnsweredQuestion answerSpelling(
-      RecallPrompt recallPrompt,
-      AnswerSpellingDTO answerDTO,
-      User user,
-      Timestamp currentUTCTimestamp) {
-    return null;
   }
 }
