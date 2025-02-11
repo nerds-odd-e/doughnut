@@ -123,7 +123,6 @@ Then('I choose yes I remember', () => {
 })
 
 Then('I skip one question', () => {
-  cy.wait(1000)
   start.assumeQuestionPage().skipQuestion()
 })
 
