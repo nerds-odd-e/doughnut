@@ -114,7 +114,7 @@ install_nixpkg_manager() {
   touch "${HOME}/.bash_profile"
 
   if [[ "${os_type}" == "Mac" || "${os_type}" == "Linux" ]]; then
-    "${TEMP_DIR}/install-nix" -s -- install
+    cat "${TEMP_DIR}/install-nix" | sh -s -- install
   else
     log "Error: Unsupported OS Platform for Nix development environment"
     exit 1
