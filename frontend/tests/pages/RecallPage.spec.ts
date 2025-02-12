@@ -6,6 +6,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
+import type { SpellingResultDTO } from "@/generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -165,21 +166,13 @@ describe("repeat page", () => {
     })
 
     it("should handle spelling questions correctly", async () => {
-      const answerResult = makeMe.anAnsweredQuestion
-        .withRecallPromptId(1)
-        .answerCorrect(false)
-        .please()
-
-      // Add spelling-specific properties
-      answerResult.predefinedQuestion = makeMe.aPredefinedQuestion
-        .withSpellCheck()
-        .withQuestionStem("test question")
-        .please()
       const note = makeMe.aNote.please()
       note.id = 42
-      answerResult.note = note
-      answerResult.answerDisplay = "test answer"
-      answerResult.answer = { id: 1, correct: false }
+      const answerResult: SpellingResultDTO = {
+        note,
+        answer: "test answer",
+        isCorrect: false,
+      }
 
       const mockedAnswerSpellingCall = vi.fn().mockResolvedValue(answerResult)
       helper.managedApi.restRecallPromptController.answerSpelling =

@@ -7,6 +7,7 @@ import type { AnsweredQuestion } from '../models/AnsweredQuestion';
 import type { AnswerSpellingDTO } from '../models/AnswerSpellingDTO';
 import type { QuestionContestResult } from '../models/QuestionContestResult';
 import type { RecallPrompt } from '../models/RecallPrompt';
+import type { SpellingResultDTO } from '../models/SpellingResultDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestRecallPromptControllerService {
@@ -79,13 +80,13 @@ export class RestRecallPromptControllerService {
     /**
      * @param recallPrompt
      * @param requestBody
-     * @returns AnsweredQuestion OK
+     * @returns SpellingResultDTO OK
      * @throws ApiError
      */
     public answerSpelling(
         recallPrompt: number,
         requestBody: AnswerSpellingDTO,
-    ): CancelablePromise<AnsweredQuestion> {
+    ): CancelablePromise<SpellingResultDTO> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/recall-prompts/{recallPrompt}/answer-spelling',

@@ -65,6 +65,7 @@ import type {
   AnsweredQuestion,
   RecallPrompt,
   AnswerSpellingDTO,
+  SpellingResultDTO,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -86,7 +87,7 @@ const props = defineProps<QuizProps>()
 // Emits definition
 const emit = defineEmits<{
   (e: "answered-question", result: AnsweredQuestion): void
-  (e: "answered-spelling", result: AnsweredQuestion): void
+  (e: "answered-spelling", result: SpellingResultDTO): void
   (e: "just-reviewed", result: AnsweredQuestion | undefined): void
   (e: "moveToEnd", currentIndex: number): void
 }>()

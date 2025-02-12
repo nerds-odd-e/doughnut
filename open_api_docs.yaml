@@ -662,7 +662,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
+                $ref: "#/components/schemas/SpellingResultDTO"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -3663,6 +3663,17 @@ components:
       properties:
         spellingAnswer:
           type: string
+    SpellingResultDTO:
+      type: object
+      properties:
+        note:
+          $ref: "#/components/schemas/Note"
+        answer:
+          type: string
+        isCorrect:
+          type: boolean
+      required:
+      - note
     QuestionSuggestionCreationParams:
       type: object
       properties:

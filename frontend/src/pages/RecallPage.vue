@@ -67,7 +67,8 @@ import Quiz from "@/components/review/Quiz.vue"
 import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
-import type { AnsweredQuestion, Note } from "@/generated/backend"
+import type { AnsweredQuestion } from "@/generated/backend/models/AnsweredQuestion"
+import type { SpellingResultDTO } from "@/generated/backend/models/SpellingResultDTO"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -77,12 +78,7 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-export type SpellingResult = {
-  type: "spelling"
-  note: Note
-  answer: string
-  isCorrect: boolean
-}
+export type SpellingResult = SpellingResultDTO & { type: "spelling" }
 
 export type QuestionResult = {
   type: "question"
@@ -165,21 +161,14 @@ const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
   decrementToRepeatCount()
 }
 
-const onAnsweredSpelling = (answerResult: AnsweredQuestion) => {
+const onAnsweredSpelling = (answerResult: SpellingResultDTO) => {
   currentIndex.value += 1
-  if (
-    answerResult.predefinedQuestion?.bareQuestion.checkSpell &&
-    answerResult.note
-  ) {
-    previousResults.value.push({
-      type: "spelling",
-      note: answerResult.note,
-      answer: answerResult.answerDisplay || "",
-      isCorrect: answerResult.answer.correct,
-    })
-    if (!answerResult.answer.correct) {
-      viewLastResult(previousResults.value.length - 1)
-    }
+  previousResults.value.push({
+    type: "spelling",
+    ...answerResult,
+  })
+  if (!answerResult.isCorrect) {
+    viewLastResult(previousResults.value.length - 1)
   }
   decrementToRepeatCount()
 }

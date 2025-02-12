@@ -110,6 +110,7 @@ export type { RunImage } from './models/RunImage';
 export type { RunStep } from './models/RunStep';
 export type { SearchTerm } from './models/SearchTerm';
 export type { SelfEvaluation } from './models/SelfEvaluation';
+export type { SpellingResultDTO } from './models/SpellingResultDTO';
 export type { SseEmitter } from './models/SseEmitter';
 export type { StepDelta } from './models/StepDelta';
 export type { StepDetails } from './models/StepDetails';
