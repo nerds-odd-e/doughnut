@@ -19,7 +19,7 @@
           v-if="currentRecallPrompt && (!currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices || currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0)"
           v-bind="{
             bareQuestion: currentRecallPrompt.bareQuestion,
-            memoryTrackerId: currentMemoryTrackerId,
+            memoryTrackerId: currentMemoryTrackerId!,
           }"
           @answer="onSpellingAnswer($event)"
           :key="`spelling-${currentRecallPrompt.id}`"
