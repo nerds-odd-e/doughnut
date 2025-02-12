@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
+import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -39,6 +40,39 @@ class RestMemoryTrackerControllerTest {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+  }
+
+  @Nested
+  class GetSpellingQuestion {
+    @Test
+    void shouldReturnClozedDetailsAsQuestionStem() throws UnexpectedNoAccessRightException {
+      Note note =
+          makeMe.aNote("moon").details("partner of earth").creatorAndOwner(userModel).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
+
+      SpellingQuestion question = controller.getSpellingQuestion(memoryTracker);
+      assertThat(question.getStem(), equalTo("<p>partner of earth</p>\n"));
+    }
+
+    @Test
+    void shouldNotBeAbleToGetSpellingQuestionForOthersMemoryTracker() {
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getSpellingQuestion(memoryTracker));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      userModel = makeMe.aNullUserModelPlease();
+      controller =
+          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
+      assertThrows(
+          ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
+    }
   }
 
   @Nested

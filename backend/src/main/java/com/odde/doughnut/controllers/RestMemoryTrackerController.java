@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
+import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -33,6 +34,15 @@ class RestMemoryTrackerController {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
+  }
+
+  @GetMapping("/{memoryTracker}/spelling-question")
+  public SpellingQuestion getSpellingQuestion(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
+    currentUser.assertReadAuthorization(memoryTracker);
+    return new SpellingQuestion(memoryTracker.getNote().getClozeDescription().clozeDetails());
   }
 
   @GetMapping("/{memoryTracker}")

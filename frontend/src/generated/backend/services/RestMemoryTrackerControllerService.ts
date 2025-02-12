@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { MemoryTracker } from '../models/MemoryTracker';
 import type { SelfEvaluation } from '../models/SelfEvaluation';
+import type { SpellingQuestion } from '../models/SpellingQuestion';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestMemoryTrackerControllerService {
@@ -85,6 +86,25 @@ export class RestMemoryTrackerControllerService {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/memory-trackers/{memoryTracker}',
+            path: {
+                'memoryTracker': memoryTracker,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param memoryTracker
+     * @returns SpellingQuestion OK
+     * @throws ApiError
+     */
+    public getSpellingQuestion(
+        memoryTracker: number,
+    ): CancelablePromise<SpellingQuestion> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/memory-trackers/{memoryTracker}/spelling-question',
             path: {
                 'memoryTracker': memoryTracker,
             },
