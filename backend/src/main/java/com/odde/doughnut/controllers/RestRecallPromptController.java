@@ -87,16 +87,11 @@ class RestRecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerSpellingDTO answerDTO) {
     currentUser.assertLoggedIn();
-    AnsweredQuestion answeredQuestion =
-        recallQuestionService.answerSpelling(
-            recallPrompt,
-            answerDTO,
-            currentUser.getEntity(),
-            testabilitySettings.getCurrentUTCTimestamp());
-    return new SpellingResultDTO(
-        answeredQuestion.note,
-        answeredQuestion.answerDisplay,
-        answeredQuestion.answer.getCorrect());
+    return recallQuestionService.answerSpelling(
+        recallPrompt,
+        answerDTO,
+        currentUser.getEntity(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping(path = "/{recallPrompt}")

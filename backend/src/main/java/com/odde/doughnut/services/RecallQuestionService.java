@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
@@ -72,13 +73,17 @@ public class RecallQuestionService {
     return recallPrompt.getAnsweredQuestion();
   }
 
-  public AnsweredQuestion answerSpelling(
+  public SpellingResultDTO answerSpelling(
       RecallPrompt recallPrompt,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
       Timestamp currentUTCTimestamp) {
-    AnswerDTO answerDTO = new AnswerDTO();
-    answerDTO.setSpellingAnswer(answerSpellingDTO.getSpellingAnswer());
-    return answerQuestion(recallPrompt, answerDTO, user, currentUTCTimestamp);
+    String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
+    MemoryTrackerService memoryTrackerService = new MemoryTrackerService(modelFactoryService);
+    Note note = recallPrompt.getPredefinedQuestion().getNote();
+    Boolean correct = note.matchAnswer(spellingAnswer);
+    memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
+        user, currentUTCTimestamp, correct, recallPrompt);
+    return new SpellingResultDTO(note, spellingAnswer, correct);
   }
 }
