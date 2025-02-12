@@ -42,7 +42,9 @@ class RestMemoryTrackerController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(memoryTracker);
-    return new SpellingQuestion(memoryTracker.getNote().getClozeDescription().clozeDetails());
+    return new SpellingQuestion(
+        memoryTracker.getNote().getClozeDescription().clozeDetails(),
+        memoryTracker.getNote().getNotebook());
   }
 
   @GetMapping("/{memoryTracker}")

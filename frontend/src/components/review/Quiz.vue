@@ -12,9 +12,6 @@
         />
       </div>
       <template v-else>
-        <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
-          <NotebookLink :notebook="currentRecallPrompt.notebook" />
-        </div>
         <SpellingQuestionComponent
           v-if="currentMemoryTracker?.spelling"
           v-bind="{
@@ -23,15 +20,20 @@
           @answer="onSpellingAnswer($event)"
           :key="`spelling-${currentRecallPrompt.id}`"
         />
-        <ContestableQuestion
-          v-else
-          v-bind="{
-            recallPrompt: currentRecallPrompt,
-            storageAccessor,
-          }"
-          @answered="onAnswered($event)"
-          :key="currentRecallPrompt.id"
-        />
+        <template v-else>
+          <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
+            <NotebookLink :notebook="currentRecallPrompt.notebook" />
+          </div>
+          <ContestableQuestion
+            v-else
+            v-bind="{
+              recallPrompt: currentRecallPrompt,
+              storageAccessor,
+            }"
+            @answered="onAnswered($event)"
+            :key="currentRecallPrompt.id"
+          />
+        </template>
       </template>
       <button
         v-if="canMoveToEnd"
