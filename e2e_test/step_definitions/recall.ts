@@ -114,6 +114,10 @@ Then(
   }
 )
 
+Then('I choose yes I remember', () => {
+  cy.yesIRemember()
+})
+
 Then('I skip one question', () => {
   start.assumeQuestionPage().skipQuestion()
 })
