@@ -22,19 +22,14 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
-import type { BareQuestion, SpellingQuestion } from "@/generated/backend"
+import type { SpellingQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const props = defineProps({
-  bareQuestion: {
-    type: Object as PropType<BareQuestion>,
-    required: true,
-  },
   memoryTrackerId: {
     type: Number,
     required: true,

@@ -16,9 +16,8 @@
           <NotebookLink :notebook="currentRecallPrompt.notebook" />
         </div>
         <SpellingQuestionComponent
-          v-if="currentRecallPrompt && (!currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices || currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0)"
+          v-if="currentMemoryTracker?.spelling"
           v-bind="{
-            bareQuestion: currentRecallPrompt.bareQuestion,
             memoryTrackerId: currentMemoryTrackerId!,
           }"
           @answer="onSpellingAnswer($event)"
@@ -107,7 +106,8 @@ const useQuestionFetching = (props: QuizProps) => {
       index < props.currentIndex + props.eagerFetchCount;
       index++
     ) {
-      const memoryTrackerId = memoryTrackerIdAt(index)
+      const memoryTracker = memoryTrackerAt(index)
+      const memoryTrackerId = memoryTracker?.memoryTrackerId
       if (memoryTrackerId === undefined) break
 
       if (memoryTrackerId in recallPromptCache.value) continue
@@ -145,8 +145,9 @@ const { recallPromptCache, fetchQuestion } = useQuestionFetching(props)
 const { managedApi } = useLoadingApi()
 
 // Computed properties with better naming
-const currentMemoryTrackerId = computed(() =>
-  memoryTrackerIdAt(props.currentIndex)
+const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
+const currentMemoryTrackerId = computed(
+  () => currentMemoryTracker.value?.memoryTrackerId
 )
 const currentQuestionFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
@@ -162,9 +163,8 @@ const currentRecallPrompt = computed(() => {
 })
 
 // Methods
-const memoryTrackerIdAt = (index: number): number | undefined => {
-  const tracker = props.memoryTrackers?.[index]
-  return tracker?.memoryTrackerId
+const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined => {
+  return props.memoryTrackers?.[index]
 }
 
 const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {

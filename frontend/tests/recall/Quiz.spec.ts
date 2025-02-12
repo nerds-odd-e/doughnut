@@ -32,10 +32,11 @@ describe("repeat page", () => {
 
   const mountPage = async (
     memoryTrackerIds: number[],
-    eagerFetchCount: number
+    eagerFetchCount: number,
+    spelling = false
   ) => {
     const memoryTrackers = memoryTrackerIds.map((id) =>
-      createMemoryTrackerLite(id)
+      createMemoryTrackerLite(id, spelling)
     )
     const wrapper = helper
       .component(Quiz)
@@ -78,7 +79,7 @@ describe("repeat page", () => {
         .please()
       mockedRandomQuestionCall.mockResolvedValue(recallPromptWithoutChoices)
 
-      const wrapper = await mountPage([1], 1)
+      const wrapper = await mountPage([1], 1, true)
 
       expect(
         wrapper.findComponent({ name: "SpellingQuestionComponent" }).exists()
@@ -101,7 +102,7 @@ describe("repeat page", () => {
         .fn()
         .mockResolvedValue(answerResult)
 
-      const wrapper = await mountPage([1], 1)
+      const wrapper = await mountPage([1], 1, true)
 
       await wrapper
         .findComponent({ name: "SpellingQuestionComponent" })
