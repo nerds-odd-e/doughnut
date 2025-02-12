@@ -25,7 +25,7 @@
   <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0"
-      v-show="!currentResult"
+      v-show="!currentAnsweredQuestion"
       :memory-trackers="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
@@ -34,8 +34,8 @@
       @move-to-end="moveMemoryTrackerToEnd"
     />
     <AnsweredQuestionComponent
-      v-if="currentResult"
-      v-bind="{ answeredQuestion: currentResult, conversationButton: true, storageAccessor }"
+      v-if="currentAnsweredQuestion"
+      v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true, storageAccessor }"
     />
     <template v-else-if="toRepeatCount === 0">
       <div class="daisy-alert daisy-alert-success">
@@ -70,6 +70,10 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
+type RecallResult = {
+  answeredQuestion: AnsweredQuestion
+}
+
 const { managedApi } = useLoadingApi()
 const {
   setToRepeatCount,
@@ -88,14 +92,14 @@ defineProps({
 
 const toRepeat = ref<number[] | undefined>(undefined)
 const currentIndex = ref(0)
-const previousResults = ref<(AnsweredQuestion | undefined)[]>([])
+const previousResults = ref<(RecallResult | undefined)[]>([])
 const previousResultCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const showTooltip = ref(false)
 
-const currentResult = computed(() => {
+const currentAnsweredQuestion = computed(() => {
   if (previousResultCursor.value === undefined) return undefined
-  return previousResults.value[previousResultCursor.value]
+  return previousResults.value[previousResultCursor.value]?.answeredQuestion
 })
 
 const finished = computed(() => previousResults.value.length)
@@ -125,7 +129,7 @@ const loadMore = async (dueInDays?: number) => {
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
   currentIndex.value += 1
-  previousResults.value.push(answerResult)
+  previousResults.value.push({ answeredQuestion: answerResult })
   decrementToRepeatCount()
   if (!answerResult) return
   if (!answerResult.answer.correct) {
