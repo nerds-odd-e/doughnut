@@ -184,7 +184,7 @@ const onAnsweredSpelling = (answerResult: AnsweredQuestion) => {
   decrementToRepeatCount()
 }
 
-const onJustReviewed = (answerResult: AnsweredQuestion | undefined) => {
+const onJustReviewed = () => {
   currentIndex.value += 1
   previousResults.value.push(undefined)
   decrementToRepeatCount()
