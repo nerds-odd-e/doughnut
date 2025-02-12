@@ -18,6 +18,12 @@ class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
     this.predefinedQuestion.correctAnswerIndex = n
     return this
   }
+
+  withSpellCheck() {
+    this.predefinedQuestion.bareQuestion.checkSpell = true
+    return this
+  }
+
   withQuestionStem(stem: string) {
     this.predefinedQuestion.bareQuestion.multipleChoicesQuestion.stem = stem
     return this

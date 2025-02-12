@@ -1,11 +1,6 @@
 <template>
   <div v-if="note">
-    <fieldset
-      class="note-under-question"
-    >
-      <legend>Note under question</legend>
-      <Breadcrumb v-bind="{ noteTopology: note.noteTopology, includingSelf: true }" />
-    </fieldset>
+    <NoteUnderQuestion v-bind="{ noteTopology: note.noteTopology }" />
   </div>
   <QuestionDisplay
     v-if="answeredQuestion.predefinedQuestion"
@@ -26,8 +21,9 @@
 import type { AnsweredQuestion } from "@/generated/backend"
 import type { PropType } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
-import Breadcrumb from "@/components/toolbars/Breadcrumb.vue"
 import ConversationButton from "./ConversationButton.vue"
+import AnswerResult from "./AnswerResult.vue"
+import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 
 const { answeredQuestion, conversationButton } = defineProps({
   answeredQuestion: {

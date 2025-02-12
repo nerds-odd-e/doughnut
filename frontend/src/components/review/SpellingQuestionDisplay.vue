@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
     <QuestionStem :stem="bareQuestion.multipleChoicesQuestion.stem" />
-    <form @submit.prevent.once="submitAnswer({ spellingAnswer })">
+    <form @submit.prevent="submitAnswer">
       <TextInput
         scope-name="memory_tracker"
         field="answer"
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { AnswerDTO, BareQuestion } from "@/generated/backend"
+import type { BareQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 
@@ -35,7 +35,7 @@ defineProps({
 const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
 
-const submitAnswer = async (answerData: AnswerDTO) => {
-  emits("answer", answerData)
+const submitAnswer = () => {
+  emits("answer", { spellingAnswer: spellingAnswer.value })
 }
 </script>

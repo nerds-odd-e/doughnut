@@ -20,7 +20,7 @@
           v-bind="{
             bareQuestion: currentRecallPrompt.bareQuestion,
           }"
-          @answer="onSpellingAnswered($event)"
+          @answer="onSpellingAnswer($event)"
           :key="`spelling-${currentRecallPrompt.id}`"
         />
         <ContestableQuestion
@@ -164,7 +164,7 @@ const memoryTrackerIdAt = (index: number): number | undefined => {
   return undefined
 }
 
-const onSpellingAnswered = async (answerData: AnswerSpellingDTO) => {
+const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
   if (answerData.spellingAnswer === undefined || !currentRecallPrompt.value)
     return
 

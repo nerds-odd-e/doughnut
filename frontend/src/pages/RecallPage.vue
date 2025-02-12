@@ -25,7 +25,7 @@
   <template v-if="toRepeat != undefined">
     <Quiz
       v-if="toRepeatCount !== 0"
-      v-show="!currentAnsweredQuestion"
+      v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
       :memory-trackers="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
@@ -36,6 +36,10 @@
     <AnsweredQuestionComponent
       v-if="currentAnsweredQuestion"
       v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true, storageAccessor }"
+    />
+    <AnsweredSpellingQuestion
+      v-if="currentAnsweredSpelling"
+      v-bind="{ result: currentAnsweredSpelling, storageAccessor }"
     />
     <template v-else-if="toRepeatCount === 0">
       <div class="daisy-alert daisy-alert-success">
@@ -60,7 +64,8 @@
 import Quiz from "@/components/review/Quiz.vue"
 import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
-import type { AnsweredQuestion } from "@/generated/backend"
+import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
+import type { AnsweredQuestion, Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -70,9 +75,19 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-type RecallResult = {
+export type SpellingResult = {
+  type: "spelling"
+  note: Note
+  answer: string
+  isCorrect: boolean
+}
+
+export type QuestionResult = {
+  type: "question"
   answeredQuestion: AnsweredQuestion
 }
+
+type RecallResult = QuestionResult | SpellingResult
 
 const { managedApi } = useLoadingApi()
 const {
@@ -99,7 +114,16 @@ const showTooltip = ref(false)
 
 const currentAnsweredQuestion = computed(() => {
   if (previousResultCursor.value === undefined) return undefined
-  return previousResults.value[previousResultCursor.value]?.answeredQuestion
+  const result = previousResults.value[previousResultCursor.value]
+  if (!result) return undefined
+  return result.type === "question" ? result.answeredQuestion : undefined
+})
+
+const currentAnsweredSpelling = computed(() => {
+  if (previousResultCursor.value === undefined) return undefined
+  const result = previousResults.value[previousResultCursor.value]
+  if (!result) return undefined
+  return result.type === "spelling" ? result : undefined
 })
 
 const finished = computed(() => previousResults.value.length)
@@ -127,14 +151,34 @@ const loadMore = async (dueInDays?: number) => {
   return response
 }
 
-const onAnswered = (answerResult: AnsweredQuestion) => {
+const onAnswered = (answerResult: AnsweredQuestion | undefined) => {
   currentIndex.value += 1
-  previousResults.value.push({ answeredQuestion: answerResult })
-  decrementToRepeatCount()
-  if (!answerResult) return
-  if (!answerResult.answer.correct) {
-    viewLastResult(previousResults.value.length - 1)
+
+  if (!answerResult) {
+    previousResults.value.push(undefined)
+  } else if (
+    answerResult.predefinedQuestion?.bareQuestion.checkSpell &&
+    answerResult.note
+  ) {
+    previousResults.value.push({
+      type: "spelling",
+      note: answerResult.note,
+      answer: answerResult.answerDisplay || "",
+      isCorrect: answerResult.answer.correct,
+    })
+    if (!answerResult.answer.correct) {
+      viewLastResult(previousResults.value.length - 1)
+    }
+  } else {
+    previousResults.value.push({
+      type: "question",
+      answeredQuestion: answerResult,
+    })
+    if (!answerResult.answer.correct) {
+      viewLastResult(previousResults.value.length - 1)
+    }
   }
+  decrementToRepeatCount()
 }
 
 const moveMemoryTrackerToEnd = (index: number) => {

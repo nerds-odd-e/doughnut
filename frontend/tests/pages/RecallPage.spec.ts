@@ -139,4 +139,79 @@ describe("repeat page", () => {
       expect(quiz.vm.canMoveToEnd).toBe(false)
     })
   })
+
+  describe('repeat page with "spelling" quiz', () => {
+    const firstMemoryTrackerId = 123
+    const mockedRandomQuestionCall = vi.fn()
+    const mockedMemoryTrackerCall = vi.fn()
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      helper.managedApi.restMemoryTrackerController.show1 =
+        mockedMemoryTrackerCall.mockResolvedValue(
+          makeMe.aMemoryTracker.please()
+        )
+      helper.managedApi.silent.restRecallPromptController.askAQuestion =
+        mockedRandomQuestionCall
+      const recallPrompt = makeMe.aRecallPrompt.please()
+      recallPrompt.id = 1
+      recallPrompt.bareQuestion.checkSpell = true
+      recallPrompt.bareQuestion.multipleChoicesQuestion.choices = []
+      mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
+
+      mockedRepeatCall.mockResolvedValue(
+        makeMe.aDueMemoryTrackersList.toRepeat([firstMemoryTrackerId]).please()
+      )
+    })
+
+    it("should handle spelling questions correctly", async () => {
+      const answerResult = makeMe.anAnsweredQuestion
+        .withRecallPromptId(1)
+        .answerCorrect(false)
+        .please()
+
+      // Add spelling-specific properties
+      answerResult.predefinedQuestion = makeMe.aPredefinedQuestion
+        .withSpellCheck()
+        .withQuestionStem("test question")
+        .please()
+      const note = makeMe.aNote.please()
+      note.id = 42
+      answerResult.note = note
+      answerResult.answerDisplay = "test answer"
+      answerResult.answer = { id: 1, correct: false }
+
+      const mockedAnswerSpellingCall = vi.fn().mockResolvedValue(answerResult)
+      helper.managedApi.restRecallPromptController.answerSpelling =
+        mockedAnswerSpellingCall
+
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      // Debug: print the wrapper's HTML
+      await wrapper.find("input#memory_tracker-answer").setValue("test answer")
+      await flushPromises()
+      await wrapper.find("form").trigger("submit")
+      await flushPromises()
+      expect(mockedAnswerSpellingCall).toHaveBeenCalled()
+
+      // Verify that a spelling result was created and displayed correctly
+      const answeredSpellingQuestion = wrapper.findComponent({
+        name: "AnsweredSpellingQuestion",
+      })
+      expect(answeredSpellingQuestion.exists()).toBe(true)
+      const spellingAlert = answeredSpellingQuestion.find(".daisy-alert-error")
+      expect(spellingAlert.exists()).toBe(true)
+      expect(spellingAlert.text()).toContain(
+        'Your answer "test answer" is incorrect.'
+      )
+
+      // Verify note is displayed
+      const noteShow = answeredSpellingQuestion.findComponent({
+        name: "NoteShow",
+      })
+      expect(noteShow.exists()).toBe(true)
+      expect(noteShow.props("noteId")).toBe(42)
+    })
+  })
 })
