@@ -1,22 +1,35 @@
+import { describe, it, expect, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
 import makeMe from "@tests/fixtures/makeMe"
 
-describe("SpellingQuestionDisplay", () => {
-  it("renders spelling question input form", async () => {
-    const bareQuestion = makeMe.aBareQuestion
-      .withStem("Spell the word 'cat'")
-      .please()
+// Mock the API
+vi.mock("@/managedApi/useLoadingApi", () => ({
+  default: () => ({
+    managedApi: {
+      restMemoryTrackerController: {
+        getSpellingQuestion: vi
+          .fn()
+          .mockResolvedValue({ stem: "Spell the word 'cat'" }),
+      },
+    },
+  }),
+}))
 
+describe("SpellingQuestionDisplay", () => {
+  const bareQuestion = makeMe.aBareQuestion
+    .withStem("Spell the word 'cat'")
+    .please()
+
+  it("renders spelling question input form", async () => {
     const wrapper = helper
       .component(SpellingQuestionComponent)
-      .withProps({ bareQuestion })
+      .withProps({ bareQuestion, memoryTrackerId: 1 })
       .mount()
 
     await flushPromises()
 
-    // Check for input form elements
     expect(
       wrapper.find("input[placeholder='put your answer here']").exists()
     ).toBe(true)
@@ -24,13 +37,9 @@ describe("SpellingQuestionDisplay", () => {
   })
 
   it("emits answer event when form is submitted", async () => {
-    const bareQuestion = makeMe.aBareQuestion
-      .withStem("Spell the word 'cat'")
-      .please()
-
     const wrapper = helper
       .component(SpellingQuestionComponent)
-      .withProps({ bareQuestion })
+      .withProps({ bareQuestion, memoryTrackerId: 1 })
       .mount()
 
     await flushPromises()

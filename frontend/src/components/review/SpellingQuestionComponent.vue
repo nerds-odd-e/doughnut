@@ -1,41 +1,71 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
-    <QuestionStem :stem="bareQuestion.multipleChoicesQuestion.stem" />
-    <form @submit.prevent="submitAnswer">
-      <TextInput
-        scope-name="memory_tracker"
-        field="answer"
-        v-model="spellingAnswer"
-        placeholder="put your answer here"
-        v-focus
-      />
-      <input
-        type="submit"
-        value="Answer"
-        class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-w-full"
-      />
-    </form>
+    <ContentLoader v-if="loading" />
+    <template v-else>
+      <QuestionStem :stem="spellingQuestion?.stem" />
+      <form @submit.prevent="submitAnswer">
+        <TextInput
+          scope-name="memory_tracker"
+          field="answer"
+          v-model="spellingAnswer"
+          placeholder="put your answer here"
+          v-focus
+        />
+        <input
+          type="submit"
+          value="Answer"
+          class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-w-full"
+        />
+      </form>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { ref } from "vue"
-import type { BareQuestion } from "@/generated/backend"
+import { ref, onMounted } from "vue"
+import type { BareQuestion, SpellingQuestion } from "@/generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
+import ContentLoader from "../commons/ContentLoader.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 
-defineProps({
+const props = defineProps({
   bareQuestion: {
     type: Object as PropType<BareQuestion>,
+    required: true,
+  },
+  memoryTrackerId: {
+    type: Number,
     required: true,
   },
 })
 
 const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
+const spellingQuestion = ref<SpellingQuestion>()
+const loading = ref(true)
+const { managedApi } = useLoadingApi()
+
+const fetchSpellingQuestion = async () => {
+  try {
+    loading.value = true
+    spellingQuestion.value =
+      await managedApi.restMemoryTrackerController.getSpellingQuestion(
+        props.memoryTrackerId
+      )
+  } catch (e) {
+    // Error handling is already done by managedApi
+  } finally {
+    loading.value = false
+  }
+}
 
 const submitAnswer = () => {
   emits("answer", { spellingAnswer: spellingAnswer.value })
 }
+
+onMounted(() => {
+  fetchSpellingQuestion()
+})
 </script>
