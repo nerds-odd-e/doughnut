@@ -114,17 +114,12 @@ Then(
   }
 )
 
-Then('I have selected the choice {string}', (choice: string) => {
-  cy.formField(choice).check()
-  cy.findByRole('button', { name: 'Keep for repetition' }).click()
-})
-
-Then('I choose yes I remember', () => {
-  cy.yesIRemember()
-})
-
 Then('I skip one question', () => {
   start.assumeQuestionPage().skipQuestion()
+})
+
+Then('I assimilate with the option of remembering spelling', () => {
+  start.assumeAssimilationPage().assimilateWithSpellingOption()
 })
 
 Then(

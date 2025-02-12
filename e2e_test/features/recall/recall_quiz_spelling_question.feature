@@ -13,7 +13,7 @@ Feature: Repetition Quiz
 
   Scenario Outline: Spelling quiz
     Given I am assimilating new note on day 1
-    And I have selected the choice "Remember Spelling"
+    And I assimilate with the option of remembering spelling
     When I am recalling my note on day 2
     And I skip one question
     Then I should be asked spelling question "means incite violence" from notebook "English"

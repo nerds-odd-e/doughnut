@@ -15,7 +15,7 @@ Feature: Browse answers and notes while recalling
       | medical  |                                | true                 | English      |
     And the OpenAI service is unavailable due to invalid system token
     And I am assimilating new note on day 1
-    And I have selected the choice "Remember Spelling"
+    And I assimilate with the option of remembering spelling
 
   @ignore
   Scenario: View last result when the quiz answer was correct
