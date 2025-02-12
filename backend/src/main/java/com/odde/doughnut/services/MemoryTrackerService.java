@@ -29,14 +29,12 @@ public class MemoryTrackerService {
             false);
 
     if (note.getRecallSetting().getRememberSpelling()) {
-      MemoryTracker spellingTracker =
-          createMemoryTracker(
-              note,
-              currentUser,
-              currentTime,
-              initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
-              true);
-      modelFactoryService.save(spellingTracker);
+      createMemoryTracker(
+          note,
+          currentUser,
+          currentTime,
+          initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
+          true);
     }
 
     return memoryTracker;

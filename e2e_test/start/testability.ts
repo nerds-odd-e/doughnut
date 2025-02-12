@@ -203,7 +203,7 @@ const testability = () => {
     },
 
     backendTimeTravelTo(day: number, hour: number) {
-      return postToTestabilityApiSuccessfully(cy, 'time_travel', {
+      postToTestabilityApiSuccessfully(cy, 'time_travel', {
         body: { travel_to: JSON.stringify(hourOfDay(day, hour)) },
       })
     },

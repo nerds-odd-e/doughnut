@@ -92,10 +92,9 @@ Then(
 )
 
 Then('I am recalling my note on day {int}', (day: number) => {
-  start.testability().backendTimeTravelTo(day, 8).then(() => {
-    cy.reload()
-    start.recall().goToRecallPage()
-  })
+  start.testability().backendTimeTravelTo(day, 8)
+  cy.reload()
+  start.recall().goToRecallPage()
 })
 
 Then('I am assimilating new note on day {int}', (day: number) => {
