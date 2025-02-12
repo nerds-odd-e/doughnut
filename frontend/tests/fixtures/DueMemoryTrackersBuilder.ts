@@ -1,21 +1,22 @@
-import type { DueMemoryTrackers } from "@/generated/backend"
+import type { DueMemoryTrackers, MemoryTrackerLite } from "@/generated/backend"
 import Builder from "./Builder"
 
 class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
-  memoryTrackerIdstoRepeat: number[] = []
+  memoryTrackersToRepeat: MemoryTrackerLite[] = []
 
-  toRepeat(memoryTrackerIds: number[]) {
-    this.memoryTrackerIdstoRepeat = memoryTrackerIds
+  toRepeat(memoryTrackers: MemoryTrackerLite[]) {
+    this.memoryTrackersToRepeat = memoryTrackers
     return this
   }
 
   // eslint-disable-next-line class-methods-use-this
   do(): DueMemoryTrackers {
     return {
-      toRepeat: this.memoryTrackerIdstoRepeat,
+      toRepeat: this.memoryTrackersToRepeat,
       dueInDays: 0,
       toRepeatCount: 10,
       totalAssimilatedCount: 100,
+      recallWindowEndAt: new Date().toISOString(),
     }
   }
 }

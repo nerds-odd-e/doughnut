@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
+import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -49,8 +50,16 @@ public class RecallService {
   }
 
   public DueMemoryTrackers getDueMemoryTrackers(int dueInDays) {
-    List<Integer> toRepeat =
-        getMemoryTrackersNeedToRepeat(dueInDays).map(MemoryTracker::getId).toList();
+    List<MemoryTrackerLite> toRepeat =
+        getMemoryTrackersNeedToRepeat(dueInDays)
+            .map(
+                mt -> {
+                  MemoryTrackerLite lite = new MemoryTrackerLite();
+                  lite.setMemoryTrackerId(mt.getId());
+                  lite.setSpelling(mt.getSpelling() != null && mt.getSpelling());
+                  return lite;
+                })
+            .toList();
     DueMemoryTrackers dueMemoryTrackers = new DueMemoryTrackers();
     dueMemoryTrackers.setDueInDays(dueInDays);
     dueMemoryTrackers.setToRepeat(toRepeat);

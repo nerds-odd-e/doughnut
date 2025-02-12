@@ -67,6 +67,7 @@ import type {
   RecallPrompt,
   AnswerSpellingDTO,
   SpellingResultDTO,
+  MemoryTrackerLite,
 } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -77,7 +78,7 @@ import NotebookLink from "../notes/NotebookLink.vue"
 
 // Interface definitions for better type safety
 interface QuizProps {
-  memoryTrackers: number[]
+  memoryTrackers: MemoryTrackerLite[]
   currentIndex: number
   eagerFetchCount: number
   storageAccessor: StorageAccessor
@@ -162,10 +163,8 @@ const currentRecallPrompt = computed(() => {
 
 // Methods
 const memoryTrackerIdAt = (index: number): number | undefined => {
-  if (props.memoryTrackers && index < props.memoryTrackers.length) {
-    return props.memoryTrackers[index]
-  }
-  return undefined
+  const tracker = props.memoryTrackers?.[index]
+  return tracker?.memoryTrackerId
 }
 
 const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {

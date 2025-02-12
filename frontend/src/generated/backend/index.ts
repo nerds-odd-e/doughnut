@@ -66,6 +66,7 @@ export type { LastError } from './models/LastError';
 export { LinkCreation } from './models/LinkCreation';
 export type { MCQWithAnswer } from './models/MCQWithAnswer';
 export type { MemoryTracker } from './models/MemoryTracker';
+export type { MemoryTrackerLite } from './models/MemoryTrackerLite';
 export type { Message } from './models/Message';
 export type { MessageContent } from './models/MessageContent';
 export type { MessageCreation } from './models/MessageCreation';

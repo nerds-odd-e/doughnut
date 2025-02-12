@@ -6,7 +6,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import type { SpellingResultDTO } from "@/generated/backend"
+import type { SpellingResultDTO, MemoryTrackerLite } from "@/generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -46,6 +46,14 @@ beforeEach(() => {
 })
 
 describe("repeat page", () => {
+  const createMemoryTrackerLite = (
+    id: number,
+    spelling = false
+  ): MemoryTrackerLite => ({
+    memoryTrackerId: id,
+    spelling,
+  })
+
   const mountPage = async () => {
     const wrapper = renderer.currentRoute({ name: "recall" }).mount()
     await flushPromises()
@@ -78,7 +86,11 @@ describe("repeat page", () => {
       mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.anApiError.please())
       mockedRepeatCall.mockResolvedValue(
         makeMe.aDueMemoryTrackersList
-          .toRepeat([firstMemoryTrackerId, secondMemoryTrackerId, 3])
+          .toRepeat([
+            createMemoryTrackerLite(firstMemoryTrackerId),
+            createMemoryTrackerLite(secondMemoryTrackerId),
+            createMemoryTrackerLite(3),
+          ])
           .please()
       )
     })
@@ -120,13 +132,17 @@ describe("repeat page", () => {
       const wrapper = await mountPage()
 
       // Initial order should be [123, 456, 3]
-      expect(wrapper.vm.toRepeat).toEqual([123, 456, 3])
+      expect(wrapper.vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
+        123, 456, 3,
+      ])
 
       // Click the "Move to end" button
       await wrapper.find('button[title="Move to end of list"]').trigger("click")
 
       // New order should be [456, 3, 123]
-      expect(wrapper.vm.toRepeat).toEqual([456, 3, 123])
+      expect(wrapper.vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
+        456, 3, 123,
+      ])
     })
 
     it("should not show move to end button for last item", async () => {
@@ -161,7 +177,9 @@ describe("repeat page", () => {
       mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
 
       mockedRepeatCall.mockResolvedValue(
-        makeMe.aDueMemoryTrackersList.toRepeat([firstMemoryTrackerId]).please()
+        makeMe.aDueMemoryTrackersList
+          .toRepeat([createMemoryTrackerLite(firstMemoryTrackerId, true)])
+          .please()
       )
     })
 

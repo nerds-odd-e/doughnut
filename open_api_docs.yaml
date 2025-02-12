@@ -4242,14 +4242,21 @@ components:
         toRepeat:
           type: array
           items:
-            type: integer
-            format: int32
+            $ref: "#/components/schemas/MemoryTrackerLite"
         dueInDays:
           type: integer
           format: int32
       required:
       - toRepeatCount
       - totalAssimilatedCount
+    MemoryTrackerLite:
+      type: object
+      properties:
+        memoryTrackerId:
+          type: integer
+          format: int32
+        spelling:
+          type: boolean
     RecallStatus:
       type: object
       properties:

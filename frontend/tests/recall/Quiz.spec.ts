@@ -3,6 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import type { MemoryTrackerLite } from "@/generated/backend"
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
@@ -21,10 +22,21 @@ describe("repeat page", () => {
       mockedRandomQuestionCall
   })
 
+  const createMemoryTrackerLite = (
+    id: number,
+    spelling = false
+  ): MemoryTrackerLite => ({
+    memoryTrackerId: id,
+    spelling,
+  })
+
   const mountPage = async (
-    memoryTrackers: number[],
+    memoryTrackerIds: number[],
     eagerFetchCount: number
   ) => {
+    const memoryTrackers = memoryTrackerIds.map((id) =>
+      createMemoryTrackerLite(id)
+    )
     const wrapper = helper
       .component(Quiz)
       .withRouter()

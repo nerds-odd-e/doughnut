@@ -69,6 +69,7 @@ import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionCompo
 import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
 import type { AnsweredQuestion } from "@/generated/backend/models/AnsweredQuestion"
 import type { SpellingResultDTO } from "@/generated/backend/models/SpellingResultDTO"
+import type { MemoryTrackerLite } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -103,7 +104,7 @@ defineProps({
   },
 })
 
-const toRepeat = ref<number[] | undefined>(undefined)
+const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const currentIndex = ref(0)
 const previousResults = ref<(RecallResult | undefined)[]>([])
 const previousResultCursor = ref<number | undefined>(undefined)
