@@ -15,7 +15,7 @@
         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
           <NotebookLink :notebook="currentRecallPrompt.notebook" />
         </div>
-        <SpellingQuestionDisplay
+        <SpellingQuestionComponent
           v-if="currentRecallPrompt && (!currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices || currentRecallPrompt.bareQuestion.multipleChoicesQuestion.choices.length === 0)"
           v-bind="{
             bareQuestion: currentRecallPrompt.bareQuestion,
@@ -71,7 +71,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
-import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
+import SpellingQuestionComponent from "./SpellingQuestionComponent.vue"
 import NotebookLink from "../notes/NotebookLink.vue"
 
 // Interface definitions for better type safety

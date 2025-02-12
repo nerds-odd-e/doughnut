@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
-import SpellingQuestionDisplay from "@/components/review/SpellingQuestionDisplay.vue"
+import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
 import makeMe from "@tests/fixtures/makeMe"
 
 describe("SpellingQuestionDisplay", () => {
@@ -10,7 +10,7 @@ describe("SpellingQuestionDisplay", () => {
       .please()
 
     const wrapper = helper
-      .component(SpellingQuestionDisplay)
+      .component(SpellingQuestionComponent)
       .withProps({ bareQuestion })
       .mount()
 
@@ -29,7 +29,7 @@ describe("SpellingQuestionDisplay", () => {
       .please()
 
     const wrapper = helper
-      .component(SpellingQuestionDisplay)
+      .component(SpellingQuestionComponent)
       .withProps({ bareQuestion })
       .mount()
 

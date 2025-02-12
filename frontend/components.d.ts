@@ -143,6 +143,7 @@ declare module 'vue' {
     Sidebar: typeof import('./src/components/notes/Sidebar.vue')['default']
     SidebarInner: typeof import('./src/components/notes/SidebarInner.vue')['default']
     SidebarNoteItem: typeof import('./src/components/notes/SidebarNoteItem.vue')['default']
+    SpellingQuestionComponent: typeof import('./src/components/review/SpellingQuestionComponent.vue')['default']
     SpellingQuestionDisplay: typeof import('./src/components/review/SpellingQuestionDisplay.vue')['default']
     SubscribeDialog: typeof import('./src/components/bazaar/SubscribeDialog.vue')['default']
     SubscriptionEditDialog: typeof import('./src/components/subscriptions/SubscriptionEditDialog.vue')['default']

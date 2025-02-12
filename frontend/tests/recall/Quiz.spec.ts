@@ -69,7 +69,7 @@ describe("repeat page", () => {
       const wrapper = await mountPage([1], 1)
 
       expect(
-        wrapper.findComponent({ name: "SpellingQuestionDisplay" }).exists()
+        wrapper.findComponent({ name: "SpellingQuestionComponent" }).exists()
       ).toBe(true)
       expect(
         wrapper.findComponent({ name: "ContestableQuestion" }).exists()
@@ -92,7 +92,7 @@ describe("repeat page", () => {
       const wrapper = await mountPage([1], 1)
 
       await wrapper
-        .findComponent({ name: "SpellingQuestionDisplay" })
+        .findComponent({ name: "SpellingQuestionComponent" })
         .vm.$emit("answer", { spellingAnswer: "cat" })
       await flushPromises()
 
