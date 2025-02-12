@@ -123,6 +123,7 @@ declare module 'vue' {
     QuillEditor: typeof import('./src/components/form/QuillEditor.vue')['default']
     Quiz: typeof import('./src/components/review/Quiz.vue')['default']
     RadioButtons: typeof import('./src/components/form/RadioButtons.vue')['default']
+    RecallPage: typeof import('./src/components/review/RecallPage.vue')['default']
     RecallProgressBar: typeof import('./src/components/review/RecallProgressBar.vue')['default']
     RecallPromptComponent: typeof import('./src/components/review/RecallPromptComponent.vue')['default']
     RecallSettingForm: typeof import('./src/components/review/RecallSettingForm.vue')['default']

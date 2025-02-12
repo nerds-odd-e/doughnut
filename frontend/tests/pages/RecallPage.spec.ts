@@ -203,7 +203,7 @@ describe("repeat page", () => {
       const spellingAlert = answeredSpellingQuestion.find(".daisy-alert-error")
       expect(spellingAlert.exists()).toBe(true)
       expect(spellingAlert.text()).toContain(
-        'Your answer "test answer" is incorrect.'
+        "Your answer `test answer` is incorrect."
       )
 
       // Verify note is displayed

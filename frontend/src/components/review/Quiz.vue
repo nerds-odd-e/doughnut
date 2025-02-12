@@ -8,7 +8,7 @@
             memoryTrackerId: currentMemoryTrackerId,
             storageAccessor,
           }"
-          @reviewed="onAnswered($event)"
+          @reviewed="(result) => emit('just-reviewed', result)"
         />
       </div>
       <template v-else>
@@ -85,7 +85,9 @@ const props = defineProps<QuizProps>()
 
 // Emits definition
 const emit = defineEmits<{
-  (e: "answered", result: AnsweredQuestion): void
+  (e: "answered-question", result: AnsweredQuestion): void
+  (e: "answered-spelling", result: AnsweredQuestion): void
+  (e: "just-reviewed", result: AnsweredQuestion | undefined): void
   (e: "moveToEnd", currentIndex: number): void
 }>()
 
@@ -174,14 +176,14 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
         currentRecallPrompt.value.id,
         { spellingAnswer: answerData.spellingAnswer }
       )
-    emit("answered", answerResult)
+    emit("answered-spelling", answerResult)
   } catch (e) {
     // Error handling is already done in the component
   }
 }
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
-  emit("answered", answerResult)
+  emit("answered-question", answerResult)
 }
 
 const canMoveToEnd = computed(() => {

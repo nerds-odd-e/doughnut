@@ -103,8 +103,8 @@ describe("repeat page", () => {
       })
 
       const emitted = wrapper.emitted()
-      expect(emitted.answered).toBeTruthy()
-      expect(emitted.answered![0]).toEqual([answerResult])
+      expect(emitted["answered-spelling"]).toBeTruthy()
+      expect(emitted["answered-spelling"]![0]).toEqual([answerResult])
     })
   })
 })

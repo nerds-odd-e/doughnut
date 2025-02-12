@@ -30,7 +30,9 @@
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
       :storage-accessor="storageAccessor"
-      @answered="onAnswered($event)"
+      @answered-question="onAnsweredQuestion"
+      @answered-spelling="onAnsweredSpelling"
+      @just-reviewed="onJustReviewed"
       @move-to-end="moveMemoryTrackerToEnd"
     />
     <AnsweredQuestionComponent
@@ -151,12 +153,21 @@ const loadMore = async (dueInDays?: number) => {
   return response
 }
 
-const onAnswered = (answerResult: AnsweredQuestion | undefined) => {
+const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
   currentIndex.value += 1
+  previousResults.value.push({
+    type: "question",
+    answeredQuestion: answerResult,
+  })
+  if (!answerResult.answer.correct) {
+    viewLastResult(previousResults.value.length - 1)
+  }
+  decrementToRepeatCount()
+}
 
-  if (!answerResult) {
-    previousResults.value.push(undefined)
-  } else if (
+const onAnsweredSpelling = (answerResult: AnsweredQuestion) => {
+  currentIndex.value += 1
+  if (
     answerResult.predefinedQuestion?.bareQuestion.checkSpell &&
     answerResult.note
   ) {
@@ -169,15 +180,13 @@ const onAnswered = (answerResult: AnsweredQuestion | undefined) => {
     if (!answerResult.answer.correct) {
       viewLastResult(previousResults.value.length - 1)
     }
-  } else {
-    previousResults.value.push({
-      type: "question",
-      answeredQuestion: answerResult,
-    })
-    if (!answerResult.answer.correct) {
-      viewLastResult(previousResults.value.length - 1)
-    }
   }
+  decrementToRepeatCount()
+}
+
+const onJustReviewed = (answerResult: AnsweredQuestion | undefined) => {
+  currentIndex.value += 1
+  previousResults.value.push(undefined)
   decrementToRepeatCount()
 }
 
