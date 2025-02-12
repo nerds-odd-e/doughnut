@@ -170,6 +170,99 @@ class RestRecallPromptControllerTests {
   }
 
   @Nested
+  class answerQuizQuestion {
+    MemoryTracker memoryTracker;
+    RecallPrompt recallPrompt;
+    AnswerDTO answerDTO = new AnswerDTO();
+
+    @BeforeEach
+    void setup() {
+      Note answerNote = makeMe.aNote().please();
+      memoryTracker =
+          makeMe
+              .aMemoryTrackerFor(answerNote)
+              .by(currentUser)
+              .forgettingCurveAndNextRecallAt(200)
+              .please();
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      recallPrompt =
+          makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, answerNote).please();
+      answerDTO.setChoiceIndex(0);
+    }
+
+    @Test
+    void shouldValidateTheAnswerAndUpdateMemoryTracker() {
+      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+      assertThat(answerResult.answer.getCorrect(), is(true));
+      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+    }
+
+    @Test
+    void shouldNoteIncreaseIndexIfRepeatImmediately() {
+      testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      controller.answerQuiz(recallPrompt, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+    }
+
+    @Test
+    void shouldIncreaseTheIndex() {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      controller.answerQuiz(recallPrompt, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+      assertThat(
+          memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+      AnswerDTO answer = new AnswerDTO();
+      assertThrows(
+          ResponseStatusException.class,
+          () -> nullUserController().answerQuiz(recallPrompt, answer));
+    }
+
+    @Nested
+    class WrongAnswer {
+      @BeforeEach
+      void setup() {
+        answerDTO.setChoiceIndex(1);
+      }
+
+      @Test
+      void shouldValidateTheWrongAnswer() {
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+        AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+        assertThat(answerResult.answer.getCorrect(), is(false));
+        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      }
+
+      @Test
+      void shouldNotChangeTheLastRecalledAtTime() {
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+        Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
+        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+        controller.answerQuiz(recallPrompt, answerDTO);
+        assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
+        assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
+      }
+
+      @Test
+      void shouldRepeatTheNextDay() {
+        controller.answerQuiz(recallPrompt, answerDTO);
+        assertThat(
+            memoryTracker.getNextRecallAt(),
+            lessThan(
+                TimestampOperations.addHoursToTimestamp(
+                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
+      }
+    }
+  }
+
+  @Nested
   class RegenerateQuestion {
     RecallPrompt recallPrompt;
     Note note;
