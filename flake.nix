@@ -56,7 +56,6 @@
             ++ lib.optionals (!stdenv.isDarwin) [
               psmisc
               xclip
-              xvfb-run
             ];
 
           shellHook = ''
