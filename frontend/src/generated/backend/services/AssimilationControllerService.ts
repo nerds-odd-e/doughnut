@@ -17,7 +17,7 @@ export class AssimilationControllerService {
      */
     public assimilate(
         requestBody: InitialInfo,
-    ): CancelablePromise<MemoryTracker> {
+    ): CancelablePromise<Array<MemoryTracker>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/assimilation',

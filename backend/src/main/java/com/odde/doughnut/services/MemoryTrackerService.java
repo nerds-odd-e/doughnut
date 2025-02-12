@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MemoryTrackerService {
@@ -17,7 +18,7 @@ public class MemoryTrackerService {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public MemoryTracker assimilate(
+  public List<MemoryTracker> assimilate(
       InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
     Note note = modelFactoryService.entityManager.find(Note.class, initialInfo.noteId);
     MemoryTracker memoryTracker =
@@ -28,16 +29,21 @@ public class MemoryTrackerService {
             initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
             false);
 
+    List<MemoryTracker> trackers = new ArrayList<>();
+    trackers.add(memoryTracker);
+
     if (note.getRecallSetting().getRememberSpelling()) {
-      createMemoryTracker(
-          note,
-          currentUser,
-          currentTime,
-          initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
-          true);
+      MemoryTracker spellingTracker =
+          createMemoryTracker(
+              note,
+              currentUser,
+              currentTime,
+              initialInfo.skipMemoryTracking != null ? initialInfo.skipMemoryTracking : false,
+              true);
+      trackers.add(spellingTracker);
     }
 
-    return memoryTracker;
+    return trackers;
   }
 
   private MemoryTracker createMemoryTracker(

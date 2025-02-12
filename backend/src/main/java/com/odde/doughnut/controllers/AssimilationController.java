@@ -51,7 +51,7 @@ class AssimilationController {
 
   @PostMapping(path = "")
   @Transactional
-  public MemoryTracker assimilate(@RequestBody InitialInfo initialInfo) {
+  public List<MemoryTracker> assimilate(@RequestBody InitialInfo initialInfo) {
     currentUser.assertLoggedIn();
     return memoryTrackerService.assimilate(
         initialInfo, currentUser.getEntity(), testabilitySettings.getCurrentUTCTimestamp());

@@ -1851,7 +1851,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/MemoryTracker"
+                type: array
+                items:
+                  $ref: "#/components/schemas/MemoryTracker"
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:

@@ -44,10 +44,11 @@ public class MemoryTrackerServiceTest {
       initialInfo.noteId = note.getId();
       initialInfo.skipMemoryTracking = false;
 
-      var memoryTracker = memoryTrackerService.assimilate(initialInfo, userModel.getEntity(), day1);
+      var memoryTrackers =
+          memoryTrackerService.assimilate(initialInfo, userModel.getEntity(), day1);
 
-      assertThat(memoryTracker.getAssimilatedAt(), equalTo(day1));
-      assertThat(memoryTracker.getLastRecalledAt(), equalTo(day1));
+      assertThat(memoryTrackers.get(0).getAssimilatedAt(), equalTo(day1));
+      assertThat(memoryTrackers.get(0).getLastRecalledAt(), equalTo(day1));
     }
   }
 }
