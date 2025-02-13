@@ -193,7 +193,7 @@ describe("repeat page", () => {
       }
 
       const mockedAnswerSpellingCall = vi.fn().mockResolvedValue(answerResult)
-      helper.managedApi.restRecallPromptController.answerSpelling =
+      helper.managedApi.restMemoryTrackerController.answerSpelling =
         mockedAnswerSpellingCall
 
       const wrapper = await mountPage()

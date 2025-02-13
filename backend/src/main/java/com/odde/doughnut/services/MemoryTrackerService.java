@@ -1,6 +1,8 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -88,5 +90,17 @@ public class MemoryTrackerService {
       Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker) {
     memoryTracker.markAsRepeated(currentUTCTimestamp, correct);
     modelFactoryService.save(memoryTracker);
+  }
+
+  public SpellingResultDTO answerSpelling(
+      MemoryTracker memoryTracker,
+      AnswerSpellingDTO answerSpellingDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
+    Note note = memoryTracker.getNote();
+    Boolean correct = note.matchAnswer(spellingAnswer);
+    markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
+    return new SpellingResultDTO(note, spellingAnswer, correct);
   }
 }

@@ -3,17 +3,23 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
+import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -247,6 +253,98 @@ class RestMemoryTrackerControllerTest {
       controller =
           new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
+    }
+  }
+
+  @Nested
+  class answerSpellingQuestion {
+    MemoryTracker memoryTracker;
+    AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
+
+    @BeforeEach
+    void setup() {
+      Note answerNote = makeMe.aNote().rememberSpelling().please();
+      memoryTracker =
+          makeMe
+              .aMemoryTrackerFor(answerNote)
+              .by(userModel)
+              .forgettingCurveAndNextRecallAt(200)
+              .spelling()
+              .please();
+      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+    }
+
+    @Test
+    void shouldValidateTheAnswerAndUpdateMemoryTracker() {
+      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+      SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
+      assertTrue(answerResult.getIsCorrect());
+      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+    }
+
+    @Test
+    void shouldNoteIncreaseIndexIfRepeatImmediately() {
+      testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      controller.answerSpelling(memoryTracker, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+    }
+
+    @Test
+    void shouldIncreaseTheIndex() {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      controller.answerSpelling(memoryTracker, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+      assertThat(
+          memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+      AnswerSpellingDTO answer = new AnswerSpellingDTO();
+      userModel = makeMe.aNullUserModelPlease();
+      controller =
+          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+      assertThrows(
+          ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
+    }
+
+    @Nested
+    class WrongAnswer {
+      @BeforeEach
+      void setup() {
+        answerDTO.setSpellingAnswer("wrong");
+      }
+
+      @Test
+      void shouldValidateTheWrongAnswer() {
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+        SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
+        assertFalse(answerResult.getIsCorrect());
+        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      }
+
+      @Test
+      void shouldNotChangeTheLastRecalledAtTime() {
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+        Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
+        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+        controller.answerSpelling(memoryTracker, answerDTO);
+        assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
+        assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
+      }
+
+      @Test
+      void shouldRepeatTheNextDay() {
+        controller.answerSpelling(memoryTracker, answerDTO);
+        assertThat(
+            memoryTracker.getNextRecallAt(),
+            lessThan(
+                TimestampOperations.addHoursToTimestamp(
+                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
+      }
     }
   }
 }

@@ -98,7 +98,7 @@ describe("repeat page", () => {
       const answerResult = makeMe.anAnsweredQuestion
         .answerCorrect(true)
         .please()
-      helper.managedApi.restRecallPromptController.answerSpelling = vi
+      helper.managedApi.restMemoryTrackerController.answerSpelling = vi
         .fn()
         .mockResolvedValue(answerResult)
 
@@ -110,7 +110,7 @@ describe("repeat page", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.restRecallPromptController.answerSpelling
+        helper.managedApi.restMemoryTrackerController.answerSpelling
       ).toHaveBeenCalledWith(1, {
         spellingAnswer: "cat",
       })

@@ -2,9 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { AnswerSpellingDTO } from '../models/AnswerSpellingDTO';
 import type { MemoryTracker } from '../models/MemoryTracker';
 import type { SelfEvaluation } from '../models/SelfEvaluation';
 import type { SpellingQuestion } from '../models/SpellingQuestion';
+import type { SpellingResultDTO } from '../models/SpellingResultDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestMemoryTrackerControllerService {
@@ -46,6 +48,29 @@ export class RestMemoryTrackerControllerService {
             path: {
                 'memoryTracker': memoryTracker,
             },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param memoryTracker
+     * @param requestBody
+     * @returns SpellingResultDTO OK
+     * @throws ApiError
+     */
+    public answerSpelling(
+        memoryTracker: number,
+        requestBody: AnswerSpellingDTO,
+    ): CancelablePromise<SpellingResultDTO> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/memory-trackers/{memoryTracker}/answer-spelling',
+            path: {
+                'memoryTracker': memoryTracker,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

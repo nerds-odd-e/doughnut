@@ -2,9 +2,7 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
@@ -71,20 +69,5 @@ public class RecallQuestionService {
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();
-  }
-
-  public SpellingResultDTO answerSpelling(
-      MemoryTracker memoryTracker,
-      AnswerSpellingDTO answerSpellingDTO,
-      User user,
-      Timestamp currentUTCTimestamp) {
-    RecallPrompt recallPrompt = generateAQuestion(memoryTracker, user);
-    String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
-    MemoryTrackerService memoryTrackerService = new MemoryTrackerService(modelFactoryService);
-    Note note = recallPrompt.getPredefinedQuestion().getNote();
-    Boolean correct = note.matchAnswer(spellingAnswer);
-    memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
-        user, currentUTCTimestamp, correct, recallPrompt);
-    return new SpellingResultDTO(note, spellingAnswer, correct);
   }
 }

@@ -174,7 +174,7 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
 
   try {
     const answerResult =
-      await managedApi.restRecallPromptController.answerSpelling(
+      await managedApi.restMemoryTrackerController.answerSpelling(
         currentMemoryTrackerId.value,
         { spellingAnswer: answerData.spellingAnswer }
       )

@@ -1,7 +1,9 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
+import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -10,6 +12,7 @@ import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,5 +105,18 @@ class RestMemoryTrackerController {
     currentUser.assertLoggedIn();
     return modelFactoryService.memoryTrackerRepository.findLast100ReviewedByUser(
         currentUser.getEntity().getId());
+  }
+
+  @PostMapping("/{memoryTracker}/answer-spelling")
+  @Transactional
+  public SpellingResultDTO answerSpelling(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
+      @Valid @RequestBody AnswerSpellingDTO answerDTO) {
+    currentUser.assertLoggedIn();
+    return memoryTrackerService.answerSpelling(
+        memoryTracker,
+        answerDTO,
+        currentUser.getEntity(),
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 }
