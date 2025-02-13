@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 export type AnswerDTO = {
-    spellingAnswer?: string;
     choiceIndex?: number;
 };
 

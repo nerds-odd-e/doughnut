@@ -3634,8 +3634,6 @@ components:
     AnswerDTO:
       type: object
       properties:
-        spellingAnswer:
-          type: string
         choiceIndex:
           type: integer
           format: int32

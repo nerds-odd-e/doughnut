@@ -47,10 +47,4 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     dto.setChoiceIndex(index);
     return answer(dto);
   }
-
-  public RecallPromptBuilder answerSpelling(String answer) {
-    AnswerDTO dto = new AnswerDTO();
-    dto.setSpellingAnswer(answer);
-    return answer(dto);
-  }
 }

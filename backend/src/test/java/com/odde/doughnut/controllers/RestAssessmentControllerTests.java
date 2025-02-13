@@ -98,7 +98,7 @@ public class RestAssessmentControllerTests {
       AssessmentAttempt assessmentAttempt =
           makeMe.anAssessmentAttempt(currentUser.getEntity()).withOneQuestion().please();
       assessmentQuestionInstance = assessmentAttempt.getAssessmentQuestionInstances().get(0);
-      answerDTO.setSpellingAnswer("my answer");
+      answerDTO.setChoiceIndex(0);
     }
 
     @Test
@@ -120,7 +120,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldNotBeAbleToAnswerTheSameQuestionTwice() {
       AnswerDTO answerDTO1 = new AnswerDTO();
-      answerDTO1.setSpellingAnswer("my answer");
+      answerDTO1.setChoiceIndex(0);
       assessmentQuestionInstance.buildAnswer(answerDTO1);
       assertThrows(
           QuestionAnswerException.class,

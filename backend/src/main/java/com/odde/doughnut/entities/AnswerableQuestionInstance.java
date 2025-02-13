@@ -38,7 +38,6 @@ public abstract class AnswerableQuestionInstance extends EntityIdentifiedByIdOnl
       throw new QuestionAnswerException("The question is already answered");
     }
     this.answer = new Answer();
-    this.answer.spellingAnswer = answerDTO.getSpellingAnswer();
     this.answer.choiceIndex = answerDTO.getChoiceIndex();
     this.answer.setCorrect(getPredefinedQuestion().checkAnswer(answerDTO));
     return answer;
