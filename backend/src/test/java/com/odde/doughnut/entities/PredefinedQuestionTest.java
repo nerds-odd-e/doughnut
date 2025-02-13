@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -54,6 +56,65 @@ class PredefinedQuestionTest {
       assertThat(
           qq.getMultipleChoicesQuestion().getStem(),
           containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
+    }
+  }
+
+  @Nested
+  class AutoEvaluateAndRegenerate {
+    Note note;
+    MCQWithAnswer mcqWithAnswer;
+    QuestionContestResult contestResult;
+
+    @BeforeEach
+    void setup() {
+      note = makeMe.aNote().please();
+      mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      contestResult = new QuestionContestResult();
+      contestResult.advice = "This question needs improvement";
+    }
+
+    @Test
+    void shouldReturnOriginalQuestionWhenEvaluationPassesOrFails() {
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      contestResult.rejected = true;
+      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
+
+      PredefinedQuestionService service =
+          new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
+      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
+
+      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
+    }
+
+    @Test
+    void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() throws JsonProcessingException {
+      MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      contestResult.rejected = false;
+      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
+      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
+          .thenReturn(regeneratedQuestion);
+
+      PredefinedQuestionService service =
+          new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
+      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
+
+      assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
+    }
+
+    @Test
+    void shouldUseOriginalQuestionWhenRegenerationFails() throws JsonProcessingException {
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      contestResult.rejected = false;
+      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
+      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
+          .thenThrow(new JsonProcessingException("Error") {});
+
+      PredefinedQuestionService service =
+          new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
+      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
+
+      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
     }
   }
 

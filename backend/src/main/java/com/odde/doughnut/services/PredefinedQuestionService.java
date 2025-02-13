@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -49,11 +50,28 @@ public class PredefinedQuestionService {
   }
 
   public PredefinedQuestion generateAFeasibleQuestion(Note note) {
-    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
-    if (MCQWithAnswer == null) {
+    MCQWithAnswer mcqWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+    if (mcqWithAnswer == null) {
       return null;
     }
-    PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+
+    // Auto-evaluate the generated question
+    QuestionContestResult contestResult =
+        aiQuestionGenerator.getQuestionContestResult(note, mcqWithAnswer);
+    if (contestResult != null && !contestResult.rejected) {
+      try {
+        // If not feasible, try to regenerate with the contest feedback
+        MCQWithAnswer regeneratedQuestion =
+            aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
+        if (regeneratedQuestion != null) {
+          mcqWithAnswer = regeneratedQuestion;
+        }
+      } catch (JsonProcessingException e) {
+        // If regeneration fails, use the original question
+      }
+    }
+
+    PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     modelFactoryService.save(result);
     return result;
   }
