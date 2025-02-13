@@ -5,23 +5,36 @@ Feature: User Contests Question generation by AI
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Scuba Diving"
-    And OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-evaluate, thread-second-question"
     Given OpenAI generates this question for assistant thread "thread-first-question":
       | Question Stem                                       | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is the most common scuba diving certification? | Rescue Diver   | Divemaster         | Open Water Diver   |
-
-  Scenario Outline: I should be able to regenerate the question when the question and choices do not make sense relating to the note
-    Given OpenAI evaluates the question as <Legitimate Question> for assistant thread "thread-evaluate"
+      | First question | Rescue Diver   | Divemaster         | Open Water Diver   |
     And OpenAI generates this question for assistant thread "thread-second-question":
       | Question Stem         | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | What is scuba diving? | Rescue Diver   | Divemaster         | Open Water Diver   |
+      | Second question | Rescue Diver   | Divemaster         | Open Water Diver   |
+
+  Scenario Outline: The generated question should be contested internally
+    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-evaluate, thread-second-question"
+    And OpenAI evaluates the question as <Legitimate Question> for assistant thread "thread-evaluate"
     And I learned one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
-    # And I contest the question
-    # Then I should see the question "What is the most common scuba diving certification?" is <Old Question Status>
+    And I should be asked "<Current Question>"
+
+    Examples:
+    | Legitimate Question |  Current Question                                    |
+    | legitamate          |  First question |
+    | not legitamate      |  Second question |
+
+  Scenario Outline: I should be able to regenerate the question when the question and choices do not make sense relating to the note
+    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-evaluate-auto, thread-evaluate-manual, thread-second-question"
+    And OpenAI evaluates the question as legitamate for assistant thread "thread-evaluate-auto"
+    And OpenAI evaluates the question as <Legitimate Question> for assistant thread "thread-evaluate-manual"
+    And I learned one note "Scuba Diving" on day 1
+    When I am recalling my note on day 2
+    And I contest the question
+    Then I should see the question "First question" is <Old Question Status>
     And I should be asked "<Current Question>"
 
     Examples:
     | Legitimate Question | Old Question Status | Current Question                                    |
-    | legitamate          | enabled             | What is the most common scuba diving certification? |
-    | not legitamate      | disabled            | What is scuba diving?                               |
+    | legitamate          | enabled             | First question |
+    | not legitamate      | disabled            | Second question |
