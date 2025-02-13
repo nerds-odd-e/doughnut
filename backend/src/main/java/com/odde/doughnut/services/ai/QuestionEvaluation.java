@@ -43,9 +43,9 @@ public class QuestionEvaluation {
                   .mapToObj(String::valueOf)
                   .collect(Collectors.joining(", "));
       result.reason +=
-          "\nUnclear answer detected. The original question assume one correct choice index "
+          "\nUnclear answer detected. The original question assume one correct choice index (0-based) of "
               + correctChoiceIndex
-              + ". however, the re-evaluation of the question showes that "
+              + ". however, the re-evaluation of the question shows that "
               + correctChoicesStr
               + " are correct to the question.";
     }
