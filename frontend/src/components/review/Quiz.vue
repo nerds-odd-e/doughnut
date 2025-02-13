@@ -2,26 +2,26 @@
   <div class="content">
     <ContentLoader v-if="!currentQuestionFetched" />
     <template v-else>
-      <div v-if="!currentRecallPrompt">
-        <JustReview
-          v-bind="{
-            memoryTrackerId: currentMemoryTrackerId,
-            storageAccessor,
-          }"
-          @reviewed="(result) => emit('just-reviewed', result)"
-        />
-      </div>
+      <SpellingQuestionComponent
+        v-if="currentMemoryTracker?.spelling"
+        v-bind="{
+          memoryTrackerId: currentMemoryTrackerId!,
+        }"
+        @answer="onSpellingAnswer($event)"
+        :key="`spelling-${currentMemoryTrackerId}`"
+      />
       <template v-else>
-        <SpellingQuestionComponent
-          v-if="currentMemoryTracker?.spelling"
-          v-bind="{
-            memoryTrackerId: currentMemoryTrackerId!,
-          }"
-          @answer="onSpellingAnswer($event)"
-          :key="`spelling-${currentRecallPrompt.id}`"
-        />
+        <div v-if="!currentRecallPrompt">
+          <JustReview
+            v-bind="{
+              memoryTrackerId: currentMemoryTrackerId,
+              storageAccessor,
+            }"
+            @reviewed="(result) => emit('just-reviewed', result)"
+          />
+        </div>
         <template v-else>
-          <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
+         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion
