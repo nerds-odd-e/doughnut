@@ -24,6 +24,7 @@
         <div
           v-html="getChoiceHtml(choice)"
           class="daisy-whitespace-normal daisy-break-words"
+          @click.capture.prevent="handleInnerClick"
         />
       </button>
     </li>
@@ -53,6 +54,13 @@ export default defineComponent({
     }
   },
   methods: {
+    handleInnerClick(event: Event) {
+      // Prevent any link clicks from navigating
+      if (event.target instanceof HTMLAnchorElement) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+    },
     isSelectedOption(optionIndex: number) {
       return this.answerChoiceIndex === optionIndex
     },
