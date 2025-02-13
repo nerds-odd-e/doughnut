@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -29,6 +30,8 @@ class RestPredefinedQuestionController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final AiQuestionGenerator aiQuestionGenerator;
+
   public RestPredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
@@ -37,20 +40,24 @@ class RestPredefinedQuestionController {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    aiQuestionGenerator =
+        new AiQuestionGenerator(
+            openAiApi,
+            new GlobalSettingsService(modelFactoryService),
+            testabilitySettings.getRandomizer());
     this.predefinedQuestionService =
-        new PredefinedQuestionService(
-            modelFactoryService,
-            new AiQuestionGenerator(
-                openAiApi,
-                new GlobalSettingsService(modelFactoryService),
-                testabilitySettings.getRandomizer()));
+        new PredefinedQuestionService(modelFactoryService, aiQuestionGenerator);
   }
 
   @PostMapping("/generate-question-without-save")
   public PredefinedQuestion generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
     currentUser.assertLoggedIn();
-    return predefinedQuestionService.generateAQuestionForNote(note);
+    MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+    if (MCQWithAnswer == null) {
+      return null;
+    }
+    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
   }
 
   @PostMapping("/{predefinedQuestion}/suggest-fine-tuning")

@@ -60,6 +60,6 @@ class PredefinedQuestionTest {
   private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
     PredefinedQuestionService predefinedQuestionService =
         new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
-    return predefinedQuestionService.generateAQuestion(note);
+    return predefinedQuestionService.generateAFeasibleQuestion(note);
   }
 }

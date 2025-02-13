@@ -8,8 +8,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 
@@ -30,21 +28,18 @@ public class RecallQuestionService {
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
     PredefinedQuestion question =
-        predefinedQuestionService.generateAQuestion(memoryTracker.getNote());
+        predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote());
     if (question == null) {
       return null;
     }
     return createARecallPromptFromQuestion(question);
   }
 
-  public RecallPrompt regenerateAQuestionOfRandomType(
-      PredefinedQuestion predefinedQuestion, QuestionContestResult contestResult)
+  public RecallPrompt regenerateAQuestion(
+      QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer)
       throws JsonProcessingException {
-    Note note = predefinedQuestion.getNote();
-    MessageRequest additionalMessage =
-        AiToolFactory.buildRegenerateQuestionMessage(predefinedQuestion, contestResult);
     MCQWithAnswer MCQWithAnswer =
-        aiQuestionGenerator.getAiGeneratedQuestion(note, additionalMessage);
+        aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
     if (MCQWithAnswer == null) {
       return null;
     }

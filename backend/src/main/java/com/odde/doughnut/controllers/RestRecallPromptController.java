@@ -54,8 +54,10 @@ class RestRecallPromptController {
       @RequestBody QuestionContestResult contestResult)
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
-    return recallQuestionService.regenerateAQuestionOfRandomType(
-        recallPrompt.getPredefinedQuestion(), contestResult);
+    return recallQuestionService.regenerateAQuestion(
+        contestResult,
+        recallPrompt.getPredefinedQuestion().getNote(),
+        recallPrompt.getPredefinedQuestion().getMcqWithAnswer());
   }
 
   @PostMapping("/{recallPrompt}/contest")

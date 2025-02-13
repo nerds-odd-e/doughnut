@@ -5,7 +5,6 @@ import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_M
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.List;
@@ -159,7 +158,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
   }
 
   public static MessageRequest buildRegenerateQuestionMessage(
-      PredefinedQuestion predefinedQuestion, QuestionContestResult contestResult)
+      QuestionContestResult contestResult, MCQWithAnswer mcqWithAnswer)
       throws JsonProcessingException {
     return MessageRequest.builder()
         .role("user")
@@ -177,7 +176,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
                 .formatted(
                     new ObjectMapper()
                         .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(predefinedQuestion.getMcqWithAnswer()),
+                        .writeValueAsString(mcqWithAnswer),
                     contestResult.advice))
         .build();
   }

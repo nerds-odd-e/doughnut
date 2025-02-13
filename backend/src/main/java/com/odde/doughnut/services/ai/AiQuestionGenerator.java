@@ -3,11 +3,11 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
+import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.client.OpenAiApi;
@@ -53,16 +53,15 @@ public record AiQuestionGenerator(
         .orElse(null);
   }
 
-  public QuestionContestResult getQuestionContestResult(PredefinedQuestion predefinedQuestion) {
+  public QuestionContestResult getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
     NoteQuestionGenerationService service =
-        notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(
-            predefinedQuestion.getNote());
+        notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
       return service
-          .evaluateQuestion(predefinedQuestion.getMcqWithAnswer())
-          .map(e -> e.getQuestionContestResult(predefinedQuestion.getCorrectAnswerIndex()))
+          .evaluateQuestion(mcqWithAnswer)
+          .map(e -> e.getQuestionContestResult(mcqWithAnswer.getCorrectChoiceIndex()))
           .orElse(null);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -75,5 +74,13 @@ public record AiQuestionGenerator(
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName1, note);
     return new AiQuestionGeneratorForNote(
         new OpenAiApiHandler(openAiApi), chatAboutNoteRequestBuilder);
+  }
+
+  public MCQWithAnswer regenerateQuestion(
+      QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer)
+      throws JsonProcessingException {
+    MessageRequest additionalMessage =
+        AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcqWithAnswer);
+    return getAiGeneratedQuestion(note, additionalMessage);
   }
 }

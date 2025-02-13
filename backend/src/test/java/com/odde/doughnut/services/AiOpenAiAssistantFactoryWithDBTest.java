@@ -79,7 +79,8 @@ class AiOpenAiAssistantFactoryWithDBTest {
           .mockCancelRun("my-run-id");
 
       QuestionContestResult contest =
-          aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
+          aiQuestionGenerator.getQuestionContestResult(
+              predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
       assertTrue(contest.rejected);
     }
 
@@ -93,7 +94,8 @@ class AiOpenAiAssistantFactoryWithDBTest {
           .mockCancelRun("my-run-id");
 
       QuestionContestResult contest =
-          aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
+          aiQuestionGenerator.getQuestionContestResult(
+              predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
       assertFalse(contest.rejected);
     }
 
@@ -107,7 +109,9 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
       assertThrows(
           RuntimeException.class,
-          () -> aiQuestionGenerator.getQuestionContestResult(predefinedQuestion));
+          () ->
+              aiQuestionGenerator.getQuestionContestResult(
+                  predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer()));
     }
   }
 }

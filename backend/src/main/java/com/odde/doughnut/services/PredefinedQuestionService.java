@@ -44,23 +44,17 @@ public class PredefinedQuestionService {
   }
 
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
-    return aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
+    return aiQuestionGenerator.getQuestionContestResult(
+        predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
   }
 
-  public PredefinedQuestion generateAQuestion(Note note) {
-    PredefinedQuestion result = generateAQuestionForNote(note);
-    if (result == null) {
-      return null;
-    }
-    modelFactoryService.save(result);
-    return result;
-  }
-
-  public PredefinedQuestion generateAQuestionForNote(Note note) {
+  public PredefinedQuestion generateAFeasibleQuestion(Note note) {
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
     if (MCQWithAnswer == null) {
       return null;
     }
-    return PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
+    modelFactoryService.save(result);
+    return result;
   }
 }
