@@ -25,7 +25,6 @@
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion
-            v-else
             v-bind="{
               recallPrompt: currentRecallPrompt,
               storageAccessor,
