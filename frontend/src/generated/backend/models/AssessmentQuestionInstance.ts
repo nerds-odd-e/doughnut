@@ -6,7 +6,7 @@ import type { Answer } from './Answer';
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type AssessmentQuestionInstance = {
     id: number;
-    answer?: Answer;
     multipleChoicesQuestion: MultipleChoicesQuestion;
+    answer?: Answer;
 };
 

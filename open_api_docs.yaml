@@ -3906,10 +3906,10 @@ components:
         id:
           type: integer
           format: int32
-        answer:
-          $ref: "#/components/schemas/Answer"
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
+        answer:
+          $ref: "#/components/schemas/Answer"
       required:
       - id
       - multipleChoicesQuestion
