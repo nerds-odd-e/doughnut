@@ -2,7 +2,6 @@ import { describe, it, expect, vi } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
-import makeMe from "@tests/fixtures/makeMe"
 
 // Mock the API
 vi.mock("@/managedApi/useLoadingApi", () => ({
