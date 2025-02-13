@@ -35,3 +35,22 @@ global.FormData = function () {
     },
   };
 }
+
+// Mock canvas context for tests
+HTMLCanvasElement.prototype.getContext = function() {
+  return {
+    drawImage: vi.fn(),
+    fillRect: vi.fn(),
+    fillStyle: "",
+    clearRect: vi.fn(),
+    getImageData: () => ({
+      data: new Array(100),
+    }),
+    putImageData: vi.fn(),
+    setTransform: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    scale: vi.fn(),
+    translate: vi.fn(),
+  }
+}
