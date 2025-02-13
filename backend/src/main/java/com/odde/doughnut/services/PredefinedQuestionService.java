@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
@@ -48,14 +47,8 @@ public class PredefinedQuestionService {
     return aiQuestionGenerator.getQuestionContestResult(predefinedQuestion);
   }
 
-  public PredefinedQuestion generateAQuestion(MemoryTracker memoryTracker, User user) {
-    Note note = memoryTracker.getNote();
-    PredefinedQuestion result;
-    if (!memoryTracker.getSpelling()) {
-      result = generateAQuestionForNote(note);
-    } else {
-      result = new SpellingPredefinedFactory(note).buildSpellingQuestion();
-    }
+  public PredefinedQuestion generateAQuestion(Note note) {
+    PredefinedQuestion result = generateAQuestionForNote(note);
     if (result == null) {
       return null;
     }

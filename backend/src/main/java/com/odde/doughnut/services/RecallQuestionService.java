@@ -28,8 +28,9 @@ public class RecallQuestionService {
         new PredefinedQuestionService(modelFactoryService, aiQuestionGenerator);
   }
 
-  public RecallPrompt generateAQuestion(MemoryTracker memoryTracker, User user) {
-    PredefinedQuestion question = predefinedQuestionService.generateAQuestion(memoryTracker, user);
+  public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
+    PredefinedQuestion question =
+        predefinedQuestionService.generateAQuestion(memoryTracker.getNote());
     if (question == null) {
       return null;
     }

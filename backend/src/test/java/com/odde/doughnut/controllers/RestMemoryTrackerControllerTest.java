@@ -258,12 +258,13 @@ class RestMemoryTrackerControllerTest {
 
   @Nested
   class answerSpellingQuestion {
+    Note answerNote;
     MemoryTracker memoryTracker;
     AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
 
     @BeforeEach
     void setup() {
-      Note answerNote = makeMe.aNote().rememberSpelling().please();
+      answerNote = makeMe.aNote().rememberSpelling().please();
       memoryTracker =
           makeMe
               .aMemoryTrackerFor(answerNote)
@@ -272,6 +273,15 @@ class RestMemoryTrackerControllerTest {
               .spelling()
               .please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+    }
+
+    @Test
+    void answerOneOfTheTitles() {
+      makeMe.theNote(answerNote).titleConstructor("this / that").please();
+      answerDTO.setSpellingAnswer("this");
+      assertTrue(controller.answerSpelling(memoryTracker, answerDTO).getIsCorrect());
+      answerDTO.setSpellingAnswer("that");
+      assertTrue(controller.answerSpelling(memoryTracker, answerDTO).getIsCorrect());
     }
 
     @Test

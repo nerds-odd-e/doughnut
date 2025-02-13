@@ -12,17 +12,13 @@ public class SpellingPredefinedFactory {
     this.answerNote = note;
   }
 
-  private String getStem() {
-    return answerNote.getClozeDescription().clozeDetails();
-  }
-
   public PredefinedQuestion buildSpellingQuestion() {
     PredefinedQuestion predefinedQuestionSpelling = new PredefinedQuestion();
     predefinedQuestionSpelling.setNote(answerNote);
     predefinedQuestionSpelling.setApproved(true);
     predefinedQuestionSpelling.getBareQuestion().setCheckSpell(true);
     MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
-    mcq.setStem(getStem());
+    mcq.setStem(answerNote.getClozeDescription().clozeDetails());
     predefinedQuestionSpelling.getBareQuestion().setMultipleChoicesQuestion(mcq);
     return predefinedQuestionSpelling;
   }

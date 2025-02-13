@@ -45,7 +45,6 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
 
   public RecallPromptBuilder useFactory(SpellingPredefinedFactory predefinedQuestionFactory) {
     this.predefinedQuestionBuilder.useFactory(predefinedQuestionFactory);
-
     return this;
   }
 

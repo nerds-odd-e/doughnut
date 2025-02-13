@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -12,6 +11,7 @@ import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,18 +45,10 @@ class PredefinedQuestionTest {
     }
 
     @Test
-    void typeShouldBeSpellingQuiz() {
-      MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).spelling().please();
-      PredefinedQuestion question = generateQuizQuestionEntity(tracker);
-      assertTrue(question.getBareQuestion().getCheckSpell());
-    }
-
-    @Test
     void shouldAlwaysChooseAIQuestionIfConfigured() {
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
-      MemoryTracker tracker = makeMe.aMemoryTrackerFor(note).please();
-      PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(tracker);
+      PredefinedQuestion randomQuizQuestion = generateQuizQuestionEntity(note);
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
@@ -65,9 +57,9 @@ class PredefinedQuestionTest {
     }
   }
 
-  private PredefinedQuestion generateQuizQuestionEntity(MemoryTracker memoryTracker) {
+  private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
     PredefinedQuestionService predefinedQuestionService =
         new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
-    return predefinedQuestionService.generateAQuestion(memoryTracker, userModel.getEntity());
+    return predefinedQuestionService.generateAQuestion(note);
   }
 }
