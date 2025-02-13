@@ -169,13 +169,13 @@ const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined => {
 }
 
 const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
-  if (answerData.spellingAnswer === undefined || !currentRecallPrompt.value)
+  if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
     return
 
   try {
     const answerResult =
       await managedApi.restRecallPromptController.answerSpelling(
-        currentRecallPrompt.value.id,
+        currentMemoryTrackerId.value,
         { spellingAnswer: answerData.spellingAnswer }
       )
     emit("answered-spelling", answerResult)

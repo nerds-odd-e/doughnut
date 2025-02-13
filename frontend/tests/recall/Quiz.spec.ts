@@ -111,7 +111,7 @@ describe("repeat page", () => {
 
       expect(
         helper.managedApi.restRecallPromptController.answerSpelling
-      ).toHaveBeenCalledWith(recallPromptWithoutChoices.id, {
+      ).toHaveBeenCalledWith(1, {
         spellingAnswer: "cat",
       })
 

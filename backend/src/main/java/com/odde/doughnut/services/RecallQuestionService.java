@@ -74,10 +74,11 @@ public class RecallQuestionService {
   }
 
   public SpellingResultDTO answerSpelling(
-      RecallPrompt recallPrompt,
+      MemoryTracker memoryTracker,
       AnswerSpellingDTO answerSpellingDTO,
       User user,
       Timestamp currentUTCTimestamp) {
+    RecallPrompt recallPrompt = generateAQuestion(memoryTracker, user);
     String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
     MemoryTrackerService memoryTrackerService = new MemoryTrackerService(modelFactoryService);
     Note note = recallPrompt.getPredefinedQuestion().getNote();

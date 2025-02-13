@@ -78,20 +78,20 @@ export class RestRecallPromptControllerService {
         });
     }
     /**
-     * @param recallPrompt
+     * @param memoryTracker
      * @param requestBody
      * @returns SpellingResultDTO OK
      * @throws ApiError
      */
     public answerSpelling(
-        recallPrompt: number,
+        memoryTracker: number,
         requestBody: AnswerSpellingDTO,
     ): CancelablePromise<SpellingResultDTO> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/recall-prompts/{recallPrompt}/answer-spelling',
+            url: '/api/recall-prompts/{memoryTracker}/answer-spelling',
             path: {
-                'recallPrompt': recallPrompt,
+                'memoryTracker': memoryTracker,
             },
             body: requestBody,
             mediaType: 'application/json',

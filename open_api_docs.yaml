@@ -633,13 +633,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/recall-prompts/{recallPrompt}/answer-spelling:
+  /api/recall-prompts/{memoryTracker}/answer-spelling:
     post:
       tags:
       - rest-recall-prompt-controller
       operationId: answerSpelling
       parameters:
-      - name: recallPrompt
+      - name: memoryTracker
         in: path
         required: true
         schema:

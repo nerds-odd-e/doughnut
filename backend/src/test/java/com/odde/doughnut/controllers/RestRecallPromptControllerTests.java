@@ -78,7 +78,6 @@ class RestRecallPromptControllerTests {
   @Nested
   class answerSpellingQuestion {
     MemoryTracker memoryTracker;
-    RecallPrompt recallPrompt;
     AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
 
     @BeforeEach
@@ -91,14 +90,13 @@ class RestRecallPromptControllerTests {
               .forgettingCurveAndNextRecallAt(200)
               .spelling()
               .please();
-      recallPrompt = makeMe.aRecallPrompt().approvedSpellingQuestionOf(answerNote).please();
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-      SpellingResultDTO answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
       assertTrue(answerResult.getIsCorrect());
       assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -107,7 +105,7 @@ class RestRecallPromptControllerTests {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerSpelling(recallPrompt, answerDTO);
+      controller.answerSpelling(memoryTracker, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -115,7 +113,7 @@ class RestRecallPromptControllerTests {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerSpelling(recallPrompt, answerDTO);
+      controller.answerSpelling(memoryTracker, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -126,15 +124,13 @@ class RestRecallPromptControllerTests {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerSpelling(recallPrompt, answer));
+          () -> nullUserController().answerSpelling(memoryTracker, answer));
     }
 
     @Nested
     class WrongAnswer {
       @BeforeEach
       void setup() {
-        recallPrompt =
-            makeMe.aRecallPrompt().approvedSpellingQuestionOf(memoryTracker.getNote()).please();
         answerDTO.setSpellingAnswer("wrong");
       }
 
@@ -142,7 +138,7 @@ class RestRecallPromptControllerTests {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-        SpellingResultDTO answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+        SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
         assertFalse(answerResult.getIsCorrect());
         assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -152,14 +148,14 @@ class RestRecallPromptControllerTests {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
         Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-        controller.answerSpelling(recallPrompt, answerDTO);
+        controller.answerSpelling(memoryTracker, answerDTO);
         assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerSpelling(recallPrompt, answerDTO);
+        controller.answerSpelling(memoryTracker, answerDTO);
         assertThat(
             memoryTracker.getNextRecallAt(),
             lessThan(

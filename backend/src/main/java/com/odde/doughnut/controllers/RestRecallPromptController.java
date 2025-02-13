@@ -81,14 +81,14 @@ class RestRecallPromptController {
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
-  @PostMapping("/{recallPrompt}/answer-spelling")
+  @PostMapping("/{memoryTracker}/answer-spelling")
   @Transactional
   public SpellingResultDTO answerSpelling(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @Valid @RequestBody AnswerSpellingDTO answerDTO) {
     currentUser.assertLoggedIn();
     return recallQuestionService.answerSpelling(
-        recallPrompt,
+        memoryTracker,
         answerDTO,
         currentUser.getEntity(),
         testabilitySettings.getCurrentUTCTimestamp());
