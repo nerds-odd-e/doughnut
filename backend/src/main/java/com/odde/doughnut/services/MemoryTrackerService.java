@@ -73,14 +73,13 @@ public class MemoryTrackerService {
   public void updateMemoryTrackerAfterAnsweringQuestion(
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     UserModel userModel = new UserModel(user, modelFactoryService);
-    Boolean checkSpell = recallPrompt.getPredefinedQuestion().getBareQuestion().getCheckSpell();
     List<MemoryTracker> memoryTrackers =
         userModel.getMemoryTrackersFor(recallPrompt.getPredefinedQuestion().getNote());
     memoryTrackers.stream()
         .filter(
             tracker -> {
               Boolean trackerSpelling = tracker.getSpelling();
-              return Boolean.TRUE.equals(checkSpell) == Boolean.TRUE.equals(trackerSpelling);
+              return !Boolean.TRUE.equals(trackerSpelling);
             })
         .findFirst()
         .ifPresent(memoryTracker -> markAsRepeated(currentUTCTimestamp, correct, memoryTracker));

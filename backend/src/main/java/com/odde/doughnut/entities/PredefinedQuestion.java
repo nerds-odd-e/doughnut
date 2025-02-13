@@ -42,9 +42,6 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public boolean checkAnswer(AnswerDTO answer) {
-    if (Boolean.TRUE.equals(bareQuestion.getCheckSpell())) {
-      return getNote().matchAnswer(answer.getSpellingAnswer());
-    }
     return Objects.equals(answer.getChoiceIndex(), getCorrectAnswerIndex());
   }
 

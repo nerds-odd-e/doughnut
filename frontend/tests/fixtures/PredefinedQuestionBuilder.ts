@@ -19,11 +19,6 @@ class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
     return this
   }
 
-  withSpellCheck() {
-    this.predefinedQuestion.bareQuestion.checkSpell = true
-    return this
-  }
-
   withQuestionStem(stem: string) {
     this.predefinedQuestion.bareQuestion.multipleChoicesQuestion.stem = stem
     return this

@@ -3454,8 +3454,6 @@ components:
     BareQuestion:
       type: object
       properties:
-        checkSpell:
-          type: boolean
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
       required:

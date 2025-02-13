@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type BareQuestion = {
-    checkSpell?: boolean;
     multipleChoicesQuestion: MultipleChoicesQuestion;
 };
 

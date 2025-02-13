@@ -170,11 +170,6 @@ describe("repeat page", () => {
         )
       helper.managedApi.silent.restRecallPromptController.askAQuestion =
         mockedRandomQuestionCall
-      const recallPrompt = makeMe.aRecallPrompt.please()
-      recallPrompt.id = 1
-      recallPrompt.bareQuestion.checkSpell = true
-      recallPrompt.bareQuestion.multipleChoicesQuestion.choices = []
-      mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
 
       mockedRepeatCall.mockResolvedValue(
         makeMe.aDueMemoryTrackersList
