@@ -23,6 +23,7 @@ import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
@@ -176,7 +177,7 @@ class RestRecallPromptControllerTests {
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().approvedSpellingQuestionOf(note).please();
+      recallPrompt = makeMe.aRecallPrompt().approvedQuestionOf(note).please();
     }
 
     @Test
@@ -251,7 +252,7 @@ class RestRecallPromptControllerTests {
       assertThat(
           lastMessage,
           allOf(
-              containsString("\"stem\" : \"<p>descrption</p>\\n\""),
+              containsString("\"stem\" : \"a default question stem\""),
               containsString("Non-feasible reason:"),
               containsString("test"),
               containsString(
@@ -379,7 +380,8 @@ class RestRecallPromptControllerTests {
     @Test
     void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
-      RecallPrompt recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(note).please();
+      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
+      RecallPrompt recallPrompt = recallPromptBuilder.approvedQuestionOf(note).please();
       makeMe.theRecallPrompt(recallPrompt).answerSpelling("wrong").please();
       makeMe.refresh(currentUser.getEntity());
       AnsweredQuestion answeredQuestion = controller.showQuestion(recallPrompt);

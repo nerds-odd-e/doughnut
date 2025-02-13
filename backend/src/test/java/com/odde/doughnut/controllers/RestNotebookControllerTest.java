@@ -181,7 +181,7 @@ class RestNotebookControllerTest {
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
       controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
-      predefinedQuestionBuilder.approvedSpellingQuestionOf(notebook.getNotes().get(0)).please();
+      predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(1));
     }

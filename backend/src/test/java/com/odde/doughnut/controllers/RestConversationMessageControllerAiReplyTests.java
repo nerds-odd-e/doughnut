@@ -20,6 +20,7 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.assistants.run.RunCreateRequest;
 import com.theokanning.openai.assistants.thread.ThreadRequest;
@@ -342,7 +343,8 @@ public class RestConversationMessageControllerAiReplyTests {
     @BeforeEach
     void setup() {
       questionNote = makeMe.aNote().creatorAndOwner(currentUser).please();
-      recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(questionNote).please();
+      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
+      recallPrompt = recallPromptBuilder.approvedQuestionOf(questionNote).please();
       conversation =
           makeMe.aConversation().forARecallPrompt(recallPrompt).from(currentUser).please();
 

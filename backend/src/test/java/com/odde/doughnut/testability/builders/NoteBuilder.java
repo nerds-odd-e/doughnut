@@ -210,14 +210,14 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder hasAnApprovedQuestion() {
     PredefinedQuestionBuilder predefinedQuestionBuilder =
-        makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(entity);
+        makeMe.aPredefinedQuestion().approvedQuestionOf(entity);
     this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
     return this;
   }
 
   public NoteBuilder hasAnUnapprovedQuestion() {
     PredefinedQuestionBuilder predefinedQuestionBuilder =
-        makeMe.aPredefinedQuestion().spellingQuestionOf(entity);
+        makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(entity);
     this.predefinedQuestionBuilders.add(predefinedQuestionBuilder);
     return this;
   }

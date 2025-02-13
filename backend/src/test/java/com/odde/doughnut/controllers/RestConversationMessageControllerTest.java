@@ -13,6 +13,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -425,7 +426,8 @@ class RestConversationMessageControllerTest {
     @BeforeEach
     void setup() {
       Note note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().spellingQuestionOf(note).answerSpelling("a").please();
+      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
+      recallPrompt = recallPromptBuilder.approvedQuestionOf(note).answerSpelling("a").please();
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
-import com.odde.doughnut.factoryServices.quizFacotries.factories.SpellingPredefinedFactory;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -15,14 +14,8 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
   @Override
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
-      spellingQuestionOf(makeMe.aNote().please(needPersist));
+      ofAIGeneratedQuestionForNote(makeMe.aNote().please(needPersist));
     }
-  }
-
-  public PredefinedQuestionBuilder spellingQuestionOf(Note note) {
-    this.entity = new SpellingPredefinedFactory(note).buildSpellingQuestion();
-    this.entity.setApproved(false);
-    return this;
   }
 
   public PredefinedQuestionBuilder approved() {
@@ -30,8 +23,8 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     return this;
   }
 
-  public PredefinedQuestionBuilder approvedSpellingQuestionOf(Note note) {
-    return spellingQuestionOf(note).approved();
+  public PredefinedQuestionBuilder approvedQuestionOf(Note note) {
+    return ofAIGeneratedQuestionForNote(note).approved();
   }
 
   public PredefinedQuestionBuilder ofAIGeneratedQuestion(MCQWithAnswer mcqWithAnswer, Note note) {
@@ -39,8 +32,9 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     return this;
   }
 
-  public PredefinedQuestionBuilder useFactory(SpellingPredefinedFactory predefinedQuestionFactory) {
-    this.entity = predefinedQuestionFactory.buildSpellingQuestion();
+  public PredefinedQuestionBuilder ofAIGeneratedQuestionForNote(Note note) {
+    MCQWithAnswer mcqWithAnswer = new MCQWithAnswerBuilder().please();
+    this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     return this;
   }
 }

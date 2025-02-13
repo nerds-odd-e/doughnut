@@ -161,7 +161,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void getQuestionsOfANoteWhenThereIsOneQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion questionOfNote =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(noteWithoutQuestions).please();
+          makeMe.aPredefinedQuestion().approvedQuestionOf(noteWithoutQuestions).please();
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithoutQuestions);
       assertThat(results, contains(questionOfNote));
     }
@@ -169,7 +169,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void getAllQuestionsOfANoteWhenThereIsMoreThanOneQuestion()
         throws UnexpectedNoAccessRightException {
-      makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(noteWithQuestions).please();
+      makeMe.aPredefinedQuestion().approvedQuestionOf(noteWithQuestions).please();
       List<PredefinedQuestion> results = controller.getAllQuestionByNote(noteWithQuestions);
       assertThat(results, hasSize(2));
     }
@@ -247,7 +247,7 @@ class RestPredefinedQuestionControllerTests {
     void mustNotBeAbleToApproveOtherPeoplesNoteQuestion() {
       Note note = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
       PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(note).please();
+          makeMe.aPredefinedQuestion().approvedQuestionOf(note).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.toggleApproval(predefinedQuestion));
@@ -256,7 +256,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void approveQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(subjectNote).please();
+          makeMe.aPredefinedQuestion().approvedQuestionOf(subjectNote).please();
       predefinedQuestion.setApproved(false);
       PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
       assertTrue(approvedQuestion.isApproved());
@@ -265,7 +265,7 @@ class RestPredefinedQuestionControllerTests {
     @Test
     void unApproveQuestion() throws UnexpectedNoAccessRightException {
       PredefinedQuestion predefinedQuestion =
-          makeMe.aPredefinedQuestion().approvedSpellingQuestionOf(subjectNote).please();
+          makeMe.aPredefinedQuestion().approvedQuestionOf(subjectNote).please();
       predefinedQuestion.setApproved(true);
       PredefinedQuestion approvedQuestion = controller.toggleApproval(predefinedQuestion);
       assertFalse(approvedQuestion.isApproved());
