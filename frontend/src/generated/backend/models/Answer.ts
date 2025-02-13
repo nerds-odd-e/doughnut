@@ -4,7 +4,6 @@
 /* eslint-disable */
 export type Answer = {
     id: number;
-    spellingAnswer?: string;
     choiceIndex?: number;
     correct: boolean;
 };

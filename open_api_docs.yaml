@@ -3643,8 +3643,6 @@ components:
         id:
           type: integer
           format: int32
-        spellingAnswer:
-          type: string
         choiceIndex:
           type: integer
           format: int32

@@ -12,9 +12,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "quiz_answer")
 public class Answer extends EntityIdentifiedByIdOnly {
-  @Column(name = "answer")
-  String spellingAnswer;
-
   @Column(name = "choice_index")
   Integer choiceIndex;
 
@@ -33,6 +30,6 @@ public class Answer extends EntityIdentifiedByIdOnly {
     if (getChoiceIndex() != null) {
       return bareQuestion.getChoices().get(getChoiceIndex());
     }
-    return getSpellingAnswer();
+    return "";
   }
 }
