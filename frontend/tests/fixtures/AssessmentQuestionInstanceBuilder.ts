@@ -20,7 +20,7 @@ class AssessmentQuestionInstanceBuilder extends Builder<AssessmentQuestionInstan
     const predefinedQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
-      bareQuestion: predefinedQuestion.bareQuestion,
+      multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
     }
   }
 }

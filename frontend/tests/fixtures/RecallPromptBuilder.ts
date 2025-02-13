@@ -21,7 +21,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     const predefinedQuestion = this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
-      bareQuestion: predefinedQuestion.bareQuestion,
+      multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
       notebook: new NotebookBuilder().do(),
     }
   }

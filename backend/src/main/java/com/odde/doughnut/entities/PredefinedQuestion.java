@@ -2,7 +2,9 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.entities.converters.MCQToJsonConverter;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -20,7 +22,10 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private Note note;
 
-  @Embedded @NotNull private BareQuestion bareQuestion = new BareQuestion();
+  @Column(name = "raw_json_question")
+  @Convert(converter = MCQToJsonConverter.class)
+  @NotNull
+  private MultipleChoicesQuestion multipleChoicesQuestion;
 
   @Column(name = "created_at")
   @JsonIgnore
@@ -35,7 +40,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(bareQuestion.getMultipleChoicesQuestion());
+    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
     mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
     return mcqWithAnswer;
   }
@@ -48,8 +53,7 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
     predefinedQuestion.setNote(note);
-    predefinedQuestion.bareQuestion.setMultipleChoicesQuestion(
-        MCQWithAnswer.getMultipleChoicesQuestion());
+    predefinedQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
     predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
     return predefinedQuestion;
   }

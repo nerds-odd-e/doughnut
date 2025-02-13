@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -28,9 +29,9 @@ public class Answer extends EntityIdentifiedByIdOnly {
   private Boolean correct;
 
   @JsonIgnore
-  String getAnswerDisplay(BareQuestion bareQuestion) {
+  String getAnswerDisplay(@NotNull MultipleChoicesQuestion bareQuestion) {
     if (getChoiceIndex() != null) {
-      return bareQuestion.getMultipleChoicesQuestion().getChoices().get(getChoiceIndex());
+      return bareQuestion.getChoices().get(getChoiceIndex());
     }
     return getSpellingAnswer();
   }

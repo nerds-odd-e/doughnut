@@ -6,11 +6,9 @@ class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
   predefinedQuestion: PredefinedQuestion = {
     id: generateId(),
     correctAnswerIndex: 0,
-    bareQuestion: {
-      multipleChoicesQuestion: {
-        stem: "answer",
-        choices: [],
-      },
+    multipleChoicesQuestion: {
+      stem: "answer",
+      choices: [],
     },
   }
 
@@ -20,14 +18,12 @@ class PredefinedQuestionBuilder extends Builder<PredefinedQuestion> {
   }
 
   withQuestionStem(stem: string) {
-    this.predefinedQuestion.bareQuestion.multipleChoicesQuestion.stem = stem
+    this.predefinedQuestion.multipleChoicesQuestion.stem = stem
     return this
   }
 
   withChoices(choices: string[]) {
-    this.predefinedQuestion.bareQuestion.multipleChoicesQuestion.choices = [
-      ...choices,
-    ]
+    this.predefinedQuestion.multipleChoicesQuestion.choices = [...choices]
     return this
   }
 

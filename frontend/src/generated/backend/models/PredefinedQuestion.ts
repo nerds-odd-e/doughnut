@@ -2,10 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BareQuestion } from './BareQuestion';
+import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type PredefinedQuestion = {
     id: number;
-    bareQuestion: BareQuestion;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
     correctAnswerIndex?: number;
     approved?: boolean;
 };

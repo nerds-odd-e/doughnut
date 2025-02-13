@@ -22,7 +22,6 @@ export type { AssimilationCountDTO } from './models/AssimilationCountDTO';
 export type { Attachment } from './models/Attachment';
 export type { AudioUploadDTO } from './models/AudioUploadDTO';
 export { BareNote } from './models/BareNote';
-export type { BareQuestion } from './models/BareQuestion';
 export type { BazaarNotebook } from './models/BazaarNotebook';
 export type { Certificate } from './models/Certificate';
 export type { ChatResponseFormat } from './models/ChatResponseFormat';

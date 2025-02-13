@@ -2,11 +2,11 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { BareQuestion } from './BareQuestion';
+import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 import type { Notebook } from './Notebook';
 export type RecallPrompt = {
     id: number;
-    bareQuestion: BareQuestion;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
     notebook?: Notebook;
 };
 

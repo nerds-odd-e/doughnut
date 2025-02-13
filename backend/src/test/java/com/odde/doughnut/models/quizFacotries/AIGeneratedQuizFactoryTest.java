@@ -44,7 +44,7 @@ class AIGeneratedQuizFactoryTest {
   void shouldIncludeQuestionStem() {
     RecallPrompt recallPrompt = buildQuestion();
     assertThat(
-        recallPrompt.getBareQuestion().getMultipleChoicesQuestion().getStem(),
+        recallPrompt.getMultipleChoicesQuestion().getStem(),
         containsString("How long did it take to build Rome?"));
   }
 

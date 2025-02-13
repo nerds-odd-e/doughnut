@@ -1,7 +1,7 @@
 <template>
   <QuestionDisplay
     v-bind="{
-      bareQuestion: localAssessmentQuestionInstance.bareQuestion,
+      multipleChoicesQuestion: localAssessmentQuestionInstance.multipleChoicesQuestion,
       answer: localAssessmentQuestionInstance.answer,
     }"
     @answer="submitAnswer($event)"

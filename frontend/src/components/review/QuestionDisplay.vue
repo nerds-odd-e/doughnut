@@ -1,9 +1,9 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
-    <QuestionStem :stem="bareQuestion.multipleChoicesQuestion.stem" />
+    <QuestionStem :stem="multipleChoicesQuestion.stem" />
     <QuestionChoices
-      v-if="bareQuestion.multipleChoicesQuestion.choices"
-      :choices="bareQuestion.multipleChoicesQuestion.choices"
+      v-if="multipleChoicesQuestion.choices"
+      :choices="multipleChoicesQuestion.choices"
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answer?.choiceIndex"
       :disabled="disabled"
@@ -14,13 +14,17 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { Answer, AnswerDTO, BareQuestion } from "@/generated/backend"
+import type {
+  Answer,
+  AnswerDTO,
+  MultipleChoicesQuestion,
+} from "@/generated/backend"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 
 defineProps({
-  bareQuestion: {
-    type: Object as PropType<BareQuestion>,
+  multipleChoicesQuestion: {
+    type: Object as PropType<MultipleChoicesQuestion>,
     required: true,
   },
   correctChoiceIndex: Number,

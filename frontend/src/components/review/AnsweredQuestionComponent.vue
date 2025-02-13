@@ -5,7 +5,7 @@
   <QuestionDisplay
     v-if="answeredQuestion.predefinedQuestion"
     v-bind="{
-      bareQuestion: answeredQuestion.predefinedQuestion.bareQuestion,
+      multipleChoicesQuestion: answeredQuestion.predefinedQuestion.multipleChoicesQuestion,
       correctChoiceIndex: answeredQuestion.predefinedQuestion.correctAnswerIndex,
       answer: answeredQuestion.answer,
     }"

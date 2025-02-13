@@ -18,14 +18,10 @@ vi.mock("@/managedApi/useLoadingApi", () => ({
 }))
 
 describe("SpellingQuestionDisplay", () => {
-  const bareQuestion = makeMe.aBareQuestion
-    .withStem("Spell the word 'cat'")
-    .please()
-
   it("renders spelling question input form", async () => {
     const wrapper = helper
       .component(SpellingQuestionComponent)
-      .withProps({ bareQuestion, memoryTrackerId: 1 })
+      .withProps({ memoryTrackerId: 1 })
       .mount()
 
     await flushPromises()
@@ -39,7 +35,7 @@ describe("SpellingQuestionDisplay", () => {
   it("emits answer event when form is submitted", async () => {
     const wrapper = helper
       .component(SpellingQuestionComponent)
-      .withProps({ bareQuestion, memoryTrackerId: 1 })
+      .withProps({ memoryTrackerId: 1 })
       .mount()
 
     await flushPromises()

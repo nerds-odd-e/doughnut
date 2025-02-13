@@ -44,7 +44,7 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       await screen.findByText(
-        assessmentQuestionInstance.bareQuestion.multipleChoicesQuestion.stem!
+        assessmentQuestionInstance.multipleChoicesQuestion.stem!
       )
     })
 

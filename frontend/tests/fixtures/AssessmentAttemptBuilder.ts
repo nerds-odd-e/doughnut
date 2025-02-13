@@ -19,7 +19,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
   withQuestions(questions: RecallPrompt[]) {
     this.data.assessmentQuestionInstances = questions.map((question) => ({
       id: question.id,
-      bareQuestion: question.bareQuestion,
+      multipleChoicesQuestion: question.multipleChoicesQuestion,
       recallPrompt: question,
     }))
     return this

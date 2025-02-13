@@ -3,10 +3,10 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Answer } from './Answer';
-import type { BareQuestion } from './BareQuestion';
+import type { MultipleChoicesQuestion } from './MultipleChoicesQuestion';
 export type AssessmentQuestionInstance = {
     id: number;
-    bareQuestion: BareQuestion;
     answer?: Answer;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
 };
 

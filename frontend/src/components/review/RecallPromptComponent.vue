@@ -2,7 +2,7 @@
   <div class="daisy-relative">
     <QuestionDisplay
       v-bind="{
-        bareQuestion: recallPrompt.bareQuestion,
+        multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
       }"
       @answer="submitQuizAnswer($event)"
       :key="`choice-${recallPrompt.id}`"

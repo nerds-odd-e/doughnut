@@ -2,7 +2,7 @@ import ApiErrorBuilder from "./ApiErrorBuilder"
 import AnsweredQuestionBuilder from "./AnsweredQuestionBuilder"
 import AssessmentAttemptBuilder from "./AssessmentAttemptBuilder"
 import AssessmentQuestionInstanceBuilder from "./AssessmentQuestionInstanceBuilder"
-import BareQuestionBuilder from "./BareQuestionBuilder"
+import MultipleChoicesQuestionBuilder from "./BareQuestionBuilder"
 import BazaarNotebooksBuilder from "./BazaarNotebooksBuilder"
 import CircleBuilder from "./CircleBuilder"
 import CircleNoteBuilder from "./CircleNoteBuilder"
@@ -101,8 +101,8 @@ class MakeMe {
     return new AnsweredQuestionBuilder()
   }
 
-  static get aBareQuestion(): BareQuestionBuilder {
-    return new BareQuestionBuilder()
+  static get aMultipleChoicesQuestion(): MultipleChoicesQuestionBuilder {
+    return new MultipleChoicesQuestionBuilder()
   }
 }
 

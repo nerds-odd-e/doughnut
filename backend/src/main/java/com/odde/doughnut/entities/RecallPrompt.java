@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "recall_prompt")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({"id", "bareQuestion", "notebook"})
+@JsonPropertyOrder({"id", "multipleChoicesQuestion", "notebook"})
 public class RecallPrompt extends AnswerableQuestionInstance {
   public Notebook getNotebook() {
     return getPredefinedQuestion().getNote().getNotebook();
@@ -29,7 +29,7 @@ public class RecallPrompt extends AnswerableQuestionInstance {
     answerResult.answer = answer;
     answerResult.note = getPredefinedQuestion().getNote();
     answerResult.predefinedQuestion = getPredefinedQuestion();
-    answerResult.answerDisplay = answer.getAnswerDisplay(this.getBareQuestion());
+    answerResult.answerDisplay = answer.getAnswerDisplay(this.getMultipleChoicesQuestion());
     answerResult.recallPromptId = id;
     return answerResult;
   }

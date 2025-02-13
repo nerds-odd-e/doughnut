@@ -3451,29 +3451,22 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PredefinedQuestionTestData"
-    BareQuestion:
-      type: object
-      properties:
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-      required:
-      - multipleChoicesQuestion
     PredefinedQuestion:
       type: object
       properties:
         id:
           type: integer
           format: int32
-        bareQuestion:
-          $ref: "#/components/schemas/BareQuestion"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
         correctAnswerIndex:
           type: integer
           format: int32
         approved:
           type: boolean
       required:
-      - bareQuestion
       - id
+      - multipleChoicesQuestion
     SubscriptionDTO:
       type: object
       properties:
@@ -3631,13 +3624,13 @@ components:
         id:
           type: integer
           format: int32
-        bareQuestion:
-          $ref: "#/components/schemas/BareQuestion"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
         notebook:
           $ref: "#/components/schemas/Notebook"
       required:
-      - bareQuestion
       - id
+      - multipleChoicesQuestion
     AnswerDTO:
       type: object
       properties:
@@ -3913,13 +3906,13 @@ components:
         id:
           type: integer
           format: int32
-        bareQuestion:
-          $ref: "#/components/schemas/BareQuestion"
         answer:
           $ref: "#/components/schemas/Answer"
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
       required:
-      - bareQuestion
       - id
+      - multipleChoicesQuestion
     Conversation:
       type: object
       properties:

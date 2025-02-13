@@ -52,7 +52,7 @@ class PredefinedQuestionTest {
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
-          qq.getBareQuestion().getMultipleChoicesQuestion().getStem(),
+          qq.getMultipleChoicesQuestion().getStem(),
           containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
     }
   }

@@ -214,8 +214,7 @@ class RestRecallPromptControllerTests {
       contestResult.reason = "test";
       RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
 
-      Assertions.assertThat(
-              regeneratedQuestion.getBareQuestion().getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getStem())
           .contains("What is the first color in the rainbow?");
     }
 

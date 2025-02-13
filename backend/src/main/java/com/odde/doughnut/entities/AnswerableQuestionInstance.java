@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -28,8 +29,8 @@ public abstract class AnswerableQuestionInstance extends EntityIdentifiedByIdOnl
   Answer answer;
 
   @NotNull
-  public BareQuestion getBareQuestion() {
-    return predefinedQuestion.getBareQuestion();
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    return predefinedQuestion.getMultipleChoicesQuestion();
   }
 
   public final Answer buildAnswer(AnswerDTO answerDTO) {

@@ -123,9 +123,8 @@ onMounted(() => {
 
 const conversationTopic = (conversation: Conversation) => {
   return (
-    conversation.subject?.assessmentQuestionInstance?.bareQuestion
-      .multipleChoicesQuestion.stem ||
-    conversation.subject?.note?.noteTopology?.titleOrPredicate
+    conversation.subject?.assessmentQuestionInstance?.multipleChoicesQuestion
+      .stem || conversation.subject?.note?.noteTopology?.titleOrPredicate
   )
 }
 

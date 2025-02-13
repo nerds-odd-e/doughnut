@@ -6,14 +6,14 @@ import markdownizer from "@/components/form/markdownizer"
 
 describe("QuestionDisplay", () => {
   it("renders multiple choice question when choices are provided", async () => {
-    const bareQuestion = makeMe.aBareQuestion
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
       .withStem("What is the capital of France?")
       .withChoices(["Paris", "Berlin", "Rome"])
       .please()
 
     const wrapper = helper
       .component(QuestionDisplay)
-      .withProps({ bareQuestion })
+      .withProps({ multipleChoicesQuestion })
       .mount()
 
     await flushPromises()
@@ -28,14 +28,14 @@ describe("QuestionDisplay", () => {
 
   it("renders markdown in stem correctly", async () => {
     const markdownStem = "# What is 2 + 2?\n\nChoose the *correct* answer:"
-    const bareQuestion = makeMe.aBareQuestion
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
       .withStem(markdownStem)
       .withChoices(["4", "5", "6"])
       .please()
 
     const wrapper = helper
       .component(QuestionDisplay)
-      .withProps({ bareQuestion })
+      .withProps({ multipleChoicesQuestion })
       .mount()
 
     await flushPromises()
@@ -58,14 +58,14 @@ describe("QuestionDisplay", () => {
       "*Italic* choice",
       "~~Strikethrough~~ choice",
     ]
-    const bareQuestion = makeMe.aBareQuestion
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
       .withStem("Choose one:")
       .withChoices(markdownChoices)
       .please()
 
     const wrapper = helper
       .component(QuestionDisplay)
-      .withProps({ bareQuestion })
+      .withProps({ multipleChoicesQuestion })
       .mount()
 
     await flushPromises()
