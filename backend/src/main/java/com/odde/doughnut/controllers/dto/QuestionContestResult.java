@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class QuestionContestResult {
-  public String reason;
+  public String advice;
   public Boolean rejected = false;
 }

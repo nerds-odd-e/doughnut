@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type QuestionContestResult = {
-    reason?: string;
+    advice?: string;
     rejected?: boolean;
 };
 

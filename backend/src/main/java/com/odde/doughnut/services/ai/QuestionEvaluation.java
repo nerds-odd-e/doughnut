@@ -16,9 +16,9 @@ public class QuestionEvaluation {
   public boolean feasibleQuestion;
 
   @JsonPropertyDescription(
-      "Explains why the question is not feasible. Leave empty if the question is feasible.")
+      "Explains why the question is not feasible and advises for improvement. Leave empty if the question is feasible.")
   @JsonProperty(required = true)
-  public String explanation;
+  public String improvementAdvices;
 
   private boolean indisputableAnswer(int correctChoiceIndex) {
     return correctChoices != null
@@ -29,12 +29,12 @@ public class QuestionEvaluation {
   public QuestionContestResult getQuestionContestResult(Integer correctChoiceIndex) {
     if (feasibleQuestion && indisputableAnswer(correctChoiceIndex)) {
       QuestionContestResult result = new QuestionContestResult();
-      result.reason = "This seems to be a legitimate question. Please answer it.";
+      result.advice = "This seems to be a legitimate question. Please answer it.";
       result.rejected = true;
       return result;
     }
     QuestionContestResult result = new QuestionContestResult();
-    result.reason = explanation == null ? "" : explanation;
+    result.advice = improvementAdvices == null ? "" : improvementAdvices;
     if (!indisputableAnswer(correctChoiceIndex)) {
       String correctChoicesStr =
           correctChoices == null
@@ -42,8 +42,8 @@ public class QuestionEvaluation {
               : Arrays.stream(correctChoices)
                   .mapToObj(String::valueOf)
                   .collect(Collectors.joining(", "));
-      result.reason +=
-          "\nUnclear answer detected. The original question assume one correct choice index (0-based) of "
+      result.advice +=
+          "\n\nUnclear answer detected. The original question assume one correct choice index (0-based) of "
               + correctChoiceIndex
               + ". however, the re-evaluation of the question shows that "
               + correctChoicesStr

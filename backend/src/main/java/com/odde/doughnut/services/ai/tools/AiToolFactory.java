@@ -71,7 +71,7 @@ public class AiToolFactory {
 
         Output Requirements:
             •	If the question fails any of the above criteria, set the field "feasibleQuestion": false in the response.
-            •	Provide a clear explanation of why the question is not feasible and what could be improved.
+            •	Provide a clear explanation of why the question is not feasible and what could be improved in the field "improvementAdvices". If the question is too far off, please advise to generate completely new question.
 
         Here is the question to evaluate:
 
@@ -166,17 +166,19 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         .content(
             """
                     Previously generated non-feasible question:
+
                     %s
 
-                    Non-feasible reason:
+                    Improvement advice:
+
                     %s
 
-                    Please regenerate or refine the question based on the above feedback."""
+                    Please regenerate or refine the question based on the above advice."""
                 .formatted(
                     new ObjectMapper()
                         .writerWithDefaultPrettyPrinter()
                         .writeValueAsString(predefinedQuestion.getMcqWithAnswer()),
-                    contestResult.reason))
+                    contestResult.advice))
         .build();
   }
 }

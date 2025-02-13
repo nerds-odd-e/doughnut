@@ -50,7 +50,7 @@ class SuggestedQuestionForFineTuningTest {
   @Test
   void testFunctionCall() {
     QuestionEvaluation questionEvaluation = getQuestionEvaluation();
-    assertThat(questionEvaluation.explanation, equalTo("a comment"));
+    assertThat(questionEvaluation.improvementAdvices, equalTo("a comment"));
     assertThat(questionEvaluation.feasibleQuestion, equalTo(false));
     assertThat(questionEvaluation.correctChoices, equalTo(new int[] {1, 2}));
   }

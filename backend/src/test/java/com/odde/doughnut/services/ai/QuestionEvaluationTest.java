@@ -12,13 +12,14 @@ class QuestionEvaluationTest {
   void shouldShowExplanationAndUnclearAnswerWhenNoCorrectChoices() {
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
     questionEvaluation.feasibleQuestion = true;
-    questionEvaluation.explanation = "what a horrible question!";
+    questionEvaluation.improvementAdvices = "what a horrible question!";
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(0);
-    assertThat(result.reason, containsString("what a horrible question!"));
-    assertThat(result.reason, containsString("Unclear answer detected"));
+    assertThat(result.advice, containsString("what a horrible question!"));
+    assertThat(result.advice, containsString("Unclear answer detected"));
     assertThat(
-        result.reason, containsString("original question assume one correct choice index 0"));
-    assertThat(result.reason, containsString("none are correct to the question"));
+        result.advice,
+        containsString("original question assume one correct choice index (0-based) of 0"));
+    assertThat(result.advice, containsString("none are correct to the question"));
   }
 
   @Test
@@ -28,8 +29,9 @@ class QuestionEvaluationTest {
     questionEvaluation.correctChoices = new int[] {1, 2};
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(0);
     assertThat(
-        result.reason, containsString("original question assume one correct choice index 0"));
-    assertThat(result.reason, containsString("1, 2 are correct to the question"));
+        result.advice,
+        containsString("original question assume one correct choice index (0-based) of 0"));
+    assertThat(result.advice, containsString("1, 2 are correct to the question"));
   }
 
   @Test
@@ -38,6 +40,6 @@ class QuestionEvaluationTest {
     questionEvaluation.feasibleQuestion = true;
     questionEvaluation.correctChoices = new int[] {0};
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(0);
-    assertEquals("This seems to be a legitimate question. Please answer it.", result.reason);
+    assertEquals("This seems to be a legitimate question. Please answer it.", result.advice);
   }
 }

@@ -89,7 +89,7 @@ const contest = async () => {
       regenerating.value = true
       prevQuestions.value.push({
         quizeQuestion: currentQuestion.value,
-        badQuestionReason: contestResult.reason,
+        badQuestionReason: contestResult.advice,
       })
       try {
         currentQuestion.value =
@@ -101,7 +101,7 @@ const contest = async () => {
         regenerating.value = false
       }
     } else {
-      currentQuestionLegitMessage.value = contestResult.reason
+      currentQuestionLegitMessage.value = contestResult.advice
     }
   } finally {
     contesting.value = false

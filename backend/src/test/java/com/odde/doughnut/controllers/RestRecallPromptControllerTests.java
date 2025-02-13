@@ -192,7 +192,7 @@ class RestRecallPromptControllerTests {
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings);
             QuestionContestResult contestResult = new QuestionContestResult();
-            contestResult.reason = "test";
+            contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
           });
     }
@@ -211,7 +211,7 @@ class RestRecallPromptControllerTests {
           .mockCancelRun("my-run-id");
 
       QuestionContestResult contestResult = new QuestionContestResult();
-      contestResult.reason = "test";
+      contestResult.advice = "test";
       RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
 
       Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getStem())
@@ -232,7 +232,7 @@ class RestRecallPromptControllerTests {
           .mockCancelRun("my-run-id");
 
       QuestionContestResult contestResult = new QuestionContestResult();
-      contestResult.reason = "test";
+      contestResult.advice = "test";
       controller.regenerate(recallPrompt, contestResult);
 
       ArgumentCaptor<RunCreateRequest> argumentCaptor =
@@ -252,10 +252,10 @@ class RestRecallPromptControllerTests {
           lastMessage,
           allOf(
               containsString("\"stem\" : \"a default question stem\""),
-              containsString("Non-feasible reason:"),
+              containsString("Improvement advice:"),
               containsString("test"),
               containsString(
-                  "Please regenerate or refine the question based on the above feedback.")));
+                  "Please regenerate or refine the question based on the above advice.")));
     }
   }
 
@@ -268,7 +268,7 @@ class RestRecallPromptControllerTests {
     void setUp() {
       questionEvaluation.correctChoices = new int[] {0};
       questionEvaluation.feasibleQuestion = true;
-      questionEvaluation.explanation = "what a horrible question!";
+      questionEvaluation.improvementAdvices = "what a horrible question!";
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
