@@ -22,7 +22,7 @@
             :is-active="false"
           >
             <template #dropdown="slotProps">
-              <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
+              <ul tabindex="0" class="daisy-dropdown-content daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
                 <li v-if="user?.admin">
                   <router-link :to="{ name: 'adminDashboard' }" @click="slotProps.closeDropdown">
                     Admin Dashboard
