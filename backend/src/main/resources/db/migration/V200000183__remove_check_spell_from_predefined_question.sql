@@ -4,6 +4,10 @@ WHERE predefined_question_id IN (
     SELECT id FROM predefined_question WHERE check_spell = true
 );
 
+DELETE FROM assessment_question_instance
+WHERE predefined_question_id IN (
+    SELECT id FROM predefined_question WHERE check_spell = true
+);
 -- Then delete records from predefined_question
 DELETE FROM predefined_question WHERE check_spell = true;
 

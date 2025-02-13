@@ -12,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "assessment_question_instance")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({"id", "mutltipleChoicesQuestion", "notebook", "answer"})
+@JsonPropertyOrder({"id", "multipleChoicesQuestion", "notebook", "answer"})
 public class AssessmentQuestionInstance extends AnswerableQuestionInstance {
   @ManyToOne
   @JoinColumn(name = "assessment_attempt_id")
