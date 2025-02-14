@@ -28,6 +28,7 @@ import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import { computed } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
+import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
 // Props
 const { note } = defineProps<{
@@ -45,6 +46,8 @@ const emit = defineEmits<{
 const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 const { totalAssimilatedCount } = useRecallData()
+
+const { incrementAssimilatedCount } = useAssimilationCount()
 
 // Computed
 const buttonKey = computed(() => note.id)
@@ -70,6 +73,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
   }
 
   if (skipMemoryTracking) {
+    incrementAssimilatedCount()
     emit("reloadNeeded")
   } else {
     emit("initialReviewDone")

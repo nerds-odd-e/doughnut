@@ -80,12 +80,8 @@ defineProps({
 })
 defineEmits(["update-reviewing"])
 
-const {
-  setDueCount,
-  assimilatedCountOfTheDay,
-  incrementAssimilatedCount,
-  totalUnassimilatedCount,
-} = useAssimilationCount()
+const { setDueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =
+  useAssimilationCount()
 
 const notes = ref<Note[] | undefined>(undefined)
 
@@ -106,7 +102,6 @@ const totalPlannedCount = computed(
 )
 
 const initialReviewDone = () => {
-  incrementAssimilatedCount()
   notes.value?.shift()
   setDueCount(notes.value?.length)
 }
