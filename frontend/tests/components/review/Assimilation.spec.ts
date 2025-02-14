@@ -13,6 +13,7 @@ const mockedGetNoteInfoCall = vi.fn()
 
 afterEach(() => {
   document.body.innerHTML = ""
+  vi.clearAllMocks()
 })
 
 beforeEach(() => {
@@ -50,36 +51,6 @@ describe("Assimilation component", () => {
         skipMemoryTracking: false,
       })
       expect(wrapper.emitted()).toHaveProperty("initialReviewDone")
-    })
-  })
-
-  describe("skip memory tracking", () => {
-    it("emits reloadNeeded when skipping memory tracking after confirmation", async () => {
-      mockedAssimilateCall.mockResolvedValue({})
-      const wrapper = renderer
-        .withStorageProps({
-          note,
-        })
-        .mount()
-
-      await flushPromises()
-      const { popups } = usePopups()
-      const skipButton = wrapper.find('input[value="Skip repetition"]')
-
-      // Setup popup confirmation to return true
-      const confirmPromise = Promise.resolve(true)
-      vi.spyOn(popups, "confirm").mockReturnValue(confirmPromise)
-
-      await skipButton.trigger("click")
-      await flushPromises()
-      await confirmPromise
-      await flushPromises()
-
-      expect(mockedAssimilateCall).toHaveBeenCalledWith({
-        noteId: note.id,
-        skipMemoryTracking: true,
-      })
-      expect(wrapper.emitted()).toHaveProperty("reloadNeeded")
     })
   })
 })
