@@ -73,9 +73,9 @@ const processForm = async (skipMemoryTracking: boolean) => {
   }
 
   if (skipMemoryTracking) {
-    incrementAssimilatedCount()
     emit("reloadNeeded")
   } else {
+    incrementAssimilatedCount()
     emit("initialReviewDone")
   }
 }
