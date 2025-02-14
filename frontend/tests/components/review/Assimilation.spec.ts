@@ -68,7 +68,7 @@ describe("Assimilation component", () => {
 
       // Setup popup confirmation to return true
       const confirmPromise = Promise.resolve(true)
-      vi.spyOn(popups, 'confirm').mockReturnValue(confirmPromise)
+      vi.spyOn(popups, "confirm").mockReturnValue(confirmPromise)
 
       await skipButton.trigger("click")
       await flushPromises()
@@ -81,4 +81,5 @@ describe("Assimilation component", () => {
       })
       expect(wrapper.emitted()).toHaveProperty("reloadNeeded")
     })
+  })
 })
