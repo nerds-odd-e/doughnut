@@ -4,7 +4,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
-import usePopups from "@/components/commons/Popups/usePopups"
 
 let renderer: RenderingHelper<typeof Assimilation>
 const mockedAssimilateCall = vi.fn()
