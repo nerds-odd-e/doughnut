@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -12,6 +13,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.theokanning.openai.client.OpenAiApi;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -110,5 +113,49 @@ class AiQuestionGeneratorTests {
     String actualCorrectAnswer =
         result.getMultipleChoicesQuestion().getChoices().get(result.getCorrectChoiceIndex());
     assertThat(actualCorrectAnswer, equalTo(expectedCorrectAnswer));
+  }
+
+  @Test
+  void shouldShuffleChoicesInSpecificOrder() {
+    // Setup a mocked randomizer
+    com.odde.doughnut.models.Randomizer mockedRandomizer =
+        mock(com.odde.doughnut.models.Randomizer.class);
+    AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
+        new AiQuestionGenerator(
+            openAiApi, new GlobalSettingsService(modelFactoryService), mockedRandomizer);
+
+    // Setup a note with enough content for question generation
+    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    makeMe.aNote().under(note).please();
+
+    // Prepare the AI response with strictChoiceOrder = false
+    MCQWithAnswer originalQuestion =
+        makeMe
+            .aMCQWithAnswer()
+            .stem("What is 2+2?")
+            .choices("4", "3", "5", "6")
+            .correctChoiceIndex(0)
+            .strictChoiceOrder(false)
+            .please();
+
+    // Mock the randomizer to return a specific shuffled order
+    List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
+    doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
+
+    // Mock the assistant API calls
+    openAIAssistantThreadMocker
+        .mockCreateRunInProcess("my-run-id")
+        .aRunThatRequireAction(
+            originalQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+        .mockRetrieveRun()
+        .mockCancelRun("my-run-id");
+
+    // Act
+    MCQWithAnswer result =
+        aiQuestionGeneratorWithMockedRandomizer.getAiGeneratedQuestion(note, null);
+
+    // Assert
+    assertThat(result.getMultipleChoicesQuestion().getChoices(), equalTo(shuffledChoices));
+    assertThat(result.getCorrectChoiceIndex(), equalTo(1)); // "4" is now at index 1
   }
 }

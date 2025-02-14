@@ -38,7 +38,7 @@ public record AiQuestionGenerator(
   private MCQWithAnswer shuffleChoices(MCQWithAnswer original) {
     List<String> choices = new ArrayList<>(original.getMultipleChoicesQuestion().getChoices());
     String correctChoice = choices.get(original.getCorrectChoiceIndex());
-    randomizer.shuffle(choices);
+    choices = randomizer.shuffle(choices);
     int newCorrectIndex = choices.indexOf(correctChoice);
 
     MultipleChoicesQuestion shuffledQuestion =
