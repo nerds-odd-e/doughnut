@@ -63,19 +63,22 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
-  await managedApi.assimilationController.assimilate({
+  const memoryTrackers = await managedApi.assimilationController.assimilate({
     noteId: note.id,
     skipMemoryTracking,
   })
 
+  const newTrackerCount = memoryTrackers.filter(
+    (t) => !t.removedFromTracking
+  ).length
   if (totalAssimilatedCount.value !== undefined) {
-    totalAssimilatedCount.value += 1
+    totalAssimilatedCount.value += newTrackerCount
   }
+  incrementAssimilatedCount(newTrackerCount)
 
   if (skipMemoryTracking) {
     emit("reloadNeeded")
   } else {
-    incrementAssimilatedCount()
     emit("initialReviewDone")
   }
 }

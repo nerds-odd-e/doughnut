@@ -26,7 +26,8 @@ public class QuestionEvaluation {
         && correctChoices[0] == correctChoiceIndex;
   }
 
-  public QuestionContestResult getQuestionContestResult(Integer correctChoiceIndex) {
+  public QuestionContestResult getQuestionContestResult(MCQWithAnswer mcqWithAnswer) {
+    int correctChoiceIndex = mcqWithAnswer.getCorrectChoiceIndex();
     if (feasibleQuestion && indisputableAnswer(correctChoiceIndex)) {
       QuestionContestResult result = new QuestionContestResult();
       result.advice = "This seems to be a legitimate question. Please answer it.";
@@ -34,21 +35,31 @@ public class QuestionEvaluation {
       return result;
     }
     QuestionContestResult result = new QuestionContestResult();
-    result.advice = improvementAdvices == null ? "" : improvementAdvices;
+    result.advice = "";
     if (!indisputableAnswer(correctChoiceIndex)) {
       String correctChoicesStr =
           correctChoices == null
               ? "none"
               : Arrays.stream(correctChoices)
-                  .mapToObj(String::valueOf)
+                  .mapToObj(
+                      i ->
+                          i
+                              + " (\""
+                              + mcqWithAnswer.getMultipleChoicesQuestion().getChoices().get(i)
+                              + "\")")
                   .collect(Collectors.joining(", "));
-      result.advice +=
-          "\n\nUnclear answer detected. The original question assume one correct choice index (0-based) of "
+
+      result.advice =
+          "Unclear answer detected. The original question assume one correct choice index (0-based) of "
               + correctChoiceIndex
-              + ". however, the re-evaluation of the question shows that "
+              + " (\""
+              + mcqWithAnswer.getMultipleChoicesQuestion().getChoices().get(correctChoiceIndex)
+              + "\"). however, the re-evaluation of the question shows that "
               + correctChoicesStr
-              + " are correct to the question.";
+              + " are correct to the question.\n"
+              + "Please make sure the correct answer is correct and unique.\n\n";
     }
+    result.advice += improvementAdvices == null ? "" : improvementAdvices;
     return result;
   }
 }

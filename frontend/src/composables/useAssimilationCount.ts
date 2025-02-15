@@ -17,12 +17,12 @@ export function useAssimilationCount() {
     totalUnassimilatedCount.value = count
   }
 
-  const incrementAssimilatedCount = () => {
+  const incrementAssimilatedCount = (count: number = 1) => {
     if (assimilatedCountOfTheDay.value !== undefined) {
-      assimilatedCountOfTheDay.value += 1
+      assimilatedCountOfTheDay.value += count
     }
     if (totalUnassimilatedCount.value !== undefined) {
-      totalUnassimilatedCount.value -= 1
+      totalUnassimilatedCount.value -= count
     }
   }
 

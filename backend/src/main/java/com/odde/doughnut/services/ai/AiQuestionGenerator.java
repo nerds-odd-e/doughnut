@@ -61,7 +61,7 @@ public record AiQuestionGenerator(
     try {
       return service
           .evaluateQuestion(mcqWithAnswer)
-          .map(e -> e.getQuestionContestResult(mcqWithAnswer.getCorrectChoiceIndex()))
+          .map(e -> e.getQuestionContestResult(mcqWithAnswer))
           .orElse(null);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
