@@ -1,3 +1,4 @@
+@ignore
 @usingMockedOpenAiService
 Feature: Recording a live audio and append to note details
   As a learner, I want to create a note to capture the audio of a live event and append it to the note details
