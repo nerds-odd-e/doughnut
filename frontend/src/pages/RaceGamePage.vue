@@ -1,7 +1,11 @@
 <template>
   <ContainerPage v-bind="{ title: 'Car Dice Roll Race' }">
     <div class="race-game">
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <img 
+        src="/src/assets/race/car-scar0.png" 
+        alt="Racing car" 
+        class="race-car"
+      />
     </div>
   </ContainerPage>
 </template>
@@ -13,5 +17,12 @@ import ContainerPage from "./commons/ContainerPage.vue"
 <style scoped>
 .race-game {
   padding: 1rem;
+  display: flex;
+  justify-content: center;
+}
+
+.race-car {
+  max-width: 400px;
+  height: auto;
 }
 </style> 
