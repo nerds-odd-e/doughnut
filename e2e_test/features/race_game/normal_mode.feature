@@ -19,6 +19,8 @@ Feature: Normal Mode in Race Game
 
   @normal_mode
   Scenario: Reset the game
-    Given the round is 15 and position is 21
+    Given the car at position 21
+    And the round count is 10
     When the player reset the game
-    Then the round becomes 1 and position becomes 0
+    Then the car should move to position 0
+    And the round count becomes 1
