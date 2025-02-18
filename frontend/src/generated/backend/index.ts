@@ -33,6 +33,7 @@ export type { CodeInterpreterTool } from './models/CodeInterpreterTool';
 export type { Conversation } from './models/Conversation';
 export type { ConversationMessage } from './models/ConversationMessage';
 export type { ConversationSubject } from './models/ConversationSubject';
+export type { CurrentProgressDTO } from './models/CurrentProgressDTO';
 export type { CurrentUserInfo } from './models/CurrentUserInfo';
 export type { Delta } from './models/Delta';
 export type { DeltaContent } from './models/DeltaContent';
@@ -98,6 +99,8 @@ export type { PredefinedQuestionTestData } from './models/PredefinedQuestionTest
 export type { QuestionContestResult } from './models/QuestionContestResult';
 export type { QuestionSuggestionCreationParams } from './models/QuestionSuggestionCreationParams';
 export type { QuestionSuggestionParams } from './models/QuestionSuggestionParams';
+export type { RaceGameProgressDTO } from './models/RaceGameProgressDTO';
+export type { RaceGameRequestDTO } from './models/RaceGameRequestDTO';
 export { Randomization } from './models/Randomization';
 export type { RecallPrompt } from './models/RecallPrompt';
 export type { RecallSetting } from './models/RecallSetting';
@@ -149,6 +152,7 @@ export type { WikidataEntityData } from './models/WikidataEntityData';
 export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
 export { AssimilationControllerService } from './services/AssimilationControllerService';
+export { RaceGameControllerService } from './services/RaceGameControllerService';
 export { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 export { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 export { RestAiControllerService } from './services/RestAiControllerService';
