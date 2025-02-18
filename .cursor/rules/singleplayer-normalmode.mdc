@@ -3,11 +3,11 @@ description:
 globs: 
 ---
 # Car Dice Roll Race Feature
-You will need to implement a new feature which will allow the user to do car racing. The player will roll a dice and depending on the outcome of the roll will determine the how far the car will move.
+You will need to implement a new feature which will allow the player to do car racing. The player will roll a dice and depending on the outcome of the roll will determine the how far the car will move.
 
 ## Domain Model
 ### Player
-A player is a user entered the page and want to play the game.
+The player can enter the page "Car Dice Roll Race" to play the game as a guest.
 
 ### Car
 Each player has a Car. Each time a player rolls a dice, the car will move.
@@ -18,8 +18,6 @@ Car has the following attributes:
 ### Round
 The Round is to record the Player's move.
 The attribute of this can be the following:
-- Before HP: the player's HP before the move
-- After HP: the player's HP after the move
 - Dice Outcome: the outcome of the dice (1-6)
 
 ## Contraints
@@ -30,11 +28,11 @@ For the initial version, we have the following constraints:
 
 ## System Flow
 ### Player visits the "Car Dice Roll Race" page
-1. The user enter our website
-2. The user visits a new Vue Route `/d/race` to start the game. Now we refer to the user as "player"
-3. The system will display the player's car and the finish line. The position is based on the last position the page was left-off (depends on the Round).
+1. The player enter our website
+2. The player visits a new Vue Route `/d/race` to start the game.
+3. The system will display the player's car and the finish line(which is the target position). The position is based on the last position the page was left-off (depends on the Round).
 
-### Player interation with the game
+### Player interaction with the game
 1. For each Round, If the car position is not at the target position yet, the player can click a button to roll a dice. The car will then move forward according to the following rules:
    - If the outcome is an even number, then the car will be moved by 2 positions
    - If the outcome is an odd number, then the car will be moved by 1 position
@@ -44,4 +42,4 @@ For the initial version, we have the following constraints:
 1. If the car has reached the target position, then the Round ends and the player will not be able to do any actions, except for Resetting the Game.
 
 ### Resetting the Game
-1. When the player clicked on the Reset button, the system will delete all Round(s) that is currently associated with the player. Effectively, this will reset the current position of the Car to 0 again. Additionally, when the player re-visits the `/race` page, the car will be at the starting position again.
+1. When the player clicked on the Reset button, the system will reset the round count that is currently associated with the player. Effectively, this will reset the current position of the Car to 0 again. Additionally, when the player re-visits the `/d/race` page, the car will be at the starting position again.
