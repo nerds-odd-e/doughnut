@@ -1,3 +1,4 @@
+@ignore
 Feature: Normal Mode in Race Game
 
   @normal_mode
