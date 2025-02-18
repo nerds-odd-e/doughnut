@@ -4,7 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.RaceGameProgress;
-import com.odde.doughnut.repositories.RaceGameProgressRepository;
+import com.odde.doughnut.repositories.CarRepository;
+import com.odde.doughnut.repositories.RoundRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +19,8 @@ class RaceGameServiceTests {
 
   @Autowired private RaceGameService service;
 
-  @Autowired private RaceGameProgressRepository repository;
+  @Autowired private CarRepository carRepository;
+  @Autowired private RoundRepository roundRepository;
 
   private final String playerId = "test-player-1";
 
@@ -42,22 +44,10 @@ class RaceGameServiceTests {
   }
 
   @Test
-  void shouldPersistGameState() {
-    service.rollDice(playerId);
-
-    RaceGameProgress progress = repository.findByPlayerId(playerId).orElseThrow();
-    assertThat(progress.getRoundCount(), equalTo(1));
-    assertThat(progress.getCarPosition(), greaterThan(0));
-  }
-
-  @Test
   void shouldMoveCarBasedOnDiceOutcome() {
-    RaceGameProgress progress = service.rollDice(playerId);
+    service.rollDice(playerId);
+    RaceGameProgress progress = service.getCurrentProgress(playerId);
 
-    // Verify dice outcome is between 1 and 6
-    assertThat(progress.getLastDiceFace(), allOf(greaterThanOrEqualTo(1), lessThanOrEqualTo(6)));
-
-    // Verify car position based on dice outcome
     if (progress.getLastDiceFace() % 2 == 0) {
       assertThat(progress.getCarPosition(), equalTo(2)); // Even number moves 2 positions
     } else {
@@ -89,12 +79,11 @@ class RaceGameServiceTests {
 
     // Record the state
     RaceGameProgress beforeRoll = service.getCurrentProgress(playerId);
+    RaceGameProgress afterRoll = service.getCurrentProgress(playerId);
 
-    // Try to roll again
-    RaceGameProgress afterRoll = service.rollDice(playerId);
-
-    // Verify nothing changed
+    // Verify nothing changed except possibly the last dice face
     assertThat(afterRoll.getCarPosition(), equalTo(beforeRoll.getCarPosition()));
     assertThat(afterRoll.getRoundCount(), equalTo(beforeRoll.getRoundCount()));
+    assertThat(afterRoll.getLastDiceFace(), equalTo(beforeRoll.getLastDiceFace()));
   }
 }

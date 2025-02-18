@@ -1,0 +1,25 @@
+-- Create car table
+CREATE TABLE car (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    player_id VARCHAR(255) NOT NULL,
+    position INTEGER NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT unique_car_player_id UNIQUE (player_id),
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Create round table
+CREATE TABLE round (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    player_id VARCHAR(255) NOT NULL,
+    count INTEGER NOT NULL DEFAULT 0,
+    last_dice_face INTEGER,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Create indexes for quick lookups
+CREATE INDEX idx_car_player_id ON car(player_id);
+CREATE INDEX idx_round_player_id ON round(player_id); 

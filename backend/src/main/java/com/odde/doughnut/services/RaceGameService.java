@@ -1,60 +1,90 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.Car;
 import com.odde.doughnut.entities.RaceGameProgress;
-import com.odde.doughnut.repositories.RaceGameProgressRepository;
+import com.odde.doughnut.entities.Round;
+import com.odde.doughnut.repositories.CarRepository;
+import com.odde.doughnut.repositories.RoundRepository;
 import java.util.Random;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RaceGameService {
-  private final RaceGameProgressRepository repository;
+  private final CarRepository carRepository;
+  private final RoundRepository roundRepository;
   private final Random random = new Random();
 
-  public RaceGameService(RaceGameProgressRepository repository) {
-    this.repository = repository;
+  public RaceGameService(CarRepository carRepository, RoundRepository roundRepository) {
+    this.carRepository = carRepository;
+    this.roundRepository = roundRepository;
   }
 
   @Transactional
-  public RaceGameProgress rollDice(String playerId) {
-    RaceGameProgress progress = getOrCreateProgress(playerId);
+  public void rollDice(String playerId) {
+    Car car = getOrCreateCar(playerId);
 
-    if (progress.getCarPosition() >= 20) {
-      return progress;
+    if (car.getPosition() >= 20) {
+      return;
     }
 
     int diceOutcome = random.nextInt(6) + 1;
     int moveAmount = diceOutcome % 2 == 0 ? 2 : 1;
 
-    progress.setCarPosition(Math.min(20, progress.getCarPosition() + moveAmount));
-    progress.setLastDiceFace(diceOutcome);
-    progress.setRoundCount(progress.getRoundCount() + 1);
+    car.setPosition(Math.min(20, car.getPosition() + moveAmount));
+    car = carRepository.save(car);
 
-    return repository.save(progress);
+    // Create a new round for this dice roll
+    Round newRound = new Round();
+    newRound.setPlayerId(playerId);
+    newRound.setLastDiceFace(diceOutcome);
+    // Get the current round count and increment it
+    int currentCount = roundRepository.findByPlayerId(playerId).map(Round::getCount).orElse(0);
+    newRound.setCount(currentCount + 1);
+    roundRepository.save(newRound);
   }
 
   @Transactional(readOnly = true)
   public RaceGameProgress getCurrentProgress(String playerId) {
-    return getOrCreateProgress(playerId);
+    Car car = getOrCreateCar(playerId);
+    Round lastRound =
+        roundRepository.findByPlayerId(playerId).orElseGet(() -> createNewRound(playerId));
+    return createProgress(car, lastRound);
   }
 
   @Transactional
   public void resetGame(String playerId) {
-    RaceGameProgress progress = getOrCreateProgress(playerId);
-    progress.setCarPosition(0);
-    progress.setRoundCount(0);
-    progress.setLastDiceFace(null);
-    repository.save(progress);
+    Car car = getOrCreateCar(playerId);
+    car.setPosition(0);
+    carRepository.save(car);
+
+    // Delete all rounds for this player
+    roundRepository.deleteByPlayerId(playerId);
   }
 
-  private RaceGameProgress getOrCreateProgress(String playerId) {
-    return repository
+  private Car getOrCreateCar(String playerId) {
+    return carRepository
         .findByPlayerId(playerId)
         .orElseGet(
             () -> {
-              RaceGameProgress newProgress = new RaceGameProgress();
-              newProgress.setPlayerId(playerId);
-              return repository.save(newProgress);
+              Car newCar = new Car();
+              newCar.setPlayerId(playerId);
+              return carRepository.save(newCar);
             });
+  }
+
+  private Round createNewRound(String playerId) {
+    Round newRound = new Round();
+    newRound.setPlayerId(playerId);
+    return roundRepository.save(newRound);
+  }
+
+  private RaceGameProgress createProgress(Car car, Round round) {
+    RaceGameProgress progress = new RaceGameProgress();
+    progress.setPlayerId(car.getPlayerId());
+    progress.setCarPosition(car.getPosition());
+    progress.setRoundCount(round.getCount());
+    progress.setLastDiceFace(round.getLastDiceFace());
+    return progress;
   }
 }

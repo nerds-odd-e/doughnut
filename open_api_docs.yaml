@@ -673,10 +673,6 @@ paths:
                 type: string
         "200":
           description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RaceGameProgressDTO"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -3742,23 +3738,6 @@ components:
       properties:
         playerId:
           type: string
-    CurrentProgressDTO:
-      type: object
-      properties:
-        carPosition:
-          type: integer
-          format: int32
-        roundCount:
-          type: integer
-          format: int32
-        lastDiceFace:
-          type: integer
-          format: int32
-    RaceGameProgressDTO:
-      type: object
-      properties:
-        currentProgress:
-          $ref: "#/components/schemas/CurrentProgressDTO"
     QuestionSuggestionCreationParams:
       type: object
       properties:
@@ -4349,6 +4328,23 @@ components:
       required:
       - toRepeatCount
       - totalAssimilatedCount
+    CurrentProgressDTO:
+      type: object
+      properties:
+        carPosition:
+          type: integer
+          format: int32
+        roundCount:
+          type: integer
+          format: int32
+        lastDiceFace:
+          type: integer
+          format: int32
+    RaceGameProgressDTO:
+      type: object
+      properties:
+        currentProgress:
+          $ref: "#/components/schemas/CurrentProgressDTO"
     NoteInfo:
       type: object
       properties:

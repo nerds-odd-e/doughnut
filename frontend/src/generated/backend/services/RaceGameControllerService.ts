@@ -28,12 +28,12 @@ export class RaceGameControllerService {
     }
     /**
      * @param requestBody
-     * @returns RaceGameProgressDTO OK
+     * @returns any OK
      * @throws ApiError
      */
     public rollDice(
         requestBody: RaceGameRequestDTO,
-    ): CancelablePromise<RaceGameProgressDTO> {
+    ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/race/go_normal',

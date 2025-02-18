@@ -18,9 +18,8 @@ public class RaceGameController {
   }
 
   @PostMapping("/go_normal")
-  public RaceGameProgressDTO rollDice(@RequestBody RaceGameRequestDTO request) {
-    RaceGameProgress progress = raceGameService.rollDice(request.getPlayerId());
-    return createProgressDTO(progress);
+  public void rollDice(@RequestBody RaceGameRequestDTO request) {
+    raceGameService.rollDice(request.getPlayerId());
   }
 
   @GetMapping("/current_progress")
