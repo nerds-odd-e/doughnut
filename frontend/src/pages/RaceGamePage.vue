@@ -1,7 +1,16 @@
 <template>
   <ContainerPage v-bind="{ title: 'Car Dice Roll Race' }">
     <div class="race-game">
-      <img src="/src/assets/race/car-scar0.png" alt="Racing car" class="race-car" />
+      <div class="race-track">
+        <img 
+          src="/src/assets/race/car-scar0.png" 
+          alt="Racing car" 
+          class="race-car"
+          :style="{ left: `${(gameProgress?.carPosition ?? 0) * (100 / maxPosition)}%` }"
+        />
+        <div class="track"></div>
+        <div class="max-position">{{ maxPosition }}</div>
+      </div>
       
       <table class="daisy-table">
         <thead>
@@ -36,6 +45,7 @@ import { ref, onMounted } from "vue"
 import type { CurrentProgressDTO } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
+const maxPosition = ref(20)
 
 // Get or create playerId
 const getStoredPlayerId = (): string => {
@@ -99,9 +109,33 @@ onMounted(() => {
   gap: 2rem;
 }
 
+.race-track {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.track {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background-color: #333;
+  border-radius: 4px;
+}
+
 .race-car {
-  max-width: 400px;
+  position: absolute;
+  width: 120px;
   height: auto;
+  z-index: 1;
+  margin-bottom: 4px;
+  transition: left 0.5s ease-out;
+  margin-left: -120px;
 }
 
 .button-container {
@@ -124,5 +158,13 @@ onMounted(() => {
 
 .daisy-table th {
   background: rgba(0, 0, 0, 0.1);
+}
+
+.max-position {
+  position: absolute;
+  bottom: -25px;
+  right: 0;
+  font-weight: bold;
+  color: #333;
 }
 </style>
