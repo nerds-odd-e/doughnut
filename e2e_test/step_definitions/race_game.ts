@@ -11,6 +11,12 @@ Given('I am at the beginning of the race game', () => {
 })
 
 When('I choose to go normal for this round', () => {
+  cy.get('#car-position')
+    .should('exist')
+    .then(($el) => {
+      const initialPosition = parseInt($el.text())
+      cy.wrap(initialPosition).as('initialPosition')
+    })
   cy.contains('button', 'GO NORMAL').click()
 })
 
@@ -18,13 +24,16 @@ Then(
   'my car should move no further than 2 steps at round {int}',
   (round: number) => {
     cy.findByText(round, { selector: '#round-count' }).should('exist')
-    cy.get('#car-position')
-      .should('exist')
-      .then(($el) => {
-        const position = parseInt($el.text())
-        expect(position).to.be.at.most(2)
-        expect(position).to.be.at.least(1)
-      })
+    cy.get<number>('@initialPosition').then((initialPosition) => {
+      cy.get('#car-position')
+        .should('exist')
+        .then(($el) => {
+          const currentPosition = parseInt($el.text())
+          const steps = currentPosition - initialPosition
+          expect(steps).to.be.at.most(2)
+          expect(steps).to.be.at.least(1)
+        })
+    })
   }
 )
 
