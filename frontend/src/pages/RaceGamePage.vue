@@ -26,7 +26,7 @@
             <td id="car-position">{{ gameProgress?.carPosition ?? 0 }}</td>
             <td id="round-count">{{ gameProgress?.roundCount ?? 0 }}</td>
             <td id="last-dice-face">{{ gameProgress?.lastDiceFace ?? '-' }}</td>
-            <td id="car-hp">{{ gameProgress?.carHp ?? 6 }}</td>
+            <td id="car-hp">{{ 6 }}</td>
           </tr>
         </tbody>
       </table>
