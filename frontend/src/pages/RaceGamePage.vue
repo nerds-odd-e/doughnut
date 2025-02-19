@@ -18,6 +18,7 @@
             <th>Car Position</th>
             <th>Round Count</th>
             <th>Last Dice Face</th>
+            <th>Car HP</th>
           </tr>
         </thead>
         <tbody>
@@ -25,13 +26,14 @@
             <td id="car-position">{{ gameProgress?.carPosition ?? 0 }}</td>
             <td id="round-count">{{ gameProgress?.roundCount ?? 0 }}</td>
             <td id="last-dice-face">{{ gameProgress?.lastDiceFace ?? '-' }}</td>
+            <td id="car-hp">{{ gameProgress?.carHp ?? 6 }}</td>
           </tr>
         </tbody>
       </table>
 
       <div class="button-container">
         <button class="daisy-btn daisy-btn-outline" @click="handleGoNormal">GO NORMAL</button>
-        <button class="daisy-btn daisy-btn-outline">GO SUPER</button>
+        <button class="daisy-btn daisy-btn-outline" @click="handleGoSuper">GO SUPER</button>
         <button class="daisy-btn daisy-btn-outline" @click="handleReset">RESET</button>
       </div>
     </div>
@@ -80,6 +82,19 @@ const handleGoNormal = async () => {
     await fetchProgress()
   } catch (error: unknown) {
     console.error("Failed to roll dice:", error)
+  }
+}
+
+const handleGoSuper = async () => {
+  try {
+    // await managedApi.raceGameController.goSuper({
+    //   playerId: playerId.value,
+    // })
+    // // Fetch the updated progress after rolling the dice
+    // await fetchProgress()
+    console.log("go super")
+  } catch (error: unknown) {
+    console.error("Failed to roll dice in super mode:", error)
   }
 }
 
