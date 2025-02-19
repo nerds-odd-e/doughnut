@@ -3,8 +3,7 @@ Feature: Normal Mode in Race Game
   @normal_mode
   Scenario: Move car when dice number is even
     Given I am at the race game
-    # And the round count is 0
-    # When the dice outcome is 4
+    When I choose to go normal for this round
     # Then the car should move to position 2
     # And the round count becomes 1
   
