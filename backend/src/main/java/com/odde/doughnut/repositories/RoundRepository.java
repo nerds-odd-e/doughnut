@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RoundRepository extends JpaRepository<Round, Long> {
-  @Query("SELECT r FROM Round r WHERE r.playerId = :playerId ORDER BY r.createdAt DESC LIMIT 1")
+  @Query("SELECT r FROM Round r WHERE r.playerId = :playerId ORDER BY r.id DESC LIMIT 1")
   Optional<Round> findByPlayerId(@Param("playerId") String playerId);
 
   @Modifying
