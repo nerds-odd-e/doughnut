@@ -1,4 +1,4 @@
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
 
 Given('I am at the race game', () => {
   cy.visit('/d/race')
