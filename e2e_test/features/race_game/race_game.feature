@@ -20,6 +20,20 @@ Feature: Normal Mode in Race Game
   #   When I choose to go super for this round
   #   Then my car should move no further than 5 steps at round 2
   #   And my car HP should become 4
+  #   When I choose to go super for this round
+  #   Then my car should move no further than 4 steps at round 3
+  #   And my car HP should become 3
+  #   When I choose to go super for this round
+  #   Then my car should move no further than 3 steps at round 4
+  #   And my car HP should become 2
+  #   When I choose to go super for this round
+  #   Then my car should move no further than 2 steps at round 5
+  #   And my car HP should become 1
+  #   When I choose to go super for this round
+  #   Then my car should move no further than 1 steps at round 6
+  #   And my car HP should become 0
+  #   When I choose to go super for this round
+  #   Then my car should no longer move
 
   # Scenario: Reset the game
   #   Given I am at the beginning of the race game
