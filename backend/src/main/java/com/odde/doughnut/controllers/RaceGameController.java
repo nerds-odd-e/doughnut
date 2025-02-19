@@ -18,8 +18,13 @@ public class RaceGameController {
   }
 
   @PostMapping("/go_normal")
-  public void rollDice(@RequestBody RaceGameRequestDTO request) {
-    raceGameService.rollDice(request.getPlayerId());
+  public void rollDiceNormal(@RequestBody RaceGameRequestDTO request) {
+    raceGameService.rollDiceNormal(request.getPlayerId());
+  }
+
+  @PostMapping("/go_super")
+  public void rollDiceSuper(@RequestBody RaceGameRequestDTO request) {
+    raceGameService.rollDiceNormal(request.getPlayerId());
   }
 
   @GetMapping("/current_progress")
@@ -38,6 +43,7 @@ public class RaceGameController {
     currentProgress.setCarPosition(progress.getCarPosition());
     currentProgress.setRoundCount(progress.getRoundCount());
     currentProgress.setLastDiceFace(progress.getLastDiceFace());
+    currentProgress.setCarHp(6);
 
     RaceGameProgressDTO dto = new RaceGameProgressDTO();
     dto.setCurrentProgress(currentProgress);

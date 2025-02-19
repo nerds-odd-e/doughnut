@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type CurrentProgressDTO = {
     carPosition?: number;
+    carHp?: number;
     roundCount?: number;
     lastDiceFace?: number;
 };

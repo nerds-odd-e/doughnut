@@ -7,6 +7,7 @@ import lombok.Setter;
 @Setter
 public class CurrentProgressDTO {
   private int carPosition;
+  private int carHp;
   private int roundCount;
-  private Integer lastDiceFace;
+  private int lastDiceFace;
 }

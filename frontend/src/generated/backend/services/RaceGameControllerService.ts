@@ -31,7 +31,25 @@ export class RaceGameControllerService {
      * @returns any OK
      * @throws ApiError
      */
-    public rollDice(
+    public rollDiceSuper(
+        requestBody: RaceGameRequestDTO,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/race/go_super',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns any OK
+     * @throws ApiError
+     */
+    public rollDiceNormal(
         requestBody: RaceGameRequestDTO,
     ): CancelablePromise<any> {
         return this.httpRequest.request({

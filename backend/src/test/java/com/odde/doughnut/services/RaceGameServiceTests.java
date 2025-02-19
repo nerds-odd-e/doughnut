@@ -36,7 +36,7 @@ class RaceGameServiceTests {
   void shouldNotMoveCarBeyondTargetPosition() {
     // Roll dice multiple times to ensure we reach target
     for (int i = 0; i < 15; i++) {
-      service.rollDice(playerId);
+      service.rollDiceNormal(playerId);
     }
 
     RaceGameProgress progress = service.getCurrentProgress(playerId);
@@ -45,7 +45,7 @@ class RaceGameServiceTests {
 
   @Test
   void shouldMoveCarBasedOnDiceOutcome() {
-    service.rollDice(playerId);
+    service.rollDiceNormal(playerId);
     RaceGameProgress progress = service.getCurrentProgress(playerId);
 
     if (progress.getLastDiceFace() % 2 == 0) {
@@ -58,7 +58,7 @@ class RaceGameServiceTests {
   @Test
   void shouldResetGameState() {
     // First move the car
-    service.rollDice(playerId);
+    service.rollDiceNormal(playerId);
 
     // Then reset the game
     service.resetGame(playerId);
@@ -74,7 +74,7 @@ class RaceGameServiceTests {
   void shouldNotMoveCarWhenAlreadyAtTarget() {
     // First get to target position
     while (service.getCurrentProgress(playerId).getCarPosition() < 20) {
-      service.rollDice(playerId);
+      service.rollDiceNormal(playerId);
     }
 
     // Record the state

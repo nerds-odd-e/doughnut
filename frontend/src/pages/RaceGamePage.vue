@@ -75,7 +75,7 @@ const fetchProgress = async () => {
 
 const handleGoNormal = async () => {
   try {
-    await managedApi.raceGameController.rollDice({
+    await managedApi.raceGameController.rollDiceNormal({
       playerId: playerId.value,
     })
     // Fetch the updated progress after rolling the dice

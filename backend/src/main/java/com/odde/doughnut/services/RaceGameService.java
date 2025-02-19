@@ -21,7 +21,7 @@ public class RaceGameService {
   }
 
   @Transactional
-  public void rollDice(String playerId) {
+  public void rollDiceNormal(String playerId) {
     Car car = getOrCreateCar(playerId);
 
     if (car.getPosition() >= 20) {

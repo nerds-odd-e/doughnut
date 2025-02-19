@@ -33,7 +33,7 @@ class RaceGameControllerTests {
     RaceGameRequestDTO request = new RaceGameRequestDTO();
     request.setPlayerId(playerId);
 
-    controller.rollDice(request);
+    controller.rollDiceNormal(request);
     RaceGameProgressDTO progress = controller.getCurrentProgress(playerId);
 
     assertThat(
@@ -48,7 +48,7 @@ class RaceGameControllerTests {
     // First make some progress
     RaceGameRequestDTO request = new RaceGameRequestDTO();
     request.setPlayerId(playerId);
-    controller.rollDice(request);
+    controller.rollDiceNormal(request);
 
     // Then reset
     controller.resetGame(request);

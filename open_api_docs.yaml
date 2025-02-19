@@ -653,11 +653,31 @@ paths:
                 type: string
         "200":
           description: OK
+  /api/race/go_super:
+    post:
+      tags:
+      - race-game-controller
+      operationId: rollDiceSuper
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaceGameRequestDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/race/go_normal:
     post:
       tags:
       - race-game-controller
-      operationId: rollDice
+      operationId: rollDiceNormal
       requestBody:
         content:
           application/json:
@@ -4332,6 +4352,9 @@ components:
       type: object
       properties:
         carPosition:
+          type: integer
+          format: int32
+        carHp:
           type: integer
           format: int32
         roundCount:
