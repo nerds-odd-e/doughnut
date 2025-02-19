@@ -27,3 +27,20 @@ Then(
       })
   }
 )
+
+When('I reset the game', () => {
+  cy.contains('button', 'RESET').click()
+})
+
+Then(
+  'my car should at the beginning of the race game and the round count is 0',
+  () => {
+    cy.findByText('0', { selector: '#round-count' }).should('exist')
+    cy.get('#car-position')
+      .should('exist')
+      .then(($el) => {
+        const position = parseInt($el.text())
+        expect(position).to.be.eq(0)
+      })
+  }
+)
