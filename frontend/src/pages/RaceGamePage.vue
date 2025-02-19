@@ -63,10 +63,11 @@ const fetchProgress = async () => {
 
 const handleGoNormal = async () => {
   try {
-    const response = await managedApi.raceGameController.rollDice({
+    await managedApi.raceGameController.rollDice({
       playerId: playerId.value,
     })
-    gameProgress.value = response.currentProgress
+    // Fetch the updated progress after rolling the dice
+    await fetchProgress()
   } catch (error: unknown) {
     console.error("Failed to roll dice:", error)
   }
