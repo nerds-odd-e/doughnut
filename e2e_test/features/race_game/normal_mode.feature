@@ -1,10 +1,10 @@
 Feature: Normal Mode in Race Game
 
   @normal_mode
-  Scenario: Move car when dice number is even
-    Given I am at the race game
+  Scenario: Go normal mode
+    Given I am at the beginning of the race game
     When I choose to go normal for this round
-    # Then the car should move to position 2
+    Then my car should move no further than 2 steps
     # And the round count becomes 1
   
   # @ignore
