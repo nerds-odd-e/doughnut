@@ -23,7 +23,7 @@
       <div class="button-container">
         <button class="daisy-btn daisy-btn-outline" @click="handleGoNormal">GO NORMAL</button>
         <button class="daisy-btn daisy-btn-outline">GO SUPER</button>
-        <button class="daisy-btn daisy-btn-outline">RESET</button>
+        <button class="daisy-btn daisy-btn-outline" @click="handleReset">RESET</button>
       </div>
     </div>
   </ContainerPage>
@@ -70,6 +70,18 @@ const handleGoNormal = async () => {
     await fetchProgress()
   } catch (error: unknown) {
     console.error("Failed to roll dice:", error)
+  }
+}
+
+const handleReset = async () => {
+  try {
+    await managedApi.raceGameController.resetGame({
+      playerId: playerId.value,
+    })
+    // Fetch the updated progress after reset
+    await fetchProgress()
+  } catch (error: unknown) {
+    console.error("Failed to reset game:", error)
   }
 }
 
