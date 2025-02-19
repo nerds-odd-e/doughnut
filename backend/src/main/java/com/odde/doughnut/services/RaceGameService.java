@@ -44,7 +44,7 @@ public class RaceGameService {
     roundRepository.save(newRound);
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public RaceGameProgress getCurrentProgress(String playerId) {
     Car car = getOrCreateCar(playerId);
     Round lastRound =
