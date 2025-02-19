@@ -4,19 +4,8 @@ Feature: Normal Mode in Race Game
   Scenario: Go normal mode
     Given I am at the beginning of the race game
     When I choose to go normal for this round
-    Then my car should move no further than 2 steps
-    # And the round count becomes 1
-  
-  # @ignore
-  # @normal_mode
-  # Scenario: Move car when dice number is odd
-  #   Given the car at position 3
-  #   And the round count is 2
-  #   When the dice outcome is 5
-  #   Then the car should move to position 4
-  #   And the round count becomes 3
+    Then my car should move no further than 2 steps at round 1
 
-  # @ignore
   # @normal_mode
   # Scenario: Reset the game
   #   Given the car at position 21
