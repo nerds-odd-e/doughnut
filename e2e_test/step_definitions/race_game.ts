@@ -17,7 +17,7 @@ When('I choose to go normal for this round', () => {
 Then(
   'my car should move no further than 2 steps at round {int}',
   (round: number) => {
-    cy.findByText(round, { selector: '#round-count' })
+    cy.findByText(round, { selector: '#round-count' }).should('exist')
     cy.get('#car-position')
       .should('exist')
       .then(($el) => {
