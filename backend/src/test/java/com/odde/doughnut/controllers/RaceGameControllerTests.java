@@ -25,7 +25,7 @@ class RaceGameControllerTests {
     RaceGameProgressDTO progress = controller.getCurrentProgress(playerId);
     assertThat(progress.getCurrentProgress().getCarPosition(), equalTo(0));
     assertThat(progress.getCurrentProgress().getRoundCount(), equalTo(0));
-    assertThat(progress.getCurrentProgress().getLastDiceFace(), nullValue());
+    assertThat(progress.getCurrentProgress().getLastDiceFace(), equalTo(0));
   }
 
   @Test
@@ -56,6 +56,6 @@ class RaceGameControllerTests {
     RaceGameProgressDTO progress = controller.getCurrentProgress(playerId);
     assertThat(progress.getCurrentProgress().getCarPosition(), equalTo(0));
     assertThat(progress.getCurrentProgress().getRoundCount(), equalTo(0));
-    assertThat(progress.getCurrentProgress().getLastDiceFace(), nullValue());
+    assertThat(progress.getCurrentProgress().getLastDiceFace(), equalTo(0));
   }
 }

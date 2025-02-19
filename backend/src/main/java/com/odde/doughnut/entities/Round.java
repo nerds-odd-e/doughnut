@@ -19,7 +19,7 @@ public class Round {
   private int count = 0;
 
   @Column(name = "last_dice_face")
-  private Integer lastDiceFace;
+  private int lastDiceFace = 0;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)

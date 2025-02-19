@@ -29,7 +29,7 @@ class RaceGameServiceTests {
     RaceGameProgress progress = service.getCurrentProgress(playerId);
     assertThat(progress.getCarPosition(), equalTo(0));
     assertThat(progress.getRoundCount(), equalTo(0));
-    assertThat(progress.getLastDiceFace(), nullValue());
+    assertThat(progress.getLastDiceFace(), equalTo(0));
   }
 
   @Test
@@ -67,7 +67,7 @@ class RaceGameServiceTests {
     RaceGameProgress progress = service.getCurrentProgress(playerId);
     assertThat(progress.getCarPosition(), equalTo(0));
     assertThat(progress.getRoundCount(), equalTo(0));
-    assertThat(progress.getLastDiceFace(), nullValue());
+    assertThat(progress.getLastDiceFace(), equalTo(0));
   }
 
   @Test
