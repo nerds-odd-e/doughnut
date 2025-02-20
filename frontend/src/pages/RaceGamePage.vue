@@ -3,7 +3,7 @@
     <div class="race-game">
       <div class="race-track">
         <img 
-          src="/src/assets/race/car-scar0.png" 
+          src="/src/assets/race/car-scarhp6.png" 
           alt="Racing car" 
           class="race-car"
           :style="{ left: `${(gameProgress?.carPosition ?? 0) * (100 / maxPosition)}%` }"
@@ -92,7 +92,6 @@ const handleGoSuper = async () => {
     })
     // Fetch the updated progress after rolling the dice
     await fetchProgress()
-    
   } catch (error: unknown) {
     console.error("Failed to roll dice in super mode:", error)
   }
