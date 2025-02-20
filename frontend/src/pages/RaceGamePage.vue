@@ -1,7 +1,7 @@
 <template>
   <ContainerPage v-bind="{ title: 'Car Dice Roll Race' }">
     <div class="race-game">
-      <div v-if="isLoading" class="loading-state">
+      <div v-if="isLoading && initLoad" class="loading-state">
         Loading game...
       </div>
       <template v-else>
@@ -66,6 +66,7 @@ const getStoredPlayerId = (): string => {
 
 const playerId = ref(getStoredPlayerId())
 const isLoading = ref(true)
+const initLoad = ref(true)
 const gameProgress = ref<CurrentProgressDTO>()
 
 const fetchProgress = async () => {
@@ -79,6 +80,7 @@ const fetchProgress = async () => {
     console.error("Failed to fetch progress:", error)
   } finally {
     isLoading.value = false
+    initLoad.value = false
   }
 }
 
