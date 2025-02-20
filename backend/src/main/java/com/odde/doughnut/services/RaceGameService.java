@@ -68,6 +68,7 @@ public class RaceGameService {
   public void resetGame(String playerId) {
     Car car = getOrCreateCar(playerId);
     car.setPosition(0);
+    car.setHp(6);
     carRepository.save(car);
 
     // Delete all rounds for this player

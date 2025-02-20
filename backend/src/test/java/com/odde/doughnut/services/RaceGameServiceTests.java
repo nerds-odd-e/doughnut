@@ -1,7 +1,8 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
 import com.odde.doughnut.entities.Car;
 import com.odde.doughnut.entities.RaceGameProgress;
@@ -84,7 +85,7 @@ class RaceGameServiceTests {
   @Test
   void shouldResetGameState() {
     // First move the car
-    service.rollDiceNormal(playerId);
+    service.rollDiceSuper(playerId);
 
     // Then reset the game
     service.resetGame(playerId);
@@ -94,6 +95,7 @@ class RaceGameServiceTests {
     assertThat(progress.getCarPosition(), equalTo(0));
     assertThat(progress.getRoundCount(), equalTo(0));
     assertThat(progress.getLastDiceFace(), equalTo(0));
+    assertThat(progress.getCarHp(), equalTo(maxHp));
   }
 
   @Test
