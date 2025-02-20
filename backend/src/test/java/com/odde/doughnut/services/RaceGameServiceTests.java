@@ -3,7 +3,9 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.odde.doughnut.entities.Car;
 import com.odde.doughnut.entities.RaceGameProgress;
+import com.odde.doughnut.repositories.CarRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 class RaceGameServiceTests {
 
   @Autowired private RaceGameService service;
+  @Autowired private CarRepository carRepository;
 
   private final String playerId = "test-player-1";
 
@@ -62,6 +65,22 @@ class RaceGameServiceTests {
     assertThat(progress.getCarHp(), equalTo(maxHp - 1));
   }
 
+  @Test
+  void shouldNotMoveCarSuperModeWithZeroHp() {
+    service.resetGame(playerId);
+
+    Car car = carRepository.findByPlayerId(playerId).orElseThrow();
+    car.setHp(0);
+    carRepository.save(car);
+
+    service.rollDiceSuper(playerId);
+    RaceGameProgress progress = service.getCurrentProgress(playerId);
+
+    assertThat(progress.getCarPosition(), equalTo(progress.getLastDiceFace()));
+    assertThat(progress.getCarHp(), equalTo(0));
+    assertThat(progress.getRoundCount(), equalTo(1));
+  }
+ 
   @Test
   void shouldResetGameState() {
     // First move the car
