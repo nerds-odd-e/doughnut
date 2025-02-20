@@ -1,55 +1,34 @@
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+/// <reference types="cypress" />
+/// <reference types="@testing-library/cypress" />
+/// <reference types="../support" />
 
-Given('I am at the beginning of the race game', () => {
-  cy.visit('/d/race')
-  cy.get('#car-position')
-    .should('exist')
-    .then(($el) => {
-      const position = parseInt($el.text())
-      expect(position).to.be.eq(0)
-    })
+import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
+import start from '../start'
+
+Given('I visit the race game page', () => {
+  start.routerToRaceGamePage()
 })
 
-When('I choose to go normal for this round', () => {
-  cy.get('#car-position')
-    .should('exist')
-    .then(($el) => {
-      const initialPosition = parseInt($el.text())
-      cy.wrap(initialPosition).as('initialPosition')
-    })
-  cy.contains('button', 'GO NORMAL').click()
+When('I roll the dice', () => {
+  start.routerToRaceGamePage().rollDice()
 })
-
-Then(
-  'my car should move no further than 2 steps at round {int}',
-  (round: number) => {
-    cy.findByText(round, { selector: '#round-count' }).should('exist')
-    cy.get<number>('@initialPosition').then((initialPosition) => {
-      cy.get('#car-position')
-        .should('exist')
-        .then(($el) => {
-          const currentPosition = parseInt($el.text())
-          const steps = currentPosition - initialPosition
-          expect(steps).to.be.at.most(2)
-          expect(steps).to.be.at.least(1)
-        })
-    })
-  }
-)
 
 When('I reset the game', () => {
-  cy.contains('button', 'RESET').click()
+  start.routerToRaceGamePage().resetGame()
 })
 
-Then(
-  'my car should at the beginning of the race game and the round count is 0',
-  () => {
-    cy.findByText('0', { selector: '#round-count' }).should('exist')
-    cy.get('#car-position')
-      .should('exist')
-      .then(($el) => {
-        const position = parseInt($el.text())
-        expect(position).to.be.eq(0)
-      })
-  }
-)
+Then('I should see my car at position {int}', (position: number) => {
+  start.routerToRaceGamePage().expectCarPosition(position)
+})
+
+Then('I should see the dice outcome is {int}', (outcome: number) => {
+  start.routerToRaceGamePage().expectDiceOutcome(outcome)
+})
+
+Then('I should see that I have won the game', () => {
+  start.routerToRaceGamePage().expectGameWon()
+})
+
+Then('I should see round count is {int}', (count: number) => {
+  start.routerToRaceGamePage().expectRoundCount(count)
+})
