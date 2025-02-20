@@ -80,7 +80,7 @@ class RaceGameServiceTests {
     assertThat(progress.getCarHp(), equalTo(0));
     assertThat(progress.getRoundCount(), equalTo(1));
   }
- 
+
   @Test
   void shouldResetGameState() {
     // First move the car
