@@ -4,8 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.entities.RaceGameProgress;
-import com.odde.doughnut.repositories.CarRepository;
-import com.odde.doughnut.repositories.RoundRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +17,9 @@ class RaceGameServiceTests {
 
   @Autowired private RaceGameService service;
 
-  @Autowired private CarRepository carRepository;
-  @Autowired private RoundRepository roundRepository;
-
   private final String playerId = "test-player-1";
+
+  private int maxHp = 6;
 
   @Test
   void shouldStartWithInitialPosition() {
@@ -44,7 +41,7 @@ class RaceGameServiceTests {
   }
 
   @Test
-  void shouldMoveCarBasedOnDiceOutcome() {
+  void shouldMoveCarBasedOnDiceOutcomeNormalMode() {
     service.rollDiceNormal(playerId);
     RaceGameProgress progress = service.getCurrentProgress(playerId);
 
@@ -53,6 +50,16 @@ class RaceGameServiceTests {
     } else {
       assertThat(progress.getCarPosition(), equalTo(1)); // Odd number moves 1 position
     }
+  }
+
+  @Test
+  void shouldMoveCarBasedOnDiceOutcomeSuperModeWithFullHp() {
+    service.resetGame(playerId);
+    service.rollDiceSuper(playerId);
+    RaceGameProgress progress = service.getCurrentProgress(playerId);
+
+    assertThat(progress.getCarPosition(), equalTo(progress.getLastDiceFace()));
+    assertThat(progress.getCarHp(), equalTo(maxHp - 1));
   }
 
   @Test

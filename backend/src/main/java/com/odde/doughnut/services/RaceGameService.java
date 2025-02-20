@@ -38,9 +38,31 @@ public class RaceGameService {
     Round newRound = new Round();
     newRound.setPlayerId(playerId);
     newRound.setLastDiceFace(diceOutcome);
-    // Get the current round count and increment it
-    int currentCount = roundRepository.findByPlayerId(playerId).map(Round::getCount).orElse(0);
-    newRound.setCount(currentCount + 1);
+    int currentRoundCount = roundRepository.findByPlayerId(playerId).map(Round::getCount).orElse(0);
+    newRound.setCount(currentRoundCount + 1);
+    roundRepository.save(newRound);
+  }
+
+  @Transactional
+  public void rollDiceSuper(String playerId) {
+    Car car = getOrCreateCar(playerId);
+
+    if (car.getPosition() >= 20) {
+      return;
+    }
+
+    int diceOutcome = random.nextInt(6) + 1;
+    int moveAmount = diceOutcome;
+    car.setPosition(Math.min(20, car.getPosition() + moveAmount));
+    car.setHp(Math.max(0, car.getHp() - 1));
+    carRepository.save(car);
+
+    // Create a new round for this dice roll
+    int lastRoundCount = roundRepository.findByPlayerId(playerId).map(Round::getCount).orElse(0);
+    Round newRound = new Round();
+    newRound.setPlayerId(playerId);
+    newRound.setLastDiceFace(diceOutcome);
+    newRound.setCount(lastRoundCount + 1);
     roundRepository.save(newRound);
   }
 
@@ -85,6 +107,7 @@ public class RaceGameService {
     progress.setCarPosition(car.getPosition());
     progress.setRoundCount(round.getCount());
     progress.setLastDiceFace(round.getLastDiceFace());
+    progress.setCarHp(car.getHp());
     return progress;
   }
 }

@@ -24,4 +24,7 @@ public class RaceGameProgress {
 
   @Column(name = "last_dice_face")
   private Integer lastDiceFace;
+
+  @Column(name = "car_hp", nullable = false)
+  private int carHp = 6;
 }
