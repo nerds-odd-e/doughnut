@@ -1,51 +1,31 @@
-import { cy } from 'local-cypress'
-
 export const assumeRaceGamePage = () => ({
   rollDice() {
-    cy.findByRole('button', { name: 'Roll Dice' }).click()
+    cy.findByRole('button', { name: 'GO NORMAL' }).click()
     cy.pageIsNotLoading()
     return this
   },
 
   resetGame() {
-    cy.findByRole('button', { name: 'Reset Game' }).click()
+    cy.findByRole('button', { name: 'GO NORMAL' }).click()
     cy.pageIsNotLoading()
     return this
   },
 
-  expectCarPosition(position: number) {
-    cy.get('[data-testid="car-position"]').should(
-      'have.text',
-      position.toString()
-    )
-    return this
-  },
-
-  expectDiceOutcome(outcome: number) {
-    cy.get('[data-testid="dice-outcome"]').should(
-      'have.text',
-      outcome.toString()
-    )
-    return this
-  },
-
-  expectGameWon() {
-    cy.get('[data-testid="game-status"]').should('have.text', 'You won!')
-    return this
-  },
-
-  expectRoundCount(count: number) {
-    cy.get('[data-testid="round-count"]').should('have.text', count.toString())
+  expectCarPosition(steps: number, round: number) {
+    cy.findByText(round, { selector: '#round-count' }).should('exist')
+    cy.get('#car-position')
+      .should('exist')
+      .then(($el) => {
+        const position = parseInt($el.text())
+        expect(position).to.be.at.most(steps)
+        expect(position).to.be.at.least(1)
+      })
     return this
   },
 })
 
-export const raceGame = () => ({
-  routerToRaceGamePage() {
-    cy.visit('/d/race')
-    cy.pageIsNotLoading()
-    return assumeRaceGamePage()
-  },
-})
-
-export default raceGame
+export const routerToRaceGamePage = () => {
+  cy.visit('/d/race')
+  cy.pageIsNotLoading()
+  return assumeRaceGamePage()
+}

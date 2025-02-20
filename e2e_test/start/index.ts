@@ -10,7 +10,10 @@ import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
 import { notebookCard } from './pageObjects/notebookCard'
 import downloadChecker from './downloadChecker'
-import { raceGame } from './pageObjects/raceGamePage'
+import {
+  assumeRaceGamePage,
+  routerToRaceGamePage,
+} from './pageObjects/raceGamePage'
 
 const start = {
   ...basicActions,
@@ -21,8 +24,9 @@ const start = {
   recall,
   assumeCirclePage,
   notebookCard,
+  assumeRaceGamePage,
+  routerToRaceGamePage,
   ...downloadChecker(),
-  ...raceGame(),
 }
 export default start
 export { mock_services }

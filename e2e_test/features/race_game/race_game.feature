@@ -1,6 +1,7 @@
 @raceGame
 Feature: Normal Mode in Race Game
 
+  @focus
   Scenario: Go normal mode
     Given I am at the beginning of the race game
     When I choose to go normal for this round
@@ -10,7 +11,8 @@ Feature: Normal Mode in Race Game
     Given I am at the beginning of the race game
     When I choose to go normal for this round
     And I reset the game
-    Then my car should at the beginning of the race game and the round count is 0
+    Then I should see my car at position 0
+    And I should see round count is 0
 
   # Scenario: Go super mode
   #   Given I am at the beginning of the race game
