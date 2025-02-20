@@ -1,5 +1,11 @@
 export const assumeRaceGamePage = () => ({
   rollDice() {
+    cy.get('#car-position')
+      .should('exist')
+      .then(($el) => {
+        const initialPosition = parseInt($el.text())
+        cy.wrap(initialPosition).as('initialPosition')
+      })
     cy.findByRole('button', { name: 'GO NORMAL' }).click()
     cy.pageIsNotLoading()
     return this
@@ -13,13 +19,16 @@ export const assumeRaceGamePage = () => ({
 
   expectCarPosition(steps: number, round: number) {
     cy.findByText(round, { selector: '#round-count' }).should('exist')
-    cy.get('#car-position')
-      .should('exist')
-      .then(($el) => {
-        const position = parseInt($el.text())
-        expect(position).to.be.at.most(steps)
-        expect(position).to.be.at.least(1)
-      })
+    cy.get<number>('@initialPosition').then((initialPosition) => {
+      cy.get('#car-position')
+        .should('exist')
+        .then(($el) => {
+          const currentPosition = parseInt($el.text())
+          const moveDistance = currentPosition - initialPosition
+          expect(moveDistance).to.be.at.most(steps)
+          expect(moveDistance).to.be.at.least(1)
+        })
+    })
     return this
   },
 })
