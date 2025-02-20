@@ -7,4 +7,6 @@ public interface Randomizer {
   <T> List<T> shuffle(List<T> list);
 
   <T> Optional<T> chooseOneRandomly(List<T> list);
+
+  int randomInteger(int min, int max);
 }

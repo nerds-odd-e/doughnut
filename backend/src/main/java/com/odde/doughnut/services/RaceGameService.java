@@ -3,9 +3,10 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Car;
 import com.odde.doughnut.entities.RaceGameProgress;
 import com.odde.doughnut.entities.Round;
+import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.repositories.CarRepository;
 import com.odde.doughnut.repositories.RoundRepository;
-import java.util.Random;
 import java.util.function.IntUnaryOperator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class RaceGameService {
   private final CarRepository carRepository;
   private final RoundRepository roundRepository;
-  private final Random random = new Random();
+  private final Randomizer random = new RealRandomizer();
+
+  private final int maxHp = 6;
 
   public RaceGameService(CarRepository carRepository, RoundRepository roundRepository) {
     this.carRepository = carRepository;
@@ -38,8 +41,9 @@ public class RaceGameService {
       return;
     }
 
-    int diceOutcome = random.nextInt(6) + 1;
-    int moveAmount = moveCalculator.applyAsInt(diceOutcome);
+    int diceOutcome = random.randomInteger(1, 6);
+    int damage = maxHp - car.getHp();
+    int moveAmount = Math.max(0, moveCalculator.applyAsInt(diceOutcome) - damage);
 
     car.setPosition(Math.min(20, car.getPosition() + moveAmount));
     if (reduceHp) {

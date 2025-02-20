@@ -31,4 +31,12 @@ public class NonRandomizer implements Randomizer {
     }
     return Optional.of(list.get(0));
   }
+
+  @Override
+  public int randomInteger(int min, int max) {
+    if (alwaysChoose.equals(Randomization.RandomStrategy.last)) {
+      return max;
+    }
+    return min;
+  }
 }

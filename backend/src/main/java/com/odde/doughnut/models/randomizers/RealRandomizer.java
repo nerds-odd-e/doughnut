@@ -26,4 +26,9 @@ public class RealRandomizer implements Randomizer {
     }
     return Optional.of(list.get(rand.nextInt(list.size())));
   }
+
+  @Override
+  public int randomInteger(int min, int max) {
+    return rand.nextInt(max - min + 1) + min;
+  }
 }

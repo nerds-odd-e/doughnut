@@ -77,8 +77,27 @@ class RaceGameServiceTests {
     service.rollDiceSuper(playerId);
     RaceGameProgress progress = service.getCurrentProgress(playerId);
 
-    assertThat(progress.getCarPosition(), equalTo(progress.getLastDiceFace()));
+    assertThat(progress.getCarPosition(), equalTo(0));
     assertThat(progress.getCarHp(), equalTo(0));
+    assertThat(progress.getRoundCount(), equalTo(1));
+  }
+
+  @Test
+  void shouldMoveLessDistanceButNotNegativeWhenSuperModeAndHpIsNotFull() {
+    int damage = 1;
+    int initCarHp = maxHp - damage;
+
+    service.resetGame(playerId);
+
+    Car car = carRepository.findByPlayerId(playerId).orElseThrow();
+    car.setHp(initCarHp);
+    carRepository.save(car);
+
+    service.rollDiceSuper(playerId);
+    RaceGameProgress progress = service.getCurrentProgress(playerId);
+
+    assertThat(progress.getCarPosition(), equalTo(progress.getLastDiceFace() - damage));
+    assertThat(progress.getCarHp(), equalTo(initCarHp - 1));
     assertThat(progress.getRoundCount(), equalTo(1));
   }
 
