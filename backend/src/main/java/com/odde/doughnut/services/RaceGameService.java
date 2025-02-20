@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Round;
 import com.odde.doughnut.repositories.CarRepository;
 import com.odde.doughnut.repositories.RoundRepository;
 import java.util.Random;
+import java.util.function.IntUnaryOperator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,15 @@ public class RaceGameService {
 
   @Transactional
   public void rollDiceNormal(String playerId) {
+    rollDice(playerId, (dice) -> dice % 2 == 0 ? 2 : 1, false);
+  }
+
+  @Transactional
+  public void rollDiceSuper(String playerId) {
+    rollDice(playerId, (dice) -> dice, true);
+  }
+
+  private void rollDice(String playerId, IntUnaryOperator moveCalculator, boolean reduceHp) {
     Car car = getOrCreateCar(playerId);
 
     if (car.getPosition() >= 20) {
@@ -29,10 +39,13 @@ public class RaceGameService {
     }
 
     int diceOutcome = random.nextInt(6) + 1;
-    int moveAmount = diceOutcome % 2 == 0 ? 2 : 1;
+    int moveAmount = moveCalculator.applyAsInt(diceOutcome);
 
     car.setPosition(Math.min(20, car.getPosition() + moveAmount));
-    car = carRepository.save(car);
+    if (reduceHp) {
+      car.setHp(Math.max(0, car.getHp() - 1));
+    }
+    carRepository.save(car);
 
     // Create a new round for this dice roll
     Round newRound = new Round();
@@ -40,29 +53,6 @@ public class RaceGameService {
     newRound.setLastDiceFace(diceOutcome);
     int currentRoundCount = roundRepository.findByPlayerId(playerId).map(Round::getCount).orElse(0);
     newRound.setCount(currentRoundCount + 1);
-    roundRepository.save(newRound);
-  }
-
-  @Transactional
-  public void rollDiceSuper(String playerId) {
-    Car car = getOrCreateCar(playerId);
-
-    if (car.getPosition() >= 20) {
-      return;
-    }
-
-    int diceOutcome = random.nextInt(6) + 1;
-    int moveAmount = diceOutcome;
-    car.setPosition(Math.min(20, car.getPosition() + moveAmount));
-    car.setHp(Math.max(0, car.getHp() - 1));
-    carRepository.save(car);
-
-    // Create a new round for this dice roll
-    int lastRoundCount = roundRepository.findByPlayerId(playerId).map(Round::getCount).orElse(0);
-    Round newRound = new Round();
-    newRound.setPlayerId(playerId);
-    newRound.setLastDiceFace(diceOutcome);
-    newRound.setCount(lastRoundCount + 1);
     roundRepository.save(newRound);
   }
 
