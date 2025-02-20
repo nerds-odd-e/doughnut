@@ -18,6 +18,9 @@ public class Car {
   @Column(name = "position", nullable = false)
   private int position = 0;
 
+  @Column(name = "hp", nullable = false)
+  private int hp = 6;
+
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
   private LocalDateTime createdAt;
@@ -48,6 +51,14 @@ public class Car {
 
   public void setPosition(int position) {
     this.position = position;
+  }
+
+  public int getHp() {
+    return hp;
+  }
+
+  public void setHp(int hp) {
+    this.hp = hp;
   }
 
   public LocalDateTime getCreatedAt() {
