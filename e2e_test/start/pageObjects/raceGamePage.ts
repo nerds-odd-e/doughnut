@@ -1,6 +1,6 @@
 import { cy } from 'local-cypress'
 
-export const raceGamePage = () => ({
+export const assumeRaceGamePage = () => ({
   rollDice() {
     cy.findByRole('button', { name: 'Roll Dice' }).click()
     cy.pageIsNotLoading()
@@ -40,4 +40,12 @@ export const raceGamePage = () => ({
   },
 })
 
-export default raceGamePage
+export const raceGame = () => ({
+  routerToRaceGamePage() {
+    cy.visit('/d/race')
+    cy.pageIsNotLoading()
+    return assumeRaceGamePage()
+  },
+})
+
+export default raceGame

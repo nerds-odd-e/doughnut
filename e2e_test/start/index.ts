@@ -10,7 +10,7 @@ import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
 import { notebookCard } from './pageObjects/notebookCard'
 import downloadChecker from './downloadChecker'
-import raceGamePage from './pageObjects/raceGamePage'
+import { raceGame } from './pageObjects/raceGamePage'
 
 const start = {
   ...basicActions,
@@ -22,11 +22,7 @@ const start = {
   assumeCirclePage,
   notebookCard,
   ...downloadChecker(),
-  routerToRaceGamePage() {
-    cy.visit('/d/race')
-    cy.pageIsNotLoading()
-    return raceGamePage()
-  },
+  ...raceGame(),
 }
 export default start
 export { mock_services }
