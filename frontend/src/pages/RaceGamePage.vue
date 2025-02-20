@@ -3,7 +3,7 @@
     <div class="race-game">
       <div class="race-track">
         <img 
-          src="/src/assets/race/car-scarhp6.png" 
+          :src="`/src/assets/race/car-scarhp${gameProgress?.carHp ?? 6}.png`"
           alt="Racing car" 
           class="race-car"
           :style="{ left: `${(gameProgress?.carPosition ?? 0) * (100 / maxPosition)}%` }"
