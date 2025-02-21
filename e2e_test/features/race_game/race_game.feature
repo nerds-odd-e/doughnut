@@ -1,7 +1,6 @@
 @raceGame
 Feature: Normal Mode in Race Game
 
-  @ignore
   Scenario: Go normal mode
     Given I am at the beginning of the race game as "Rahul"
     When I choose to go normal for this round

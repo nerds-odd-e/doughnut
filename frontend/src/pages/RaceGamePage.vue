@@ -5,6 +5,17 @@
         Loading game...
       </div>
       <template v-else>
+        <div class="player-join">
+          <input 
+            type="text" 
+            class="daisy-input daisy-input-bordered" 
+            aria-label="name"
+            placeholder="Enter your name"
+            v-model="playerName"
+          />
+          <button class="daisy-btn daisy-btn-primary" @click="handleJoin">JOIN</button>
+        </div>
+
         <div class="race-track">
           <img 
             src="/src/assets/race/car-scarhp6.png" 
@@ -68,6 +79,12 @@ const playerId = ref(getStoredPlayerId())
 const isLoading = ref(true)
 const initLoad = ref(true)
 const gameProgress = ref<CurrentProgressDTO>()
+const playerName = ref("")
+
+const handleJoin = () => {
+  // Implementation will be added later
+  console.log("Join clicked with name:", playerName.value)
+}
 
 const fetchProgress = async () => {
   isLoading.value = true
@@ -132,6 +149,13 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+}
+
+.player-join {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
 }
 
 .race-track {
