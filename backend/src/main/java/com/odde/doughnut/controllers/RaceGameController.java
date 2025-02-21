@@ -43,7 +43,7 @@ public class RaceGameController {
     currentProgress.setCarPosition(progress.getCarPosition());
     currentProgress.setRoundCount(progress.getRoundCount());
     currentProgress.setLastDiceFace(progress.getLastDiceFace());
-    currentProgress.setCarHp(5);
+    currentProgress.setCarHp(progress.getCarHp());
 
     RaceGameProgressDTO dto = new RaceGameProgressDTO();
     dto.setCurrentProgress(currentProgress);
