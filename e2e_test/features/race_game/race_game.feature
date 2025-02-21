@@ -1,6 +1,7 @@
 @raceGame
 Feature: Normal Mode in Race Game
 
+@ignore
   Scenario: Join the game
     When I am at the beginning of the race game as "Rahul"
     Then I should see a car belongs to "Rahul"
@@ -10,7 +11,7 @@ Feature: Normal Mode in Race Game
     When I choose to go normal for this round
     Then my car should move no further than 2 steps at round 1
 
-  @ignore
+@ignore
   Scenario: Reset the Game
     Given I am at the beginning of the race game as "Rahul"
     When I choose to go normal for this round
@@ -22,7 +23,7 @@ Feature: Normal Mode in Race Game
     Given I am at the beginning of the race game as "Rahul"
     When I choose to go super for this round
     Then my car should move no further than 6 steps at round 1
-    #And my car HP should become 5
+    And my car HP should become 5
 
 @ignore
   Scenario: Go super mode

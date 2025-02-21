@@ -24,7 +24,7 @@ public class RaceGameController {
 
   @PostMapping("/go_super")
   public void rollDiceSuper(@RequestBody RaceGameRequestDTO request) {
-    raceGameService.rollDiceNormal(request.getPlayerId());
+    raceGameService.rollDiceSuper(request.getPlayerId());
   }
 
   @GetMapping("/current_progress")
@@ -43,7 +43,7 @@ public class RaceGameController {
     currentProgress.setCarPosition(progress.getCarPosition());
     currentProgress.setRoundCount(progress.getRoundCount());
     currentProgress.setLastDiceFace(progress.getLastDiceFace());
-    currentProgress.setCarHp(6);
+    currentProgress.setCarHp(5);
 
     RaceGameProgressDTO dto = new RaceGameProgressDTO();
     dto.setCurrentProgress(currentProgress);

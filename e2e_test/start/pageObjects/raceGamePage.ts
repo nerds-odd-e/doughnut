@@ -45,6 +45,16 @@ export const assumeRaceGamePage = () => ({
     cy.findByText(`${name}`).should('exist')
     return this
   },
+
+  expectCarHp(expectedHp: number) {
+    cy.get('#car-hp')
+      .should('exist')
+      .then(($el) => {
+        const hp = parseInt($el.text())
+        expect(hp).to.equal(expectedHp)
+      })
+    return this
+  },
 })
 
 export const routerToRaceGamePage = () => {

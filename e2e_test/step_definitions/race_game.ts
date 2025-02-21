@@ -27,3 +27,7 @@ Then(
 Then('I should see a car belongs to {string}', (name: string) => {
   start.assumeRaceGamePage().expectCarBelongsTo(name)
 })
+
+Then('my car HP should become {int}', (expectedHp: number) => {
+  start.assumeRaceGamePage().expectCarHp(expectedHp)
+})
