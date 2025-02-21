@@ -3,12 +3,12 @@ Feature: Normal Mode in Race Game
 
   @focus
   Scenario: Go normal mode
-    Given I am at the beginning of the race game
+    Given I am at the beginning of the race game as "Rahul"
     When I choose to go normal for this round
     Then my car should move no further than 2 steps at round 1
 
-  Scenario: Reset the game
-    Given I am at the beginning of the race game
+  Scenario: Reset the Game
+    Given I am at the beginning of the race game as "Rahul"
     When I choose to go normal for this round
     And I reset the game
     Then I should see my car at position 0
@@ -43,4 +43,3 @@ Feature: Normal Mode in Race Game
   #   And I reset the game
   #   Then my car should at the beginning of the race game and the round count is 0
   #   And my car HP should be 6
-
