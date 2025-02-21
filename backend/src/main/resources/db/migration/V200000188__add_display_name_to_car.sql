@@ -1,0 +1,1 @@
+ALTER TABLE car ADD COLUMN display_name VARCHAR(255); 

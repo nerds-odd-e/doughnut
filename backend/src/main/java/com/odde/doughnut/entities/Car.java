@@ -1,6 +1,11 @@
 package com.odde.doughnut.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -20,6 +25,9 @@ public class Car {
 
   @Column(name = "hp", nullable = false)
   private int hp = 6;
+
+  @Column(name = "display_name")
+  private String displayName;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false, updatable = false)
@@ -59,6 +67,14 @@ public class Car {
 
   public void setHp(int hp) {
     this.hp = hp;
+  }
+
+  public String getDisplayName() {
+    return displayName;
+  }
+
+  public void setDisplayName(String displayName) {
+    this.displayName = displayName;
   }
 
   public LocalDateTime getCreatedAt() {
