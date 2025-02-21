@@ -50,6 +50,7 @@
           <button class="daisy-btn daisy-btn-outline" @click="handleGoNormal">GO NORMAL</button>
           <button class="daisy-btn daisy-btn-outline" @click="handleGoSuper">GO SUPER</button>
           <button class="daisy-btn daisy-btn-outline" @click="handleReset">RESET</button>
+          <span>Rahul</span>
         </div>
       </template>
     </div>

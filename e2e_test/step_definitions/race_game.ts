@@ -19,3 +19,7 @@ Then(
     start.assumeRaceGamePage().expectCarPosition(steps, round)
   }
 )
+
+Then('I should see a car belongs to {string}', (name: string) => {
+  start.assumeRaceGamePage().expectCarBelongsTo(name)
+})

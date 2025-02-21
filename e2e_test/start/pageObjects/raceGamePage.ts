@@ -38,6 +38,11 @@ export const assumeRaceGamePage = () => ({
     cy.pageIsNotLoading()
     return this
   },
+
+  expectCarBelongsTo(name: string) {
+    cy.findByText(`${name}`).should('exist')
+    return this
+  },
 })
 
 export const routerToRaceGamePage = () => {
