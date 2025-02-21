@@ -1,12 +1,12 @@
 export const assumeRaceGamePage = () => ({
-  rollDice() {
+  rollDice(isSuper: boolean = false) {
     cy.get('#car-position')
       .should('exist')
       .then(($el) => {
         const initialPosition = parseInt($el.text())
         cy.wrap(initialPosition).as('initialPosition')
       })
-    cy.findByRole('button', { name: 'GO NORMAL' }).click()
+    cy.findByRole('button', { name: isSuper ? 'GO SUPER' : 'GO NORMAL' }).click()
     cy.pageIsNotLoading()
     return this
   },

@@ -18,32 +18,36 @@ Feature: Normal Mode in Race Game
     Then I should see my car at position 0
     And I should see round count is 0
 
-  # Scenario: Go super mode
-  #   Given I am at the beginning of the race game
-  #   When I choose to go super for this round
-  #   Then my car should move no further than 6 steps at round 1
-  #   And my car HP should become 5
-  #   When I choose to go super for this round
-  #   Then my car should move no further than 5 steps at round 2
-  #   And my car HP should become 4
-  #   When I choose to go super for this round
-  #   Then my car should move no further than 4 steps at round 3
-  #   And my car HP should become 3
-  #   When I choose to go super for this round
-  #   Then my car should move no further than 3 steps at round 4
-  #   And my car HP should become 2
-  #   When I choose to go super for this round
-  #   Then my car should move no further than 2 steps at round 5
-  #   And my car HP should become 1
-  #   When I choose to go super for this round
-  #   Then my car should move no further than 1 steps at round 6
-  #   And my car HP should become 0
-  #   When I choose to go super for this round
-  #   Then my car should no longer move
+  Scenario: Go super mode
+    Given I am at the beginning of the race game as "Rahul"
+    When I choose to go super for this round
+    Then my car should move no further than 6 steps at round 1
+    #And my car HP should become 5
 
-  # Scenario: Reset the game
-  #   Given I am at the beginning of the race game
-  #   When I choose to go super for this round
-  #   And I reset the game
-  #   Then my car should at the beginning of the race game and the round count is 0
-  #   And my car HP should be 6
+@ignore
+  Scenario: Go super mode
+    When I choose to go super for this round
+    Then my car should move no further than 5 steps at round 2
+    And my car HP should become 4
+    When I choose to go super for this round
+    Then my car should move no further than 4 steps at round 3
+    And my car HP should become 3
+    When I choose to go super for this round
+    Then my car should move no further than 3 steps at round 4
+    And my car HP should become 2
+    When I choose to go super for this round
+    Then my car should move no further than 2 steps at round 5
+    And my car HP should become 1
+    When I choose to go super for this round
+    Then my car should move no further than 1 steps at round 6
+    And my car HP should become 0
+    When I choose to go super for this round
+    Then my car should no longer move
+
+@ignore
+  Scenario: Reset the game
+    Given I am at the beginning of the race game
+    When I choose to go super for this round
+    And I reset the game
+    Then my car should at the beginning of the race game and the round count is 0
+    And my car HP should be 6

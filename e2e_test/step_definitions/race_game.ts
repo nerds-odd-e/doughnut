@@ -6,7 +6,11 @@ Given('I am at the beginning of the race game as {string}', (name: string) => {
 })
 
 When('I choose to go normal for this round', () => {
-  start.assumeRaceGamePage().rollDice()
+  start.assumeRaceGamePage().rollDice(false)
+})
+
+When('I choose to go super for this round', () => {
+  start.assumeRaceGamePage().rollDice(true)
 })
 
 When('I reset the game', () => {
