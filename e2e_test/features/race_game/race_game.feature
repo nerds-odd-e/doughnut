@@ -1,10 +1,13 @@
 @raceGame
 Feature: Normal Mode in Race Game
 
-@ignore
-  Scenario: Join the game
-    When I am at the beginning of the race game as "Rahul"
-    Then I should see a car belongs to "Rahul"
+  Scenario Outline: Join the game
+    When I am at the beginning of the race game as "<displayName>"
+    Then I should see a car belongs to "<displayName>"
+    Examples:
+      | displayName |
+      | Rahul       |
+      # | Rooney      |
 
   Scenario: Go normal mode
     Given I am at the beginning of the race game as "Rahul"
