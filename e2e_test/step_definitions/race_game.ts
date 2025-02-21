@@ -1,8 +1,8 @@
 import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
-Given('I am at the beginning of the race game as {string}', (_: string) => {
-  start.routerToRaceGamePage()
+Given('I am at the beginning of the race game as {string}', (name: string) => {
+  start.routerToRaceGamePage().joinAs(name)
 })
 
 When('I choose to go normal for this round', () => {

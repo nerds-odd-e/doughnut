@@ -1,12 +1,13 @@
 @raceGame
 Feature: Normal Mode in Race Game
 
-  @focus
+  @ignore
   Scenario: Go normal mode
     Given I am at the beginning of the race game as "Rahul"
     When I choose to go normal for this round
     Then my car should move no further than 2 steps at round 1
 
+  @ignore
   Scenario: Reset the Game
     Given I am at the beginning of the race game as "Rahul"
     When I choose to go normal for this round

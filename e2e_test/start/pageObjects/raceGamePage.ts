@@ -31,6 +31,13 @@ export const assumeRaceGamePage = () => ({
     })
     return this
   },
+
+  joinAs(name: string) {
+    cy.findByRole('textbox', { name: /name/i }).type(name)
+    cy.findByRole('button', { name: 'JOIN' }).click()
+    cy.pageIsNotLoading()
+    return this
+  },
 })
 
 export const routerToRaceGamePage = () => {
