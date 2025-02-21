@@ -16,6 +16,7 @@
           <button class="daisy-btn daisy-btn-primary" @click="handleJoin">JOIN</button>
         </div>
 
+        <span>{{ gameProgress?.displayName }}</span>
         <div class="race-track">
           <img 
             src="/src/assets/race/car-scarhp6.png" 
@@ -50,7 +51,6 @@
           <button class="daisy-btn daisy-btn-outline" @click="handleGoNormal">GO NORMAL</button>
           <button class="daisy-btn daisy-btn-outline" @click="handleGoSuper">GO SUPER</button>
           <button class="daisy-btn daisy-btn-outline" @click="handleReset">RESET</button>
-          <span>Rahul</span>
         </div>
       </template>
     </div>

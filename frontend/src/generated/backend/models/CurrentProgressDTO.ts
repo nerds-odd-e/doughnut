@@ -7,5 +7,6 @@ export type CurrentProgressDTO = {
     carHp?: number;
     roundCount?: number;
     lastDiceFace?: number;
+    displayName?: string;
 };
 

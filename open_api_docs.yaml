@@ -4363,6 +4363,8 @@ components:
         lastDiceFace:
           type: integer
           format: int32
+        displayName:
+          type: string
     RaceGameProgressDTO:
       type: object
       properties:
