@@ -103,6 +103,7 @@ public class RaceGameService {
     progress.setRoundCount(round.getCount());
     progress.setLastDiceFace(round.getLastDiceFace());
     progress.setCarHp(car.getHp());
+    progress.setDisplayName(car.getDisplayName());
     return progress;
   }
 }

@@ -10,8 +10,5 @@ public class CurrentProgressDTO {
   private int carHp;
   private int roundCount;
   private int lastDiceFace;
-
-  public String getDisplayName() {
-    return "Rahul";
-  }
+  private String displayName;
 }

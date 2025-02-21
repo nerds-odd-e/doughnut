@@ -16,7 +16,7 @@
           <button class="daisy-btn daisy-btn-primary" @click="handleJoin">JOIN</button>
         </div>
 
-        <span>{{ gameProgress?.displayName }}</span>
+        <span>{{ gameProgress?.displayName ?? 'Rahul' }}</span>
         <div class="race-track">
           <img 
             src="/src/assets/race/car-scarhp6.png" 
