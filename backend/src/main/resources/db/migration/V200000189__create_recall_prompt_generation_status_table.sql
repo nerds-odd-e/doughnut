@@ -1,5 +1,5 @@
 CREATE TABLE recall_prompt_generation_status (
-    memory_tracker_id INT PRIMARY KEY,
+    memory_tracker_id INT unsigned PRIMARY KEY,
     last_attempt_time TIMESTAMP,
     attempt_count INT NOT NULL DEFAULT 0,
     successful BOOLEAN NOT NULL DEFAULT FALSE,
