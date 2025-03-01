@@ -44,20 +44,8 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt findExistingUnansweredRecallPrompt(Note note) {
-    // Use JPQL to find recall prompts for the note that don't have an answer
-    String jpql =
-        "SELECT rp FROM RecallPrompt rp "
-            + "JOIN rp.predefinedQuestion pq "
-            + "WHERE pq.note = :note "
-            + "AND rp.answer IS NULL";
-
     List<RecallPrompt> results =
-        modelFactoryService
-            .entityManager
-            .createQuery(jpql, RecallPrompt.class)
-            .setParameter("note", note)
-            .getResultList();
-
+        modelFactoryService.recallPromptRepository.findUnansweredByNote(note);
     return results.isEmpty() ? null : results.get(0);
   }
 
