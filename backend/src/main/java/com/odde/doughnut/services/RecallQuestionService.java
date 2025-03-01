@@ -10,6 +10,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
@@ -27,12 +28,37 @@ public class RecallQuestionService {
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
+    // First check if there's an existing unanswered recall prompt for this note
+    RecallPrompt existingPrompt = findExistingUnansweredRecallPrompt(memoryTracker.getNote());
+    if (existingPrompt != null) {
+      return existingPrompt;
+    }
+
+    // If no existing prompt found, generate a new one
     PredefinedQuestion question =
         predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote());
     if (question == null) {
       return null;
     }
     return createARecallPromptFromQuestion(question);
+  }
+
+  private RecallPrompt findExistingUnansweredRecallPrompt(Note note) {
+    // Use JPQL to find recall prompts for the note that don't have an answer
+    String jpql =
+        "SELECT rp FROM RecallPrompt rp "
+            + "JOIN rp.predefinedQuestion pq "
+            + "WHERE pq.note = :note "
+            + "AND rp.answer IS NULL";
+
+    List<RecallPrompt> results =
+        modelFactoryService
+            .entityManager
+            .createQuery(jpql, RecallPrompt.class)
+            .setParameter("note", note)
+            .getResultList();
+
+    return results.isEmpty() ? null : results.get(0);
   }
 
   public RecallPrompt regenerateAQuestion(

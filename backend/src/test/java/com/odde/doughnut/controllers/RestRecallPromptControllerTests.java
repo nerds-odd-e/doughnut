@@ -364,6 +364,74 @@ class RestRecallPromptControllerTests {
 
       assertThat(recallPrompt.getId(), notNullValue());
     }
+
+    @Test
+    void shouldReuseExistingUnansweredRecallPrompt() {
+      // Create a note and memory tracker
+      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+      makeMe.aNote().under(note).please(); // Add another note to the notebook
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
+
+      // Create an existing unanswered recall prompt for the note
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      RecallPrompt existingPrompt =
+          makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+
+      // Ask for a question for the memory tracker
+      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
+
+      // Verify that the existing prompt was returned
+      assertThat(returnedPrompt.getId(), equalTo(existingPrompt.getId()));
+
+      // Verify that no new prompt was created
+      long count =
+          modelFactoryService
+              .entityManager
+              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
+              .getSingleResult();
+      assertThat(count, equalTo(1L));
+    }
+
+    @Test
+    void shouldGenerateNewPromptWhenExistingPromptsHaveAnswers() {
+      // Mock the assistant API calls
+      MCQWithAnswer jsonQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      // Create a note and memory tracker
+      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+      makeMe.aNote().under(note).please(); // Add another note to the notebook
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
+
+      // Create an existing recall prompt with an answer
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      RecallPrompt existingPrompt =
+          makeMe
+              .aRecallPrompt()
+              .ofAIGeneratedQuestion(mcqWithAnswer, note)
+              .answerChoiceIndex(0) // Add an answer
+              .please();
+
+      // Ask for a question for the memory tracker
+      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
+
+      // Verify that a new prompt was returned
+      assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
+
+      // Verify that a new prompt was created
+      long count =
+          modelFactoryService
+              .entityManager
+              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
+              .getSingleResult();
+      assertThat(count, equalTo(2L));
+    }
   }
 
   @Nested

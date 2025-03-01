@@ -31,6 +31,7 @@ public class ModelFactoryService {
   @Autowired public ConversationRepository conversationRepository;
   @Autowired public ConversationMessageRepository conversationMessageRepository;
   @Autowired public NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
+  @Autowired public RecallPromptRepository recallPromptRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
