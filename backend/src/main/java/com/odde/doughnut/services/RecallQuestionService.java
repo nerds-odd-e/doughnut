@@ -34,19 +34,21 @@ public class RecallQuestionService {
       return existingPrompt;
     }
 
-    // If no existing prompt found, generate a new one
-    PredefinedQuestion question =
-        predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote());
-    if (question == null) {
-      return null;
-    }
-    return createARecallPromptFromQuestion(question);
+    return generateNewRecallPrompt(memoryTracker.getNote());
   }
 
   private RecallPrompt findExistingUnansweredRecallPrompt(Note note) {
     List<RecallPrompt> results =
         modelFactoryService.recallPromptRepository.findUnansweredByNote(note);
     return results.isEmpty() ? null : results.get(0);
+  }
+
+  private RecallPrompt generateNewRecallPrompt(Note note) {
+    PredefinedQuestion question = predefinedQuestionService.generateAFeasibleQuestion(note);
+    if (question == null) {
+      return null;
+    }
+    return createARecallPromptFromQuestion(question);
   }
 
   public RecallPrompt regenerateAQuestion(
