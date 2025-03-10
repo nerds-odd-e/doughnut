@@ -31,15 +31,16 @@
       in {
         devShells.default = pkgs.mkShell {
           name = "doughnut";
-
+          nativeBuildInputs = with pkgs;
+            [
+              autoPatchelfHook
+            ];
           buildInputs = with pkgs;
             [
-              jdk23
+              zulu23
               nodejs_23
               corepack_23
-              python312
-              poetry
-              zsh
+              python313
               git
               git-secret
               gitleaks
@@ -56,6 +57,27 @@
             ++ lib.optionals (!stdenv.isDarwin) [
               psmisc
               xclip
+              xorg.libX11
+              xorg.libXcomposite
+              xorg.libXdamage
+              xorg.libXext
+              xorg.libXfixes
+              xorg.libXi
+              xorg.libXrandr
+              xorg.libXrender
+              xorg.libXtst
+              gtk3
+              nss
+              alsa-lib
+              at-spi2-atk
+              dbus
+              expat
+              mesa
+              nspr
+              udev
+              cups
+              pango
+              cairo
             ];
 
           shellHook = ''
@@ -110,7 +132,6 @@
             export NODE_PATH="$(dirname $(dirname $(readlink -f $(which node))))"
             export PNPM_HOME="$(dirname $(dirname $(readlink -f $(which pnpm))))"
             export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
-            export POETRY_PATH="$(dirname $(dirname $(readlink -f $(which poetry))))"
             export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$PATH
 
             # Export MySQL configuration
@@ -125,12 +146,17 @@
             export MYSQL_LOG_FILE="''${MYSQL_HOME}/mysql.log"
 
             # Configure pnpm and start Biome
-            log "Setting up PNPM and Biome..."
-            corepack prepare pnpm@10.0 --activate
-            corepack use pnpm@10.0
+            log "Setting up PNPM..."
+            corepack prepare pnpm@10.0.0 --activate
+            corepack use pnpm@10.0.0
             pnpm --frozen-lockfile recursive install
 
-            # Stop and start Biome server
+            # Restart biome daemon
+            if [[ -d "/etc/nixos" ]]; then
+              BIOME_VERSION=$(node -p "require('./package.json').devDependencies.biome" 2>/dev/null || echo "")
+              pgrep biome | xargs kill -9
+              autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@''${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
+            fi
             pnpm biome stop
             pnpm biome start
 
@@ -144,6 +170,10 @@
                 fi
               fi
             )
+            if [[ -d "/etc/nixos" ]]; then
+              autoPatchelf "''${HOME}/.cache/Cypress/''${CYPRESS_VERSION}/Cypress/"
+            fi
+            #export CYPRESS_CACHE_FOLDER="$PWD/.cypress-cache"
 
             # Start process-compose for MySQL only
             ./scripts/init_mysql.sh &
@@ -162,7 +192,6 @@
             printf "  • PNPM:   %s\n" "$(pnpm --version)"
             printf "  • Biome:  %s\n" "$(pnpm biome --version)"
             printf "  • Python: %s\n" "$(python --version)"
-            printf "  • Poetry: %s\n" "$(poetry --version)"
 
             printf "\n📂 Paths:\n"
             printf "  • JAVA_HOME:     %s\n" "$JAVA_HOME"
