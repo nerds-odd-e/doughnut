@@ -62,7 +62,7 @@
     "@testing-library/cypress": "10.0.3",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.32",
-    "@types/node": "^22.13.1",
+    "@types/node": "^22.13.10",
     "@types/testing-library__cypress": "^5.0.13",
     "adm-zip": "^0.5.16",
     "cypress": "14.0.3",
@@ -76,7 +76,7 @@
     "process": "^0.11.10",
     "superagent": "^10.1.1",
     "syncpack": "^13.0.2",
-    "typescript": "5.7.3",
+    "typescript": "5.8.2",
     "util": "^0.12.5",
     "wait-on": "^8.0.2"
   },
