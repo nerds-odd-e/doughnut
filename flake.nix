@@ -28,6 +28,10 @@
 
         inherit (pkgs) stdenv lib;
         apple_sdk = pkgs.darwin.apple_sdk.frameworks;
+
+        # Check for PYTHON_DEV environment variable
+        pythonDev = builtins.getEnv "PYTHON_DEV" == "true";
+        pythonPackages = if pythonDev then [ pkgs.python313 pkgs.poetry ] else [];
       in {
         devShells.default = pkgs.mkShell {
           name = "doughnut";
@@ -40,7 +44,6 @@
               zulu23
               nodejs_23
               corepack_23
-              python313
               git
               git-secret
               gitleaks
@@ -53,7 +56,9 @@
               nixfmt-classic
               hclfmt
               fzf
-            ] ++ lib.optionals stdenv.isDarwin [ sequelpro ]
+            ]
+            ++ pythonPackages
+            ++ lib.optionals stdenv.isDarwin [ sequelpro ]
             ++ lib.optionals (!stdenv.isDarwin) [
               psmisc
               xclip
@@ -131,8 +136,13 @@
             export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
             export NODE_PATH="$(dirname $(dirname $(readlink -f $(which node))))"
             export PNPM_HOME="$(dirname $(dirname $(readlink -f $(which pnpm))))"
-            export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
-            export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$PATH
+            # Only set PYTHON_PATH if Python is available
+            if command -v python >/dev/null 2>&1; then
+              export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
+              export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$PYTHON_PATH/bin:$PATH
+            else
+              export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$PATH
+            fi
 
             # Export MySQL configuration
             export MYSQL_BASEDIR="${pkgs.mysql80}"
@@ -147,8 +157,8 @@
 
             # Configure pnpm and start Biome
             log "Setting up PNPM..."
-            corepack prepare pnpm@10.0.0 --activate
-            corepack use pnpm@10.0.0
+            corepack prepare pnpm@10.6.2 --activate
+            corepack use pnpm@10.6.2
             pnpm --frozen-lockfile recursive install
 
             # Restart biome daemon
@@ -178,6 +188,23 @@
             # Start process-compose for MySQL only
             ./scripts/init_mysql.sh &
 
+            # Setup Poetry if Python development is enabled
+            if [ "${builtins.toString pythonDev}" = "true" ]; then
+              log "Setting up Python development environment..."
+              if command -v poetry >/dev/null 2>&1; then
+                poetry --version
+                # Configure poetry to create virtual environments in the project directory
+                poetry config virtualenvs.in-project true
+                # Initialize poetry if pyproject.toml doesn't exist
+                if [ ! -f pyproject.toml ]; then
+                  log "No pyproject.toml found. You can initialize a new Python project with 'poetry init'"
+                else
+                  log "Installing Python dependencies..."
+                  poetry install
+                fi
+              fi
+            fi
+
             cat << 'EOF'
             ╔════════════════════════════════════════════════════════════════════════════════════╗
             ║                         NIX DEVELOPMENT ENVIRONMENT                                ║
@@ -191,13 +218,20 @@
             printf "  • Node:   %s\n" "$(node --version)"
             printf "  • PNPM:   %s\n" "$(pnpm --version)"
             printf "  • Biome:  %s\n" "$(pnpm biome --version)"
-            printf "  • Python: %s\n" "$(python --version)"
+            if command -v python >/dev/null 2>&1; then
+              printf "  • Python: %s\n" "$(python --version)"
+              if command -v poetry >/dev/null 2>&1; then
+                printf "  • Poetry: %s\n" "$(poetry --version)"
+              fi
+            fi
 
             printf "\n📂 Paths:\n"
             printf "  • JAVA_HOME:     %s\n" "$JAVA_HOME"
             printf "  • NODE_PATH:     %s\n" "$NODE_PATH"
             printf "  • PNPM_HOME:     %s\n" "$PNPM_HOME"
-            printf "  • PYTHON_PATH:   %s\n" "$PYTHON_PATH"
+            if [ -n "$PYTHON_PATH" ]; then
+              printf "  • PYTHON_PATH:   %s\n" "$PYTHON_PATH"
+            fi
             printf "  • MYSQL_HOME:    %s\n" "$MYSQL_HOME"
             printf "  • MYSQL_DATADIR: %s\n" "$MYSQL_DATADIR"
             printf "\n"
