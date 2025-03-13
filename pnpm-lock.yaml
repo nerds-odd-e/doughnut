@@ -86,10 +86,10 @@ importers:
         specifier: ^0.11.10
         version: 0.11.10
       superagent:
-        specifier: ^10.1.1
+        specifier: ^10.2.0
         version: 10.2.0
       syncpack:
-        specifier: ^13.0.2
+        specifier: ^13.0.3
         version: 13.0.3(typescript@5.8.2)
       typescript:
         specifier: 5.8.2
