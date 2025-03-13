@@ -38,7 +38,7 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@hey-api/openapi-ts':
-        specifier: ^0.64.2
+        specifier: ^0.64.11
         version: 0.64.11(typescript@5.8.2)
       '@testing-library/cypress':
         specifier: 10.0.3
