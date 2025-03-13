@@ -1,6 +1,7 @@
 ---
 description: 
 globs: **/*
+alwaysApply: false
 ---
 # Car Dice Roll Race Feature
 You will need to implement a new feature which will allow the player to do car racing. The player will roll a dice and depending on the outcome of the roll will determine the how far the car will move.

@@ -1,0 +1,106 @@
+---
+description: The background question generation feature
+globs: 
+alwaysApply: false
+---
+# Data Model Summary: Memory Tracking System
+
+## 1. MemoryTracker
+
+The `MemoryTracker` entity is the core component of the spaced repetition system that tracks a user's memory of a specific note.
+
+**Key Attributes:**
+- **note**: The note being tracked (Many-to-One relationship)
+- **user**: The user whose memory is being tracked
+- **lastRecalledAt**: Timestamp when the note was last recalled
+- **nextRecallAt**: Timestamp when the note should be recalled next
+- **assimilatedAt**: Timestamp when the note was first assimilated into memory
+- **repetitionCount**: Number of times the note has been reviewed
+- **forgettingCurveIndex**: Index used to calculate the next recall time based on the forgetting curve algorithm
+- **removedFromTracking**: Boolean flag to indicate if the note is no longer being tracked
+- **spelling**: Boolean flag to indicate if this tracker is for spelling practice
+
+**Key Behaviors:**
+- Calculates the next recall time based on the forgetting curve algorithm
+- Updates the forgetting curve index based on successful or failed reviews
+- Marks notes as reviewed with success or failure status
+
+## 2. PredefinedQuestion
+
+The `PredefinedQuestion` entity represents a question that can be asked about a note.
+
+**Key Attributes:**
+- **note**: The note this question is about (Many-to-One relationship)
+- **multipleChoicesQuestion**: The actual question content stored as a JSON structure
+- **correctAnswerIndex**: Index of the correct answer in the choices array
+- **approved**: Boolean flag indicating if the question has been approved
+- **createdAt**: Timestamp when the question was created
+
+**Key Behaviors:**
+- Converts between internal representation and MCQWithAnswer format
+- Checks if a given answer is correct
+- Can be created from an MCQWithAnswer object
+
+## 3. RecallPrompt
+
+The `RecallPrompt` entity extends `AnswerableQuestionInstance` and represents a specific instance of a question being asked during a recall session.
+
+**Key Attributes:**
+- **predefinedQuestion**: The question being asked (inherited from AnswerableQuestionInstance)
+- **answer**: The user's answer to the question (inherited from AnswerableQuestionInstance)
+
+**Key Behaviors:**
+- Gets the notebook associated with the question
+- Creates an AnsweredQuestion object when answered
+- Provides question details in a structured format
+
+## 4. AnswerableQuestionInstance (Abstract Base Class)
+
+This is the base class for question instances that can be answered.
+
+**Key Attributes:**
+- **predefinedQuestion**: The question being asked
+- **answer**: The user's answer to the question
+
+**Key Behaviors:**
+- Gets the multiple choice question from the predefined question
+- Builds an answer from an AnswerDTO
+
+## 5. Answer
+
+The `Answer` entity represents a user's answer to a question.
+
+**Key Attributes:**
+- **choiceIndex**: Index of the chosen answer
+- **correct**: Boolean flag indicating if the answer was correct
+- **createdAt**: Timestamp when the answer was created
+
+**Key Behaviors:**
+- Gets the display text of the answer based on the question
+
+## Relationships and Flow
+
+1. **User Memory Tracking**:
+   - A user has many `MemoryTracker` instances (one for each note they're learning)
+   - Each `MemoryTracker` is associated with one `Note` and one `User`
+   - The system uses the forgetting curve algorithm to determine when notes should be reviewed
+
+2. **Question Generation and Answering**:
+   - `PredefinedQuestion` instances are created for notes (either manually or via AI)
+   - During a review session, a `RecallPrompt` is created using a `PredefinedQuestion`
+   - The user answers the question, creating an `Answer` object
+   - The answer correctness affects the `MemoryTracker` for that note
+
+3. **Spaced Repetition Logic**:
+   - When a user answers a question, the `MemoryTracker` is updated
+   - Correct answers increase the forgetting curve index, extending the time until next review
+   - Incorrect answers decrease the index, scheduling a sooner review
+   - The system tracks repetition count to measure progress
+
+4. **Question Types and Generation**:
+   - Questions are stored as multiple-choice questions
+   - AI can be used to generate and refine questions
+   - Questions can be contested if they don't make sense
+   - Questions can be approved for regular use
+
+This data model effectively implements a spaced repetition system with AI-assisted question generation, allowing users to efficiently memorize and recall information from notes.
