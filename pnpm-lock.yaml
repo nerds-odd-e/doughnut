@@ -38,8 +38,8 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@hey-api/openapi-ts':
-        specifier: ^0.64.11
-        version: 0.64.11(typescript@5.8.2)
+        specifier: ^0.64.12
+        version: 0.64.12(typescript@5.8.2)
       '@testing-library/cypress':
         specifier: 10.0.3
         version: 10.0.3(cypress@14.2.0)
@@ -767,8 +767,8 @@ packages:
     resolution: {integrity: sha512-F6LSkttZcT/XiX3ydeDqTY3uRN3BLJMwyMTk4kg/ichZlKUp3+3Odv0WokSmXGSoZGTW/N66FROMYAm5NPdJlA==}
     engines: {node: '>= 16'}
 
-  '@hey-api/openapi-ts@0.64.11':
-    resolution: {integrity: sha512-ehvi2P3cJY7GC5768N+OvYK8Pak0N3oSjosDmjUjc+W7C8JTbabiCLwszxLefCtqFyv2G2mLl0vqlCj6Bpy+DQ==}
+  '@hey-api/openapi-ts@0.64.12':
+    resolution: {integrity: sha512-Y1UUJWgSYHTqU33sRzv+ASs9Txqz+wJ4UE/f6g69X81SoOPMpa2LXLbNvAtNFUpTMcdCV2hd7+m2/gxmkx79DQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=22.10.0}
     hasBin: true
     peerDependencies:
@@ -5631,7 +5631,7 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.0
 
-  '@hey-api/openapi-ts@0.64.11(typescript@5.8.2)':
+  '@hey-api/openapi-ts@0.64.12(typescript@5.8.2)':
     dependencies:
       '@hey-api/json-schema-ref-parser': 1.0.2
       c12: 2.0.1
