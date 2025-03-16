@@ -2,21 +2,21 @@
   <ContainerPage
     v-bind="{ contentLoaded: true, title: `Recent` }"
   >
-    <div class="daisy-tabs">
+    <div class="daisy:tabs">
       <a
-        :class="`daisy-tab ${activePage === 'recentlyAdded' ? 'daisy-tab-active' : ''}`"
+        :class="`daisy:tab ${activePage === 'recentlyAdded' ? 'daisy:tab-active' : ''}`"
         role="button"
         href="#"
         @click="activePage = 'recentlyAdded'"
       >Recently Added/Updated</a>
       <a
-        :class="`daisy-tab ${activePage === 'recentlyLearned' ? 'daisy-tab-active' : ''}`"
+        :class="`daisy:tab ${activePage === 'recentlyLearned' ? 'daisy:tab-active' : ''}`"
         role="button"
         href="#"
         @click="activePage = 'recentlyLearned'"
       >Recently Learned</a>
       <a
-        :class="`daisy-tab ${activePage === 'recentlyReviewed' ? 'daisy-tab-active' : ''}`"
+        :class="`daisy:tab ${activePage === 'recentlyReviewed' ? 'daisy:tab-active' : ''}`"
         role="button"
         href="#"
         @click="activePage = 'recentlyReviewed'"

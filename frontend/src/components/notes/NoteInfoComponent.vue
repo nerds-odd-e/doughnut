@@ -5,7 +5,7 @@
     @level-changed="$emit('levelChanged', $event)"
   />
   <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
-  <table v-if="memoryTrackers.length" class="daisy-table daisy-table-bordered">
+  <table v-if="memoryTrackers.length" class="daisy:table daisy-table-bordered">
     <thead>
       <tr>
         <th>Type</th>

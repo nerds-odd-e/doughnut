@@ -13,7 +13,7 @@
     <template v-else>
       <div class="message-center-container">
         <div class="sidebar" :class="{ 'hide-on-mobile': !showSidebarOnMobile }">
-          <ul class="daisy-menu">
+          <ul class="daisy:menu">
             <li
               v-for="conversation in conversations"
               :key="conversation.id"

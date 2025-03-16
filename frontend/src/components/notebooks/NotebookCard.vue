@@ -1,13 +1,13 @@
 <template>
-  <div role="card" class="daisy-card notebook-card" data-cy="notebook-card">
+  <div role="card" class="daisy:card notebook-card" data-cy="notebook-card">
     <div class="notebook-binding"></div>
     <slot name="cardHeader" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
       class="no-underline"
     >
-      <div class="daisy-card-body">
-        <h5 class="daisy-card-title">
+      <div class="daisy:card-body">
+        <h5 class="daisy:card-title">
           {{ notebook.title }}
         </h5>
         <p v-if="notebook.shortDetails" class="note-short-details">

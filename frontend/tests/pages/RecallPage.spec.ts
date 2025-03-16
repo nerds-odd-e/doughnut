@@ -116,7 +116,7 @@ describe("repeat page", () => {
       mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
       vi.runOnlyPendingTimers()
       await flushPromises()
-      await wrapper.find("button.daisy-btn-primary").trigger("click")
+      await wrapper.find("button.daisy\\:btn-primary").trigger("click")
       expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith(
         firstMemoryTrackerId,
         true
@@ -206,7 +206,9 @@ describe("repeat page", () => {
         name: "AnsweredSpellingQuestion",
       })
       expect(answeredSpellingQuestion.exists()).toBe(true)
-      const spellingAlert = answeredSpellingQuestion.find(".daisy-alert-error")
+      const spellingAlert = answeredSpellingQuestion.find(
+        ".daisy\\:alert-error"
+      )
       expect(spellingAlert.exists()).toBe(true)
       expect(spellingAlert.text()).toContain(
         "Your answer `test answer` is incorrect."

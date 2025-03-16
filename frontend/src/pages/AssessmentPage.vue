@@ -2,7 +2,7 @@
   <ContainerPage v-bind="{ contentLoaded: loaded, title: `Assessment For ${ assessmentAttempt?.notebookTitle }`}">
     <Assessment v-if="assessmentAttempt" :assessment-attempt="assessmentAttempt" />
   </ContainerPage>
-  <div v-if="errors" class="daisy-alert daisy-alert-danger">{{ errors }}</div>
+  <div v-if="errors" class="daisy:alert daisy-alert-danger">{{ errors }}</div>
 </template>
 
 <script setup lang="ts">

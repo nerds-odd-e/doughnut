@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
+  <div class="daisy-btn-group daisy-btn-group-sm daisy:flex daisy:align-items-center daisy:flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <PopButton title="Edit notebook settings">
       <template #button_face>
@@ -26,14 +26,14 @@
       <NotebookQuestionsDialog v-bind="{ notebook }" />
     </PopButton>
     <button
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      class="daisy:btn daisy:btn-ghost daisy:btn-sm"
       @click="shareNotebook()"
       title="Share notebook to bazaar"
     >
       <SvgBazaarShare />
     </button>
     <label
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      class="daisy:btn daisy:btn-ghost daisy:btn-sm"
       title="Import from Obsidian"
     >
       <input
@@ -46,7 +46,7 @@
       <SvgObsidian />
     </label>
     <button
-      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      class="daisy:btn daisy:btn-ghost daisy:btn-sm"
       @click="exportForObsidian"
       title="Export notebook for Obsidian"
     >

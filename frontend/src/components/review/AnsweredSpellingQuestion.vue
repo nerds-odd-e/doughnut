@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-alert" :class="{ 'daisy-alert-success': result.isCorrect, 'daisy-alert-error': !result.isCorrect }">
+  <div class="daisy:alert" :class="{ 'daisy:alert-success': result.isCorrect, 'daisy:alert-error': !result.isCorrect }">
     <strong>
       {{ result.isCorrect ? 'Correct!' : `Your answer \`${result.answer}\` is incorrect.` }}
     </strong>

@@ -6,7 +6,7 @@
       <img class="ai-art" v-if="imageSrc" :src="imageSrc" />
     </div>
   </form>
-  <button class="daisy-btn daisy-btn-secondary" @click="askForImage">Ask again</button>
+  <button class="daisy:btn daisy:btn-secondary" @click="askForImage">Ask again</button>
 </template>
 
 <script lang="ts">

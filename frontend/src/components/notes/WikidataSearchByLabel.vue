@@ -16,7 +16,7 @@
         @change="onSelectSearchResult"
         @blur="removeSearchSuggestions"
         v-model="selectedOption"
-        class="popup-select daisy-select daisy-select-bordered"
+        class="popup-select daisy:select daisy-select-bordered"
       >
         <option disabled value="">- Choose Wikidata Search Result -</option>
         <option
@@ -31,7 +31,7 @@
       <button
         title="Wikidata Id"
         type="button"
-        class="daisy-btn daisy-btn-outline daisy-btn-neutral"
+        class="daisy:btn daisy:btn-outline daisy:btn-neutral"
         @click.prevent="fetchSearchResult"
       >
         <SvgSearchWikidata />

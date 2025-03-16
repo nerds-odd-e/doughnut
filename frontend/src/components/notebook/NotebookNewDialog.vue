@@ -4,7 +4,7 @@
       v-model="noteFormData.newTitle"
       :error-message="errors.newTitle"
     />
-    <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
+    <input type="submit" value="Submit" class="daisy:btn daisy:btn-primary" />
   </form>
 </template>
 

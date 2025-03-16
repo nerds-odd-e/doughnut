@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-text-break">
+  <div class="daisy:text-break">
     <NoteAccessoryDisplay
       v-if="noteAccessory"
       :note-accessory="noteAccessory"

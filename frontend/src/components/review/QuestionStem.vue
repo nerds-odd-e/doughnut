@@ -1,6 +1,6 @@
 <template>
   <div
-    class="daisy-whitespace-pre-wrap"
+    class="daisy:whitespace-pre-wrap"
     data-test="stem"
     v-if="stem"
     v-html="stemHtml"

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="note-recent-update-indicator daisy-flex daisy-flex-col daisy-gap-1 daisy-py-2"
+    class="note-recent-update-indicator daisy:flex daisy:flex-col daisy:gap-1 daisy:py-2"
     :style="`color: ${bgColor}`"
   >
     <slot />

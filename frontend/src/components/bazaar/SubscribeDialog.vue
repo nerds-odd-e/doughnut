@@ -1,7 +1,7 @@
 <template>
-  <div class="daisy-card daisy-w-96 daisy-shadow-xl">
-    <div class="daisy-card-body">
-      <h3 class="daisy-card-title">Add to my learning</h3>
+  <div class="daisy:card daisy:w-96 daisy:shadow-xl">
+    <div class="daisy:card-body">
+      <h3 class="daisy:card-title">Add to my learning</h3>
       <p v-if="!loggedIn">Please login first</p>
       <form v-else @submit.prevent.once="processForm">
         <TextInput
@@ -13,7 +13,7 @@
         <input
           type="submit"
           value="Submit"
-          class="daisy-btn daisy-btn-primary daisy-mt-4"
+          class="daisy:btn daisy:btn-primary daisy:mt-4"
         />
       </form>
     </div>

@@ -1,6 +1,6 @@
 <template>
   <button
-    class="daisy-btn daisy-btn-sm daisy-btn-ghost"
+    class="daisy:btn daisy:btn-sm daisy:btn-ghost"
     role="button"
     :title="undoTitle"
     @click="undoDelete()"

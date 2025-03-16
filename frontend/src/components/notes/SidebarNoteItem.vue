@@ -1,6 +1,6 @@
 <template>
   <li
-    class="daisy-list-group-item daisy-list-group-item-action daisy-py-2 daisy-pb-0 daisy-pe-0 daisy-border-0"
+    class="daisy:list-group-item daisy:list-group-item-action daisy:py-2 daisy:pb-0 daisy:pe-0 daisy:border-0"
     :class="{
       'active-item': noteRealm.id === activeNoteRealm.note.id,
       'dragging': draggedNote?.id === noteRealm.id,
@@ -14,7 +14,7 @@
     @dragend="onDragEnd"
   >
     <div
-      class="daisy-flex daisy-w-full daisy-justify-between daisy-items-start note-content"
+      class="daisy:flex daisy:w-full daisy:justify-between daisy:items-start note-content"
       @click="toggleChildren(noteRealm.id)"
     >
       <NoteTitleWithLink
@@ -26,7 +26,7 @@
       <span
         role="button"
         title="expand children"
-        class="daisy-badge daisy-cursor-pointer"
+        class="daisy:badge daisy:cursor-pointer"
         >{{ childrenCount ?? "..." }}</span
       >
       <div

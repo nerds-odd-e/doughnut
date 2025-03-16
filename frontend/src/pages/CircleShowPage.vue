@@ -20,9 +20,9 @@
         </NotebookCardsWithButtons>
       </main>
 
-      <nav class="daisy-flex daisy-justify-end">
+      <nav class="daisy:flex daisy:justify-end">
         <div
-          class="daisy-flex-none circle-member"
+          class="daisy:flex-none circle-member"
           v-for="member in circle.members"
           :key="member.name"
         >
@@ -33,8 +33,8 @@
       <h2>Invite People To Your Circle</h2>
       Please share this invitation code so that they can join your circle:
 
-      <div class="daisy-hero daisy-bg-base-200">
-        <input id="invitation-code" :value="invitationUrl" readonly class="daisy-input daisy-input-bordered daisy-w-full" />
+      <div class="daisy:hero daisy:bg-base-200">
+        <input id="invitation-code" :value="invitationUrl" readonly class="daisy:input daisy-input-bordered daisy:w-full" />
       </div>
     </div>
   </ContainerPage>

@@ -1,5 +1,5 @@
 <template>
-  <PopButton btn-class="daisy-btn daisy-btn-primary" title="New notebook">
+  <PopButton btn-class="daisy:btn daisy:btn-primary" title="New notebook">
     <template #button_face>
       <slot />
     </template>

@@ -31,7 +31,7 @@ describe("main menu", () => {
     helper.component(MainMenu).withProps({ user }).render()
 
     const noteLink = screen.getByRole("button", { name: "Note" })
-    expect(noteLink.querySelector(".daisy-text-primary")).toBeInTheDocument()
+    expect(noteLink.querySelector(".daisy\\:text-primary")).toBeInTheDocument()
   })
 
   it("shows note link in main menu", async () => {
@@ -47,7 +47,9 @@ describe("main menu", () => {
     helper.component(MainMenu).withProps({ user }).render()
 
     const circlesLink = screen.getByRole("button", { name: "Circles" })
-    expect(circlesLink.querySelector(".daisy-text-primary")).toBeInTheDocument()
+    expect(
+      circlesLink.querySelector(".daisy\\:text-primary")
+    ).toBeInTheDocument()
   })
 
   it("shows assimilate link in both main menu and dropdown menu", async () => {

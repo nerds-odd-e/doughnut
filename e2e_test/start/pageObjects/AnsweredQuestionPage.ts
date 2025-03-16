@@ -5,7 +5,7 @@ const assumeAnsweredQuestionPage = () => {
     expectLastAnswerToBeCorrect() {
       // checking the css name isn't the best solution
       // but the text changes
-      cy.get('.daisy-alert-success').should('exist')
+      cy.get('.daisy\\:alert-success').should('exist')
     },
     showMemoryTracker(noteTopology?: string) {
       cy.findByText('Note under question')

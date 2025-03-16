@@ -1,8 +1,8 @@
 <template>
-  <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
+  <div class="quiz-instruction daisy:relative daisy:mt-5" data-test="question-section">
     <ContentLoader v-if="loading" />
     <template v-else>
-      <div v-if="spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
+      <div v-if="spellingQuestion?.notebook" class="notebook-source daisy:mb-4">
         <NotebookLink :notebook="spellingQuestion.notebook" />
       </div>
       <QuestionStem :stem="spellingQuestion?.stem" />
@@ -17,7 +17,7 @@
         <input
           type="submit"
           value="Answer"
-          class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-w-full"
+          class="daisy:btn daisy:btn-primary daisy:btn-lg daisy:w-full"
         />
       </form>
     </template>

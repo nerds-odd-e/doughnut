@@ -23,7 +23,7 @@ describe("SuggestQuestion", () => {
       helper.managedApi.restPredefinedQuestionController.suggestQuestionForFineTuning =
         vi.fn().mockResolvedValue({})
       wrapper.get(".negative-feedback-btn").trigger("click")
-      wrapper.get("button.daisy-btn-success").trigger("click")
+      wrapper.get("button.daisy\\:btn-success").trigger("click")
       await flushPromises()
       expect(
         helper.managedApi.restPredefinedQuestionController

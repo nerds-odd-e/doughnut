@@ -1,16 +1,16 @@
 <template>
   <div
-    class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
+    class="nav-item daisy:text-neutral-content daisy:rounded-lg daisy:px-2"
     :class="{
-      'daisy-text-primary daisy-bg-primary/10': isActive,
-      'hover:daisy-bg-base-content/5': !isActive,
-      'daisy-dropdown daisy-dropdown-end lg:daisy-dropdown-right': hasDropdown
+      'daisy:text-primary daisy:bg-primary/10': isActive,
+      'daisy:hover:bg-base-content/5': !isActive,
+      'daisy:dropdown daisy:dropdown-end daisy:lg:dropdown-right': hasDropdown
     }"
   >
     <router-link
       v-if="name && !hasDropdown"
       :to="{ name: name }"
-      class="daisy-flex daisy-flex-col daisy-items-center"
+      class="daisy:flex daisy:flex-col daisy:items-center"
     >
       <div class="icon-container">
         <component :is="icon" width="24" height="24" />
@@ -21,11 +21,11 @@
       <span class="label">{{ label }}</span>
     </router-link>
 
-    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown">
+    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy:dropdown">
       <summary
         tabindex="0"
         role="button"
-        class="daisy-flex daisy-flex-col daisy-items-center cursor-pointer list-none"
+        class="daisy:flex daisy:flex-col daisy:items-center cursor-pointer list-none"
         :aria-label="label"
       >
         <div class="icon-container">

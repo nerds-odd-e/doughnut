@@ -1,5 +1,5 @@
 <template>
-  <table class="daisy-table" v-if="approvals?.length">
+  <table class="daisy:table" v-if="approvals?.length">
     <thead>
     <tr>
       <th>Notebook</th>
@@ -16,7 +16,7 @@
       </td>
       <td>
         <button
-          class="daisy-btn daisy-btn-primary"
+          class="daisy:btn daisy:btn-primary"
           style="background-color: green; border-color: green;"
           @click="approveNoteBook(approval.id)"
         >

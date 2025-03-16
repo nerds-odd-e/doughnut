@@ -1,17 +1,17 @@
 <template>
-  <ol class="choices daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
+  <ol class="choices daisy:flex daisy:flex-wrap daisy:flex-row daisy:justify-start daisy:list-none daisy:p-0" v-if="choices && choices.length > 0">
     <li
-      class="choice daisy-w-[46%] daisy-min-h-[80px] daisy-m-[2%] sm:daisy-w-full"
+      class="choice daisy:w-[46%] daisy:min-h-[80px] daisy:m-[2%] daisy:sm:w-full"
       v-for="(choice, index) in choices"
       :key="index"
     >
       <button
         :class="[
-          'daisy-w-full daisy-h-full daisy-flex daisy-justify-center daisy-items-center',
-          'daisy-rounded-lg daisy-bg-base-200',
-          'hover:daisy-bg-primary hover:daisy-text-primary-content',
-          'focus:daisy-outline-none focus:daisy-ring-2 focus:daisy-ring-primary',
-          'disabled:daisy-opacity-65 daisy-transition-colors daisy-select-none',
+          'daisy:w-full daisy:h-full daisy:flex daisy:justify-center daisy:items-center',
+          'daisy:rounded-lg daisy:bg-base-200',
+          'daisy:hover:bg-primary daisy:hover:text-primary-content',
+          'daisy:focus:outline-hidden daisy:focus:ring-2 daisy:focus:ring-primary',
+          'daisy:disabled:opacity-65 daisy:transition-colors daisy:select-none',
           {
             'is-correct': isOptionCorrect(index),
             'is-incorrect': !isOptionCorrect(index),
@@ -23,7 +23,7 @@
       >
         <div
           v-html="getChoiceHtml(choice)"
-          class="daisy-whitespace-normal daisy-break-words"
+          class="daisy:whitespace-normal daisy:break-words"
           @click.capture.prevent="handleInnerClick"
         />
       </button>

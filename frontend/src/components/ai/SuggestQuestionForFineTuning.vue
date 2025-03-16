@@ -30,7 +30,7 @@
   />
   <div class="feedback-actions-container">
     <button
-      class="suggest-fine-tuning-ok-btn daisy-btn daisy-btn-success"
+      class="suggest-fine-tuning-ok-btn daisy:btn daisy:btn-success"
       @click="suggestQuestionForFineTuning"
     >
       OK

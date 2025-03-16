@@ -7,7 +7,7 @@ describe("RecentPage.vue", () => {
     it("shows Recently Added/Updated tab by default", async () => {
       const wrapper = helper.component(RecentPage).mount()
 
-      const activeTab = wrapper.find(".daisy-tab-active")
+      const activeTab = wrapper.find(".daisy\\:tab-active")
       expect(activeTab.text()).toBe("Recently Added/Updated")
       expect(
         wrapper.findComponent({ name: "RecentlyAddedNotes" }).exists()
@@ -18,11 +18,11 @@ describe("RecentPage.vue", () => {
       const wrapper = helper.component(RecentPage).mount()
 
       const tab = wrapper
-        .findAll(".daisy-tab")
+        .findAll(".daisy\\:tab")
         .find((el) => el.text() === "Recently Learned")
       await tab?.trigger("click")
 
-      const activeTab = wrapper.find(".daisy-tab-active")
+      const activeTab = wrapper.find(".daisy\\:tab-active")
       expect(activeTab.text()).toBe("Recently Learned")
       expect(
         wrapper.findComponent({ name: "RecentlyLearnedNotes" }).exists()
@@ -33,11 +33,11 @@ describe("RecentPage.vue", () => {
       const wrapper = helper.component(RecentPage).mount()
 
       const tab = wrapper
-        .findAll(".daisy-tab")
+        .findAll(".daisy\\:tab")
         .find((el) => el.text() === "Recently Reviewed")
       await tab?.trigger("click")
 
-      const activeTab = wrapper.find(".daisy-tab-active")
+      const activeTab = wrapper.find(".daisy\\:tab-active")
       expect(activeTab.text()).toBe("Recently Reviewed")
       expect(
         wrapper.findComponent({ name: "RecentlyReviewedNotes" }).exists()

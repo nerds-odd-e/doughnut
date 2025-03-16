@@ -8,12 +8,12 @@
         <div class="player-join">
           <input 
             type="text" 
-            class="daisy-input daisy-input-bordered" 
+            class="daisy:input daisy-input-bordered" 
             aria-label="name"
             placeholder="Enter your name"
             v-model="playerName"
           />
-          <button class="daisy-btn daisy-btn-primary" @click="handleJoin">JOIN</button>
+          <button class="daisy:btn daisy:btn-primary" @click="handleJoin">JOIN</button>
         </div>
 
         <span>{{ gameProgress?.displayName ?? 'Rahul' }}</span>
@@ -28,7 +28,7 @@
           <div class="max-position">{{ maxPosition }}</div>
         </div>
         
-        <table class="daisy-table">
+        <table class="daisy:table">
           <thead>
             <tr>
               <th>Car Position</th>
@@ -48,9 +48,9 @@
         </table>
 
         <div class="button-container">
-          <button class="daisy-btn daisy-btn-outline" @click="handleGoNormal">GO NORMAL</button>
-          <button class="daisy-btn daisy-btn-outline" @click="handleGoSuper">GO SUPER</button>
-          <button class="daisy-btn daisy-btn-outline" @click="handleReset">RESET</button>
+          <button class="daisy:btn daisy:btn-outline" @click="handleGoNormal">GO NORMAL</button>
+          <button class="daisy:btn daisy:btn-outline" @click="handleGoSuper">GO SUPER</button>
+          <button class="daisy:btn daisy:btn-outline" @click="handleReset">RESET</button>
         </div>
       </template>
     </div>
@@ -194,19 +194,19 @@ onMounted(() => {
   justify-content: center;
 }
 
-.daisy-table {
+.daisy:table {
   background: white;
   border-radius: 0.5rem;
   overflow: hidden;
 }
 
-.daisy-table th,
-.daisy-table td {
+.daisy:table th,
+.daisy:table td {
   padding: 1rem;
   text-align: center;
 }
 
-.daisy-table th {
+.daisy:table th {
   background: rgba(0, 0, 0, 0.1);
 }
 

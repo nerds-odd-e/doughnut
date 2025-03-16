@@ -7,7 +7,7 @@
       v-model="formData.name"
       :error-message="errors['name']"
     />
-    <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
+    <input type="submit" value="Submit" class="daisy:btn daisy:btn-primary" />
   </form>
 </template>
 

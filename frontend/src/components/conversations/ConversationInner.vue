@@ -16,12 +16,12 @@
       <div
         v-for="conversationMessage in currentConversationMessages"
         :key="conversationMessage.id"
-        class="daisy-flex daisy-mb-3"
-        :class="{ 'daisy-justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
+        class="daisy:flex daisy:mb-3"
+        :class="{ 'daisy:justify-end': isCurrentUser(conversationMessage.sender?.id || 0) }"
       >
         <div
           v-if="!isCurrentUser(conversationMessage.sender?.id || 0)"
-          class="message-avatar daisy-me-2"
+          class="message-avatar daisy:me-2"
           :title="conversationMessage.sender?.name || 'AI Assistant'"
         >
           <template v-if="conversationMessage.sender?.id === undefined">
@@ -33,9 +33,9 @@
         </div>
 
         <div
-          class="daisy-card daisy-py-2 daisy-px-3"
+          class="daisy:card daisy:py-2 daisy:px-3"
           :class="[
-            isCurrentUser(conversationMessage.sender?.id || 0) ? 'daisy-text-bg-dark' : 'daisy-bg-light',
+            isCurrentUser(conversationMessage.sender?.id || 0) ? 'daisy:text-bg-dark' : 'daisy:bg-light',
             conversationMessage.sender?.id === undefined ? 'ai-chat' : '',
           ]"
         >
@@ -187,7 +187,7 @@ const showDefaultMessages = computed(() => {
 
 .unknown-request {
   font-family: monospace;
-  @apply daisy-bg-base-200;
+  background-color: #f0f0f0; /* Light gray background as a fallback */
   padding: 0.5rem;
   border-radius: 0.25rem;
   white-space: pre-wrap;

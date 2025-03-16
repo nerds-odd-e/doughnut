@@ -5,12 +5,12 @@ export const assumeAssimilationPage = () => ({
     const [assimlatedTodayCount, toAssimilateCountForToday, totalCount] =
       toAssimilateAndTotal.split('/')
 
-    cy.get('.daisy-progress-bar').should(
+    cy.get('.daisy\\:progress-bar').should(
       'contain',
       `Assimilating: ${assimlatedTodayCount}/${toAssimilateCountForToday}`
     )
-    // Click progress bar to show tooltip
-    cy.get('.daisy-progress-bar').first().click()
+    // Click progress bar to show tooltip - use force:true to click even when covered by another element
+    cy.get('.daisy\\:progress-bar').first().click({ force: true })
 
     // Check tooltip content
     cy.get('.tooltip-content').within(() => {

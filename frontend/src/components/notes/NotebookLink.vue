@@ -1,7 +1,7 @@
 <template>
   <router-link
     :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
-    class="daisy-text-decoration-none"
+    class="daisy:text-decoration-none"
   >
     <SvgNotebook class="me-1" />
     <span>{{ notebook.title }}</span>

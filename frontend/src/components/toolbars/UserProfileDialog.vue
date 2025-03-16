@@ -26,7 +26,7 @@
           v-model="formData.spaceIntervals"
           :error-message="errors.spaceIntervals"
         />
-        <input type="submit" value="Submit" class="daisy-btn daisy-btn-primary" />
+        <input type="submit" value="Submit" class="daisy:btn daisy:btn-primary" />
       </form>
     </div>
   </ContainerPage>

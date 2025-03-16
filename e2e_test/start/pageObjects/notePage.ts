@@ -37,7 +37,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     const getButton = () => cy.findByRole('button', { name: btnTextOrTitle })
     return {
       click: () => {
-        getButton().click()
+        getButton().click({ force: true })
         return { ...submittableForm }
       },
       shouldNotExist: () => getButton().should('not.exist'),
@@ -258,7 +258,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         .invoke('text')
         .then((currentTopic) => {
           // Find the note in sidebar
-          cy.get('.daisy-list-group-item')
+          cy.get('.daisy\\:list-group-item')
             .contains(currentTopic)
             .as('currentNote')
           // Find previous sibling
@@ -287,7 +287,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         .invoke('text')
         .then((currentTopic) => {
           // Find the note in sidebar
-          cy.get('.daisy-list-group-item')
+          cy.get('.daisy\\:list-group-item')
             .contains(currentTopic)
             .as('currentNote')
           // Find next sibling

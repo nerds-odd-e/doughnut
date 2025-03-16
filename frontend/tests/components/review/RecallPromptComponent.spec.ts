@@ -42,16 +42,20 @@ describe("RecallPromptComponent", () => {
         .vm.$emit("answer", { choiceIndex: 0 })
 
       // Verify loading overlay is shown
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
+      expect(wrapper.find(".daisy\\:absolute.daisy\\:inset-0").exists()).toBe(
+        true
+      )
       expect(
-        wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
+        wrapper.find(".daisy\\:loading.daisy\\:loading-spinner").exists()
       ).toBe(true)
 
       vi.runAllTimers()
       await flushPromises()
 
       // Verify loading state is removed after response
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(false)
+      expect(wrapper.find(".daisy\\:absolute.daisy\\:inset-0").exists()).toBe(
+        false
+      )
     })
 
     it("allows retrying on API error", async () => {
@@ -70,7 +74,9 @@ describe("RecallPromptComponent", () => {
       await flushPromises()
 
       // Verify error state
-      expect(wrapper.find(".daisy-alert.daisy-alert-error").exists()).toBe(true)
+      expect(wrapper.find(".daisy\\:alert.daisy\\:alert-error").exists()).toBe(
+        true
+      )
 
       // Submit second answer (should succeed)
       await wrapper
@@ -80,7 +86,7 @@ describe("RecallPromptComponent", () => {
 
       // Verify success
       expect(wrapper.emitted().answered).toBeTruthy()
-      expect(wrapper.find(".daisy-alert.daisy-alert-error").exists()).toBe(
+      expect(wrapper.find(".daisy\\:alert.daisy\\:alert-error").exists()).toBe(
         false
       )
     })

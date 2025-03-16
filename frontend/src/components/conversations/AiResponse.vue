@@ -1,15 +1,15 @@
 <template>
-  <div v-if="currentAiReply" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
+  <div v-if="currentAiReply" class="daisy:flex daisy:mb-3">
+    <div class="message-avatar daisy:me-2" title="AI Assistant">
       <SvgRobot />
     </div>
-    <div class="daisy-card daisy-py-2 daisy-px-3 daisy-bg-light ai-chat"
+    <div class="daisy:card daisy:py-2 daisy:px-3 daisy:bg-light ai-chat"
     v-html="markdowntToHtml(currentAiReply)"
     />
   </div>
 
-  <div v-if="currentSuggestion" class="daisy-flex daisy-mb-3">
-    <div class="message-avatar daisy-me-2" title="AI Assistant">
+  <div v-if="currentSuggestion" class="daisy:flex daisy:mb-3">
+    <div class="message-avatar daisy:me-2" title="AI Assistant">
       <SvgRobot />
     </div>
     <ToolCallHandler
@@ -22,15 +22,15 @@
     />
   </div>
 
-  <div v-if="lastErrorMessage" class="last-error-message daisy-text-danger daisy-mb-3">
+  <div v-if="lastErrorMessage" class="last-error-message daisy:text-danger daisy:mb-3">
     {{ lastErrorMessage }}
   </div>
 
-  <div v-if="aiStatus" class="daisy-flex daisy-align-items-center status-bar daisy-mb-3">
-    <div class="daisy-spinner-border daisy-spinner-border-sm daisy-me-2" role="status">
+  <div v-if="aiStatus" class="daisy:flex daisy:align-items-center status-bar daisy:mb-3">
+    <div class="daisy-spinner-border daisy-spinner-border-sm daisy:me-2" role="status">
       <span class="daisy-visually-hidden">Loading...</span>
     </div>
-    <small class="daisy-text-secondary">{{ aiStatus }}</small>
+    <small class="daisy:text-secondary">{{ aiStatus }}</small>
   </div>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
-  <div class="sidebar-container daisy-w-full daisy-h-full">
-    <div class="daisy-flex daisy-flex-col daisy-h-full">
-      <ul v-if="user" class="daisy-menu daisy-w-full daisy-flex-1">
+  <div class="sidebar-container daisy:w-full daisy:h-full">
+    <div class="daisy:flex daisy:flex-col daisy:h-full">
+      <ul v-if="user" class="daisy:menu daisy:w-full daisy:flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
             <NavigationItem v-bind="{ ...item }" />
@@ -22,7 +22,7 @@
             :is-active="false"
           >
             <template #dropdown="slotProps">
-              <ul tabindex="0" class="daisy-dropdown-content daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
+              <ul tabindex="0" class="daisy-dropdown-content daisy:p-2 daisy:bg-base-100 daisy:rounded-box daisy:w-52 daisy:shadow">
                 <li v-if="user?.admin">
                   <router-link :to="{ name: 'adminDashboard' }" @click="slotProps.closeDropdown">
                     Admin Dashboard
@@ -30,12 +30,12 @@
                 </li>
                 <li>
                   <router-link :to="{ name: 'recent' }" @click="slotProps.closeDropdown">
-                    <SvgAssimilate class="daisy-mr-2" />Recent...
+                    <SvgAssimilate class="daisy:mr-2" />Recent...
                   </router-link>
                 </li>
                 <li>
                   <div
-                    class="daisy-w-full daisy-text-left"
+                    class="daisy:w-full daisy:text-left"
                     @click="slotProps.closeDropdown"
                   >
                     <PopButton title="user settings">
@@ -70,14 +70,14 @@
         </li>
       </ul>
       <LoginButton v-else />
-      <div class="daisy-flex daisy-flex-col daisy-items-center">
+      <div class="daisy:flex daisy:flex-col daisy:items-center">
         <router-link
           to="/"
-          class="brand-text [writing-mode:vertical-lr] daisy-text-center daisy-py-4 daisy-font-bold daisy-text-neutral-400 daisy-whitespace-nowrap daisy-no-underline"
+          class="brand-text daisy:[writing-mode:vertical-lr] daisy:text-center daisy:py-4 daisy:font-bold daisy:text-neutral-400 daisy:whitespace-nowrap daisy:no-underline"
         >
           Doughnut by
         </router-link>
-        <a href="https://odd-e.com" target="_blank" class="daisy-mb-4">
+        <a href="https://odd-e.com" target="_blank" class="daisy:mb-4">
           <img
             src="/odd-e.png"
             width="35"
@@ -193,7 +193,7 @@ const logout = async () => {
     height: auto;
     display: block;
 
-    .daisy-menu {
+    .daisy:menu {
       flex-direction: row;
       flex-wrap: nowrap;
       justify-content: center;
@@ -217,7 +217,10 @@ const logout = async () => {
   }
 
   .daisy-dropdown {
-    @apply daisy-dropdown-end;
+    position: relative;
+    display: inline-block;
+    right: 0;
+    left: auto;
   }
 }
 

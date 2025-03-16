@@ -1,5 +1,5 @@
-@tailwind base;
-@tailwind components;
+@import "tailwindcss/preflight";
+@config "../../tailwind.config.ts";
 @tailwind utilities;
 
 svg {

@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
+  <div class="quiz-instruction daisy:relative daisy:mt-5" data-test="question-section">
     <QuestionStem :stem="multipleChoicesQuestion.stem" />
     <QuestionChoices
       v-if="multipleChoicesQuestion.choices"

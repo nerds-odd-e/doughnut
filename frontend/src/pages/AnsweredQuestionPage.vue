@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-container">
+  <div class="daisy:container">
     <ContentLoader v-if="!answeredQuestion" />
     <AnsweredQuestionComponent
       v-else

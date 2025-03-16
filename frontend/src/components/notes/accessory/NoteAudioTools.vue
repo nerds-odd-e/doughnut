@@ -8,10 +8,10 @@
         </svg>
       </button>
     </div>
-    <div class="daisy-alert daisy-alert-info" v-if="errors">{{ errors }}</div>
+    <div class="daisy:alert daisy:alert-info" v-if="errors">{{ errors }}</div>
     <div class="button-group">
       <template v-if="!isRecording">
-        <button class="daisy-btn" @click="startRecording" title="Record Audio">
+        <button class="daisy:btn" @click="startRecording" title="Record Audio">
           <SvgAudioInput width="24" height="24" />
         </button>
       </template>
@@ -27,18 +27,18 @@
           </option>
         </select>
       </template>
-      <button class="daisy-btn" @click="tryFlushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
+      <button class="daisy:btn" @click="tryFlushAudio" :disabled="!isRecording || isProcessing" title="Flush Audio">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
         </svg>
       </button>
-      <button class="daisy-btn" @click="stopRecording" :disabled="!isRecording" title="Stop Recording">
+      <button class="daisy:btn" @click="stopRecording" :disabled="!isRecording" title="Stop Recording">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
           <path d="M6 6h12v12H6z"/>
         </svg>
       </button>
       <button
-        class="daisy-btn"
+        class="daisy:btn"
         @click="saveAudioLocally"
         :disabled="isRecording || !audioFile"
         title="Save Audio Locally"
@@ -48,7 +48,7 @@
         </svg>
       </button>
       <button
-        class="daisy-btn"
+        class="daisy:btn"
         @click="toggleAdvancedOptions"
         title="Advanced Options"
       >
@@ -290,7 +290,7 @@ const tryFlushAudio = async () => {
   gap: 20px;
 }
 
-.daisy-btn {
+.daisy:btn {
   background-color: #4299e1;
   border: none;
   color: white;
@@ -320,7 +320,7 @@ const tryFlushAudio = async () => {
     gap: 10px;
   }
 
-  .daisy-btn {
+  .daisy:btn {
     padding: 8px;
   }
 }

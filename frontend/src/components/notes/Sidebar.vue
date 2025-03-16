@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-ml-[-1rem]">
+  <div class="daisy:ml-[-1rem]">
     <SidebarInner
       :class="{ 'is-disabled': !activeNoteRealm }"
       v-if="activeNoteRealm && headNoteId"

@@ -6,7 +6,7 @@
     }"
   >
     <div v-if="!!failureReport">
-      <div class="daisy-hero daisy-bg-base-200">
+      <div class="daisy:hero daisy:bg-base-200">
         <h2><p v-text="failureReport.errorName" /></h2>
         <pre v-text="failureReport.errorDetail" />
         <p v-text="failureReport.createDatetime" />
