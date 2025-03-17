@@ -3,7 +3,7 @@
   <div class="daisy:overflow-auto daisy:max-h-40" style="max-height: 200px">
     <ul class="daisy:menu">
       <li
-        class="daisy-menu-item"
+        class="daisy:menu-item"
         v-for="circle in circles"
         :key="circle.id"
         @click="move(circle)"

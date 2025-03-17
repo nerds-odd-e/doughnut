@@ -27,8 +27,8 @@
   </div>
 
   <div v-if="aiStatus" class="daisy:flex daisy:align-items-center status-bar daisy:mb-3">
-    <div class="daisy-spinner-border daisy-spinner-border-sm daisy:me-2" role="status">
-      <span class="daisy-visually-hidden">Loading...</span>
+    <div class="daisy:spinner-border daisy:spinner-border-sm daisy:me-2" role="status">
+      <span class="daisy:visually-hidden">Loading...</span>
     </div>
     <small class="daisy:text-secondary">{{ aiStatus }}</small>
   </div>

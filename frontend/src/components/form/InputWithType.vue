@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-form-control">
+  <div class="daisy:form-control">
     <div v-if="beforeLabel" class="daisy:flex daisy:items-center daisy:gap-2">
       <slot />
       <label v-if="!!field || !!title" :for="controlId" class="daisy:label">

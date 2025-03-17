@@ -53,8 +53,8 @@ describe("MessageCenterPage", () => {
       const listItems = await findAllByRole("listitem")
       expect(listItems).toHaveLength(2)
 
-      expect(listItems[1]).toHaveClass("daisy-active")
-      expect(listItems[0]).not.toHaveClass("daisy-active")
+      expect(listItems[1]).toHaveClass("daisy:active")
+      expect(listItems[0]).not.toHaveClass("daisy:active")
     })
 
     it("should highlight the selected conversation", async () => {

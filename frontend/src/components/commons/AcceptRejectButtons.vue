@@ -16,7 +16,7 @@
         Accept
       </button>
       <button
-        class="daisy:btn daisy-btn-outline-secondary daisy:btn-sm"
+        class="daisy:btn daisy:btn-outline-secondary daisy:btn-sm"
         @click="$emit('skip')"
         :disabled="disabled"
       >

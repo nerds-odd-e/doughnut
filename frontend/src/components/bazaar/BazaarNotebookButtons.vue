@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-btn-group daisy-btn-group-sm">
+  <div class="daisy:btn-group daisy:btn-group-sm">
     <PopButton
       v-if="!notebook.notebookSettings.skipMemoryTrackingEntirely"
       title="Add to my learning"

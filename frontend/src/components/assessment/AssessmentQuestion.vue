@@ -8,10 +8,10 @@
     :key="localAssessmentQuestionInstance.id"
    />
   <div v-if="localAssessmentQuestionInstance.answer && !localAssessmentQuestionInstance.answer.correct">
-    <div class="daisy:alert daisy-alert-danger">
+    <div class="daisy:alert daisy:alert-danger">
       <strong>The answer is incorrect.</strong>
     </div>
-    <button class="daisy:btn daisy-btn-danger" @click="$emit('advance')">Continue</button>
+    <button class="daisy:btn daisy:btn-danger" @click="$emit('advance')">Continue</button>
     <PopButton title="Send feedback">
       <template #button_face>
         <button class="daisy:btn daisy:btn-secondary">Send feedback</button>

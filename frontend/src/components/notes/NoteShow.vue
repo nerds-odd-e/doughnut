@@ -102,7 +102,7 @@
                 <ul class="daisy:menu daisy:rounded-lg daisy:shadow-sm">
                   <li v-for="link in noteRealm.inboundReferences"
                       :key="link.id"
-                      class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy:transition-colors daisy:py-2"
+                      class="daisy:menu-item daisy:hover:daisy:bg-base-200 daisy:transition-colors daisy:py-2"
                   >
                     <div class="daisy:flex daisy:items-center daisy:gap-2">
                       <span class="daisy:text-sm daisy:text-base-content/70">

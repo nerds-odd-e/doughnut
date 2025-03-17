@@ -10,9 +10,7 @@ export const assumeMessageCenterPage = () => {
       return this
     },
     expectMessageDisplayAtUserSide(message: string) {
-      cy.findByText(message)
-        .parents('.daisy\\:justify-end')
-        .should('be.visible')
+      cy.findByText(message).parents('.daisy-justify-end').should('be.visible')
       return this
     },
     expectMessageDisplayAtOtherSide(message: string) {

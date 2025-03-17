@@ -301,12 +301,12 @@ const tryFlushAudio = async () => {
   flex-shrink: 0;
 }
 
-.daisy-btn:hover:not(:disabled) {
+.daisy:btn:hover:not(:disabled) {
   background-color: #3182ce;
   transform: scale(1.05);
 }
 
-.daisy-btn:disabled {
+.daisy:btn:disabled {
   background-color: #a0aec0;
   cursor: not-allowed;
 }

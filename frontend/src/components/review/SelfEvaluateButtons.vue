@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-btn-group">
+  <div class="daisy:btn-group">
     <button
       class="daisy:btn daisy:btn-primary loading"
       @click.once="$emit('self-evaluated-memory-state', true)"

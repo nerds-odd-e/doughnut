@@ -34,7 +34,7 @@
       Please share this invitation code so that they can join your circle:
 
       <div class="daisy:hero daisy:bg-base-200">
-        <input id="invitation-code" :value="invitationUrl" readonly class="daisy:input daisy-input-bordered daisy:w-full" />
+        <input id="invitation-code" :value="invitationUrl" readonly class="daisy:input daisy:input-bordered daisy:w-full" />
       </div>
     </div>
   </ContainerPage>

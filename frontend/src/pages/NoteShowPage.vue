@@ -1,6 +1,6 @@
 <template>
   <!--
-    Instead of using a daisy-drawer, we're using a responsive layout with a sidebar that
+    Instead of using a daisy:drawer, we're using a responsive layout with a sidebar that
     is either a static column on md+ screens or an overlay on smaller screens.
   -->
   <div class="daisy:h-full daisy:relative daisy:flex">

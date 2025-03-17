@@ -6,9 +6,9 @@
       </div>
       <template v-else>
         <div class="player-join">
-          <input 
-            type="text" 
-            class="daisy:input daisy-input-bordered" 
+          <input
+            type="text"
+            class="daisy:input daisy:input-bordered"
             aria-label="name"
             placeholder="Enter your name"
             v-model="playerName"
@@ -18,16 +18,16 @@
 
         <span>{{ gameProgress?.displayName ?? 'Rahul' }}</span>
         <div class="race-track">
-          <img 
-            src="/src/assets/race/car-scarhp6.png" 
-            alt="Racing car" 
+          <img
+            src="/src/assets/race/car-scarhp6.png"
+            alt="Racing car"
             class="race-car"
             :style="{ left: `${(gameProgress?.carPosition ?? 0) * (100 / maxPosition)}%` }"
           />
           <div class="track"></div>
           <div class="max-position">{{ maxPosition }}</div>
         </div>
-        
+
         <table class="daisy:table">
           <thead>
             <tr>

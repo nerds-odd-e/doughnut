@@ -2,7 +2,7 @@
   <div class="daisy:alert daisy:alert-success" v-if="answeredQuestion.answer.correct">
     Correct!
   </div>
-  <div class="daisy:alert daisy-alert-danger" v-else>
+  <div class="daisy:alert daisy:alert-danger" v-else>
     <strong>
       {{ "Your answer `" + answeredQuestion.answerDisplay + "` is incorrect." }}
     </strong>

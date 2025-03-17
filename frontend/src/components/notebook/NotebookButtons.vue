@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy-btn-group daisy-btn-group-sm daisy:flex daisy:align-items-center daisy:flex-wrap">
+  <div class="daisy:btn-group daisy:btn-group-sm daisy:flex daisy:align-items-center daisy:flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
     <PopButton title="Edit notebook settings">
       <template #button_face>

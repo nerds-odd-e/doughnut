@@ -2,37 +2,37 @@
   <ContainerPage v-bind="{ title: 'Admin Dashboard' }" />
   <div class="daisy:tabs">
     <a
-      :class="`daisy:tab ${activePage === 'fineTuningData' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy:tab ${activePage === 'fineTuningData' ? 'daisy:tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'fineTuningData'"
     >Fine Tuning Data</a>
     <a
-      :class="`daisy:tab ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy:tab ${activePage === 'failureReport' ? 'daisy:tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'failureReport'"
     >Failure Reports</a>
     <a
-      :class="`daisy:tab ${activePage === 'manageModel' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy:tab ${activePage === 'manageModel' ? 'daisy:tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'manageModel'"
     >Manage Models</a>
     <a
-      :class="`daisy:tab ${activePage === 'manageAssistant' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy:tab ${activePage === 'manageAssistant' ? 'daisy:tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'manageAssistant'"
     >Manage Assistant</a>
     <a
-      :class="`daisy:tab ${activePage === 'manageBazaar' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy:tab ${activePage === 'manageBazaar' ? 'daisy:tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'manageBazaar'"
     >Manage Bazaar</a>
     <a
-      :class="`daisy:tab ${activePage === 'certificateRequests' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy:tab ${activePage === 'certificateRequests' ? 'daisy:tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'certificateRequests'"

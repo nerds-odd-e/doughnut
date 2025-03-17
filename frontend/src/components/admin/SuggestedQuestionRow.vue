@@ -6,7 +6,7 @@
     <td>{{ suggestedQuestion.positiveFeedback ? "Positive" : "Negative" }}</td>
     <td>{{ suggestedQuestion.comment }}</td>
     <td>
-      <div class="daisy-btn-group" role="group">
+      <div class="daisy:btn-group" role="group">
         <button
           v-if="!suggestedQuestion.positiveFeedback"
           class="daisy:btn daisy:btn-sm"

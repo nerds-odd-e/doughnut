@@ -6,28 +6,28 @@
     <br />
     {{ redirectAfterLogin }}
   </p>
-  <div v-if="errorMessage" class="daisy:alert daisy-alert-danger">
+  <div v-if="errorMessage" class="daisy:alert daisy:alert-danger">
     {{ errorMessage }}
   </div>
 
   <div class="daisy:min-h-screen daisy:flex daisy:justify-center daisy:items-center">
     <form @submit.prevent="handleSubmit" class="daisy:text-center">
-      <div class="daisy-form-control daisy:mb-4">
+      <div class="daisy:form-control daisy:mb-4">
         <label for="username" class="daisy:label">Username</label>
         <input
           type="text"
           v-model="username"
-          class="daisy:input daisy-input-bordered"
+          class="daisy:input daisy:input-bordered"
           id="username"
           required
         />
       </div>
-      <div class="daisy-form-control daisy:mb-4">
+      <div class="daisy:form-control daisy:mb-4">
         <label for="password" class="daisy:label">Password</label>
         <input
           type="password"
           v-model="password"
-          class="daisy:input daisy-input-bordered"
+          class="daisy:input daisy:input-bordered"
           id="password"
           required
         />

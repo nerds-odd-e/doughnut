@@ -4,7 +4,7 @@
       <slot name="input_prepend" />
     </template>
     <input
-      :class="`daisy:input daisy-input-bordered daisy:w-full ${!!errorMessage ? 'daisy:input-error' : ''}`"
+      :class="`daisy:input daisy:input-bordered daisy:w-full ${!!errorMessage ? 'daisy:input-error' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
       :value="modelValue"

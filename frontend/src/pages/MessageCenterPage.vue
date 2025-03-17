@@ -17,8 +17,8 @@
             <li
               v-for="conversation in conversations"
               :key="conversation.id"
-              class="daisy-menu-item"
-              :class="{ 'daisy-active': conversationId === conversation.id }"
+              class="daisy:menu-item"
+              :class="{ 'daisy:active': conversationId === conversation.id }"
               @click="selectConversation(conversation)"
             >
               <div>{{ conversationTopic(conversation) }}</div>

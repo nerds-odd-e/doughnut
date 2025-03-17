@@ -20,7 +20,7 @@
           />
           <i v-else> (This is not a certifiable assessment.)</i>
         </div>
-        <div class="daisy:alert daisy-alert-danger" v-else="">You have not passed the assessment.</div>
+        <div class="daisy:alert daisy:alert-danger" v-else="">You have not passed the assessment.</div>
       </div>
     </div>
   </div>

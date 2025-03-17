@@ -9,7 +9,7 @@
         </td>
         <td>
           <button
-            class="daisy:btn daisy-btn-danger"
+            class="daisy:btn daisy:btn-danger"
             @click="removeFromBazaar(bazaarNotebook)"
           >
             Remove

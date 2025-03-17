@@ -3,18 +3,18 @@
     <div class="daisy:flex daisy:flex-col daisy:h-full">
       <ul v-if="user" class="daisy:menu daisy:w-full daisy:flex-1">
         <template v-if="!isHomePage">
-          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
+          <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="daisy:menu-item">
             <NavigationItem v-bind="{ ...item }" />
           </li>
         </template>
 
         <template v-if="!isHomePage">
-          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
+          <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="daisy:menu-item">
             <NavigationItem v-bind="{ ...item, to: item.name }" />
           </li>
         </template>
 
-        <li class="daisy-menu-item">
+        <li class="daisy:menu-item">
           <NavigationItem
             label="Account"
             :icon="SvgMissingAvatar"
@@ -22,7 +22,7 @@
             :is-active="false"
           >
             <template #dropdown="slotProps">
-              <ul tabindex="0" class="daisy-dropdown-content daisy:p-2 daisy:bg-base-100 daisy:rounded-box daisy:w-52 daisy:shadow">
+              <ul tabindex="0" class="daisy:dropdown-content daisy:p-2 daisy:bg-base-100 daisy:rounded-box daisy:w-52 daisy:shadow">
                 <li v-if="user?.admin">
                   <router-link :to="{ name: 'adminDashboard' }" @click="slotProps.closeDropdown">
                     Admin Dashboard
@@ -168,7 +168,7 @@ const logout = async () => {
 </script>
 
 <style lang="scss" scoped>
-.daisy-menu-item {
+.daisy:menu-item {
   padding: 0;
   text-align: center;
   width: 100%;
@@ -200,7 +200,7 @@ const logout = async () => {
       gap: 1rem;
     }
 
-    .daisy-menu-item {
+    .daisy:menu-item {
       width: auto;
     }
   }
@@ -216,7 +216,7 @@ const logout = async () => {
     display: none;
   }
 
-  .daisy-dropdown {
+  .daisy:dropdown {
     position: relative;
     display: inline-block;
     right: 0;
