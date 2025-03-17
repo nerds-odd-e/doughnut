@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy:join">
+  <div class="daisy-join">
     <PopButton title="Edit subscription">
       <template #button_face>
         <SvgEdit />
@@ -9,7 +9,7 @@
         @done="doneHandler($event)"
       />
     </PopButton>
-    <button class="daisy:btn daisy:btn-sm" title="Unsubscribe" @click="processForm()">
+    <button class="daisy-btn daisy-btn-sm" title="Unsubscribe" @click="processForm()">
       <SvgUnsubscribe />
     </button>
   </div>

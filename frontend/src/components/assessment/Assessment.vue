@@ -11,7 +11,7 @@
       <div v-else-if="localAssessmentAttempt?.submittedAt">
         <p>Your score: {{ localAssessmentAttempt.answersCorrect }} / {{ localAssessmentAttempt.totalQuestionCount }}</p>
         <div v-if="localAssessmentAttempt.isPass">
-          <div class="daisy:alert daisy:alert-success">
+          <div class="daisy-alert daisy-alert-success">
             You have passed the assessment.
           </div>
           <AssessmentClaimCertificate
@@ -20,7 +20,7 @@
           />
           <i v-else> (This is not a certifiable assessment.)</i>
         </div>
-        <div class="daisy:alert daisy-alert-danger" v-else="">You have not passed the assessment.</div>
+        <div class="daisy-alert daisy-alert-danger" v-else="">You have not passed the assessment.</div>
       </div>
     </div>
   </div>

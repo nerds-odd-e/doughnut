@@ -7,7 +7,7 @@
       v-model="formData.dailyTargetOfNewNotes"
       :error-message="errors.dailyTargetOfNewNotes"
     />
-    <input type="submit" value="Update" class="daisy:btn daisy:btn-primary" />
+    <input type="submit" value="Update" class="daisy-btn daisy-btn-primary" />
   </form>
 </template>
 

@@ -15,7 +15,7 @@ export const assumeNoteTargetSearchDialog = () => {
       return this
     },
     expectExactLinkTargets: (targets: string[]) => {
-      cy.get('.search-result .daisy\\:card-title')
+      cy.get('.search-result .daisy-card-title')
         .then((elms) => Cypress._.map(elms, 'innerText'))
         .should('deep.equal', targets)
     },

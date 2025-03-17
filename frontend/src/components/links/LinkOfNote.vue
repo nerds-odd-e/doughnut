@@ -1,9 +1,9 @@
 <template>
-  <span class="link-container daisy:inline-flex daisy:items-center daisy:gap-1">
+  <span class="link-container daisy-inline-flex daisy-items-center daisy-gap-1">
     <LinkNob v-bind="{ noteTopology }" v-if="!!reverse" :inverse-icon="true" />
     <router-link
       :to="{ name: 'noteShow', params: { noteId: note.id } }"
-      class="link-title daisy:no-underline daisy:font-medium daisy:hover:underline daisy:transition-all"
+      class="link-title daisy-no-underline daisy-font-medium hover:daisy-underline daisy-transition-all"
     >
       <NoteTitleComponent v-if="noteTopology" v-bind="{ noteTopology }" />
     </router-link>

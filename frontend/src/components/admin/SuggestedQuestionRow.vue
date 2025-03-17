@@ -9,14 +9,14 @@
       <div class="daisy-btn-group" role="group">
         <button
           v-if="!suggestedQuestion.positiveFeedback"
-          class="daisy:btn daisy:btn-sm"
+          class="daisy-btn daisy-btn-sm"
           @click="duplicateQuestion(suggestedQuestion)"
         >
           Duplicate
         </button>
-        <button class="daisy:btn daisy:btn-sm" @click="chatStarter">Chat</button>
+        <button class="daisy-btn daisy-btn-sm" @click="chatStarter">Chat</button>
         <button
-          class="daisy:btn daisy:btn-sm"
+          class="daisy-btn daisy-btn-sm"
           @click="deleteSuggestedQuestion(suggestedQuestion)"
         >
           Del

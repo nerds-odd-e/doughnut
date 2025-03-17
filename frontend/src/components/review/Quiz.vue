@@ -21,7 +21,7 @@
           />
         </div>
         <template v-else>
-         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy:mb-4">
+         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
             <NotebookLink :notebook="currentRecallPrompt.notebook" />
           </div>
           <ContestableQuestion
@@ -37,7 +37,7 @@
     </template>
     <button
       v-if="canMoveToEnd"
-      class="daisy:btn daisy:btn-ghost daisy:btn-circle"
+      class="daisy-btn daisy-btn-ghost daisy-btn-circle"
       title="Move to end of list"
       @click="moveToEnd"
     >

@@ -5,7 +5,7 @@
     v-bind="{ scopeName, field, options, errorMessage }"
   >
     <template #labelAddition="{ value }">
-      <div class="daisy:text-center">
+      <div class="daisy-text-center">
         <SvgLinkTypeIcon :link-type="value" :inverse-icon="inverseIcon" />
       </div>
     </template>

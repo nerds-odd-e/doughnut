@@ -16,7 +16,7 @@
           v-bind="{ noteTopology: targetNoteTopology }"
       /></strong>
     </div>
-    <button class="daisy:btn daisy:btn-secondary go-back-button" @click="$emit('goBack')">
+    <button class="daisy-btn daisy-btn-secondary go-back-button" @click="$emit('goBack')">
       <SvgGoBack />
     </button>
   </div>

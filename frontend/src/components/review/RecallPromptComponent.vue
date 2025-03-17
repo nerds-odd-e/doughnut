@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy:relative">
+  <div class="daisy-relative">
     <QuestionDisplay
       v-bind="{
         multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
@@ -9,11 +9,11 @@
       :disabled="isLoading"
     />
 
-    <div v-if="isLoading" class="daisy:absolute daisy:inset-0 daisy:bg-base-100/80 daisy:flex daisy:justify-center daisy:items-center daisy:z-50">
-      <span class="daisy:loading daisy:loading-spinner daisy:loading-lg"></span>
+    <div v-if="isLoading" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-flex daisy-justify-center daisy-items-center daisy-z-50">
+      <span class="daisy-loading daisy-loading-spinner daisy-loading-lg"></span>
     </div>
 
-    <div v-if="error" class="daisy:alert daisy:alert-error daisy:mt-4">
+    <div v-if="error" class="daisy-alert daisy-alert-error daisy-mt-4">
       <span>{{ error }}</span>
     </div>
   </div>

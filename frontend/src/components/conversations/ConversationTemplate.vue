@@ -1,6 +1,6 @@
 <template>
-  <div class="dialog-bar daisy:bg-base-300">
-    <div class="daisy:flex daisy:align-items-center daisy:gap-2">
+  <div class="dialog-bar daisy-bg-base-300">
+    <div class="daisy-flex daisy-align-items-center daisy-gap-2">
       <select
         v-if="conversations?.length && conversations.length > 1"
         class="conversation-select"
@@ -17,7 +17,7 @@
       </select>
       <button
         v-if="allowNewConversation"
-        class="daisy:btn daisy:btn-sm daisy-btn-outline-primary"
+        class="daisy-btn daisy-btn-sm daisy-btn-outline-primary"
         @click="$emit('new-conversation')"
         aria-label="New Conversation"
       >
@@ -25,7 +25,7 @@
       </button>
     </div>
     <div class="daisy-spacer"></div>
-    <div class="daisy:flex daisy:align-items-center daisy:gap-2">
+    <div class="daisy-flex daisy-align-items-center daisy-gap-2">
       <button
         class="maximize-button"
         @click="$emit('toggle-maximize')"
@@ -79,21 +79,21 @@
     <slot name="messages" />
   </div>
 
-  <div class="bottom-container daisy:bg-base-100">
+  <div class="bottom-container daisy-bg-base-100">
     <div v-if="defaultMessages" class="default-messages">
       <button
         v-for="(message, index) in defaultMessages"
         :key="index"
-        class="default-message-button daisy:bg-base-200 daisy:text-base-content"
+        class="default-message-button daisy-bg-base-200 daisy-text-base-content"
         @click="handleDefaultMessageClick(message)"
       >
         {{ message }}
       </button>
     </div>
 
-    <div class="chat-controls daisy:bg-base-100">
+    <div class="chat-controls daisy-bg-base-100">
       <form
-        class="chat-input-form daisy:bg-base-200"
+        class="chat-input-form daisy-bg-base-200"
         @submit.prevent="handleSendMessageWithAI()"
         :disabled="!trimmedMessage"
       >

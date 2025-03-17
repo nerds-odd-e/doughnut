@@ -62,21 +62,21 @@ onMounted(async () => {
 
 <template>
   <Popups />
-  <div class="daisy:flex daisy:h-dvh daisy:bg-base-100 daisy:text-base-content">
-    <div class="main-menu daisy:flex daisy:bg-neutral daisy:text-neutral-content daisy:z-10000">
+  <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
+    <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000]">
       <MainMenu
         :user="user"
         @update-user="user = $event"
       />
     </div>
-    <div class="daisy:flex daisy:flex-col daisy:grow path-and-content">
-      <div class="daisy:sticky daisy:top-0 daisy:z-100 global-bar">
+    <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
+      <div class="daisy-sticky daisy-top-0 daisy-z-100 global-bar">
         <GlobalBar
           v-bind="{ storageAccessor, user, apiStatus }"
           @update-user="user = $event"
         />
       </div>
-      <div class="daisy:grow daisy:overflow-y-auto main-content">
+      <div class="daisy-flex-grow daisy-overflow-y-auto main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
         <template v-else-if="userLoaded">
           <router-view v-slot="{ Component }">

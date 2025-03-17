@@ -1,5 +1,5 @@
 <template>
-  <div class="note-image daisy:text-center" v-if="!!noteImage">
+  <div class="note-image daisy-text-center" v-if="!!noteImage">
     <div style="position: relative; display: inline-block" id="note-image">
       <img :src="noteImage" />
       <svg

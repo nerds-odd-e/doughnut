@@ -1,5 +1,5 @@
 <template>
-  <table class="daisy:table">
+  <table class="daisy-table">
     <thead>
       <tr>
         <th scope="col">Stem</th>

@@ -1,12 +1,12 @@
 <template>
-  <div class="daisy:grid daisy:grid-cols-1 daisy:sm:grid-cols-2 daisy:md:grid-cols-2 daisy:lg:grid-cols-3 daisy:xl:grid-cols-4 daisy:gap-4">
+  <div class="daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 md:daisy-grid-cols-2 lg:daisy-grid-cols-3 xl:daisy-grid-cols-4 daisy-gap-4">
     <div
       v-for="notebook in notebooks"
       :key="notebook.id"
     >
       <NotebookCard :notebook="notebook">
         <template #cardHeader>
-          <span class="daisy:flex daisy:justify-end daisy:p-0">
+          <span class="daisy-flex daisy-justify-end daisy-p-0">
             <slot :notebook="notebook" />
           </span>
         </template>

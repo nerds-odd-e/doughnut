@@ -1,26 +1,26 @@
 <template>
   <div class="daisy-form-control">
-    <div v-if="beforeLabel" class="daisy:flex daisy:items-center daisy:gap-2">
+    <div v-if="beforeLabel" class="daisy-flex daisy-items-center daisy-gap-2">
       <slot />
-      <label v-if="!!field || !!title" :for="controlId" class="daisy:label">
+      <label v-if="!!field || !!title" :for="controlId" class="daisy-label">
         {{ titlized }}
       </label>
     </div>
     <template v-else>
-      <label v-if="!!field || !!title" :for="controlId" class="daisy:label">
+      <label v-if="!!field || !!title" :for="controlId" class="daisy-label">
         {{ titlized }}
       </label>
       <i v-if="hint" class="hint" v-text="hint" />
-      <div class="daisy:join">
+      <div class="daisy-join">
         <template v-if="$slots.input_prepend">
-          <div class="daisy:join-item">
+          <div class="daisy-join-item">
             <slot name="input_prepend" />
           </div>
         </template>
         <slot />
       </div>
     </template>
-    <div class="daisy:text-error daisy:text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>
+    <div class="daisy-text-error daisy-text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>
   </div>
 </template>
 

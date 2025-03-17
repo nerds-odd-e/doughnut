@@ -297,7 +297,7 @@ When(
     start.jumpToNotePage(parentNoteTitle)
     const matcher = new RegExp(`${noteTitle1}.*${noteTitle2}`, 'g')
 
-    cy.get('.daisy\\:card-title').then(($els) => {
+    cy.get('.daisy-card-title').then(($els) => {
       const texts = Array.from($els, (el) => el.innerText)
       expect(texts).to.match(matcher)
     })

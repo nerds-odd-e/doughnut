@@ -1,5 +1,5 @@
 <template>
-  <nav class="daisy:navbar daisy:bg-base-200">
+  <nav class="daisy-navbar daisy-bg-base-200">
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteNewButton
         button-title="Add Child Note"
@@ -30,7 +30,7 @@
 
       <a
         v-if="!conversationButton"
-        class="daisy:btn daisy:btn-ghost daisy:btn-sm"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         role="button"
         @click="() => router.push({
           name: 'noteShow',
@@ -43,17 +43,17 @@
       </a>
 
       <div v-if="note.wikidataId">
-        <div class="daisy:dropdown">
+        <div class="daisy-dropdown">
           <label
             role="button"
             tabindex="0"
-            class="daisy:btn daisy:btn-ghost daisy:btn-sm"
+            class="daisy-btn daisy-btn-ghost daisy-btn-sm"
             title="wikidata options"
           >
             <SvgWikidata />
           </label>
 
-          <ul tabindex="0" class="daisy-dropdown-content daisy:menu daisy:p-2 daisy:bg-base-300 daisy:rounded-box daisy:w-52 daisy:shadow daisy:z-50">
+          <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
             <li class="daisy-menu-item">
               <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
             </li>
@@ -86,29 +86,29 @@
         </template>
       </PopButton>
 
-      <button v-if="!asMarkdown" class="daisy:btn daisy:btn-ghost daisy:btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+      <button v-if="!asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <SvgMarkdown />
       </button>
-      <button v-else class="daisy:btn daisy:btn-ghost daisy:btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
+      <button v-else class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
         <SvgRichContent />
       </button>
 
-      <button class="daisy:btn daisy:btn-ghost daisy:btn-sm" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
+      <button class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
         <SvgAudioInput />
       </button>
 
-      <div class="daisy:dropdown daisy:dropdown-end">
+      <div class="daisy-dropdown daisy-dropdown-end">
         <button
           tabindex="0"
-          class="daisy:btn daisy:btn-ghost daisy:btn-sm"
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
           title="more options"
         >
           <SvgCog />
         </button>
-        <ul tabindex="0" class="daisy-dropdown-content daisy:menu daisy:p-2 daisy:bg-base-300 daisy:rounded-box daisy:w-52 daisy:shadow daisy:z-50">
+        <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
           <li>
             <PopButton
-              btn-class="daisy:w-full"
+              btn-class="daisy-w-full"
               title="Note Recall Settings"
             >
               <NoteInfoBar v-bind="{ noteId: note.id }" />
@@ -117,7 +117,7 @@
 
           <li>
             <PopButton
-              btn-class="daisy:w-full"
+              btn-class="daisy-w-full"
               title="Generate Image with DALL-E"
             >
               <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
@@ -126,7 +126,7 @@
 
           <li>
             <PopButton
-              btn-class="daisy:w-full"
+              btn-class="daisy-w-full"
               title="Edit Note Image"
             >
               <template #button_face>
@@ -144,7 +144,7 @@
 
           <li>
             <PopButton
-              btn-class="daisy:w-full"
+              btn-class="daisy-w-full"
               title="Edit Note URL"
             >
               <template #button_face>
@@ -162,7 +162,7 @@
 
           <li>
             <PopButton
-              btn-class="daisy:w-full"
+              btn-class="daisy-w-full"
               title="Questions for the note"
             >
               <Questions v-bind="{ note }" />
@@ -170,7 +170,7 @@
           </li>
           <li>
             <NoteDeleteButton
-              class="daisy:w-full"
+              class="daisy-w-full"
               v-bind="{ noteId: note.id, storageAccessor }"
             />
           </li>

@@ -1,12 +1,12 @@
 <template>
   <TeleportToHeadStatus v-if="title">
-    <h2 class="fs-4 daisy:text-2xl">{{ title }}</h2>
+    <h2 class="fs-4 daisy-text-2xl">{{ title }}</h2>
   </TeleportToHeadStatus>
 
   <div :class="[
-    'daisy:mx-auto',
-    { 'daisy:h-full daisy:min-h-full': props.fullHeight },
-    { 'daisy:container daisy:mt-3': !props.fullHeight }
+    'daisy-mx-auto',
+    { 'daisy-h-full daisy-min-h-full': props.fullHeight },
+    { 'daisy-container daisy-mt-3': !props.fullHeight }
   ]">
     <ContentLoader v-if="!contentLoaded" />
     <template v-else>

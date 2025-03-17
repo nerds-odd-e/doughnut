@@ -1,7 +1,7 @@
 <template>
-  <div class="conversation-container daisy:flex daisy:flex-col daisy:flex-1 min-h-0">
+  <div class="conversation-container daisy-flex daisy-flex-col daisy-flex-1 min-h-0">
     <!-- Upper half -->
-    <div v-if="!isMaximized" class="subject-container daisy:flex-1 daisy:overflow-auto daisy:p-4 daisy:border-b daisy:border-base-300">
+    <div v-if="!isMaximized" class="subject-container daisy-flex-1 daisy-overflow-auto daisy-p-4 daisy-border-b daisy-border-base-300">
       <NoteShow
         v-if="conversation.subject?.note?.id"
         v-bind="{
@@ -28,7 +28,7 @@
     </div>
 
     <!-- Lower half -->
-    <div class="daisy:flex-1 daisy:flex daisy:flex-col daisy:bg-base-200 min-h-0" :class="{ 'maximized': isMaximized }">
+    <div class="daisy-flex-1 daisy-flex daisy-flex-col daisy-bg-base-200 min-h-0" :class="{ 'maximized': isMaximized }">
       <ConversationInner
         v-bind="{
           conversation,

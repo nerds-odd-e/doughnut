@@ -1,6 +1,6 @@
 <template>
-  <div class="daisy:text-sm daisy:breadcrumbs daisy:max-w-full">
-    <ul class="daisy:m-0 daisy:pl-0">
+  <div class="daisy-text-sm daisy-breadcrumbs daisy-max-w-full">
+    <ul class="daisy-m-0 daisy-pl-0">
       <slot name="topLink" />
       <li
         v-for="noteTopology in ancestors"

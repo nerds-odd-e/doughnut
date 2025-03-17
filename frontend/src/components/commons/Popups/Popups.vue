@@ -13,13 +13,13 @@
         <div>
           <pre style="white-space: pre-wrap">{{ popupInfo.message }}</pre>
         </div>
-        <button class="daisy:btn daisy:btn-success" @click="resolve(true)">OK</button>
+        <button class="daisy-btn daisy-btn-success" @click="resolve(true)">OK</button>
       </template>
     </Modal>
 
     <Modal
       v-if="popupInfo.type === 'confirm'"
-      class="popups daisy:z-9998"
+      class="popups daisy-z-[9998]"
       :isPopup="true"
       @close_request="resolve(false)"
     >
@@ -30,8 +30,8 @@
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <button class="daisy:btn daisy:btn-success" @click="resolve(true)">OK</button>
-        <button class="daisy:btn daisy:btn-secondary" @click="resolve(false)">
+        <button class="daisy-btn daisy-btn-success" @click="resolve(true)">OK</button>
+        <button class="daisy-btn daisy-btn-secondary" @click="resolve(false)">
           Cancel
         </button>
       </template>

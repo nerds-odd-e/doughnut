@@ -6,12 +6,12 @@ const recallPage = () => {
       const [recalledTodayCount, toRecallCountForToday, totalCount] =
         numberOfRecalls.split('/')
 
-      cy.get('.daisy\\:progress-bar').should(
+      cy.get('.daisy-progress-bar').should(
         'contain',
         `Recalling: ${recalledTodayCount}/${toRecallCountForToday}`
       )
-      // Click progress bar to show tooltip - use force:true to click even when covered by another element
-      cy.get('.daisy\\:progress-bar').first().click({ force: true })
+      // Click progress bar to show tooltip
+      cy.get('.daisy-progress-bar').first().click()
 
       // Check tooltip content
       cy.get('.tooltip-content').within(() => {

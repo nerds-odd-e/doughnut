@@ -1,11 +1,11 @@
 <template>
   <TeleportToHeadStatus v-if="title">
-    <div class="daisy:shrink-0">
+    <div class="daisy-flex-shrink-0">
       <slot name="buttons" />
     </div>
-    <div class="daisy:grow" @click.prevent="$emit('showMore')">
+    <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
       <div
-        :class="['daisy:progress-bar', { thin : $slots.default !== undefined }]"
+        :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
         v-if="toRepeatCount !== null"
       >
         <span
@@ -39,7 +39,7 @@ defineSlots<{
 </script>
 
 <style lang="scss" scoped>
-.daisy:progress-bar {
+.daisy-progress-bar {
   width: 100%;
   background-color: gray;
   height: 25px;

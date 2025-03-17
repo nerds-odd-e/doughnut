@@ -14,11 +14,11 @@
         />
       </template>
     </PopButton>
-    <button class="daisy:btn" title="Start Assessment" @click="openAssessmentPage">
+    <button class="daisy-btn" title="Start Assessment" @click="openAssessmentPage">
       <SvgAssessment />
     </button>
   </div>
-  <div v-if="notebook.certifiable" class="daisy:p-1 certification-icon" >
+  <div v-if="notebook.certifiable" class="daisy-p-1 certification-icon" >
     <SvgCertifiedAssessment/>
   </div>
 </template>

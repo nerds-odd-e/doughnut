@@ -1,17 +1,17 @@
 <template>
-  <div class="note-show-container daisy:flex daisy:flex-col daisy:h-full">
+  <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
     <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
       <template #default="{ noteRealm }">
         <TeleportToHeadStatus>
           <button
             v-if="onToggleSidebar"
             role="button"
-            class="daisy:btn daisy:btn-sm daisy:btn-ghost"
+            class="daisy-btn daisy-btn-sm daisy-btn-ghost"
             :class="{ 'sidebar-expanded': isSidebarExpanded }"
             title="toggle sidebar"
             @click="(e: MouseEvent) => onToggleSidebar?.(e)"
           >
-          <div class="daisy:w-4 daisy:h-4">
+          <div class="daisy-w-4 daisy-h-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -58,10 +58,10 @@
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
-              class="note-content-wrapper daisy:flex-1 daisy:min-h-0 daisy:overflow-auto daisy:flex daisy:flex-col daisy:lg:flex-row daisy:gap-4"
+              class="note-content-wrapper daisy-flex-1 daisy-min-h-0 daisy-overflow-auto daisy-flex daisy-flex-col lg:daisy-flex-row daisy-gap-4"
               :class="{ minimized: isMinimized }"
             >
-              <div id="main-note-content" class="daisy:flex daisy:flex-col daisy:w-full daisy:lg:w-9/12">
+              <div id="main-note-content" class="daisy-flex daisy-flex-col daisy-w-full lg:daisy-w-9/12">
                 <NoteTextContent
                   v-bind="{
                     note: noteRealm.note,
@@ -81,7 +81,7 @@
                   }"
                 >
                   <p>
-                    <span class="daisy:mr-3">
+                    <span class="daisy-mr-3">
                       Created: {{ toLocalDateString(noteRealm.note.createdAt) }}
                     </span>
                     <span>
@@ -96,16 +96,16 @@
               </div>
               <div
 	        v-if="noteRealm.inboundReferences && noteRealm.inboundReferences?.length > 0"
-                class="daisy:w-full daisy:lg:w-3/12 daisy:border-l daisy:border-base-300 daisy:pl-4 daisy:bg-amber-50/50"
+                class="daisy-w-full lg:daisy-w-3/12 daisy-border-l daisy-border-base-300 daisy-pl-4 daisy-bg-amber-50/50"
 	      >
-                <h3 class="daisy:text-lg daisy:font-medium daisy:mb-2">Referenced by</h3>
-                <ul class="daisy:menu daisy:rounded-lg daisy:shadow-sm">
+                <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">Referenced by</h3>
+                <ul class="daisy-menu daisy-rounded-lg daisy-shadow-sm">
                   <li v-for="link in noteRealm.inboundReferences"
                       :key="link.id"
-                      class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy:transition-colors daisy:py-2"
+                      class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy-transition-colors daisy-py-2"
                   >
-                    <div class="daisy:flex daisy:items-center daisy:gap-2">
-                      <span class="daisy:text-sm daisy:text-base-content/70">
+                    <div class="daisy-flex daisy-items-center daisy-gap-2">
+                      <span class="daisy-text-sm daisy-text-base-content/70">
                         {{ reverseLabel(link.noteTopology.linkType) }}
                       </span>
                       <LinkOfNote

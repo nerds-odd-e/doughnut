@@ -13,12 +13,12 @@
 
   <div
     v-if="showTooltip"
-    class="tooltip-popup daisy:fixed daisy:inset-0 daisy:bg-black/50 daisy:flex daisy:justify-center daisy:items-center daisy:z-1000"
+    class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
     @click="showTooltip = false"
   >
-    <div class="tooltip-content daisy:bg-white daisy:p-4 daisy:rounded-lg daisy:shadow-lg">
-      <p class="daisy:my-2 daisy:text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-      <p class="daisy:my-2 daisy:text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+    <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
+      <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+      <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
     </div>
   </div>
 
@@ -44,17 +44,17 @@
       v-bind="{ result: currentAnsweredSpelling, storageAccessor }"
     />
     <template v-else-if="toRepeatCount === 0">
-      <div class="daisy:alert daisy:alert-success">
+      <div class="daisy-alert daisy-alert-success">
         You have finished all repetitions for this half a day!
       </div>
       <div>
-        <button role="button" class="daisy:btn daisy:btn-secondary" @click="loadMore(3)">
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(3)">
           Load more from next 3 days
         </button>
-        <button role="button" class="daisy:btn daisy:btn-secondary" @click="loadMore(7)">
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(7)">
           Load more from next 7 days
         </button>
-        <button role="button" class="daisy:btn daisy:btn-secondary" @click="loadMore(14)">
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(14)">
           Load more from next 14 days
         </button>
       </div>

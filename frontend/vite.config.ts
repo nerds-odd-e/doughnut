@@ -10,7 +10,7 @@ import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import tailwindcssPlugin from '@tailwindcss/postcss'
+import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import Inspector from 'unplugin-vue-inspector/vite'
 
@@ -50,7 +50,9 @@ const config = defineConfig({
     devSourcemap: true,
     postcss: {
       plugins: [
-        tailwindcssPlugin(),
+        tailwindcss({
+          config: './tailwind.config.ts',
+        }),
         autoprefixer(),
       ],
     },

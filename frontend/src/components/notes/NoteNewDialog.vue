@@ -1,6 +1,6 @@
 <template>
-  <div class="daisy:card daisy:w-full">
-    <div class="daisy:card-body">
+  <div class="daisy-card daisy-w-full">
+    <div class="daisy-card-body">
       <form @submit.prevent="processForm">
         <fieldset :disabled="processing">
           <div class="title-search-container">
@@ -35,7 +35,7 @@
           <input
             type="submit"
             value="Submit"
-            class="daisy:btn daisy:btn-primary daisy:mt-4"
+            class="daisy-btn daisy-btn-primary daisy-mt-4"
           />
         </fieldset>
       </form>

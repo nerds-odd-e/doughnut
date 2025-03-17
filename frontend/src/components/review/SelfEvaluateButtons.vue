@@ -1,14 +1,14 @@
 <template>
   <div class="daisy-btn-group">
     <button
-      class="daisy:btn daisy:btn-primary loading"
+      class="daisy-btn daisy-btn-primary loading"
       @click.once="$emit('self-evaluated-memory-state', true)"
       :disabled="!ready"
     >
       Yes, I remember
     </button>
     <button
-      class="daisy:btn daisy:btn-secondary"
+      class="daisy-btn daisy-btn-secondary"
       @click.once="$emit('self-evaluated-memory-state', false)"
     >
       No, I need more repetition

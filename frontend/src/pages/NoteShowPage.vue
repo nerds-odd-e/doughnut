@@ -3,23 +3,23 @@
     Instead of using a daisy-drawer, we're using a responsive layout with a sidebar that
     is either a static column on md+ screens or an overlay on smaller screens.
   -->
-  <div class="daisy:h-full daisy:relative daisy:flex">
+  <div class="daisy-h-full daisy-relative daisy-flex">
     <!-- Overlay mask for mobile -->
     <div
       v-if="!isMdOrLarger && sidebarOpened"
-      class="daisy:fixed daisy:inset-0 daisy:bg-black/50 daisy:z-30"
+      class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
       @click="sidebarOpened = false"
     ></div>
 
     <!-- Sidebar -->
     <aside
       :class="[
-        'daisy:bg-base-200 daisy:w-72 daisy:transition-all daisy:ease-in-out daisy:overflow-y-auto',
+        'daisy-bg-base-200 daisy-w-72 daisy-transition-all daisy-ease-in-out daisy-overflow-y-auto',
         isMdOrLarger
-          ? (sidebarOpened ? 'daisy:relative' : 'daisy:hidden')
+          ? (sidebarOpened ? 'daisy-relative' : 'daisy-hidden')
           : (sidebarOpened
-              ? 'daisy:translate-x-0 daisy:fixed daisy:top-0 daisy:left-0 daisy:z-40 daisy:h-full'
-              : 'daisy:-translate-x-full daisy:fixed daisy:top-0 daisy:left-0 daisy:h-full')
+              ? 'daisy-translate-x-0 daisy-fixed daisy-top-0 daisy-left-0 daisy-z-40 daisy-h-full'
+              : '-daisy-translate-x-full daisy-fixed daisy-top-0 daisy-left-0 daisy-h-full')
       ]"
     >
       <NoteSidebar
@@ -33,7 +33,7 @@
 
     <!-- Main Content -->
     <main
-      class="daisy:flex-1 daisy:p-4 daisy:container daisy:mx-auto daisy:overflow-y-auto"
+      class="daisy-flex-1 daisy-p-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
     >
       <NoteShow
         v-bind="{
@@ -48,7 +48,7 @@
         <template #note-conversation="{ noteRealm }">
           <div
             v-if="Boolean(route.query.conversation)"
-            class="conversation-wrapper daisy:border-t daisy:border-base-200 daisy:flex-1 daisy:flex daisy:flex-col daisy:bg-base-100/50"
+            class="conversation-wrapper daisy-border-t daisy-border-base-200 daisy-flex-1 daisy-flex daisy-flex-col daisy-bg-base-100/50"
           >
             <NoteConversation
               :note-id="noteRealm.id"

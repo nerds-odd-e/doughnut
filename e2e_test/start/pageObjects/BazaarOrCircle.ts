@@ -23,7 +23,7 @@ export const bazaarOrCircle = () => {
     expectCertificationIcon(notebook: string, exists: boolean) {
       const icon = cy
         .findByText(notebook)
-        .parents('.daisy\\:card')
+        .parents('.daisy-card')
         .find('.certification-icon')
       if (exists) {
         icon.should('exist')

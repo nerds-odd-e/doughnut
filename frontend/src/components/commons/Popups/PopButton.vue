@@ -1,6 +1,6 @@
 <template>
   <button
-    :class="`daisy:btn daisy:btn-ghost daisy:btn-sm ${btnClass ?? ''}`"
+    :class="`daisy-btn daisy-btn-ghost daisy-btn-sm ${btnClass ?? ''}`"
     :aria-label="ariaLabel"
     role="button"
     @click.prevent="show=true"

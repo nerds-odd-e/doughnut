@@ -1,5 +1,5 @@
 <template>
-  <table v-if="notebooks" class="daisy:table">
+  <table v-if="notebooks" class="daisy-table">
     <tbody>
       <tr v-for="bazaarNotebook in notebooks" :key="bazaarNotebook.id">
         <td>
@@ -9,7 +9,7 @@
         </td>
         <td>
           <button
-            class="daisy:btn daisy-btn-danger"
+            class="daisy-btn daisy-btn-danger"
             @click="removeFromBazaar(bazaarNotebook)"
           >
             Remove

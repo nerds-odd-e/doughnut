@@ -27,7 +27,7 @@ export const notebookCard = (notebook: string) => ({
   },
   importObsidianData(filename: string) {
     cy.findByText(notebook, { selector: '.notebook-card *' })
-      .parents('.daisy\\:card')
+      .parents('.daisy-card')
       .within(() => {
         cy.get('input[type="file"]').selectFile(
           `e2e_test/fixtures/${filename}`,

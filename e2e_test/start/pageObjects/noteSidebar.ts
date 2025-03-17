@@ -13,7 +13,7 @@ export const noteSidebar = () => {
           .parent()
           .parent()
           .within(() => {
-            cy.findByTitle('expand children').click({ force: true })
+            cy.findByTitle('expand children').click()
           })
       })
     },

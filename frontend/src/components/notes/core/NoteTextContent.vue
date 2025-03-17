@@ -1,5 +1,5 @@
 <template>
-  <div class="daisy:alert daisy:alert-warning" v-if="note.deletedAt">
+  <div class="daisy-alert daisy-alert-warning" v-if="note.deletedAt">
     This note has been deleted
   </div>
   <NoteTitleAsPredicate
