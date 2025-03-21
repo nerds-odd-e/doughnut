@@ -75,10 +75,10 @@ public class OpenAiApiHandler {
     try {
       Files.write(tempFile.toPath(), content.getBytes(), StandardOpenOption.WRITE);
       RequestBody fileRequestBody =
-          RequestBody.create(tempFile, MediaType.parse("application/octet-stream"));
+          RequestBody.create(MediaType.parse("application/octet-stream"), tempFile);
       MultipartBody.Part filePart =
           MultipartBody.Part.createFormData("file", tempFile.getName(), fileRequestBody);
-      RequestBody purposeBody = RequestBody.create(purpose, MediaType.parse("text/plain"));
+      RequestBody purposeBody = RequestBody.create(MediaType.parse("text/plain"), purpose);
       try {
         return blockGet(openAiApi.uploadFile(purposeBody, filePart)).getId();
       } catch (Exception e) {

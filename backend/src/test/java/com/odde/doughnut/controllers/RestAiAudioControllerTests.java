@@ -60,7 +60,7 @@ class RestAiAudioControllerTests {
 
   protected void mockTranscriptionSrtResponse(String responseBody) {
     when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
-        .thenReturn(Single.just(ResponseBody.create(responseBody, null)));
+        .thenReturn(Single.just(ResponseBody.create(null, responseBody)));
   }
 
   private MockMultipartFile createMockAudioFile(String filename) {

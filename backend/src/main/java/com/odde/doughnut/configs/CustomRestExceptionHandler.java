@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -26,17 +27,20 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
       final @NotNull HttpHeaders headers,
       final @NotNull HttpStatusCode status,
       final @NotNull WebRequest request) {
-    final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
-    if (ex instanceof BindException bindException) {
-      for (final FieldError error : bindException.getBindingResult().getFieldErrors()) {
-        apiError.add(error.getField(), error.getDefaultMessage());
-      }
-      for (final ObjectError error : bindException.getBindingResult().getGlobalErrors()) {
-        apiError.add(error.getObjectName(), error.getDefaultMessage());
-      }
-      return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-    }
     return super.handleExceptionInternal(ex, body, headers, status, request);
+  }
+
+  @ExceptionHandler({BindException.class})
+  public ResponseEntity<Object> handleBindException(
+      final BindException ex, final WebRequest request) {
+    final ApiError apiError = new ApiError("binding error", ApiError.ErrorType.BINDING_ERROR);
+    for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
+      apiError.add(error.getField(), error.getDefaultMessage());
+    }
+    for (final ObjectError error : ex.getBindingResult().getGlobalErrors()) {
+      apiError.add(error.getObjectName(), error.getDefaultMessage());
+    }
+    return new ResponseEntity<>(apiError, new HttpHeaders(), HttpStatus.BAD_REQUEST);
   }
 
   @Override

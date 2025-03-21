@@ -101,7 +101,7 @@ public final class OtherAiServices {
   }
 
   public String getTranscriptionFromAudio(String filename, byte[] bytes) throws IOException {
-    RequestBody requestFile = RequestBody.create(bytes, MediaType.parse("multipart/form-data"));
+    RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), bytes);
 
     MultipartBody.Part body = MultipartBody.Part.createFormData("file", filename, requestFile);
 

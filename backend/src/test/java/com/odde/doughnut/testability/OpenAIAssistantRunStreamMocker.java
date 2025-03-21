@@ -64,7 +64,7 @@ public final class OpenAIAssistantRunStreamMocker {
                         toSSEString("done", "DONE"))))
             .collect(Collectors.joining());
     ResponseBody responseBody =
-        ResponseBody.create(assistantSSEString, MediaType.parse("text/event-stream"));
+        ResponseBody.create(MediaType.parse("text/event-stream"), assistantSSEString);
     Call<ResponseBody> call = new ResponseBodyCallStub(responseBody);
 
     Mockito.doReturn(call).when(openAiApi).createRunStream(any(), any());
