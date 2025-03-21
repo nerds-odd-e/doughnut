@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": ">=23",
-    "pnpm": ">=10.6.3"
+    "pnpm": ">=10.6.5"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -33,23 +33,23 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@tailwindcss/postcss": "^4.0.14",
+    "@tailwindcss/postcss": "^4.0.15",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^22.13.10",
     "@types/turndown": "^5.0.5",
-    "@vitejs/plugin-vue": "^5.2.1",
-    "@vitejs/plugin-vue-jsx": "^4.1.1",
+    "@vitejs/plugin-vue": "^5.2.3",
+    "@vitejs/plugin-vue-jsx": "^4.1.2",
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.4.21",
-    "daisyui": "^5.0.4",
+    "daisyui": "^5.0.9",
     "es-toolkit": "^1.33.0",
     "jsdom": "^26.0.0",
     "optionator": "^0.9.4",
     "postcss": "^8.5.3",
     "postcss-load-config": "^6.0.1",
-    "sass-embedded": "^1.85.1",
-    "tailwindcss": "^4.0.14",
+    "sass-embedded": "^1.86.0",
+    "tailwindcss": "^4.0.15",
     "terser": "^5.39.0",
     "typescript": "5.8.2",
     "unplugin-auto-import": "^19.1.1",
@@ -58,7 +58,7 @@
     "unplugin-vue-router": "^0.12.0",
     "vite": "6.2.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "3.0.8",
+    "vitest": "3.0.9",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
     "vue-tsc": "2.2.8"
