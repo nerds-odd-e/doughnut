@@ -163,7 +163,7 @@
 
             # Restart biome daemon
             if [[ -d "/etc/nixos" ]]; then
-              BIOME_VERSION=$(node -p "require('./package.json').devDependencies.biome" 2>/dev/null || echo "")
+              BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']" 2>/dev/null || echo "")
               pgrep biome | xargs kill -9
               autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@''${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
             fi
@@ -171,19 +171,17 @@
             pnpm biome start
 
             # Setup Cypress with specific version
-            (
-              log "Setting up Cypress..."
-              CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
-              if [ -n "$CYPRESS_VERSION" ]; then
-                if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
-                  pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
-                fi
+            log "Setting up Cypress..."
+            CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
+            if [ -n "$CYPRESS_VERSION" ]; then
+              if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
+                pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
               fi
-            )
+            fi
+
             if [[ -d "/etc/nixos" ]]; then
               autoPatchelf "''${HOME}/.cache/Cypress/''${CYPRESS_VERSION}/Cypress/"
             fi
-            #export CYPRESS_CACHE_FOLDER="$PWD/.cypress-cache"
 
             # Start process-compose for MySQL only
             ./scripts/init_mysql.sh &
