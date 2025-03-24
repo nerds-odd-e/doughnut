@@ -71,10 +71,16 @@
               xorg.libXrandr
               xorg.libXrender
               xorg.libXtst
+              xorg.libXScrnSaver
+              xorg.libxshmfence
               gtk3
+              gtk2
+              glib
               nss
               alsa-lib
+              atk
               at-spi2-atk
+              libdrm
               dbus
               expat
               mesa
@@ -179,9 +185,11 @@
               fi
             fi
 
-            if [[ -d "/etc/nixos" ]]; then
+            if [[ "$OSTYPE" == "linux"* || -d "/etc/nixos" ]]; then
+              log "Patching Cypress binaries on Linux..."
               autoPatchelf "''${HOME}/.cache/Cypress/''${CYPRESS_VERSION}/Cypress/"
             fi
+            export CYPRESS_CACHE_FOLDER=$HOME/.cache/Cypress
 
             # Start process-compose for MySQL only
             ./scripts/init_mysql.sh &
