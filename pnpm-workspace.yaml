@@ -2,5 +2,8 @@ packages:
   - frontend
 onlyBuiltDependencies:
   - '@badeball/cypress-cucumber-preprocessor'
+  - '@biomejs/biome'
   - '@parcel/watcher'
+  - core-js-pure
   - cypress
+  - esbuild
