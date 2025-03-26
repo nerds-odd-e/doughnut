@@ -35,7 +35,7 @@
     "@biomejs/biome": "1.9.4",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
-    "@types/node": "^22.13.10",
+    "@types/node": "^22.13.13",
     "@types/turndown": "^5.0.5",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",
