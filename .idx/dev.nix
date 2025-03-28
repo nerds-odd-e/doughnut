@@ -22,7 +22,7 @@
     pkgs.jq
     pkgs.lsd
     pkgs.nixfmt-classic
-    pkgs.yamlint
+    pkgs.yamllint
     pkgs.psmisc
     pkgs.xclip
     pkgs.xorg.libX11
