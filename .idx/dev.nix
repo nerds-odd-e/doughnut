@@ -2,17 +2,55 @@
 # see: https://developers.google.com/idx/guides/customize-idx-env
 { pkgs, ... }: {
   # Which nixpkgs channel to use.
-  channel = "unstable"; # or "unstable"
+  channel = "stable-24.11"; # or "unstable"
 
   # Use https://search.nixos.org/packages to find packages
   packages = [
     pkgs.direnv
-    #pkgs.cypress
-    pkgs.corepack_22
-    pkgs.nodejs_22
-    pkgs.jdk22
+    pkgs.corepack_23
+    pkgs.nodejs_23
+    pkgs.zulu23
+    pkgs.git
+    pkgs.git-secret
+    pkgs.libmysqlclient
+    pkgs.mysql80
+    pkgs.mysql-client
+    pkgs.mysql_jdbc
     pkgs.bat
+    pkgs.fzf
+    pkgs.hclfmt
+    pkgs.jq
     pkgs.lsd
+    pkgs.nixfmt-classic
+    pkgs.yamlint
+    pkgs.psmisc
+    pkgs.xclip
+    pkgs.xorg.libX11
+    pkgs.xorg.libXcomposite
+    pkgs.xorg.libXdamage
+    pkgs.xorg.libXext
+    pkgs.xorg.libXfixes
+    pkgs.xorg.libXi
+    pkgs.xorg.libXrandr
+    pkgs.xorg.libXrender
+    pkgs.xorg.libXtst
+    pkgs.xorg.libXScrnSaver
+    pkgs.xorg.libxshmfence
+    pkgs.gtk3
+    pkgs.gtk2
+    pkgs.glib
+    pkgs.nss
+    pkgs.atk
+    pkgs.at-spi2-atk
+    pkgs.libdrm
+    pkgs.dbus
+    pkgs.expat
+    pkgs.mesa
+    pkgs.nspr
+    pkgs.udev
+    pkgs.cups
+    pkgs.pango
+    pkgs.cairo
   ];
 
   # Sets environment variables in the workspace
