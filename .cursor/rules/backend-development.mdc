@@ -1,12 +1,15 @@
 ---
 description: Backend development guildelines
 globs: backend/**/*.*
+alwaysApply: false
 ---
 # Backend Unit Test Practices
 
 ## Run Test in Terminal
 
-If starting a new terminal, please wait for the `nix develop` to be loaded by `direnv` first. And if `direnv` isn't configured, please run `nix develop` first. Then, to run the tests:
+Run `nix develop` first in any new terminal.
+
+Then, to run the tests:
 
 ```
 pnpm backend:verify

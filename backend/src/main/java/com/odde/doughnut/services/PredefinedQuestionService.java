@@ -45,8 +45,14 @@ public class PredefinedQuestionService {
   }
 
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
-    return aiQuestionGenerator.getQuestionContestResult(
-        predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
+    QuestionContestResult result =
+        aiQuestionGenerator.getQuestionContestResult(
+            predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
+    if (!result.rejected) {
+      predefinedQuestion.setContested(true);
+      modelFactoryService.save(predefinedQuestion);
+    }
+    return result;
   }
 
   public PredefinedQuestion generateAFeasibleQuestion(Note note) {

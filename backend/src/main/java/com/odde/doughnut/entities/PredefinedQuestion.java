@@ -38,6 +38,10 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   private boolean approved;
 
   @JsonIgnore
+  @Column(name = "is_contested")
+  private boolean contested;
+
+  @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
     mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());

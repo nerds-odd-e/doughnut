@@ -13,6 +13,7 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       "SELECT rp FROM RecallPrompt rp "
           + "JOIN rp.predefinedQuestion pq "
           + "WHERE pq.note = :note "
-          + "AND rp.answer IS NULL")
+          + "AND rp.answer IS NULL "
+          + "AND pq.contested = false")
   List<RecallPrompt> findUnansweredByNote(@Param("note") Note note);
 }

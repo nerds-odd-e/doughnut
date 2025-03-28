@@ -432,6 +432,49 @@ class RestRecallPromptControllerTests {
               .getSingleResult();
       assertThat(count, equalTo(2L));
     }
+
+    @Test
+    void shouldNotReuseContestedQuestions() {
+      // Create a note and memory tracker
+      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+      makeMe.aNote().under(note).please(); // Add another note to the notebook
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(currentUser).please();
+
+      // Create an existing unanswered recall prompt with a contested question
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      PredefinedQuestion contestedQuestion =
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+      contestedQuestion.setContested(true);
+      modelFactoryService.save(contestedQuestion);
+      RecallPrompt existingPrompt = makeMe.aRecallPrompt().please();
+      existingPrompt.setPredefinedQuestion(contestedQuestion);
+      modelFactoryService.save(existingPrompt);
+
+      // Mock the AI to generate a new question
+      MCQWithAnswer newQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(
+              newQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      // Ask for a question for the memory tracker
+      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
+
+      // Verify that a new prompt was returned
+      assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
+      assertThat(returnedPrompt.getPredefinedQuestion().isContested(), equalTo(false));
+
+      // Verify that a new prompt was created
+      long count =
+          modelFactoryService
+              .entityManager
+              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
+              .getSingleResult();
+      assertThat(count, equalTo(2L));
+    }
   }
 
   @Nested
@@ -453,6 +496,55 @@ class RestRecallPromptControllerTests {
       makeMe.refresh(currentUser.getEntity());
       AnsweredQuestion answeredQuestion = controller.showQuestion(recallPrompt);
       assertThat(answeredQuestion.recallPromptId, equalTo(recallPrompt.getId()));
+    }
+  }
+
+  @Nested
+  class ContestQuestion {
+    RecallPrompt recallPrompt;
+    Note note;
+    QuestionEvaluation questionEvaluation = new QuestionEvaluation();
+
+    @BeforeEach
+    void setUp() {
+      note = makeMe.aNote().please();
+      recallPrompt = makeMe.aRecallPrompt().approvedQuestionOf(note).please();
+      questionEvaluation.correctChoices = new int[] {0};
+      questionEvaluation.feasibleQuestion = false;
+      questionEvaluation.improvementAdvices = "This is a valid contest";
+    }
+
+    @Test
+    void shouldMarkQuestionAsContestedWhenContestIsAccepted() {
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      // When
+      QuestionContestResult result = controller.contest(recallPrompt);
+
+      // Then
+      assertThat(result.rejected, equalTo(false));
+      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
+    }
+
+    @Test
+    void shouldNotMarkQuestionAsContestedWhenContestIsRejected() {
+      questionEvaluation.feasibleQuestion = true;
+      openAIAssistantThreadMocker
+          .mockCreateRunInProcess("my-run-id")
+          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
+          .mockRetrieveRun()
+          .mockCancelRun("my-run-id");
+
+      // When
+      QuestionContestResult result = controller.contest(recallPrompt);
+
+      // Then
+      assertThat(result.rejected, equalTo(true));
+      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
     }
   }
 }

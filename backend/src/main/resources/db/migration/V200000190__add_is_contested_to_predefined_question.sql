@@ -1,0 +1,1 @@
+ALTER TABLE predefined_question ADD COLUMN is_contested BOOLEAN NOT NULL DEFAULT FALSE;
