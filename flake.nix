@@ -169,13 +169,17 @@
             corepack use pnpm@10.7.0
             pnpm --frozen-lockfile recursive install
 
-            # Restart biome daemon
+            # Restart biome daemon in a controlled manner
             if [[ -d "/etc/nixos" ]]; then
               BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']" 2>/dev/null || echo "")
-              pgrep biome | xargs kill -9
+              if pgrep biome >/dev/null; then
+                log "Stopping existing Biome daemon..."
+                pgrep biome | xargs kill -9 || true
+              fi
               autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@''${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
             fi
-            pnpm biome stop
+            pnpm biome stop || true
+            log "Starting Biome daemon..."
             pnpm biome start
 
             # Setup Cypress with specific version
@@ -183,6 +187,7 @@
             CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
             if [ -n "$CYPRESS_VERSION" ]; then
               if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
+                log "Installing Cypress version ''${CYPRESS_VERSION//\"}"
                 pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
               fi
             fi
@@ -193,8 +198,25 @@
             fi
             export CYPRESS_CACHE_FOLDER=$HOME/.cache/Cypress
 
-            # Start process-compose for MySQL only
-            ./scripts/init_mysql.sh &
+            # Start MySQL with proper process management
+            if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
+              log "Starting MySQL server..."
+              ./scripts/init_mysql.sh
+              MAX_RETRIES=30
+              RETRY_COUNT=0
+              while ! mysqladmin ping -h127.0.0.1 -P3309 --silent >/dev/null 2>&1; do
+                RETRY_COUNT=$((RETRY_COUNT + 1))
+                if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+                  log "Error: MySQL failed to start after $MAX_RETRIES attempts"
+                  return 1
+                fi
+                log "Waiting for MySQL to be ready... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+                sleep 1
+              done
+              log "MySQL is ready!"
+            else
+              log "MySQL is already running on port 3309"
+            fi
 
             # Setup Poetry if Python development is enabled
             if [ "${builtins.toString pythonDev}" = "true" ]; then
