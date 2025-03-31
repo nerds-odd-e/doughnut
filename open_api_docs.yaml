@@ -4642,6 +4642,21 @@ components:
     CodeInterpreterTool:
       allOf:
       - $ref: "#/components/schemas/Tool"
+    CompletionTokensDetails:
+      type: object
+      properties:
+        reasoning_tokens:
+          type: integer
+          format: int64
+        audio_tokens:
+          type: integer
+          format: int64
+        accepted_prediction_tokens:
+          type: integer
+          format: int64
+        rejected_prediction_tokens:
+          type: integer
+          format: int64
     Delta:
       type: object
       properties:
@@ -4872,6 +4887,15 @@ components:
           type: string
         delta:
           $ref: "#/components/schemas/Delta"
+    PromptTokensDetails:
+      type: object
+      properties:
+        cached_tokens:
+          type: integer
+          format: int64
+        audio_tokens:
+          type: integer
+          format: int64
     RequiredAction:
       type: object
       properties:
@@ -5170,6 +5194,10 @@ components:
         total_tokens:
           type: integer
           format: int64
+        prompt_tokens_details:
+          $ref: "#/components/schemas/PromptTokensDetails"
+        completion_tokens_details:
+          $ref: "#/components/schemas/CompletionTokensDetails"
     VectorStore:
       type: object
       properties:
