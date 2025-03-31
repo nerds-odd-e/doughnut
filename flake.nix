@@ -63,6 +63,7 @@
               psmisc
               xclip
               xorg.xorgserver
+              xorg.xauth
               xorg.libX11
               xorg.libXcomposite
               xorg.libXdamage

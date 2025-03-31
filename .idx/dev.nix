@@ -26,6 +26,7 @@
     pkgs.psmisc
     pkgs.xclip
     pkgs.xorg.xorgserver
+    pkgs.xorg.xauth
     pkgs.xorg.libX11
     pkgs.xorg.libXcomposite
     pkgs.xorg.libXdamage
@@ -58,6 +59,7 @@
   # Sets environment variables in the workspace
   env = {
     CYPRESS_XVFB_ARGS = "--server-num=1 --auth-num-lock --server-args=\"-screen 0 1280x720x24\"";
+    PATH = "$HOME/.local/bin:$PATH";
   };
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
@@ -94,7 +96,54 @@
       # Runs when the workspace is (re)started
       onStart = {
         nix-develop = "nix develop";
-        wrap-cypress = "mkdir -p $HOME/.local/bin && ln -sf $(which xvfb-run) $HOME/.local/bin/cypress && export PATH=$HOME/.local/bin:$PATH";
+        create-xvfb-wrapper = '''
+          mkdir -p $HOME/.local/bin
+          cat > $HOME/.local/bin/xvfb-run << 'EOF'
+          #!/bin/sh
+
+          # Custom xvfb-run script for Google IDX
+          XVFB=$(which Xvfb)
+          XAUTH=$(which xauth)
+          AUTHFILE=$(mktemp -p /tmp serverauth.XXXXXXXX)
+          ERRORFILE=$(mktemp -p /tmp xvfb-run.XXXXXXXX)
+          SCREEN_NUM=1
+          DISPLAY=:$SCREEN_NUM
+          
+          # Setup auth
+          touch $AUTHFILE
+          if [ -n "$XAUTH" ]; then
+            $XAUTH -f $AUTHFILE add $DISPLAY . $(mcookie)
+          fi
+          
+          # Start Xvfb
+          $XVFB $DISPLAY -screen 0 1280x720x24 -auth $AUTHFILE -nolisten tcp -nolisten unix &
+          XVFB_PID=$!
+          
+          # Wait for Xvfb to start
+          sleep 1
+          
+          # Run the command
+          DISPLAY=$DISPLAY "$@"
+          EXIT_CODE=$?
+          
+          # Cleanup
+          kill $XVFB_PID
+          rm -f $AUTHFILE $ERRORFILE
+          
+          exit $EXIT_CODE
+          EOF
+          
+          chmod +x $HOME/.local/bin/xvfb-run
+          
+          # Create Cypress wrapper script
+          cat > $HOME/.local/bin/cypress << 'EOF'
+          #!/bin/sh
+          # Wrapper to run Cypress with Xvfb
+          exec $HOME/.local/bin/xvfb-run $(which cypress.js) "$@"
+          EOF
+          
+          chmod +x $HOME/.local/bin/cypress
+        ''';
       };
     };
   };
