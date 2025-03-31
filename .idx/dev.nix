@@ -51,10 +51,14 @@
     pkgs.cups
     pkgs.pango
     pkgs.cairo
+    pkgs.makeWrapper
+    pkgs.xvfb
   ];
 
   # Sets environment variables in the workspace
-  env = {};
+  env = {
+    CYPRESS_XVFB_ARGS = "--server-num=1 --auth-num-lock --server-args=\"-screen 0 1280x720x24\"";
+  };
   idx = {
     # Search for the extensions you want on https://open-vsx.org/ and use "publisher.id"
     extensions = [
@@ -90,6 +94,7 @@
       # Runs when the workspace is (re)started
       onStart = {
         nix-develop = "nix develop";
+        wrap-cypress = "mkdir -p $HOME/.local/bin && ln -sf $(which xvfb-run) $HOME/.local/bin/cypress && export PATH=$HOME/.local/bin:$PATH";
       };
     };
   };
