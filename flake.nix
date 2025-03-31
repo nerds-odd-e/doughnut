@@ -62,6 +62,7 @@
             ++ lib.optionals (!stdenv.isDarwin) [
               psmisc
               xclip
+              xorg.xorgserver
               xorg.libX11
               xorg.libXcomposite
               xorg.libXdamage
