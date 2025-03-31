@@ -25,6 +25,7 @@
     pkgs.yamllint
     pkgs.psmisc
     pkgs.xclip
+    pkgs.xorg.xorgserver
     pkgs.xorg.libX11
     pkgs.xorg.libXcomposite
     pkgs.xorg.libXdamage
@@ -52,7 +53,6 @@
     pkgs.pango
     pkgs.cairo
     pkgs.makeWrapper
-    pkgs.xvfb
   ];
 
   # Sets environment variables in the workspace
