@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai.builder;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
-import com.odde.doughnut.services.graphRAG.BareNote;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.function.FunctionDefinition;
 import java.util.ArrayList;
@@ -16,15 +15,10 @@ public class OpenAIChatRequestBuilder {
   ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
-    OpenAIChatRequestBuilder builder =
-        new OpenAIChatRequestBuilder().model(modelName).addSystemMessage(systemInstruction);
-    String noteDescription = note.getNoteDescription();
-    BareNote bareNote = BareNote.fromNoteWithoutTruncate(note);
-    if ((bareNote.getDetails() != null && !bareNote.getDetails().trim().isEmpty())
-        || bareNote.getObjectUriAndTitle() != null) {
-      builder.addSystemMessage(noteDescription);
-    }
-    return builder;
+    return new OpenAIChatRequestBuilder()
+        .model(modelName)
+        .addSystemMessage(systemInstruction)
+        .addSystemMessage(note.getNoteDescription());
   }
 
   public OpenAIChatRequestBuilder model(String modelName) {

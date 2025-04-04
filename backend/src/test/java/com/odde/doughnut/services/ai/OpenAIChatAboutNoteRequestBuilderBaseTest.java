@@ -39,28 +39,6 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
     assertThat(content, containsString("object"));
   }
 
-  @Test
-  void shouldNotAddNoteDescriptionWhenEmpty() {
-    Note note = makeMe.aNote().details("").inMemoryPlease();
-    ChatCompletionRequest request =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note).build();
-    assertThat(request.getMessages().size(), equalTo(1)); // Only system instruction
-    assertThat(
-        request.getMessages().get(0).getTextContent(),
-        equalTo(OpenAIChatRequestBuilder.systemInstruction));
-  }
-
-  @Test
-  void shouldNotAddNoteDescriptionWhenNull() {
-    Note note = makeMe.aNote().details(null).inMemoryPlease();
-    ChatCompletionRequest request =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note).build();
-    assertThat(request.getMessages().size(), equalTo(1)); // Only system instruction
-    assertThat(
-        request.getMessages().get(0).getTextContent(),
-        equalTo(OpenAIChatRequestBuilder.systemInstruction));
-  }
-
   private static String getNoteOfFocusDescription(Note note) {
     ChatCompletionRequest request =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note).build();
