@@ -165,8 +165,8 @@
 
             # Configure pnpm and start Biome
             log "Setting up PNPM..."
-            corepack prepare pnpm@10.7.0 --activate
-            corepack use pnpm@10.7.0
+            corepack prepare pnpm@10.7.1 --activate
+            corepack use pnpm@10.7.1
             pnpm --frozen-lockfile recursive install
 
             # Restart biome daemon in a controlled manner
