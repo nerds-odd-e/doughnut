@@ -9,6 +9,7 @@ plugins {
   id 'org.springframework.boot' version '3.4.4'
   // Spotless for the code style
   id "com.diffplug.spotless" version "7.0.2"
+  id "com.github.ben-manes.versions" version "0.52.0"
 }
 
 apply plugin: 'io.spring.dependency-management'
