@@ -108,9 +108,20 @@
             eval "$LOG_FUNCTION"
 
             # Define error handler
-            export ERROR_HANDLER='handle_error() { local error_code="$2"; log "Warning: Command exited with status $error_code"; return 0; }'
+            export ERROR_HANDLER='handle_error() {
+              local error_code="$2"
+              log "Warning: Command exited with status $error_code"
+              # Ensure proper exit status propagation
+              if [ "$error_code" -ne 0 ]; then
+                exit "$error_code"
+              fi
+              return "$error_code"
+            }'
             eval "$ERROR_HANDLER"
             trap 'handle_error "0" "$?"' ERR
+
+            # Ensure proper shell termination handling
+            trap 'exit $?' EXIT INT TERM
 
             # Configure fzf
             export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
@@ -267,7 +278,9 @@
             printf "\n"
 
             log "Environment setup complete! 🎉"
-            return 0
+            # Explicitly signal completion to parent process
+            kill -SIGTERM $$ &>/dev/null || true
+            exit 0
           '';
         };
       });
