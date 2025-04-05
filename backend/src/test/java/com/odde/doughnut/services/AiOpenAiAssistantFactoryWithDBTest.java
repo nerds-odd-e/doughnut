@@ -11,8 +11,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -32,8 +31,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
   private AiQuestionGenerator aiQuestionGenerator;
   @Mock private OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
-  private OpenAIAssistantMocker openAIAssistantMocker;
-  private OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+  private OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
@@ -42,8 +40,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
         new GlobalSettingsService(makeMe.modelFactoryService);
     aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, globalSettingsService, new NonRandomizer());
-    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
   }
 
   @Nested
@@ -72,11 +69,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void rejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       QuestionContestResult contest =
           aiQuestionGenerator.getQuestionContestResult(
@@ -87,11 +80,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       QuestionContestResult contest =
           aiQuestionGenerator.getQuestionContestResult(
@@ -101,11 +90,7 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
     @Test
     void noFunctionCallInvoked() throws JsonProcessingException {
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunWithNoToolCalls()
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockNullChatCompletion();
 
       assertThrows(
           RuntimeException.class,

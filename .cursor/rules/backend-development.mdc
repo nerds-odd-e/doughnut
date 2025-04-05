@@ -8,7 +8,7 @@ alwaysApply: false
 ## Run Test in Terminal
 
 
-To run the tests:
+To run the tests, at the root level run command:
 
 ```
 nix develop -c pnpm backend:verify

@@ -62,15 +62,9 @@ export const questionGenerationService = () => ({
     cy.then(async () => {
       await mock_services
         .openAi()
-        .stubCreateRuns(threadId, ['run-123'])
-        .aRun('run-123')
-        .stubRetrieveRunsThatRequireAction([
-          {
-            response: 'evaluate_question',
-            arguments: JSON.stringify(record),
-          },
-        ])
+        .chatCompletion()
+        .requestMessageMatches({ role: 'user', content: 'Memory Assistant' })
+        .stubQuestionEvaluation(JSON.stringify(record))
     })
-    mock_services.openAi().stubRunCancellation(threadId, 'run-123')
   },
 })

@@ -5,8 +5,10 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +32,20 @@ public class NotebookAssistantForNoteService {
     return assistantService.createThread(messages, getNotebookAssistantInstructions());
   }
 
-  protected AssistantThread createThreadWithNoteInfo1(List<MessageRequest> additionalMessages) {
+  private String getGraphRAGDescription() {
     GraphRAGService graphRAGService =
         new GraphRAGService(new CharacterBasedTokenCountingStrategy());
     GraphRAGResult retrieve = graphRAGService.retrieve(note, 5000);
-    String prettyString = new ObjectMapper().valueToTree(retrieve).toPrettyString();
-    String noteDescription =
-        """
+    String prettyString = getObjectMapper().valueToTree(retrieve).toPrettyString();
+    return """
         Focus Note and the notes related to it:
         %s
         """
-            .formatted(prettyString);
+        .formatted(prettyString);
+  }
+
+  protected AssistantThread createThreadWithNoteInfo1(List<MessageRequest> additionalMessages) {
+    String noteDescription = getGraphRAGDescription();
     List<MessageRequest> messages = new ArrayList<>();
     messages.add(MessageRequest.builder().role("assistant").content(noteDescription).build());
     if (!additionalMessages.isEmpty()) {
@@ -53,7 +58,20 @@ public class NotebookAssistantForNoteService {
     return assistantService.getThread(threadId, getNotebookAssistantInstructions());
   }
 
-  private String getNotebookAssistantInstructions() {
+  public OpenAiApiHandler getOpenAiApiHandler() {
+    return assistantService.getOpenAiApiHandler();
+  }
+
+  public ObjectMapper getObjectMapper() {
+    return new ObjectMapper();
+  }
+
+  public OpenAIChatRequestBuilder createChatRequestBuilder(String modelName) {
+    String noteDescription = getGraphRAGDescription();
+    return new OpenAIChatRequestBuilder().model(modelName).addSystemMessage(noteDescription);
+  }
+
+  protected String getNotebookAssistantInstructions() {
     NotebookAiAssistant notebookAiAssistant = note.getNotebook().getNotebookAiAssistant();
     if (notebookAiAssistant == null) {
       return null;

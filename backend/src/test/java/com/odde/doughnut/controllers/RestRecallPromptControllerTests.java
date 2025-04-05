@@ -69,6 +69,13 @@ class RestRecallPromptControllerTests {
     // Initialize assistant mocker
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+
+    // Mock chat completion for question evaluation
+    QuestionEvaluation evaluation = new QuestionEvaluation();
+    evaluation.feasibleQuestion = false;
+    evaluation.correctChoices = new int[] {0};
+    evaluation.improvementAdvices = "This question needs improvement";
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
   }
 
   RestRecallPromptController nullUserController() {
@@ -293,11 +300,8 @@ class RestRecallPromptControllerTests {
 
     @Test
     void rejected() {
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      questionEvaluation.feasibleQuestion = true;
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
@@ -310,32 +314,25 @@ class RestRecallPromptControllerTests {
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
 
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      questionEvaluation.feasibleQuestion = true;
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       controller.contest(recallPrompt);
 
-      ArgumentCaptor<RunCreateRequest> argumentCaptor =
-          ArgumentCaptor.forClass(RunCreateRequest.class);
-      verify(openAiApi).createRun(any(), argumentCaptor.capture());
+      ArgumentCaptor<com.theokanning.openai.completion.chat.ChatCompletionRequest> argumentCaptor =
+          ArgumentCaptor.forClass(
+              com.theokanning.openai.completion.chat.ChatCompletionRequest.class);
+      verify(openAiApi).createChatCompletion(argumentCaptor.capture());
       assertThat(argumentCaptor.getValue().getModel(), equalTo("gpt-new"));
     }
 
     @Test
     void acceptTheContest() {
       questionEvaluation.feasibleQuestion = false;
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
-
-      QuestionContestResult contest = controller.contest(recallPrompt);
-      assertFalse(contest.rejected);
+      QuestionContestResult contestResult = controller.contest(recallPrompt);
+      assertFalse(contestResult.rejected);
     }
   }
 
@@ -516,11 +513,7 @@ class RestRecallPromptControllerTests {
 
     @Test
     void shouldMarkQuestionAsContestedWhenContestIsAccepted() {
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       // When
       QuestionContestResult result = controller.contest(recallPrompt);
@@ -533,11 +526,7 @@ class RestRecallPromptControllerTests {
     @Test
     void shouldNotMarkQuestionAsContestedWhenContestIsRejected() {
       questionEvaluation.feasibleQuestion = true;
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(questionEvaluation, "evaluate_question")
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       // When
       QuestionContestResult result = controller.contest(recallPrompt);

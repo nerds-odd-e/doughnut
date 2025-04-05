@@ -222,16 +222,23 @@ public class OpenAiApiHandler {
       InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
     ChatCompletionRequest chatRequest = openAIChatRequestBuilder.responseJsonSchema(tool).build();
 
-    return chatCompletion(chatRequest)
-        .map(ChatCompletionChoice::getMessage)
-        .map(AssistantMessage::getContent)
-        .map(
-            content -> {
-              try {
-                return new ObjectMapper().readTree(content);
-              } catch (JsonProcessingException e) {
-                return null;
-              }
-            });
+    try {
+      return chatCompletion(chatRequest)
+          .map(ChatCompletionChoice::getMessage)
+          .map(AssistantMessage::getContent)
+          .map(
+              content -> {
+                try {
+                  return new ObjectMapper().readTree(content);
+                } catch (JsonProcessingException e) {
+                  return null;
+                }
+              });
+    } catch (RuntimeException e) {
+      if (e.getCause() instanceof com.fasterxml.jackson.databind.exc.MismatchedInputException) {
+        return Optional.empty();
+      }
+      throw e;
+    }
   }
 }

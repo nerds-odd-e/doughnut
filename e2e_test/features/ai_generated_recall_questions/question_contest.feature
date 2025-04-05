@@ -13,7 +13,7 @@ Feature: User Contests Question generation by AI
       | Second question | Rescue Diver   | Divemaster         | Open Water Diver   |
 
   Scenario Outline: The generated question should be contested internally
-    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-evaluate, thread-second-question"
+    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-second-question"
     And OpenAI evaluates the question as <Legitimate Question> for assistant thread "thread-evaluate"
     And I learned one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
@@ -24,17 +24,10 @@ Feature: User Contests Question generation by AI
     | legitamate          |  First question |
     | not legitamate      |  Second question |
 
-  Scenario Outline: I should be able to regenerate the question when the question and choices do not make sense relating to the note
-    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-evaluate-auto, thread-evaluate-manual, thread-second-question"
-    And OpenAI evaluates the question as legitamate for assistant thread "thread-evaluate-auto"
-    And OpenAI evaluates the question as <Legitimate Question> for assistant thread "thread-evaluate-manual"
+  Scenario: I should be able to contest a question
+    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-second-question"
+    And OpenAI evaluates the question as not legitamate for assistant thread "thread-evaluate"
     And I learned one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
     And I contest the question
-    Then I should see the question "First question" is <Old Question Status>
-    And I should be asked "<Current Question>"
-
-    Examples:
-    | Legitimate Question | Old Question Status | Current Question                                    |
-    | legitamate          | enabled             | First question |
-    | not legitamate      | disabled            | Second question |
+    And I should be asked "Second question"

@@ -27,6 +27,12 @@
   - When removing assistant-based implementation
   - Then no functionality should be affected
   - And the codebase should be cleaner
+  - [ ] Refactor NoteQuestionGenerationService to remove OpenAiApiHandler dependency
+    - Scenario: When evaluating questions in NoteQuestionGenerationService
+    - Given the service needs to use chat completion
+    - When accessing OpenAI API functionality
+    - Then it should not need to get OpenAiApiHandler from assistantService
+    - And the dependencies should be properly injected
 
 ### Completed Tasks
 - [x] Investigated chat completion API capabilities for question evaluation

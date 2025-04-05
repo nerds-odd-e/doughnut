@@ -14,6 +14,10 @@ public final class OpenAiAssistant {
     this.assistantId = assistantId;
   }
 
+  public OpenAiApiHandler getOpenAiApiHandler() {
+    return openAiApiHandler;
+  }
+
   public AssistantThread getThread(String threadId, String additionalInstructions) {
     return new AssistantThread(assistantId, threadId, openAiApiHandler, additionalInstructions);
   }

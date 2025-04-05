@@ -21,6 +21,11 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   }
 
   public void mockChatCompletionAndReturnJsonSchema(Object result) {
+    if (result == null) {
+      mockNullChatCompletion();
+      return;
+    }
+
     ChatCompletionResult toBeReturned =
         MakeMe.makeMeWithoutFactoryService()
             .openAiCompletionResult()
@@ -28,6 +33,14 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
             .please();
 
     Mockito.doReturn(Single.just(toBeReturned))
+        .when(openAiApi)
+        .createChatCompletion(
+            ArgumentMatchers.argThat(
+                request -> request.getTools() == null || request.getTools().isEmpty()));
+  }
+
+  public void mockNullChatCompletion() {
+    Mockito.doReturn(Single.just(new ChatCompletionResult()))
         .when(openAiApi)
         .createChatCompletion(
             ArgumentMatchers.argThat(

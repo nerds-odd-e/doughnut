@@ -53,21 +53,32 @@ public class NoteQuestionGenerationService {
 
   public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question)
       throws JsonProcessingException {
-    MessageRequest message =
-        MessageRequest.builder()
-            .role("user")
-            .content(AiToolFactory.questionEvaluationAiTool(question).getMessageBody())
-            .build();
+    return evaluateQuestionWithChatCompletion(question);
+  }
 
-    QuestionEvaluation evaluation =
-        notebookAssistantForNoteService
-            .createThreadWithNoteInfo1(List.of(message))
-            .withTool(AiToolFactory.evaluateQuestion())
-            .withModelName(globalSettingsService.globalSettingEvaluation().getValue())
-            .run()
-            .getRunResult()
-            .getAssumedToolCallArgument(QuestionEvaluation.class);
+  private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(MCQWithAnswer question) {
+    var chatRequestBuilder =
+        notebookAssistantForNoteService.createChatRequestBuilder(
+            globalSettingsService.globalSettingEvaluation().getValue());
 
-    return Optional.ofNullable(evaluation);
+    String instructions = notebookAssistantForNoteService.getNotebookAssistantInstructions();
+    if (instructions != null && !instructions.trim().isEmpty()) {
+      chatRequestBuilder.addSystemMessage(instructions);
+    }
+
+    return notebookAssistantForNoteService
+        .getOpenAiApiHandler()
+        .requestAndGetJsonSchemaResult(
+            AiToolFactory.questionEvaluationAiTool(question), chatRequestBuilder)
+        .map(
+            jsonNode -> {
+              try {
+                return notebookAssistantForNoteService
+                    .getObjectMapper()
+                    .treeToValue(jsonNode, QuestionEvaluation.class);
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            });
   }
 }
