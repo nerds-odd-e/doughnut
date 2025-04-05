@@ -13,12 +13,14 @@ We usually don't run all the e2e test locally, since it will take too much time,
 nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
+Typically, the developer will start the backend, frontend, mountebank mock services manually.
 If any backend code is changed, the backend server will need to be restarted manually. In case it is running in the agent mode, please pause or stop and remind the programmer to restart the backend service before continue.
 
 ## Technology Stack
 - Cypress for E2E testing
 - Cucumber plugin for BDD-style tests
 - TypeScript for type safety and better IDE support
+- Mountebank is used to mock external services.
 
 ## Project Structure
 - `e2e_test` contains all the tests
@@ -26,6 +28,10 @@ If any backend code is changed, the backend server will need to be restarted man
 - `e2e_test/step_definitions` contains the step definitions for the tests
 - `e2e_test/start/` contains the page objects for the tests
 - `e2e_test/support/` contains the support files for the tests
+
+## Debugging
+
+The backend service log is located at `backend/logs/doughnut-e2e.log`. Please make sure only get tail from it.
 
 ## Key Practices
 
