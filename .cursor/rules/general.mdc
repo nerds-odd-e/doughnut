@@ -1,0 +1,41 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Running command in terminal
+
+This project use nix to manage the development envioroment. So we need to run `nix develop` once first in every new terminal window to start the nix enviroment. But right now there is a bug in the Cursor IDE that when in the Cursor agent mode, Cursor won't be able to detect the nix command finished running. So, for now, instead of `nix develop`, please always run
+
+```
+nix develop -c <command>
+```
+
+To run backend unit test:
+
+```
+nix develop -c pnpm backend:verify
+```
+
+
+To run frontend unit test:
+
+```
+nix develop -c pnpm frontend:test
+```
+
+# Development preferences
+
+## High Cohesion
+
+It is the top priority to keep high cohesion all the time.
+
+* Minimize the duplicate and make sure the same concept has one representation acroess the whole system
+* The code should have good mapping to the ubiquitous business domain
+* Thing belong together should be placed together or close by, so that they are easy to use
+
+## Keep it simple
+
+* DO NOT follow the defensive programming style
+* Use the simplest solution and minimum code to achieve what the prompt asked to do.

@@ -1,16 +1,17 @@
 ---
 description: Vue.js frontend development in the Doughnut project
 globs: frontend/**/*.{vue,ts}, frontend/tests/**/*.{ts,js}, frontend/src/**/*.{ts,vue}
+alwaysApply: false
 ---
 
 # Frontend Development Cursor Rules
 
 ## Run Test in Terminal
 
-If starting a new terminal, please wait for the `nix develop` to be loaded by `direnv` first. And if `direnv` isn't configured, please run `nix develop` first. Then, to run the tests at the root level:
+To run frontend tests in terminal:
 
 ```
-pnpm frontend:test
+nix develop -c pnpm frontend:test
 ```
 
 ## File Organization

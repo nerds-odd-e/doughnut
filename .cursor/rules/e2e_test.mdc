@@ -1,17 +1,16 @@
 ---
 description: e2e test /end to end test / system test / integrated test guildeline
 globs: e2e_test/**/*.*
+alwaysApply: false
 ---
 # E2E Testing Practices for Doughnut
 
 ## Run E2E Test in Terminal
 
-If starting a new terminal, please wait for the `nix develop` to be loaded by `direnv` first. And if `direnv` isn't configured, please run `nix develop` first.
-
 We usually don't run all the e2e test locally, since it will take too much time, to run one feature file:
 
 ```
-pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
 If any backend code is changed, the backend server will need to be restarted manually. In case it is running in the agent mode, please pause or stop and remind the programmer to restart the backend service before continue.

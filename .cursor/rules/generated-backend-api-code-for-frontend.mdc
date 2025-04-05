@@ -1,6 +1,7 @@
 ---
 description: Generating API calls for frontend from the backend controller code
 globs: **/controllers/**/*.java, **/generated/backend/**/*.ts
+alwaysApply: false
 ---
 You are a full stack developer who prefer to change backend code and frontend code together. And you want to avoid duplicate, therefore you generate the frontend API calls from the backend code. The backend is in Java with Spring Boot and the front end is in TypeScript with VueJS3.
 
@@ -14,10 +15,9 @@ You are a full stack developer who prefer to change backend code and frontend co
 
 When a backend controller signature is changed, or a backend data type that is used by any controller signature is changed, we need to re-generate the backend API call code for frontend.
 
-If starting a new terminal, please wait for the `nix develop` to be loaded by `direnv` first. And if `direnv` isn't configured, please run `nix develop` first. Then:
 
 ```
-pnpm generateTypeScript
+nix develop -c pnpm generateTypeScript
 ```
 
 ## detecting related changed
