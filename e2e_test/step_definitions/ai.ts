@@ -58,7 +58,7 @@ Given(
 )
 
 Given('OpenAI evaluates the question as legitamate', () => {
-  start.questionGenerationService().stubEvaluationQuestion('', {
+  start.questionGenerationService().stubEvaluationQuestion({
     feasibleQuestion: true,
     correctChoices: [0],
     improvementAdvices: 'Yes, this is a good question!',
@@ -66,7 +66,7 @@ Given('OpenAI evaluates the question as legitamate', () => {
 })
 
 Given('OpenAI evaluates the question as not legitamate', () => {
-  start.questionGenerationService().stubEvaluationQuestion('', {
+  start.questionGenerationService().stubEvaluationQuestion({
     feasibleQuestion: false,
     correctChoices: [0],
     improvementAdvices:

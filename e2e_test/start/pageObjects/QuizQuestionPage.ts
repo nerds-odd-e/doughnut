@@ -35,9 +35,11 @@ const assumeQuestionPage = (stem?: string) => {
               .toArray()
               .every(
                 (btn) =>
-                  !Cypress.$(btn).hasClass('is-disabled') &&
-                  !Cypress.$(btn).hasClass('disabled') &&
-                  !Cypress.$(btn).hasClass('daisy-opacity-65')
+                  !(
+                    Cypress.$(btn).hasClass('is-disabled') ||
+                    Cypress.$(btn).hasClass('disabled') ||
+                    Cypress.$(btn).hasClass('daisy-opacity-65')
+                  )
               )
           ).to.be.true
         })

@@ -56,7 +56,6 @@ export const questionGenerationService = () => ({
   },
 
   stubEvaluationQuestion: (
-    threadId: string,
     record: Record<string, boolean | string | number[]>
   ) => {
     cy.then(async () => {
