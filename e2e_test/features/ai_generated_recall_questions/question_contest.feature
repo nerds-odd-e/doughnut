@@ -14,7 +14,7 @@ Feature: User Contests Question generation by AI
 
   Scenario Outline: The generated question should be contested internally
     Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-second-question"
-    And OpenAI evaluates the question as <Legitimate Question> for assistant thread "thread-evaluate"
+    And OpenAI evaluates the question as <Legitimate Question>
     And I learned one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
     And I should be asked "<Current Question>"
@@ -26,7 +26,7 @@ Feature: User Contests Question generation by AI
 
   Scenario: I should be able to contest a question
     Given OpenAI assistant will create these thread ids in sequence: "thread-first-question, thread-second-question"
-    And OpenAI evaluates the question as not legitamate for assistant thread "thread-evaluate"
+    And OpenAI evaluates the question as not legitamate
     And I learned one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
     And I contest the question

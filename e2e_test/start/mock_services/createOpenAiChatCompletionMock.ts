@@ -83,22 +83,19 @@ const openAiChatCompletionStubber = (
       )
     },
     stubQuestionEvaluation(argumentsString: string) {
-      return serviceMocker.stubPoster(
-        `/chat/completions`,
-        {
-          object: 'chat.completion',
-          choices: [
-            {
-              message: {
-                role: 'assistant',
-                content: argumentsString,
-              },
-              index: 0,
-              finish_reason: 'stop',
+      return serviceMocker.stubPoster(`/chat/completions`, {
+        object: 'chat.completion',
+        choices: [
+          {
+            message: {
+              role: 'assistant',
+              content: argumentsString,
             },
-          ],
-        }
-      )
+            index: 0,
+            finish_reason: 'stop',
+          },
+        ],
+      })
     },
   }
 }

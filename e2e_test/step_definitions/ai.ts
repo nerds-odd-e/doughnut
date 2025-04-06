@@ -57,34 +57,29 @@ Given(
   }
 )
 
-Given(
-  'OpenAI evaluates the question as legitamate for assistant thread {string}',
-  (threadId: string) => {
-    start.questionGenerationService().stubEvaluationQuestion('', {
-      feasibleQuestion: true,
-      correctChoices: [0],
-      improvementAdvices: ""
-    })
-  }
-)
+Given('OpenAI evaluates the question as legitamate', () => {
+  start.questionGenerationService().stubEvaluationQuestion('', {
+    feasibleQuestion: true,
+    correctChoices: [0],
+    improvementAdvices: 'Yes, this is a good question!',
+  })
+})
 
-Given(
-  'OpenAI evaluates the question as not legitamate for assistant thread {string}',
-  (threadId: string) => {
-    start.questionGenerationService().stubEvaluationQuestion('', {
-      feasibleQuestion: false,
-      correctChoices: [0],
-      improvementAdvices: "This question is not feasible and needs to be regenerated completely."
-    })
+Given('OpenAI evaluates the question as not legitamate', () => {
+  start.questionGenerationService().stubEvaluationQuestion('', {
+    feasibleQuestion: false,
+    correctChoices: [0],
+    improvementAdvices:
+      'This question is not feasible and needs to be regenerated completely.',
+  })
 
-    start.questionGenerationService().stubAskingMCQ('thread-second-question', {
-      'Question Stem': 'Second question',
-      'Correct Choice': 'Rescue Diver',
-      'Incorrect Choice 1': 'Divemaster',
-      'Incorrect Choice 2': 'Open Water Diver'
-    })
-  }
-)
+  start.questionGenerationService().stubAskingMCQ('thread-second-question', {
+    'Question Stem': 'Second question',
+    'Correct Choice': 'Rescue Diver',
+    'Incorrect Choice 1': 'Divemaster',
+    'Incorrect Choice 2': 'Open Water Diver',
+  })
+})
 
 Then('I contest the question', () => {
   cy.findByRole('button', { name: "Doesn't make sense?" }).click()
