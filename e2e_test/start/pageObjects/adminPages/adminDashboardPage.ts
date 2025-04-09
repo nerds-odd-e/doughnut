@@ -9,6 +9,21 @@ export function assumeAdminDashboardPage() {
         shouldContain(content: string) {
           cy.get('body').should('contain', content)
         },
+        checkFailureReportItem(index = 0) {
+          cy.get('.failure-report')
+            .eq(index)
+            .find('input[type="checkbox"]')
+            .check()
+          return this
+        },
+        deleteSelected() {
+          cy.findByRole('button', { name: 'Delete Selected' }).click()
+          return this
+        },
+        shouldBeEmpty() {
+          cy.get('.failure-report').should('not.exist')
+          return this
+        },
       }
     },
 
