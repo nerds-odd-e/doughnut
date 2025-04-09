@@ -29,23 +29,30 @@ class TimestampOperationsTest {
 
   @Test
   void formatISOTimeToYearSupportingBC_handlesInvalidDay() {
-    // Invalid day "00" should be replaced with "01"
+    // Invalid day "00" should return just the month and year
     String result = TimestampOperations.formatISOTimeToYearSupportingBC("1170-01-00T00:00:00Z");
-    assertThat(result, equalTo("01 January 1170"));
+    assertThat(result, equalTo("January 1170"));
   }
 
   @Test
   void formatISOTimeToYearSupportingBC_handlesBothInvalidMonthAndDay() {
-    // Both invalid month and day "00-00" should be replaced with "01-01"
+    // Both invalid month and day "00-00" should return just the year
     String result = TimestampOperations.formatISOTimeToYearSupportingBC("1170-00-00T00:00:00Z");
-    assertThat(result, equalTo("01 January 1170"));
+    assertThat(result, equalTo("1170"));
   }
 
   @Test
   void formatISOTimeToYearSupportingBC_handlesInvalidBCDates() {
-    // Both invalid month and day in BC dates
+    // Both invalid month and day in BC dates should return just the year + B.C.
     String result = TimestampOperations.formatISOTimeToYearSupportingBC("-1170-00-00T00:00:00Z");
-    assertThat(result, equalTo("01 January 1171 B.C."));
+    assertThat(result, equalTo("1171 B.C."));
+  }
+
+  @Test
+  void formatISOTimeToYearSupportingBC_handlesInvalidBCDayOnly() {
+    // Invalid day in BC dates should return just the month and year + B.C.
+    String result = TimestampOperations.formatISOTimeToYearSupportingBC("-1170-10-00T00:00:00Z");
+    assertThat(result, equalTo("October 1171 B.C."));
   }
 
   @Test
@@ -57,7 +64,7 @@ class TimestampOperationsTest {
 
   @Test
   void formatISOTimeToYearSupportingBC_handlesSpecificHistoricalCase() {
-    // Test for Confucius birth date which has special handling
+    // Test for Confucius birth date
     String result = TimestampOperations.formatISOTimeToYearSupportingBC("-0552-10-09T00:00:00Z");
     assertThat(result, equalTo("09 October 0553 B.C."));
   }
