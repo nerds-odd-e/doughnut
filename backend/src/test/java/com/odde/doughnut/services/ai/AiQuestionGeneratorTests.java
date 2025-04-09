@@ -158,4 +158,34 @@ class AiQuestionGeneratorTests {
     assertThat(result.getMultipleChoicesQuestion().getChoices(), equalTo(shuffledChoices));
     assertThat(result.getCorrectChoiceIndex(), equalTo(1)); // "4" is now at index 1
   }
+
+  @Test
+  void shouldRejectQuestionWithInvalidChoiceIndex() {
+    // Setup a note with enough content for question generation
+    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    makeMe.aNote().under(note).please();
+
+    // Prepare an AI response with an invalid choice index (3 for a list of 3 choices)
+    MCQWithAnswer invalidQuestion =
+        makeMe
+            .aMCQWithAnswer()
+            .stem("What is 2+2?")
+            .choices("4", "3", "5") // 3 choices (indices 0-2)
+            .correctChoiceIndex(3) // Invalid index!
+            .please();
+
+    // Mock the assistant API calls
+    openAIAssistantThreadMocker
+        .mockCreateRunInProcess("my-run-id")
+        .aRunThatRequireAction(
+            invalidQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
+        .mockRetrieveRun()
+        .mockCancelRun("my-run-id");
+
+    // Act
+    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+
+    // Assert
+    assertThat(result, equalTo(null)); // Question should be rejected
+  }
 }

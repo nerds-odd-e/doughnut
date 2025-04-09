@@ -46,6 +46,12 @@ public class NoteQuestionGenerationService {
     if (question != null
         && question.getMultipleChoicesQuestion().getStem() != null
         && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {
+      // Validate the correct choice index is within bounds
+      int correctChoiceIndex = question.getCorrectChoiceIndex();
+      int choicesCount = question.getMultipleChoicesQuestion().getChoices().size();
+      if (correctChoiceIndex < 0 || correctChoiceIndex >= choicesCount) {
+        return null; // Reject questions with invalid choice indices
+      }
       return question;
     }
     return null;
