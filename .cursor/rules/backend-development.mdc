@@ -11,13 +11,13 @@ alwaysApply: false
 To run the tests, at the root folder level run command:
 
 ```
-nix develop -c pnpm backend:verify
+CURSOR_DEV=true nix develop -c pnpm backend:verify
 ```
 
 or, when there's no db migration needed, run the follow will be faster:
 
 ```
-nix develop -c pnpm backend:test_only
+CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 
 Always run all unit tests instead of just sepected file or test case, unlike for e2e test.
