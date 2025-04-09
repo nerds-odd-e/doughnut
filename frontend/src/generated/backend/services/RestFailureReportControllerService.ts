@@ -39,4 +39,22 @@ export class RestFailureReportControllerService {
             },
         });
     }
+    /**
+     * @param requestBody
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteFailureReports(
+        requestBody: Array<number>,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/failure-reports/delete',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

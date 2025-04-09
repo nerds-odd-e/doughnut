@@ -3,20 +3,34 @@
   <ContainerPage v-else v-bind="{ contentLoaded: failureReports !== undefined }">
     <div v-if="!!failureReports">
       <h2>Failure report list</h2>
+      <div v-if="selectedFailureReports.length > 0" class="mb-3">
+        <button class="btn btn-danger" @click="deleteSelected">Delete Selected</button>
+      </div>
       <div
         class="failure-report"
         v-for="element in failureReports"
         :key="element.id"
       >
-        {{ element.createDatetime }} :
-        <router-link
-          :to="{
-            name: 'failureReport',
-            params: { failureReportId: element.id },
-          }"
-        >
-          {{ element.errorName }}
-        </router-link>
+        <div class="d-flex align-items-center">
+          <input
+            type="checkbox"
+            :value="element.id"
+            v-model="selectedFailureReports"
+            class="me-2"
+          />
+          {{ element.createDatetime }} :
+          <router-link
+            :to="{
+              name: 'failureReport',
+              params: { failureReportId: element.id },
+            }"
+          >
+            {{ element.errorName }}
+          </router-link>
+        </div>
+      </div>
+      <div v-if="failureReports.length === 0" class="mt-3">
+        No failure reports found.
       </div>
     </div>
   </ContainerPage>
@@ -35,6 +49,7 @@ export default {
     return {
       failureReports: null,
       errorMessage: null,
+      selectedFailureReports: [],
     }
   },
   methods: {
@@ -49,6 +64,24 @@ export default {
             throw err
           }
           this.errorMessage = "It seems you cannot access this page."
+        })
+    },
+    deleteSelected() {
+      if (this.selectedFailureReports.length === 0) {
+        return
+      }
+
+      this.managedApi.restFailureReportController
+        .deleteFailureReports(this.selectedFailureReports)
+        .then(() => {
+          this.fetchData()
+          this.selectedFailureReports = []
+        })
+        .catch((err) => {
+          if (err.status === 401) {
+            throw err
+          }
+          this.errorMessage = "Error deleting failure reports."
         })
     },
   },

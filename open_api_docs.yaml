@@ -3359,6 +3359,29 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/failure-reports/delete:
+    delete:
+      tags:
+      - rest-failure-report-controller
+      operationId: deleteFailureReports
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+                format: int32
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
 components:
   schemas:
     Circle:

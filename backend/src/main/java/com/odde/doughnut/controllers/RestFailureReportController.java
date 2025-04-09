@@ -6,8 +6,11 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -50,5 +53,21 @@ class RestFailureReportController {
     failureReportForView.githubIssueUrl =
         realGithubService.getIssueUrl(failureReport.getIssueNumber());
     return failureReportForView;
+  }
+
+  @DeleteMapping("/delete")
+  public void deleteFailureReports(@RequestBody List<Integer> ids)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertLoggedIn();
+    currentUser.assertAdminAuthorization();
+    ids.forEach(
+        id -> {
+          modelFactoryService
+              .failureReportRepository
+              .findById(id)
+              .ifPresent(
+                  failureReport ->
+                      modelFactoryService.failureReportRepository.delete(failureReport));
+        });
   }
 }
