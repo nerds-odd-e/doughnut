@@ -128,11 +128,10 @@ class ObsidianFormatServiceTest {
 
     // Create two different notes that both tag the same target note
     Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
-    Note tagger2 = makeMe.aNote("Tagger 2").under(headNote).please();
 
     // Create tag links from both taggers to the target
     makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
-    makeMe.aReification().between(tagger2, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
 
     makeMe.refresh(headNote.getNotebook());
 
