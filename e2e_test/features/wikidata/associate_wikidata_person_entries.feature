@@ -24,7 +24,7 @@ Feature: Note creation should have details if wikidata is a person
     Examples:
       | person name     | Wikidata Id | expected details         |
       | Wang Chien-ming | Q706446     | Taiwan, 31 March 1980    |
-      | Confucius       | Q4604       | Lu, 09 October 0552 B.C. |
+      | Confucius       | Q4604       | Lu, 09 October 0553 B.C. |
 
 
   @usingMockedWikidataService
