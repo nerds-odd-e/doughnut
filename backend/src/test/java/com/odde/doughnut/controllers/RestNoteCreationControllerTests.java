@@ -199,7 +199,7 @@ class RestNoteCreationControllerTests {
              WikidataId | Birthday from Wikidata | CountryQID | Country Name | Expected Birthday    | Name
             #---------------------------------------------------------------------------------------------
              Q706446    | +1980-03-31T00:00:00Z  |            |              | 31 March 1980        |
-             Q4604      | -0552-10-09T00:00:00Z  | Q736936    |              | 09 October 0552 B.C. | Confucius
+             Q4604      | -0552-10-09T00:00:00Z  | Q736936    |              | 09 October 0553 B.C. | Confucius
              Q706446    | +1980-03-31T00:00:00Z  | Q865       | Taiwan       | 31 March 1980        | Wang Chen-ming
              Q706446    |                        | Q865       | Taiwan       |                      |
              Q706446    | +1980-03-31T00:00:00Z  | Q30        | The US of A  |  31 March 1980       |
