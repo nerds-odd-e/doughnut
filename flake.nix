@@ -29,9 +29,73 @@
         inherit (pkgs) stdenv lib;
         apple_sdk = pkgs.darwin.apple_sdk.frameworks;
 
-        # Check for PYTHON_DEV environment variable
-        pythonDev = builtins.getEnv "PYTHON_DEV" == "true";
-        pythonPackages = if pythonDev then [ pkgs.python313 pkgs.poetry ] else [];
+        # Env var to check whether to run more nix init steps (helps speeds up CURSOR agent mode)
+        cursorDevEnv = builtins.getEnv "CURSOR_DEV";
+        # Env var to conditionally include Python packages
+        pythonDevEnv = builtins.getEnv "PYTHON_DEV";
+        pythonDev = pythonDevEnv == "true";
+        poetryPath = "${pkgs.poetry}/bin";
+        pythonPackages = if pythonDev then [
+          pkgs.python313
+          pkgs.poetry
+          pkgs.python313Packages.pip
+          pkgs.python313Packages.setuptools
+          pkgs.python313Packages.wheel
+        ] else [];
+
+        basePackages = with pkgs; [
+          zulu23
+          nodejs_23
+          corepack_23
+          git
+          git-secret
+          gitleaks
+          jq
+          libmysqlclient
+          mysql80
+          mysql-client
+          mysql_jdbc
+          yamllint
+          nixfmt-classic
+          hclfmt
+          fzf
+        ];
+
+        darwinPackages = with pkgs; lib.optionals stdenv.isDarwin [ sequelpro ];
+
+        linuxPackages = with pkgs; lib.optionals (!stdenv.isDarwin) [
+          psmisc
+          xclip
+          xorg.xorgserver
+          xorg.xauth
+          xorg.libX11
+          xorg.libXcomposite
+          xorg.libXdamage
+          xorg.libXext
+          xorg.libXfixes
+          xorg.libXi
+          xorg.libXrandr
+          xorg.libXrender
+          xorg.libXtst
+          xorg.libXScrnSaver
+          xorg.libxshmfence
+          gtk3
+          gtk2
+          glib
+          nss
+          alsa-lib
+          atk
+          at-spi2-atk
+          libdrm
+          dbus
+          expat
+          mesa
+          nspr
+          udev
+          cups
+          pango
+          cairo
+        ];
       in {
         devShells.default = pkgs.mkShell {
           name = "doughnut";
@@ -40,24 +104,10 @@
               autoPatchelfHook
             ];
           buildInputs = with pkgs;
-            [
-              zulu23
-              nodejs_23
-              corepack_23
-              git
-              git-secret
-              gitleaks
-              jq
-              libmysqlclient
-              mysql80
-              mysql-client
-              mysql_jdbc
-              yamllint
-              nixfmt-classic
-              hclfmt
-              fzf
-            ]
+            basePackages
             ++ pythonPackages
+            ++ darwinPackages
+            ++ linuxPackages
             ++ lib.optionals stdenv.isDarwin [ sequelpro ]
             ++ lib.optionals (!stdenv.isDarwin) [
               psmisc
@@ -144,8 +194,9 @@
             export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
             export NODE_PATH="$(dirname $(dirname $(readlink -f $(which node))))"
             export PNPM_HOME="$(dirname $(dirname $(readlink -f $(which pnpm))))"
-            # Only set PYTHON_PATH if Python is available
-            if command -v python >/dev/null 2>&1; then
+
+            # Only set PYTHON_PATH if PYTHON_DEV is true and Python is available
+            if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
               export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
               export PATH=$JAVA_HOME/bin:$NODE_PATH/bin:$PNPM_HOME/bin:$PYTHON_PATH/bin:$PATH
             else
@@ -163,64 +214,73 @@
             export MYSQLX_TCP_PORT="33090"
             export MYSQL_LOG_FILE="''${MYSQL_HOME}/mysql.log"
 
-            # Configure pnpm and start Biome
-            log "Setting up PNPM..."
-            corepack prepare pnpm@10.8.0 --activate
-            corepack use pnpm@10.8.0
-            pnpm --frozen-lockfile recursive install
+            echo "CURSOR_DEV: ''${CURSOR_DEV:-}"
+            if [ "''${CURSOR_DEV:-}" != "true" ]; then
+              # Configure pnpm and start Biome
+              log "Setting up PNPM..."
+              corepack prepare pnpm@10.8.0 --activate
+              corepack use pnpm@10.8.0
+              pnpm --frozen-lockfile recursive install
 
-            # Restart biome daemon in a controlled manner
-            if [[ -d "/etc/nixos" ]]; then
-              BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']" 2>/dev/null || echo "")
-              if pgrep biome >/dev/null; then
-                log "Stopping existing Biome daemon..."
-                pgrep biome | xargs kill -9 || true
-              fi
-              autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@''${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
-            fi
-            pnpm biome stop || true
-            log "Starting Biome daemon..."
-            pnpm biome start
-
-            # Setup Cypress with specific version
-            log "Setting up Cypress..."
-            CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
-            if [ -n "$CYPRESS_VERSION" ]; then
-              if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
-                log "Installing Cypress version ''${CYPRESS_VERSION//\"}"
-                pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
-              fi
-            fi
-
-            if [[ "$OSTYPE" == "linux"* || -d "/etc/nixos" ]]; then
-              log "Patching Cypress binaries on Linux..."
-              autoPatchelf "''${HOME}/.cache/Cypress/''${CYPRESS_VERSION}/Cypress/"
-            fi
-            export CYPRESS_CACHE_FOLDER=$HOME/.cache/Cypress
-
-            # Start MySQL with proper process management
-            if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
-              log "Starting MySQL server..."
-              ./scripts/init_mysql.sh
-              MAX_RETRIES=30
-              RETRY_COUNT=0
-              while ! mysqladmin ping -h127.0.0.1 -P3309 --silent >/dev/null 2>&1; do
-                RETRY_COUNT=$((RETRY_COUNT + 1))
-                if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-                  log "Error: MySQL failed to start after $MAX_RETRIES attempts"
-                  return 1
+              # Restart biome daemon in a controlled manner
+              if [[ -d "/etc/nixos" ]]; then
+                BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']" 2>/dev/null || echo "")
+                if pgrep biome >/dev/null; then
+                  log "Stopping existing Biome daemon..."
+                  pgrep biome | xargs kill -9 || true
                 fi
-                log "Waiting for MySQL to be ready... (attempt $RETRY_COUNT/$MAX_RETRIES)"
-                sleep 1
-              done
-              log "MySQL is ready!"
-            else
-              log "MySQL is already running on port 3309"
+                autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@''${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
+              fi
+              pnpm biome stop || true
+              log "Starting Biome daemon..."
+              pnpm biome start
+
+              # Setup Cypress with specific version
+              log "Setting up Cypress..."
+              CYPRESS_VERSION=$(node -p "require('./package.json').devDependencies.cypress" 2>/dev/null || echo "")
+              if [ -n "$CYPRESS_VERSION" ]; then
+                if [[ ! -d "$HOME/.cache/Cypress/''${CYPRESS_VERSION//\"}" ]] && [[ ! -d "$HOME/Library/Caches/Cypress/''${CYPRESS_VERSION//\"}" ]]; then
+                  log "Installing Cypress version ''${CYPRESS_VERSION//\"}"
+                  pnpx cypress install --version ''${CYPRESS_VERSION//\"} --force
+                fi
+              fi
+
+              if [[ "$OSTYPE" == "linux"* || -d "/etc/nixos" ]]; then
+                log "Patching Cypress binaries on Linux..."
+                autoPatchelf "''${HOME}/.cache/Cypress/''${CYPRESS_VERSION}/Cypress/"
+              fi
+              export CYPRESS_CACHE_FOLDER=$HOME/.cache/Cypress
+
+              # Start MySQL with proper process management
+              if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
+                log "Starting MySQL server..."
+                ./scripts/init_mysql.sh
+                MAX_RETRIES=30
+                RETRY_COUNT=0
+                while ! mysqladmin ping -h127.0.0.1 -P3309 --silent >/dev/null 2>&1; do
+                  RETRY_COUNT=$((RETRY_COUNT + 1))
+                  if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+                    log "Error: MySQL failed to start after $MAX_RETRIES attempts"
+                    return 1
+                  fi
+                  log "Waiting for MySQL to be ready... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+                  sleep 1
+                done
+                log "MySQL is ready!"
+              else
+                log "MySQL is already running on port 3309"
+              fi
             fi
 
-            # Setup Poetry if Python development is enabled
-            if [ "${builtins.toString pythonDev}" = "true" ]; then
+            # Setup Python and Poetry if Python development is enabled
+            echo "PYTHON_DEV: ''${PYTHON_DEV:-}"
+            if [ "''${PYTHON_DEV:-}" = "true" ]; then
               log "Setting up Python development environment..."
+              # Add poetry to PATH explicitly
+              export PATH=${poetryPath}:$PATH
+              log "Checking poetry installation..."
+              log "Poetry binary should be at: ${poetryPath}/poetry"
+              which poetry || log "Poetry not found in PATH: $PATH"
               if command -v poetry >/dev/null 2>&1; then
                 poetry --version
                 # Configure poetry to create virtual environments in the project directory

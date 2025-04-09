@@ -11,7 +11,7 @@ alwaysApply: false
 To run frontend tests in terminal:
 
 ```
-nix develop -c pnpm frontend:test
+CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
 ## File Organization
