@@ -8,7 +8,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -18,6 +20,7 @@ public class ObsidianFormatService {
 
   private final NoteConstructionService noteConstructionService;
   private final ModelFactoryService modelFactoryService;
+  private final Set<String> usedPaths = new HashSet<>();
 
   public ObsidianFormatService(User user, ModelFactoryService modelFactoryService) {
     TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -31,6 +34,9 @@ public class ObsidianFormatService {
     try (var baos = new ByteArrayOutputStream();
         var zos = new ZipOutputStream(baos)) {
 
+      // Clear the used paths set before starting a new export
+      usedPaths.clear();
+
       writeNoteToZip(headNote, zos, "");
 
       zos.close();
@@ -40,6 +46,15 @@ public class ObsidianFormatService {
 
   private void writeNoteToZip(Note note, ZipOutputStream zos, String path) throws IOException {
     String filePath = generateFilePath(path, note);
+
+    // Skip if this path was already used
+    if (usedPaths.contains(filePath)) {
+      return;
+    }
+
+    // Add the path to the set of used paths
+    usedPaths.add(filePath);
+
     String fileContent = generateMarkdownContent(note);
     zos.putNextEntry(new ZipEntry(filePath));
     zos.write(fileContent.getBytes());

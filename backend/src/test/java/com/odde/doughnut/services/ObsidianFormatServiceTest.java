@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -95,5 +96,51 @@ class ObsidianFormatServiceTest {
     assertThat(
         zipContents.get("Root Note/Parent Note/Leaf Note.md"),
         containsString("# Leaf Note\nLeaf Content"));
+  }
+
+  @Test
+  void shouldNotFailWhenANoteIsTaggedTwiceByTheSameTarger() throws IOException {
+    // Arrange
+    Note targetNote = makeMe.aNote("Tagged Note").details("This note is tagged").please();
+
+    // Create two different notes that both tag the same target note
+    Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
+
+    // Create tag links from both taggers to the target
+    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+
+    makeMe.refresh(headNote.getNotebook());
+
+    // Act & Assert
+    // This should throw a ZipException for duplicate entry
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(headNote);
+
+    // The test should never reach this point because of the exception
+    Map<String, String> zipContents = extractZipContents(zipBytes);
+    assertThat(zipContents.size(), org.hamcrest.Matchers.greaterThan(0));
+  }
+
+  @Test
+  void shouldNotFailWhenSameNoteIsTaggedByDifferentTaggers() throws IOException {
+    // Arrange
+    Note targetNote = makeMe.aNote("Tagged Note").details("This note is tagged").please();
+
+    // Create two different notes that both tag the same target note
+    Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
+    Note tagger2 = makeMe.aNote("Tagger 2").under(headNote).please();
+
+    // Create tag links from both taggers to the target
+    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aReification().between(tagger2, targetNote, LinkType.TAGGED_BY).please();
+
+    makeMe.refresh(headNote.getNotebook());
+
+    // Act & Assert
+    byte[] zipBytes = obsidianFormatService.exportToObsidian(headNote);
+
+    // The test should pass now with our fix
+    Map<String, String> zipContents = extractZipContents(zipBytes);
+    assertThat(zipContents.size(), org.hamcrest.Matchers.greaterThan(0));
   }
 }

@@ -6,7 +6,7 @@ alwaysApply: true
 
 # Running command in terminal
 
-This project use nix to manage the development envioroment. So we need to run `nix develop` once first in every new terminal window to start the nix enviroment. But right now there is a bug in the Cursor IDE that when in the Cursor agent mode, Cursor won't be able to detect the nix command finished running. So, for now, instead of `nix develop`, please always run
+This project use nix to manage the development envioroment. So we need to run `nix develop` once first in every new terminal window to start the nix enviroment. But right now there is a bug in the Cursor IDE that when in the Cursor agent mode, Cursor won't be able to detect the nix command finished running. So, for now, instead of `nix develop`, please always at the root folder run
 
 ```
 nix develop -c <command>
