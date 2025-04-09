@@ -122,16 +122,16 @@ class ObsidianFormatServiceTest {
   }
 
   @Test
-  void shouldNotFailWhenSameNoteIsTaggedByDifferentTaggers() throws IOException {
+  void shouldNotFailWhenSameNoteIsTaggedByDifferentTaggets() throws IOException {
     // Arrange
     Note targetNote = makeMe.aNote("Tagged Note").details("This note is tagged").please();
 
     // Create two different notes that both tag the same target note
-    Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
+    Note childWithTags = makeMe.aNote("Tagger 1").under(headNote).please();
 
     // Create tag links from both taggers to the target
-    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
-    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aReification().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aReification().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
 
     makeMe.refresh(headNote.getNotebook());
 
@@ -141,5 +141,14 @@ class ObsidianFormatServiceTest {
     // The test should pass now with our fix
     Map<String, String> zipContents = extractZipContents(zipBytes);
     assertThat(zipContents.size(), org.hamcrest.Matchers.greaterThan(0));
+
+    // Verify the file names in the zip content - using the actual title of the head note
+    String headNoteTitle = headNote.getTopicConstructor();
+    assertThat(
+        zipContents.keySet(),
+        hasItems(
+            headNoteTitle + "/__index.md",
+            headNoteTitle + "/Tagger 1/__index.md",
+            headNoteTitle + "/Tagger 1/_tagged by.md"));
   }
 }
