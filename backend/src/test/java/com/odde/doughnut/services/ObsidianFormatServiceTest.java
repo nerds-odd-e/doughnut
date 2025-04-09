@@ -122,7 +122,7 @@ class ObsidianFormatServiceTest {
   }
 
   @Test
-  void shouldNotFailWhenSameNoteIsTaggedByDifferentTaggets() throws IOException {
+  void whenOneNoteIsTaggedByTwoNotes() throws IOException {
     // Arrange
     Note targetNote = makeMe.aNote("Tagged Note").details("This note is tagged").please();
 
