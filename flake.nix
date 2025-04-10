@@ -168,7 +168,7 @@
             # Add Python to PATH if enabled
             if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
               export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
-              export PATH=$PATH:$PYTHON_PATH/bin
+              export PATH="${poetryPath}:$PYTHON_PATH/bin:$PATH"
 
               # Setup Python environment if enabled
               setup_python "${poetryPath}"

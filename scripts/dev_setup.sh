@@ -39,16 +39,15 @@ setup_cypress() {
 
   if [[ "$OSTYPE" == "linux"* || -d "/etc/nixos" ]]; then
     log "Patching Cypress binaries on Linux..."
-    autoPatchelf "''${HOME}/.cache/Cypress/''${CYPRESS_VERSION}/Cypress/"
+    autoPatchelf "${HOME}/.cache/Cypress/${CYPRESS_VERSION}/Cypress/"
   fi
   export CYPRESS_CACHE_FOLDER=$HOME/.cache/Cypress
 }
 
 # Setup Python and Poetry
 setup_python() {
-  if [ "''${PYTHON_DEV:-}" = "true" ]; then
+  if [ "${PYTHON_DEV:-}" = "true" ]; then
     log "Setting up Python development environment..."
-    export PATH="$1:$PATH"
     log "Checking poetry installation..."
     log "Poetry binary should be at: $1/poetry"
     which poetry || log "Poetry not found in PATH: $PATH"
