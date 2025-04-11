@@ -62,7 +62,11 @@ public class OpenAiApiHandler {
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
-    return blockGet(openAiApi.createChatCompletion(request)).getChoices().stream().findFirst();
+    ChatCompletionResult result = blockGet(openAiApi.createChatCompletion(request));
+    if (result == null || result.getChoices() == null || result.getChoices().isEmpty()) {
+      return Optional.empty();
+    }
+    return result.getChoices().stream().findFirst();
   }
 
   public List<Model> getModels() {

@@ -36,24 +36,48 @@ Given('An OpenAI response is unavailable', () => {
   mock_services.openAi().stubOpenAiCompletionWithErrorResponse()
 })
 
+Given('OpenAI generates this question:', (questionTable: DataTable) => {
+  const hashes = questionTable.hashes()
+  if (hashes.length !== 1 || !hashes[0]) {
+    throw new Error(
+      `Expected exactly one row in the data table, but got ${hashes.length}`
+    )
+  }
+  start
+    .questionGenerationService()
+    .resetAndStubAskingMCQByChatCompletion(hashes[0])
+})
+
 Given(
-  'OpenAI generates this question for assistant thread {string}:',
-  (threadId: string, questionTable: DataTable) => {
+  'OpenAI generates this as first question:',
+  (questionTable: DataTable) => {
     const hashes = questionTable.hashes()
     if (hashes.length !== 1 || !hashes[0]) {
       throw new Error(
         `Expected exactly one row in the data table, but got ${hashes.length}`
       )
     }
-    start.questionGenerationService().stubAskingMCQ(threadId, hashes[0])
+    // Store the first question as the default
+    start
+      .questionGenerationService()
+      .resetAndStubAskingMCQByChatCompletion(hashes[0])
   }
 )
 
 Given(
-  'OpenAI assistant will create these thread ids in sequence: {string}',
-  (threadIds: string) => {
-    const threadIdsArray = threadIds.split(',').map((id) => id.trim())
-    mock_services.openAi().stubCreateThreads(threadIdsArray)
+  'OpenAI generates this as second question:',
+  (questionTable: DataTable) => {
+    const hashes = questionTable.hashes()
+    if (hashes.length !== 1 || !hashes[0]) {
+      throw new Error(
+        `Expected exactly one row in the data table, but got ${hashes.length}`
+      )
+    }
+    // Register the second question to be used after contest
+    cy.then(async () => {
+      // Just store the data, it will be used by the "not legitamate" step
+      Cypress.env('secondQuestion', hashes[0])
+    })
   }
 )
 
@@ -73,12 +97,17 @@ Given('OpenAI evaluates the question as not legitamate', () => {
       'This question is not feasible and needs to be regenerated completely.',
   })
 
-  start.questionGenerationService().stubAskingMCQ('thread-second-question', {
+  // Use the stored second question data if available
+  const secondQuestion = Cypress.env('secondQuestion') || {
     'Question Stem': 'Second question',
     'Correct Choice': 'Rescue Diver',
     'Incorrect Choice 1': 'Divemaster',
     'Incorrect Choice 2': 'Open Water Diver',
-  })
+  }
+
+  start
+    .questionGenerationService()
+    .resetAndStubAskingMCQByChatCompletion(secondQuestion)
 })
 
 Then('I contest the question', () => {

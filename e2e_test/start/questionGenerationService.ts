@@ -26,35 +26,6 @@ export const questionGenerationService = () => ({
     })
   },
 
-  stubAskingMCQ: (threadId: string, record: Record<string, string>) => {
-    const mcqWithAnswer: MCQWithAnswer = {
-      correctChoiceIndex: 0,
-      strictChoiceOrder: true,
-      multipleChoicesQuestion: {
-        stem: record['Question Stem']!,
-        choices: [
-          record['Correct Choice']!,
-          record['Incorrect Choice 1']!,
-          record['Incorrect Choice 2']!,
-        ],
-      },
-    }
-
-    cy.then(async () => {
-      await mock_services
-        .openAi()
-        .stubCreateRuns(threadId, ['run-123'])
-        .aRun('run-123')
-        .stubRetrieveRunsThatRequireAction([
-          {
-            response: 'ask_single_answer_multiple_choice_question',
-            arguments: JSON.stringify(mcqWithAnswer),
-          },
-        ])
-      mock_services.openAi().stubRunCancellation(threadId, 'run-123')
-    })
-  },
-
   stubEvaluationQuestion: (
     record: Record<string, boolean | string | number[]>
   ) => {

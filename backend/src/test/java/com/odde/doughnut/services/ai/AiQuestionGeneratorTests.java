@@ -8,10 +8,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +28,7 @@ class AiQuestionGeneratorTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
-  OpenAIAssistantMocker openAIAssistantMocker;
-  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+  OpenAIChatCompletionMock openAIChatCompletionMock;
   AiQuestionGenerator aiQuestionGenerator;
 
   @BeforeEach
@@ -40,9 +37,8 @@ class AiQuestionGeneratorTests {
     aiQuestionGenerator =
         new AiQuestionGenerator(openAiApi, globalSettingsService, new RealRandomizer());
 
-    // Initialize assistant mocker
-    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+    // Initialize chat completion mock
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
   }
 
   @Test
@@ -50,13 +46,8 @@ class AiQuestionGeneratorTests {
     MCQWithAnswer jsonQuestion =
         makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-    // Mock the assistant API calls
-    openAIAssistantThreadMocker
-        .mockCreateRunInProcess("my-run-id")
-        .aRunThatRequireAction(
-            jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-        .mockRetrieveRun()
-        .mockCancelRun("my-run-id");
+    // Mock the chat completion API calls
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
     // another note is needed, otherwise the note will be the only note in the notebook
@@ -85,13 +76,8 @@ class AiQuestionGeneratorTests {
             .strictChoiceOrder(false)
             .please();
 
-    // Mock the assistant API calls
-    openAIAssistantThreadMocker
-        .mockCreateRunInProcess("my-run-id")
-        .aRunThatRequireAction(
-            originalQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-        .mockRetrieveRun()
-        .mockCancelRun("my-run-id");
+    // Mock the chat completion API calls
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(originalQuestion);
 
     // Act
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
@@ -142,13 +128,8 @@ class AiQuestionGeneratorTests {
     List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
     doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
 
-    // Mock the assistant API calls
-    openAIAssistantThreadMocker
-        .mockCreateRunInProcess("my-run-id")
-        .aRunThatRequireAction(
-            originalQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-        .mockRetrieveRun()
-        .mockCancelRun("my-run-id");
+    // Mock the chat completion API calls
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(originalQuestion);
 
     // Act
     MCQWithAnswer result =
@@ -174,13 +155,8 @@ class AiQuestionGeneratorTests {
             .correctChoiceIndex(3) // Invalid index!
             .please();
 
-    // Mock the assistant API calls
-    openAIAssistantThreadMocker
-        .mockCreateRunInProcess("my-run-id")
-        .aRunThatRequireAction(
-            invalidQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-        .mockRetrieveRun()
-        .mockCancelRun("my-run-id");
+    // Mock the chat completion API calls
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(invalidQuestion);
 
     // Act
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);

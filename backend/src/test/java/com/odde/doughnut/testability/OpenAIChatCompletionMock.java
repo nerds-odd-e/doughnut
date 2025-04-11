@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
+import java.util.ArrayList;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 
@@ -40,7 +41,9 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   }
 
   public void mockNullChatCompletion() {
-    Mockito.doReturn(Single.just(new ChatCompletionResult()))
+    ChatCompletionResult emptyResult = new ChatCompletionResult();
+    emptyResult.setChoices(new ArrayList<>());
+    Mockito.doReturn(Single.just(emptyResult))
         .when(openAiApi)
         .createChatCompletion(
             ArgumentMatchers.argThat(

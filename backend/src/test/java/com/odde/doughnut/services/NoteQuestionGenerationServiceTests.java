@@ -2,23 +2,17 @@ package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
-import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
-import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.assistants.run.RunCreateRequest;
-import com.theokanning.openai.assistants.thread.ThreadRequest;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
-import java.util.List;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,16 +30,15 @@ class NoteQuestionGenerationServiceTests {
   @Mock OpenAiApi openAiApi;
   GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
-  OpenAIAssistantMocker openAIAssistantMocker;
-  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+  OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
   private OpenAiAssistant assistant;
   private NoteQuestionGenerationService service;
 
   @BeforeEach
   void setup() {
-    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation("thread-id");
+    // Initialize OpenAIChatCompletionMock
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
 
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();
@@ -67,7 +60,7 @@ class NoteQuestionGenerationServiceTests {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      mockSuccessfulQuestionGeneration(jsonQuestion);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
       // Execute
       MCQWithAnswer generatedQuestion = service.generateQuestion(null);
@@ -89,23 +82,26 @@ class NoteQuestionGenerationServiceTests {
               .correctChoiceIndex(0)
               .please();
 
-      mockSuccessfulQuestionGeneration(mcqWithAnswer);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
       // Execute
       service.generateQuestion(null);
 
       // Verify
-      ArgumentCaptor<ThreadRequest> messagesCaptor = ArgumentCaptor.forClass(ThreadRequest.class);
-      verify(openAiApi).createThread(messagesCaptor.capture());
+      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
+      verify(openAiApi).createChatCompletion(requestCaptor.capture());
 
-      List<MessageRequest> messages = messagesCaptor.getValue().getMessages();
-      assertThat(messages, hasSize(2));
+      // Check if any message contains the expected text
+      boolean hasQuestionDesignerInstruction =
+          requestCaptor.getValue().getMessages().stream()
+              .anyMatch(
+                  message -> message.toString().contains("Please act as a Question Designer"));
 
-      MessageRequest instructionMessage = messages.get(1);
-      assertThat(instructionMessage.getRole(), is("user"));
       assertThat(
-          instructionMessage.getContent().toString(),
-          containsString("Please act as a Question Designer"));
+          "A message should contain the Question Designer instruction",
+          hasQuestionDesignerInstruction,
+          is(true));
     }
 
     @Test
@@ -118,41 +114,29 @@ class NoteQuestionGenerationServiceTests {
               .correctChoiceIndex(0)
               .please();
 
-      mockSuccessfulQuestionGeneration(mcqWithAnswer);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
       // Act
       service.generateQuestion(null);
 
       // Verify
-      ArgumentCaptor<RunCreateRequest> runRequestCaptor =
-          ArgumentCaptor.forClass(RunCreateRequest.class);
-      verify(openAiApi).createRun(anyString(), runRequestCaptor.capture());
+      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
+      verify(openAiApi).createChatCompletion(requestCaptor.capture());
 
-      assertThat(runRequestCaptor.getValue().getModel(), is("gpt-4o-mini"));
+      assertThat(requestCaptor.getValue().getModel(), is("gpt-4o-mini"));
     }
 
     @Test
-    void shouldHandleCompletedRunWithoutAction() throws JsonProcessingException {
-      // Mock AI response for a completed run
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aCompletedRun()
-          .mockRetrieveRun();
+    void shouldHandleNullChatCompletion() throws JsonProcessingException {
+      // Mock AI response for null completion
+      openAIChatCompletionMock.mockNullChatCompletion();
 
       // Execute and verify
       MCQWithAnswer result = service.generateQuestion(null);
 
-      // Verify that a completed run returns null
+      // Verify that a null completion returns null
       assertThat(result, is(nullValue()));
-    }
-
-    private void mockSuccessfulQuestionGeneration(MCQWithAnswer question) {
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(
-              question, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
     }
   }
 }

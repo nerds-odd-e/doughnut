@@ -152,14 +152,6 @@ const openAiService = () => {
       return this
     },
 
-    stubCreateThreads(threadIds: string[]) {
-      serviceMocker.stubPosterWithMultipleResponses(
-        `/threads`,
-        threadIds.map((threadId) => ({
-          id: threadId,
-        }))
-      )
-    },
     stubCreateRuns(threadId: string, runIds: string[]) {
       serviceMocker.stubPosterWithMultipleResponses(
         `/threads/${threadId}/runs`,

@@ -20,8 +20,7 @@ Feature: Quiz Question Management
 
   @usingMockedOpenAiService
   Scenario: Can generate the question by AI
-    Given OpenAI assistant will create these thread ids in sequence: "thread-first-question"
-    And OpenAI generates this question for assistant thread "thread-first-question":
+    Given OpenAI generates this question:
       | Question Stem                            | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | Why do cows have hooves instead of feet? | they lactose   | they moo           | they have          |
     When I generate question by AI for note "The cow joke"

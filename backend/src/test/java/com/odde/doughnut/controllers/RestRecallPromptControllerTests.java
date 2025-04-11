@@ -16,20 +16,15 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
 import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
-import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.assistants.run.RunCreateRequest;
-import com.theokanning.openai.assistants.thread.ThreadRequest;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -59,16 +54,12 @@ class RestRecallPromptControllerTests {
 
   @BeforeEach
   void setup() {
-    testabilitySettings.setRandomization(new Randomization(first, 1));
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
-    controller =
-        new RestRecallPromptController(
-            openAiApi, modelFactoryService, currentUser, testabilitySettings);
+    testabilitySettings.setRandomization(new Randomization(first, 1));
 
-    // Initialize assistant mocker
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
     openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
 
     // Mock chat completion for question evaluation
     QuestionEvaluation evaluation = new QuestionEvaluation();
@@ -76,6 +67,10 @@ class RestRecallPromptControllerTests {
     evaluation.correctChoices = new int[] {0};
     evaluation.improvementAdvices = "This question needs improvement";
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
+
+    controller =
+        new RestRecallPromptController(
+            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
   RestRecallPromptController nullUserController() {
@@ -209,13 +204,8 @@ class RestRecallPromptControllerTests {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      // Mock the assistant API calls using the same pattern as GenerateRandomQuestion
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(
-              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      // Mock the chat completion API calls
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
@@ -230,39 +220,32 @@ class RestRecallPromptControllerTests {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      // Mock the assistant API calls
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(
-              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      // Mock the chat completion API calls
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
       controller.regenerate(recallPrompt, contestResult);
 
-      ArgumentCaptor<RunCreateRequest> argumentCaptor =
-          ArgumentCaptor.forClass(RunCreateRequest.class);
-      verify(openAiApi).createRun(any(), argumentCaptor.capture());
-      ArgumentCaptor<ThreadRequest> messagesCaptor = ArgumentCaptor.forClass(ThreadRequest.class);
-      verify(openAiApi).createThread(messagesCaptor.capture());
+      // Verify chat completion call contains message with question info and contest result
+      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
+          ArgumentCaptor.forClass(ChatCompletionRequest.class);
+      verify(openAiApi, atLeastOnce()).createChatCompletion(requestCaptor.capture());
 
-      List<MessageRequest> messages = messagesCaptor.getValue().getMessages();
-      assertThat(messages.size(), equalTo(3));
-      assertThat(messages.get(0).getRole(), equalTo("assistant"));
-      assertThat(
-          messages.get(1).getContent().toString(),
-          containsString(AiToolFactory.mcqWithAnswerAiTool().getMessageBody()));
-      String lastMessage = messages.get(2).getContent().toString();
-      assertThat(
-          lastMessage,
-          allOf(
-              containsString("\"stem\" : \"a default question stem\""),
-              containsString("Improvement advice:"),
-              containsString("test"),
-              containsString(
-                  "Please regenerate or refine the question based on the above advice.")));
+      // Check if any message contains the required contest info
+      boolean hasContestInfo =
+          requestCaptor.getValue().getMessages().stream()
+              .anyMatch(
+                  message -> {
+                    String content = message.toString();
+                    return content.contains("Previously generated non-feasible question")
+                        && content.contains("Improvement advice")
+                        && content.contains("test")
+                        && content.contains(
+                            "Please regenerate or refine the question based on the above advice");
+                  });
+
+      assertThat("A message should contain the contest information", hasContestInfo, is(true));
     }
   }
 
@@ -343,13 +326,8 @@ class RestRecallPromptControllerTests {
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
 
-      // Mock the assistant API calls
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(
-              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      // Mock the chat completion API calls
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       // another note is needed, otherwise the note will be the only note in the notebook, and the
@@ -391,15 +369,10 @@ class RestRecallPromptControllerTests {
 
     @Test
     void shouldGenerateNewPromptWhenExistingPromptsHaveAnswers() {
-      // Mock the assistant API calls
+      // Mock the chat completion API calls
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(
-              jsonQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
       // Create a note and memory tracker
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
@@ -432,6 +405,11 @@ class RestRecallPromptControllerTests {
 
     @Test
     void shouldNotReuseContestedQuestions() {
+      // Mock the chat completion API calls
+      MCQWithAnswer jsonQuestion =
+          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
+
       // Create a note and memory tracker
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please(); // Add another note to the notebook
@@ -450,12 +428,7 @@ class RestRecallPromptControllerTests {
       // Mock the AI to generate a new question
       MCQWithAnswer newQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(
-              newQuestion, AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(newQuestion);
 
       // Ask for a question for the memory tracker
       RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
