@@ -6,12 +6,16 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.graphRAG.BareNote;
+import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
+import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -349,5 +353,27 @@ public class Note extends EntityIdentifiedByIdOnly {
     notebook.setOwnership(ownership);
     notebook.setHeadNote(this);
     setNotebook(notebook);
+  }
+
+  @JsonIgnore
+  public String getNotebookAssistantInstructions() {
+    NotebookAiAssistant notebookAiAssistant = getNotebook().getNotebookAiAssistant();
+    if (notebookAiAssistant == null) {
+      return null;
+    }
+    return notebookAiAssistant.getAdditionalInstructionsToAi();
+  }
+
+  @JsonIgnore
+  public String getGraphRAGDescription() {
+    GraphRAGService graphRAGService =
+        new GraphRAGService(new CharacterBasedTokenCountingStrategy());
+    GraphRAGResult retrieve = graphRAGService.retrieve(this, 5000);
+    String prettyString = new ObjectMapper().valueToTree(retrieve).toPrettyString();
+    return """
+          Focus Note and the notes related to it:
+          %s
+          """
+        .formatted(prettyString);
   }
 }

@@ -2,8 +2,10 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.Optional;
@@ -26,11 +28,9 @@ public class NoteQuestionGenerationService {
   }
 
   private MCQWithAnswer generateQuestionWithChatCompletion(MessageRequest additionalMessage) {
-    var chatRequestBuilder =
-        notebookAssistantForNoteService.createChatRequestBuilder(
-            globalSettingsService.globalSettingQuestionGeneration().getValue());
+    var chatRequestBuilder = getChatRequestBuilder();
 
-    String instructions = notebookAssistantForNoteService.getNotebookAssistantInstructions();
+    String instructions = notebookAssistantForNoteService.note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
       chatRequestBuilder.addSystemMessage(instructions);
     }
@@ -50,9 +50,7 @@ public class NoteQuestionGenerationService {
             jsonNode -> {
               try {
                 MCQWithAnswer question =
-                    notebookAssistantForNoteService
-                        .getObjectMapper()
-                        .treeToValue(jsonNode, MCQWithAnswer.class);
+                    new ObjectMapper().treeToValue(jsonNode, MCQWithAnswer.class);
 
                 // Validate the question
                 if (question != null
@@ -80,11 +78,9 @@ public class NoteQuestionGenerationService {
   }
 
   private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(MCQWithAnswer question) {
-    var chatRequestBuilder =
-        notebookAssistantForNoteService.createChatRequestBuilder(
-            globalSettingsService.globalSettingEvaluation().getValue());
+    var chatRequestBuilder = getChatRequestBuilder();
 
-    String instructions = notebookAssistantForNoteService.getNotebookAssistantInstructions();
+    String instructions = notebookAssistantForNoteService.note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
       chatRequestBuilder.addSystemMessage(instructions);
     }
@@ -102,12 +98,16 @@ public class NoteQuestionGenerationService {
     return result.map(
         jsonNode -> {
           try {
-            return notebookAssistantForNoteService
-                .getObjectMapper()
-                .treeToValue(jsonNode, QuestionEvaluation.class);
+            return new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class);
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }
         });
+  }
+
+  private OpenAIChatRequestBuilder getChatRequestBuilder() {
+    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
+    String noteDescription = notebookAssistantForNoteService.note.getGraphRAGDescription();
+    return new OpenAIChatRequestBuilder().model(modelName).addSystemMessage(noteDescription);
   }
 }
