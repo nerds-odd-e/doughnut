@@ -45,11 +45,9 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
-    service =
-        new NoteQuestionGenerationService(
-            globalSettingsService, new NotebookAssistantForNoteService(assistant, testNote));
+    service = new NoteQuestionGenerationService(globalSettingsService, testNote, openAiApiHandler);
   }
 
   @Nested

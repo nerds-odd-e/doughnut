@@ -54,10 +54,7 @@ public final class NotebookAssistantForNoteServiceFactory {
   }
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
-    NotebookAssistantForNoteService notebookAssistantForNoteService =
-        getDefaultAssistantForNoteService(note);
-    return new NoteQuestionGenerationService(
-        globalSettingsService, notebookAssistantForNoteService);
+    return new NoteQuestionGenerationService(globalSettingsService, note, openAiApiHandler);
   }
 
   public ChatAboutNoteService createChatAboutNoteService(Note note) {

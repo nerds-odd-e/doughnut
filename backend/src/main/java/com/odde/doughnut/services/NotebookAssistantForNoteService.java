@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +28,5 @@ public class NotebookAssistantForNoteService {
 
   public AssistantThread getThread(String threadId) {
     return assistantService.getThread(threadId, note.getNotebookAssistantInstructions());
-  }
-
-  public OpenAiApiHandler getOpenAiApiHandler() {
-    return assistantService.getOpenAiApiHandler();
   }
 }
