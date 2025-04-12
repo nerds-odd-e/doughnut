@@ -34,25 +34,9 @@
                   </router-link>
                 </li>
                 <li>
-                  <div
-                    class="daisy-w-full daisy-text-left"
-                    @click="slotProps.closeDropdown"
-                  >
-                    <PopButton title="user settings">
-                      <template #button_face>Settings for {{ user.name }}</template>
-                      <template #default="{ closer }">
-                        <UserProfileDialog
-                          v-bind="{ user }"
-                          @user-updated="
-                            if ($event) {
-                              $emit('updateUser', $event);
-                            }
-                            closer();
-                          "
-                        />
-                      </template>
-                    </PopButton>
-                  </div>
+                  <a href="#" @click="(e) => { e.preventDefault(); showUserSettingsDialog(); slotProps.closeDropdown(); }">
+                    Settings for {{ user.name }}
+                  </a>
                 </li>
                 <li>
                   <router-link :to="{ name: 'assessmentAndCertificateHistory' }" @click="slotProps.closeDropdown">
@@ -88,6 +72,19 @@
       </div>
     </div>
   </div>
+  <Modal v-if="showUserSettings" @close_request="showUserSettings = false">
+    <template #body>
+      <UserProfileDialog
+        v-bind="{ user }"
+        @user-updated="
+          if ($event) {
+            $emit('updateUser', $event);
+          }
+          showUserSettings = false;
+        "
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -97,16 +94,16 @@ import LoginButton from "@/components/toolbars/LoginButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import { useRoute } from "vue-router"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
-import PopButton from "@/components/commons/Popups/PopButton.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { watch, computed } from "vue"
+import { watch, computed, ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { messageCenterConversations } from "@/store/messageStore"
+import Modal from "@/components/commons/Modal.vue"
 
 const props = defineProps({
   user: { type: Object as PropType<User>, required: false },
@@ -119,6 +116,7 @@ defineEmits<{
 const route = useRoute()
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 const isHomePage = computed(() => route.name === "home")
+const showUserSettings = ref(false)
 
 const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
   useAssimilationCount()
@@ -164,6 +162,10 @@ watch(
 const logout = async () => {
   await managedApi.logout()
   window.location.href = "/d/bazaar"
+}
+
+const showUserSettingsDialog = () => {
+  showUserSettings.value = true
 }
 </script>
 
