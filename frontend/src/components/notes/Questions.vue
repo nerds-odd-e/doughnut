@@ -56,6 +56,13 @@
           </template>
           <td>
             <button
+              class="edit-btn"
+              @click="editQuestion(question)"
+              title="Edit Question"
+            >
+              ✏️
+            </button>
+            <button
               class="delete-btn"
               @click="confirmDelete(question)"
               title="Delete Question"
@@ -77,6 +84,19 @@
     <template #body>
       <QuestionManagement
         :predefinedQuestion="openedQuestion"
+      />
+    </template>
+  </Modal>
+
+  <Modal
+    v-if="questionToEdit !== undefined"
+    @close_request="questionToEdit = undefined"
+  >
+    <template #body>
+      <NoteEditQuestion
+        v-bind="{ note, question: questionToEdit }"
+        @close-dialog="questionToEdit = undefined"
+        @question-updated="questionUpdated"
       />
     </template>
   </Modal>
@@ -105,6 +125,7 @@ import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
+import NoteEditQuestion from "./NoteEditQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import Modal from "../commons/Modal.vue"
@@ -121,6 +142,7 @@ const props = defineProps({
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
 const questionToDelete = ref<PredefinedQuestion | undefined>()
+const questionToEdit = ref<PredefinedQuestion | undefined>()
 
 const fetchQuestions = async () => {
   questions.value =
@@ -141,6 +163,15 @@ const toggleApproval = async (questionId?: number) => {
 }
 const confirmDelete = (question: PredefinedQuestion) => {
   questionToDelete.value = question
+}
+const editQuestion = (question: PredefinedQuestion) => {
+  questionToEdit.value = question
+}
+const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  const index = questions.value.findIndex(q => q.id === updatedQuestion.id)
+  if (index !== -1) {
+    questions.value[index] = updatedQuestion
+  }
 }
 const deleteQuestion = async () => {
   if (questionToDelete.value && questionToDelete.value.id) {
@@ -188,11 +219,12 @@ onMounted(() => {
   width: 100%;
   text-align: center;
 }
-.delete-btn {
+.delete-btn, .edit-btn {
   background: none;
   border: none;
   cursor: pointer;
   font-size: 16px;
+  margin: 0 3px;
 }
 .delete-confirmation {
   text-align: center;
