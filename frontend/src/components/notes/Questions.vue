@@ -20,6 +20,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -43,17 +44,32 @@
           <template
             v-if="question.multipleChoicesQuestion.choices"
           >
-            <td
-              v-for="(choice, index) in question
-                .multipleChoicesQuestion.choices"
-              :class="{
-                'correct-choice': index === question.correctAnswerIndex,
-              }"
-              :key="index"
-            >
-              {{ choice }}
-            </td>
+            <template v-for="(_, index) in Array(4)" :key="index">
+              <td v-if="index < question.multipleChoicesQuestion.choices.length"
+                :class="{
+                  'correct-choice': index === question.correctAnswerIndex,
+                }">
+                {{ question.multipleChoicesQuestion.choices[index] }}
+              </td>
+              <td v-else></td>
+            </template>
           </template>
+          <td>
+            <button
+              class="edit-btn"
+              @click="editQuestion(question)"
+              title="Edit Question"
+            >
+              ✏️
+            </button>
+            <button
+              class="delete-btn"
+              @click="confirmDelete(question)"
+              title="Delete Question"
+            >
+              🗑️
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -71,6 +87,36 @@
       />
     </template>
   </Modal>
+
+  <Modal
+    v-if="questionToEdit !== undefined"
+    @close_request="questionToEdit = undefined"
+  >
+    <template #body>
+      <NoteEditQuestion
+        v-bind="{ note, question: questionToEdit }"
+        @close-dialog="questionToEdit = undefined"
+        @question-updated="questionUpdated"
+      />
+    </template>
+  </Modal>
+
+  <Modal
+    v-if="questionToDelete !== undefined"
+    @close_request="questionToDelete = undefined"
+  >
+    <template #body>
+      <div class="delete-confirmation">
+        <h3>Delete Question</h3>
+        <p>Are you sure you want to delete this question?</p>
+        <p class="question-text">{{ questionToDelete?.multipleChoicesQuestion.stem }}</p>
+        <div class="action-buttons">
+          <button class="btn btn-secondary" @click="questionToDelete = undefined">Cancel</button>
+          <button class="btn btn-danger" @click="deleteQuestion">Delete</button>
+        </div>
+      </div>
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -79,9 +125,13 @@ import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
+import NoteEditQuestion from "./NoteEditQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
+import Modal from "../commons/Modal.vue"
+import { useToast } from "vue-toastification"
 
+const toast = useToast()
 const { managedApi } = useLoadingApi()
 const props = defineProps({
   note: {
@@ -91,6 +141,8 @@ const props = defineProps({
 })
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
+const questionToDelete = ref<PredefinedQuestion | undefined>()
+const questionToEdit = ref<PredefinedQuestion | undefined>()
 
 const fetchQuestions = async () => {
   questions.value =
@@ -107,6 +159,36 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
+  }
+}
+const confirmDelete = (question: PredefinedQuestion) => {
+  questionToDelete.value = question
+}
+const editQuestion = (question: PredefinedQuestion) => {
+  questionToEdit.value = question
+}
+const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  const index = questions.value.findIndex((q) => q.id === updatedQuestion.id)
+  if (index !== -1) {
+    questions.value[index] = updatedQuestion
+  }
+}
+const deleteQuestion = async () => {
+  if (questionToDelete.value && questionToDelete.value.id) {
+    try {
+      await managedApi.restPredefinedQuestionController.deleteQuestion(
+        questionToDelete.value.id
+      )
+      questions.value = questions.value.filter(
+        (q) => q.id !== questionToDelete.value?.id
+      )
+      toast.success("Question successfully deleted")
+    } catch (error) {
+      toast.error("An error occurred while deleting the question")
+      console.error("Question deletion error:", error)
+    } finally {
+      questionToDelete.value = undefined
+    }
   }
 }
 onMounted(() => {
@@ -138,5 +220,24 @@ onMounted(() => {
   margin-top: 10px;
   width: 100%;
   text-align: center;
+}
+.delete-btn, .edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  margin: 0 3px;
+}
+.delete-confirmation {
+  text-align: center;
+}
+.delete-confirmation .question-text {
+  font-weight: bold;
+  margin: 10px 0;
+}
+.delete-confirmation .action-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
 }
 </style>
