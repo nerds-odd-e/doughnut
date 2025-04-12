@@ -55,6 +55,18 @@ const notebookSettingsPopup = () => {
       clickButton('Update Notebook AI Assistant Settings')
       cy.pageIsNotLoading()
     },
+    exportForObsidian() {
+      cy.findByRole('button', { name: 'Export for Obsidian' }).click()
+      cy.pageIsNotLoading()
+      return this
+    },
+    importObsidianData(filename: string) {
+      cy.contains('label', 'Import from Obsidian')
+        .find('input[type="file"]')
+        .selectFile(`e2e_test/fixtures/${filename}`, { force: true })
+      cy.pageIsNotLoading()
+      return this
+    },
   }
 }
 

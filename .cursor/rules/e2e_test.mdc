@@ -10,7 +10,7 @@ alwaysApply: false
 We usually don't run all the e2e test locally, since it will take too much time, to run one feature file:
 
 ```
-nix develop -c pnpm cy:run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
 Typically, the developer will start the backend, frontend, mountebank mock services manually.

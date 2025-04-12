@@ -23,17 +23,9 @@ export const notebookCard = (notebook: string) => ({
     return notebookSettingsPopup()
   },
   exportForObsidian() {
-    findNotebookCardButton(notebook, 'Export notebook for Obsidian').click()
+    return this.editNotebookSettings().exportForObsidian()
   },
   importObsidianData(filename: string) {
-    cy.findByText(notebook, { selector: '.notebook-card *' })
-      .parents('.daisy-card')
-      .within(() => {
-        cy.get('input[type="file"]').selectFile(
-          `e2e_test/fixtures/${filename}`,
-          { force: true }
-        )
-      })
-    cy.pageIsNotLoading()
+    return this.editNotebookSettings().importObsidianData(filename)
   },
 })

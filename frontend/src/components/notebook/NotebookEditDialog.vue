@@ -27,6 +27,26 @@
     <NotebookCertificateRequest v-bind="{ notebook }" />
   </div>
 
+  <!-- Obsidian Import/Export Section -->
+  <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-my-4">
+    <h4 class="daisy-text-lg">Obsidian Integration</h4>
+    <div class="daisy-flex daisy-gap-2">
+      <label class="daisy-btn daisy-btn-sm daisy-btn-outline">
+        Import from Obsidian
+        <input
+          type="file"
+          accept=".zip"
+          class="!hidden"
+          style="display: none !important"
+          @change="handleObsidianImport"
+        />
+      </label>
+      <button class="daisy-btn daisy-btn-sm daisy-btn-outline" @click="exportForObsidian">
+        Export for Obsidian
+      </button>
+    </div>
+  </div>
+
   <!-- Admin Section -->
   <template v-if="user?.admin">
     <hr/>
@@ -85,5 +105,32 @@ const processForm = () => {
         console.error("Unexpected error format:", err)
       }
     })
+}
+
+const exportForObsidian = () => {
+  const link = document.createElement("a")
+  link.style.display = "none"
+  link.href = `/api/notebooks/${props.notebook.id}/obsidian`
+  link.download = `${props.notebook.title}-obsidian.zip`
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
+const handleObsidianImport = async (event: Event) => {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+
+  try {
+    await managedApi.restNotebookController.importObsidian(props.notebook.id, {
+      file,
+    })
+    // Clear file input for reuse
+    ;(event.target as HTMLInputElement).value = ""
+    router.go(0) // Refresh page to show imported notes
+  } catch (error) {
+    alert("Failed to import file")
+    console.error("Import error:", error)
+  }
 }
 </script>
