@@ -115,12 +115,12 @@ const removeChoice = () => {
 const updateQuestion = async () => {
   try {
     if (predefinedQuestion.value && predefinedQuestion.value.id) {
-    //   const updatedQuestion = await managedApi.restPredefinedQuestionController.updateQuestion(
-    //     predefinedQuestion.value.id,
-    //     predefinedQuestion.value
-    //   )
-    //   emit("question-updated", updatedQuestion)
-    //   toast.success("Question successfully updated")
+      const updatedQuestion = await managedApi.restPredefinedQuestionController.updateQuestion(
+        predefinedQuestion.value.id,
+        predefinedQuestion.value
+      )
+      emit("question-updated", updatedQuestion)
+      toast.success("Question successfully updated")
     }
   } catch (error) {
     toast.error("An error occurred while updating the question")

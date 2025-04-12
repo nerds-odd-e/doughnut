@@ -85,4 +85,18 @@ public class PredefinedQuestionService {
   public void deleteQuestion(PredefinedQuestion predefinedQuestion) {
     modelFactoryService.remove(predefinedQuestion);
   }
+
+  public PredefinedQuestion updateQuestion(PredefinedQuestion existingQuestion, PredefinedQuestion updatedQuestion) {
+    // Update the existing question with new values
+    existingQuestion.setMultipleChoicesQuestion(updatedQuestion.getMultipleChoicesQuestion());
+    existingQuestion.setCorrectAnswerIndex(updatedQuestion.getCorrectAnswerIndex());
+
+    // Save changes
+    Notebook parentNotebook = existingQuestion.getNote().getNotebook();
+    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(parentNotebook);
+    modelFactoryService.save(existingQuestion);
+
+    return existingQuestion;
+  }
 }
