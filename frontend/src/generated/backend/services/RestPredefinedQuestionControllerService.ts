@@ -135,4 +135,23 @@ export class RestPredefinedQuestionControllerService {
             },
         });
     }
+    /**
+     * @param predefinedQuestion
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        predefinedQuestion: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/predefined-questions/{predefinedQuestion}',
+            path: {
+                'predefinedQuestion': predefinedQuestion,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

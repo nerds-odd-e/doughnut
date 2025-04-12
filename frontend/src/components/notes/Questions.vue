@@ -107,7 +107,10 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
+import Modal from "../commons/Modal.vue"
+import { useToast } from "vue-toastification"
 
+const toast = useToast()
 const { managedApi } = useLoadingApi()
 const props = defineProps({
   note: {
@@ -140,12 +143,19 @@ const confirmDelete = (question: PredefinedQuestion) => {
   questionToDelete.value = question
 }
 const deleteQuestion = async () => {
-  if (questionToDelete.value) {
-    // await managedApi.restPredefinedQuestionController.deleteQuestion(questionToDelete.value.id)
-    questions.value = questions.value.filter(
+  if (questionToDelete.value && questionToDelete.value.id) {
+    try {
+      await managedApi.restPredefinedQuestionController.deleteQuestion(questionToDelete.value.id)
+      questions.value = questions.value.filter(
       (q) => q.id !== questionToDelete.value?.id
-    )
-    questionToDelete.value = undefined
+      )
+      toast.success("Question successfully deleted")
+    } catch (error) {
+      toast.error("An error occurred while deleting the question")
+      console.error("Question deletion error:", error)
+    } finally {
+      questionToDelete.value = undefined
+    }
   }
 }
 onMounted(() => {
