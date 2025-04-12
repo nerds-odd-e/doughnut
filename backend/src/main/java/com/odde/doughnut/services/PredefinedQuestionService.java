@@ -64,21 +64,33 @@ public class PredefinedQuestionService {
     // Auto-evaluate the generated question
     QuestionContestResult contestResult =
         aiQuestionGenerator.getQuestionContestResult(note, mcqWithAnswer);
+
+    PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+
     if (contestResult != null && !contestResult.rejected) {
+      // Save the original bad question with contested=true flag
+      result.setContested(true);
+      modelFactoryService.save(result);
+
       try {
-        // If not feasible, try to regenerate with the contest feedback
+        // Try to regenerate with the contest feedback
         MCQWithAnswer regeneratedQuestion =
             aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
         if (regeneratedQuestion != null) {
-          mcqWithAnswer = regeneratedQuestion;
+          // Create and save the regenerated question
+          result = PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
+          modelFactoryService.save(result);
+          return result;
         }
       } catch (JsonProcessingException e) {
-        // If regeneration fails, use the original question
+        // If regeneration fails, use the already saved original question
+        return result;
       }
+    } else {
+      // Save the original question if it passed evaluation
+      modelFactoryService.save(result);
     }
 
-    PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
-    modelFactoryService.save(result);
     return result;
   }
 }

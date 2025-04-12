@@ -3,11 +3,11 @@ package com.odde.doughnut.entities;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -17,6 +17,7 @@ import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -115,6 +116,54 @@ class PredefinedQuestionTest {
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
+    }
+
+    @Test
+    void shouldSaveBothOriginalAndRegeneratedQuestions() throws JsonProcessingException {
+      // Setup
+      MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      contestResult.rejected = false;
+      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
+      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
+          .thenReturn(regeneratedQuestion);
+
+      // Use ArgumentCaptor to capture questions being saved
+      ModelFactoryService mockModelFactory = mock(ModelFactoryService.class);
+      ArgumentCaptor<PredefinedQuestion> questionCaptor =
+          ArgumentCaptor.forClass(PredefinedQuestion.class);
+      when(mockModelFactory.save(questionCaptor.capture())).thenAnswer(i -> i.getArgument(0));
+
+      // Execute
+      PredefinedQuestionService service =
+          new PredefinedQuestionService(mockModelFactory, aiQuestionGenerator);
+      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
+
+      // Verify
+      // Should have captured two questions (original and regenerated)
+      assertThat(questionCaptor.getAllValues().size(), equalTo(2));
+
+      // The first saved question should be the original with contested=true
+      PredefinedQuestion firstSavedQuestion = questionCaptor.getAllValues().get(0);
+      assertThat(
+          firstSavedQuestion.getMcqWithAnswer().getMultipleChoicesQuestion(),
+          equalTo(mcqWithAnswer.getMultipleChoicesQuestion()));
+      assertThat(
+          "First question should be marked as contested",
+          firstSavedQuestion.isContested(),
+          is(true));
+
+      // The second saved question should be the regenerated one
+      PredefinedQuestion secondSavedQuestion = questionCaptor.getAllValues().get(1);
+      assertThat(
+          secondSavedQuestion.getMcqWithAnswer().getMultipleChoicesQuestion(),
+          equalTo(regeneratedQuestion.getMultipleChoicesQuestion()));
+      assertThat(secondSavedQuestion.isContested(), is(false));
+
+      // The result should be the regenerated question
+      assertThat(
+          result.getMcqWithAnswer().getMultipleChoicesQuestion(),
+          equalTo(regeneratedQuestion.getMultipleChoicesQuestion()));
     }
   }
 
