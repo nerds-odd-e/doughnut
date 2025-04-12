@@ -1,5 +1,5 @@
 <template>
-  <h4>Request to obtain certificate from assessment</h4>
+  <h4 class="daisy-text-lg">Request to obtain certificate from assessment</h4>
   <ContentLoader v-if="loaded === false" />
   <div v-else>
     <button :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
@@ -43,11 +43,10 @@ const approvalButtonText = computed(() => {
 
 const approvalButtonClasses = computed(() => {
   return {
-    btn: true,
-    "btn-primary": approval.value === undefined,
-    "btn-disabled": approval.value !== undefined,
-    "btn-layout": true,
-    "mt-2": true,
+    "daisy-btn": true,
+    "daisy-btn-primary": approval.value === undefined,
+    "daisy-btn-disabled": approval.value !== undefined,
+    "daisy-mt-2": true,
     display: "block",
   }
 })

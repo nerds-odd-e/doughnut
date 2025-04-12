@@ -19,7 +19,7 @@
       v-model="formData.certificateExpiry"
       :error-message="errors.certificateExpiry"
     />
-    <button class="btn btn-primary btn-layout mt-2" @click="processForm">
+    <button class="daisy-btn daisy-btn-primary daisy-mt-2" @click="processForm">
       Update
     </button>
   <hr/>

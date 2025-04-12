@@ -1,5 +1,5 @@
 <template>
-  <h3>Notebook Assistant Management</h3>
+  <h4 class="daisy-text-lg">Notebook Assistant Management</h4>
 
   <!-- AI Instructions Form -->
   <form @submit.prevent="updateAiInstructions">
@@ -82,7 +82,4 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.mt-4 {
-  margin-top: 1rem;
-}
 </style>
