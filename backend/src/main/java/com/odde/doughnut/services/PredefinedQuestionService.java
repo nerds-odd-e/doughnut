@@ -47,9 +47,9 @@ public class PredefinedQuestionService {
     QuestionContestResult result =
         aiQuestionGenerator.getQuestionContestResult(
             predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
-    if (!result.rejected) {
+    if (result != null && !result.rejected) {
       predefinedQuestion.setContested(true);
-      modelFactoryService.save(predefinedQuestion);
+      modelFactoryService.merge(predefinedQuestion);
     }
     return result;
   }
@@ -60,18 +60,15 @@ public class PredefinedQuestionService {
       return null;
     }
 
-    // Auto-evaluate the generated question
-    QuestionContestResult contestResult =
-        aiQuestionGenerator.getQuestionContestResult(note, mcqWithAnswer);
-
     PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
+    modelFactoryService.save(result);
+
+    // Auto-evaluate the generated question
+    QuestionContestResult contestResult = contest(result);
 
     if (contestResult == null || contestResult.rejected) {
-      return modelFactoryService.save(result);
+      return result;
     }
-    // Save the original bad question with contested=true flag
-    result.setContested(true);
-    modelFactoryService.save(result);
 
     // Try to regenerate with the contest feedback
     MCQWithAnswer regeneratedQuestion =
