@@ -64,7 +64,7 @@ const props = defineProps({
   question: {
     type: Object as PropType<PredefinedQuestion>,
     required: true,
-  }
+  },
 })
 
 const predefinedQuestion = ref<PredefinedQuestion>({
@@ -115,10 +115,11 @@ const removeChoice = () => {
 const updateQuestion = async () => {
   try {
     if (predefinedQuestion.value && predefinedQuestion.value.id) {
-      const updatedQuestion = await managedApi.restPredefinedQuestionController.updateQuestion(
-        predefinedQuestion.value.id,
-        predefinedQuestion.value
-      )
+      const updatedQuestion =
+        await managedApi.restPredefinedQuestionController.updateQuestion(
+          predefinedQuestion.value.id,
+          predefinedQuestion.value
+        )
       emit("question-updated", updatedQuestion)
       toast.success("Question successfully updated")
     }

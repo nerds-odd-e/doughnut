@@ -86,7 +86,8 @@ public class PredefinedQuestionService {
     modelFactoryService.remove(predefinedQuestion);
   }
 
-  public PredefinedQuestion updateQuestion(PredefinedQuestion existingQuestion, PredefinedQuestion updatedQuestion) {
+  public PredefinedQuestion updateQuestion(
+      PredefinedQuestion existingQuestion, PredefinedQuestion updatedQuestion) {
     // Update the existing question with new values
     existingQuestion.setMultipleChoicesQuestion(updatedQuestion.getMultipleChoicesQuestion());
     existingQuestion.setCorrectAnswerIndex(updatedQuestion.getCorrectAnswerIndex());

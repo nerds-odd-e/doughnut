@@ -168,7 +168,7 @@ const editQuestion = (question: PredefinedQuestion) => {
   questionToEdit.value = question
 }
 const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
-  const index = questions.value.findIndex(q => q.id === updatedQuestion.id)
+  const index = questions.value.findIndex((q) => q.id === updatedQuestion.id)
   if (index !== -1) {
     questions.value[index] = updatedQuestion
   }
@@ -176,9 +176,11 @@ const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
 const deleteQuestion = async () => {
   if (questionToDelete.value && questionToDelete.value.id) {
     try {
-      await managedApi.restPredefinedQuestionController.deleteQuestion(questionToDelete.value.id)
+      await managedApi.restPredefinedQuestionController.deleteQuestion(
+        questionToDelete.value.id
+      )
       questions.value = questions.value.filter(
-      (q) => q.id !== questionToDelete.value?.id
+        (q) => q.id !== questionToDelete.value?.id
       )
       toast.success("Question successfully deleted")
     } catch (error) {
