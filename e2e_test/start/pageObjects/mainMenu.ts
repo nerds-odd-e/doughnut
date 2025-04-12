@@ -19,7 +19,7 @@ export const mainMenu = () => {
           return assumeAdminDashboardPage()
         },
         userSettings(userName: string) {
-          cy.findByRole('button', { name: `Settings for ${userName}` }).click({
+          cy.findByRole('link', { name: `Settings for ${userName}` }).click({
             force: true,
           })
           return {
