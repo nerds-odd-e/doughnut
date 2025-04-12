@@ -105,43 +105,9 @@
             ];
           buildInputs = with pkgs;
             basePackages
-            ++ pythonPackages
             ++ darwinPackages
             ++ linuxPackages
-            ++ lib.optionals stdenv.isDarwin [ sequelpro ]
-            ++ lib.optionals (!stdenv.isDarwin) [
-              psmisc
-              xclip
-              xorg.xorgserver
-              xorg.xauth
-              xorg.libX11
-              xorg.libXcomposite
-              xorg.libXdamage
-              xorg.libXext
-              xorg.libXfixes
-              xorg.libXi
-              xorg.libXrandr
-              xorg.libXrender
-              xorg.libXtst
-              xorg.libXScrnSaver
-              xorg.libxshmfence
-              gtk3
-              gtk2
-              glib
-              nss
-              alsa-lib
-              atk
-              at-spi2-atk
-              libdrm
-              dbus
-              expat
-              mesa
-              nspr
-              udev
-              cups
-              pango
-              cairo
-            ];
+            ++ pythonPackages;
 
           shellHook = ''
             # Source helper scripts
