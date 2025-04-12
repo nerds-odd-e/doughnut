@@ -158,26 +158,27 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
   }
 
   public static MessageRequest buildRegenerateQuestionMessage(
-      QuestionContestResult contestResult, MCQWithAnswer mcqWithAnswer)
-      throws JsonProcessingException {
+      QuestionContestResult contestResult, MCQWithAnswer mcqWithAnswer) {
+    String mcq = null;
+    try {
+      mcq = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(mcqWithAnswer);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
     return MessageRequest.builder()
         .role("user")
-        .content(
+        .textMessage(
             """
-                    Previously generated non-feasible question:
+                Previously generated non-feasible question:
 
-                    %s
+                %s
 
-                    Improvement advice:
+                Improvement advice:
 
-                    %s
+                %s
 
-                    Please regenerate or refine the question based on the above advice."""
-                .formatted(
-                    new ObjectMapper()
-                        .writerWithDefaultPrettyPrinter()
-                        .writeValueAsString(mcqWithAnswer),
-                    contestResult.advice))
+                Please regenerate or refine the question based on the above advice."""
+                .formatted(mcq, contestResult.advice))
         .build();
   }
 }

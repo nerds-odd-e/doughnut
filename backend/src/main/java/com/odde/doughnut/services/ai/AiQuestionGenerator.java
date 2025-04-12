@@ -77,8 +77,7 @@ public record AiQuestionGenerator(
   }
 
   public MCQWithAnswer regenerateQuestion(
-      QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer)
-      throws JsonProcessingException {
+      QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer) {
     MessageRequest additionalMessage =
         AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcqWithAnswer);
     return getAiGeneratedQuestion(note, additionalMessage);

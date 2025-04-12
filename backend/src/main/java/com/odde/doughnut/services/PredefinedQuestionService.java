@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -67,30 +66,22 @@ public class PredefinedQuestionService {
 
     PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
 
-    if (contestResult != null && !contestResult.rejected) {
-      // Save the original bad question with contested=true flag
-      result.setContested(true);
-      modelFactoryService.save(result);
-
-      try {
-        // Try to regenerate with the contest feedback
-        MCQWithAnswer regeneratedQuestion =
-            aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
-        if (regeneratedQuestion != null) {
-          // Create and save the regenerated question
-          result = PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
-          modelFactoryService.save(result);
-          return result;
-        }
-      } catch (JsonProcessingException e) {
-        // If regeneration fails, use the already saved original question
-        return result;
-      }
-    } else {
-      // Save the original question if it passed evaluation
-      modelFactoryService.save(result);
+    if (contestResult == null || contestResult.rejected) {
+      return modelFactoryService.save(result);
     }
+    // Save the original bad question with contested=true flag
+    result.setContested(true);
+    modelFactoryService.save(result);
 
-    return result;
+    // Try to regenerate with the contest feedback
+    MCQWithAnswer regeneratedQuestion =
+        aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
+    if (regeneratedQuestion != null) {
+      // Create and save the regenerated question
+      PredefinedQuestion regenerated =
+          PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
+      return modelFactoryService.save(regenerated);
+    }
+    return modelFactoryService.save(result);
   }
 }

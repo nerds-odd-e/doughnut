@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -88,7 +87,7 @@ class PredefinedQuestionTest {
     }
 
     @Test
-    void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() throws JsonProcessingException {
+    void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
       contestResult.rejected = false;
@@ -104,22 +103,7 @@ class PredefinedQuestionTest {
     }
 
     @Test
-    void shouldUseOriginalQuestionWhenRegenerationFails() throws JsonProcessingException {
-      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
-      contestResult.rejected = false;
-      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
-      when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
-          .thenThrow(new JsonProcessingException("Error") {});
-
-      PredefinedQuestionService service =
-          new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
-      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
-
-      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
-    }
-
-    @Test
-    void shouldSaveBothOriginalAndRegeneratedQuestions() throws JsonProcessingException {
+    void shouldSaveBothOriginalAndRegeneratedQuestions() {
       // Setup
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);

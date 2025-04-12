@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
@@ -52,8 +51,7 @@ public class RecallQuestionService {
   }
 
   public RecallPrompt regenerateAQuestion(
-      QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer)
-      throws JsonProcessingException {
+      QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer) {
     MCQWithAnswer MCQWithAnswer =
         aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
     if (MCQWithAnswer == null) {
