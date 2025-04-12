@@ -1,6 +1,6 @@
 <template>
   <div>
-    <PopButton btn-class="btn btn-primary" title="Add Question">
+    <PopButton btn-class="daisy-btn daisy-btn-primary" title="Add Question">
       <template #default="{ closer }">
         <NoteAddQuestion
           v-bind="{ note }"
@@ -11,7 +11,7 @@
         />
       </template>
     </PopButton>
-    <table class="question-table mt-2" v-if="questions.length">
+    <table class="question-table daisy-mt-2" v-if="questions.length">
       <thead>
         <tr>
           <th>Approved</th>
@@ -57,8 +57,8 @@
         </tr>
       </tbody>
     </table>
-    <div v-else class="no-questions">
-      <b >No questions</b>
+    <div v-else class="daisy-mt-2 daisy-w-full daisy-text-center">
+      <b>No questions</b>
     </div>
   </div>
   <Modal
@@ -133,10 +133,5 @@ onMounted(() => {
 
 .correct-choice {
   background-color: #4caf50;
-}
-.no-questions {
-  margin-top: 10px;
-  width: 100%;
-  text-align: center;
 }
 </style>
