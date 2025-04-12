@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined, title: 'Notebooks' }">
-    <p>
+    <p class="daisy-mb-6">
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
     </p>
     <main>
