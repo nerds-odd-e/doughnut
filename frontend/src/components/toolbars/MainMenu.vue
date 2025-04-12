@@ -22,29 +22,29 @@
             :is-active="false"
           >
             <template #dropdown="slotProps">
-              <ul tabindex="0" class="daisy-dropdown-content daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow">
-                <li v-if="user?.admin">
-                  <router-link :to="{ name: 'adminDashboard' }" @click="slotProps.closeDropdown">
+              <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow daisy-max-w-52 daisy-overflow-hidden">
+                <li v-if="user?.admin" class="daisy-menu-item hover:daisy-bg-base-200">
+                  <router-link :to="{ name: 'adminDashboard' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
                     Admin Dashboard
                   </router-link>
                 </li>
-                <li>
-                  <router-link :to="{ name: 'recent' }" @click="slotProps.closeDropdown">
+                <li class="daisy-menu-item hover:daisy-bg-base-200">
+                  <router-link :to="{ name: 'recent' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
                     <SvgAssimilate class="daisy-mr-2" />Recent...
                   </router-link>
                 </li>
-                <li>
-                  <a href="#" @click="(e) => { e.preventDefault(); showUserSettingsDialog(); slotProps.closeDropdown(); }">
+                <li class="daisy-menu-item hover:daisy-bg-base-200">
+                  <a href="#" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="(e) => { e.preventDefault(); showUserSettingsDialog(); slotProps.closeDropdown(); }">
                     Settings for {{ user.name }}
                   </a>
                 </li>
-                <li>
-                  <router-link :to="{ name: 'assessmentAndCertificateHistory' }" @click="slotProps.closeDropdown">
+                <li class="daisy-menu-item hover:daisy-bg-base-200">
+                  <router-link :to="{ name: 'assessmentAndCertificateHistory' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
                     My Assessments and Certificates
                   </router-link>
                 </li>
-                <li>
-                  <a href="#" @click="(e) => { e.preventDefault(); logout(); slotProps.closeDropdown(); }">
+                <li class="daisy-menu-item hover:daisy-bg-base-200">
+                  <a href="#" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="(e) => { e.preventDefault(); logout(); slotProps.closeDropdown(); }">
                     Logout
                   </a>
                 </li>
