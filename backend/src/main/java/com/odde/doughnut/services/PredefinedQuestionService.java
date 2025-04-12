@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
@@ -44,10 +45,14 @@ public class PredefinedQuestionService {
   }
 
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
-    QuestionContestResult result =
-        aiQuestionGenerator.getQuestionContestResult(
-            predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
-    if (result != null && !result.rejected) {
+    MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
+    QuestionEvaluation questionContestResult =
+        aiQuestionGenerator.getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer);
+    if (questionContestResult == null) {
+      return null;
+    }
+    QuestionContestResult result = questionContestResult.getQuestionContestResult(mcqWithAnswer);
+    if (!result.rejected) {
       predefinedQuestion.setContested(true);
       modelFactoryService.merge(predefinedQuestion);
     }

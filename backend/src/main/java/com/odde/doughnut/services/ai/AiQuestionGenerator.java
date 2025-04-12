@@ -53,16 +53,13 @@ public record AiQuestionGenerator(
         .orElse(null);
   }
 
-  public QuestionContestResult getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
+  public QuestionEvaluation getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      return service
-          .evaluateQuestion(mcqWithAnswer)
-          .map(e -> e.getQuestionContestResult(mcqWithAnswer))
-          .orElse(null);
+      return service.evaluateQuestion(mcqWithAnswer).orElse(null);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

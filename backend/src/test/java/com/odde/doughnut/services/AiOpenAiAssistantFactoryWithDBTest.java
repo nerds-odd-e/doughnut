@@ -71,9 +71,11 @@ class AiOpenAiAssistantFactoryWithDBTest {
       questionEvaluation.feasibleQuestion = true;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
+      MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
       QuestionContestResult contest =
-          aiQuestionGenerator.getQuestionContestResult(
-              predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
+          aiQuestionGenerator
+              .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
+              .getQuestionContestResult(mcqWithAnswer);
       assertTrue(contest.rejected);
     }
 
@@ -82,9 +84,11 @@ class AiOpenAiAssistantFactoryWithDBTest {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
+      MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
       QuestionContestResult contest =
-          aiQuestionGenerator.getQuestionContestResult(
-              predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
+          aiQuestionGenerator
+              .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
+              .getQuestionContestResult(mcqWithAnswer);
       assertFalse(contest.rejected);
     }
 
@@ -94,9 +98,12 @@ class AiOpenAiAssistantFactoryWithDBTest {
 
       assertThrows(
           RuntimeException.class,
-          () ->
-              aiQuestionGenerator.getQuestionContestResult(
-                  predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer()));
+          () -> {
+            MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
+            aiQuestionGenerator
+                .getQuestionContestResult(predefinedQuestion.getNote(), mcqWithAnswer)
+                .getQuestionContestResult(mcqWithAnswer);
+          });
     }
   }
 }

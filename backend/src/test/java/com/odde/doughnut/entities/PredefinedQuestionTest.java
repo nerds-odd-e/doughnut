@@ -5,12 +5,12 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
@@ -63,20 +63,19 @@ class PredefinedQuestionTest {
   class AutoEvaluateAndRegenerate {
     Note note;
     MCQWithAnswer mcqWithAnswer;
-    QuestionContestResult contestResult;
+    QuestionEvaluation contestResult;
 
     @BeforeEach
     void setup() {
       note = makeMe.aNote().please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      contestResult = new QuestionContestResult();
-      contestResult.advice = "This question needs improvement";
+      contestResult = new QuestionEvaluation();
     }
 
     @Test
     void shouldReturnOriginalQuestionWhenEvaluationPassesOrFails() {
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
-      contestResult.rejected = true;
+      contestResult.feasibleQuestion = false;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
 
       PredefinedQuestionService service =
@@ -90,7 +89,7 @@ class PredefinedQuestionTest {
     void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
-      contestResult.rejected = false;
+      contestResult.feasibleQuestion = true;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
       when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
           .thenReturn(regeneratedQuestion);
@@ -107,7 +106,7 @@ class PredefinedQuestionTest {
       // Setup
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
-      contestResult.rejected = false;
+      contestResult.feasibleQuestion = true;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
       when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
           .thenReturn(regeneratedQuestion);
