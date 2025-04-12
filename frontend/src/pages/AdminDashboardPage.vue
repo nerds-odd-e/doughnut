@@ -1,49 +1,51 @@
 <template>
   <ContainerPage v-bind="{ title: 'Admin Dashboard' }" />
-  <div class="daisy-tabs">
+  <div class="daisy-tabs daisy-tabs-boxed daisy-bg-base-200 daisy-p-2 daisy-flex daisy-justify-center daisy-mb-4">
     <a
-      :class="`daisy-tab ${activePage === 'fineTuningData' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'fineTuningData' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'fineTuningData'"
     >Fine Tuning Data</a>
     <a
-      :class="`daisy-tab ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'failureReport'"
     >Failure Reports</a>
     <a
-      :class="`daisy-tab ${activePage === 'manageModel' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'manageModel' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'manageModel'"
     >Manage Models</a>
     <a
-      :class="`daisy-tab ${activePage === 'manageAssistant' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'manageAssistant' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'manageAssistant'"
     >Manage Assistant</a>
     <a
-      :class="`daisy-tab ${activePage === 'manageBazaar' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'manageBazaar' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'manageBazaar'"
     >Manage Bazaar</a>
     <a
-      :class="`daisy-tab ${activePage === 'certificateRequests' ? 'daisy-tab-active' : ''}`"
+      :class="`daisy-tab daisy-tab-lg ${activePage === 'certificateRequests' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
       @click="activePage = 'certificateRequests'"
     >Certification Requests</a>
   </div>
-  <FineTuningData v-if="activePage === 'fineTuningData'" />
-  <FailureReportList v-if="activePage === 'failureReport'" />
-  <ManageModel v-if="activePage === 'manageModel'" />
-  <ManageAssistant v-if="activePage === 'manageAssistant'" />
-  <ManageBazaar v-if="activePage === 'manageBazaar'" />
-  <CertificateRequests v-if="activePage === 'certificateRequests'" />
+  <div class="daisy-container daisy-mx-auto">
+    <FineTuningData v-if="activePage === 'fineTuningData'" />
+    <FailureReportList v-if="activePage === 'failureReport'" />
+    <ManageModel v-if="activePage === 'manageModel'" />
+    <ManageAssistant v-if="activePage === 'manageAssistant'" />
+    <ManageBazaar v-if="activePage === 'manageBazaar'" />
+    <CertificateRequests v-if="activePage === 'certificateRequests'" />
+  </div>
 </template>
 
 <script setup lang="ts">
