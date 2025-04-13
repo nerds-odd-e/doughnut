@@ -20,6 +20,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -54,6 +55,14 @@
               {{ choice }}
             </td>
           </template>
+          <td class="actions">
+            <button class="btn btn-sm btn-primary me-2" @click="openedQuestion=question">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button class="btn btn-sm btn-danger" @click="deleteQuestion(question)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -68,6 +77,7 @@
     <template #body>
       <QuestionManagement
         :predefinedQuestion="openedQuestion"
+        @question-updated="questionUpdated"
       />
     </template>
   </Modal>
@@ -81,6 +91,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
+import Modal from "../commons/Modal.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -98,17 +109,40 @@ const fetchQuestions = async () => {
       props.note.id
     )
 }
+
 const questionAdded = (newQuestion: PredefinedQuestion) => {
   if (newQuestion == null) {
     return
   }
   questions.value.push(newQuestion)
 }
+
+const questionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  const index = questions.value.findIndex(q => q.id === updatedQuestion.id)
+  if (index !== -1) {
+    questions.value[index] = updatedQuestion
+  }
+  openedQuestion.value = undefined
+}
+
+const deleteQuestion = async (question: PredefinedQuestion) => {
+  if (!confirm('この質問を削除してもよろしいですか？')) {
+    return
+  }
+  try {
+    await managedApi.restPredefinedQuestionController.deleteQuestion(question.id)
+    questions.value = questions.value.filter(q => q.id !== question.id)
+  } catch (error) {
+    console.error('Failed to delete question:', error)
+  }
+}
+
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
   }
 }
+
 onMounted(() => {
   fetchQuestions()
 })
@@ -134,9 +168,22 @@ onMounted(() => {
 .correct-choice {
   background-color: #4caf50;
 }
+
 .no-questions {
   margin-top: 10px;
   width: 100%;
   text-align: center;
+}
+
+.actions {
+  white-space: nowrap;
+}
+
+.actions button {
+  padding: 0.25rem 0.5rem;
+}
+
+.actions button i {
+  font-size: 0.875rem;
 }
 </style>

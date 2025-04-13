@@ -1,12 +1,15 @@
 package com.odde.doughnut.services;
 
+import java.sql.Timestamp;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
@@ -80,5 +83,15 @@ public class PredefinedQuestionService {
     PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     modelFactoryService.save(result);
     return result;
+  }
+
+  public void deleteQuestion(PredefinedQuestion question) {
+    modelFactoryService.remove(question);
+  }
+
+  public PredefinedQuestion updateQuestion(PredefinedQuestion question, PredefinedQuestion updatedQuestion) {
+    question.setMultipleChoicesQuestion(updatedQuestion.getMultipleChoicesQuestion());
+    question.setCorrectAnswerIndex(updatedQuestion.getCorrectAnswerIndex());
+    return modelFactoryService.save(question);
   }
 }
