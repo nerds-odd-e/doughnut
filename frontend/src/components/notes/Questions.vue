@@ -115,6 +115,16 @@ const toggleApproval = async (questionId?: number) => {
   }
 }
 
+const deleteQuestion = async (questionId?: number) => {
+  if (!questionId) return;
+  
+  const confirmMessage = 'Are you sure you want to delete this question?';
+  if (window.confirm(confirmMessage)) {
+    await managedApi.restPredefinedQuestionController.deleteQuestion(questionId);
+    questions.value = questions.value.filter(q => q.id !== questionId);
+  }
+}
+
 const maxChoices = computed(() => {
   return Math.max(
     ...questions.value.map(
