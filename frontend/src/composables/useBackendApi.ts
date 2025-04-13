@@ -4,6 +4,7 @@ import { ExportControllerService } from '@/generated/backend/services/ExportCont
 import type { ApiRequestOptions } from '@/generated/backend/core/ApiRequestOptions'
 import type { CancelablePromise } from '@/generated/backend/core/CancelablePromise'
 import { BaseHttpRequest } from "@/generated/backend/core/BaseHttpRequest"
+import { ImportControllerService } from '@/generated/backend/services/ImportControllerService'
 
 const apiConfig: OpenAPIConfig = {
   BASE: '',
@@ -28,10 +29,12 @@ class CustomHttpRequest extends BaseHttpRequest {
 }
 
 const httpRequest = new CustomHttpRequest(apiConfig)
-const api = new ExportControllerService(httpRequest)
+const exportApi = new ExportControllerService(httpRequest)
+const importApi = new ImportControllerService(httpRequest)
 
 export const useBackendApi = () => {
   return {
-    exportController: api
+    exportController: exportApi,
+    importController: importApi
   }
 } 

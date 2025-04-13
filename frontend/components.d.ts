@@ -47,6 +47,7 @@ declare module 'vue' {
     FullScreen: typeof import('./src/components/common/FullScreen.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
     ImageFormBody: typeof import('./src/components/notes/accessory/ImageFormBody.vue')['default']
+    ImportButton: typeof import('./src/components/notebook/ImportButton.vue')['default']
     InputWithType: typeof import('./src/components/form/InputWithType.vue')['default']
     JustReview: typeof import('./src/components/review/JustReview.vue')['default']
     LinkNob: typeof import('./src/components/links/LinkNob.vue')['default']

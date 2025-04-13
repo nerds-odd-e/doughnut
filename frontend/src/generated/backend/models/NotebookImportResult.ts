@@ -2,9 +2,10 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Metadata = {
-    version?: string;
-    exportedBy?: string;
-    exportedAt?: string;
+export type NotebookImportResult = {
+    originalId?: number;
+    newId?: number;
+    title?: string;
+    notesCount?: number;
 };
 

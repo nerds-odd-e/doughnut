@@ -1470,6 +1470,54 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
+  /api/import/notebooks:
+    post:
+      tags:
+      - import-controller
+      operationId: importNotebook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportDataSchema"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ImportResult"
+  /api/import/all:
+    post:
+      tags:
+      - import-controller
+      operationId: importAllNotebooks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportDataSchema"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ImportResult"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -3711,6 +3759,9 @@ components:
         updated_at:
           type: string
           format: date-time
+        owner:
+          $ref: "#/components/schemas/User"
+          writeOnly: true
       required:
       - headNoteId
       - id
@@ -4026,6 +4077,69 @@ components:
       properties:
         asFirstChild:
           type: boolean
+    ImportDataSchema:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        notebooks:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotebookImport"
+    Metadata:
+      type: object
+      properties:
+        version:
+          type: string
+        exportedBy:
+          type: string
+        exportedAt:
+          type: string
+          format: date-time
+    NoteImport:
+      type: object
+      properties:
+        title:
+          type: string
+        details:
+          type: string
+    NotebookImport:
+      type: object
+      properties:
+        title:
+          type: string
+        notes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteImport"
+    ImportResult:
+      type: object
+      properties:
+        notebooks:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotebookImportResult"
+        totalImported:
+          type: integer
+          format: int32
+        warnings:
+          type: array
+          items:
+            type: string
+    NotebookImportResult:
+      type: object
+      properties:
+        originalId:
+          type: integer
+          format: int64
+        newId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        notesCount:
+          type: integer
+          format: int32
     ConversationMessage:
       type: object
       properties:
@@ -4643,16 +4757,6 @@ components:
         forgettingCurveIndex:
           type: integer
           format: int32
-    Metadata:
-      type: object
-      properties:
-        version:
-          type: string
-        exportedAt:
-          type: string
-          format: date-time
-        exportedBy:
-          type: string
     NoteExport:
       type: object
       properties:

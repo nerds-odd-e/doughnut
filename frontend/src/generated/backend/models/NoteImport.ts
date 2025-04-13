@@ -2,9 +2,8 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type Metadata = {
-    version?: string;
-    exportedBy?: string;
-    exportedAt?: string;
+export type NoteImport = {
+    title?: string;
+    details?: string;
 };
 

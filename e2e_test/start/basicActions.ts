@@ -58,4 +58,12 @@ export default {
   },
   messageCenterIndicator,
   navigateToMyCircles,
+  importFromJson(filePath: string) {
+    cy.get('input[type="file"]').selectFile(filePath, { force: true })
+    cy.get('button').contains('Import').click()
+  },
+  importAllFromJson(filePath: string) {
+    cy.get('input[type="file"]').selectFile(filePath, { force: true })
+    cy.get('button').contains('Import All').click()
+  }
 }

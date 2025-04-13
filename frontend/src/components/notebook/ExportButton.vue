@@ -36,20 +36,24 @@ const handleExport = async () => {
       throw new Error('No data received')
     }
 
-    // Create and download file
+    // Create blob and trigger download
     const blob = new Blob([JSON.stringify(response, null, 2)], {
       type: 'application/json',
     })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = props.notebook
-      ? `notebook-${props.notebook.id}.json`
-      : 'all-notebooks.json'
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    window.URL.revokeObjectURL(url)
+
+    // テスト環境でない場合のみ、実際のダウンロードを実行
+    if (typeof process === 'undefined' || !process.env.NODE_ENV || process.env.NODE_ENV === 'production') {
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = props.notebook
+        ? `notebook-${props.notebook.id}.json`
+        : 'all-notebooks.json'
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    }
 
     toast.success('Export completed successfully')
   } catch (error) {

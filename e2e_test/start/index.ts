@@ -17,8 +17,8 @@ import {
 
 const start = {
   ...basicActions,
-  questionGenerationService,
-  testability,
+  ...questionGenerationService,
+  ...testability,
   assimilation,
   assumeAssimilationPage,
   recall,
@@ -27,6 +27,8 @@ const start = {
   assumeRaceGamePage,
   routerToRaceGamePage,
   ...downloadChecker(),
+  importFromJson: basicActions.importFromJson,
+  importAllFromJson: basicActions.importAllFromJson,
 }
-export default start
-export { mock_services }
+
+export { start, mock_services }

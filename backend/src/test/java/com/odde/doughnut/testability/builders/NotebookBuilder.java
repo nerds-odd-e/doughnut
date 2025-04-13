@@ -47,4 +47,9 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     noteBuilder.ownership(circle.getOwnership());
     return this;
   }
+
+  public NotebookBuilder title(String title) {
+    noteBuilder.please().getNotebook().setTitle(title);
+    return this;
+  }
 }

@@ -3,6 +3,7 @@
     <div class="daisy-mb-6 daisy-flex daisy-justify-between daisy-items-center">
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
       <ExportButton />
+      <ImportButton />
     </div>
     <main>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
@@ -33,7 +34,7 @@ import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import ExportButton from "@/components/notebook/ExportButton.vue"
-
+import ImportButton from "@/components/notebook/ImportButton.vue"
 const { managedApi } = useLoadingApi()
 
 const user = inject<Ref<User | undefined>>("currentUser")

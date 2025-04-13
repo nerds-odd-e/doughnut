@@ -86,18 +86,18 @@ describe('ExportButton', () => {
   it('disables button during export', async () => {
     const wrapper = mount(ExportButton)
     const button = wrapper.find('button')
-
-    // Mock a delayed response
+    
+    // APIレスポンスを遅延させる
     mockApi.exportController.exportAllNotebooks.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
+      () => new Promise(resolve => setTimeout(resolve, 100))
     )
-
-    // Click the button
-    button.trigger('click')
-
-    // Check that the button is disabled and shows loading state
+    
+    // エクスポートを開始
+    await button.trigger('click')
     await wrapper.vm.$nextTick()
+    
+    // ボタンが無効化され、テキストが「Exporting...」に変更されていることを確認
     expect(button.attributes('disabled')).toBeDefined()
-    expect(button.text()).toBe('Export All')
+    expect(button.text()).toBe('Exporting...')
   })
 }) 

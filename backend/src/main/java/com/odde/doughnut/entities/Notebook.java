@@ -193,4 +193,12 @@ public class Notebook extends EntityIdentifiedByIdOnly {
     notebookAssistant.setAssistantId(id);
     return notebookAssistant;
   }
+
+  public void setTitle(String title) {
+    this.headNote.setTopicConstructor(title);
+  }
+
+  public void setOwner(User owner) {
+    this.ownership.setUser(owner);
+  }
 }

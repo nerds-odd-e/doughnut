@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Circle } from './Circle';
 import type { NotebookSettings } from './NotebookSettings';
+import type { User } from './User';
 export type Notebook = {
     id: number;
     certifiable?: boolean;
@@ -14,5 +15,6 @@ export type Notebook = {
     headNoteId: number;
     shortDetails?: string;
     updated_at: string;
+    owner?: User;
 };
 
