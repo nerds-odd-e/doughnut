@@ -16,10 +16,9 @@
         <tr>
           <th>Approved</th>
           <th>Question Text</th>
-          <th>A</th>
-          <th>B</th>
-          <th>C</th>
-          <th>D</th>
+          <template v-for="(_, index) in maxChoices" :key="index">
+            <th>{{ String.fromCharCode(65 + index) }}</th>
+          </template>
         </tr>
       </thead>
       <tbody>
@@ -40,12 +39,9 @@
               {{ question.multipleChoicesQuestion.stem }}
             </span>
           </td>
-          <template
-            v-if="question.multipleChoicesQuestion.choices"
-          >
+          <template v-if="question.multipleChoicesQuestion.choices">
             <td
-              v-for="(choice, index) in question
-                .multipleChoicesQuestion.choices"
+              v-for="(choice, index) in question.multipleChoicesQuestion.choices"
               :class="{
                 'correct-choice': index === question.correctAnswerIndex,
               }"
@@ -75,7 +71,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
@@ -109,6 +105,15 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
   }
 }
+
+const maxChoices = computed(() => {
+  return Math.max(
+    ...questions.value.map(
+      (q) => q.multipleChoicesQuestion.choices?.length ?? 0
+    )
+  )
+})
+
 onMounted(() => {
   fetchQuestions()
 })
