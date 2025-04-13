@@ -14,7 +14,7 @@
     <table class="question-table mt-2" v-if="questions.length">
       <thead>
         <tr>
-          <th>Delete</th>
+          <th>Actions</th>
           <th>Approved</th>
           <th>Question Text</th>
           <template v-for="(_, index) in maxChoices" :key="index">
@@ -28,12 +28,26 @@
           :key="question.multipleChoicesQuestion.stem"
         >
           <td>
-            <button 
-              class="btn btn-danger btn-sm"
-              @click="deleteQuestion(question.id)"
-            >
-              🗑
-            </button>
+            <div class="btn-group">
+              <button 
+                class="btn btn-danger btn-sm"
+                @click="deleteQuestion(question.id)"
+              >
+                🗑
+              </button>
+              <PopButton btn-class="btn btn-primary btn-sm" title="✎">
+                <template #default="{ closer }">
+                  <NoteAddQuestion
+                    v-bind="{ note }"
+                    :editQuestion="question"
+                    @close-dialog="
+                      closer();
+                      questionEdited($event, question.id);
+                    "
+                  />
+                </template>
+              </PopButton>
+            </div>
           </td>
           <td>
             <input
@@ -132,6 +146,16 @@ const maxChoices = computed(() => {
     )
   )
 })
+
+const questionEdited = (editedQuestion: PredefinedQuestion, originalId: number) => {
+  if (editedQuestion == null) {
+    return
+  }
+  const index = questions.value.findIndex(q => q.id === originalId)
+  if (index !== -1) {
+    questions.value[index] = editedQuestion
+  }
+}
 
 onMounted(() => {
   fetchQuestions()

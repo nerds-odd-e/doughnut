@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, ref } from "vue"
+import { computed, ref, onMounted } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
@@ -58,6 +58,11 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+  editQuestion: {
+    type: Object as PropType<PredefinedQuestion>,
+    required: false,
+    default: null
+  }
 })
 
 const predefinedQuestion = ref<PredefinedQuestion>({
@@ -130,4 +135,10 @@ const generateQuestionByAI = async () => {
       props.note.id
     )
 }
+
+onMounted(() => {
+  if (props.editQuestion) {
+    predefinedQuestion.value = JSON.parse(JSON.stringify(props.editQuestion))
+  }
+})
 </script>
