@@ -3097,6 +3097,48 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/FailureReportForView"
+  /api/export/notebooks/{notebook}:
+    get:
+      tags:
+      - export-controller
+      operationId: exportNotebook
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExportDataSchema"
+  /api/export/all:
+    get:
+      tags:
+      - export-controller
+      operationId: exportAllNotebooks
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ExportDataSchema"
   /api/data_upgrade:
     get:
       tags:
@@ -4577,6 +4619,96 @@ components:
           type: string
         body:
           type: string
+    ExportDataSchema:
+      type: object
+      properties:
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        notebooks:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotebookExport"
+    MemoryStatus:
+      type: object
+      properties:
+        lastRecalledAt:
+          type: string
+          format: date-time
+        nextRecallAt:
+          type: string
+          format: date-time
+        repetitionCount:
+          type: integer
+          format: int32
+        forgettingCurveIndex:
+          type: integer
+          format: int32
+    Metadata:
+      type: object
+      properties:
+        version:
+          type: string
+        exportedAt:
+          type: string
+          format: date-time
+        exportedBy:
+          type: string
+    NoteExport:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        details:
+          type: string
+        wikidataId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        links:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteLink"
+        memoryStatus:
+          $ref: "#/components/schemas/MemoryStatus"
+    NoteLink:
+      type: object
+      properties:
+        linkType:
+          type: string
+        targetNoteId:
+          type: integer
+          format: int32
+    NotebookExport:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        shortDetails:
+          type: string
+        certifiable:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        settings:
+          $ref: "#/components/schemas/NotebookSettings"
+        notes:
+          type: array
+          items:
+            $ref: "#/components/schemas/NoteExport"
     CircleForUserView:
       type: object
       properties:

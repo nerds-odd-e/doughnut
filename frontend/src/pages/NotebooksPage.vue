@@ -1,8 +1,9 @@
 <template>
   <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined, title: 'Notebooks' }">
-    <p class="daisy-mb-6">
+    <div class="daisy-mb-6 daisy-flex daisy-justify-between daisy-items-center">
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
-    </p>
+      <ExportButton />
+    </div>
     <main>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
         <template #default="{ notebook }">
@@ -31,6 +32,7 @@ import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithBut
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
+import ExportButton from "@/components/notebook/ExportButton.vue"
 
 const { managedApi } = useLoadingApi()
 

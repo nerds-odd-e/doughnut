@@ -32,6 +32,7 @@
     >
       <SvgBazaarShare />
     </button>
+    <ExportButton :notebook="notebook" />
   </div>
 </template>
 
@@ -49,6 +50,7 @@ import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
+import ExportButton from "./ExportButton.vue"
 
 const { managedApi } = useLoadingApi()
 const router = useRouter()
