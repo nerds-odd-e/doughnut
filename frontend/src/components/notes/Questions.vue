@@ -14,6 +14,7 @@
     <table class="question-table mt-2" v-if="questions.length">
       <thead>
         <tr>
+          <th>Delete</th>
           <th>Approved</th>
           <th>Question Text</th>
           <template v-for="(_, index) in maxChoices" :key="index">
@@ -26,6 +27,14 @@
           v-for="(question, outerIndex) in questions"
           :key="question.multipleChoicesQuestion.stem"
         >
+          <td>
+            <button 
+              class="btn btn-danger btn-sm"
+              @click="deleteQuestion(question.id)"
+            >
+              🗑
+            </button>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
