@@ -20,6 +20,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -54,6 +55,14 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <button
+              class="daisy-btn daisy-btn-error daisy-btn-sm"
+              @click="deleteQuestion(question.id)"
+            >
+              Delete
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -109,6 +118,15 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
   }
 }
+
+const deleteQuestion = async (questionId?: number) => {
+  if (!questionId) return
+  if (!confirm('Are you sure you want to delete this question?')) return
+  
+  await managedApi.restPredefinedQuestionController.deleteQuestion(questionId)
+  questions.value = questions.value.filter(q => q.id !== questionId)
+}
+
 onMounted(() => {
   fetchQuestions()
 })

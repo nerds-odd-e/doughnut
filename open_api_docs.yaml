@@ -3359,6 +3359,26 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/predefined-questions/{predefinedQuestion}:
+    delete:
+      tags:
+      - rest-predefined-question-controller
+      operationId: deleteQuestion
+      parameters:
+      - name: predefinedQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/failure-reports/delete:
     delete:
       tags:

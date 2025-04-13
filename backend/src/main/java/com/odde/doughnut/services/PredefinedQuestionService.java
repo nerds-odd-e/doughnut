@@ -44,6 +44,10 @@ public class PredefinedQuestionService {
     return question;
   }
 
+  public void deleteQuestion(PredefinedQuestion question) {
+    modelFactoryService.remove(question);
+  }
+
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =
