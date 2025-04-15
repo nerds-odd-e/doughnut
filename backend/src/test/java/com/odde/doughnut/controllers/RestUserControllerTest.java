@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
@@ -9,6 +10,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,5 +58,44 @@ class RestUserControllerTest {
     User anotherUser = makeMe.aUser().please();
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser, dto));
+  }
+
+  @Test
+  void createUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
+    String token = controller.createUserToken(userModel.getEntity());
+    assertThat(token, notNullValue());
+  }
+
+  @Test
+  void createTokenForOtherUserShouldFail() {
+    User anotherUser = makeMe.aUser().please();
+    assertThrows(
+        UnexpectedNoAccessRightException.class, () -> controller.createUserToken(anotherUser));
+  }
+
+  @Test
+  void deleteUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
+    controller.deleteUserToken(userModel.getEntity());
+    // No exception thrown means success
+  }
+
+  @Test
+  void deleteTokenForOtherUserShouldFail() {
+    User anotherUser = makeMe.aUser().please();
+    assertThrows(
+        UnexpectedNoAccessRightException.class, () -> controller.deleteUserToken(anotherUser));
+  }
+
+  @Test
+  void getUserTokensSuccessfully() throws UnexpectedNoAccessRightException {
+    List<String> tokens = controller.getUserTokens(userModel.getEntity());
+    assertThat(tokens, notNullValue());
+  }
+
+  @Test
+  void getTokensForOtherUserShouldFail() {
+    User anotherUser = makeMe.aUser().please();
+    assertThrows(
+        UnexpectedNoAccessRightException.class, () -> controller.getUserTokens(anotherUser));
   }
 }

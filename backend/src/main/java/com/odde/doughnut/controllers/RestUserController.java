@@ -9,6 +9,8 @@ import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,5 +50,30 @@ class RestUserController {
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
     modelFactoryService.save(user);
     return user;
+  }
+
+  @PostMapping("/{user}/token")
+  @Transactional
+  public String createUserToken(@PathVariable @Schema(type = "integer") User user)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(user);
+    // TODO: Implement actual token generation and storage
+    return "generated_token";
+  }
+
+  @DeleteMapping("/{user}/token")
+  @Transactional
+  public void deleteUserToken(@PathVariable @Schema(type = "integer") User user)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(user);
+    // TODO: Implement token deletion
+  }
+
+  @GetMapping("/{user}/tokens")
+  public List<String> getUserTokens(@PathVariable @Schema(type = "integer") User user)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(user);
+    // TODO: Implement fetching user tokens
+    return new ArrayList<>();
   }
 }
