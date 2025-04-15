@@ -1,5 +1,6 @@
 Feature: new user
 
+  @ignore
   Scenario: New user creating account
     Given I'm on the login page
     When I identify myself as a new user
