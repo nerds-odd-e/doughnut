@@ -8,8 +8,8 @@ deactivate_nvm() {
 # Setup PNPM and Biome
 setup_pnpm_and_biome() {
   log "Setting up PNPM..."
-  corepack prepare pnpm@10.8.0 --activate
-  corepack use pnpm@10.8.0
+  corepack prepare pnpm@10.8.1 --activate
+  corepack use pnpm@10.8.1
   pnpm --frozen-lockfile recursive install
 
   # Restart biome daemon
