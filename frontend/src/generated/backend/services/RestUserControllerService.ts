@@ -41,6 +41,44 @@ export class RestUserControllerService {
     }
     /**
      * @param user
+     * @returns string OK
+     * @throws ApiError
+     */
+    public createUserToken(
+        user: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/user/{user}/token',
+            path: {
+                'user': user,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param user
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteUserToken(
+        user: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/user/{user}/token',
+            path: {
+                'user': user,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param user
      * @param requestBody
      * @returns User OK
      * @throws ApiError
@@ -57,6 +95,25 @@ export class RestUserControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param user
+     * @returns string OK
+     * @throws ApiError
+     */
+    public getUserTokens(
+        user: number,
+    ): CancelablePromise<Array<string>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/user/{user}/tokens',
+            path: {
+                'user': user,
+            },
             errors: {
                 500: `Internal Server Error`,
             },

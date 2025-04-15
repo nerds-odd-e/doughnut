@@ -46,6 +46,49 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/User"
+  /api/user/{user}/token:
+    post:
+      tags:
+      - rest-user-controller
+      operationId: createUserToken
+      parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      tags:
+      - rest-user-controller
+      operationId: deleteUserToken
+      parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
@@ -2525,6 +2568,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WikidataEntityData"
+  /api/user/{user}/tokens:
+    get:
+      tags:
+      - rest-user-controller
+      operationId: getUserTokens
+      parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  type: string
   /api/user/current-user-info:
     get:
       tags:
