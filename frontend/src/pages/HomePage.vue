@@ -204,6 +204,8 @@ onUnmounted(() => {
 .welcome-text {
   text-align: center;
   margin-bottom: 3rem;
+  font-size: 2rem;
+  font-weight: 600;
 }
 
 .learning-process {
