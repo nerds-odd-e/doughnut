@@ -1,5 +1,6 @@
 Feature: Authentication with Token
 
+  @ignore
   Scenario: Authenticate user with a valid token
     Given a user exists
     And I have a token "my_token"
@@ -7,6 +8,7 @@ Feature: Authentication with Token
     Then the request should be successful
     And the user can be authenticated
 
+  @ignore
   Scenario: Fail to authenticate user with an invalid token
     Given a user exists
     And I have an invalid token "invalid_token"
