@@ -51,13 +51,6 @@ const commonConfig = {
             })
           })
         },
-
-        checkMcpServerStatus() {
-          // 実際のMCPサーバーのステータスチェックを実装
-          // ここでは簡単な例として、常に'running'を返す
-          return 'running';
-        },
-
         fileShouldExistSoon(filePath, retryCount = 50): Promise<boolean> {
           const checker = (count: number): Promise<boolean> => {
             return new Promise((resolve) => {
