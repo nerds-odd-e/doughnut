@@ -62,11 +62,11 @@ When('I save my profile with:', (data: DataTable) => {
   cy.get('input[value="Submit"]').click()
 })
 
-When('I click button "generate"', ()=>{
+When('I click button "generate"', () => {
   cy.findByRole('button', { name: 'generate' }).click()
 })
 
-When('I click "MCP Token" in side menu', ()=>{
+When('I click "MCP Token" in side menu', () => {
   cy.findByRole('link', { name: 'MCP Token' }).click()
 })
 
@@ -142,11 +142,11 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
 
-Then('I should see generated Token', ()=>{
-
+Then('I should see generated Token', () => {
+  return
 })
 
-Then('I should see MCP token', ()=>{
+Then('I should see MCP token', () => {
   cy.get('input[data-testid="mcp-token"]')
     .should('be.visible')
     .should('have.value')
