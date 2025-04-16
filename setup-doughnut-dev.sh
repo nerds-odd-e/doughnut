@@ -54,29 +54,6 @@ check_wsl2() {
   fi
 }
 
-download_nixpkg_manager_install_script() {
-  if ! command -v curl >/dev/null 2>&1; then
-    log "Error: curl is required but not installed"
-    exit 1
-  fi
-
-  # Check internet connectivity
-  if ! curl -s --head https://install.lix.systems >/dev/null; then
-    log "Error: No internet connection or install.lix.systems is unreachable"
-    exit 1
-  fi
-
-  rm -f ./install-nix
-  if ! curl -sSf -L -o "${TEMP_DIR}/install-nix" https://install.lix.systems/lix; then
-    log "Failed to download nix installer"
-    exit 1
-  fi
-  chmod +x "${TEMP_DIR}/install-nix" || {
-    log "Failed to make installer executable"
-    exit 1
-  }
-}
-
 configure_nix_flakes() {
   local flakes_config="experimental-features = nix-command flakes"
 
@@ -108,16 +85,23 @@ install_nixpkg_manager() {
     return 0
   fi
 
-  log "Starting nix installation"
-  download_nixpkg_manager_install_script
+  log "Starting nix installation using Determinate Nix Installer"
 
-  touch "${HOME}/.bash_profile"
-
-  if [[ "${os_type}" == "Mac" || "${os_type}" == "Linux" ]]; then
-    cat "${TEMP_DIR}/install-nix" | sh -s -- install
-  else
-    log "Error: Unsupported OS Platform for Nix development environment"
+  # Check internet connectivity
+  if ! curl -s --head https://install.determinate.systems/nix >/dev/null; then
+    log "Error: No internet connection or install.determinate.systems is unreachable"
     exit 1
+  fi
+
+  # Install Nix using Determinate Nix Installer
+  if ! curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate; then
+    log "Failed to install Nix using Determinate Nix Installer"
+    exit 1
+  fi
+
+  # Source nix in current shell
+  if [ -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh' ]; then
+    . '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh'
   fi
 
   allow_nix_unfree
@@ -142,6 +126,7 @@ main() {
     log "------------------------------------------ CONGRATS !!! ----------------------------------------------------"
     log "  doughnut basic nix development environment tooling setup completed successfully."
     log "  Please exit this shell terminal and start a new one in doughnut root directory then execute 'nix develop'."
+    log "  To uninstall Nix in the future, you can run: /nix/nix-installer uninstall"
     log "------------------------------------------    END       ----------------------------------------------------"
   else
     log "------------------------------------------ WARNING !!! ----------------------------------------------------"
