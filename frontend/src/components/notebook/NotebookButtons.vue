@@ -1,6 +1,7 @@
 <template>
   <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
+    <label v-if="isDefault" class="daisy-float-left">Default</label>
     <PopButton title="Edit notebook settings">
       <template #button_face>
         <SvgEditNotebook />
@@ -36,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -65,4 +67,6 @@ const shareNotebook = async () => {
     router.push({ name: "notebooks" })
   }
 }
+
+const isDefault = computed(() => false /* props.notebook.isDefault */)
 </script>

@@ -28,7 +28,4 @@ export const notebookCard = (notebook: string) => ({
   importObsidianData(filename: string) {
     return this.editNotebookSettings().importObsidianData(filename)
   },
-  selectAsDefault() {
-    findNotebookCardButton(notebook, 'Make default').click()
-  },
 })
