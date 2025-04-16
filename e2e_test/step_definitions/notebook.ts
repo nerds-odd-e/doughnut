@@ -189,3 +189,13 @@ Then('I should see popup {string}', (message: string) => {
     expect(text).to.equal(message)
   })
 })
+
+When(
+  'I select {string} as default notebook',
+  (notebookTitle: string) => {
+    start
+      .routerToNotebooksPage()
+      .notebookCard(notebookTitle)
+      .selectAsDefault()
+  }
+)
