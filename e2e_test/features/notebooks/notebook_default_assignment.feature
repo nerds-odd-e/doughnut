@@ -9,5 +9,5 @@ Feature: Notebook default assignment
 
   @ignore
   Scenario: Assign notebook as default
-    When I select Notebook Two as default
-    Then Notebook Two is the default for existing user
+    When I select the notebook with title "Notebook Two" as default
+    Then the notebook "Notebook Two" is the default for existing user
