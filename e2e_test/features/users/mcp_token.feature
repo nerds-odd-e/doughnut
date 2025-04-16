@@ -5,12 +5,18 @@ Feature: Handling MCP Token
 
   @ignore
   Scenario: Generate MCP Token
-    When I click "MCP Token" in side menu
-    When I click button "generate"
+    When I generate MCP Token
     Then I should see generated Token
 
   @ignore
   Scenario: Delete MCP Token
-    When I click "MCP Token" in side menu
-    When I click button "delete"
+    Given I have MCP Token
+    When I delete MCP Token
     Then I should see empty MCP Token
+    And the Token can not be used
+
+  @ignore
+  Scenario: Authenticate user with a valid token
+    Given I have MCP Token
+    When I query MCP server with MCP token
+    Then the request should be successful
