@@ -43,6 +43,11 @@ Given("I'm on the login page", () => {
   cy.visit('/users/identify')
 })
 
+Given('I have MCP Token', () => {
+  start.mainMenu().userOptions().mcpToken()
+  cy.findByRole('button', { name: 'Generate' }).click()
+})
+
 When('I identify myself as a new user', () => {
   cy.get('#username').type('user')
   cy.get('#password').type('password')
@@ -70,6 +75,10 @@ When('I generate MCP Token', () => {
   start.mainMenu().userOptions().mcpToken()
 })
 
+When('I delete MCP Token', () => {
+  cy.findByRole('button', { name: 'Delete' }).click()
+})
+
 Then('I should see {string} in the page', (content) => {
   cy.get('body').should('contain', content)
 })
@@ -90,6 +99,10 @@ Then('my space setting is {string}', (number: string) => {
 
 Then("I haven't login", () => {
   start.logout()
+})
+
+Then('I should see empty MCP Token', () => {
+  cy.findByTestId('mcp-token').should('have.value', '')
 })
 
 When('I visit the falure reports on the admin page', () => {

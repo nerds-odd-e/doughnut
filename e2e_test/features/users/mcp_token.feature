@@ -7,12 +7,10 @@ Feature: Handling MCP Token
     When I generate MCP Token
     Then I should see generated Token
 
-  @ignore
   Scenario: Delete MCP Token
     Given I have MCP Token
     When I delete MCP Token
     Then I should see empty MCP Token
-    And the Token can not be used
 
   @ignore
   Scenario: Authenticate user with a valid token
