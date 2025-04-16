@@ -190,6 +190,8 @@ Then('I should see popup {string}', (message: string) => {
   })
 })
 
-When('I select the notebook with title {string} as default', (notebookTitle: string) =>
-  start.routerToNotebooksPage().notebookCard(notebookTitle).selectAsDefault()
+When(
+  'I select the notebook with title {string} as default',
+  (notebookTitle: string) =>
+    start.routerToNotebooksPage().notebookCard(notebookTitle).selectAsDefault()
 )
