@@ -44,8 +44,7 @@ Given("I'm on the login page", () => {
 })
 
 Given('I have MCP Token', () => {
-  start.mainMenu().userOptions().mcpToken()
-  cy.findByRole('button', { name: 'Generate' }).click()
+  start.mainMenu().userOptions().generateMcpToken()
 })
 
 When('I identify myself as a new user', () => {
@@ -68,7 +67,7 @@ When('I save my profile with:', (data: DataTable) => {
 })
 
 When('I generate MCP Token', () => {
-  start.mainMenu().userOptions().mcpToken()
+  start.mainMenu().userOptions().generateMcpToken()
 })
 
 When('I delete MCP Token', () => {
@@ -152,7 +151,9 @@ Then('I should be on the welcome page and asked to login', () => {
 })
 
 Then('I should see generated Token', () => {
-  return
+  cy.get('input[data-testid="mcp-token"]')
+    .should('be.visible')
+    .should('have.value', 'generated_token')
 })
 
 Then('I should see MCP token', () => {

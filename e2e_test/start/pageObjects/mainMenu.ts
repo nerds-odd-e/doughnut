@@ -32,8 +32,9 @@ export const mainMenu = () => {
         logout() {
           cy.findByRole('link', { name: 'Logout' }).click({ force: true })
         },
-        mcpToken() {
+        generateMcpToken() {
           cy.findByRole('link', { name: 'MCP Token' }).click()
+          cy.findByRole('button', { name: 'Generate' }).click()
         },
         myAssessmentAndCertificateHistory() {
           cy.findByRole('link', {
