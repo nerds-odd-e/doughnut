@@ -2,10 +2,8 @@ Feature: Notebook default assignment
 
   Background:
     Given I am logged in as an existing user
-      And there are some notes:
-      | Title        | Details         | Parent Title |
-      | Notebook One | First notebook  | Notebook One |
-      | Notebook Two | Second notebook | Notebook Two |
+      And I create a notebook with the title "Notebook One"
+      And I create a notebook with the title "Notebook Two"
 
   @ignore
   Scenario: Assign notebook as default
