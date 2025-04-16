@@ -63,7 +63,7 @@ class RestUserControllerTest {
   @Test
   void createUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
     String token = controller.createUserToken(userModel.getEntity());
-    assertThat(token, notNullValue());
+    assertThat(token, equalTo("generated_token"));
   }
 
   @Test
