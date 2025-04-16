@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { Token } from '../models/Token';
 import type { User } from '../models/User';
 import type { UserDTO } from '../models/UserDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
@@ -41,12 +42,12 @@ export class RestUserControllerService {
     }
     /**
      * @param user
-     * @returns string OK
+     * @returns Token OK
      * @throws ApiError
      */
     public createUserToken(
         user: number,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<Token> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/user/{user}/token',

@@ -45,7 +45,9 @@ const userId = user.value.id
 const token = ref("")
 
 const generateToken = async () => {
-  token.value = await managedApi.restUserController.createUserToken(userId)
+  const response = await managedApi.restUserController.createUserToken(userId)
+  console.log(response)
+  token.value = response.token ?? ""
 }
 
 const deleteToken = async () => {

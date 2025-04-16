@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
+import com.odde.doughnut.entities.Token;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -54,11 +55,11 @@ class RestUserController {
 
   @PostMapping("/{user}/token")
   @Transactional
-  public String createUserToken(@PathVariable @Schema(type = "integer") User user)
+  public Token createUserToken(@PathVariable @Schema(type = "integer") User user)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     // TODO: Implement actual token generation and storage
-    return "{\"token\": \"generated_token\"}";
+    return new Token("generated_token");
   }
 
   @DeleteMapping("/{user}/token")
