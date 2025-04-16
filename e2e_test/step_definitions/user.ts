@@ -67,10 +67,6 @@ When('I save my profile with:', (data: DataTable) => {
   cy.get('input[value="Submit"]').click()
 })
 
-When('I click button "generate"', () => {
-  cy.findByRole('button', { name: 'generate' }).click()
-})
-
 When('I generate MCP Token', () => {
   start.mainMenu().userOptions().mcpToken()
 })
