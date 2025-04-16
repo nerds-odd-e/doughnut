@@ -13,7 +13,6 @@ export const useTokenApi = () => {
       await api.restUserController.deleteUserToken(userId)
     },
 
-    async getTokens(userId: number): Promise<string[]> {
     async getTokens(userId: number): Promise<Token[]> {
       const response = await api.restUserController.getUserTokens(userId)
       return response

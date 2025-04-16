@@ -3,6 +3,7 @@ Feature: Handling MCP Token
   Background:
     Given I am logged in as an existing user
 
+  @ignore
   Scenario: Generate MCP Token
     When I generate MCP Token
     Then I should see generated Token

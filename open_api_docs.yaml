@@ -69,7 +69,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/Token"
+                type: string
     delete:
       tags:
       - rest-user-controller
@@ -3499,24 +3499,6 @@ components:
       - externalIdentifier
       - id
       - name
-    Token:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        user:
-          $ref: "#/components/schemas/User"
-        token:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        expiresAt:
-          type: string
-          format: date-time
-        revoked:
-          type: boolean
     TimeTravelRelativeToNow:
       type: object
       properties:
