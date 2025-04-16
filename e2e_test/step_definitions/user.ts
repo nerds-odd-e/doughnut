@@ -66,8 +66,7 @@ When('I click button "generate"', () => {
   cy.findByRole('button', { name: 'generate' }).click()
 })
 
-When('I click "MCP Token" in side menu', () => {
-  cy.findByRole('link', { name: 'MCP Token' }).click()
+When('I generate MCP Token', () => {
   start.mainMenu().userOptions().mcpToken()
 })
 
