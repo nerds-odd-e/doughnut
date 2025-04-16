@@ -7,7 +7,6 @@ Feature: Notebook default assignment
       | Notebook One | First notebook  | Notebook One |
       | Notebook Two | Second notebook | Notebook Two |
 
-
   @ignore
   Scenario: Assign notebook as default
     When I select Notebook Two as default
