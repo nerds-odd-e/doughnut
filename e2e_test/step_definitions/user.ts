@@ -7,6 +7,9 @@ import { Given, Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import type { DataTable } from '@cucumber/cucumber'
 import start from '../start'
 
+// UUIDの正規表現パターン
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+
 Given('I am logged in as {string}', (externalIdentifier: string) => {
   start.loginAs(externalIdentifier)
 })
@@ -151,13 +154,11 @@ Then('I should be on the welcome page and asked to login', () => {
 })
 
 Then('I should see generated Token', () => {
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
   cy.get('input[data-testid="mcp-token"]')
     .should('be.visible')
     .invoke('val')
-    .should(
-      'match',
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-    )
+    .should('match', uuidPattern)
 })
 
 Then('I should see MCP token', () => {
