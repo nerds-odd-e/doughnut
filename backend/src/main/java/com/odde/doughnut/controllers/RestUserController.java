@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
+import com.odde.doughnut.controllers.dto.UserTokenDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -9,6 +10,7 @@ import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,11 +56,17 @@ class RestUserController {
 
   @PostMapping("/{user}/token")
   @Transactional
-  public String createUserToken(@PathVariable @Schema(type = "integer") User user)
+  public UserTokenDTO createUserToken(@PathVariable @Schema(type = "integer") User user)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
-    // TODO: Implement actual token generation and storage
-    return "generated_token";
+
+    // 単純な実装例（実際のトークン生成と保存はTODOとして残す）
+    String token = "generated_token";
+    String name = "API Token";
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime expiry = now.plusYears(1);
+
+    return new UserTokenDTO(token, name, now, expiry);
   }
 
   @DeleteMapping("/{user}/token")

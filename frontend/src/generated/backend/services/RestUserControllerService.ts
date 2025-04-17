@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { User } from '../models/User';
 import type { UserDTO } from '../models/UserDTO';
+import type { UserTokenDTO } from '../models/UserTokenDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestUserControllerService {
@@ -41,12 +42,12 @@ export class RestUserControllerService {
     }
     /**
      * @param user
-     * @returns string OK
+     * @returns UserTokenDTO OK
      * @throws ApiError
      */
     public createUserToken(
         user: number,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<UserTokenDTO> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/user/{user}/token',

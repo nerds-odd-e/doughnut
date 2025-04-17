@@ -148,6 +148,7 @@ export type { Usage } from './models/Usage';
 export type { User } from './models/User';
 export type { UserDTO } from './models/UserDTO';
 export type { UserForOtherUserView } from './models/UserForOtherUserView';
+export type { UserTokenDTO } from './models/UserTokenDTO';
 export type { VectorStore } from './models/VectorStore';
 export type { WikidataAssociationCreation } from './models/WikidataAssociationCreation';
 export type { WikidataEntityData } from './models/WikidataEntityData';

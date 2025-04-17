@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
+import com.odde.doughnut.controllers.dto.UserTokenDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -62,8 +62,12 @@ class RestUserControllerTest {
 
   @Test
   void createUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
-    String token = controller.createUserToken(userModel.getEntity());
-    assertThat(token, equalTo("generated_token"));
+    UserTokenDTO tokenDTO = controller.createUserToken(userModel.getEntity());
+    assertThat(tokenDTO, notNullValue());
+    assertThat(tokenDTO.getToken(), notNullValue());
+    assertThat(tokenDTO.getName(), equalTo("API Token"));
+    assertThat(tokenDTO.getCreatedAt(), notNullValue());
+    assertThat(tokenDTO.getExpiresAt(), notNullValue());
   }
 
   @Test

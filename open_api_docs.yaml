@@ -69,7 +69,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/UserTokenDTO"
     delete:
       tags:
       - rest-user-controller
@@ -3499,6 +3499,19 @@ components:
       - externalIdentifier
       - id
       - name
+    UserTokenDTO:
+      type: object
+      properties:
+        token:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
     TimeTravelRelativeToNow:
       type: object
       properties:
