@@ -29,7 +29,8 @@ export const notebookCard = (notebook: string) => ({
     return this.editNotebookSettings().importObsidianData(filename)
   },
   shouldBeDefault() {
-    cy.findByText(notebook, { selector: '.notebook-card *' })
-      .parents('.notebook-card')
+    cy.findByText(notebook, { selector: '.notebook-card *' }).parents(
+      '.notebook-card'
+    )
   },
 })

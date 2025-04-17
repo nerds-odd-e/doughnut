@@ -201,10 +201,19 @@ When(
   }
 )
 
-Then('I should see the notebook {string} as default', (notebookTitle: string) => {
-  start.routerToNotebooksPage().notebookCard(notebookTitle).shouldBeDefault()
-})
+Then(
+  'I should see the notebook {string} as default',
+  (notebookTitle: string) => {
+    start.routerToNotebooksPage().notebookCard(notebookTitle).shouldBeDefault()
+  }
+)
 
-Then('I do not see the notebook {string} as default', (notebookTitle: string) => {
-  start.routerToNotebooksPage().notebookCard(notebookTitle).shouldNotBeDefault()
-})
+Then(
+  'I do not see the notebook {string} as default',
+  (notebookTitle: string) => {
+    start
+      .routerToNotebooksPage()
+      .notebookCard(notebookTitle)
+      .shouldNotBeDefault()
+  }
+)
