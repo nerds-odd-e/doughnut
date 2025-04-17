@@ -59,7 +59,7 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
   implementation 'org.springframework.ai:spring-ai-openai'
-  implementation platform("org.springframework.ai:spring-ai-starter-mcp-server-webmvc")
+  implementation "org.springframework.ai:spring-ai-starter-mcp-server-webmvc"
 }
 
 dependencyManagement {

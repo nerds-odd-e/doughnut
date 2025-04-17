@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class InstructionService {
 
   @Tool(description = "Get instruction")
-  public String getInstruction(String instruction) {
+  public String getInstruction() {
     return "hello";
   }
 }
