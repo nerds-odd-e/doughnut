@@ -65,7 +65,6 @@ class RestUserControllerTest {
     UserTokenDTO tokenDTO = controller.createUserToken(userModel.getEntity());
     assertThat(tokenDTO, notNullValue());
     assertThat(tokenDTO.getToken(), notNullValue());
-    assertThat(tokenDTO.getName(), equalTo("API Token"));
     assertThat(tokenDTO.getCreatedAt(), notNullValue());
     assertThat(tokenDTO.getExpiresAt(), notNullValue());
   }

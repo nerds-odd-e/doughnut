@@ -3504,8 +3504,6 @@ components:
       properties:
         token:
           type: string
-        name:
-          type: string
         createdAt:
           type: string
           format: date-time

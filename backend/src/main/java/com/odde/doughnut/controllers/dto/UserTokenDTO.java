@@ -12,7 +12,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserTokenDTO {
   private String token;
-  private String name;
   private LocalDateTime createdAt;
   private LocalDateTime expiresAt;
 }

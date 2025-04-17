@@ -4,7 +4,6 @@
 /* eslint-disable */
 export type UserTokenDTO = {
     token?: string;
-    name?: string;
     createdAt?: string;
     expiresAt?: string;
 };

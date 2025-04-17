@@ -63,11 +63,10 @@ class RestUserController {
 
     // 単純な実装例（実際のトークン生成と保存はTODOとして残す）
     String token = UUID.randomUUID().toString();
-    String name = "API Token";
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime expiry = now.plusYears(1);
 
-    return new UserTokenDTO(token, name, now, expiry);
+    return new UserTokenDTO(token, now, expiry);
   }
 
   @DeleteMapping("/{user}/token")
