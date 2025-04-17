@@ -153,7 +153,11 @@ Then('I should be on the welcome page and asked to login', () => {
 Then('I should see generated Token', () => {
   cy.get('input[data-testid="mcp-token"]')
     .should('be.visible')
-    .should('have.value', 'generated_token')
+    .invoke('val')
+    .should(
+      'match',
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    )
 })
 
 Then('I should see MCP token', () => {

@@ -13,6 +13,7 @@ import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -61,7 +62,7 @@ class RestUserController {
     currentUser.assertAuthorization(user);
 
     // 単純な実装例（実際のトークン生成と保存はTODOとして残す）
-    String token = "generated_token";
+    String token = UUID.randomUUID().toString();
     String name = "API Token";
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime expiry = now.plusYears(1);
