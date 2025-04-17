@@ -207,13 +207,3 @@ Then(
     start.routerToNotebooksPage().notebookCard(notebookTitle).shouldBeDefault()
   }
 )
-
-Then(
-  'I do not see the notebook {string} as default',
-  (notebookTitle: string) => {
-    start
-      .routerToNotebooksPage()
-      .notebookCard(notebookTitle)
-      .shouldNotBeDefault()
-  }
-)
