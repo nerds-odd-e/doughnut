@@ -7,6 +7,12 @@ Feature: Handling MCP Token
     When I generate MCP Token
     Then I should see generated Token
 
+  @ignore
+  Scenario: Generate MCP Token & Refresh Page
+    When I generate MCP Token
+    And I refresh page
+    Then I should see generated Token
+    
   Scenario: Delete MCP Token
     Given I have MCP Token
     When I delete MCP Token
