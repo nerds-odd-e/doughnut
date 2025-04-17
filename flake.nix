@@ -61,6 +61,22 @@
           fzf
         ];
 
+        basePackagesNoNode = with pkgs; [
+          zulu23
+          git
+          git-secret
+          gitleaks
+          jq
+          libmysqlclient
+          mysql80
+          mysql-client
+          mysql_jdbc
+          yamllint
+          nixfmt-classic
+          hclfmt
+          fzf
+        ];
+
         darwinPackages = with pkgs; lib.optionals stdenv.isDarwin [ sequelpro ];
 
         linuxPackages = with pkgs; lib.optionals (!stdenv.isDarwin) [
@@ -97,71 +113,137 @@
           cairo
         ];
       in {
-        devShells.default = pkgs.mkShell {
-          name = "doughnut";
-          nativeBuildInputs = with pkgs;
-            [
-              autoPatchelfHook
-            ];
-          buildInputs = with pkgs;
-            basePackages
-            ++ darwinPackages
-            ++ linuxPackages
-            ++ pythonPackages;
+        devShells = {
+          default = pkgs.mkShell {
+            name = "doughnut";
+            nativeBuildInputs = with pkgs;
+              [
+                autoPatchelfHook
+              ];
+            buildInputs = with pkgs;
+              basePackages
+              ++ darwinPackages
+              ++ linuxPackages
+              ++ pythonPackages;
 
-          shellHook = ''
-            # Source helper scripts
-            source ./scripts/shell_setup.sh
-            source ./scripts/dev_setup.sh
+            NIX_CFLAGS_COMPILE = "-Wno-error=deprecated-declarations";
+            
+            shellHook = ''
+              # Source helper scripts
+              source ./scripts/shell_setup.sh
+              source ./scripts/dev_setup.sh
 
-            # Initialize basic shell environment
-            setup_shell
-            setup_logging
-            setup_fzf "${pkgs.fzf}"
+              # Initialize basic shell environment
+              setup_shell
+              setup_logging
+              setup_fzf "${pkgs.fzf}"
 
-            # Add git push script alias
-            alias g='./scripts/git_push.sh'
+              # Add git push script alias
+              alias g='./scripts/git_push.sh'
 
-            # Deactivate nvm if exists
-            deactivate_nvm
+              # Deactivate nvm if exists
+              deactivate_nvm
 
-            # Setup core environment
-            setup_env_vars
+              # Setup core environment
+              setup_env_vars
 
-            # Setup MySQL environment
-            setup_mysql_env "${pkgs.mysql80}"
+              # Setup MySQL environment
+              setup_mysql_env "${pkgs.mysql80}"
 
-            # Add Python to PATH if enabled
-            if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
-              export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
-              export PATH="${poetryPath}:$PYTHON_PATH/bin:$PATH"
+              # Add Python to PATH if enabled
+              if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
+                export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
+                export PATH="${poetryPath}:$PYTHON_PATH/bin:$PATH"
 
-              # Setup Python environment if enabled
-              setup_python "${poetryPath}"
-            fi
-
-            echo "CURSOR_DEV: ''${CURSOR_DEV:-}"
-            if [ "''${CURSOR_DEV:-}" != "true" ]; then
-              # Setup development environment
-              setup_pnpm_and_biome
-              setup_cypress
-
-              # Start MySQL if not running
-              if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
-                log "Starting MySQL server..."
-                ./scripts/init_mysql.sh
-                check_mysql_ready
-              else
-                log "MySQL is running on port 3309 & ready to go! 🏃"
+                # Setup Python environment if enabled
+                setup_python "${poetryPath}"
               fi
-            fi
 
-            # Print environment information
-            print_env_info
+              echo "CURSOR_DEV: ''${CURSOR_DEV:-}"
+              if [ "''${CURSOR_DEV:-}" != "true" ]; then
+                # Setup development environment
+                setup_pnpm_and_biome
+                setup_cypress
 
-            log "Environment setup complete! 🎉"
-            return 0
-          '';
+                # Start MySQL if not running
+                if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
+                  log "Starting MySQL server..."
+                  ./scripts/init_mysql.sh
+                  check_mysql_ready
+                else
+                  log "MySQL is running on port 3309 & ready to go! 🏃"
+                fi
+              fi
+
+              # Print environment information
+              print_env_info
+
+              log "Environment setup complete! 🎉"
+              return 0
+            '';
+          };
+
+          nonode = pkgs.mkShell {
+            name = "doughnut-nonode";
+            nativeBuildInputs = with pkgs;
+              [
+                autoPatchelfHook
+              ];
+            buildInputs = with pkgs;
+              basePackagesNoNode
+              ++ darwinPackages
+              ++ linuxPackages
+              ++ pythonPackages;
+
+            NIX_CFLAGS_COMPILE = "-Wno-error=deprecated-declarations";
+            
+            shellHook = ''
+              # Source helper scripts
+              source ./scripts/shell_setup.sh
+              source ./scripts/dev_setup.sh
+
+              # Initialize basic shell environment
+              setup_shell
+              setup_logging
+              setup_fzf "${pkgs.fzf}"
+
+              # Add git push script alias
+              alias g='./scripts/git_push.sh'
+
+              # Setup core environment
+              setup_env_vars
+
+              # Setup MySQL environment
+              setup_mysql_env "${pkgs.mysql80}"
+
+              # Add Python to PATH if enabled
+              if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
+                export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
+                export PATH="${poetryPath}:$PYTHON_PATH/bin:$PATH"
+
+                # Setup Python environment if enabled
+                setup_python "${poetryPath}"
+              fi
+
+              echo "CURSOR_DEV: ''${CURSOR_DEV:-}"
+              if [ "''${CURSOR_DEV:-}" != "true" ]; then
+                # Start MySQL if not running
+                if ! lsof -i :3309 -sTCP:LISTEN >/dev/null 2>&1; then
+                  log "Starting MySQL server..."
+                  ./scripts/init_mysql.sh
+                  check_mysql_ready
+                else
+                  log "MySQL is running on port 3309 & ready to go! 🏃"
+                fi
+              fi
+
+              # Print environment information
+              print_env_info
+
+              log "Environment setup complete! 🎉"
+              return 0
+            '';
+          };
         };
       });
 }
