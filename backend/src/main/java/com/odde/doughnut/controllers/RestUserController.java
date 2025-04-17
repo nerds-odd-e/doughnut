@@ -58,7 +58,7 @@ class RestUserController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     // TODO: Implement actual token generation and storage
-    return "{\"token\": \"generated_token\"}";
+    return "generated_token";
   }
 
   @DeleteMapping("/{user}/token")
