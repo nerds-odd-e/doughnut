@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { inject, type Ref } from "vue"
 import type { User } from "@/generated/backend"
@@ -44,6 +44,16 @@ const userId = user.value.id
 
 const token = ref("")
 
+const fetchTokens = async () => {
+  const tokens = await managedApi.restUserController.getUserTokens(userId)
+  if (tokens && tokens.length > 0) {
+    const firstToken = tokens[0]
+    if (firstToken) {
+      token.value = firstToken
+    }
+  }
+}
+
 const generateToken = async () => {
   const response = await managedApi.restUserController.createUserToken(userId)
   console.log("token", response)
@@ -54,4 +64,6 @@ const deleteToken = async () => {
   token.value = ""
   await managedApi.restUserController.deleteUserToken(userId)
 }
+
+onMounted(fetchTokens)
 </script> 

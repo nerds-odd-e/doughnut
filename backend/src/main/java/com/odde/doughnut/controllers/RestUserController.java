@@ -82,6 +82,8 @@ class RestUserController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     // TODO: Implement fetching user tokens
-    return new ArrayList<>();
+    List<String> tokens = new ArrayList<>();
+    tokens.add(UUID.randomUUID().toString());
+    return tokens;
   }
 }
