@@ -8,9 +8,8 @@ Feature: Handling MCP Token
     Then I should see generated Token
 
   @ignore
-  Scenario: Generate MCP Token & Refresh Page
-    When I generate MCP Token
-    And I refresh page
+  Scenario: Generate MCP Token & Reload Page
+    When I generate MCP Token and I reload page
     Then I should see generated Token
     
   Scenario: Delete MCP Token

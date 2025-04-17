@@ -74,6 +74,11 @@ When('I delete MCP Token', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
 })
 
+When('I generate MCP Token and I reload page', () => {
+  start.mainMenu().userOptions().generateMcpToken()
+  cy.reload()
+})
+
 Then('I should see {string} in the page', (content) => {
   cy.get('body').should('contain', content)
 })
