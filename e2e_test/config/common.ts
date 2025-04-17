@@ -19,6 +19,8 @@ const commonConfig = {
   defaultCommandTimeout: 6000,
   trashAssetsBeforeRuns: true,
   environment: 'ci',
+  backendBaseUrl: 'http://localhost:9081',
+
   e2e: {
     async setupNodeEvents(
       on: Cypress.PluginEvents,
@@ -50,12 +52,6 @@ const commonConfig = {
               resolve(null)
             })
           })
-        },
-
-        checkMcpServerStatus() {
-          // 実際のMCPサーバーのステータスチェックを実装
-          // ここでは簡単な例として、常に'running'を返す
-          return 'running'
         },
 
         fileShouldExistSoon(filePath, retryCount = 50): Promise<boolean> {
