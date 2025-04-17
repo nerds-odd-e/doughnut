@@ -169,6 +169,11 @@
             </PopButton>
           </li>
           <li>
+            <button class="daisy-btn daisy-btn-ghost daisy-w-full">
+              <span class="ms-2">Make default</span>
+            </button>
+          </li>
+          <li>
             <NoteDeleteButton
               class="daisy-w-full"
               v-bind="{ noteId: note.id, storageAccessor }"
