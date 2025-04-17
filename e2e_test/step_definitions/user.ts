@@ -84,6 +84,11 @@ When('I generate MCP Token and I reload page', () => {
     })
 })
 
+When('I delete MCP Token and I reload page', () => {
+  cy.findByRole('button', { name: 'Delete' }).click()
+  cy.reload()
+})
+
 Then('I should see same Token', () => {
   cy.get('@savedTokenValue').then((savedToken) => {
     cy.findByTestId('mcp-token').should('have.value', savedToken)

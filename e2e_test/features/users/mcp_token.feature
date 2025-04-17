@@ -16,6 +16,11 @@ Feature: Handling MCP Token
     When I delete MCP Token
     Then I should see empty MCP Token
 
+  Scenario: Delete MCP Token & Reload Page
+    Given I have MCP Token
+    When I delete MCP Token and I reload page
+    Then I should see empty MCP Token
+
   @ignore
   Scenario: Authenticate user with a valid token
     Given I have MCP Token
