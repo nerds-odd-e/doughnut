@@ -3,6 +3,8 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.controllers.dto.UserTokenDTO;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserToken;
+import com.odde.doughnut.entities.repositories.UserTokenRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
@@ -11,9 +13,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,10 +24,15 @@ import org.springframework.web.bind.annotation.*;
 class RestUserController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
+  private final UserTokenRepository userTokenRepository;
 
-  public RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser) {
+  public RestUserController(
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      UserTokenRepository userTokenRepository) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.userTokenRepository = userTokenRepository;
   }
 
   @PostMapping("")
@@ -61,10 +68,12 @@ class RestUserController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
 
-    // 単純な実装例（実際のトークン生成と保存はTODOとして残す）
     String token = UUID.randomUUID().toString();
     LocalDateTime now = LocalDateTime.now();
     LocalDateTime expiry = now.plusYears(1);
+
+    UserToken userToken = new UserToken(user, token, now, expiry);
+    userTokenRepository.save(userToken);
 
     return new UserTokenDTO(token, now, expiry);
   }
@@ -74,18 +83,17 @@ class RestUserController {
   public void deleteUserToken(@PathVariable @Schema(type = "integer") User user)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
-    // TODO: Implement token deletion
+    userTokenRepository.deleteAllByUser(user);
   }
 
   @GetMapping("/{user}/tokens")
   public List<UserTokenDTO> getUserTokens(@PathVariable @Schema(type = "integer") User user)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
-    // TODO: Implement fetching user tokens
-    List<UserTokenDTO> tokens = new ArrayList<>();
-    tokens.add(
-        new UserTokenDTO(
-            UUID.randomUUID().toString(), LocalDateTime.now(), LocalDateTime.now().plusYears(1)));
-    return tokens;
+    List<UserToken> tokens = userTokenRepository.findAllByUser(user);
+    return tokens.stream()
+        .map(
+            token -> new UserTokenDTO(token.getToken(), token.getCreatedAt(), token.getExpiresAt()))
+        .collect(Collectors.toList());
   }
 }

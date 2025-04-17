@@ -7,6 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.controllers.dto.UserTokenDTO;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserToken;
+import com.odde.doughnut.entities.repositories.UserTokenRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -24,13 +26,14 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestUserControllerTest {
   @Autowired MakeMe makeMe;
+  @Autowired UserTokenRepository userTokenRepository;
   UserModel userModel;
   RestUserController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestUserController(makeMe.modelFactoryService, userModel);
+    controller = new RestUserController(makeMe.modelFactoryService, userModel, userTokenRepository);
   }
 
   @Test
@@ -67,6 +70,10 @@ class RestUserControllerTest {
     assertThat(tokenDTO.getToken(), notNullValue());
     assertThat(tokenDTO.getCreatedAt(), notNullValue());
     assertThat(tokenDTO.getExpiresAt(), notNullValue());
+
+    List<UserToken> savedTokens = userTokenRepository.findAllByUser(userModel.getEntity());
+    assertThat(savedTokens.size(), equalTo(1));
+    assertThat(savedTokens.get(0).getToken(), equalTo(tokenDTO.getToken()));
   }
 
   @Test
@@ -91,12 +98,21 @@ class RestUserControllerTest {
 
   @Test
   void getUserTokensSuccessfully() throws UnexpectedNoAccessRightException {
+    // トークンを作成して保存
+    String token = "test-token";
+    UserToken userToken =
+        new UserToken(
+            userModel.getEntity(),
+            token,
+            java.time.LocalDateTime.now(),
+            java.time.LocalDateTime.now().plusYears(1));
+    userTokenRepository.save(userToken);
+
     List<UserTokenDTO> tokens = controller.getUserTokens(userModel.getEntity());
+
     assertThat(tokens, notNullValue());
-    assertThat(tokens.size(), greaterThan(0));
-    assertThat(tokens.get(0).getToken(), notNullValue());
-    assertThat(tokens.get(0).getCreatedAt(), notNullValue());
-    assertThat(tokens.get(0).getExpiresAt(), notNullValue());
+    assertThat(tokens.size(), equalTo(1));
+    assertThat(tokens.get(0).getToken(), equalTo(token));
   }
 
   @Test
