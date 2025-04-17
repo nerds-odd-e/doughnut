@@ -73,7 +73,10 @@ export const assumeNotePage = (noteTopology?: string) => {
         cy.expectNoteCards(children)
       })
     },
-
+    notePageMoreOptionsButton: (btnTextOrTitle: string) => {
+      privateToolbarButton('more options').click()
+      return privateToolbarButton(btnTextOrTitle)
+    },
     linkNoteTo: (target: string) => {
       const findLink = () =>
         cy

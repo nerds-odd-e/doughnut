@@ -172,6 +172,7 @@ declare module 'vue' {
     SvgCog: typeof import('./src/components/svgs/SvgCog.vue')['default']
     SvgCollapse: typeof import('./src/components/svgs/SvgCollapse.vue')['default']
     SvgContest: typeof import('./src/components/svgs/SvgContest.vue')['default']
+    SvgDefault: typeof import('./src/components/svgs/SvgDefault.vue')['default']
     SvgDescriptionIndicator: typeof import('./src/components/svgs/SvgDescriptionIndicator.vue')['default']
     SvgDown: typeof import('./src/components/svgs/SvgDown.vue')['default']
     SvgDownload: typeof import('./src/components/svgs/SvgDownload.vue')['default']

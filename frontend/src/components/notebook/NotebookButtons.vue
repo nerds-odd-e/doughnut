@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
-    <label v-if="isDefault" class="daisy-float-left">Default</label>
+    <label v-if="isDefault" class="daisy-float-left daisy-card-default">Default</label>
     <PopButton title="Edit notebook settings">
       <template #button_face>
         <SvgEditNotebook />
@@ -68,5 +68,5 @@ const shareNotebook = async () => {
   }
 }
 
-const isDefault = computed(() => false /* props.notebook.isDefault */)
+const isDefault = computed(() => true /* props.notebook.isDefault */)
 </script>

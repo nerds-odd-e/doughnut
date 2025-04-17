@@ -195,9 +195,12 @@ When(
   (notebookTitle: string) => {
     start
       .routerToNotebooksPage()
-      .notebookCard(notebookTitle)
       .navigateToChild(notebookTitle)
-    //.notePageMoreOptionsButton('Make default')
-    //.click()
+      .notePageMoreOptionsButton('Make default')
+      .click()
   }
 )
+
+Then('I should see the notebook {string} as default', (notebookTitle: string) => {
+  start.routerToNotebooksPage().notebookCard(notebookTitle).shouldBeDefault()
+})
