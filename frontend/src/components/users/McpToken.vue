@@ -56,7 +56,6 @@ const fetchTokens = async () => {
 
 const generateToken = async () => {
   const response = await managedApi.restUserController.createUserToken(userId)
-  console.log("token", response)
   token.value = response.token ?? ""
 }
 
