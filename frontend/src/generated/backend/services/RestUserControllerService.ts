@@ -103,12 +103,12 @@ export class RestUserControllerService {
     }
     /**
      * @param user
-     * @returns string OK
+     * @returns UserTokenDTO OK
      * @throws ApiError
      */
     public getUserTokens(
         user: number,
-    ): CancelablePromise<Array<string>> {
+    ): CancelablePromise<Array<UserTokenDTO>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/user/{user}/tokens',

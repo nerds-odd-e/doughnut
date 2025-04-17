@@ -49,7 +49,7 @@ const fetchTokens = async () => {
   if (tokens && tokens.length > 0) {
     const firstToken = tokens[0]
     if (firstToken) {
-      token.value = firstToken
+      token.value = firstToken.token ?? ""
     }
   }
 }

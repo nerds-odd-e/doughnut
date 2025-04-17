@@ -91,8 +91,12 @@ class RestUserControllerTest {
 
   @Test
   void getUserTokensSuccessfully() throws UnexpectedNoAccessRightException {
-    List<String> tokens = controller.getUserTokens(userModel.getEntity());
+    List<UserTokenDTO> tokens = controller.getUserTokens(userModel.getEntity());
     assertThat(tokens, notNullValue());
+    assertThat(tokens.size(), greaterThan(0));
+    assertThat(tokens.get(0).getToken(), notNullValue());
+    assertThat(tokens.get(0).getCreatedAt(), notNullValue());
+    assertThat(tokens.get(0).getExpiresAt(), notNullValue());
   }
 
   @Test

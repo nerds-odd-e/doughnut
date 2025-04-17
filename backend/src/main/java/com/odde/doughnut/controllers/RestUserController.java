@@ -78,12 +78,14 @@ class RestUserController {
   }
 
   @GetMapping("/{user}/tokens")
-  public List<String> getUserTokens(@PathVariable @Schema(type = "integer") User user)
+  public List<UserTokenDTO> getUserTokens(@PathVariable @Schema(type = "integer") User user)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(user);
     // TODO: Implement fetching user tokens
-    List<String> tokens = new ArrayList<>();
-    tokens.add(UUID.randomUUID().toString());
+    List<UserTokenDTO> tokens = new ArrayList<>();
+    tokens.add(
+        new UserTokenDTO(
+            UUID.randomUUID().toString(), LocalDateTime.now(), LocalDateTime.now().plusYears(1)));
     return tokens;
   }
 }

@@ -2593,7 +2593,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: "#/components/schemas/UserTokenDTO"
   /api/user/current-user-info:
     get:
       tags:
