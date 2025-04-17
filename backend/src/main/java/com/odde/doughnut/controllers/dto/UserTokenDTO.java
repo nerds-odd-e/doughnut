@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers.dto;
 
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserTokenDTO {
-  private String token;
-  private LocalDateTime createdAt;
-  private LocalDateTime expiresAt;
+  @NotNull private String token;
+  @NotNull private LocalDateTime createdAt;
+  @NotNull private LocalDateTime expiresAt;
 }

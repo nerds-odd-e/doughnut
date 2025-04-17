@@ -3510,6 +3510,10 @@ components:
         expiresAt:
           type: string
           format: date-time
+      required:
+      - createdAt
+      - expiresAt
+      - token
     TimeTravelRelativeToNow:
       type: object
       properties:

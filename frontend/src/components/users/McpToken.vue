@@ -49,14 +49,14 @@ const fetchTokens = async () => {
   if (tokens && tokens.length > 0) {
     const firstToken = tokens[0]
     if (firstToken) {
-      token.value = firstToken.token ?? ""
+      token.value = firstToken.token
     }
   }
 }
 
 const generateToken = async () => {
   const response = await managedApi.restUserController.createUserToken(userId)
-  token.value = response.token ?? ""
+  token.value = response.token
 }
 
 const deleteToken = async () => {

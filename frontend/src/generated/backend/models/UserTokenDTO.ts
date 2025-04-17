@@ -3,8 +3,8 @@
 /* tslint:disable */
 /* eslint-disable */
 export type UserTokenDTO = {
-    token?: string;
-    createdAt?: string;
-    expiresAt?: string;
+    token: string;
+    createdAt: string;
+    expiresAt: string;
 };
 
