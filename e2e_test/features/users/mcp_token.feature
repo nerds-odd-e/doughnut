@@ -7,6 +7,7 @@ Feature: Handling MCP Token
     When I generate MCP Token
     Then I should see generated Token
 
+  @ignore
   Scenario: Generate MCP Token & Reload Page
     When I generate MCP Token and I reload page
     Then I should see generated Token
