@@ -48,5 +48,7 @@ When('Call instruction API by MCP Client', () => {
 })
 
 Then('Return Doughnut instruction', () => {
-  expect(instructionResponse.content[0]!.text).to.equal('"hello"')
+  expect(instructionResponse.content[0]!.text).to.equal(
+    '"Doughnut is a Personal Knowledge Management tool"'
+  )
 })

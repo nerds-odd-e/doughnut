@@ -8,6 +8,6 @@ public class InstructionService {
 
   @Tool(description = "Get instruction")
   public String getInstruction() {
-    return "hello";
+    return "Doughnut is a Personal Knowledge Management tool";
   }
 }
