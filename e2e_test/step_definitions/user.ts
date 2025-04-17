@@ -76,14 +76,18 @@ When('I delete MCP Token', () => {
 
 When('I generate MCP Token and I reload page', () => {
   start.mainMenu().userOptions().generateMcpToken()
-  let savedToken = ''
   cy.findByTestId('mcp-token')
     .invoke('val')
     .then((token) => {
-      savedToken = token as string
+      cy.wrap(token).as('savedTokenValue')
       cy.reload()
-      cy.findByTestId('mcp-token').should('have.value', savedToken)
     })
+})
+
+Then('I should see same Token', () => {
+  cy.get('@savedTokenValue').then((savedToken) => {
+    cy.findByTestId('mcp-token').should('have.value', savedToken)
+  })
 })
 
 Then('I should see {string} in the page', (content) => {

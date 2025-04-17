@@ -10,7 +10,7 @@ Feature: Handling MCP Token
   @ignore
   Scenario: Generate MCP Token & Reload Page
     When I generate MCP Token and I reload page
-    Then I should see generated Token
+    Then I should see same Token
     
   Scenario: Delete MCP Token
     Given I have MCP Token
