@@ -68,5 +68,5 @@ const shareNotebook = async () => {
   }
 }
 
-const isDefault = computed(() => true /* props.notebook.isDefault */)
+const isDefault = computed(() => false /* props.notebook.isDefault */)
 </script>
