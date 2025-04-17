@@ -21,6 +21,7 @@ import org.springframework.lang.NonNull;
 @Table(name = "notebook")
 @JsonPropertyOrder({
   "id",
+  "default",
   "certifiable",
   "notebookSettings",
   "creatorId",
@@ -178,6 +179,10 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   public Circle getCircle() {
     return getOwnership().getCircle();
+  }
+
+  public boolean isDefault() {
+    return false;
   }
 
   @JsonIgnore
