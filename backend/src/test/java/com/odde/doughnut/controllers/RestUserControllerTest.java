@@ -85,8 +85,22 @@ class RestUserControllerTest {
 
   @Test
   void deleteUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
+    // トークンを作成して保存
+    String token = "test-token";
+    UserToken userToken =
+        new UserToken(
+            userModel.getEntity(),
+            token,
+            java.time.LocalDateTime.now(),
+            java.time.LocalDateTime.now().plusYears(1));
+    userTokenRepository.save(userToken);
+
+    // トークンを削除
     controller.deleteUserToken(userModel.getEntity());
-    // No exception thrown means success
+
+    // トークンが削除されたことを確認
+    List<UserToken> savedTokens = userTokenRepository.findAllByUser(userModel.getEntity());
+    assertThat(savedTokens.size(), equalTo(0));
   }
 
   @Test
