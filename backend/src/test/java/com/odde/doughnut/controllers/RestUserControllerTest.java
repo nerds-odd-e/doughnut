@@ -114,13 +114,7 @@ class RestUserControllerTest {
   void getUserTokensSuccessfully() throws UnexpectedNoAccessRightException {
     // トークンを作成して保存
     String token = "test-token";
-    UserToken userToken =
-        new UserToken(
-            userModel.getEntity(),
-            token,
-            java.time.LocalDateTime.now(),
-            java.time.LocalDateTime.now().plusYears(1));
-    userTokenRepository.save(userToken);
+    makeMe.theUser(userModel.getEntity()).withToken(token).please(true);
 
     List<UserTokenDTO> tokens = controller.getUserTokens(userModel.getEntity());
 
