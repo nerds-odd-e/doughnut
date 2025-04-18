@@ -59,10 +59,12 @@ class NotebookTest {
     }
 
     @Test
-    void settingAsDefaultNotebook() {
+    void settingDefaultNotebook() {
       notebook.setDefaultNotebook(true);
-
       assertThat(notebook.isDefaultNotebook()).isTrue();
+
+      notebook.setDefaultNotebook(false);
+      assertThat(notebook.isDefaultNotebook()).isFalse();
     }
   }
 }
