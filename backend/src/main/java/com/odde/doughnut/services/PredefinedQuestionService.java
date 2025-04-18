@@ -86,4 +86,8 @@ public class PredefinedQuestionService {
     }
     return modelFactoryService.save(result);
   }
+
+  public void deleteQuestion(PredefinedQuestion predefinedQuestion) {
+    modelFactoryService.remove(predefinedQuestion);
+  }
 }

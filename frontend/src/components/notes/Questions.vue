@@ -14,12 +14,12 @@
     <table class="question-table daisy-mt-2" v-if="questions.length">
       <thead>
         <tr>
+          <th>Actions</th>
           <th>Approved</th>
           <th>Question Text</th>
-          <th>A</th>
-          <th>B</th>
-          <th>C</th>
-          <th>D</th>
+          <template v-for="(_, index) in maxChoices" :key="index">
+            <th>{{ String.fromCharCode(65 + index) }}</th>
+          </template>
         </tr>
       </thead>
       <tbody>
@@ -27,6 +27,28 @@
           v-for="(question, outerIndex) in questions"
           :key="question.multipleChoicesQuestion.stem"
         >
+          <td>
+            <div class="btn-group">
+              <button 
+                class="btn btn-danger btn-sm"
+                @click="deleteQuestion(question.id)"
+              >
+                🗑
+              </button>
+              <PopButton btn-class="btn btn-primary btn-sm" title="✎">
+                <template #default="{ closer }">
+                  <NoteAddQuestion
+                    v-bind="{ note }"
+                    :editQuestion="question"
+                    @close-dialog="
+                      closer();
+                      questionEdited($event, question.id);
+                    "
+                  />
+                </template>
+              </PopButton>
+            </div>
+          </td>
           <td>
             <input
               :id="'checkbox-' + outerIndex"
@@ -40,12 +62,9 @@
               {{ question.multipleChoicesQuestion.stem }}
             </span>
           </td>
-          <template
-            v-if="question.multipleChoicesQuestion.choices"
-          >
+          <template v-if="question.multipleChoicesQuestion.choices">
             <td
-              v-for="(choice, index) in question
-                .multipleChoicesQuestion.choices"
+              v-for="(choice, index) in question.multipleChoicesQuestion.choices"
               :class="{
                 'correct-choice': index === question.correctAnswerIndex,
               }"
@@ -75,7 +94,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
@@ -109,6 +128,35 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
   }
 }
+
+const deleteQuestion = async (questionId?: number) => {
+  if (!questionId) return;
+  
+  const confirmMessage = 'Are you sure you want to delete this question?';
+  if (window.confirm(confirmMessage)) {
+    await managedApi.restPredefinedQuestionController.deleteQuestion(questionId);
+    questions.value = questions.value.filter(q => q.id !== questionId);
+  }
+}
+
+const maxChoices = computed(() => {
+  return Math.max(
+    ...questions.value.map(
+      (q) => q.multipleChoicesQuestion.choices?.length ?? 0
+    )
+  )
+})
+
+const questionEdited = (editedQuestion: PredefinedQuestion, originalId: number) => {
+  if (editedQuestion == null) {
+    return
+  }
+  const index = questions.value.findIndex(q => q.id === originalId)
+  if (index !== -1) {
+    questions.value[index] = editedQuestion
+  }
+}
+
 onMounted(() => {
   fetchQuestions()
 })

@@ -113,4 +113,14 @@ class RestPredefinedQuestionController {
     currentUser.assertAuthorization(predefinedQuestion.getNote());
     return predefinedQuestionService.toggleApproval(predefinedQuestion);
   }
+
+  @DeleteMapping("/{predefinedQuestion}")
+  @Transactional
+  public void deleteQuestion(
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(predefinedQuestion.getNote());
+    predefinedQuestionService.deleteQuestion(predefinedQuestion);
+  }
 }
