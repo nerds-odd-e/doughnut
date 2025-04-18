@@ -33,5 +33,5 @@ When('Call get username tool by MCP Client', () => {
 })
 
 Then('Return username', () => {
-  expect(usernameResponse.content[0]!.text).to.equal('Terry')
+  expect(usernameResponse.content[0]!.text).to.equal('"Terry"')
 })

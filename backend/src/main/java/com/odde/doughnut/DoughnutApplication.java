@@ -2,6 +2,7 @@ package com.odde.doughnut;
 
 import com.odde.doughnut.configs.DoughnutTaskRunner;
 import com.odde.doughnut.mcp.InstructionService;
+import com.odde.doughnut.mcp.UserNameService;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.method.MethodToolCallbackProvider;
 import org.springframework.boot.SpringApplication;
@@ -30,5 +31,10 @@ public class DoughnutApplication {
   @Bean
   public ToolCallbackProvider instructionTools(InstructionService instructionService) {
     return MethodToolCallbackProvider.builder().toolObjects(instructionService).build();
+  }
+
+  @Bean
+  public ToolCallbackProvider userNameTools(UserNameService userNameService) {
+    return MethodToolCallbackProvider.builder().toolObjects(userNameService).build();
   }
 }

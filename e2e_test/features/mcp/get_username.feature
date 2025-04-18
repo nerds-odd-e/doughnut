@@ -3,8 +3,7 @@ Feature: get username
 
   Background:
     Given I am logged in as an existing user
-
-  @ignore
+  
   Scenario: get username
     Given MCP server is running
     And I generate MCP Token
