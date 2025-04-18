@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -49,6 +48,21 @@ class NotebookTest {
     void shouldReturnCorrectCreatorId() {
       assertThat(notebook.getCreatorId())
           .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
+    }
+  }
+
+  @Nested
+  class NotebookDefaultTests {
+    @Test
+    void notDefaultNotebookByDefault() {
+      assertThat(notebook.isDefaultNotebook()).isFalse();
+    }
+
+    @Test
+    void settingAsDefaultNotebook() {
+      notebook.setDefaultNotebook(true);
+
+      assertThat(notebook.isDefaultNotebook()).isTrue();
     }
   }
 }

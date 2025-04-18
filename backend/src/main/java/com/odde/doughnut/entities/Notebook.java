@@ -21,7 +21,6 @@ import org.springframework.lang.NonNull;
 @Table(name = "notebook")
 @JsonPropertyOrder({
   "id",
-  "default",
   "certifiable",
   "notebookSettings",
   "creatorId",
@@ -31,6 +30,16 @@ import org.springframework.lang.NonNull;
   "shortDetails"
 })
 public class Notebook extends EntityIdentifiedByIdOnly {
+  @Transient private boolean defaultNotebook = false;
+
+  public boolean isDefaultNotebook() {
+    return this.defaultNotebook;
+  }
+
+  public void setDefaultNotebook(boolean defaultNotebook) {
+    this.defaultNotebook = defaultNotebook;
+  }
+
   @OneToOne
   @JoinColumn(name = "creator_id")
   @JsonIgnore
@@ -179,10 +188,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   public Circle getCircle() {
     return getOwnership().getCircle();
-  }
-
-  public boolean isDefault() {
-    return false;
   }
 
   @JsonIgnore
