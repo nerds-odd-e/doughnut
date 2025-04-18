@@ -14,6 +14,7 @@ import {
   assumeRaceGamePage,
   routerToRaceGamePage,
 } from './pageObjects/raceGamePage'
+import * as mcpClient from './mcp_client'
 
 const start = {
   ...basicActions,
@@ -29,4 +30,4 @@ const start = {
   ...downloadChecker(),
 }
 export default start
-export { mock_services }
+export { mock_services, mcpClient }

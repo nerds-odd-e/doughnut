@@ -1,9 +1,12 @@
 Feature: get username
   Return username
 
+  Background:
+    Given I am logged in as an existing user
+
   @ignore
   Scenario: get username
     Given MCP server is running
-    And User have valid MCP token
+    And I generate MCP Token
     When Call get username tool by MCP Client
     Then Return username

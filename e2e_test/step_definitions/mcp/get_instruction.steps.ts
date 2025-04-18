@@ -1,6 +1,5 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { SSEClientTransport } from '@modelcontextprotocol/sdk/client/sse.js'
+import { getMcpClient, connectMcpClient } from '../../start/mcp_client'
 
 interface InstructionResponse {
   content: Array<{
@@ -9,26 +8,11 @@ interface InstructionResponse {
   status: string
 }
 
-let client: Client
 let instructionResponse: InstructionResponse
 
 Given('MCP server is running', () => {
-  client = new Client(
-    {
-      name: 'doughnut-mcp-client',
-      version: '1.0.0',
-    },
-    {
-      capabilities: {},
-    }
-  )
-
-  const transport = new SSEClientTransport(
-    new URL(`${Cypress.config().backendBaseUrl}/sse`)
-  )
-
   const asyncFunction = async () => {
-    await client.connect(transport)
+    await connectMcpClient()
   }
 
   cy.wrap(asyncFunction())
@@ -36,6 +20,7 @@ Given('MCP server is running', () => {
 
 When('Call instruction API by MCP Client', () => {
   const asyncFunction = async () => {
+    const client = getMcpClient()
     const result = await client.callTool({
       name: 'getInstruction',
     })
