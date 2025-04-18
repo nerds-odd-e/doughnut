@@ -3735,8 +3735,6 @@ components:
         id:
           type: integer
           format: int32
-        default:
-          type: boolean
         certifiable:
           type: boolean
         notebookSettings:

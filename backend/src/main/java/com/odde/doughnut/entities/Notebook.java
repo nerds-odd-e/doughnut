@@ -30,7 +30,7 @@ import org.springframework.lang.NonNull;
   "shortDetails"
 })
 public class Notebook extends EntityIdentifiedByIdOnly {
-  @Transient private boolean defaultNotebook = false;
+  @JsonIgnore @Transient private boolean defaultNotebook = false;
 
   public boolean isDefaultNotebook() {
     return this.defaultNotebook;
