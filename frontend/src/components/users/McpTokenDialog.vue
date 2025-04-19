@@ -60,8 +60,8 @@ const generateToken = async () => {
 }
 
 const deleteToken = async () => {
-  token.value = ""
   await managedApi.restUserController.deleteUserToken(userId)
+  token.value = ""
 }
 
 onMounted(fetchTokens)
