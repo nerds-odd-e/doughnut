@@ -21,12 +21,13 @@ Given(
   }
 )
 
-// Handle both API names with separate step definitions
-When('Call instruction tool by MCP Client', () => {
+// Use the literal API names directly from the feature file
+When('I call the {string} MCP tool', (apiName: string) => {
   const asyncFunction = async () => {
     const client = getMcpClient()
+
     const result = await client.callTool({
-      name: 'getInstruction',
+      name: apiName,
     })
     return result
   }
@@ -36,29 +37,10 @@ When('Call instruction tool by MCP Client', () => {
   })
 })
 
-When('Call get username tool by MCP Client', () => {
-  const asyncFunction = async () => {
-    const client = getMcpClient()
-    const result = await client.callTool({
-      name: 'getUsername',
-    })
-    return result
-  }
-
-  cy.wrap(asyncFunction()).then((response) => {
-    apiResponse = response as ApiResponse
-  })
-})
-
-// Separate step definitions for each return value
-Then('Return Doughnut instruction', () => {
-  expect(apiResponse.content[0]!.text).to.equal(
-    '"Doughnut is a Personal Knowledge Management tool"'
-  )
-})
-
-Then('Return username', () => {
-  expect(apiResponse.content[0]!.text).to.equal('"Terry"')
+// Use the literal expected response directly from the feature file
+Then('the response should contain {string}', (expectedResponse: string) => {
+  const expectedWithQuotes = `"${expectedResponse}"`
+  expect(apiResponse.content[0]!.text).to.equal(expectedWithQuotes)
 })
 
 Given('User have valid MCP token', () => {
