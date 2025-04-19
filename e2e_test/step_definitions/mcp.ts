@@ -1,5 +1,5 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { getMcpClient, connectMcpClient } from '../../start/mcp_client'
+import { getMcpClient, connectMcpClient } from '../start/mcp_client'
 
 interface InstructionResponse {
   content: Array<{
@@ -39,4 +39,39 @@ Then('Return Doughnut instruction', () => {
   expect(instructionResponse.content[0]!.text).to.equal(
     '"Doughnut is a Personal Knowledge Management tool"'
   )
+})
+
+interface UsernameResponse {
+  content: Array<{
+    text: string
+  }>
+  status: string
+}
+
+let usernameResponse: UsernameResponse
+
+Given('User have valid MCP token', () => {
+  const asyncFunction = async () => {
+    await connectMcpClient()
+  }
+
+  cy.wrap(asyncFunction())
+})
+
+When('Call get username tool by MCP Client', () => {
+  const asyncFunction = async () => {
+    const client = getMcpClient()
+    const result = await client.callTool({
+      name: 'getUsername',
+    })
+    return result
+  }
+
+  cy.wrap(asyncFunction()).then((response) => {
+    usernameResponse = response as UsernameResponse
+  })
+})
+
+Then('Return username', () => {
+  expect(usernameResponse.content[0]!.text).to.equal('"Terry"')
 })
