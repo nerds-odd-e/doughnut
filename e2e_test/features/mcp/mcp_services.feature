@@ -4,14 +4,15 @@ Feature: MCP (Model Context Protocol) Services
   notes.
 
   Background:
-    Given I connect to an MCP client that connects to Doughnut MCP service
-
-  Scenario: get instruction
-    When Call instruction API by MCP Client
-    Then Return Doughnut instruction
-
-  Scenario: get username
     Given I am logged in as an existing user
     And I generate MCP Token
-    When Call get username tool by MCP Client
-    Then Return username
+    And I connect to an MCP client that connects to Doughnut MCP service
+
+  Scenario Outline: MCP API calls
+    When Call <api_name> tool by MCP Client
+    Then Return <return_value>
+
+    Examples:
+      | api_name     | return_value          |
+      | instruction  | Doughnut instruction  |
+      | get username | username              |

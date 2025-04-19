@@ -1,14 +1,14 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 import { getMcpClient, connectMcpClient } from '../start/mcp_client'
 
-interface InstructionResponse {
+interface ApiResponse {
   content: Array<{
     text: string
   }>
   status: string
 }
 
-let instructionResponse: InstructionResponse
+let apiResponse: ApiResponse
 
 Given(
   'I connect to an MCP client that connects to Doughnut MCP service',
@@ -21,7 +21,8 @@ Given(
   }
 )
 
-When('Call instruction API by MCP Client', () => {
+// Handle both API names with separate step definitions
+When('Call instruction tool by MCP Client', () => {
   const asyncFunction = async () => {
     const client = getMcpClient()
     const result = await client.callTool({
@@ -31,31 +32,8 @@ When('Call instruction API by MCP Client', () => {
   }
 
   cy.wrap(asyncFunction()).then((response) => {
-    instructionResponse = response as InstructionResponse
+    apiResponse = response as ApiResponse
   })
-})
-
-Then('Return Doughnut instruction', () => {
-  expect(instructionResponse.content[0]!.text).to.equal(
-    '"Doughnut is a Personal Knowledge Management tool"'
-  )
-})
-
-interface UsernameResponse {
-  content: Array<{
-    text: string
-  }>
-  status: string
-}
-
-let usernameResponse: UsernameResponse
-
-Given('User have valid MCP token', () => {
-  const asyncFunction = async () => {
-    await connectMcpClient()
-  }
-
-  cy.wrap(asyncFunction())
 })
 
 When('Call get username tool by MCP Client', () => {
@@ -68,10 +46,25 @@ When('Call get username tool by MCP Client', () => {
   }
 
   cy.wrap(asyncFunction()).then((response) => {
-    usernameResponse = response as UsernameResponse
+    apiResponse = response as ApiResponse
   })
 })
 
+// Separate step definitions for each return value
+Then('Return Doughnut instruction', () => {
+  expect(apiResponse.content[0]!.text).to.equal(
+    '"Doughnut is a Personal Knowledge Management tool"'
+  )
+})
+
 Then('Return username', () => {
-  expect(usernameResponse.content[0]!.text).to.equal('"Terry"')
+  expect(apiResponse.content[0]!.text).to.equal('"Terry"')
+})
+
+Given('User have valid MCP token', () => {
+  const asyncFunction = async () => {
+    await connectMcpClient()
+  }
+
+  cy.wrap(asyncFunction())
 })
