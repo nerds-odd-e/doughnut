@@ -10,13 +10,16 @@ interface InstructionResponse {
 
 let instructionResponse: InstructionResponse
 
-Given('MCP server is running', () => {
-  const asyncFunction = async () => {
-    await connectMcpClient()
-  }
+Given(
+  'I connect to an MCP client that connects to Doughnut MCP service',
+  () => {
+    const asyncFunction = async () => {
+      await connectMcpClient()
+    }
 
-  cy.wrap(asyncFunction())
-})
+    cy.wrap(asyncFunction())
+  }
+)
 
 When('Call instruction API by MCP Client', () => {
   const asyncFunction = async () => {

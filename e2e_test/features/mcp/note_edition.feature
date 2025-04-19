@@ -1,7 +1,7 @@
 Feature: Note edition
 
   Background:
-    Given MCP server is running
+    Given I connect to an MCP client that connects to Doughnut MCP service
     And user exists
 
   @ignore
