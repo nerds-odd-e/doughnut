@@ -1,6 +1,6 @@
 <template>
   <div class="daisy-container">
-    <h2>MCP Token</h2>
+    <h2>MCP Token Dialog</h2>
     <div class="daisy-form-control">
       <input
         type="text"
@@ -65,4 +65,4 @@ const deleteToken = async () => {
 }
 
 onMounted(fetchTokens)
-</script> 
+</script>

@@ -16,7 +16,7 @@ import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
-import McpTokenPage from "@/components/users/McpToken.vue"
+import McpTokenPage from "@/components/users/McpTokenDialog.vue"
 
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly
