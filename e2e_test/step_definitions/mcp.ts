@@ -8,8 +8,6 @@ interface ApiResponse {
   status: string
 }
 
-let apiResponse: ApiResponse
-
 Given(
   'I connect to an MCP client that connects to Doughnut MCP service with my MCP token',
   () => {
@@ -41,12 +39,15 @@ When('I call the {string} MCP tool', (apiName: string) => {
   }
 
   cy.wrap(asyncFunction()).then((response) => {
-    apiResponse = response as ApiResponse
+    cy.wrap(response).as('MCPApiResponse')
   })
 })
 
 // Use the literal expected response directly from the feature file
 Then('the response should contain {string}', (expectedResponse: string) => {
-  const expectedWithQuotes = `"${expectedResponse}"`
-  expect(apiResponse.content[0]!.text).to.equal(expectedWithQuotes)
+  cy.get('@MCPApiResponse').then((response) => {
+    const expectedWithQuotes = `"${expectedResponse}"`
+    const actualResponse = response as unknown as ApiResponse
+    expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
+  })
 })
