@@ -151,9 +151,3 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.contains('Welcome')
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
-
-Then('I should see MCP token', () => {
-  cy.get('input[data-testid="mcp-token"]')
-    .should('be.visible')
-    .should('have.value')
-})
