@@ -36,7 +36,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from "vue"
 import { useRouter } from "vue-router"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import usePopups from "@/components/commons/Popups/usePopups"

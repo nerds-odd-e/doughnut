@@ -131,4 +131,29 @@ class RestUserControllerTest {
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.getUserTokens(anotherUser));
   }
+
+  @Test
+  void tokenOperationsWithUnauthorizedUserShouldFail() {
+    // Create controller with an unauthorized user model
+    UserModel unauthorizedUserModel = makeMe.aUser().toModelPlease();
+    RestUserController controllerWithUnauthorizedUser =
+        new RestUserController(
+            makeMe.modelFactoryService, unauthorizedUserModel, userTokenRepository);
+
+    // Create a different user to test against
+    User targetUser = makeMe.aUser().please();
+
+    // All token operations should fail with authorization exception
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controllerWithUnauthorizedUser.createUserToken(targetUser));
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controllerWithUnauthorizedUser.deleteUserToken(targetUser));
+
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () -> controllerWithUnauthorizedUser.getUserTokens(targetUser));
+  }
 }
