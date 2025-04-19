@@ -42,11 +42,3 @@ Then('the response should contain {string}', (expectedResponse: string) => {
   const expectedWithQuotes = `"${expectedResponse}"`
   expect(apiResponse.content[0]!.text).to.equal(expectedWithQuotes)
 })
-
-Given('User have valid MCP token', () => {
-  const asyncFunction = async () => {
-    await connectMcpClient()
-  }
-
-  cy.wrap(asyncFunction())
-})
