@@ -189,21 +189,3 @@ Then('I should see popup {string}', (message: string) => {
     expect(text).to.equal(message)
   })
 })
-
-When(
-  'I select the notebook with title {string} as default',
-  (notebookTitle: string) => {
-    start
-      .routerToNotebooksPage()
-      .navigateToChild(notebookTitle)
-      .notePageMoreOptionsButton('Make default')
-      .click()
-  }
-)
-
-Then(
-  'I should see the notebook {string} as default',
-  (notebookTitle: string) => {
-    start.routerToNotebooksPage().notebookCard(notebookTitle).shouldBeDefault()
-  }
-)
