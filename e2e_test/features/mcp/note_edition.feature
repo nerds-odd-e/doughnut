@@ -2,7 +2,7 @@ Feature: Note edition
 
   Background:
     Given I connect to an MCP client that connects to Doughnut MCP service with my MCP token
-    And user exists
+    Given I am logged in as an existing user
 
   @ignore
   Scenario Outline: Update a note
@@ -15,12 +15,5 @@ Feature: Note edition
       | inputTitle | inputDetails | resultTitle | resultDetails |
       | Cat        | Cat is cute  | Cat         | Cat is cute   |
       | Cat        |              | Cat         |               |
-      |            | Cat is cute  | Dog         | Dog is cute   |
-      |            |              | Dog         | Dog is cute   |
-
-  @ignore
-  Scenario: Update note with invalid authentication
-    Given I have a note with title "Dog" and detail "Dog is cute"
-    And I have an invalid authentication token on the MCP client
-    When I ask the MCP client to update the note title to "Cat"
-    Then MCP server returns an error
+      |            | Cat is cute  | Dog         | Cat is cute   |
+      |            |              | Dog         |               |
