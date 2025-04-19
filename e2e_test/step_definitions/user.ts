@@ -43,8 +43,14 @@ Given("I'm on the login page", () => {
   cy.visit('/users/identify')
 })
 
-Given('I have MCP Token', () => {
-  start.mainMenu().userOptions().generateMcpToken()
+Given('I have a MCP Token', () => {
+  start
+    .mainMenu()
+    .userOptions()
+    .generateMcpToken()
+    .then((token) => {
+      cy.wrap(token).as('savedTokenValue')
+    })
 })
 
 When('I identify myself as a new user', () => {
@@ -74,25 +80,9 @@ When('I delete MCP Token', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
 })
 
-When('I generate a MCP Token and I reload page', () => {
-  start.mainMenu().userOptions().generateMcpToken()
-  cy.findByTestId('mcp-token')
-    .invoke('val')
-    .then((token) => {
-      cy.wrap(token).as('savedTokenValue')
-      cy.reload()
-    })
-})
-
 When('I delete MCP Token and I reload page', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
   cy.reload()
-})
-
-Then('I should see same Token', () => {
-  cy.get('@savedTokenValue').then((savedToken) => {
-    cy.findByTestId('mcp-token').should('have.value', savedToken)
-  })
 })
 
 Then('I should see {string} in the page', (content) => {

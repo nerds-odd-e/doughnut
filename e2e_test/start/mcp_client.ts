@@ -18,21 +18,13 @@ export const getMcpClient = () => {
   return client
 }
 
-export const connectMcpClient = async (mcpToken?: string) => {
+export const connectMcpClient = async (mcpToken: string) => {
   const client = getMcpClient()
-  const config = Cypress.config() as any
-  let sseUrl = `${config.backendBaseUrl}/sse`
+  let sseUrl = `${Cypress.config().backendBaseUrl}/sse`
 
-  // If token is provided, add it to the URL
-  if (mcpToken) {
-    const token = mcpToken.replace('saved mcp token: ', '')
-    sseUrl = `${sseUrl}?token=${token}`
-  }
+  sseUrl = `${sseUrl}?token=${mcpToken}`
 
-  const transport = new SSEClientTransport(
-    // @ts-ignore
-    new URL(sseUrl)
-  )
+  const transport = new SSEClientTransport(new URL(sseUrl))
   await client.connect(transport)
   return client
 }

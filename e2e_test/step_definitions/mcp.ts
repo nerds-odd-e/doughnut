@@ -9,30 +9,23 @@ interface ApiResponse {
 }
 
 let apiResponse: ApiResponse
-let savedMcpToken: string
 
 Given(
-  'I connect to an MCP client that connects to Doughnut MCP service',
+  'I connect to an MCP client that connects to Doughnut MCP service with my MCP token',
   () => {
     // First, we need to get the MCP token from the page
-    cy.findByTestId('mcp-token')
-      .should('exist')
-      .invoke('val')
-      .then((token) => {
-        if (token) {
-          savedMcpToken = `saved mcp token: ${token}`
-          cy.log(savedMcpToken)
-
-          // Then connect with the token
-          const asyncFunction = async () => {
-            await connectMcpClient(savedMcpToken)
-          }
-
-          cy.wrap(asyncFunction())
-        } else {
-          throw new Error('MCP token is not found or empty')
+    cy.get('@savedTokenValue').then((token) => {
+      if (token) {
+        // Then connect with the token
+        const asyncFunction = async () => {
+          await connectMcpClient(token as unknown as string)
         }
-      })
+
+        cy.wrap(asyncFunction())
+      } else {
+        throw new Error('MCP token is not found or empty')
+      }
+    })
   }
 )
 

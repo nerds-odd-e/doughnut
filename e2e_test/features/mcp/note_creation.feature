@@ -1,7 +1,7 @@
 Feature: Note creation
 
   Background:
-    Given I connect to an MCP client that connects to Doughnut MCP service
+    Given I connect to an MCP client that connects to Doughnut MCP service with my MCP token
     and user exists
 
   @ignore

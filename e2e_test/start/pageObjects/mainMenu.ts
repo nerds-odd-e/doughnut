@@ -35,6 +35,8 @@ export const mainMenu = () => {
         generateMcpToken() {
           cy.findByRole('link', { name: 'MCP Token' }).click()
           cy.findByRole('button', { name: 'Generate' }).click()
+          cy.pageIsNotLoading()
+          return cy.findByTestId('mcp-token').invoke('val')
         },
         myAssessmentAndCertificateHistory() {
           cy.findByRole('link', {

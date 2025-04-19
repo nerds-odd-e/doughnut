@@ -5,8 +5,8 @@ Feature: MCP (Model Context Protocol) Services
 
   Background:
     Given I am logged in as an existing user
-    And I generate a MCP Token
-    And I connect to an MCP client that connects to Doughnut MCP service
+    And I have a MCP Token
+    And I connect to an MCP client that connects to Doughnut MCP service with my MCP token
 
   Scenario Outline: MCP API calls
     When I call the "<api_name>" MCP tool
