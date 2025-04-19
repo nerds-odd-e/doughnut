@@ -5,7 +5,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Background:
     Given I am logged in as an existing user
-    And I generate MCP Token
+    And I generate a MCP Token
     And I connect to an MCP client that connects to Doughnut MCP service
 
   Scenario Outline: MCP API calls

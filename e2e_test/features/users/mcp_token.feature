@@ -4,13 +4,13 @@ Feature: Handling MCP Token
     Given I am logged in as an existing user
 
   Scenario: Generate MCP Token
-    When I generate MCP Token
+    When I generate a MCP Token
     Then I should see generated Token
 
   Scenario: Generate MCP Token & Reload Page
-    When I generate MCP Token and I reload page
+    When I generate a MCP Token and I reload page
     Then I should see same Token
-    
+
   Scenario: Delete MCP Token
     Given I have MCP Token
     When I delete MCP Token

@@ -66,7 +66,7 @@ When('I save my profile with:', (data: DataTable) => {
   cy.get('input[value="Submit"]').click()
 })
 
-When('I generate MCP Token', () => {
+When('I generate a MCP Token', () => {
   start.mainMenu().userOptions().generateMcpToken()
 })
 
@@ -74,7 +74,7 @@ When('I delete MCP Token', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
 })
 
-When('I generate MCP Token and I reload page', () => {
+When('I generate a MCP Token and I reload page', () => {
   start.mainMenu().userOptions().generateMcpToken()
   cy.findByTestId('mcp-token')
     .invoke('val')
