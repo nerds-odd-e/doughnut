@@ -50,21 +50,4 @@ class NotebookTest {
           .isEqualTo(notebook.getCreatorEntity().getExternalIdentifier());
     }
   }
-
-  @Nested
-  class NotebookDefaultTests {
-    @Test
-    void notDefaultNotebookByDefault() {
-      assertThat(notebook.isDefaultNotebook()).isFalse();
-    }
-
-    @Test
-    void settingDefaultNotebook() {
-      notebook.setDefaultNotebook(true);
-      assertThat(notebook.isDefaultNotebook()).isTrue();
-
-      notebook.setDefaultNotebook(false);
-      assertThat(notebook.isDefaultNotebook()).isFalse();
-    }
-  }
 }

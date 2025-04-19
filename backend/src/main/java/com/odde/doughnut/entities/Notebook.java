@@ -30,16 +30,6 @@ import org.springframework.lang.NonNull;
   "shortDetails"
 })
 public class Notebook extends EntityIdentifiedByIdOnly {
-  @JsonIgnore @Transient private boolean defaultNotebook = false;
-
-  public boolean isDefaultNotebook() {
-    return this.defaultNotebook;
-  }
-
-  public void setDefaultNotebook(boolean defaultNotebook) {
-    this.defaultNotebook = defaultNotebook;
-  }
-
   @OneToOne
   @JoinColumn(name = "creator_id")
   @JsonIgnore
