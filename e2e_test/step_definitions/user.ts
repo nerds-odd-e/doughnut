@@ -72,10 +72,6 @@ When('I save my profile with:', (data: DataTable) => {
   cy.get('input[value="Submit"]').click()
 })
 
-When('I generate a MCP Token', () => {
-  start.mainMenu().userOptions().generateMcpToken()
-})
-
 When('I delete MCP Token', () => {
   cy.findByRole('button', { name: 'Delete' }).click()
 })
@@ -159,15 +155,6 @@ Then('I logout via the UI', () => {
 Then('I should be on the welcome page and asked to login', () => {
   cy.contains('Welcome')
   cy.findByRole('button', { name: 'Login via Github' }).click()
-})
-
-Then('I should see generated Token', () => {
-  const uuidPattern =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
-  cy.get('input[data-testid="mcp-token"]')
-    .should('be.visible')
-    .invoke('val')
-    .should('match', uuidPattern)
 })
 
 Then('I should see MCP token', () => {

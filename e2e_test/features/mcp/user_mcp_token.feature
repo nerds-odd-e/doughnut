@@ -1,11 +1,8 @@
-Feature: Handling MCP Token
+Feature: User MCP Token
+  As a learner, I want to have a token to access Doughnut via MCP protocol.
 
   Background:
     Given I am logged in as an existing user
-
-  Scenario: Generate MCP Token
-    When I generate a MCP Token
-    Then I should see generated Token
 
   Scenario: Delete MCP Token
     Given I have a MCP Token

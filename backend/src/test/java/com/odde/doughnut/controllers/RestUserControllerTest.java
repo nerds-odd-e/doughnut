@@ -67,7 +67,9 @@ class RestUserControllerTest {
   void createUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
     UserTokenDTO tokenDTO = controller.createUserToken(userModel.getEntity());
     assertThat(tokenDTO, notNullValue());
-    assertThat(tokenDTO.getToken(), notNullValue());
+    assertThat(
+        tokenDTO.getToken(),
+        matchesPattern("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
     assertThat(tokenDTO.getCreatedAt(), notNullValue());
     assertThat(tokenDTO.getExpiresAt(), notNullValue());
 
