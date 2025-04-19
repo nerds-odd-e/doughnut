@@ -43,7 +43,7 @@ describe("McpTokenDialog.vue", () => {
     await nextTick()
 
     const tokenInput = wrapper.find("[data-testid='mcp-token']")
-    expect(tokenInput.element.value).toBe(mockToken.token)
+    expect((tokenInput.element as HTMLInputElement).value).toBe(mockToken.token)
     expect(
       helper.managedApi.restUserController.getUserTokens
     ).toHaveBeenCalledWith(mockUser.id)
@@ -70,9 +70,10 @@ describe("McpTokenDialog.vue", () => {
     await nextTick()
 
     // Before clicking generate button, token should be the one from initial fetch
-    expect(wrapper.find("[data-testid='mcp-token']").element.value).toBe(
-      mockToken.token
-    )
+    expect(
+      (wrapper.find("[data-testid='mcp-token']").element as HTMLInputElement)
+        .value
+    ).toBe(mockToken.token)
 
     // Click generate button
     await wrapper.find("[data-testid='generate']").trigger("click")
@@ -82,9 +83,10 @@ describe("McpTokenDialog.vue", () => {
     await nextTick()
 
     // After generating, token should be updated with new value from API response
-    expect(wrapper.find("[data-testid='mcp-token']").element.value).toBe(
-      mockNewToken.token
-    )
+    expect(
+      (wrapper.find("[data-testid='mcp-token']").element as HTMLInputElement)
+        .value
+    ).toBe(mockNewToken.token)
 
     // Verify API was called with correct parameters
     expect(
@@ -113,9 +115,10 @@ describe("McpTokenDialog.vue", () => {
     await nextTick()
 
     // Before clicking delete button, token should be the one from initial fetch
-    expect(wrapper.find("[data-testid='mcp-token']").element.value).toBe(
-      mockToken.token
-    )
+    expect(
+      (wrapper.find("[data-testid='mcp-token']").element as HTMLInputElement)
+        .value
+    ).toBe(mockToken.token)
 
     // Click delete button
     await wrapper.find("[data-testid='delete']").trigger("click")
@@ -125,7 +128,10 @@ describe("McpTokenDialog.vue", () => {
     await nextTick()
 
     // After deleting, token should be empty
-    expect(wrapper.find("[data-testid='mcp-token']").element.value).toBe("")
+    expect(
+      (wrapper.find("[data-testid='mcp-token']").element as HTMLInputElement)
+        .value
+    ).toBe("")
 
     // Verify API was called with correct parameters
     expect(
