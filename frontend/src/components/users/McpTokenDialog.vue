@@ -32,20 +32,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import { inject, type Ref } from "vue"
-import type { User } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
-const user = inject<Ref<User | undefined>>("currentUser")
-if (!user?.value?.id) {
-  throw new Error("User must be logged in")
-}
-const userId = user.value.id
-
 const token = ref("")
 
 const fetchTokens = async () => {
-  const tokens = await managedApi.restUserController.getUserTokens(userId)
+  const tokens = await managedApi.restUserController.getUserTokens()
   if (tokens && tokens.length > 0) {
     const firstToken = tokens[0]
     if (firstToken) {
@@ -55,12 +47,12 @@ const fetchTokens = async () => {
 }
 
 const generateToken = async () => {
-  const response = await managedApi.restUserController.createUserToken(userId)
+  const response = await managedApi.restUserController.createUserToken()
   token.value = response.token
 }
 
 const deleteToken = async () => {
-  await managedApi.restUserController.deleteUserToken(userId)
+  await managedApi.restUserController.deleteUserToken()
   token.value = ""
 }
 

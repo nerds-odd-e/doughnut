@@ -46,17 +46,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/User"
-  /api/user/{user}/token:
+  /api/user/token:
     post:
       tags:
       - rest-user-controller
       operationId: createUserToken
-      parameters:
-      - name: user
-        in: path
-        required: true
-        schema:
-          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -74,12 +68,6 @@ paths:
       tags:
       - rest-user-controller
       operationId: deleteUserToken
-      parameters:
-      - name: user
-        in: path
-        required: true
-        schema:
-          type: integer
       responses:
         "500":
           description: Internal Server Error
@@ -2568,17 +2556,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WikidataEntityData"
-  /api/user/{user}/tokens:
+  /api/user/tokens:
     get:
       tags:
       - rest-user-controller
       operationId: getUserTokens
-      parameters:
-      - name: user
-        in: path
-        required: true
-        schema:
-          type: integer
       responses:
         "500":
           description: Internal Server Error

@@ -62,11 +62,10 @@ class RestUserController {
     return user;
   }
 
-  @PostMapping("/{user}/token")
+  @PostMapping("/token")
   @Transactional
-  public UserTokenDTO createUserToken(@PathVariable @Schema(type = "integer") User user)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(user);
+  public UserTokenDTO createUserToken() {
+    User user = currentUser.getEntity();
 
     String token = UUID.randomUUID().toString();
     LocalDateTime now = LocalDateTime.now();
@@ -78,18 +77,16 @@ class RestUserController {
     return new UserTokenDTO(token, now, expiry);
   }
 
-  @DeleteMapping("/{user}/token")
+  @DeleteMapping("/token")
   @Transactional
-  public void deleteUserToken(@PathVariable @Schema(type = "integer") User user)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(user);
+  public void deleteUserToken() {
+    User user = currentUser.getEntity();
     userTokenRepository.deleteAllByUser(user);
   }
 
-  @GetMapping("/{user}/tokens")
-  public List<UserTokenDTO> getUserTokens(@PathVariable @Schema(type = "integer") User user)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(user);
+  @GetMapping("/tokens")
+  public List<UserTokenDTO> getUserTokens() {
+    User user = currentUser.getEntity();
     List<UserToken> tokens = userTokenRepository.findAllByUser(user);
     return tokens.stream()
         .map(

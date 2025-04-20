@@ -41,38 +41,26 @@ export class RestUserControllerService {
         });
     }
     /**
-     * @param user
      * @returns UserTokenDTO OK
      * @throws ApiError
      */
-    public createUserToken(
-        user: number,
-    ): CancelablePromise<UserTokenDTO> {
+    public createUserToken(): CancelablePromise<UserTokenDTO> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/user/{user}/token',
-            path: {
-                'user': user,
-            },
+            url: '/api/user/token',
             errors: {
                 500: `Internal Server Error`,
             },
         });
     }
     /**
-     * @param user
      * @returns any OK
      * @throws ApiError
      */
-    public deleteUserToken(
-        user: number,
-    ): CancelablePromise<any> {
+    public deleteUserToken(): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'DELETE',
-            url: '/api/user/{user}/token',
-            path: {
-                'user': user,
-            },
+            url: '/api/user/token',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -102,19 +90,13 @@ export class RestUserControllerService {
         });
     }
     /**
-     * @param user
      * @returns UserTokenDTO OK
      * @throws ApiError
      */
-    public getUserTokens(
-        user: number,
-    ): CancelablePromise<Array<UserTokenDTO>> {
+    public getUserTokens(): CancelablePromise<Array<UserTokenDTO>> {
         return this.httpRequest.request({
             method: 'GET',
-            url: '/api/user/{user}/tokens',
-            path: {
-                'user': user,
-            },
+            url: '/api/user/tokens',
             errors: {
                 500: `Internal Server Error`,
             },

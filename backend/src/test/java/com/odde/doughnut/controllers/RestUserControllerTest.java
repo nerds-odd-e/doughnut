@@ -64,8 +64,8 @@ class RestUserControllerTest {
   }
 
   @Test
-  void createUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
-    UserTokenDTO tokenDTO = controller.createUserToken(userModel.getEntity());
+  void createUserTokenSuccessfully() {
+    UserTokenDTO tokenDTO = controller.createUserToken();
     assertThat(tokenDTO, notNullValue());
     assertThat(
         tokenDTO.getToken(),
@@ -79,14 +79,7 @@ class RestUserControllerTest {
   }
 
   @Test
-  void createTokenForOtherUserShouldFail() {
-    User anotherUser = makeMe.aUser().please();
-    assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.createUserToken(anotherUser));
-  }
-
-  @Test
-  void deleteUserTokenSuccessfully() throws UnexpectedNoAccessRightException {
+  void deleteUserTokenSuccessfully() {
     // トークンを作成して保存
     String token = "test-token";
     UserToken userToken =
@@ -98,7 +91,7 @@ class RestUserControllerTest {
     userTokenRepository.save(userToken);
 
     // トークンを削除
-    controller.deleteUserToken(userModel.getEntity());
+    controller.deleteUserToken();
 
     // トークンが削除されたことを確認
     List<UserToken> savedTokens = userTokenRepository.findAllByUser(userModel.getEntity());
@@ -106,54 +99,15 @@ class RestUserControllerTest {
   }
 
   @Test
-  void deleteTokenForOtherUserShouldFail() {
-    User anotherUser = makeMe.aUser().please();
-    assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.deleteUserToken(anotherUser));
-  }
-
-  @Test
-  void getUserTokensSuccessfully() throws UnexpectedNoAccessRightException {
+  void getUserTokensSuccessfully() {
     // トークンを作成して保存
     String token = "test-token";
     makeMe.theUser(userModel.getEntity()).withToken(token).please(true);
 
-    List<UserTokenDTO> tokens = controller.getUserTokens(userModel.getEntity());
+    List<UserTokenDTO> tokens = controller.getUserTokens();
 
     assertThat(tokens, notNullValue());
     assertThat(tokens.size(), equalTo(1));
     assertThat(tokens.get(0).getToken(), equalTo(token));
-  }
-
-  @Test
-  void getTokensForOtherUserShouldFail() {
-    User anotherUser = makeMe.aUser().please();
-    assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller.getUserTokens(anotherUser));
-  }
-
-  @Test
-  void tokenOperationsWithUnauthorizedUserShouldFail() {
-    // Create controller with an unauthorized user model
-    UserModel unauthorizedUserModel = makeMe.aUser().toModelPlease();
-    RestUserController controllerWithUnauthorizedUser =
-        new RestUserController(
-            makeMe.modelFactoryService, unauthorizedUserModel, userTokenRepository);
-
-    // Create a different user to test against
-    User targetUser = makeMe.aUser().please();
-
-    // All token operations should fail with authorization exception
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controllerWithUnauthorizedUser.createUserToken(targetUser));
-
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controllerWithUnauthorizedUser.deleteUserToken(targetUser));
-
-    assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controllerWithUnauthorizedUser.getUserTokens(targetUser));
   }
 }
