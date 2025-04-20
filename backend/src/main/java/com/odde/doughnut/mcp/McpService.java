@@ -4,7 +4,12 @@ import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserNameService {
+public class McpService {
+
+  @Tool(description = "Get instruction")
+  public String getInstruction() {
+    return "Doughnut is a Personal Knowledge Management tool";
+  }
 
   @Tool(description = "Get username")
   public String getUsername() {

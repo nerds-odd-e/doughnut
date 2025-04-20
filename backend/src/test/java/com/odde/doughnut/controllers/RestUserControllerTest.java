@@ -71,7 +71,6 @@ class RestUserControllerTest {
         tokenDTO.getToken(),
         matchesPattern("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
     assertThat(tokenDTO.getCreatedAt(), notNullValue());
-    assertThat(tokenDTO.getExpiresAt(), notNullValue());
 
     List<UserToken> savedTokens = userTokenRepository.findAllByUser(userModel.getEntity());
     assertThat(savedTokens.size(), equalTo(1));
@@ -83,11 +82,7 @@ class RestUserControllerTest {
     // トークンを作成して保存
     String token = "test-token";
     UserToken userToken =
-        new UserToken(
-            userModel.getEntity(),
-            token,
-            java.time.LocalDateTime.now(),
-            java.time.LocalDateTime.now().plusYears(1));
+        new UserToken(userModel.getEntity(), token, java.time.LocalDateTime.now());
     userTokenRepository.save(userToken);
 
     // トークンを削除

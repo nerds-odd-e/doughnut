@@ -34,8 +34,7 @@ public class UserBuilder extends EntityBuilder<User> {
 
   public UserBuilder withToken(String token) {
     java.time.LocalDateTime now = java.time.LocalDateTime.now();
-    java.time.LocalDateTime expiry = now.plusYears(1);
-    entity.getTokens().add(new com.odde.doughnut.entities.UserToken(entity, token, now, expiry));
+    entity.getTokens().add(new com.odde.doughnut.entities.UserToken(entity, token, now));
     return this;
   }
 
