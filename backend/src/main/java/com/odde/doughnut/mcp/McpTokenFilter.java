@@ -25,8 +25,6 @@ public class McpTokenFilter implements Filter {
           String token = httpRequest.getParameter("token");
 
           if (token != null && !token.isEmpty()) {
-            // Store in ThreadLocal for traditional request handling
-            McpService.setCurrentToken(token);
 
             // For SSE sessions, find and register the user in our cache
             findAndRegisterUser(token);
@@ -35,7 +33,7 @@ public class McpTokenFilter implements Filter {
       }
       chain.doFilter(request, response);
     } finally {
-      McpService.clearCurrentToken();
+      McpTokenManager.clearCurrentToken();
     }
   }
 
@@ -43,7 +41,7 @@ public class McpTokenFilter implements Filter {
     Optional<UserToken> userToken = userTokenRepository.findByToken(token);
     if (userToken.isPresent()) {
       User user = userToken.get().getUser();
-      McpService.registerTokenUser(token, user);
+      McpTokenManager.registerTokenUser(token, user);
     }
   }
 }
