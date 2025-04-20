@@ -14,5 +14,4 @@ import lombok.Setter;
 public class UserTokenDTO {
   @NotNull private String token;
   @NotNull private LocalDateTime createdAt;
-  @NotNull private LocalDateTime expiresAt;
 }

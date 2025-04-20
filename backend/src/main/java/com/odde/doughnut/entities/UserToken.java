@@ -26,14 +26,9 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Column(name = "created_at")
   private LocalDateTime createdAt;
 
-  @NotNull
-  @Column(name = "expires_at")
-  private LocalDateTime expiresAt;
-
-  public UserToken(User user, String token, LocalDateTime createdAt, LocalDateTime expiresAt) {
+  public UserToken(User user, String token, LocalDateTime createdAt) {
     this.user = user;
     this.token = token;
     this.createdAt = createdAt;
-    this.expiresAt = expiresAt;
   }
 }

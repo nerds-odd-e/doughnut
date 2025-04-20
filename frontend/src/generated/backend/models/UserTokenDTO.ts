@@ -5,6 +5,5 @@
 export type UserTokenDTO = {
     token: string;
     createdAt: string;
-    expiresAt: string;
 };
 

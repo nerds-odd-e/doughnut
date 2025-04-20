@@ -69,12 +69,11 @@ class RestUserController {
 
     String token = UUID.randomUUID().toString();
     LocalDateTime now = LocalDateTime.now();
-    LocalDateTime expiry = now.plusYears(1);
 
-    UserToken userToken = new UserToken(user, token, now, expiry);
+    UserToken userToken = new UserToken(user, token, now);
     userTokenRepository.save(userToken);
 
-    return new UserTokenDTO(token, now, expiry);
+    return new UserTokenDTO(token, now);
   }
 
   @DeleteMapping("/token")
@@ -89,8 +88,7 @@ class RestUserController {
     User user = currentUser.getEntity();
     List<UserToken> tokens = userTokenRepository.findAllByUser(user);
     return tokens.stream()
-        .map(
-            token -> new UserTokenDTO(token.getToken(), token.getCreatedAt(), token.getExpiresAt()))
+        .map(token -> new UserTokenDTO(token.getToken(), token.getCreatedAt()))
         .collect(Collectors.toList());
   }
 }

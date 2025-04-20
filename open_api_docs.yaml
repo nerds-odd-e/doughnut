@@ -3489,12 +3489,8 @@ components:
         createdAt:
           type: string
           format: date-time
-        expiresAt:
-          type: string
-          format: date-time
       required:
       - createdAt
-      - expiresAt
       - token
     TimeTravelRelativeToNow:
       type: object
