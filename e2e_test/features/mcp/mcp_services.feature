@@ -4,7 +4,7 @@ Feature: MCP (Model Context Protocol) Services
   notes.
 
   Background:
-    Given I am logged in as an existing user
+    Given I am logged in as "old_learner"
     And I have a MCP Token
     And I connect to an MCP client that connects to Doughnut MCP service with my MCP token
 
@@ -15,4 +15,4 @@ Feature: MCP (Model Context Protocol) Services
     Examples:
       | api_name        | expected_response                               |
       | getInstruction  | Doughnut is a Personal Knowledge Management tool |
-      | getUsername     | Terry                                           |
+      | getUsername     | Old Learner                                     |
