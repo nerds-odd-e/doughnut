@@ -64,7 +64,7 @@
     "@types/node": "^22.14.1",
     "@types/testing-library__cypress": "^5.0.13",
     "adm-zip": "^0.5.16",
-    "cypress": "14.3.0",
+    "cypress": "14.3.1",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.4.7",
