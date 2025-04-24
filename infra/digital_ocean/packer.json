@@ -1,7 +1,7 @@
 {
     "variables": {
-      "version": "Mar2024",
-      "image": "ubuntu-22-04-x64",
+      "version": "Apr2025",
+      "image": "ubuntu-24-04-x64",
       "region": "sgp1",
       "size": "c-16",
       "do_token": "{{env `DIGITALOCEAN_API_TOKEN`}}",
@@ -40,7 +40,7 @@
         "ufw allow from 0.0.0.0/0 to any port 22",
         "ufw allow from 0.0.0.0/0 to any port 3389",
         "ufw enable",
-        "curl -sSf -L https://install.lix.systems/lix | sh -s -- install",
+        "curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate",
         "curl -sfL https://direnv.net/install.sh | bash",
         "sudo -u lia echo 'eval '$(direnv hook bash)' >> /home/lia/.bashrc",
         "sudo -u lia echo 'eval '$(direnv hook zsh)' >> /home/lia/.zshrc",

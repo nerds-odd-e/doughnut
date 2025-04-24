@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.13.0
+# syntax=docker.io/docker/dockerfile:1.15.0
 
 ARG TARGET_PLATFORM=linux/amd64
 
@@ -77,7 +77,7 @@ ENV USER=gitpod
 WORKDIR /home/gitpod
 
 # Install Nix
-RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 
 
