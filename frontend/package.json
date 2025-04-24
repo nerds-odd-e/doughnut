@@ -4,8 +4,8 @@
   "license": "MIT",
   "type": "module",
   "engines": {
-    "node": ">=23",
-    "pnpm": ">=10.8.1"
+    "node": ">=22",
+    "pnpm": ">=10.9.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",

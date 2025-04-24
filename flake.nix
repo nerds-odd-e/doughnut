@@ -14,24 +14,22 @@
           config = {
             allowUnfree = true;
             permittedInsecurePackages = [];
+            substituteOnDestination = true;
+            # Use specific binary caches
+            binaryCaches = [
+              "https://cache.nixos.org"
+              "https://nixcache.reflex-frp.org"
+            ];
+            trusted-binary-caches = [
+              "https://cache.nixos.org"
+              "https://nixcache.reflex-frp.org"
+            ];
           };
-          overlays = [
-            (final: prev: {
-              boost = prev.boost.override {
-                enableShared = true;
-                enableStatic = true;
-                extraB2Flags = [ "--without-stacktrace" ];
-              };
-            })
-          ];
         };
 
         inherit (pkgs) stdenv lib;
         apple_sdk = pkgs.darwin.apple_sdk.frameworks;
-
-        # Env var to check whether to run more nix init steps (helps speeds up CURSOR agent mode)
         cursorDevEnv = builtins.getEnv "CURSOR_DEV";
-        # Env var to conditionally include Python packages
         pythonDevEnv = builtins.getEnv "PYTHON_DEV";
         pythonDev = pythonDevEnv == "true";
         poetryPath = "${pkgs.poetry}/bin";
@@ -45,8 +43,8 @@
 
         basePackages = with pkgs; [
           zulu23
-          nodejs_23
-          corepack_23
+          nodejs_22
+          corepack_22
           git
           git-secret
           gitleaks
@@ -66,6 +64,9 @@
         linuxPackages = with pkgs; lib.optionals (!stdenv.isDarwin) [
           psmisc
           xclip
+        ];
+
+        linuxCypressPackages = with pkgs; lib.optionals (!stdenv.isDarwin) [
           xorg.xorgserver
           xorg.xauth
           xorg.libX11
@@ -96,18 +97,16 @@
           pango
           cairo
         ];
+
       in {
         devShells.default = pkgs.mkShell {
           name = "doughnut";
-          nativeBuildInputs = with pkgs;
-            [
-              autoPatchelfHook
-            ];
-          buildInputs = with pkgs;
-            basePackages
-            ++ darwinPackages
-            ++ linuxPackages
-            ++ pythonPackages;
+          nativeBuildInputs = with pkgs; [ autoPatchelfHook ];
+          buildInputs = basePackages ++ darwinPackages ++ linuxPackages;
+
+          # Force binary substitutes for the shell
+          preferLocalBuild = false;
+          allowSubstitutes = true;
 
           shellHook = ''
             # Source helper scripts

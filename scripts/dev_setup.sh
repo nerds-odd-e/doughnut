@@ -8,19 +8,19 @@ deactivate_nvm() {
 # Setup PNPM and Biome
 setup_pnpm_and_biome() {
   log "Setting up PNPM..."
-  corepack prepare pnpm@10.8.1 --activate
-  corepack use pnpm@10.8.1
+  corepack prepare pnpm@10.9.0 --activate
+  corepack use pnpm@10.9.0
   pnpm --frozen-lockfile recursive install
 
-  # Restart biome daemon
-  if [[ -d "/etc/nixos" ]]; then
+  if [ -e /etc/NIXOS ] || [ -e /etc/nixos ]; then
+    log "Patching Biome binaries on NixOS..."
     BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']" 2>/dev/null || echo "")
-    if pgrep biome >/dev/null; then
-      log "Stopping existing Biome daemon..."
-      pgrep biome | xargs kill -9 || true
-    fi
+    # Static link dynamic libs/bin for NixOS
     autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
   fi
+
+  # Restart biome daemon
+  log "Stopping existing Biome daemon..."
   pnpm biome stop || true
   log "Starting Biome daemon..."
   pnpm biome start
@@ -37,8 +37,9 @@ setup_cypress() {
     fi
   fi
 
-  if [[ "$OSTYPE" == "linux"* || -d "/etc/nixos" ]]; then
-    log "Patching Cypress binaries on Linux..."
+  # Static link dynamic libs/bin for NixOS
+  if [ -e /etc/NIXOS ] || [ -e /etc/nixos ]; then
+    log "Patching Cypress binaries on NixOS..."
     autoPatchelf "${HOME}/.cache/Cypress/${CYPRESS_VERSION}/Cypress/"
   fi
   export CYPRESS_CACHE_FOLDER=$HOME/.cache/Cypress
