@@ -77,7 +77,7 @@ ENV USER=gitpod
 WORKDIR /home/gitpod
 
 # Install Nix
-RUN curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
+RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 
 
