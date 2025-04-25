@@ -22,7 +22,7 @@
     "file-saver": "^2.0.5",
     "gsap": "^3.12.7",
     "intersection-observer": "^0.12.2",
-    "marked": "^15.0.8",
+    "marked": "^15.0.11",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.3",
     "turndown": "^7.2.0",
@@ -35,14 +35,14 @@
     "@biomejs/biome": "1.9.4",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.15.1",
     "@types/turndown": "^5.0.5",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vitejs/plugin-vue-jsx": "^4.1.2",
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.23",
-    "es-toolkit": "^1.35.0",
+    "es-toolkit": "^1.36.0",
     "jsdom": "^26.1.0",
     "optionator": "^0.9.4",
     "postcss": "^8.5.3",
@@ -60,6 +60,6 @@
     "vitest": "3.1.2",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
-    "vue-tsc": "2.2.8"
+    "vue-tsc": "2.2.10"
   }
 }
