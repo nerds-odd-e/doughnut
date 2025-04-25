@@ -28,11 +28,12 @@
         "wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg",
         "add-apt-repository universe",
         "apt-get update -y && apt-get upgrade -y && apt-get install -y zsh xrdp ubuntu-desktop libfuse2 google-chrome-stable git-all vim net-tools software-properties-common apt-transport-https wget libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 libatomic1 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 xauth xvfb bat lsof git-extras git-secret unzip zip bash-completion xclip fasd fzf zoxide whois",
-        "wget -O cursor.AppImage 'https://downloads.cursor.com/production/ec408037b24566b11e6132c58bbe6ad27046eb91/linux/x64/Cursor-0.49.4-x86_64.AppImage'",
+        "wget -O cursor.AppImage 'https://downloads.cursor.com/production/fd861c8a80c0f9e4e35294b1915ee8a7b29ae858/linux/x64/Cursor-0.49.5-x86_64.AppImage'",
         "chmod +x cursor.AppImage",
         "sudo mv cursor.AppImage /usr/local/bin/cursor",
         "apt install -f -y",
         "snap install intellij-idea-community --classic",
+        "ln -s /snap/intellij-idea-community/current/bin/idea.sh /usr/local/bin/idea",
         "adduser xrdp ssl-cert",
         "export ENCRYPTED_LIA_PASSWORD=$(echo $LIA_PASSWORD | openssl passwd -6 -stdin) && useradd -m -d /home/lia -s /usr/bin/zsh -p $ENCRYPTED_LIA_PASSWORD lia",
         "usermod -aG sudo lia",
@@ -44,7 +45,6 @@
         "sudo -u lia mkdir -p /home/lia/.config/nix && sudo -u lia touch /home/lia/.config/nix/nix.conf",
         "sudo -u lia echo 'experimental-features = nix-command flakes' >> /home/lia/.config/nix/nix.conf",
         "sudo -u lia git clone https://github.com/nerds-odd-e/doughnut.git /home/lia/doughnut",
-        "ln -s /snap/intellij-idea-community/current/bin/idea.sh /usr/local/bin/idea",
         "systemctl enable xrdp"
       ],
       "environment_vars": [
