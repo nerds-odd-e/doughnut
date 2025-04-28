@@ -41,7 +41,7 @@
         "ufw allow from 0.0.0.0/0 to any port 22",
         "ufw allow from 0.0.0.0/0 to any port 3389",
         "ufw enable",
-        "curl -sSf -L https://install.lix.systems/lix | sh -s -- install --no-confirm",
+        "curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate --no-confirm",
         "sudo -u lia mkdir -p /home/lia/.config/nix && sudo -u lia touch /home/lia/.config/nix/nix.conf",
         "sudo -u lia echo 'experimental-features = nix-command flakes' >> /home/lia/.config/nix/nix.conf",
         "sudo -u lia git clone https://github.com/nerds-odd-e/doughnut.git /home/lia/doughnut",
