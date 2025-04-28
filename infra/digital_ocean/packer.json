@@ -28,7 +28,7 @@
         "wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | gpg --dearmor | tee /etc/apt/trusted.gpg.d/microsoft.gpg",
         "add-apt-repository universe",
         "apt-get update -y && apt-get upgrade -y && apt-get install -y zsh xrdp ubuntu-desktop libfuse2 google-chrome-stable git-all vim net-tools software-properties-common apt-transport-https wget libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 libatomic1 libatk-bridge2.0-0 libcups2 libdrm2 libgbm1 xauth xvfb bat lsof git-extras git-secret unzip zip bash-completion xclip fasd fzf zoxide whois",
-        "wget -O cursor.AppImage 'https://downloads.cursor.com/production/fd861c8a80c0f9e4e35294b1915ee8a7b29ae858/linux/x64/Cursor-0.49.5-x86_64.AppImage'",
+        "wget -O cursor.AppImage 'https://downloads.cursor.com/production/0781e811de386a0c5bcb07ceb259df8ff8246a52/linux/x64/Cursor-0.49.6-x86_64.AppImage'",
         "chmod +x cursor.AppImage",
         "sudo mv cursor.AppImage /usr/local/bin/cursor",
         "apt install -f -y",
