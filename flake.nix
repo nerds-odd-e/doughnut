@@ -57,6 +57,7 @@
           nixfmt-classic
           hclfmt
           fzf
+          act
         ];
 
         darwinPackages = with pkgs; lib.optionals stdenv.isDarwin [ sequelpro ];
