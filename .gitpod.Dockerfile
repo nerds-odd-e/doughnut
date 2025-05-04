@@ -1,4 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1.15.0
+# syntax=docker.io/docker/dockerfile:1.15.1
 FROM yeongsheng/doughnut-gitpod:2025-04-24
 
 # -----------------------------------------------------
