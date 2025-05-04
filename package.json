@@ -81,7 +81,7 @@
   },
   "dependencies": {
     "@cucumber/cucumber": "^11.2.0",
-    "@modelcontextprotocol/sdk": "^1.10.2",
+    "@modelcontextprotocol/sdk": "^1.11.0",
     "vue-toastification": "2.0.0-rc.5"
   },
   "pnpm": {
