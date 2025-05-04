@@ -50,7 +50,7 @@
           gitleaks
           jq
           libmysqlclient
-          mysql80
+          mysql84
           mysql-client
           mysql_jdbc
           yamllint
