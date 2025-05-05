@@ -73,7 +73,7 @@
     "npm-run-all2": "^8.0.1",
     "openapi-typescript-codegen": "^0.29.0",
     "process": "^0.11.10",
-    "superagent": "^10.2.0",
+    "superagent": "^10.2.1",
     "syncpack": "^13.0.4",
     "typescript": "5.8.3",
     "util": "^0.12.5",
