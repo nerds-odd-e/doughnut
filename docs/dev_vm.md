@@ -19,4 +19,4 @@
 - **Important:** Make sure to copy your new personal access token. You won't be able to see it again!
 - run `git config --global credential.helper cache`
 - Each time you're prompted for a username and password, use your GitHub username and the personal access token, respectively.
-11. You may refer [here](./git_https_to_git+ssh.md) for instructions on how to convert your locally cloned git HTTPS remote-origin to a git+ssh remote-origin which will then use ssh authentication instead
+11. You may refer [here](./git+https_to_git+ssh_doughnut_repo_auth.md) for instructions on how to convert your locally cloned git HTTPS remote-origin to a git+ssh remote-origin which will then use ssh authentication instead
