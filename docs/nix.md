@@ -1,15 +1,15 @@
 # Local development machine development environment setup with nix
 
-## :warning: 🚨 **ONLY PROCEED**  with the subsequent steps if `./setup-doughnut-dev.sh` (see [README.md](../README.md)) somehow failed for you!!!
+## :warning: 🚨 **ONLY PROCEED**  with the subsequent steps if `./setup-doughnut-dev.sh` (see [README.md](../README.md)) somehow failed horribly for you!!!
 
-### 1. Install Lix
+### 1. Install Nix
 
-We use Lix (a variant of Nix package manager) to manage and ensure a reproducible development environment ([https://lix.systems/](https://lix.systems/)).
+We use Nix installer by Determinate Systems to manage and ensure a reproducible development environment ([https://determinate.systems/posts/determinate-nix-installer/](https://determinate.systems/posts/determinate-nix-installer/)).
 
-Full details on Lix installation via lix-installer [here](https://git.lix.systems/lix-project/lix-installer)
+Full details on Nix installation via Determinate nix-installer [here](https://github.com/DeterminateSystems/nix-installer)
 
 ```bash
-curl --proto '=https' --tlsv1.2 -sSf -L https://install.lix.systems/lix | sh -s -- install
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install --determinate
 ```
 
 ### 2. Setup and run doughnut for the first time (local development profile)
@@ -61,7 +61,7 @@ pnpm frontend:verify
 
 Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 5173; backend app on port 9081)
 
-#### :warning: For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. This is not managed by Nix! (see [Additional things to note for Microsoft Windows10/Windows11 developers using WSL2g with Ubuntu-23.04.](./wsl2.md))
+#### :warning: For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. This is not managed by Nix! (see [Additional things to note for Microsoft Windows10/Windows11 developers using WSL2g with Ubuntu-24.04.](./wsl2.md))
 
 ```bash
 # from doughnut source root dir
@@ -75,18 +75,10 @@ Run headless E2E (doughnut full stack started on port 9081)
 pnpm verify
 ```
 
-### 3. Upgrade Lix
+### 3. Uninstalling
 
-You can upgrade Lix with:
-
-```bash
-sudo -i nix upgrade-nix
-```
-
-### 4. Uninstalling
-
-I hope you don't, but IF YOU REALLY REALLY NEED TO, you can remove a lix-installer-installed Nix by running
+IF YOU REALLY REALLY NEED TO, you can remove Nix by running
 
 ```bash
-/nix/lix-installer uninstall
+/nix/nix-installer uninstall
 ```
