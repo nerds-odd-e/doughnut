@@ -54,7 +54,7 @@ dependencies {
   compileOnly 'org.projectlombok:lombok:1.18.38'
   annotationProcessor 'org.projectlombok:lombok:1.18.38'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-  runtimeOnly 'com.mysql:mysql-connector-j:9.2.0'
+  runtimeOnly 'com.mysql:mysql-connector-j:9.3.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
