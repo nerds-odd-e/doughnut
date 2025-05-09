@@ -63,7 +63,7 @@
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.32",
     "@types/node": "^22.15.17",
-    "@types/testing-library__cypress": "^5.0.13",
+    "@types/testing-library__cypress": "^7.0.0",
     "adm-zip": "^0.5.16",
     "cypress": "14.3.3",
     "cypress-file-upload": "^5.0.8",
