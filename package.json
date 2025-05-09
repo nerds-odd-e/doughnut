@@ -58,10 +58,11 @@
     "@badeball/cypress-cucumber-preprocessor": "^22.0.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.4",
     "@biomejs/biome": "1.9.4",
+    "@modelcontextprotocol/sdk": "^1.11.1",
     "@testing-library/cypress": "10.0.3",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.32",
-    "@types/node": "^22.15.14",
+    "@types/node": "^22.15.17",
     "@types/testing-library__cypress": "^5.0.13",
     "adm-zip": "^0.5.16",
     "cypress": "14.3.3",
@@ -81,7 +82,6 @@
   },
   "dependencies": {
     "@cucumber/cucumber": "^11.2.0",
-    "@modelcontextprotocol/sdk": "^1.11.0",
     "vue-toastification": "2.0.0-rc.5"
   },
   "pnpm": {
