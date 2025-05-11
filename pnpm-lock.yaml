@@ -55,9 +55,6 @@ importers:
       '@types/node':
         specifier: ^22.15.17
         version: 22.15.17
-      '@types/testing-library__cypress':
-        specifier: ^7.0.0
-        version: 7.0.0(cypress@14.3.3)
       adm-zip:
         specifier: ^0.5.16
         version: 0.5.16
@@ -1117,10 +1114,6 @@ packages:
 
   '@types/sizzle@2.3.9':
     resolution: {integrity: sha512-xzLEyKB50yqCUPUJkIsrVvoWNfFUbIZI+RspLWt8u+tIW/BetMBZtgV2LY/2o+tYH8dRvQ+eoPf3NdhQCcLE2w==}
-
-  '@types/testing-library__cypress@7.0.0':
-    resolution: {integrity: sha512-pDF1YGsbY+GS4bgYul3J5/b4W7gsBV1h0We0JxQXqYQjc39IHYDST5X1PftwB3bOAB8xEnX4I+jZiGpg+J7n3A==}
-    deprecated: This is a stub types definition. @testing-library/cypress provides its own type definitions, so you do not need this installed.
 
   '@types/triple-beam@1.3.5':
     resolution: {integrity: sha512-6WaYesThRMCl19iryMYP7/x2OVgCtbIVflDGFpWnb9irXI3UjYE4AzmYuiUKY1AJstGijoY+MgUszMgRxIYTYw==}
@@ -5865,12 +5858,6 @@ snapshots:
   '@types/sinonjs__fake-timers@8.1.1': {}
 
   '@types/sizzle@2.3.9': {}
-
-  '@types/testing-library__cypress@7.0.0(cypress@14.3.3)':
-    dependencies:
-      '@testing-library/cypress': 10.0.3(cypress@14.3.3)
-    transitivePeerDependencies:
-      - cypress
 
   '@types/triple-beam@1.3.5': {}
 
