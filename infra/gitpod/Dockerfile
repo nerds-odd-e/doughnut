@@ -50,6 +50,8 @@ RUN apt-get install -y \
     xclip \
     fasd \
     fzf \
+    neovim \
+    direnv \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \
@@ -77,21 +79,18 @@ ENV USER=gitpod
 WORKDIR /home/gitpod
 
 # Install Nix
-RUN curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+RUN curl --proto '=https' --tlsv1.2 -L https://nixos.org/nix/install | sh -s -- --no-daemon \
+  && echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc \
+  && echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.zshrc \
+  && mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix \
+  && mkdir -p /home/gitpod/.config/nix \
+  && touch /home/gitpod/.config/nix/nix.conf \
+  && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
-
-
-RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
-RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix
-
-RUN mkdir -p /home/gitpod/.config/nix \
-    && touch /home/gitpod/.config/nix/nix.conf \
-    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
 
 # xclip & nix develop
 RUN echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.bashrc \
     && echo "test -f ./sh_profile && source ./sh_profile" >> /home/gitpod/.zshrc
-
 
 EXPOSE 5173
 EXPOSE 3309
