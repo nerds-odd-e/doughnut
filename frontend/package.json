@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": ">=22",
-    "pnpm": ">=10.9.0"
+    "pnpm": ">=10.11.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
