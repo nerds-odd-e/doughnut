@@ -54,7 +54,6 @@ vscode:
     - Shelex.vscode-cy-helper
     - mtxr.sqltools
     - GulajavaMinistudio.mayukaithemevsc
-    - GabrielBB.vscode-lombok
     - jnoortheen.nix-ide
     - unifiedjs.vscode-mdx
     - antfu.vite
@@ -64,10 +63,11 @@ vscode:
     - pinage404.nix-extension-pack
     - ms-azuretools.vscode-docker
     - saoudrizwan.claude-dev
-    - supermaven.supermaven
     - MarsCode.marscode-extension
     - bradlc.vscode-tailwindcss
     - stivo.tailwind-fold
     - alfredbirk.tailwind-documentation
     - KalimahApps.tailwind-config-viewer
     - emranweb.daisyui-snippet
+    - Pleiades.java-extension-pack-jdk
+    - nicegyuha.spring-boot-extension-pack-with-kotlin
