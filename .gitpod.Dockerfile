@@ -15,7 +15,6 @@ WORKDIR /home/gitpod
 ENV PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 RUN export PATH="${PATH}:/nix/var/nix/profiles/default/bin"
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
-RUN nix-env -iA nixpkgs.direnv && nix-env -iA nixpkgs.nix-direnv
 
 # fasd
 RUN echo 'eval "$(fasd --init auto)"' >> ~/.bashrc
