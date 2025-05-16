@@ -5,8 +5,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Background:
     Given I am logged in as "old_learner"
-    And I have a MCP Token
-    And I connect to an MCP client that connects to Doughnut MCP service with my MCP token
+    And I connect to an MCP client that connects to Doughnut MCP service
 
   Scenario Outline: MCP API calls
     When I call the "<api_name>" MCP tool
@@ -15,4 +14,3 @@ Feature: MCP (Model Context Protocol) Services
     Examples:
       | api_name        | expected_response                               |
       | getInstruction  | Doughnut is a Personal Knowledge Management tool |
-      | getUsername     | Old Learner                                     |

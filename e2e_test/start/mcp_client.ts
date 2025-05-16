@@ -18,11 +18,9 @@ export const getMcpClient = () => {
   return client
 }
 
-export const connectMcpClient = async (mcpToken: string) => {
+export const connectMcpClient = async () => {
   const client = getMcpClient()
-  let sseUrl = `${Cypress.config().backendBaseUrl}/sse`
-
-  sseUrl = `${sseUrl}?token=${mcpToken}`
+  const sseUrl = `${Cypress.config().backendBaseUrl}/sse`
 
   const transport = new SSEClientTransport(new URL(sseUrl))
   await client.connect(transport)
