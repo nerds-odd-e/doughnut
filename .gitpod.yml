@@ -67,7 +67,4 @@ vscode:
     - bradlc.vscode-tailwindcss
     - stivo.tailwind-fold
     - alfredbirk.tailwind-documentation
-    - KalimahApps.tailwind-config-viewer
-    - emranweb.daisyui-snippet
     - Pleiades.java-extension-pack-jdk
-    - nicegyuha.spring-boot-extension-pack-with-kotlin
