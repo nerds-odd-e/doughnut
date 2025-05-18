@@ -60,11 +60,6 @@ public class User extends EntityIdentifiedByIdOnly {
   @Getter
   private final List<Subscription> subscriptions = new ArrayList<>();
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-  @JsonIgnore
-  @Getter
-  private final List<UserToken> tokens = new ArrayList<>();
-
   public User() {
     ownership.setUser(this);
   }

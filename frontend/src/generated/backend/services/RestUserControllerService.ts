@@ -4,7 +4,6 @@
 /* eslint-disable */
 import type { User } from '../models/User';
 import type { UserDTO } from '../models/UserDTO';
-import type { UserTokenDTO } from '../models/UserTokenDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestUserControllerService {
@@ -41,32 +40,6 @@ export class RestUserControllerService {
         });
     }
     /**
-     * @returns UserTokenDTO OK
-     * @throws ApiError
-     */
-    public createUserToken(): CancelablePromise<UserTokenDTO> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/user/token',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns any OK
-     * @throws ApiError
-     */
-    public deleteUserToken(): CancelablePromise<any> {
-        return this.httpRequest.request({
-            method: 'DELETE',
-            url: '/api/user/token',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
      * @param user
      * @param requestBody
      * @returns User OK
@@ -84,19 +57,6 @@ export class RestUserControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @returns UserTokenDTO OK
-     * @throws ApiError
-     */
-    public getUserTokens(): CancelablePromise<Array<UserTokenDTO>> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/user/tokens',
             errors: {
                 500: `Internal Server Error`,
             },

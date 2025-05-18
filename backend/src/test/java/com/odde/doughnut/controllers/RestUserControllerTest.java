@@ -1,18 +1,14 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
-import com.odde.doughnut.controllers.dto.UserTokenDTO;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.UserToken;
-import com.odde.doughnut.entities.repositories.UserTokenRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +22,13 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestUserControllerTest {
   @Autowired MakeMe makeMe;
-  @Autowired UserTokenRepository userTokenRepository;
   UserModel userModel;
   RestUserController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestUserController(makeMe.modelFactoryService, userModel, userTokenRepository);
+    controller = new RestUserController(makeMe.modelFactoryService, userModel);
   }
 
   @Test
@@ -61,48 +56,5 @@ class RestUserControllerTest {
     User anotherUser = makeMe.aUser().please();
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser, dto));
-  }
-
-  @Test
-  void createUserTokenSuccessfully() {
-    UserTokenDTO tokenDTO = controller.createUserToken();
-    assertThat(tokenDTO, notNullValue());
-    assertThat(
-        tokenDTO.getToken(),
-        matchesPattern("^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"));
-    assertThat(tokenDTO.getCreatedAt(), notNullValue());
-
-    List<UserToken> savedTokens = userTokenRepository.findAllByUser(userModel.getEntity());
-    assertThat(savedTokens.size(), equalTo(1));
-    assertThat(savedTokens.get(0).getToken(), equalTo(tokenDTO.getToken()));
-  }
-
-  @Test
-  void deleteUserTokenSuccessfully() {
-    // トークンを作成して保存
-    String token = "test-token";
-    UserToken userToken =
-        new UserToken(userModel.getEntity(), token, java.time.LocalDateTime.now());
-    userTokenRepository.save(userToken);
-
-    // トークンを削除
-    controller.deleteUserToken();
-
-    // トークンが削除されたことを確認
-    List<UserToken> savedTokens = userTokenRepository.findAllByUser(userModel.getEntity());
-    assertThat(savedTokens.size(), equalTo(0));
-  }
-
-  @Test
-  void getUserTokensSuccessfully() {
-    // トークンを作成して保存
-    String token = "test-token";
-    makeMe.theUser(userModel.getEntity()).withToken(token).please(true);
-
-    List<UserTokenDTO> tokens = controller.getUserTokens();
-
-    assertThat(tokens, notNullValue());
-    assertThat(tokens.size(), equalTo(1));
-    assertThat(tokens.get(0).getToken(), equalTo(token));
   }
 }

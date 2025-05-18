@@ -1,10 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
-import com.odde.doughnut.controllers.dto.UserTokenDTO;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.UserToken;
-import com.odde.doughnut.entities.repositories.UserTokenRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
@@ -12,10 +9,6 @@ import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,15 +17,10 @@ import org.springframework.web.bind.annotation.*;
 class RestUserController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
-  private final UserTokenRepository userTokenRepository;
 
-  public RestUserController(
-      ModelFactoryService modelFactoryService,
-      UserModel currentUser,
-      UserTokenRepository userTokenRepository) {
+  public RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.userTokenRepository = userTokenRepository;
   }
 
   @PostMapping("")
@@ -60,35 +48,5 @@ class RestUserController {
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
     modelFactoryService.save(user);
     return user;
-  }
-
-  @PostMapping("/token")
-  @Transactional
-  public UserTokenDTO createUserToken() {
-    User user = currentUser.getEntity();
-
-    String token = UUID.randomUUID().toString();
-    LocalDateTime now = LocalDateTime.now();
-
-    UserToken userToken = new UserToken(user, token, now);
-    userTokenRepository.save(userToken);
-
-    return new UserTokenDTO(token, now);
-  }
-
-  @DeleteMapping("/token")
-  @Transactional
-  public void deleteUserToken() {
-    User user = currentUser.getEntity();
-    userTokenRepository.deleteAllByUser(user);
-  }
-
-  @GetMapping("/tokens")
-  public List<UserTokenDTO> getUserTokens() {
-    User user = currentUser.getEntity();
-    List<UserToken> tokens = userTokenRepository.findAllByUser(user);
-    return tokens.stream()
-        .map(token -> new UserTokenDTO(token.getToken(), token.getCreatedAt()))
-        .collect(Collectors.toList());
   }
 }

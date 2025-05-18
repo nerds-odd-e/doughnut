@@ -46,37 +46,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/User"
-  /api/user/token:
-    post:
-      tags:
-      - rest-user-controller
-      operationId: createUserToken
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserTokenDTO"
-    delete:
-      tags:
-      - rest-user-controller
-      operationId: deleteUserToken
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
@@ -2556,26 +2525,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WikidataEntityData"
-  /api/user/tokens:
-    get:
-      tags:
-      - rest-user-controller
-      operationId: getUserTokens
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserTokenDTO"
   /api/user/current-user-info:
     get:
       tags:
@@ -3481,17 +3430,6 @@ components:
       - externalIdentifier
       - id
       - name
-    UserTokenDTO:
-      type: object
-      properties:
-        token:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-      required:
-      - createdAt
-      - token
     TimeTravelRelativeToNow:
       type: object
       properties:

@@ -32,12 +32,6 @@ public class UserBuilder extends EntityBuilder<User> {
     return this;
   }
 
-  public UserBuilder withToken(String token) {
-    java.time.LocalDateTime now = java.time.LocalDateTime.now();
-    entity.getTokens().add(new com.odde.doughnut.entities.UserToken(entity, token, now));
-    return this;
-  }
-
   public UserModel toModelPlease() {
     return makeMe.modelFactoryService.toUserModel(please());
   }
