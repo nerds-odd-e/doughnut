@@ -52,7 +52,7 @@
         "# Install development tools",
         "apt-get install -y bat lsof git-extras git-secret zoxide fzf fasd unzip p7zip-full p7zip-rar",
         "# Install Cursor IDE with desktop entry",
-        "wget -O cursor.AppImage 'https://downloads.cursor.com/production/8ea935e79a50a02da912a034bbeda84a6d3d355d/linux/x64/Cursor-0.50.4-x86_64.AppImage'",
+        "wget -O cursor.AppImage 'https://downloads.cursor.com/production/96e5b01ca25f8fbd4c4c10bc69b15f6228c80771/linux/x64/Cursor-0.50.5-x86_64.AppImage'",
         "chmod +x cursor.AppImage",
         "mkdir -p /opt/cursor",
         "mv cursor.AppImage /opt/cursor/cursor",
