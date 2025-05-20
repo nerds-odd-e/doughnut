@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
@@ -9,6 +10,7 @@ import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,5 +50,19 @@ class RestUserController {
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
     modelFactoryService.save(user);
     return user;
+  }
+
+  @PostMapping("/generate-token")
+  @Transactional
+  public String generateToken() {
+    currentUser.assertLoggedIn();
+    User user = currentUser.getEntity();
+
+    String uuid = UUID.randomUUID().toString();
+
+    // save token to DB
+    UserToken userToken = new UserToken(user.getId(), uuid);
+    modelFactoryService.save(userToken);
+    return uuid;
   }
 }
