@@ -53,6 +53,7 @@ When('I should be asked to create my profile', () => {
   cy.get('body').should('contain', 'Please create your profile')
 })
 
+
 When('I save my profile with:', (data: DataTable) => {
   data.hashes().forEach((elem) => {
     for (const propName in elem) {
@@ -133,3 +134,20 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.contains('Welcome')
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
+
+Given('I am on generate token page', () => {
+  cy.visit('/d/generate-token')
+})
+
+When('I click generate token button', () => {
+  cy.findByRole('button', { name: 'Generate Token' }).click()
+})
+
+Then('I should see token string in the page', () => {
+  cy.get('[data-test="token-result"]')
+  .invoke('text')
+  .should('match', /\S+/)
+})
+
+
+
