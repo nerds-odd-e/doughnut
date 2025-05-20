@@ -4,14 +4,14 @@
       <ul v-if="user" class="daisy-menu daisy-w-full daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
-            <NavigationItem v-bind="{ ...item }" />
-          </li>
+          <NavigationItem v-bind="{ ...item }" />
+        </li>
         </template>
 
         <template v-if="!isHomePage">
           <li v-for="item in lowerNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
-            <NavigationItem v-bind="{ ...item, to: item.name }" />
-          </li>
+          <NavigationItem v-bind="{ ...item, to: item.name }" />
+        </li>
         </template>
 
         <li class="daisy-menu-item">
@@ -41,6 +41,11 @@
                 <li class="daisy-menu-item hover:daisy-bg-base-200">
                   <router-link :to="{ name: 'assessmentAndCertificateHistory' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
                     My Assessments and Certificates
+                  </router-link>
+                </li>
+                <li class="daisy-menu-item hover:daisy-bg-base-200">
+                  <router-link :to="{ name: 'generateToken' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
+                    Generate Token
                   </router-link>
                 </li>
                 <li class="daisy-menu-item hover:daisy-bg-base-200">
