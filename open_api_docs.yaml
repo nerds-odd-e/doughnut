@@ -63,7 +63,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/UserToken"
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
@@ -3448,6 +3448,20 @@ components:
       - externalIdentifier
       - id
       - name
+    UserToken:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        userId:
+          type: integer
+          format: int32
+        token:
+          type: string
+      required:
+      - id
+      - token
     TimeTravelRelativeToNow:
       type: object
       properties:

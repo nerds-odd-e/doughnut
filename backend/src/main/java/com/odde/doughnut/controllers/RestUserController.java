@@ -54,7 +54,7 @@ class RestUserController {
 
   @PostMapping("/generate-token")
   @Transactional
-  public String generateToken() {
+  public UserToken generateToken() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
 
@@ -62,7 +62,7 @@ class RestUserController {
 
     // save token to DB
     UserToken userToken = new UserToken(user.getId(), uuid);
-    modelFactoryService.save(userToken);
-    return uuid;
+    userToken = modelFactoryService.save(userToken);
+    return userToken;
   }
 }
