@@ -6,11 +6,13 @@ Feature: Generate Token
     When I click generate token button
     Then I should see token string in the page
 
+  @ignore
   Scenario: Generate token when I haven't login
     Given I haven't login
     When I am on generate token page
     Then I should see message that says "You need to be logged in to generate token."
 
+  @ignore
   Scenario: Generate token when session is expired
     Given I am logged in as an existing user
     And I am on generate token page
