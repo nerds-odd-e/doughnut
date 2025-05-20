@@ -7,9 +7,9 @@ Feature: MCP (Model Context Protocol) get user info
    Scenario Outline: Retrieve basic user information
     Given header contains "<mcpToken>"
     When the client requests user information via MCP service
-    Then The "<userInfo>" is displayed
+    Then The "<userName>" is displayed
     Examples:
-      | mcpToken      | userInfo                  |
+      | mcpToken      | userName                  |
       | none          | Error Message             |
-      | exist         | User Object               |
-      | non_exist     | Null or Empty User Object |
+      | exist         | userName               |
+      | non_exist     | Null or Empty userName |
