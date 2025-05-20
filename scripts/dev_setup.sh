@@ -16,14 +16,16 @@ setup_pnpm_and_biome() {
     log "Patching Biome binaries on NixOS..."
     BIOME_VERSION=$(node -p "require('./package.json').devDependencies['@biomejs/biome']" 2>/dev/null || echo "")
     # Static link dynamic libs/bin for NixOS
-    autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64"
+    if [ -n "$BIOME_VERSION" ]; then
+      autoPatchelf "./node_modules/.pnpm/@biomejs+cli-linux-x64@${BIOME_VERSION}/node_modules/@biomejs/cli-linux-x64" || true
+    fi
   fi
 
-  # Restart biome daemon
+  # Restart biome daemon with error handling
   log "Stopping existing Biome daemon..."
   pnpm biome stop || true
   log "Starting Biome daemon..."
-  pnpm biome start
+  pnpm biome start || true
 }
 
 # Setup Cypress
@@ -68,7 +70,7 @@ setup_python() {
 
 # Print environment info
 print_env_info() {
-  cat << 'EOF'
+  cat <<'EOF'
 ╔════════════════════════════════════════════════════════════════════════════════════╗
 ║                         NIX DEVELOPMENT ENVIRONMENT                                ║
 ╚════════════════════════════════════════════════════════════════════════════════════╝

@@ -129,7 +129,7 @@
             setup_env_vars
 
             # Setup MySQL environment
-            setup_mysql_env "${pkgs.mysql80}"
+            setup_mysql_env "${pkgs.mysql84}"
 
             # Add Python to PATH if enabled
             if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
