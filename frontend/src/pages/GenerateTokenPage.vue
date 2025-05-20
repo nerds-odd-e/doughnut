@@ -1,32 +1,3 @@
-<script setup lang="ts">
-import { ref } from "vue"
-
-const token = ref<string | null>(null)
-const loading = ref(false)
-const copied = ref(false)
-
-const generateToken = async () => {
-  try {
-    loading.value = true
-    copied.value = false
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    token.value = "example-generated-token-123456"
-    loading.value = false
-  } catch (error) {
-    console.error("Error generating token:", error)
-    loading.value = false
-  }
-}
-
-const copyToken = async () => {
-  if (token.value) {
-    await navigator.clipboard.writeText(token.value)
-    copied.value = true
-    setTimeout(() => (copied.value = false), 1500)
-  }
-}
-</script>
-
 <template>
   <div class="daisy-container daisy-mx-auto daisy-p-4">
     <h1 class="daisy-text-2xl daisy-font-bold daisy-mb-4">Generate Token</h1>
@@ -58,3 +29,35 @@ const copyToken = async () => {
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { ref } from "vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+
+const { managedApi } = useLoadingApi()
+
+const token = ref<string | null>(null)
+const loading = ref(false)
+const copied = ref(false)
+
+const generateToken = async () => {
+  loading.value = true
+  copied.value = false
+  try {
+    const res = await managedApi.restUserController.generateToken()
+    token.value = res.token
+  } catch (error) {
+    console.error("Error generating token:", error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const copyToken = async () => {
+  if (token.value) {
+    await navigator.clipboard.writeText(token.value)
+    copied.value = true
+    setTimeout(() => (copied.value = false), 1500)
+  }
+}
+</script>
