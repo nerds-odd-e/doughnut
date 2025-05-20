@@ -40,6 +40,19 @@ export class RestUserControllerService {
         });
     }
     /**
+     * @returns string OK
+     * @throws ApiError
+     */
+    public generateToken(): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/user/generate-token',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @param user
      * @param requestBody
      * @returns User OK
