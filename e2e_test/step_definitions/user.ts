@@ -53,7 +53,6 @@ When('I should be asked to create my profile', () => {
   cy.get('body').should('contain', 'Please create your profile')
 })
 
-
 When('I save my profile with:', (data: DataTable) => {
   data.hashes().forEach((elem) => {
     for (const propName in elem) {
@@ -144,10 +143,5 @@ When('I click generate token button', () => {
 })
 
 Then('I should see token string in the page', () => {
-  cy.get('[data-testid="token-result"]')
-  .invoke('text')
-  .should('match', /\S+/)
+  cy.get('[data-testid="token-result"]').invoke('text').should('match', /\S+/)
 })
-
-
-
