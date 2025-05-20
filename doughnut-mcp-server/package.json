@@ -7,9 +7,7 @@
   "bin": {
     "doughnut-mcp-server": "./build/index.js"
   },
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "prepare": "npm run build",
