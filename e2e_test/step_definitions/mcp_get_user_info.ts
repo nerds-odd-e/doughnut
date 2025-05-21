@@ -1,5 +1,4 @@
 import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { getMcpClient } from '../start/mcp_client'
 
 interface ApiResponse {
   content: Array<{
@@ -9,15 +8,10 @@ interface ApiResponse {
 }
 
 When('the client requests user information via MCP service', () => {
-  const asyncFunction = async () => {
-    const client = getMcpClient()
-    const result = await client.callTool({
-      name: 'getUserInfo',
-      arguments: { mcpToken: cy.get('@savedMcpToken') },
-    })
-    return result
-  }
-  cy.wrap(asyncFunction()).then((response) => {
+  const apiName = 'getUserInfo'
+  const backendBaseUrl =
+    Cypress.env('backendBaseUrl') || 'http://localhost:9081'
+  cy.task('callMcpTool', { apiName, backendBaseUrl }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
 })

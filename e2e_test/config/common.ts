@@ -166,8 +166,13 @@ const commonConfig = {
         connectMcpClient(backendBaseUrl: string) {
           return connectMcpClient(backendBaseUrl)
         },
-        async callMcpTool({ apiName, backendBaseUrl }: { apiName: string, backendBaseUrl: string }) {
-          const { getMcpClient, connectMcpClient } = await import('../support/mcp_client')
+        async callMcpTool({
+          apiName,
+          backendBaseUrl,
+        }: { apiName: string; backendBaseUrl: string }) {
+          const { getMcpClient, connectMcpClient } = await import(
+            '../support/mcp_client'
+          )
           const client = getMcpClient()
           if (!client.isConnected) {
             await connectMcpClient(backendBaseUrl)
