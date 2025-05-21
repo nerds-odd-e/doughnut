@@ -59,7 +59,6 @@ class RestUserControllerTest {
         UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser, dto));
   }
 
-
   @Test
   void generateTokenShouldReturnValidUserToken() {
     UserToken userToken = controller.generateToken();
@@ -69,4 +68,3 @@ class RestUserControllerTest {
     java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
   }
 }
-

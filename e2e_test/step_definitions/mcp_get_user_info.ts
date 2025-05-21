@@ -1,6 +1,5 @@
-import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { getMcpClient, connectMcpClient } from '../start/mcp_client'
-
+import { When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import { getMcpClient } from '../start/mcp_client'
 
 interface ApiResponse {
   content: Array<{
@@ -9,13 +8,12 @@ interface ApiResponse {
   status: string
 }
 
-
 When('the client requests user information via MCP service', () => {
   const asyncFunction = async () => {
     const client = getMcpClient()
     const result = await client.callTool({
       name: 'getUserInfo',
-      arguments: { mcpToken: cy.get('@savedMcpToken') }
+      arguments: { mcpToken: cy.get('@savedMcpToken') },
     })
     return result
   }
