@@ -1,5 +1,4 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import { getMcpClient, connectMcpClient } from '../start/mcp_client'
 
 interface ApiResponse {
   content: Array<{
@@ -11,22 +10,15 @@ interface ApiResponse {
 Given(
   'I connect to an MCP client that connects to Doughnut MCP service',
   () => {
-    cy.wrap(connectMcpClient())
+    const backendBaseUrl = Cypress.config('backendBaseUrl') || 'http://localhost:9081'
+    cy.task('connectMcpClient', backendBaseUrl)
   }
 )
 
 // Use the literal API names directly from the feature file
 When('I call the {string} MCP tool', (apiName: string) => {
-  const asyncFunction = async () => {
-    const client = getMcpClient()
-
-    const result = await client.callTool({
-      name: apiName,
-    })
-    return result
-  }
-
-  cy.wrap(asyncFunction()).then((response) => {
+  const backendBaseUrl = Cypress.env('backendBaseUrl') || 'http://localhost:9081'
+  cy.task('callMcpTool', { apiName, backendBaseUrl }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
 })

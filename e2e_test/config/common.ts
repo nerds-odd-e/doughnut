@@ -1,4 +1,5 @@
 import { existsSync, rmdir } from 'node:fs'
+import { connectMcpClient } from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor')
@@ -161,6 +162,18 @@ const commonConfig = {
           }
 
           return true
+        },
+        connectMcpClient(backendBaseUrl: string) {
+          return connectMcpClient(backendBaseUrl)
+        },
+        async callMcpTool({ apiName, backendBaseUrl }: { apiName: string, backendBaseUrl: string }) {
+          const { getMcpClient, connectMcpClient } = await import('../support/mcp_client')
+          const client = getMcpClient()
+          if (!client.isConnected) {
+            await connectMcpClient(backendBaseUrl)
+          }
+          const result = await client.callTool({ name: apiName })
+          return result
         },
       })
 
