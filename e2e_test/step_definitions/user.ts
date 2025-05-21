@@ -138,6 +138,12 @@ Given('I am on generate token page', () => {
   cy.visit('/d/generate-token')
 })
 
+Given('I have a valid MCP token', () => {
+  cy.visit('/d/generate-token')
+  cy.findByRole('button', { name: 'Generate Token' }).click()
+  cy.get('[data-testid="token-result"]').invoke('text').as('savedMcpToken')
+})
+
 When('I click generate token button', () => {
   cy.findByRole('button', { name: 'Generate Token' }).click()
 })
