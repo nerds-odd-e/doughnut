@@ -31,7 +31,7 @@ export const connectMcpClient = async () => {
 
   // Use absolute path to the built server entry point
   const serverPath =
-    './backend/src/main/resources/static/js/mcp-server.bundle.js'
+    '../../backend/src/main/resources/static/js/mcp-server.bundle.js'
 
   // Optionally, check if the file exists for better error reporting
   const fs = require('fs')
