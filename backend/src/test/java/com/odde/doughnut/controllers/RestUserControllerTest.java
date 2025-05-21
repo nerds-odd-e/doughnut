@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
@@ -66,5 +67,17 @@ class RestUserControllerTest {
     // Check that the token is a valid UUID
     assertThat(userToken.getToken().length(), equalTo(36));
     java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
+  }
+
+  @Test
+  void getUserInfoByToken_validToken() {
+    String expectedUserName = "old_learner";
+    assertEquals(expectedUserName, controller.getUserInfoByMcpToken("1234567890"));
+  }
+
+  @Test
+  void getUserInfoByToken_invalidToken() {
+    String expectedUserName = "Null or Empty userName";
+    assertEquals(expectedUserName, controller.getUserInfoByMcpToken(""));
   }
 }

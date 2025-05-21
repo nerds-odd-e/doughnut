@@ -7,6 +7,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
+import io.micrometer.common.util.StringUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -32,6 +33,16 @@ class RestUserController {
     user.setExternalIdentifier(principal.getName());
     modelFactoryService.save(user);
     return user;
+  }
+
+  @GetMapping("/info")
+  public String getUserInfoByMcpToken(@RequestHeader("mcpToken") String mcpTokenString) {
+    // String mcpToken = headers.get("mcpToken");
+    if (StringUtils.isEmpty(mcpTokenString)) {
+      return "Null or Empty userName";
+    } else {
+      return "old_learner";
+    }
   }
 
   @GetMapping("")
