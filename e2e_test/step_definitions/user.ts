@@ -134,20 +134,17 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
 
-Given('I am on generate token page', () => {
-  cy.visit('/d/generate-token')
+When('I generate MCP token', () => {
+  start.mainMenu().userOptions().generateToken()
+  cy.get('[data-testid="generate-token-btn"]').click()
+})
+
+Then('I can use new MCP token', () => {
+  cy.get('[data-testid="token-result"]').invoke('text').should('match', /\S+/)
 })
 
 Given('I have a valid MCP token', () => {
   cy.visit('/d/generate-token')
   cy.findByRole('button', { name: 'Generate Token' }).click()
   cy.get('[data-testid="token-result"]').invoke('text').as('savedMcpToken')
-})
-
-When('I click generate token button', () => {
-  cy.findByRole('button', { name: 'Generate Token' }).click()
-})
-
-Then('I should see token string in the page', () => {
-  cy.get('[data-testid="token-result"]').invoke('text').should('match', /\S+/)
 })

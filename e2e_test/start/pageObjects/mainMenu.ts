@@ -38,6 +38,11 @@ export const mainMenu = () => {
           }).click({ force: true })
           return assumeAssessmentAndCertificateHistoryPage()
         },
+        generateToken() {
+          cy.findByRole('link', { name: 'Generate Token' }).click({
+            force: true,
+          })
+        },
       }
     },
     myMessageCenter() {
