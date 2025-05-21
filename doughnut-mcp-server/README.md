@@ -88,7 +88,7 @@ To use the MCP server bundle remotely (e.g., with Cursor), update your MCP serve
       "command": "node",
       "args": [
         "-e",
-        "import('node-fetch').then(f=>f.default('https://doughnut.odd-e.com/assets/mcp-server.bundle.js').then(r=>r.text()).then(eval))"
+        "import('node-fetch').then(f=>f.default('https://doughnut.odd-e.com/assets/js/mcp-server.bundle.js').then(r=>r.text()).then(eval))"
       ],
       "transportType": "stdio"
     }
