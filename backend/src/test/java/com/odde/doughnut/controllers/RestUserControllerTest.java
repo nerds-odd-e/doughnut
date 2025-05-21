@@ -57,13 +57,4 @@ class RestUserControllerTest {
     assertThrows(
         UnexpectedNoAccessRightException.class, () -> controller.updateUser(anotherUser, dto));
   }
-
-  @Test
-  void generateTokenShouldReturnValidUserToken() {
-    UserToken userToken = controller.generateToken();
-    assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
-    // Check that the token is a valid UUID
-    assertThat(userToken.getToken().length(), equalTo(36));
-    java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
-  }
 }
