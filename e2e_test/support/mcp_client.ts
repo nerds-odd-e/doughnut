@@ -34,7 +34,7 @@ export const connectMcpClient = async (backendBaseUrl: string) => {
   const path = require('path')
   const http = require('http')
   const https = require('https')
-  const MCP_SERVER_URL = `${backendBaseUrl}/js/mcp-server.bundle.js`
+  const MCP_SERVER_URL = `${backendBaseUrl}/mcp-server.bundle.js`
   const tempDir = os.tmpdir()
   const tempFile = path.join(tempDir, 'mcp-server.bundle.js')
 

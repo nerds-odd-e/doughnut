@@ -19,7 +19,8 @@
       "src/@types/doughnut/index.d.ts",
       "src/generated/backend/**/*.ts",
       "tests/*.js",
-      "tests/shims-vue.d.ts"
+      "tests/shims-vue.d.ts",
+      "public"
     ],
     "ignoreUnknown": true
   },
@@ -218,7 +219,8 @@
       "**/shims-vue.d.ts",
       "**/vitest.config.ts",
       "**/setupVitest.js",
-      "**/typed-router.d.ts"
+      "**/typed-router.d.ts",
+      "public"
     ]
   },
   "javascript": {
