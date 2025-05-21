@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 public class McpService {
   @Autowired private Environment env;
   private RestTemplate restTemplate = new RestTemplate();
-  private String urlLocal = "http://localhost:5173/";
+  private String urlLocal = "http://localhost:9081/";
   private String urlProd = "https://doughnut.odd-e.com/";
 
   private String api = "/api/user/info";
