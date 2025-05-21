@@ -13,6 +13,7 @@ Given(
     const backendBaseUrl =
       Cypress.config('backendBaseUrl') || 'http://localhost:9081'
     cy.task('connectMcpClient', backendBaseUrl)
+    cy.wait(500)
   }
 )
 
@@ -28,7 +29,7 @@ When('I call the {string} MCP tool', (apiName: string) => {
 // Use the literal expected response directly from the feature file
 Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
-    const expectedWithQuotes = `"${expectedResponse}"`
+    const expectedWithQuotes = `${expectedResponse}`
     const actualResponse = response as unknown as ApiResponse
     expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
   })

@@ -13,4 +13,4 @@ Feature: MCP (Model Context Protocol) Services
 
     Examples:
       | api_name        | expected_response                               |
-      | getInstruction  | Doughnut is a Personal Knowledge Management tool |
+      | get_instruction  | Doughnut is a Personal Knowledge Management tool |
