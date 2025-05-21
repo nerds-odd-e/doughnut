@@ -42,6 +42,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
         },
       },
+      {
+        name: 'get_sampleapi',
+        description: 'Get sample api',
+        inputSchema: {
+          type: 'object',
+        },
+      },
     ],
   }
 })
@@ -58,6 +65,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: 'text',
             text: 'Doughnut is a Personal Knowledge Management tool',
+          },
+        ],
+      }
+    }
+    case 'get_sampleapi': {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'Sample API',
           },
         ],
       }
