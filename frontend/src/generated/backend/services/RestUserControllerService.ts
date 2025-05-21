@@ -76,4 +76,23 @@ export class RestUserControllerService {
             },
         });
     }
+    /**
+     * @param mcpToken
+     * @returns string OK
+     * @throws ApiError
+     */
+    public getUserInfoByMcpToken(
+        mcpToken: string,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/user/info',
+            headers: {
+                'mcpToken': mcpToken,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }
