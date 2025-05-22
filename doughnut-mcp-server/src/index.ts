@@ -49,6 +49,35 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
         },
       },
+      {
+        name: 'update_note_text_content',
+        description:
+          'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided.',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            noteId: {
+              type: 'integer',
+              description: 'The ID of the note to update.',
+            },
+            newTitle: {
+              type: 'string',
+              description: 'The new title for the note.',
+              nullable: true,
+            },
+            newDetails: {
+              type: 'string',
+              description: 'The new details for the note.',
+              nullable: true,
+            },
+            authToken: {
+              type: 'string',
+              description: 'Bearer token for authentication.',
+            },
+          },
+          required: ['noteId', 'authToken'],
+        },
+      },
     ],
   }
 })
@@ -79,7 +108,97 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         ],
       }
     }
-
+    case 'update_note_text_content': {
+      const { noteId, newTitle, newDetails, authToken } = request.params
+        .input as {
+        noteId: number
+        newTitle?: string | null
+        newDetails?: string | null
+        authToken: string
+      }
+      if (typeof newTitle !== 'string' && typeof newDetails !== 'string') {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'At least one of newTitle or newDetails must be provided.',
+            },
+          ],
+        }
+      }
+      let titleResult: any = null
+      let detailsResult: any = null
+      // Update title if provided
+      if (typeof newTitle === 'string') {
+        const titleResponse = await fetch(
+          `http://localhost:9081/api/text_content/${noteId}/title`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ newTitle }),
+          }
+        )
+        if (!titleResponse.ok) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Failed to update note title: ${titleResponse.status} ${await titleResponse.text()}`,
+              },
+            ],
+          }
+        }
+        titleResult = await titleResponse.json()
+      }
+      // Update details if provided
+      if (typeof newDetails === 'string') {
+        const detailsResponse = await fetch(
+          `http://localhost:9081/api/text_content/${noteId}/details`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${authToken}`,
+            },
+            body: JSON.stringify({ details: newDetails }),
+          }
+        )
+        if (!detailsResponse.ok) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Failed to update note details: ${detailsResponse.status} ${await detailsResponse.text()}`,
+              },
+            ],
+          }
+        }
+        detailsResult = await detailsResponse.json()
+      }
+      // Compose result message
+      let msg = 'Note updated successfully.'
+      if (
+        titleResult &&
+        titleResult.note &&
+        titleResult.note.topicConstructor
+      ) {
+        msg += ` Title: ${titleResult.note.topicConstructor}.`
+      }
+      if (detailsResult && detailsResult.note && detailsResult.note.details) {
+        msg += ` Details: ${detailsResult.note.details}.`
+      }
+      return {
+        content: [
+          {
+            type: 'text',
+            text: msg,
+          },
+        ],
+      }
+    }
     default:
       throw new Error('Unknown tool')
   }
