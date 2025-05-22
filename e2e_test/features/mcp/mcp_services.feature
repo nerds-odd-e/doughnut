@@ -36,7 +36,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Scenario Outline: Retrieve basic user information
     When call Mcp server get_user_info API
-    Then the response should contain "<userName>"
+    Then the response should return user name contain "<userName>"
 
     Examples:
       | userName    |
@@ -45,7 +45,7 @@ Feature: MCP (Model Context Protocol) Services
   @ignore
   Scenario Outline: Retrieve graph with note id
     When the client requests read note with graph from "<noteId>" via MCP service
-    Then the MCP service returns the json of the graph from note
+    Then the response should return a json object contain "<expected_response>"
     #And the json is correctly formatted
 
     Examples:
