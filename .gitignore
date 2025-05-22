@@ -94,7 +94,7 @@ infra/ssl/
 frontend/node_modules
 frontend/dist/
 frontend/tsconfig.tsbuildinfo
-frontend/public/mcp-server.bundle.js
+frontend/public/mcp-server.bundle.mjs
 backend/src/main/resources/static/favicon.ico
 backend/src/main/resources/static/odd-e.ico
 backend/src/main/resources/static/index.html

@@ -6,6 +6,35 @@ This is a TypeScript-based MCP server that demonstrates core MCP concepts by pro
 
 - Tools for getting instructions and updating note text content via the Doughnut backend API.
 
+## How to use this MCP Server
+
+Run this command to build the mcp server
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
+```
+Add the below command to your AI MCP Server configuration
+
+```json
+{
+  "mcpServers": {
+    "doughnut": {
+      "disabled": false,
+      "timeout": 60,
+      "transportType": "stdio",
+      "command": "node",
+      "args": [
+        "/home/csd/doughnut/frontend/public/mcp-server.bundle.mjs"
+      ],
+      "env": {
+        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+
 ## Features
 
 ### Tools
@@ -34,28 +63,6 @@ The MCP server supports configuration via environment variables:
 - `DOUGHNUT_API_AUTH_TOKEN`: The authentication token to use for API requests
 
 You can set these in your MCP server configuration using the `env` property, or when running the bundle.
-
-## Example MCP Server Configuration
-
-```json
-{
-  "mcpServers": {
-    "doughnut": {
-      "disabled": false,
-      "timeout": 60,
-      "transportType": "stdio",
-      "command": "node",
-      "args": [
-        "/home/csd/doughnut/doughnut-mcp-server/build/mcp-server.bundle.mjs"
-      ],
-      "env": {
-        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
-        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
-      }
-    }
-  }
-}
-```
 
 ## How to Add a New API Tool
 
@@ -109,10 +116,9 @@ To add a new tool to the MCP server, edit `src/index.ts`:
 3. **Rebuild the bundle**  
    After making changes, rebuild the bundle:
    ```
-   cd doughnut-mcp-server
-   pnpm bundle
+   pnpm mcp-server:bundle
    ```
-   This will output `build/mcp-server.bundle.mjs`.
+   This will output `mcp-server.bundle.mjs` into the frontend/public folder
 
 ## Development
 

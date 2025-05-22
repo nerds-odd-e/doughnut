@@ -5536,7 +5536,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "update_note_text_content",
-        description: "Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided. Authentication token is taken from the DOUGHNUT_API_AUTH_TOKEN environment variable.",
+        description: "Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided.",
         inputSchema: {
           type: "object",
           properties: {
@@ -5553,9 +5553,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               type: "string",
               description: "The new details for the note.",
               nullable: true
+            },
+            authToken: {
+              type: "string",
+              description: "Bearer token for authentication."
             }
           },
-          required: ["noteId"]
+          required: ["noteId", "authToken"]
         }
       },
       {
@@ -5575,8 +5579,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     ]
   };
 });
-var DOUGHNUT_API_BASE_URL = process.env.DOUGHNUT_API_BASE_URL || "http://localhost:9081";
-var authToken = process.env.DOUGHNUT_API_AUTH_TOKEN;
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   switch (request.params.name) {
     case "get_instruction": {
@@ -5600,17 +5602,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       };
     }
     case "update_note_text_content": {
-      const { noteId, newTitle, newDetails } = request.params.input;
-      if (!authToken) {
-        return {
-          content: [
-            {
-              type: "text",
-              text: "DOUGHNUT_API_AUTH_TOKEN environment variable is required."
-            }
-          ]
-        };
-      }
+      const { noteId, newTitle, newDetails, authToken } = request.params.input;
       if (typeof newTitle !== "string" && typeof newDetails !== "string") {
         return {
           content: [
@@ -5625,7 +5617,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       let detailsResult = null;
       if (typeof newTitle === "string") {
         const titleResponse = await fetch(
-          `${DOUGHNUT_API_BASE_URL}/api/text_content/${noteId}/title`,
+          `http://localhost:9081/api/text_content/${noteId}/title`,
           {
             method: "PATCH",
             headers: {
@@ -5649,7 +5641,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
       if (typeof newDetails === "string") {
         const detailsResponse = await fetch(
-          `${DOUGHNUT_API_BASE_URL}/api/text_content/${noteId}/details`,
+          `http://localhost:9081/api/text_content/${noteId}/details`,
           {
             method: "PATCH",
             headers: {
