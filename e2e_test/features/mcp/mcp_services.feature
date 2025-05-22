@@ -22,3 +22,14 @@ Feature: MCP (Model Context Protocol) Services
     And I have a notebook with the head note "Harry Potter"
     When I request MCP server to get the notebook list
     Then I should receive a list of notebooks in the MCP response: "Lord of the Rings, Harry Potter"
+
+  @ignore
+  Scenario Outline: Update note title/detail
+    When I call the "<api_name>" MCP tool
+    And I update a note title "<original_title>" to "<new_title>"
+    Then the response should contain "<expected_response>"
+
+    Examples:
+      | api_name | original_title | new_title | expected_response |
+      | update_note_title_and_details | Dog | Cat | Note updated successfully |
+      | update_note_title_and_details | Chicken | Cat | Failed to update note |
