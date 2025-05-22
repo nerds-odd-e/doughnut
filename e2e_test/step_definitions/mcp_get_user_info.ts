@@ -9,7 +9,7 @@ interface ApiResponse {
 
 When('call Mcp server get_user_info API', () => {
   const apiName = 'get_user_info'
-  const baseUrl = Cypress.config('baseUrl')
+  const baseUrl = Cypress.config('backendBaseUrl')
   cy.task('callMcpTool', { apiName, baseUrl }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })

@@ -224,8 +224,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'get_user_info': {
-      const mcpToken = '1234567890'
-      const apiUrl = 'http://localhost:9081' + '/api/user/info'
+      const mcpToken = 'testToken'
+      const apiUrl = `${request.params.baseUrl}/api/user/info`
 
       try {
         const response = await fetch(apiUrl, {
