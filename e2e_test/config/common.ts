@@ -170,7 +170,13 @@ const commonConfig = {
           apiName,
           baseUrl,
           mcpToken,
-        }: { apiName: string; baseUrl: string; mcpToken: string }) {
+          noteId,
+        }: {
+          apiName: string
+          baseUrl: string
+          mcpToken: string
+          noteId: string
+        }) {
           const { getMcpClient, connectMcpClient } = await import(
             '../support/mcp_client'
           )
@@ -180,6 +186,7 @@ const commonConfig = {
             name: apiName,
             baseUrl: baseUrl,
             mcpToken: mcpToken,
+            noteId: noteId,
           })
           return result
         },

@@ -93,6 +93,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
         },
       },
+      {
+        name: 'get_graph_with_note_id',
+        description: 'Get graph with note id',
+        inputSchema: {
+          type: 'object',
+        },
+      },
     ],
   }
 })
@@ -250,6 +257,34 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             {
               type: 'text',
               text: `ERROR: ${err.message}`,
+            },
+          ],
+        }
+      }
+    }
+
+    case 'get_graph_with_note_id': {
+      const apiUrl = `${request.params.baseUrl}/api/notes/${request.params.noteId}/graph`
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+        })
+        const json = await response.json()
+        return {
+          content: [
+            {
+              type: 'json',
+              json: json,
+            },
+          ],
+        }
+      } catch (err) {
+        return {
+          content: [
+            {
+              type: 'json',
+              json: `ERROR: ${err.message}`,
             },
           ],
         }
