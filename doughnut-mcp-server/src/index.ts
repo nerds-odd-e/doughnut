@@ -85,6 +85,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           type: 'object',
         },
       },
+      {
+        name: 'get_notebook_list',
+        description: 'Get notebook list (Not ready for use)',
+        inputSchema: {
+          type: 'object',
+        },
+      },
     ],
   }
 })
@@ -202,6 +209,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: 'text',
             text: msg,
+          }
+        ]
+      }
+    }
+    case 'get_notebook_list': {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: 'Lord of the Rings, Harry Potter',
           },
         ],
       }

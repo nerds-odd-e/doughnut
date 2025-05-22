@@ -43,7 +43,7 @@ When(
 )
 
 Then(
-  'should receive a list of notebooks in the MCP response: {string}',
+  'I should receive a list of notebooks in the MCP response contain {string}',
   (expectedResponse: string) => {
     cy.get('@MCPApiResponse').then((response) => {
       const expectedWithQuotes = `${expectedResponse}`

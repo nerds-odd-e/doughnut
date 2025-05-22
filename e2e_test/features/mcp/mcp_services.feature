@@ -16,12 +16,11 @@ Feature: MCP (Model Context Protocol) Services
       | api_name        | expected_response                               |
       | get_instruction  | Doughnut is a Personal Knowledge Management tool |
 
-  @ignore
   Scenario: Get notebook list
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
-    When I request MCP server to get the notebook list
-    Then I should receive a list of notebooks in the MCP response: "Lord of the Rings, Harry Potter"
+    When I call the "get_notebook_list" MCP tool
+    Then I should receive a list of notebooks in the MCP response contain "Lord of the Rings, Harry Potter"
 
   @ignore
   Scenario Outline: Update note title/detail

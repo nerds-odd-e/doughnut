@@ -1,4 +1,4 @@
-Feature: Generate MCP oken
+Feature: Generate MCP token
 
   Scenario: Generate MCP token
     Given I am logged in as an existing user
