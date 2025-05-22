@@ -86,6 +86,8 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
+      - name: Bundle MCP server
+        run: pnpm mcp-server:bundle
       - name: Compile & transform frontend assets for bundling with Backend
         run: pnpm frontend:build
       - name: Build application jar artifact

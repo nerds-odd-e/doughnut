@@ -13,6 +13,7 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
     "start:mb": "mb",
+    "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C doughnut-mcp-server bundle-and-deploy",
     "frontend:build": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend build",
     "frontend:format_build": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend format && pnpm -C frontend build",
     "frontend:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend format",
