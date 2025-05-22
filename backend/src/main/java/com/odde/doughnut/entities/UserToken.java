@@ -24,4 +24,6 @@ public class UserToken extends EntityIdentifiedByIdOnly {
     this.userId = userId;
     this.token = token;
   }
+
+  public UserToken() {}
 }

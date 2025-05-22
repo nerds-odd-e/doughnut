@@ -33,14 +33,13 @@ Feature: MCP (Model Context Protocol) Services
       | update_note_text_content | n12345 | Cat | Note updated successfully. |
       | update_note_text_content | n12346 | Cat | Failed to update note |
 
-  @ignore
   Scenario Outline: Retrieve basic user information
     When call Mcp server get_user_info API
     Then the response should contain "<userName>"
 
     Examples:
       | userName    |
-      | old_learner |
+      | Old Learner |
 
   @ignore
   Scenario Outline: Retrieve graph with note id

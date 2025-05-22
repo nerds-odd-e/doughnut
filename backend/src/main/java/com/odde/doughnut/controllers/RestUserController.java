@@ -39,8 +39,6 @@ class RestUserController {
   public String getUserInfoByMcpToken(@RequestHeader("mcpToken") String mcpTokenString) {
     if (StringUtils.isEmpty(mcpTokenString)) {
       return "Null or Empty userName";
-    } else if ("testToken".equals(mcpTokenString)) {
-      return "old_learner";
     } else {
       User user = modelFactoryService.findUserByToken(mcpTokenString).orElse(null);
       return (user != null) ? user.getName() : "Error: user not found";
