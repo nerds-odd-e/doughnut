@@ -13,16 +13,16 @@
     "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=build/mcp-server.bundle.js --format=esm",
     "deploy-bundle": "cp build/mcp-server.bundle.js ../frontend/public/mcp-server.bundle.js",
     "bundle-and-deploy": "pnpm bundle && pnpm deploy-bundle",
-    "prepare": "npm run build",
     "watch": "tsc --watch",
-    "inspector": "npx @modelcontextprotocol/inspector build/index.js"
+    "inspector": "npx @modelcontextprotocol/inspector build/index.js",
+    "format": "echo 'No formatting needed for doughnut-mcp-server'"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "0.6.0"
+    "@modelcontextprotocol/sdk": "^1.11.4"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
+    "@types/node": "^22.15.19",
     "esbuild": "^0.25.4",
-    "typescript": "^5.3.3"
+    "typescript": "5.8.3"
   }
 }
