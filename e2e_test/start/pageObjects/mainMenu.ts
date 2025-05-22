@@ -42,6 +42,7 @@ export const mainMenu = () => {
           cy.findByRole('link', { name: 'Generate Token' }).click({
             force: true,
           })
+          cy.findByRole('button', { name: 'Generate Token' }).click()
         },
       }
     },

@@ -32,3 +32,14 @@ Then('the response should contain {string}', (expectedResponse: string) => {
     expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
   })
 })
+
+Then(
+  'should receive a list of notebooks in the MCP response: {string}',
+  (expectedResponse: string) => {
+    cy.get('@MCPApiResponse').then((response) => {
+      const expectedWithQuotes = `${expectedResponse}`
+      const actualResponse = response as unknown as ApiResponse
+      expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
+    })
+  }
+)

@@ -136,7 +136,6 @@ Then('I should be on the welcome page and asked to login', () => {
 
 When('I generate MCP token', () => {
   start.mainMenu().userOptions().generateToken()
-  cy.get('[data-testid="generate-token-btn"]').click()
 })
 
 Then('I can use new MCP token', () => {
