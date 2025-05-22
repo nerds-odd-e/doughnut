@@ -224,7 +224,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'get_user_info': {
-      const mcpToken = 'testToken'
+      const mcpToken = `${request.params.mcpToken}`
       const apiUrl = `${request.params.baseUrl}/api/user/info`
 
       try {
