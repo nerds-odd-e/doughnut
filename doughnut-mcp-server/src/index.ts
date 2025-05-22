@@ -53,7 +53,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: 'update_note_text_content',
         description:
-          'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided.',
+          'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided. Authentication token is taken from the DOUGHNUT_API_AUTH_TOKEN environment variable.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -71,12 +71,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
               description: 'The new details for the note.',
               nullable: true,
             },
-            authToken: {
-              type: 'string',
-              description: 'Bearer token for authentication.',
-            },
           },
-          required: ['noteId', 'authToken'],
+          required: ['noteId'],
         },
       },
       {
@@ -105,6 +101,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 })
 
 /**
+ * Get Doughnut API base URL from environment or use default.
+ */
+const DOUGHNUT_API_BASE_URL =
+  process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
+const authToken = process.env.DOUGHNUT_API_AUTH_TOKEN
+
+/**
  * Handler for the create_note tool.
  * Creates a new note with the provided title and content, and returns success message.
  */
@@ -131,12 +134,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'update_note_text_content': {
-      const { noteId, newTitle, newDetails, authToken } = request.params
-        .input as {
+      const { noteId, newTitle, newDetails } = request.params.input as {
         noteId: number
         newTitle?: string | null
         newDetails?: string | null
-        authToken: string
+      }
+      // Always use authToken from environment variable
+      if (!authToken) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'DOUGHNUT_API_AUTH_TOKEN environment variable is required.',
+            },
+          ],
+        }
       }
       if (typeof newTitle !== 'string' && typeof newDetails !== 'string') {
         return {
@@ -153,7 +165,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       // Update title if provided
       if (typeof newTitle === 'string') {
         const titleResponse = await fetch(
-          `http://localhost:9081/api/text_content/${noteId}/title`,
+          `${DOUGHNUT_API_BASE_URL}/api/text_content/${noteId}/title`,
           {
             method: 'PATCH',
             headers: {
@@ -178,7 +190,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       // Update details if provided
       if (typeof newDetails === 'string') {
         const detailsResponse = await fetch(
-          `http://localhost:9081/api/text_content/${noteId}/details`,
+          `${DOUGHNUT_API_BASE_URL}/api/text_content/${noteId}/details`,
           {
             method: 'PATCH',
             headers: {

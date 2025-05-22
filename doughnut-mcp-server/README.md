@@ -1,23 +1,65 @@
 # doughnut-mcp-server MCP Server
 
-A Model Context Protocol server for doughnut
+A Model Context Protocol server for Doughnut.
 
-This is a TypeScript-based MCP server that implements a simple notes system. It demonstrates core MCP concepts by providing:
+This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
 
-- Tools for get instruction, and proxying to external APIs.
+- Tools for getting instructions and updating note text content via the Doughnut backend API.
 
 ## Features
 
 ### Tools
+
 - `get_instruction` - Get instruction of Doughnut
   - Takes an empty object as parameter
   - Returns instruction for Doughnut
 
-- Proxy: Any other tool call will be proxied to a configured API endpoint, with a `sessionId` parameter automatically added.
+- `get_sampleapi` - Get sample API
+  - Takes an empty object as parameter
+  - Returns a sample API response
+
+- `update_note_text_content` - Update the title and/or details of a note by note ID
+  - Parameters:
+    - `noteId` (integer, required): The ID of the note to update
+    - `newTitle` (string, optional): The new title for the note
+    - `newDetails` (string, optional): The new details for the note
+  - At least one of `newTitle` or `newDetails` must be provided
+  - **Authentication token is always taken from the `DOUGHNUT_API_AUTH_TOKEN` environment variable**
+
+## Environment Variable Configuration
+
+The MCP server supports configuration via environment variables:
+
+- `DOUGHNUT_API_BASE_URL`: The base URL of the Doughnut backend API (default: `http://localhost:9081`)
+- `DOUGHNUT_API_AUTH_TOKEN`: The authentication token to use for API requests
+
+You can set these in your MCP server configuration using the `env` property, or when running the bundle.
+
+## Example MCP Server Configuration
+
+```json
+{
+  "mcpServers": {
+    "doughnut": {
+      "disabled": false,
+      "timeout": 60,
+      "transportType": "stdio",
+      "command": "node",
+      "args": [
+        "/home/csd/doughnut/doughnut-mcp-server/build/mcp-server.bundle.mjs"
+      ],
+      "env": {
+        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
 
 ## How to Add a New API Tool
 
-To add a new API/tool to the MCP server, edit `src/index.ts`:
+To add a new tool to the MCP server, edit `src/index.ts`:
 
 1. **Define your tool in the ListTools handler**  
    Add your tool to the `tools` array in the `ListToolsRequestSchema` handler:
@@ -59,56 +101,40 @@ To add a new API/tool to the MCP server, edit `src/index.ts`:
            ],
          }
        default:
-         // Proxy logic (already implemented)
+         throw new Error('Unknown tool')
      }
    })
    ```
-   - If you do not add a case, the request will be proxied to the configured API endpoint.
 
 3. **Rebuild the bundle**  
    After making changes, rebuild the bundle:
    ```
    cd doughnut-mcp-server
-   CURSOR_DEV=true nix develop -c pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=build/mcp-server.bundle.js --format=esm
+   pnpm bundle
    ```
-
-4. **Host the bundle**  
-   Upload `build/mcp-server.bundle.js` to your public server or CDN.
-
-## MCP Server Configuration for Remote Bundle
-
-To use the MCP server bundle remotely (e.g., with Cursor), update your MCP server configuration as follows:
-
-```json
-{
-  "mcpServers": {
-    "doughnut": {
-      "disabled": false,
-      "timeout": 60,
-      "command": "node",
-      "args": [
-        "-e",
-        "import('node-fetch').then(f=>f.default('https://doughnut.odd-e.com/assets/js/mcp-server.bundle.js').then(r=>r.text()).then(eval))"
-      ],
-      "transportType": "stdio"
-    }
-  }
-}
-```
-
-- This configuration will fetch and execute the MCP server bundle from the provided URL using Node.js and node-fetch.
-- Make sure the URL points to your hosted `mcp-server.bundle.js`.
+   This will output `build/mcp-server.bundle.mjs`.
 
 ## Development
 
-- To run locally, you can use:
+- To run locally (TypeScript, not bundled):
   ```
   CURSOR_DEV=true nix develop -c node src/index.ts
   ```
-- To build the bundle for remote use:
+- To build the bundle for use in MCP configuration:
   ```
-  CURSOR_DEV=true nix develop -c pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=build/mcp-server.bundle.js --format=esm
+  pnpm bundle
   ```
+  This will output `build/mcp-server.bundle.mjs`.
+
+## Running the MCP Server Bundle with Custom Environment Variables
+
+To run the ESM bundle with a custom backend URL and authentication token, use:
+
+```sh
+DOUGHNUT_API_BASE_URL=http://your-server:port DOUGHNUT_API_AUTH_TOKEN=your-token node build/mcp-server.bundle.mjs
+```
+
+Replace `http://your-server:port` and `your-token` with your actual backend address and token.
 
 ## Installation
 

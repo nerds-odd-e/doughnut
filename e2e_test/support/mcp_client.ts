@@ -34,9 +34,9 @@ export const connectMcpClient = async (baseUrl: string) => {
   const path = require('path')
   const http = require('http')
   const https = require('https')
-  const MCP_SERVER_URL = `${baseUrl}/mcp-server.bundle.js`
+  const MCP_SERVER_URL = `${baseUrl}/mcp-server.bundle.mjs`
   const tempDir = os.tmpdir()
-  const tempFile = path.join(tempDir, 'mcp-server.bundle.js')
+  const tempFile = path.join(tempDir, 'mcp-server.bundle.mjs')
 
   // Helper to download the file
   async function downloadFile(fileUrl: string, dest: string): Promise<void> {
