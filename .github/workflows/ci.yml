@@ -87,7 +87,7 @@ jobs:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
       - name: Bundle MCP server
-        run: pnpm mcp-server:bundle
+        run: pnpm bundle:all
       - name: Compile & transform frontend assets for bundling with Backend
         run: pnpm frontend:build
       - name: Build application jar artifact
@@ -148,7 +148,7 @@ jobs:
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
-          build: pnpm mcp-server:bundle && pnpm frontend:build
+          build: pnpm bundle:all
           start: pnpm run-p -clnr sut start:mb
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150

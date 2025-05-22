@@ -46,7 +46,8 @@
     "verify": "pnpm format:all && pnpm test",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
     "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint",
-    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format"
+    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format",
+    "bundle:all": "pnpm mcp-server:bundle && pnpm frontend:build"
   },
   "cypress-cucumber-preprocessor": {
     "stepDefinitions": "e2e_test/step_definitions/**/*.ts",
