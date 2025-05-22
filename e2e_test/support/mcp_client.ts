@@ -22,7 +22,7 @@ export const getMcpClient = () => {
  * Connects the MCP client to the doughnut-mcp-server using stdio.
  * Spawns the server as a child process and connects via StdioClientTransport.
  */
-export const connectMcpClient = async (backendBaseUrl: string) => {
+export const connectMcpClient = async (baseUrl: string) => {
   const client = getMcpClient()
   // Only connect once
   if ((client as unknown as { _connected?: boolean })._connected) {
@@ -34,7 +34,7 @@ export const connectMcpClient = async (backendBaseUrl: string) => {
   const path = require('path')
   const http = require('http')
   const https = require('https')
-  const MCP_SERVER_URL = `${backendBaseUrl}/mcp-server.bundle.js`
+  const MCP_SERVER_URL = `${baseUrl}/mcp-server.bundle.js`
   const tempDir = os.tmpdir()
   const tempFile = path.join(tempDir, 'mcp-server.bundle.js')
 
