@@ -148,7 +148,7 @@ jobs:
         with:
           browser: chrome
           config-file: e2e_test/config/ci.ts
-          build: pnpm frontend:build
+          build: pnpm mcp-server:bundle && pnpm frontend:build
           start: pnpm run-p -clnr sut start:mb
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
