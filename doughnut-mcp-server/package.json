@@ -10,9 +10,7 @@
   "files": ["build"],
   "scripts": {
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
-    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=build/mcp-server.bundle.js --format=esm",
-    "deploy-bundle": "cp build/mcp-server.bundle.js ../frontend/public/mcp-server.bundle.js",
-    "bundle-and-deploy": "pnpm bundle && pnpm deploy-bundle",
+    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.js --format=esm",
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
     "format": "echo 'No formatting needed for doughnut-mcp-server'"
