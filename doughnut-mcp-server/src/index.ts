@@ -209,8 +209,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           {
             type: 'text',
             text: msg,
-          }
-        ]
+          },
+        ],
       }
     }
     case 'get_notebook_list': {
