@@ -12,7 +12,6 @@ Given(
   () => {
     const baseUrl = Cypress.config('baseUrl')
     cy.task('connectMcpClient', baseUrl)
-    cy.wait(500)
   }
 )
 
