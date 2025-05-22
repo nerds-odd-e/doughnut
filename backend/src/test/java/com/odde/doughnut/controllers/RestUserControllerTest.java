@@ -71,8 +71,9 @@ class RestUserControllerTest {
 
   @Test
   void getUserInfoByToken_validToken() {
-    String expectedUserName = "old_learner";
-    assertEquals(expectedUserName, controller.getUserInfoByMcpToken("1234567890"));
+    UserToken userToken = controller.generateToken();
+    String expectedUserName = userModel.getEntity().getName();
+    assertEquals(expectedUserName, controller.getUserInfoByMcpToken(userToken.getToken()));
   }
 
   @Test

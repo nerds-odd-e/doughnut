@@ -65,6 +65,11 @@ public class ModelFactoryService {
     return userRepository.findById(id);
   }
 
+  public Optional<User> findUserByToken(String token) {
+    UserToken usertoken = userTokenRepository.findByToken(token);
+    return this.findUserById(usertoken.getUserId());
+  }
+
   public UserModel toUserModel(User user) {
     return new UserModel(user, this);
   }

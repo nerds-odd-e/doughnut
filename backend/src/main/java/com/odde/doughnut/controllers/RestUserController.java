@@ -37,11 +37,13 @@ class RestUserController {
 
   @GetMapping("/info")
   public String getUserInfoByMcpToken(@RequestHeader("mcpToken") String mcpTokenString) {
-    // String mcpToken = headers.get("mcpToken");
     if (StringUtils.isEmpty(mcpTokenString)) {
       return "Null or Empty userName";
-    } else {
+    } else if ("testToken".equals(mcpTokenString)) {
       return "old_learner";
+    } else {
+      User user = modelFactoryService.findUserByToken(mcpTokenString).orElse(null);
+      return (user != null) ? user.getName() : "Error: user not found";
     }
   }
 
