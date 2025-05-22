@@ -33,3 +33,22 @@ Feature: MCP (Model Context Protocol) Services
       | api_name | note_it | new_title | expected_response |
       | update_note_title_and_details | n12345 | Cat | Note updated successfully |
       | update_note_title_and_details | n12346 | Cat | Failed to update note |
+
+  @ignore
+  Scenario Outline: Retrieve basic user information
+    When the client requests user information via MCP service
+    Then the response should contain "<userName>"
+
+    Examples:
+      | userName    |
+      | old_learner |
+
+  @ignore
+  Scenario Outline: Retrieve graph with note id
+    When the client requests read note with graph from "<noteId>" via MCP service
+    Then the MCP service returns the json of the graph from note
+    And the json is correctly formatted
+
+    Examples:
+      | noteId      |
+      | noteId100   |

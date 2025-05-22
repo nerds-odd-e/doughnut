@@ -54,4 +54,9 @@ public class McpService {
 
     return "";
   }
+
+  @Tool(description = "Get graph with note id")
+  public String getGrapWithNoteId(String noteId) {
+    return "test";
+  }
 }
