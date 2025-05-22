@@ -10,6 +10,7 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js'
+import type { NoteUpdateResult } from './types.js'
 
 /**
  * Create an MCP server to connect to Doughnut server
@@ -140,8 +141,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       }
-      let titleResult: any = null
-      let detailsResult: any = null
+      let titleResult: NoteUpdateResult | null = null
+      let detailsResult: NoteUpdateResult | null = null
       // Update title if provided
       if (typeof newTitle === 'string') {
         const titleResponse = await fetch(
