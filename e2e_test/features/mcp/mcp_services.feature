@@ -36,7 +36,7 @@ Feature: MCP (Model Context Protocol) Services
 
   @ignore
   Scenario Outline: Retrieve basic user information
-    When the client requests user information via MCP service
+    When call Mcp server get_user_info API
     Then the response should contain "<userName>"
 
     Examples:
