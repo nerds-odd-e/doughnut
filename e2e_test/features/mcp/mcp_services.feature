@@ -26,10 +26,10 @@ Feature: MCP (Model Context Protocol) Services
   @ignore
   Scenario Outline: Update note title/detail
     When I call the "<api_name>" MCP tool
-    And I update a note title "<original_title>" to "<new_title>"
+    And I update a note title with this id "<note_it>" to "new_title"
     Then the response should contain "<expected_response>"
 
     Examples:
-      | api_name | original_title | new_title | expected_response |
-      | update_note_title_and_details | Dog | Cat | Note updated successfully |
-      | update_note_title_and_details | Chicken | Cat | Failed to update note |
+      | api_name | note_it | new_title | expected_response |
+      | update_note_title_and_details | n12345 | Cat | Note updated successfully |
+      | update_note_title_and_details | n12346 | Cat | Failed to update note |

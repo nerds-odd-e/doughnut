@@ -33,6 +33,16 @@ Then('the response should contain {string}', (expectedResponse: string) => {
   })
 })
 
+// Step definition for updating a note title by id
+When(
+  'I update a note title with this id {string} to {string}',
+  (noteId: string, newTitle: string) => {
+    cy.task('updateNoteTitle', { noteId, newTitle }).then((response) => {
+      cy.wrap(response).as('MCPApiResponse')
+    })
+  }
+)
+
 Then(
   'should receive a list of notebooks in the MCP response: {string}',
   (expectedResponse: string) => {
