@@ -78,6 +78,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ['noteId', 'authToken'],
         },
       },
+      {
+        name: 'get_user_info',
+        description: 'Get user info',
+        inputSchema: {
+          type: 'object',
+        },
+      },
     ],
   }
 })
@@ -199,6 +206,38 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         ],
       }
     }
+    case 'get_user_info': {
+      const mcpToken = '1234567890'
+      const apiUrl = 'http://localhost:9081' + '/api/user/info'
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            mcpToken: mcpToken,
+          },
+        })
+        const text = await response.text()
+        return {
+          content: [
+            {
+              type: 'text',
+              text,
+            },
+          ],
+        }
+      } catch (err) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `ERROR: ${err.message}`,
+            },
+          ],
+        }
+      }
+    }
+
     default:
       throw new Error('Unknown tool')
   }

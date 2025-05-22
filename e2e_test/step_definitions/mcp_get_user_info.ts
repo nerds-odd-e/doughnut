@@ -7,14 +7,16 @@ interface ApiResponse {
   status: string
 }
 
-When('the client requests user information via MCP service', () => {
-  const apiName = 'getUserInfo'
-  const backendBaseUrl =
-    Cypress.env('backendBaseUrl') || 'http://localhost:9081'
-  cy.task('callMcpTool', { apiName, backendBaseUrl }).then((response) => {
-    cy.wrap(response).as('MCPApiResponse')
-  })
-})
+When(
+  'I connect to an MCP client that connects to Doughnut MCP service get user info',
+  () => {
+    const apiName = 'get_user_info'
+    const baseUrl = Cypress.config('baseUrl')
+    cy.task('callMcpTool', { apiName, baseUrl }).then((response) => {
+      cy.wrap(response).as('MCPApiResponse')
+    })
+  }
+)
 
 Then('the {string} should be returned', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
