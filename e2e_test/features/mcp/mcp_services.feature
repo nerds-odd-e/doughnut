@@ -49,4 +49,4 @@ Feature: MCP (Model Context Protocol) Services
 
     Examples:
       | noteId      | expected_response                               |
-      | 1   | blank                              |
+      | 1           | blank                                           |

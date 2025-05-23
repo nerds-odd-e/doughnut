@@ -19,11 +19,7 @@ Given(
 )
 
 Given('I have a note with the id {int}', (nodeId: number) => {
-  const notes = Array(1)
-    .fill(0)
-    .map((_, i) => {
-      return { Title: `Note ${i + nodeId}` }
-    })
+  const notes = [{ Title: `Note ${nodeId}` }]
   start.testability().injectNotes(notes)
 })
 
