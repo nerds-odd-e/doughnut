@@ -12,8 +12,6 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import type { NoteUpdateResult } from './types.js'
 
-const globalMcpToken = process.argv[2]
-
 /**
  * Create an MCP server to connect to Doughnut server
  */
@@ -252,15 +250,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     case 'get_notebook_list': {
       const mcpToken = `${request.params.mcpToken}`
-      const apiUrl = `${request.params.baseUrl}/api/notebooks/get-notebook-list`
 
       try {
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            mcpToken: globalMcpToken || mcpToken,
-          },
-        })
+        const response = await fetch(
+          `${DOUGHNUT_API_BASE_URL}/api/notebooks/get-notebook-list`,
+          {
+            method: 'GET',
+            headers: {
+              mcpToken: authToken || mcpToken,
+            },
+          }
+        )
         const data: { title: string }[] = await response.json()
         const noteBookTitle = data.map((n) => n.title).join(', ')
         return {
