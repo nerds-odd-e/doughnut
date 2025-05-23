@@ -285,13 +285,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     case 'get_user_info': {
       const mcpToken = `${request.params.mcpToken}`
-      const apiUrl = `${request.params.baseUrl}/api/user/info`
+      const apiUrl = `${DOUGHNUT_API_BASE_URL}/api/user/info`
 
       try {
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {
-            mcpToken: mcpToken,
+            mcpToken: authToken || mcpToken,
           },
         })
         const text = await response.text()
@@ -317,7 +317,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
 
     case 'get_graph_with_note_id': {
-      const apiUrl = `${request.params.baseUrl}/api/notes/${request.params.noteId}/graph`
+      const apiUrl = `${DOUGHNUT_API_BASE_URL}/api/notes/${request.params.noteId}/graph`
 
       try {
         const response = await fetch(apiUrl, {
