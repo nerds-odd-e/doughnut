@@ -257,4 +257,23 @@ export class RestNotebookControllerService {
             },
         });
     }
+    /**
+     * @param mcpToken
+     * @returns Notebook OK
+     * @throws ApiError
+     */
+    public getNotebookList(
+        mcpToken: string,
+    ): CancelablePromise<Array<Notebook>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notebooks/get-notebook-list',
+            headers: {
+                'mcpToken': mcpToken,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }
