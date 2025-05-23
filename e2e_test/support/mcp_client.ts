@@ -27,10 +27,6 @@ export const connectMcpClient = async ({
   mcpToken,
 }: { baseUrl: string; mcpToken: string }) => {
   const client = getMcpClient()
-  // Only connect once
-  if ((client as unknown as { _connected?: boolean })._connected) {
-    return true
-  }
 
   const fs = require('fs')
   const os = require('os')
