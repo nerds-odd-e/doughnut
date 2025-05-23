@@ -7,13 +7,6 @@ interface ApiResponse {
   status: string
 }
 
-interface ApiResponseForNoteGraph {
-  content: Array<{
-    json: string
-  }>
-  status: string
-}
-
 Given(
   'I connect to an MCP client that connects to Doughnut MCP service',
   () => {
@@ -93,23 +86,26 @@ Then(
 )
 
 // step definition for get_note_graph API
-When('I call the {string} MCP tool with note id {string}', (noteId: string) => {
-  const apiName = 'get_graph_with_note_id'
-  const baseUrl = Cypress.config('backendBaseUrl')
-  cy.task('callMcpToolWithNoteId', { apiName, baseUrl, noteId }).then(
-    (response) => {
-      cy.wrap(response).as('MCPApiResponse')
-    }
-  )
-})
+When(
+  'the client requests read note with graph from {string} via MCP service',
+  (noteId: string) => {
+    const apiName = 'get_graph_with_note_id'
+    const baseUrl = Cypress.config('backendBaseUrl')
+    cy.task('callMcpToolWithNoteId', { apiName, baseUrl, noteId }).then(
+      (response) => {
+        cy.wrap(response).as('MCPApiResponse')
+      }
+    )
+  }
+)
 
 Then(
   'the response should return a json object contain {string}',
   (expectedResponse: string) => {
     cy.get('@MCPApiResponse').then((response) => {
       const expectedWithQuotes = `${expectedResponse}`
-      const actualResponse = response as unknown as ApiResponseForNoteGraph
-      expect(actualResponse.content[0]!.json).to.contains(expectedWithQuotes)
+      const actualResponse = response as unknown as ApiResponse
+      expect(actualResponse.content[0]!.text).to.contains(expectedWithQuotes)
     })
   }
 )

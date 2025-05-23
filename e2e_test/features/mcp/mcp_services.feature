@@ -42,7 +42,7 @@ Feature: MCP (Model Context Protocol) Services
       | userName    |
       | Old Learner |
 
-  @ignore
+
   Scenario Outline: Retrieve graph with note id
     When the client requests read note with graph from "<noteId>" via MCP service
     Then the response should return a json object contain "<expected_response>"

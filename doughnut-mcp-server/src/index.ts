@@ -322,12 +322,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const response = await fetch(apiUrl, {
           method: 'GET',
         })
-        const json = await response.json()
+        const text = await response.text()
         return {
           content: [
             {
-              type: 'json',
-              json: json,
+              type: 'text',
+              text,
             },
           ],
         }
@@ -335,8 +335,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return {
           content: [
             {
-              type: 'json',
-              json: `ERROR: ${err.message}`,
+              type: 'text',
+              text: `ERROR: ${err.message}`,
             },
           ],
         }
