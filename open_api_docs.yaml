@@ -2566,7 +2566,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/UserDTO"
   /api/user/current-user-info:
     get:
       tags:

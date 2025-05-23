@@ -78,12 +78,12 @@ export class RestUserControllerService {
     }
     /**
      * @param mcpToken
-     * @returns string OK
+     * @returns UserDTO OK
      * @throws ApiError
      */
     public getUserInfoByMcpToken(
         mcpToken: string,
-    ): CancelablePromise<string> {
+    ): CancelablePromise<UserDTO> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/user/info',
