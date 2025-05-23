@@ -163,8 +163,11 @@ const commonConfig = {
 
           return true
         },
-        connectMcpClient(baseUrl: string) {
-          return connectMcpClient(baseUrl)
+        connectMcpClient({
+          baseUrl,
+          mcpToken,
+        }: { baseUrl: string; mcpToken: string }) {
+          return connectMcpClient({ baseUrl, mcpToken })
         },
         async callMcpTool({
           apiName,
@@ -178,7 +181,7 @@ const commonConfig = {
           const { getMcpClient, connectMcpClient } = await import(
             '../support/mcp_client'
           )
-          await connectMcpClient()
+          await connectMcpClient({ baseUrl, mcpToken })
           const client = getMcpClient()
           const result = await client.callTool({
             name: apiName,
@@ -191,15 +194,17 @@ const commonConfig = {
           apiName,
           baseUrl,
           noteId,
+          mcpToken,
         }: {
           apiName: string
           baseUrl: string
           noteId: string
+          mcpToken: string
         }) {
           const { getMcpClient, connectMcpClient } = await import(
             '../support/mcp_client'
           )
-          await connectMcpClient()
+          await connectMcpClient({ baseUrl, mcpToken })
           const client = getMcpClient()
           const result = await client.callTool({
             name: apiName,

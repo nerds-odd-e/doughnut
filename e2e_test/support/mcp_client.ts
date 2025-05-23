@@ -22,7 +22,10 @@ export const getMcpClient = () => {
  * Connects the MCP client to the doughnut-mcp-server using stdio.
  * Spawns the server as a child process and connects via StdioClientTransport.
  */
-export const connectMcpClient = async (baseUrl: string) => {
+export const connectMcpClient = async ({
+  baseUrl,
+  mcpToken,
+}: { baseUrl: string; mcpToken: string }) => {
   const client = getMcpClient()
   // Only connect once
   if ((client as unknown as { _connected?: boolean })._connected) {
@@ -62,11 +65,14 @@ export const connectMcpClient = async (baseUrl: string) => {
 
   // Always fetch the latest bundle before starting
   await downloadFile(MCP_SERVER_URL, tempFile)
-
   // Let the SDK spawn the process: pass command as array ['node', tempFile]
   const transport = new StdioClientTransport({
     command: process.execPath,
     args: [tempFile],
+    env: {
+      DOUGHNUT_API_BASE_URL: 'http://localhost:9081',
+      DOUGHNUT_API_AUTH_TOKEN: mcpToken,
+    },
   })
   await client.connect(transport)
   ;(client as { _connected?: boolean })._connected = true

@@ -12,7 +12,9 @@ Given(
   'I connect to an MCP client that connects to Doughnut MCP service',
   () => {
     const baseUrl = Cypress.config('baseUrl')
-    cy.task('connectMcpClient', baseUrl)
+    cy.get('@savedMcpToken').then((mcpToken) => {
+      cy.task('connectMcpClient', { baseUrl, mcpToken })
+    })
   }
 )
 
@@ -54,10 +56,19 @@ Then('the response should contain {string}', (expectedResponse: string) => {
 
 // Step definition for updating a note title by id
 When(
-  'I update a note title with this id {string} to {string}',
-  (noteId: string, newTitle: string) => {
-    cy.task('updateNoteTitle', { noteId, newTitle }).then((response) => {
-      cy.wrap(response).as('MCPApiResponse')
+  'I call the {string} MCP tool and update a note title with this id {string} to {string}',
+  (apiName: string, noteId: string, newTitle: string) => {
+    const baseUrl = Cypress.config('baseUrl')
+    cy.get('@savedMcpToken').then((mcpToken) => {
+      cy.task('callMcpTool', {
+        apiName,
+        baseUrl,
+        mcpToken,
+        noteId,
+        newTitle,
+      }).then((response) => {
+        cy.wrap(response).as('MCPApiResponse')
+      })
     })
   }
 )
@@ -101,11 +112,16 @@ When(
   (noteId: string) => {
     const apiName = 'get_graph_with_note_id'
     const baseUrl = Cypress.config('backendBaseUrl')
-    cy.task('callMcpToolWithNoteId', { apiName, baseUrl, noteId }).then(
-      (response) => {
+    cy.get('@savedMcpToken').then((mcpToken) => {
+      cy.task('callMcpToolWithNoteId', {
+        apiName,
+        baseUrl,
+        noteId,
+        mcpToken,
+      }).then((response) => {
         cy.wrap(response).as('MCPApiResponse')
-      }
-    )
+      })
+    })
   }
 )
 
