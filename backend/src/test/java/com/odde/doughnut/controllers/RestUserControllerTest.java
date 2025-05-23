@@ -2,12 +2,12 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
+import com.odde.doughnut.exceptions.McpTokenException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -70,15 +70,17 @@ class RestUserControllerTest {
   }
 
   @Test
-  void getUserInfoByToken_validToken() {
+  void getUserInfoByToken_validToken() throws McpTokenException {
     UserToken userToken = controller.generateToken();
+
     String expectedUserName = userModel.getEntity().getName();
-    assertEquals(expectedUserName, controller.getUserInfoByMcpToken(userToken.getToken()));
+
+    assertEquals(
+        expectedUserName, controller.getUserInfoByMcpToken(userToken.getToken()).getName());
   }
 
   @Test
   void getUserInfoByToken_invalidToken() {
-    String expectedUserName = "Null or Empty userName";
-    assertEquals(expectedUserName, controller.getUserInfoByMcpToken(""));
+    assertThrows(McpTokenException.class, () -> controller.getUserInfoByMcpToken(""));
   }
 }

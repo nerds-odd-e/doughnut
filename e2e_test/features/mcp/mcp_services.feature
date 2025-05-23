@@ -10,7 +10,7 @@ Feature: MCP (Model Context Protocol) Services
 
   Scenario Outline: MCP API calls
     When I call the "<api_name>" MCP tool
-    Then the response should contain "<expected_response>"
+    Then the response should equal "<expected_response>"
 
     Examples:
       | api_name        | expected_response                               |

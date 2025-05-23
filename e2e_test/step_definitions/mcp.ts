@@ -33,11 +33,19 @@ When('I call the {string} MCP tool', (apiName: string) => {
 })
 
 // Use the literal expected response directly from the feature file
-Then('the response should contain {string}', (expectedResponse: string) => {
+Then('the response should equal {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
     const expectedWithQuotes = `${expectedResponse}`
     const actualResponse = response as unknown as ApiResponse
     expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
+  })
+})
+
+Then('the response should contain {string}', (expectedResponse: string) => {
+  cy.get('@MCPApiResponse').then((response) => {
+    const expectedWithQuotes = `${expectedResponse}`
+    const actualResponse = response as unknown as ApiResponse
+    expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
   })
 })
 

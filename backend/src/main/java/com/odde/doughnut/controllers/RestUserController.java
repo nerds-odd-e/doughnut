@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
+import com.odde.doughnut.exceptions.McpTokenException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
@@ -36,13 +37,16 @@ class RestUserController {
   }
 
   @GetMapping("/info")
-  public String getUserInfoByMcpToken(@RequestHeader("mcpToken") String mcpTokenString) {
+  public UserDTO getUserInfoByMcpToken(@RequestHeader("mcpToken") String mcpTokenString)
+      throws McpTokenException {
     if (StringUtils.isEmpty(mcpTokenString)) {
-      return "Null or Empty userName";
-    } else {
-      User user = modelFactoryService.findUserByToken(mcpTokenString).orElse(null);
-      return (user != null) ? user.getName() : "Error: user not found";
+      throw new McpTokenException("Null or Empty userName");
     }
+
+    User user = modelFactoryService.findUserByToken(mcpTokenString).orElse(null);
+    UserDTO userDTO = new UserDTO();
+    userDTO.setName(user.getName());
+    return userDTO;
   }
 
   @GetMapping("")
