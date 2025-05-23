@@ -136,10 +136,24 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'update_note_text_content': {
-      const { noteId, newTitle, newDetails } = request.params.input as {
-        noteId: number
-        newTitle?: string | null
-        newDetails?: string | null
+      let noteId: number | undefined,
+        newTitle: string | null | undefined,
+        newDetails: string | null | undefined
+      if (
+        request.params.arguments &&
+        typeof request.params.arguments === 'object'
+      ) {
+        ;({ noteId, newTitle, newDetails } = request.params.arguments as {
+          noteId: number
+          newTitle?: string | null
+          newDetails?: string | null
+        })
+      } else {
+        ;({ noteId, newTitle, newDetails } = request.params as {
+          noteId: number
+          newTitle?: string | null
+          newDetails?: string | null
+        })
       }
       // Always use authToken from environment variable
       if (!authToken) {
@@ -162,6 +176,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       }
+
       let titleResult: NoteUpdateResult | null = null
       let detailsResult: NoteUpdateResult | null = null
       // Update title if provided
