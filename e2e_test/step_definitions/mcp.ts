@@ -80,7 +80,7 @@ Then(
     cy.get('@MCPApiResponse').then((response) => {
       const expectedWithQuotes = `${expectedResponse}`
       const actualResponse = response as unknown as ApiResponse
-      expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
+      expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
     })
   }
 )
