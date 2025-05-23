@@ -261,12 +261,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             mcpToken: globalMcpToken || mcpToken,
           },
         })
-        const data = await response.json()
+        const data: { title: string }[] = await response.json()
+        const noteBookTitle = data.map((n) => n.title).join(', ')
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify(data, null, 2),
+              text: noteBookTitle,
             },
           ],
         }
