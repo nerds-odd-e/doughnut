@@ -84,7 +84,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'get_notebook_list',
-        description: 'Get notebook list (Not ready for use)',
+        description: 'Get notebook list',
         inputSchema: {
           type: 'object',
         },
