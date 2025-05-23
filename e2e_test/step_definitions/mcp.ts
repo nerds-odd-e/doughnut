@@ -1,4 +1,5 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import start from '../start'
 
 interface ApiResponse {
   content: Array<{
@@ -14,6 +15,15 @@ Given(
     cy.task('connectMcpClient', baseUrl)
   }
 )
+
+Given('I have a note with the id {int}', (nodeId: number) => {
+  const notes = Array(1)
+    .fill(0)
+    .map((_, i) => {
+      return { Title: `Note ${i + nodeId}` }
+    })
+  start.testability().injectNotes(notes)
+})
 
 // Use the literal API names directly from the feature file
 When('I call the {string} MCP tool', (apiName: string) => {
