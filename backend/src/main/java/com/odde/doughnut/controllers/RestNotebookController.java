@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
@@ -20,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -186,7 +186,7 @@ class RestNotebookController {
   }
 
   private String sanitizeFileName(String fileName) {
-    return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
+    return fileName.replaceAll("[\\/:*?\"<>|]", "_");
   }
 
   @Operation(summary = "Import Obsidian file")
@@ -202,5 +202,19 @@ class RestNotebookController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
     obsidianFormatService.importFromObsidian(file, notebook);
+  }
+
+  @GetMapping("/get-notebook-list")
+  public List<Notebook> getNotebookList(@RequestHeader("mcpToken") String mcpToken) {
+    return modelFactoryService
+        .findUserByToken(mcpToken)
+        .map(
+            user -> {
+              Ownership ownership = user.getOwnership();
+              if (ownership == null) return new ArrayList<Notebook>();
+              List<Notebook> notebooks = ownership.getNotebooks();
+              return notebooks != null ? new ArrayList<>(notebooks) : new ArrayList<Notebook>();
+            })
+        .orElse(new ArrayList<Notebook>());
   }
 }

@@ -12,6 +12,8 @@ import {
 } from '@modelcontextprotocol/sdk/types.js'
 import type { NoteUpdateResult } from './types.js'
 
+const globalMcpToken = process.argv[2]
+
 /**
  * Create an MCP server to connect to Doughnut server
  */
@@ -234,13 +236,35 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'get_notebook_list': {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: 'Lord of the Rings, Harry Potter',
+      const mcpToken = `${request.params.mcpToken}`
+      const apiUrl = `${request.params.baseUrl}/api/notebooks/get-notebook-list`
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'GET',
+          headers: {
+            mcpToken: globalMcpToken || mcpToken,
           },
-        ],
+        })
+        const data = await response.json()
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(data, null, 2),
+            },
+          ],
+        }
+      } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err)
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `ERROR: ${errorMsg}`,
+            },
+          ],
+        }
       }
     }
     case 'get_user_info': {
@@ -264,11 +288,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
+        const errorMsg = err instanceof Error ? err.message : String(err)
         return {
           content: [
             {
               type: 'text',
-              text: `ERROR: ${err.message}`,
+              text: `ERROR: ${errorMsg}`,
             },
           ],
         }

@@ -25,8 +25,10 @@ Given(
 // Use the literal API names directly from the feature file
 When('I call the {string} MCP tool', (apiName: string) => {
   const baseUrl = Cypress.config('baseUrl')
-  cy.task('callMcpTool', { apiName, baseUrl }).then((response) => {
-    cy.wrap(response).as('MCPApiResponse')
+  cy.get('@savedMcpToken').then((mcpToken) => {
+    cy.task('callMcpTool', { apiName, baseUrl, mcpToken }).then((response) => {
+      cy.wrap(response).as('MCPApiResponse')
+    })
   })
 })
 
