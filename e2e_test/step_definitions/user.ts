@@ -135,15 +135,23 @@ Then('I should be on the welcome page and asked to login', () => {
 })
 
 When('I generate MCP token', () => {
-  start.mainMenu().userOptions().manageMCPTokens()
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .generateToken()
+    .as('generatedMcpToken')
 })
 
 Then('I can use new MCP token', () => {
-  cy.get('[data-testid="token-result"]').invoke('text').should('match', /\S+/)
+  cy.get('@generatedMcpToken').should('match', /\S+/)
 })
 
 Given('I have a valid MCP token', () => {
-  cy.visit('/d/generate-token')
-  cy.findByRole('button', { name: 'Generate Token' }).click()
-  cy.get('[data-testid="token-result"]').invoke('text').as('savedMcpToken')
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .generateToken()
+    .as('savedMcpToken')
 })

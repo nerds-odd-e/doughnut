@@ -2,6 +2,7 @@ import { routerToMyNotebooksPage } from './myNotebooksPage'
 import { assumeAdminDashboardPage } from './adminPages/adminDashboardPage'
 import { assumeAssessmentAndCertificateHistoryPage } from './assessmentAndCertificateHistoryPage'
 import { messageCenterIndicator } from './messageCenterIndicator'
+import { manageMCPTokensPage } from './manageMCPTokensPage'
 
 export const mainMenu = () => {
   routerToMyNotebooksPage()
@@ -42,7 +43,7 @@ export const mainMenu = () => {
           cy.findByRole('link', { name: 'Manage MCP Tokens' }).click({
             force: true,
           })
-          cy.findByRole('button', { name: 'Generate Token' }).click()
+          return manageMCPTokensPage()
         },
       }
     },
