@@ -135,7 +135,7 @@ Then('I should be on the welcome page and asked to login', () => {
 })
 
 When('I generate MCP token', () => {
-  start.mainMenu().userOptions().generateToken()
+  start.mainMenu().userOptions().manageMCPTokens()
 })
 
 Then('I can use new MCP token', () => {

@@ -38,8 +38,8 @@ export const mainMenu = () => {
           }).click({ force: true })
           return assumeAssessmentAndCertificateHistoryPage()
         },
-        generateToken() {
-          cy.findByRole('link', { name: 'Generate Token' }).click({
+        manageMCPTokens() {
+          cy.findByRole('link', { name: 'Manage MCP Tokens' }).click({
             force: true,
           })
           cy.findByRole('button', { name: 'Generate Token' }).click()

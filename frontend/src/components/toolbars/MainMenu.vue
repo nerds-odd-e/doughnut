@@ -45,7 +45,7 @@
                 </li>
                 <li class="daisy-menu-item hover:daisy-bg-base-200">
                   <router-link :to="{ name: 'generateToken' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
-                    Generate Token
+                    Manage MCP Tokens
                   </router-link>
                 </li>
                 <li class="daisy-menu-item hover:daisy-bg-base-200">
