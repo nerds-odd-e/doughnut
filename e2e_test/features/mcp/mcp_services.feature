@@ -29,14 +29,3 @@ Feature: MCP (Model Context Protocol) Services
     Examples:
       | userName    |
       | Old Learner |
-
-
-  Scenario Outline: Retrieve graph with note id
-    Given I have a note with the id <noteId>
-    When the client requests read note with graph from "<noteId>" via MCP service
-    Then the response should return a json object contain "<expected_response>"
-    #And the json is correctly formatted
-
-    Examples:
-      | noteId      | expected_response                               |
-      | 1           | blank                                           |

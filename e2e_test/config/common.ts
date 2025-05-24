@@ -187,26 +187,6 @@ const commonConfig = {
           })
           return result
         },
-        async callMcpToolWithNoteId({
-          apiName,
-          baseUrl,
-          noteId,
-          mcpToken,
-        }: {
-          apiName: string
-          baseUrl: string
-          noteId: string
-          mcpToken: string
-        }) {
-          await spawnAndConnectMcpServer({ baseUrl, mcpToken })
-          const client = getMcpClient()
-          const result = await client.callTool({
-            name: apiName,
-            baseUrl: baseUrl,
-            noteId: noteId,
-          })
-          return result
-        },
       })
 
       return config

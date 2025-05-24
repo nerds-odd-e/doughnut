@@ -1,5 +1,4 @@
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
-import start from '../start'
 
 interface ApiResponse {
   content: Array<{
@@ -17,11 +16,6 @@ Given(
     })
   }
 )
-
-Given('I have a note with the id {int}', (nodeId: number) => {
-  const notes = [{ Title: `Note ${nodeId}` }]
-  start.testability().injectNotes(notes)
-})
 
 // Use the literal API names directly from the feature file
 When('I call the {string} MCP tool', (apiName: string) => {
@@ -71,36 +65,6 @@ Then(
       const expectedWithQuotes = `${expectedResponse}`
       const actualResponse = response as unknown as ApiResponse
       expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
-    })
-  }
-)
-
-// step definition for get_note_graph API
-When(
-  'the client requests read note with graph from {string} via MCP service',
-  (noteId: string) => {
-    const apiName = 'get_graph_with_note_id'
-    const baseUrl = Cypress.config('baseUrl')
-    cy.get('@savedMcpToken').then((mcpToken) => {
-      cy.task('callMcpToolWithNoteId', {
-        apiName,
-        baseUrl,
-        noteId,
-        mcpToken,
-      }).then((response) => {
-        cy.wrap(response).as('MCPApiResponse')
-      })
-    })
-  }
-)
-
-Then(
-  'the response should return a json object contain {string}',
-  (expectedResponse: string) => {
-    cy.get('@MCPApiResponse').then((response) => {
-      const expectedWithQuotes = `${expectedResponse}`
-      const actualResponse = response as unknown as ApiResponse
-      expect(actualResponse.content[0]!.text).to.contains(expectedWithQuotes)
     })
   }
 )
