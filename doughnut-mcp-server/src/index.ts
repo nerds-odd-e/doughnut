@@ -141,13 +141,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         request.params.arguments &&
         typeof request.params.arguments === 'object'
       ) {
-        ;({ noteId, newTitle, newDetails } = request.params.arguments as {
+        ({ noteId, newTitle, newDetails } = request.params.arguments as {
           noteId: number
           newTitle?: string | null
           newDetails?: string | null
         })
       } else {
-        ;({ noteId, newTitle, newDetails } = request.params as unknown as {
+        ({ noteId, newTitle, newDetails } = request.params as unknown as {
           noteId: number
           newTitle?: string | null
           newDetails?: string | null
