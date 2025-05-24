@@ -42,33 +42,6 @@ Then('the response should equal {string}', (expectedResponse: string) => {
   })
 })
 
-Then('the response should contain {string}', (expectedResponse: string) => {
-  cy.get('@MCPApiResponse').then((response) => {
-    const expectedWithQuotes = `${expectedResponse}`
-    const actualResponse = response as unknown as ApiResponse
-    expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
-  })
-})
-
-// Step definition for updating a note title by id
-When(
-  'I call the {string} MCP tool and update a note title with this id {string} to {string}',
-  (apiName: string, noteId: string, newTitle: string) => {
-    const baseUrl = Cypress.config('baseUrl')
-    cy.get('@savedMcpToken').then((mcpToken) => {
-      cy.task('callMcpTool', {
-        apiName,
-        baseUrl,
-        mcpToken,
-        noteId,
-        newTitle,
-      }).then((response) => {
-        cy.wrap(response).as('MCPApiResponse')
-      })
-    })
-  }
-)
-
 Then(
   'I should receive a list of notebooks in the MCP response contain {string}',
   (expectedResponse: string) => {

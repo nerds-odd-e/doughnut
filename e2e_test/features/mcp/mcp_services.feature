@@ -22,16 +22,6 @@ Feature: MCP (Model Context Protocol) Services
     When I call the "get_notebook_list" MCP tool
     Then I should receive a list of notebooks in the MCP response contain "Lord of the Rings, Harry Potter"
 
-  @ignore
-  Scenario Outline: Update note title/detail
-    When I call the "<api_name>" MCP tool and update a note title with this id "<note_id>" to "new_title"
-    Then the response should contain "<expected_response>"
-
-    Examples:
-      | api_name | new_title | expected_response |
-      | update_note_text_content | Cat | Note updated successfully. |
-      | update_note_text_content | Cat | Failed to update note |
-
   Scenario Outline: Retrieve basic user information
     When call Mcp server get_user_info API
     Then the response should return user name contain "<userName>"
