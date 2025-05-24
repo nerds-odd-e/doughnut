@@ -178,7 +178,6 @@ const commonConfig = {
           baseUrl: string
           mcpToken: string
         }) {
-          await spawnAndConnectMcpServer({ baseUrl, mcpToken })
           const client = getMcpClient()
           const result = await client.callTool({
             name: apiName,
