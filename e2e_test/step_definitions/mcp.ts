@@ -13,7 +13,7 @@ Given(
   () => {
     const baseUrl = Cypress.config('baseUrl')
     cy.get('@savedMcpToken').then((mcpToken) => {
-      cy.task('connectMcpClient', { baseUrl, mcpToken })
+      cy.task('spawnAndConnectMcpServer', { baseUrl, mcpToken })
     })
   }
 )

@@ -22,7 +22,7 @@ export const getMcpClient = () => {
  * Connects the MCP client to the doughnut-mcp-server using stdio.
  * Spawns the server as a child process and connects via StdioClientTransport.
  */
-export const connectMcpClient = async ({
+export const spawnAndConnectMcpServer = async ({
   baseUrl,
   mcpToken,
 }: { baseUrl: string; mcpToken: string }) => {
