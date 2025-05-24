@@ -3,5 +3,5 @@ Feature: User MCP token
 
   Scenario: Generate MCP token
     Given I am logged in as an existing user
-    When I generate MCP token
-    Then I can use new MCP token
+    When I generate a new MCP token
+    Then the new MCP Token should be a valid UUID

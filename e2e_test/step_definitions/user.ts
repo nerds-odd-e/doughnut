@@ -134,7 +134,7 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
 
-When('I generate MCP token', () => {
+When('I generate a new MCP token', () => {
   start
     .mainMenu()
     .userOptions()
@@ -143,8 +143,11 @@ When('I generate MCP token', () => {
     .as('generatedMcpToken')
 })
 
-Then('I can use new MCP token', () => {
-  cy.get('@generatedMcpToken').should('match', /\S+/)
+Then('the new MCP Token should be a valid UUID', () => {
+  cy.get('@generatedMcpToken').should(
+    'match',
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+  )
 })
 
 Given('I have a valid MCP token', () => {
