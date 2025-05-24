@@ -134,9 +134,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'update_note_text_content': {
-      let noteId: number | undefined,
-        newTitle: string | null | undefined,
-        newDetails: string | null | undefined
+      let noteId: number | undefined
+      let newTitle: string | null | undefined
+      let newDetails: string | null | undefined
       if (
         request.params.arguments &&
         typeof request.params.arguments === 'object'
