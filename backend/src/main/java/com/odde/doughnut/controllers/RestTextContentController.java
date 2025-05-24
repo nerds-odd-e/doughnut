@@ -11,25 +11,18 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/text_content")
 class RestTextContentController {
-  private static final Logger logger = LoggerFactory.getLogger(RestTextContentController.class);
-
   private final ModelFactoryService modelFactoryService;
 
   private UserModel currentUser;
-
-  private final HttpServletRequest request;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -37,12 +30,10 @@ class RestTextContentController {
   public RestTextContentController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings,
-      HttpServletRequest request) {
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.request = request;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -65,34 +56,11 @@ class RestTextContentController {
 
   private NoteRealm updateNote(Note note, Consumer<Note> updateFunction)
       throws UnexpectedNoAccessRightException {
-    String authorizationHeader = request.getHeader("Authorization");
-    logger.debug("Authorization header: {}", authorizationHeader);
-    UserModel userModel;
-    if (currentUser == null) {
-      String token = null;
-      if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-        token = authorizationHeader.substring(7);
-      } else if (authorizationHeader != null) {
-        token = authorizationHeader;
-      }
-      logger.debug("Extracted token: {}", token);
-      if (token == null) {
-        throw new UnexpectedNoAccessRightException();
-      }
-      var userOpt = modelFactoryService.findUserByToken(token);
-      if (userOpt.isEmpty()) {
-        throw new UnexpectedNoAccessRightException();
-      }
-      userModel = new UserModel(userOpt.get(), modelFactoryService);
-      userModel.assertAuthorization(note);
-    } else {
-      currentUser.assertAuthorization(note);
-      userModel = currentUser;
-    }
+    currentUser.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     modelFactoryService.save(note);
-    return new NoteViewer(userModel.getEntity(), note).toJsonObject();
+    return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
   }
 }

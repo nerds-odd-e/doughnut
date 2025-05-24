@@ -134,20 +134,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'update_note_text_content': {
-      let noteId: number | undefined
-      let newTitle: string | null | undefined
-      let newDetails: string | null | undefined
+      let noteId: number | undefined,
+        newTitle: string | null | undefined,
+        newDetails: string | null | undefined
       if (
         request.params.arguments &&
         typeof request.params.arguments === 'object'
       ) {
-        ({ noteId, newTitle, newDetails } = request.params.arguments as {
+        ;({ noteId, newTitle, newDetails } = request.params.arguments as {
           noteId: number
           newTitle?: string | null
           newDetails?: string | null
         })
       } else {
-        ({ noteId, newTitle, newDetails } = request.params as unknown as {
+        ;({ noteId, newTitle, newDetails } = request.params as {
           noteId: number
           newTitle?: string | null
           newDetails?: string | null
@@ -333,12 +333,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : String(err)
         return {
           content: [
             {
               type: 'text',
-              text: `ERROR: ${errorMsg}`,
+              text: `ERROR: ${err.message}`,
             },
           ],
         }

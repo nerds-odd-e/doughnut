@@ -67,9 +67,6 @@ public class ModelFactoryService {
 
   public Optional<User> findUserByToken(String token) {
     UserToken usertoken = userTokenRepository.findByToken(token);
-    if (usertoken == null) {
-      return Optional.empty();
-    }
     return this.findUserById(usertoken.getUserId());
   }
 
