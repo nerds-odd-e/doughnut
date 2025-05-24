@@ -15,12 +15,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 import java.util.function.Consumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/text_content")
 class RestTextContentController {
+  private static final Logger logger = LoggerFactory.getLogger(RestTextContentController.class);
+
   private final ModelFactoryService modelFactoryService;
 
   private UserModel currentUser;
@@ -62,14 +66,16 @@ class RestTextContentController {
   private NoteRealm updateNote(Note note, Consumer<Note> updateFunction)
       throws UnexpectedNoAccessRightException {
     String authorizationHeader = request.getHeader("Authorization");
+    logger.debug("Authorization header: {}", authorizationHeader);
     UserModel userModel;
-    if (currentUser.getEntity() == null) {
+    if (currentUser == null) {
       String token = null;
       if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
         token = authorizationHeader.substring(7);
       } else if (authorizationHeader != null) {
         token = authorizationHeader;
       }
+      logger.debug("Extracted token: {}", token);
       if (token == null) {
         throw new UnexpectedNoAccessRightException();
       }
