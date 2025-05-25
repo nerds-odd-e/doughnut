@@ -63,13 +63,12 @@ class McpClient {
 
     // Always fetch the latest bundle before starting
     await this.#downloadFile(MCP_SERVER_URL, tempFile)
-    // Let the SDK spawn the process: pass command as array ['node', tempFile]
+    // Let the SDK spawn the process: pass command as array ['node', tempFile, mcpToken]
     this.transport = new StdioClientTransport({
       command: process.execPath,
-      args: [tempFile],
+      args: [tempFile, mcpToken],
       env: {
         DOUGHNUT_API_BASE_URL: 'http://localhost:9081',
-        DOUGHNUT_API_AUTH_TOKEN: mcpToken,
       },
     })
     await this.client.connect(this.transport)

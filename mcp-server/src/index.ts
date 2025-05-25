@@ -53,7 +53,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       {
         name: 'update_note_text_content',
         description:
-          'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided. Authentication token is taken from the DOUGHNUT_API_AUTH_TOKEN environment variable.',
+          'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided. Authentication token is taken from the mcpToken argument.',
         inputSchema: {
           type: 'object',
           properties: {
@@ -105,7 +105,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
  */
 const DOUGHNUT_API_BASE_URL =
   process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
-const authToken = process.env.DOUGHNUT_API_AUTH_TOKEN
+const authToken = process.argv[2]
 
 /**
  * Handler for the create_note tool.
@@ -147,7 +147,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           newDetails?: string | null
         })
       } else {
-        ;({ noteId, newTitle, newDetails } = request.params as {
+        ;({ noteId, newTitle, newDetails } = request.params as unknown as {
           noteId: number
           newTitle?: string | null
           newDetails?: string | null
@@ -249,20 +249,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'get_notebook_list': {
-      const mcpToken = `${request.params.mcpToken}`
-
       try {
         const response = await fetch(
           `${DOUGHNUT_API_BASE_URL}/api/notebooks/get-notebook-list`,
           {
             method: 'GET',
             headers: {
-              mcpToken: authToken || mcpToken,
+              mcpToken: authToken,
             },
           }
         )
-        const data: { title: string }[] = await response.json()
-        const noteBookTitle = data.map((n) => n.title).join(', ')
+        const data = await response.json()
+        if (!Array.isArray(data)) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `ERROR: Unexpected response from get-notebook-list: ${JSON.stringify(data)}`,
+              },
+            ],
+          }
+        }
+        const noteBookTitle = data.map((n: any) => n.title).join(', ')
         return {
           content: [
             {
@@ -272,7 +280,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : String(err)
+        const errorMsg = (err as any).message || String(err)
         return {
           content: [
             {
@@ -284,14 +292,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case 'get_user_info': {
-      const mcpToken = `${request.params.mcpToken}`
       const apiUrl = `${DOUGHNUT_API_BASE_URL}/api/user/info`
-
       try {
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {
-            mcpToken: authToken || mcpToken,
+            mcpToken: authToken,
           },
         })
         const text = await response.text()
@@ -304,7 +310,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        const errorMsg = err instanceof Error ? err.message : String(err)
+        const errorMsg = (err as any).message || String(err)
         return {
           content: [
             {
@@ -333,11 +339,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
+        const errorMsg = (err as any).message || String(err)
         return {
           content: [
             {
               type: 'text',
-              text: `ERROR: ${err.message}`,
+              text: `ERROR: ${errorMsg}`,
             },
           ],
         }

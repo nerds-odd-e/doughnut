@@ -39,3 +39,4 @@
   - Confirmed `requestAndGetJsonSchemaResult` can handle our use case
   - Verified it supports custom system messages for notebook instructions
   - Checked it maintains the same output format
+- [x] Pass mcpToken as an argument to the MCP server, not as an environment variable (completed)
