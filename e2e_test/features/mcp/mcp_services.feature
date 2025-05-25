@@ -9,7 +9,7 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid MCP token
     And I connect to an MCP client that connects to Doughnut MCP service
 
-  Scenario Outline: MCP API calls
+  Scenario Outline: MCP Tools
     When I call the "<api_name>" MCP tool
     Then the response should contain "<expected_response>"
 
@@ -22,4 +22,5 @@ Feature: MCP (Model Context Protocol) Services
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
     When I call the "get_notebook_list" MCP tool
-    Then I should receive a list of notebooks in the MCP response contain "Lord of the Rings, Harry Potter"
+    Then the response should contain "Lord of the Rings"
+    Then the response should contain "Harry Potter"

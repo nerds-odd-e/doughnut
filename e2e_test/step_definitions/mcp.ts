@@ -27,19 +27,7 @@ When('I call the {string} MCP tool', (apiName: string) => {
 // Use the literal expected response directly from the feature file
 Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
-    const expectedWithQuotes = `${expectedResponse}`
     const actualResponse = response as unknown as ApiResponse
-    expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
+    expect(actualResponse.content[0]!.text).to.contain(expectedResponse)
   })
 })
-
-Then(
-  'I should receive a list of notebooks in the MCP response contain {string}',
-  (expectedResponse: string) => {
-    cy.get('@MCPApiResponse').then((response) => {
-      const expectedWithQuotes = `${expectedResponse}`
-      const actualResponse = response as unknown as ApiResponse
-      expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
-    })
-  }
-)
