@@ -1,5 +1,10 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
+import http from 'http'
+import https from 'https'
 
 interface MaybeChildProcess {
   child?: { kill: () => void }
@@ -31,11 +36,6 @@ class McpClient {
       }
     )
 
-    const fs = require('fs')
-    const os = require('os')
-    const path = require('path')
-    const http = require('http')
-    const https = require('https')
     const MCP_SERVER_URL = `${baseUrl}/mcp-server.bundle.mjs`
     const tempDir = os.tmpdir()
     const tempFile = path.join(tempDir, 'mcp-server.bundle.mjs')
@@ -56,7 +56,7 @@ class McpClient {
           }
           response.pipe(file)
           file.on('finish', () => {
-            file.close(resolve)
+            file.close(() => resolve())
           })
         })
       })
