@@ -16,6 +16,11 @@ class McpClient {
     baseUrl,
     mcpToken,
   }: { baseUrl: string; mcpToken: string }) {
+    if (this.client !== null) {
+      throw new Error(
+        'MCP client is already connected. Please disconnect the previous client before connecting a new one.'
+      )
+    }
     this.client = new Client(
       {
         name: 'doughnut-mcp-client',
