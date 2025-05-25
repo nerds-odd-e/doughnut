@@ -68,7 +68,7 @@ class McpClient {
       command: process.execPath,
       args: [tempFile, mcpToken],
       env: {
-        DOUGHNUT_API_BASE_URL: 'http://localhost:9081',
+        DOUGHNUT_API_BASE_URL: baseUrl,
       },
     })
     await this.client.connect(this.transport)
