@@ -17,6 +17,27 @@ class McpClient {
   client: Client | null = null
   transport: StdioClientTransport | null = null
 
+  async #downloadFile(fileUrl: string, dest: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const proto = fileUrl.startsWith('https') ? https : http
+      const file = fs.createWriteStream(dest)
+      proto.get(fileUrl, (response) => {
+        if (response.statusCode !== 200) {
+          reject(
+            new Error(
+              `Failed to download MCP server bundle: ${response.statusCode} ${response.statusMessage}`
+            )
+          )
+          return
+        }
+        response.pipe(file)
+        file.on('finish', () => {
+          file.close(() => resolve())
+        })
+      })
+    })
+  }
+
   async spawnAndConnectMcpServer({
     baseUrl,
     mcpToken,
@@ -40,30 +61,8 @@ class McpClient {
     const tempDir = os.tmpdir()
     const tempFile = path.join(tempDir, 'mcp-server.bundle.mjs')
 
-    // Helper to download the file
-    async function downloadFile(fileUrl: string, dest: string): Promise<void> {
-      return new Promise((resolve, reject) => {
-        const proto = fileUrl.startsWith('https') ? https : http
-        const file = fs.createWriteStream(dest)
-        proto.get(fileUrl, (response) => {
-          if (response.statusCode !== 200) {
-            reject(
-              new Error(
-                `Failed to download MCP server bundle: ${response.statusCode} ${response.statusMessage}`
-              )
-            )
-            return
-          }
-          response.pipe(file)
-          file.on('finish', () => {
-            file.close(() => resolve())
-          })
-        })
-      })
-    }
-
     // Always fetch the latest bundle before starting
-    await downloadFile(MCP_SERVER_URL, tempFile)
+    await this.#downloadFile(MCP_SERVER_URL, tempFile)
     // Let the SDK spawn the process: pass command as array ['node', tempFile]
     this.transport = new StdioClientTransport({
       command: process.execPath,
