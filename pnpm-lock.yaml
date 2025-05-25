@@ -101,7 +101,7 @@ importers:
         specifier: ^8.0.3
         version: 8.0.3
 
-  doughnut-mcp-server:
+  mcp-server:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: ^1.11.4
