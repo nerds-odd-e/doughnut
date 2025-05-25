@@ -19,11 +19,8 @@ Given(
 
 // Use the literal API names directly from the feature file
 When('I call the {string} MCP tool', (apiName: string) => {
-  const baseUrl = Cypress.config('baseUrl')
-  cy.get('@savedMcpToken').then((mcpToken) => {
-    cy.task('callMcpTool', { apiName, baseUrl, mcpToken }).then((response) => {
-      cy.wrap(response).as('MCPApiResponse')
-    })
+  cy.task('callMcpTool', { apiName }).then((response) => {
+    cy.wrap(response).as('MCPApiResponse')
   })
 })
 
@@ -50,11 +47,8 @@ Then(
 // step definition for get_user_info API
 When('call Mcp server get_user_info API', () => {
   const apiName = 'get_user_info'
-  const baseUrl = Cypress.config('baseUrl')
-  cy.get('@savedMcpToken').then((mcpToken) => {
-    cy.task('callMcpTool', { apiName, baseUrl, mcpToken }).then((response) => {
-      cy.wrap(response).as('MCPApiResponse')
-    })
+  cy.task('callMcpTool', { apiName }).then((response) => {
+    cy.wrap(response).as('MCPApiResponse')
   })
 })
 

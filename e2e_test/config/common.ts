@@ -171,14 +171,10 @@ const commonConfig = {
         },
         async callMcpTool({
           apiName,
-          baseUrl,
-          mcpToken,
         }: {
           apiName: string
-          baseUrl: string
-          mcpToken: string
         }) {
-          return await mcpClient.callMcpTool({ apiName, baseUrl, mcpToken })
+          return await mcpClient.callMcpTool({ apiName })
         },
         async disconnectMcpServer() {
           return await mcpClient.disconnectMcpServer()
