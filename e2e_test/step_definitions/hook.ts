@@ -66,6 +66,14 @@ After({ tags: '@usingMockedOpenAiService' }, () => {
   mock_services.openAi().restore()
 })
 
+// the Afer hook from cypress-cucumber-preprocessor is not working
+// as expected.
+// When a test fail, the After hook is not called.
+// So we need to call the task in the Before hook as well.
+Before({ tags: '@TerminateMCPServerWhenTeardown' }, () => {
+  cy.task('disconnectMcpServer')
+})
+
 After({ tags: '@TerminateMCPServerWhenTeardown' }, () => {
   cy.task('disconnectMcpServer')
 })

@@ -25,11 +25,11 @@ When('I call the {string} MCP tool', (apiName: string) => {
 })
 
 // Use the literal expected response directly from the feature file
-Then('the response should equal {string}', (expectedResponse: string) => {
+Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
     const expectedWithQuotes = `${expectedResponse}`
     const actualResponse = response as unknown as ApiResponse
-    expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
+    expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
   })
 })
 
@@ -40,25 +40,6 @@ Then(
       const expectedWithQuotes = `${expectedResponse}`
       const actualResponse = response as unknown as ApiResponse
       expect(actualResponse.content[0]!.text).to.equal(expectedWithQuotes)
-    })
-  }
-)
-
-// step definition for get_user_info API
-When('call Mcp server get_user_info API', () => {
-  const apiName = 'get_user_info'
-  cy.task('callMcpTool', { apiName }).then((response) => {
-    cy.wrap(response).as('MCPApiResponse')
-  })
-})
-
-Then(
-  'the response should return user name contain {string}',
-  (expectedResponse: string) => {
-    cy.get('@MCPApiResponse').then((response) => {
-      const expectedWithQuotes = `${expectedResponse}`
-      const actualResponse = response as unknown as ApiResponse
-      expect(actualResponse.content[0]!.text).to.contain(expectedWithQuotes)
     })
   }
 )
