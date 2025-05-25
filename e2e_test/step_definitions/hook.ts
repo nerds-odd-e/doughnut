@@ -65,3 +65,7 @@ Before({ tags: '@usingMockedOpenAiService' }, () => {
 After({ tags: '@usingMockedOpenAiService' }, () => {
   mock_services.openAi().restore()
 })
+
+After({ tags: '@TerminateMCPServerWhenTeardown' }, () => {
+  cy.task('disconnectMcpServer')
+})

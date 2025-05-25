@@ -1,3 +1,4 @@
+@TerminateMCPServerWhenTeardown
 Feature: MCP (Model Context Protocol) Services
   As a note taker, I want my AI clients like Cursor to use the MCP services from
   Doughnut, so that AI can automatically update my notes and fetch information from my

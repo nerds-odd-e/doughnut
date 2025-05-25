@@ -1,5 +1,9 @@
 import { existsSync, rmdir } from 'node:fs'
-import { getMcpClient, spawnAndConnectMcpServer } from '../support/mcp_client'
+import {
+  spawnAndConnectMcpServer,
+  disconnectMcpServer,
+  callMcpTool,
+} from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
 } = require('@badeball/cypress-cucumber-preprocessor')
@@ -163,11 +167,11 @@ const commonConfig = {
 
           return true
         },
-        spawnAndConnectMcpServer({
+        async spawnAndConnectMcpServer({
           baseUrl,
           mcpToken,
         }: { baseUrl: string; mcpToken: string }) {
-          return spawnAndConnectMcpServer({ baseUrl, mcpToken })
+          return await spawnAndConnectMcpServer({ baseUrl, mcpToken })
         },
         async callMcpTool({
           apiName,
@@ -178,13 +182,10 @@ const commonConfig = {
           baseUrl: string
           mcpToken: string
         }) {
-          const client = getMcpClient()
-          const result = await client.callTool({
-            name: apiName,
-            baseUrl: baseUrl,
-            mcpToken: mcpToken,
-          })
-          return result
+          return await callMcpTool({ apiName, baseUrl, mcpToken })
+        },
+        async disconnectMcpServer() {
+          return await disconnectMcpServer()
         },
       })
 
