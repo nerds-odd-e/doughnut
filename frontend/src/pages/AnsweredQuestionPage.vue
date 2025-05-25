@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
-import type { AnsweredQuestion } from "@/generated/backend"
+import type { AnsweredQuestion } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { onMounted, ref, watch, type PropType } from "vue"

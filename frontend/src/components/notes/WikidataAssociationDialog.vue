@@ -46,7 +46,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { Note, WikidataAssociationCreation } from "@/generated/backend"
+import type { Note, WikidataAssociationCreation } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import TextInput from "../form/TextInput.vue"

@@ -29,7 +29,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { Circle } from "@/generated/backend"
+import type { Circle } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import CircleNewDialog from "@/components/circles/CircleNewDialog.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

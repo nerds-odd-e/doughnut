@@ -18,7 +18,7 @@ import type {
   Answer,
   AnswerDTO,
   MultipleChoicesQuestion,
-} from "@/generated/backend"
+} from "generated/backend"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 

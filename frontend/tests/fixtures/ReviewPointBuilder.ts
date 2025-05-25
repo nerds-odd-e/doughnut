@@ -1,4 +1,4 @@
-import type { Note, NoteRealm, MemoryTracker } from "@/generated/backend"
+import type { Note, NoteRealm, MemoryTracker } from "generated/backend"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import generateId from "./generateId"

@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import type { Note } from "@/generated/backend"
+import type { Note } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"

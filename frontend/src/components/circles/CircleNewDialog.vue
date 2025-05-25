@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import type { Circle } from "@/generated/backend"
+import type { Circle } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"

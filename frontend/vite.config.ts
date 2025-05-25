@@ -17,6 +17,7 @@ import Inspector from 'unplugin-vue-inspector/vite'
 const config = defineConfig({
   resolve: {
     alias: {
+      '@/generated/backend': fileURLToPath(new URL('../../generated/backend', import.meta.url)),
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@tests': fileURLToPath(new URL('./tests', import.meta.url)),
     }

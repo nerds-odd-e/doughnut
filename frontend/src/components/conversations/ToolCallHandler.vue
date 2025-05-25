@@ -21,7 +21,7 @@ import type {
   NoteDetailsCompletion,
   Note,
   ToolCallResult,
-} from "@/generated/backend"
+} from "generated/backend"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
 import type { StorageAccessor } from "@/store/createNoteStorage"

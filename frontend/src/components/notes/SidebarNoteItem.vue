@@ -51,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@/generated/backend"
+import type { Note, NoteRealm } from "generated/backend"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 import SidebarInner from "./SidebarInner.vue"

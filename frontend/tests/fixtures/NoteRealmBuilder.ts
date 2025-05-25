@@ -1,4 +1,4 @@
-import type { NoteRealm } from "@/generated/backend"
+import type { NoteRealm } from "generated/backend"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import generateId from "./generateId"

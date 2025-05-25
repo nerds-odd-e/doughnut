@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Notebook } from "@/generated/backend"
+import type { Notebook } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"

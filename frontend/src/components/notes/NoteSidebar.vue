@@ -11,7 +11,7 @@
 import { type PropType } from "vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import Sidebar from "./Sidebar.vue"
-import type { NoteRealm } from "@/generated/backend"
+import type { NoteRealm } from "generated/backend"
 
 defineProps({
   noteRealm: { type: Object as PropType<NoteRealm>, required: true },

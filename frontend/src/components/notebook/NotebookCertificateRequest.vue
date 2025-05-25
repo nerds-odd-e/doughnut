@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
-import type { Notebook, NotebookCertificateApproval } from "@/generated/backend"
+import type { Notebook, NotebookCertificateApproval } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const { managedApi } = useLoadingApi()

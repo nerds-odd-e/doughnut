@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue"
-import type { BazaarNotebook, User } from "@/generated/backend"
+import type { BazaarNotebook, User } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"

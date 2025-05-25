@@ -1,4 +1,4 @@
-import type { CircleForUserView, Notebook } from "@/generated/backend"
+import type { CircleForUserView, Notebook } from "generated/backend"
 import NotebooksBuilder from "./BazaarNotebooksBuilder"
 import Builder from "./Builder"
 import generateId from "./generateId"

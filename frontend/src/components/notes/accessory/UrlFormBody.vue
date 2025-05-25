@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteAccessoriesDTO } from "@/generated/backend"
+import type { NoteAccessoriesDTO } from "generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import TextInput from "../../form/TextInput.vue"

@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { NoteTopology } from "@/generated/backend"
+import { NoteTopology } from "generated/backend"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 
 defineProps({

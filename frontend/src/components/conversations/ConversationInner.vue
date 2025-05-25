@@ -60,11 +60,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type {
-  User,
-  ConversationMessage,
-  Conversation,
-} from "@/generated/backend"
+import type { User, ConversationMessage, Conversation } from "generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"

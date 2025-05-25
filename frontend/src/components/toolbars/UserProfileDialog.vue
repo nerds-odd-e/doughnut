@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
-import type { User } from "@/generated/backend"
+import type { User } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { onMounted, ref } from "vue"

@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AnsweredQuestion, RecallPrompt } from "@/generated/backend"
+import type { AnsweredQuestion, RecallPrompt } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"

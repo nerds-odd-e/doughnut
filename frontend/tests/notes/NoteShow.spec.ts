@@ -1,5 +1,5 @@
 import NoteShow from "@/components/notes/NoteShow.vue"
-import type { NoteRealm } from "@/generated/backend"
+import type { NoteRealm } from "generated/backend"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"

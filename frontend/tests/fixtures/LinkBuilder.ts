@@ -1,5 +1,5 @@
-import type { Note } from "@/generated/backend"
-import { NoteTopology } from "@/generated/backend"
+import type { Note } from "generated/backend"
+import { NoteTopology } from "generated/backend"
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 

@@ -189,8 +189,8 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import type { Note } from "@/generated/backend"
-import type { NoteAccessory } from "@/generated/backend"
+import type { Note } from "generated/backend"
+import type { NoteAccessory } from "generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
 import SvgAddSibling from "../../svgs/SvgAddSibling.vue"

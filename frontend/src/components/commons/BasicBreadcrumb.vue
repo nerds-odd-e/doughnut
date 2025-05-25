@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { NoteTopology } from "@/generated/backend"
+import { NoteTopology } from "generated/backend"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 defineProps({ ancestors: Array as PropType<NoteTopology[]> })

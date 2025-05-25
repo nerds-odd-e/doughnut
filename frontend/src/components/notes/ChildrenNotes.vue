@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { Note } from "@/generated/backend"
+import type { Note } from "generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgCollapse from "../svgs/SvgCollapse.vue"
 import SvgExpand from "../svgs/SvgExpand.vue"

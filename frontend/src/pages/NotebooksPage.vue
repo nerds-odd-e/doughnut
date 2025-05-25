@@ -24,7 +24,7 @@
 
 <script setup lang="ts">
 import { inject, onMounted, ref, type Ref } from "vue"
-import type { Notebook, Subscription, User } from "@/generated/backend"
+import type { Notebook, Subscription, User } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"

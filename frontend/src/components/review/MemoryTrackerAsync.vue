@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import type { MemoryTracker } from "@/generated/backend"
+import type { MemoryTracker } from "generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "../notes/NoteShow.vue"

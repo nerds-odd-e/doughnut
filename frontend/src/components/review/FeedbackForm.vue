@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AssessmentQuestionInstance } from "@/generated/backend"
+import type { AssessmentQuestionInstance } from "generated/backend"
 import { ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi.ts"
 

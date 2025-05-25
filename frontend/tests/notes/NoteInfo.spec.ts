@@ -2,7 +2,7 @@ import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { NoteInfo } from "@/generated/backend"
+import type { NoteInfo } from "generated/backend"
 
 const stubResponse: NoteInfo = {
   memoryTrackers: [makeMe.aMemoryTracker.please()],

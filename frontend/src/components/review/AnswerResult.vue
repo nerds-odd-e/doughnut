@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AnsweredQuestion } from "@/generated/backend"
+import type { AnsweredQuestion } from "generated/backend"
 import type { PropType } from "vue"
 
 defineProps({

@@ -1,4 +1,4 @@
-import type { PredefinedQuestion } from "@/generated/backend"
+import type { PredefinedQuestion } from "generated/backend"
 
 function isMCQWithAnswerValid(predefinedQuestion: PredefinedQuestion): boolean {
   const { stem, choices } = predefinedQuestion.multipleChoicesQuestion

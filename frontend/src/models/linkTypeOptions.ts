@@ -1,4 +1,4 @@
-import { NoteTopology } from "@/generated/backend"
+import { NoteTopology } from "generated/backend"
 
 interface LinkTypeOption {
   label: NoteTopology.linkType

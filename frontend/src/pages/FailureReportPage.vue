@@ -25,7 +25,7 @@
 import { ref, onMounted } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
-import type { FailureReport } from "@/generated/backend"
+import type { FailureReport } from "generated/backend"
 
 interface Props {
   failureReportId: number

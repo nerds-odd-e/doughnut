@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { MemoryTrackerLite } from "@/generated/backend"
+import type { MemoryTrackerLite } from "generated/backend"
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()

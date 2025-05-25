@@ -58,7 +58,7 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import type { Notebook, User } from "@/generated/backend"
+import type { Notebook, User } from "generated/backend"
 import CheckInput from "@/components/form/CheckInput.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "../form/TextInput.vue"
