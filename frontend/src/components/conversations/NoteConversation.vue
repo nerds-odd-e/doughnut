@@ -42,7 +42,7 @@ import useLoadingApi from "@/managedApi/useLoadingApi.ts"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import ConversationInner from "./ConversationInner.vue"
 import { inject, ref, type Ref, onMounted } from "vue"
-import type { Conversation, User } from "generated/backend"
+import type { Conversation, User } from "@/generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
 

@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NoteAccessory } from "generated/backend"
+import type { NoteAccessory } from "@/generated/backend"
 import type { PropType } from "vue"
 import ShowImage from "./ShowImage.vue"
 

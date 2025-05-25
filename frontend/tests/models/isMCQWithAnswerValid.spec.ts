@@ -1,4 +1,4 @@
-import type { PredefinedQuestion } from "generated/backend"
+import type { PredefinedQuestion } from "@/generated/backend"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import makeMe from "@tests/fixtures/makeMe"
 

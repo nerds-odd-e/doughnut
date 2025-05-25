@@ -41,7 +41,7 @@
 <script lang="ts" setup>
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { GlobalAiModelSettings } from "generated/backend"
+import type { GlobalAiModelSettings } from "@/generated/backend"
 import Select from "../form/Select.vue"
 
 const props = defineProps({

@@ -135,7 +135,7 @@
 import { computed, inject, ref, type PropType, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type { NoteAccessory, User } from "generated/backend"
+import type { NoteAccessory, User } from "@/generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"

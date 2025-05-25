@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { Notebook } from "generated/backend"
+import type { Notebook } from "@/generated/backend"
 import SvgNotebook from "@/components/svgs/SvgNotebook.vue"
 
 defineProps({

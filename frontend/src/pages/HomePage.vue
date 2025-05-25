@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, type Ref, inject } from "vue"
-import type { User } from "generated/backend"
+import type { User } from "@/generated/backend"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 

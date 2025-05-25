@@ -41,7 +41,7 @@
 import type {
   PredefinedQuestion,
   QuestionSuggestionCreationParams,
-} from "generated/backend"
+} from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref } from "vue"
 

@@ -13,8 +13,8 @@
 
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader"
-import type { SuggestedQuestionForFineTuning } from "generated/backend"
-import { ApiError } from "generated/backend"
+import type { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import { ApiError } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 

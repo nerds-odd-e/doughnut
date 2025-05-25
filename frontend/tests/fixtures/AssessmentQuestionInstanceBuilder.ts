@@ -1,4 +1,4 @@
-import type { AssessmentQuestionInstance } from "generated/backend"
+import type { AssessmentQuestionInstance } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"

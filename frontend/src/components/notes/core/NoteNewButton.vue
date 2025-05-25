@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import type { StorageAccessor } from "../../../store/createNoteStorage"
-import type { Note } from "generated/backend"
+import type { Note } from "@/generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import NoteNewDialog from "../NoteNewDialog.vue"

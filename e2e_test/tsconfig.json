@@ -9,10 +9,7 @@
     "types": ["cypress", "node", "jquery", "@testing-library/cypress"],
     "typeRoots": ["types", "../node_modules/@types"],
     "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "paths": {
-      "generated/backend": ["../generated/backend"]
-    }
+    "noUnusedParameters": false
   },
   "include": [
     "types/**/*.d.ts",

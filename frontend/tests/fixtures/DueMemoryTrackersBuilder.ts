@@ -1,4 +1,4 @@
-import type { DueMemoryTrackers, MemoryTrackerLite } from "generated/backend"
+import type { DueMemoryTrackers, MemoryTrackerLite } from "@/generated/backend"
 import Builder from "./Builder"
 
 class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {

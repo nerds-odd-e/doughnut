@@ -2,7 +2,7 @@ import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import { type ConversationMessage } from "generated/backend"
+import { type ConversationMessage } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import { simulateAiResponse } from "./AiResponse.spec"
 

@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
-import type { Note } from "generated/backend"
+import type { Note } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"

@@ -2,7 +2,7 @@ import type {
   AssessmentAttempt,
   Notebook,
   RecallPrompt,
-} from "generated/backend"
+} from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

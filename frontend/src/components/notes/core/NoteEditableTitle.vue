@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { NoteTopology } from "generated/backend"
+import { NoteTopology } from "@/generated/backend"
 import { type StorageAccessor } from "../../../store/createNoteStorage"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import SeamlessTextEditor from "../../form/SeamlessTextEditor.vue"

@@ -31,7 +31,7 @@
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { AssessmentAttempt } from "generated/backend"
+import type { AssessmentAttempt } from "@/generated/backend"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
 import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
 

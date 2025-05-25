@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import { type PropType } from "vue"
-import type { Note } from "generated/backend"
+import type { Note } from "@/generated/backend"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import NoteEditableTitle from "./NoteEditableTitle.vue"
 import NoteTitleAsPredicate from "./NoteTitleAsPredicate.vue"

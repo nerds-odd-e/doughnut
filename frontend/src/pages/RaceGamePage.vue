@@ -61,7 +61,7 @@
 import ContainerPage from "./commons/ContainerPage.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref, onMounted } from "vue"
-import type { CurrentProgressDTO } from "generated/backend"
+import type { CurrentProgressDTO } from "@/generated/backend"
 
 const { managedApi } = useLoadingApi()
 const maxPosition = ref(20)

@@ -3,7 +3,7 @@ import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificat
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
-import type { AssessmentAttempt } from "generated/backend"
+import type { AssessmentAttempt } from "@/generated/backend"
 
 describe("assessment and certificate history page", () => {
   const user = makeMe.aUser.please()

@@ -1,6 +1,6 @@
-import { ApiError } from "generated/backend"
-import type { ApiRequestOptions } from "generated/backend/core/ApiRequestOptions"
-import type { ApiResult } from "generated/backend/core/ApiResult"
+import { ApiError } from "@/generated/backend"
+import type { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions"
+import type { ApiResult } from "@/generated/backend/core/ApiResult"
 import Builder from "./Builder"
 
 class ApiErrorBuilder extends Builder<ApiError> {

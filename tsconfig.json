@@ -20,11 +20,7 @@
     "noImplicitReturns": true,
     "removeComments": true,
     "allowUnreachableCode": false,
-    "incremental": true,
-    "baseUrl": ".",
-    "paths": {
-      "generated/backend": ["generated/backend"]
-    }
+    "incremental": true
   },
   "exclude": [
     "node_modules",

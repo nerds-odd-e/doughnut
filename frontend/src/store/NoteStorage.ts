@@ -1,4 +1,4 @@
-import type { Note, NoteRealm } from "generated/backend"
+import type { Note, NoteRealm } from "@/generated/backend"
 import type { Ref } from "vue"
 import { ref } from "vue"
 

@@ -1,5 +1,5 @@
 import MainMenu from "@/components/toolbars/MainMenu.vue"
-import type { User } from "generated/backend/models/User"
+import type { User } from "@/generated/backend/models/User"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"

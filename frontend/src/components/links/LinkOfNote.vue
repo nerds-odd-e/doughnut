@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import type { Note } from "generated/backend"
+import type { Note } from "@/generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import { colors } from "../../colors"

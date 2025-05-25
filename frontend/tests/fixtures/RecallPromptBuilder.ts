@@ -1,4 +1,4 @@
-import type { RecallPrompt } from "generated/backend"
+import type { RecallPrompt } from "@/generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
