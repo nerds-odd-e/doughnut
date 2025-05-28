@@ -6,7 +6,7 @@ buildscript {
 
 plugins {
   id 'java'
-  id 'org.springframework.boot' version '3.4.5'
+  id 'org.springframework.boot' version '3.4.6'
   // Spotless for the code style
   id "com.diffplug.spotless" version "7.0.4"
   id "com.github.ben-manes.versions" version "0.52.0"
