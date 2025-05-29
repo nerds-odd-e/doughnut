@@ -64,4 +64,32 @@ export OPENAI_API_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects
   jq -r ".payload.data" | base64 --decode)
 
 # Start server
-bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} -Dspring.openai.token=${OPENAI_API_TOKEN} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+export TZ="Asia/Singapore"
+export TERM=xterm
+export DEBIAN_FRONTEND=noninteractive
+export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
+        -XX:MaxRAMPercentage=85.0 \
+        -XX:+UseG1GC \
+        -XX:MaxGCPauseMillis=100 \
+        -XX:G1HeapRegionSize=32M \
+        -XX:InitiatingHeapOccupancyPercent=35 \
+        -XX:+UseStringDeduplication \
+        -XX:+UseCompressedOops \
+        -XX:+AlwaysPreTouch \
+        -XX:+UseNUMA \
+        -XX:+DisableExplicitGC \
+        -XX:+ParallelRefProcEnabled \
+        -XX:+PerfDisableSharedMem \
+        -XX:+UseLargePages \
+        -XX:LargePageSizeInBytes=2m \
+        -XX:+UseTransparentHugePages \
+        -XX:+ExitOnOutOfMemoryError \
+        -XX:+HeapDumpOnOutOfMemoryError \
+        -XX:HeapDumpPath=/var/log \
+        -XX:ActiveProcessorCount=2 \
+        -Djava.security.egd=file:/dev/./urandom \
+        -Dspring.output.ansi.enabled=never \
+        -Dspring.jmx.enabled=false \
+        -Dspring.liveBeansView.mbeanDomain=false"
+
+bash -c "java ${JAVA_OPTS} -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} -Dspring.openai.token=${OPENAI_API_TOKEN} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &

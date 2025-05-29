@@ -72,12 +72,13 @@ build {
   provisioner "shell" {
     environment_vars = [
       "DEBIAN_FRONTEND=noninteractive",
-      "TERM=linux",
-      "PYTHONWARNINGS=ignore::UserWarning"
+      "TERM=xterm",
+      "PYTHONWARNINGS=ignore::UserWarning",
+      "DPKG_FRONTEND=noninteractive"
     ]
     inline = [
-      "sudo apt-get update -y",
-      "sudo apt-get install -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' python3-full python3-venv python3-pip python3-dev gcc g++ make",
+      "sudo -E apt-get update -y",
+      "sudo -E apt-get install -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' -o Dpkg::Pre-Install-Pkgs::='/usr/sbin/dpkg-preconfigure --apt' python3-full python3-venv python3-pip python3-dev gcc g++ make",
       "sudo python3 -m venv /opt/salt-venv",
       "sudo /opt/salt-venv/bin/pip3 install --upgrade pip",
       "sudo /opt/salt-venv/bin/pip3 install --upgrade setuptools",
@@ -88,7 +89,11 @@ build {
       "sudo /opt/salt-venv/bin/pip3 install requests",
       "sudo /opt/salt-venv/bin/pip3 install pycryptodome",
       "sudo /opt/salt-venv/bin/pip3 install pyzmq",
-      "sudo /opt/salt-venv/bin/pip3 install salt==3005.5",
+      "sudo /opt/salt-venv/bin/pip3 install looseversion",
+      "sudo /opt/salt-venv/bin/pip3 install packaging",
+      "sudo /opt/salt-venv/bin/pip3 install certifi",
+      "sudo /opt/salt-venv/bin/pip3 install tornado",
+      "sudo /opt/salt-venv/bin/pip3 install salt==3006.10",
       "sudo mkdir -p /etc/salt /var/cache/salt /var/log/salt /var/run/salt /srv",
       "echo 'id: local' | sudo tee /etc/salt/minion",
       "sudo ln -sf /opt/salt-venv/bin/salt-minion /usr/local/bin/",
@@ -105,5 +110,16 @@ build {
     local_pillar_roots   = "salt/pillar"
     remote_state_tree    = "/srv/salt"
     remote_pillar_roots  = "/srv/pillar"
+    skip_bootstrap       = true
+    log_level           = "info"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo systemctl stop salt-minion",
+      "sudo systemctl disable salt-minion",
+      "sudo rm -rf /var/cache/salt /var/run/salt",
+      "sudo rm -f /etc/salt/minion_id"
+    ]
   }
 }
