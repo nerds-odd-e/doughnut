@@ -270,7 +270,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             ],
           }
         }
-        const noteBookTitle = data.map((n: any) => n.title).join(', ')
+        const noteBookTitle = data.map((n: Notebook) => n.title).join(', ')
         return {
           content: [
             {
@@ -280,7 +280,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        const errorMsg = (err as any).message || String(err)
+        const errorMsg = isErrorWithMessage(err) ? err.message : String(err)
         return {
           content: [
             {
@@ -310,7 +310,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        const errorMsg = (err as any).message || String(err)
+        const errorMsg = isErrorWithMessage(err) ? err.message : String(err)
         return {
           content: [
             {
@@ -339,7 +339,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        const errorMsg = (err as any).message || String(err)
+        const errorMsg = isErrorWithMessage(err) ? err.message : String(err)
         return {
           content: [
             {
@@ -369,3 +369,21 @@ main().catch((error) => {
   console.error('Server error:', error)
   process.exit(1)
 })
+
+interface Notebook {
+  title: string
+  // Add other properties if needed
+}
+
+interface ErrorWithMessage {
+  message: string
+}
+
+function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'message' in error &&
+    typeof (error as Record<string, unknown>).message === 'string'
+  )
+}
