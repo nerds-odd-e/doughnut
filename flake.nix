@@ -2,7 +2,7 @@
   description = "doughnut development environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -42,7 +42,7 @@
         ] else [];
 
         basePackages = with pkgs; [
-          zulu23
+          zulu24
           nodejs_22
           corepack_22
           git
