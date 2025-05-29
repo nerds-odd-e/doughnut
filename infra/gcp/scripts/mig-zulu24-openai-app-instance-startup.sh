@@ -14,8 +14,8 @@ gsutil cp gs://"${BUCKET}/backend_app_jar/${ARTIFACT}-${VERSION}.jar" "/opt/doug
 # Stop unneeded salt-minion
 systemctl stop salt-minion
 
-# Make Java 22 default
-export JAVA_HOME=/usr/lib/jvm/zre-22-amd64
+# Make JRE 24 default
+export JAVA_HOME=/usr/lib/jvm/zre-24-amd64
 export PATH=$PATH:$JAVA_HOME/bin
 
 export ACCESS_TOKEN=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \
