@@ -36,7 +36,7 @@ importers:
         version: 22.0.1(@babel/core@7.27.3)(cypress@14.4.0)(typescript@5.8.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.5
-        version: 2.2.5(esbuild@0.25.4)
+        version: 2.2.5(esbuild@0.25.5)
       '@biomejs/biome':
         specifier: 1.9.4
         version: 1.9.4
@@ -100,12 +100,6 @@ importers:
       wait-on:
         specifier: ^8.0.3
         version: 8.0.3
-
-  doughnut-mcp-server:
-    devDependencies:
-      esbuild:
-        specifier: 0.25.5
-        version: 0.25.5
 
   frontend:
     dependencies:
@@ -5678,10 +5672,10 @@ snapshots:
       - supports-color
       - typescript
 
-  '@bahmutov/cypress-esbuild-preprocessor@2.2.5(esbuild@0.25.4)':
+  '@bahmutov/cypress-esbuild-preprocessor@2.2.5(esbuild@0.25.5)':
     dependencies:
       debug: 4.4.1(supports-color@8.1.1)
-      esbuild: 0.25.4
+      esbuild: 0.25.5
     transitivePeerDependencies:
       - supports-color
 
