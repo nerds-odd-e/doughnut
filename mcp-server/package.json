@@ -13,11 +13,9 @@
     "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.mjs --format=esm",
     "format": "echo 'No formatting needed for doughnut-mcp-server'"
   },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0"
-  },
   "devDependencies": {
-    "@types/node": "^22.15.24",
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@types/node": "^22.15.27",
     "esbuild": "^0.25.4",
     "typescript": "5.8.3"
   }
