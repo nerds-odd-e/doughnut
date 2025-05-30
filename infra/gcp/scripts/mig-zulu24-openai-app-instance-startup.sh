@@ -99,15 +99,6 @@ bash -c "java ${JAVA_OPTS} -jar \
         -Dspring.datasource.password=${MYSQL_PASSWORD} \
         -Dspring.github_for_issues.token=${GITHUB_FOR_ISSUES_API_TOKEN} \
         -Dspring.openai.token=${OPENAI_API_TOKEN} \
-        -Dspring.datasource.hikari.connection-timeout=20000 \
-        -Dspring.datasource.hikari.minimum-idle=5 \
-        -Dspring.datasource.hikari.maximum-pool-size=12 \
-        -Dspring.datasource.hikari.idle-timeout=300000 \
-        -Dspring.datasource.hikari.max-lifetime=1200000 \
-        -Dspring.datasource.hikari.auto-commit=true \
-        -Dspring.datasource.hikari.connection-test-query=SELECT 1 \
-        -Dspring.datasource.hikari.validation-timeout=5000 \
-        -Dspring.datasource.hikari.leak-detection-threshold=60000 \
         -Dlogging.level.com.zaxxer.hikari=WARN \
         -Dlogging.level.com.zaxxer.hikari.HikariConfig=WARN \
         /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
