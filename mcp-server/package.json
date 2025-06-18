@@ -8,7 +8,13 @@
     "doughnut-mcp-server": "./build/index.js"
   },
   "files": ["build"],
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10.12.1"
+  },
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "syncpack fix-mismatches",
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.mjs --format=esm",
     "format": "echo 'No formatting needed for doughnut-mcp-server'"
