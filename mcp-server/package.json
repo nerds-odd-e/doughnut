@@ -7,7 +7,9 @@
   "bin": {
     "doughnut-mcp-server": "./build/index.js"
   },
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "engines": {
     "node": ">=22",
     "pnpm": ">=10.12.1"
@@ -20,7 +22,7 @@
     "format": "echo 'No formatting needed for doughnut-mcp-server'"
   },
   "devDependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@modelcontextprotocol/sdk": "^1.12.3",
     "@types/node": "^22.15.30",
     "esbuild": "^0.25.4",
     "typescript": "5.8.3"

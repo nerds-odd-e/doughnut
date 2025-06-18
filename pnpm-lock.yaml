@@ -44,8 +44,8 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.1
-        version: 1.12.1
+        specifier: ^1.12.3
+        version: 1.12.3
       '@testing-library/cypress':
         specifier: 10.0.3
         version: 10.0.3(cypress@14.4.1)
@@ -231,8 +231,8 @@ importers:
   mcp-server:
     devDependencies:
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.1
-        version: 1.12.1
+        specifier: ^1.12.3
+        version: 1.12.3
       '@types/node':
         specifier: ^22.15.30
         version: 22.15.30
@@ -1066,8 +1066,8 @@ packages:
   '@mixmark-io/domino@2.2.0':
     resolution: {integrity: sha512-Y28PR25bHXUg88kCV7nivXrP2Nj2RueZ3/l/jdx6J9f8J4nsEGcgX0Qe6lt7Pa+J79+kPiJU3LguR6O/6zrLOw==}
 
-  '@modelcontextprotocol/sdk@1.12.1':
-    resolution: {integrity: sha512-KG1CZhZfWg+u8pxeM/mByJDScJSrjjxLc8fwQqbsS8xCjBmQfMNEBTotYdNanKekepnfRI85GtgQlctLFpcYPw==}
+  '@modelcontextprotocol/sdk@1.12.3':
+    resolution: {integrity: sha512-DyVYSOafBvk3/j1Oka4z5BWT8o4AFmoNyZY9pALOm7Lh3GZglR71Co4r4dEUoqDWdDazIZQHBe7J2Nwkg6gHgQ==}
     engines: {node: '>=18'}
 
   '@noble/hashes@1.8.0':
@@ -6108,7 +6108,7 @@ snapshots:
 
   '@mixmark-io/domino@2.2.0': {}
 
-  '@modelcontextprotocol/sdk@1.12.1':
+  '@modelcontextprotocol/sdk@1.12.3':
     dependencies:
       ajv: 6.12.6
       content-type: 1.0.5
