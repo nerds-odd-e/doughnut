@@ -7,7 +7,9 @@
   "bin": {
     "doughnut-mcp-server": "./build/index.js"
   },
-  "files": ["build"],
+  "files": [
+    "build"
+  ],
   "engines": {
     "node": ">=22",
     "pnpm": ">=10.12.1"
