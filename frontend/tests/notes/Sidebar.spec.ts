@@ -78,7 +78,7 @@ describe("Sidebar", () => {
       }
     }
 
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: Mock class doesn't fully implement IntersectionObserver interface
     global.IntersectionObserver = MockIntersectionObserver as any
     /* eslint-enable */
 

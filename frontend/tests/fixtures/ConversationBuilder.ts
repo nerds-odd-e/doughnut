@@ -20,7 +20,7 @@ class ConversationBuilder extends Builder<Conversation> {
     return this
   }
   withoutId() {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: Needed to modify a property that might not exist in the type
     ;(this.data as any).id = undefined
     return this
   }

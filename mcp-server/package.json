@@ -7,9 +7,7 @@
   "bin": {
     "doughnut-mcp-server": "./build/index.js"
   },
-  "files": [
-    "build"
-  ],
+  "files": ["build"],
   "engines": {
     "node": ">=22",
     "pnpm": ">=10.12.1"
@@ -19,9 +17,11 @@
     "postinstall": "syncpack fix-mismatches",
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.mjs --format=esm",
-    "format": "echo 'No formatting needed for doughnut-mcp-server'"
+    "lint": "biome check .",
+    "format": "biome check --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "2.0.0",
     "@modelcontextprotocol/sdk": "^1.12.3",
     "@types/node": "^22.15.30",
     "esbuild": "^0.25.4",

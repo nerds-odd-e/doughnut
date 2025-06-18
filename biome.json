@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.0.0/schema.json",
   "vcs": {
     "clientKind": "git",
     "enabled": true,
@@ -7,34 +7,35 @@
     "defaultBranch": "main"
   },
   "files": {
-    "ignore": [
-      "**/.direnv",
-      "**/.git",
-      "**/.github",
-      "**/.gradle",
-      "**/.idea",
-      "**/.vscode",
-      "**/dist",
-      "**/gradle",
-      "**/node_modules",
-      "**/*.md",
-      "**/.eslintrc.cjs",
-      "**/index.html",
-      "backend",
-      "docs",
-      "doughnut_mobile",
-      "frontend",
-      "infra",
-      "mysql",
-      "secrets_public_keys",
-      "training_data",
-      "e2e_test/support/index.d.ts",
-      "**/cypress/screenshots/**",
-      "**/cypress/videos/**",
-      "**/cypress/downloads/**",
-      "**/*.feature",
-      "**/cucumber-json-formatter",
-      "**/cucumber-messages.ndjson"
+    "includes": [
+      "**",
+      "!**/.direnv",
+      "!**/.git",
+      "!**/.github",
+      "!**/.gradle",
+      "!**/.idea",
+      "!**/.vscode",
+      "!**/dist",
+      "!**/gradle",
+      "!**/node_modules",
+      "!**/*.md",
+      "!**/.eslintrc.cjs",
+      "!**/index.html",
+      "!**/backend",
+      "!**/docs",
+      "!**/doughnut_mobile",
+      "!**/frontend",
+      "!**/infra",
+      "!**/mysql",
+      "!**/secrets_public_keys",
+      "!**/training_data",
+      "!**/e2e_test/support/index.d.ts",
+      "!**/cypress/screenshots/**",
+      "!**/cypress/videos/**",
+      "!**/cypress/downloads/**",
+      "!**/*.feature",
+      "!**/cucumber-json-formatter",
+      "!**/cucumber-messages.ndjson"
     ],
     "ignoreUnknown": true
   },
@@ -44,7 +45,7 @@
     "indentWidth": 2,
     "lineWidth": 80
   },
-  "organizeImports": { "enabled": false },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "linter": {
     "enabled": true,
     "rules": {
@@ -52,7 +53,6 @@
       "complexity": {
         "noBannedTypes": "error",
         "noExtraBooleanCast": "error",
-        "noMultipleSpacesInRegularExpressionLiterals": "error",
         "noUselessCatch": "error",
         "noUselessConstructor": "error",
         "noUselessRename": "error",
@@ -60,11 +60,13 @@
         "noUselessThisAlias": "error",
         "noUselessTypeConstraint": "error",
         "noVoid": "error",
-        "noWith": "error",
         "useArrowFunction": "off",
         "useLiteralKeys": "error",
         "useRegexLiterals": "error",
-        "useSimplifiedLogicExpression": "error"
+        "useSimplifiedLogicExpression": "error",
+        "noAdjacentSpacesInRegex": "error",
+        "noArguments": "error",
+        "noCommaOperator": "error"
       },
       "correctness": {
         "noConstAssign": "error",
@@ -76,7 +78,6 @@
         "noInnerDeclarations": "error",
         "noInvalidConstructorSuper": "error",
         "noInvalidUseBeforeDeclaration": "warn",
-        "noNewSymbol": "error",
         "noNonoctalDecimalEscape": "error",
         "noPrecisionLoss": "error",
         "noSelfAssign": "error",
@@ -90,20 +91,18 @@
         "noUnusedImports": "error",
         "noUnusedLabels": "error",
         "noUnusedVariables": "error",
-        "useArrayLiterals": "off",
         "useIsNan": "error",
         "useValidForDirection": "error",
         "useYield": "error",
         "useHookAtTopLevel": "error",
-        "noUnusedPrivateClassMembers": "error"
+        "noUnusedPrivateClassMembers": "error",
+        "noInvalidBuiltinInstantiation": "error",
+        "useValidTypeof": "error"
       },
       "security": { "noGlobalEval": "error" },
       "style": {
-        "noArguments": "error",
-        "noCommaOperator": "error",
         "noInferrableTypes": "warn",
         "noNamespace": "error",
-        "noVar": "error",
         "useAsConstAssertion": "error",
         "useBlockStatements": "off",
         "useConst": "error",
@@ -112,7 +111,8 @@
         "useSingleVarDeclarator": "warn",
         "useImportType": "warn",
         "useExportType": "warn",
-        "useTemplate": "error"
+        "useTemplate": "error",
+        "useArrayLiterals": "off"
       },
       "suspicious": {
         "noAssignInExpressions": "error",
@@ -143,10 +143,11 @@
         "noUnsafeNegation": "error",
         "useDefaultSwitchClauseLast": "error",
         "useGetterReturn": "error",
-        "useValidTypeof": "error",
         "noConfusingVoidType": "warn",
         "noImplicitAnyLet": "warn",
-        "noRedundantUseStrict": "warn"
+        "noRedundantUseStrict": "warn",
+        "noWith": "error",
+        "noVar": "error"
       }
     }
   },
@@ -183,11 +184,10 @@
   },
   "overrides": [
     {
-      "include": ["**/e2e_test/**/*.{js,ts,jsx,tsx}"],
+      "includes": ["**/e2e_test/**/*.{js,ts,jsx,tsx}"],
       "linter": {
         "rules": {
           "style": {
-            "noArguments": "error",
             "noNonNullAssertion": "off"
           },
           "suspicious": {
@@ -198,7 +198,8 @@
           },
           "complexity": {
             "noForEach": "off",
-            "useOptionalChain": "off"
+            "useOptionalChain": "off",
+            "noArguments": "error"
           },
           "correctness": {
             "noUnusedVariables": "warn",
@@ -208,7 +209,7 @@
       }
     },
     {
-      "include": ["**/e2e_test/step_definitions/**/*.{ts,js}"],
+      "includes": ["**/e2e_test/step_definitions/**/*.{ts,js}"],
       "linter": {
         "rules": {
           "style": {

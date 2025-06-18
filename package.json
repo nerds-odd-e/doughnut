@@ -14,6 +14,8 @@
     "postinstall": "syncpack fix-mismatches",
     "start:mb": "mb",
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
+    "mcp-server:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server lint",
+    "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
     "frontend:build": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend build",
     "frontend:format_build": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend format && pnpm -C frontend build",
     "frontend:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend format",
@@ -45,8 +47,8 @@
     "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm run-p -clnr sut start:mb frontend:sut cy:open",
     "verify": "pnpm format:all && pnpm test",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
-    "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint",
-    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format",
+    "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint && pnpm mcp-server:lint",
+    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format && pnpm mcp-server:format",
     "bundle:all": "pnpm mcp-server:bundle && pnpm frontend:build"
   },
   "cypress-cucumber-preprocessor": {
@@ -59,7 +61,7 @@
     "@anev/ts-mountebank": "1.8.0",
     "@badeball/cypress-cucumber-preprocessor": "^22.1.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5",
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.0.0",
     "@modelcontextprotocol/sdk": "^1.12.3",
     "@testing-library/cypress": "10.0.3",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",

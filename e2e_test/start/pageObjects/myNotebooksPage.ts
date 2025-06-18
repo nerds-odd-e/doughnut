@@ -13,7 +13,6 @@ const myNotebooksPage = () => {
     navigateToPath(notePath: NotePath) {
       return notePath.path.reduce<ReturnType<typeof assumeNotePage>>(
         (page, noteTopology) => page.navigateToChild(noteTopology),
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
         this as any
       )
     },

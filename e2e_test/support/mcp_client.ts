@@ -41,7 +41,10 @@ class McpClient {
   async spawnAndConnectMcpServer({
     baseUrl,
     mcpToken,
-  }: { baseUrl: string; mcpToken: string }) {
+  }: {
+    baseUrl: string
+    mcpToken: string
+  }) {
     if (this.client !== null) {
       throw new Error(
         'MCP client is already connected. Please disconnect the previous client before connecting a new one.'
@@ -76,11 +79,7 @@ class McpClient {
     return true
   }
 
-  async callMcpTool({
-    apiName,
-  }: {
-    apiName: string
-  }) {
+  async callMcpTool({ apiName }: { apiName: string }) {
     if (!this.client) throw new Error('MCP client is not connected')
     const result = await this.client.callTool({
       name: apiName,

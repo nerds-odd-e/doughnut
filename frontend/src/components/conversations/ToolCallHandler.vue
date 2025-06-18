@@ -48,7 +48,7 @@ const suggestionTitle = computed(() => {
       return "Suggested title:"
     case "unknown":
       return `Unknown tool call: ${
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        // biome-ignore lint/suspicious/noExplicitAny: Type is dynamically determined at runtime
         (props.suggestion.content as any).functionName
       }`
     default:
