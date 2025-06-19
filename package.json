@@ -14,8 +14,6 @@
     "postinstall": "syncpack fix-mismatches",
     "start:mb": "mb",
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
-    "mcp-server:lint": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server lint",
-    "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
     "frontend:build": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend build",
     "frontend:format_build": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend format && pnpm -C frontend build",
     "frontend:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C frontend format",
@@ -47,8 +45,8 @@
     "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm run-p -clnr sut start:mb frontend:sut cy:open",
     "verify": "pnpm format:all && pnpm test",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
-    "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint && pnpm mcp-server:lint",
-    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format && pnpm mcp-server:format",
+    "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint",
+    "format:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:format && pnpm frontend:format && pnpm cy:format",
     "bundle:all": "pnpm mcp-server:bundle && pnpm frontend:build"
   },
   "cypress-cucumber-preprocessor": {
@@ -68,7 +66,7 @@
     "@types/jquery": "^3.5.32",
     "@types/node": "^22.15.30",
     "adm-zip": "^0.5.16",
-    "cypress": "14.4.1",
+    "cypress": "14.5.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.4.7",
