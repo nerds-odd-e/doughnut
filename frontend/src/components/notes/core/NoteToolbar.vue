@@ -161,6 +161,13 @@
           </li>
 
           <li>
+            <button class="daisy-btn daisy-w-full" @click="downloadDescendants">
+              <SvgDownload />
+              <span class="ms-2">Download All Descendants</span>
+            </button>
+          </li>
+
+          <li>
             <PopButton
               btn-class="daisy-w-full"
               title="Questions for the note"
@@ -215,6 +222,9 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
+import SvgDownload from "../../svgs/SvgDownload.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import { saveAs } from "file-saver"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
@@ -229,10 +239,20 @@ const router = useRouter()
 
 const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
+const { managedApi } = useLoadingApi()
+
 const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
   if (na) {
     emit("note-accessory-updated", na)
   }
   closer()
+}
+
+const downloadDescendants = async () => {
+  const result = await managedApi.restNoteController.getDescendants(note.id)
+  const blob = new Blob([JSON.stringify(result, null, 2)], {
+    type: "application/json",
+  })
+  saveAs(blob, `note-${note.id}-descendants.json`)
 }
 </script>

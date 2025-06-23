@@ -253,6 +253,25 @@ export class RestNoteControllerService {
     }
     /**
      * @param note
+     * @returns GraphRAGResult OK
+     * @throws ApiError
+     */
+    public getDescendants(
+        note: number,
+    ): CancelablePromise<GraphRAGResult> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/notes/{note}/descendants',
+            path: {
+                'note': note,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
      * @returns NoteAccessory OK
      * @throws ApiError
      */

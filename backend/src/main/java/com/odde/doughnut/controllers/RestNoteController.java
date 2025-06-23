@@ -13,7 +13,9 @@ import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.WikidataService;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
+import com.odde.doughnut.services.graphRAG.FocusNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
@@ -229,5 +231,17 @@ class RestNoteController {
     GraphRAGService graphRAGService =
         new GraphRAGService(new CharacterBasedTokenCountingStrategy());
     return graphRAGService.retrieve(note, tokenLimit);
+  }
+
+  @GetMapping("/{note}/descendants")
+  public GraphRAGResult getDescendants(@PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertReadAuthorization(note);
+    FocusNote focus = FocusNote.fromNote(note);
+    List<BareNote> descendants =
+        note.getAllDescendants().map(BareNote::fromNoteWithoutTruncate).toList();
+    GraphRAGResult result = new GraphRAGResult(focus);
+    result.getRelatedNotes().addAll(descendants);
+    return result;
   }
 }

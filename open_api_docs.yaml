@@ -2788,6 +2788,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GraphRAGResult"
+  /api/notes/{note}/descendants:
+    get:
+      tags:
+      - rest-note-controller
+      operationId: getDescendants
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GraphRAGResult"
   /api/notes/{note}/accessory:
     get:
       tags:

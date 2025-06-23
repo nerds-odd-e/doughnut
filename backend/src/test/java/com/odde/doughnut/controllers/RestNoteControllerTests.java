@@ -335,5 +335,25 @@ class RestNoteControllerTests {
           UnexpectedNoAccessRightException.class,
           () -> controller.getGraph(unauthorizedNote, 5000));
     }
+
+    @Test
+    void shouldReturnAllDescendants() throws UnexpectedNoAccessRightException {
+      Note grandchild = makeMe.aNote("Grandchild").under(child1).please();
+      makeMe.refresh(rootNote);
+      GraphRAGResult result = controller.getDescendants(rootNote);
+      assertThat(result.getFocusNote().getUri(), equalTo(rootNote.getUri()));
+      assertThat(result.getRelatedNotes(), hasSize(2));
+      assertThat(
+          result.getRelatedNotes().stream().map(n -> n.getTitle()).toList(),
+          containsInAnyOrder("Child 1", "Grandchild"));
+    }
+
+    @Test
+    void shouldThrowWhenUserDoesNotOwnTheNote() {
+      User otherUser = makeMe.aUser().please();
+      Note otherUsersNote = makeMe.aNote().creatorAndOwner(otherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class, () -> controller.getDescendants(otherUsersNote));
+    }
   }
 }
