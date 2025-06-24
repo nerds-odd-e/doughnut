@@ -59,7 +59,7 @@
     "@anev/ts-mountebank": "1.8.0",
     "@badeball/cypress-cucumber-preprocessor": "^22.1.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5",
-    "@biomejs/biome": "2.0.4",
+    "@biomejs/biome": "2.0.5",
     "@modelcontextprotocol/sdk": "^1.12.3",
     "@testing-library/cypress": "10.0.3",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
