@@ -204,8 +204,8 @@ importers:
         specifier: ^28.7.0
         version: 28.7.0(@babel/parser@7.27.5)(vue@3.5.17(typescript@5.8.3))
       unplugin-vue-inspector:
-        specifier: ^2.3.1
-        version: 2.3.1(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0))
+        specifier: ^2.3.2
+        version: 2.3.2(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0))
       unplugin-vue-router:
         specifier: ^0.12.0
         version: 0.12.0(vue-router@4.5.1(vue@3.5.17(typescript@5.8.3)))(vue@3.5.17(typescript@5.8.3))
@@ -4479,8 +4479,8 @@ packages:
       '@nuxt/kit':
         optional: true
 
-  unplugin-vue-inspector@2.3.1:
-    resolution: {integrity: sha512-eFnJjS546hvEy0RKem4pss7lEzwyivYWgsoaERyGtt6BOE54VPmSnDSy/ZpX5fUHyau35cV2b4UIwIc/qYtuUA==}
+  unplugin-vue-inspector@2.3.2:
+    resolution: {integrity: sha512-RA5SPIY881SaD5hEyRhnsa6BuNJ31mdo1m/0EZgjhmQI7zCE9DokAjNctZGGXgzrrOxc1WYK8MrnxMdvfhed6w==}
 
   unplugin-vue-router@0.12.0:
     resolution: {integrity: sha512-xjgheKU0MegvXQcy62GVea0LjyOdMxN0/QH+ijN29W62ZlMhG7o7K+0AYqfpprvPwpWtuRjiyC5jnV2SxWye2w==}
@@ -4558,10 +4558,10 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
-  vite-plugin-vue-inspector@5.3.1:
-    resolution: {integrity: sha512-cBk172kZKTdvGpJuzCCLg8lJ909wopwsu3Ve9FsL1XsnLBiRT9U3MePcqrgGHgCX2ZgkqZmAGR8taxw+TV6s7A==}
+  vite-plugin-vue-inspector@5.3.2:
+    resolution: {integrity: sha512-YvEKooQcSiBTAs0DoYLfefNja9bLgkFM7NI2b07bE2SruuvX0MEa9cMaxjKVMkeCp5Nz9FRIdcN1rOdFVBeL6Q==}
     peerDependencies:
-      vite: ^3.0.0-0 || ^4.0.0-0 || ^5.0.0-0 || ^6.0.0-0
+      vite: ^3.0.0-0 || ^4.0.0-0 || ^5.0.0-0 || ^6.0.0-0 || ^7.0.0-0
 
   vite-tsconfig-paths@5.1.4:
     resolution: {integrity: sha512-cYj0LRuLV2c2sMqhqhGpaO3LretdtMn/BVX4cPLanIZuwwrkVl+lK84E/miEXkCHWXuq65rhNN4rXsBcOB3S4w==}
@@ -9387,11 +9387,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  unplugin-vue-inspector@2.3.1(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)):
+  unplugin-vue-inspector@2.3.2(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
       kolorist: 1.8.0
       unplugin: 1.16.1
-      vite-plugin-vue-inspector: 5.3.1(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0))
+      vite-plugin-vue-inspector: 5.3.2(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0))
     transitivePeerDependencies:
       - supports-color
       - vite
@@ -9504,7 +9504,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-vue-inspector@5.3.1(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)):
+  vite-plugin-vue-inspector@5.3.2(vite@6.3.5(@types/node@22.15.32)(jiti@1.21.7)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)):
     dependencies:
       '@babel/core': 7.27.4
       '@babel/plugin-proposal-decorators': 7.27.1(@babel/core@7.27.4)
