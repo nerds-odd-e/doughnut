@@ -93,7 +93,7 @@ build {
       "sudo /opt/salt-venv/bin/pip3 install packaging",
       "sudo /opt/salt-venv/bin/pip3 install certifi",
       "sudo /opt/salt-venv/bin/pip3 install tornado",
-      "sudo /opt/salt-venv/bin/pip3 install salt==3006.11",
+      "sudo /opt/salt-venv/bin/pip3 install salt==3006.13",
       "sudo mkdir -p /etc/salt /var/cache/salt /var/log/salt /var/run/salt /srv",
       "echo 'id: local' | sudo tee /etc/salt/minion",
       "sudo ln -sf /opt/salt-venv/bin/salt-minion /usr/local/bin/",
