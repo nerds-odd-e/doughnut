@@ -21,7 +21,7 @@
   "dependencies": {
     "file-saver": "^2.0.5",
     "intersection-observer": "^0.12.2",
-    "marked": "^15.0.12",
+    "marked": "^16.0.0",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.3",
     "turndown": "^7.2.0",
@@ -52,7 +52,7 @@
     "terser": "^5.43.1",
     "typescript": "5.8.3",
     "unplugin-auto-import": "^19.3.0",
-    "unplugin-vue-components": "^28.7.0",
+    "unplugin-vue-components": "^28.8.0",
     "unplugin-vue-inspector": "^2.3.2",
     "unplugin-vue-router": "^0.12.0",
     "vite": "7.0.0",
