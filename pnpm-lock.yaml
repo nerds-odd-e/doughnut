@@ -168,8 +168,8 @@ importers:
         specifier: ^4.12.23
         version: 4.12.24(postcss@8.5.6)
       es-toolkit:
-        specifier: ^1.39.5
-        version: 1.39.5
+        specifier: ^1.39.6
+        version: 1.39.6
       gsap:
         specifier: ^3.13.0
         version: 3.13.0
@@ -2173,8 +2173,8 @@ packages:
     resolution: {integrity: sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==}
     engines: {node: '>= 0.4'}
 
-  es-toolkit@1.39.5:
-    resolution: {integrity: sha512-z9V0qU4lx1TBXDNFWfAASWk6RNU6c6+TJBKE+FLIg8u0XJ6Yw58Hi0yX8ftEouj6p1QARRlXLFfHbIli93BdQQ==}
+  es-toolkit@1.39.6:
+    resolution: {integrity: sha512-uiVjnLem6kkfXumlwUEWEKnwUN5QbSEB0DHy2rNJt0nkYcob5K0TXJ7oJRzhAcvx+SRmz4TahKyN5V9cly/IPA==}
 
   esbuild@0.25.5:
     resolution: {integrity: sha512-P8OtKZRv/5J5hhz0cUAdu/cLuPIKXpQl1R9pZtvmHWQvrAUVd0UNIPT4IB4W3rNOqVO0rlqHmCIbSwxh/c9yUQ==}
@@ -6904,7 +6904,7 @@ snapshots:
       has-tostringtag: 1.0.2
       hasown: 2.0.2
 
-  es-toolkit@1.39.5: {}
+  es-toolkit@1.39.6: {}
 
   esbuild@0.25.5:
     optionalDependencies:
