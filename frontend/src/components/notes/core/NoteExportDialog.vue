@@ -1,4 +1,6 @@
 <template>
+  <div class="daisy-card">
+    <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
       <!-- Descendants Export -->
       <details :open="expandedDescendants" class="daisy-collapse daisy-bg-base-200 daisy-rounded-box daisy-mt-4">
@@ -49,6 +51,29 @@
           Export Note Graph (JSON)
         </summary>
         <div v-if="expandedGraph" class="daisy-mt-4">
+          <div class="daisy-flex daisy-items-center daisy-gap-2 daisy-mb-2">
+            <label for="token-limit" class="daisy-label-text">Token Limit:</label>
+            <input
+              id="token-limit"
+              type="number"
+              min="100"
+              max="10000"
+              step="100"
+              v-model.number="tokenLimit"
+              class="daisy-input daisy-input-sm daisy-w-24"
+              data-testid="token-limit-input"
+            />
+            <button
+              class="daisy-btn daisy-btn-ghost daisy-btn-xs"
+              @click="refreshGraph"
+              :disabled="loadingGraph"
+              data-testid="refresh-graph-btn"
+              aria-label="Refresh Graph"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M4 4v5h.582M20 20v-5h-.581M19.418 9A7.994 7.994 0 0 0 12 4a8 8 0 1 0 7.418 5"/></svg>
+            </button>
+            <span v-if="loadingGraph" class="daisy-loading daisy-loading-spinner daisy-loading-xs"></span>
+          </div>
           <textarea
             class="daisy-textarea daisy-textarea-bordered daisy-w-full daisy-h-48 daisy-bg-base-100 daisy-font-mono daisy-text-xs"
             readonly
@@ -78,6 +103,8 @@
           </div>
         </div>
       </details>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -97,6 +124,8 @@ const jsonDescendants = ref("")
 const jsonGraph = ref("")
 const copiedDescendants = ref(false)
 const copiedGraph = ref(false)
+const tokenLimit = ref(5000)
+const loadingGraph = ref(false)
 
 watch(
   () => expandedDescendants.value,
@@ -114,11 +143,27 @@ watch(
   () => expandedGraph.value,
   async (val) => {
     if (val && !jsonGraph.value) {
-      const result = await managedApi.restNoteController.getGraph(props.note.id)
-      jsonGraph.value = JSON.stringify(result, null, 2)
+      await fetchGraph()
     }
   }
 )
+
+async function fetchGraph() {
+  loadingGraph.value = true
+  try {
+    const result = await managedApi.restNoteController.getGraph(
+      props.note.id,
+      tokenLimit.value
+    )
+    jsonGraph.value = JSON.stringify(result, null, 2)
+  } finally {
+    loadingGraph.value = false
+  }
+}
+
+function refreshGraph() {
+  fetchGraph()
+}
 
 function toggleExpanded(which: "descendants" | "graph", event: Event) {
   event.preventDefault()

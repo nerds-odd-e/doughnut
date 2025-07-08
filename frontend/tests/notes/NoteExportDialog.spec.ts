@@ -91,7 +91,8 @@ describe("NoteExportDialog", () => {
     })
     // Should call API once
     expect(helper.managedApi.restNoteController.getGraph).toHaveBeenCalledWith(
-      note.id
+      note.id,
+      5000
     )
   })
 
@@ -128,5 +129,35 @@ describe("NoteExportDialog", () => {
     await fireEvent.click(getByText("Export Note Graph (JSON)"))
     await waitFor(() => getByTestId("graph-json-textarea"))
     expect(getGraphMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("allows customizing token limit and refreshes graph", async () => {
+    const note = makeMe.aNote.please()
+    const graphData1 = { focusNote: { id: note.id }, relatedNotes: [] }
+    const graphData2 = {
+      focusNote: { id: note.id, token: 1234 },
+      relatedNotes: [],
+    }
+    const getGraphMock = vi
+      .fn()
+      .mockResolvedValueOnce(graphData1)
+      .mockResolvedValueOnce(graphData2)
+    helper.managedApi.restNoteController.getGraph = getGraphMock
+    const { getByText, getByTestId } = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .render()
+    await fireEvent.click(getByText("Export Note Graph (JSON)"))
+    await waitFor(() => getByTestId("graph-json-textarea"))
+    // Change token limit
+    const input = getByTestId("token-limit-input") as HTMLInputElement
+    input.value = "1234"
+    await fireEvent.input(input)
+    await fireEvent.click(getByTestId("refresh-graph-btn"))
+    await waitFor(() => {
+      expect(getGraphMock).toHaveBeenLastCalledWith(note.id, 1234)
+      const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
+      expect(textarea.value).toContain('"token": 1234')
+    })
   })
 })
