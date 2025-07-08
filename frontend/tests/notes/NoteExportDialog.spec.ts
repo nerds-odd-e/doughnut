@@ -8,23 +8,65 @@ import { saveAs } from "file-saver"
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
 describe("NoteExportDialog", () => {
-  it("downloads all descendants as JSON when button is clicked", async () => {
+  it("fetches and displays descendants JSON when expanded", async () => {
     const note = makeMe.aNote.please()
     const descendantsData = { focusNote: { id: note.id }, relatedNotes: [] }
     helper.managedApi.restNoteController.getDescendants = vi
       .fn()
       .mockResolvedValue(descendantsData)
-    const { getByText } = helper
+    const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
-    const button = getByText("Download All Descendants (JSON)")
-    await fireEvent.click(button)
+    // Initially, textarea is not visible
+    expect(queryByTestId("descendants-json-textarea")).toBeNull()
+    // Expand the details
+    await fireEvent.click(getByText("Export Descendants (JSON)"))
     await waitFor(() => {
-      expect(
-        helper.managedApi.restNoteController.getDescendants
-      ).toHaveBeenCalledWith(note.id)
-      expect(saveAs).toHaveBeenCalled()
+      const textarea = getByTestId(
+        "descendants-json-textarea"
+      ) as HTMLTextAreaElement
+      expect(textarea).toBeTruthy()
+      expect(textarea.value).toContain('"focusNote"')
     })
+    // Should call API once
+    expect(
+      helper.managedApi.restNoteController.getDescendants
+    ).toHaveBeenCalledWith(note.id)
+  })
+
+  it("downloads JSON when download button is clicked", async () => {
+    const note = makeMe.aNote.please()
+    const descendantsData = { focusNote: { id: note.id }, relatedNotes: [] }
+    helper.managedApi.restNoteController.getDescendants = vi
+      .fn()
+      .mockResolvedValue(descendantsData)
+    const { getByText, getByTestId } = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .render()
+    await fireEvent.click(getByText("Export Descendants (JSON)"))
+    await waitFor(() => getByTestId("download-json-btn"))
+    await fireEvent.click(getByTestId("download-json-btn"))
+    expect(saveAs).toHaveBeenCalled()
+  })
+
+  it("does not refetch JSON if already loaded when toggling open/close", async () => {
+    const note = makeMe.aNote.please()
+    const descendantsData = { focusNote: { id: note.id }, relatedNotes: [] }
+    const getDescendantsMock = vi.fn().mockResolvedValue(descendantsData)
+    helper.managedApi.restNoteController.getDescendants = getDescendantsMock
+    const { getByText, getByTestId } = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .render()
+    await fireEvent.click(getByText("Export Descendants (JSON)"))
+    await waitFor(() => getByTestId("descendants-json-textarea"))
+    expect(getDescendantsMock).toHaveBeenCalledTimes(1)
+    // Close and reopen
+    await fireEvent.click(getByText("Export Descendants (JSON)"))
+    await fireEvent.click(getByText("Export Descendants (JSON)"))
+    await waitFor(() => getByTestId("descendants-json-textarea"))
+    expect(getDescendantsMock).toHaveBeenCalledTimes(1)
   })
 })

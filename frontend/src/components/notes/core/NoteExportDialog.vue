@@ -2,32 +2,63 @@
   <div class="daisy-card daisy-w-96">
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
-      <button class="daisy-btn daisy-btn-primary w-full" @click="downloadDescendants">
-        <SvgDownload />
-        <span class="ms-2">Download All Descendants (JSON)</span>
-      </button>
+      <details :open="expanded">
+        <summary class="daisy-btn daisy-btn-primary w-full" @click="toggleExpanded">Export Descendants (JSON)</summary>
+        <div v-if="expanded" class="mt-4">
+          <textarea
+            class="daisy-textarea w-full h-48"
+            readonly
+            :value="jsonData"
+            data-testid="descendants-json-textarea"
+          />
+          <button
+            class="daisy-btn daisy-btn-secondary w-full mt-2"
+            @click="downloadJson"
+            :disabled="!jsonData"
+            data-testid="download-json-btn"
+          >
+            <SvgDownload />
+            <span class="ms-2">Download JSON</span>
+          </button>
+        </div>
+      </details>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, watch } from "vue"
+import type { Note } from "@/generated/backend"
 import { saveAs } from "file-saver"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import SvgDownload from "../../svgs/SvgDownload.vue"
-import type { Note } from "@/generated/backend"
 
 const props = defineProps<{ note: Note }>()
-const emit = defineEmits(["close-dialog"])
 const { managedApi } = useLoadingApi()
 
-const downloadDescendants = async () => {
-  const result = await managedApi.restNoteController.getDescendants(
-    props.note.id
-  )
-  const blob = new Blob([JSON.stringify(result, null, 2)], {
-    type: "application/json",
-  })
+const expanded = ref(false)
+const jsonData = ref("")
+
+watch(
+  () => expanded.value,
+  async (val) => {
+    if (val && !jsonData.value) {
+      const result = await managedApi.restNoteController.getDescendants(
+        props.note.id
+      )
+      jsonData.value = JSON.stringify(result, null, 2)
+    }
+  }
+)
+
+function toggleExpanded(event: Event) {
+  event.preventDefault()
+  expanded.value = !expanded.value
+}
+
+function downloadJson() {
+  if (!jsonData.value) return
+  const blob = new Blob([jsonData.value], { type: "application/json" })
   saveAs(blob, `note-${props.note.id}-descendants.json`)
-  emit("close-dialog")
 }
 </script>
