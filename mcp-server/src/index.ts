@@ -219,19 +219,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     case 'get_notebook_list': {
       try {
-        const notebooks =
-          await api.restNotebookController.getNotebookList(authToken)
-        if (!Array.isArray(notebooks)) {
+        const notebooksViewed = await api.restNotebookController.myNotebooks()
+        if (!(notebooksViewed && Array.isArray(notebooksViewed.notebooks))) {
           return {
             content: [
               {
                 type: 'text',
-                text: `ERROR: Unexpected response from get-notebook-list: ${JSON.stringify(notebooks)}`,
+                text: `ERROR: Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`,
               },
             ],
           }
         }
-        const noteBookTitle = notebooks.map((n: any) => n.title).join(', ')
+        const noteBookTitle = notebooksViewed.notebooks
+          .map((n: any) => n.title)
+          .join(', ')
         return {
           content: [
             {

@@ -6,7 +6,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -14,15 +13,21 @@ import org.springframework.web.context.annotation.RequestScope;
 @Component
 @RequestScope
 public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
-  @Autowired UserRepository userRepository;
-  @Autowired ModelFactoryService modelFactoryService;
-  String externalId = null;
-  User user = null;
+  private final UserRepository userRepository;
+  private final ModelFactoryService modelFactoryService;
+  private String externalId = null;
+  private User user = null;
 
-  public CurrentUserFetcherFromRequest(HttpServletRequest request) {
-    String mcpToken = request.getHeader("mcpToken");
-    if (mcpToken != null && !mcpToken.isEmpty()) {
-      user = modelFactoryService.findUserByToken(mcpToken).orElse(null);
+  public CurrentUserFetcherFromRequest(
+      HttpServletRequest request,
+      UserRepository userRepository,
+      ModelFactoryService modelFactoryService) {
+    this.userRepository = userRepository;
+    this.modelFactoryService = modelFactoryService;
+    String authHeader = request.getHeader("Authorization");
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      String token = authHeader.substring(7);
+      user = modelFactoryService.findUserByToken(token).orElse(null);
       if (user != null) {
         externalId = user.getExternalIdentifier();
         return;
