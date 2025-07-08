@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
@@ -17,11 +18,14 @@ public class RecallQuestionService {
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public RecallQuestionService(
-      OpenAiApi openAiApi, ModelFactoryService modelFactoryService, Randomizer randomizer) {
+      OpenAiApi openAiApi,
+      ModelFactoryService modelFactoryService,
+      Randomizer randomizer,
+      ObjectMapper objectMapper) {
     this.modelFactoryService = modelFactoryService;
     aiQuestionGenerator =
         new AiQuestionGenerator(
-            openAiApi, new GlobalSettingsService(modelFactoryService), randomizer);
+            openAiApi, new GlobalSettingsService(modelFactoryService), randomizer, objectMapper);
     this.predefinedQuestionService =
         new PredefinedQuestionService(modelFactoryService, aiQuestionGenerator);
   }

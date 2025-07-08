@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
@@ -34,8 +36,11 @@ class AiQuestionGeneratorTests {
   @BeforeEach
   void setup() {
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, globalSettingsService, new RealRandomizer());
+        new AiQuestionGenerator(
+            openAiApi, globalSettingsService, new RealRandomizer(), objectMapper);
 
     // Initialize chat completion mock
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
@@ -106,9 +111,14 @@ class AiQuestionGeneratorTests {
     // Setup a mocked randomizer
     com.odde.doughnut.models.Randomizer mockedRandomizer =
         mock(com.odde.doughnut.models.Randomizer.class);
+    ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
         new AiQuestionGenerator(
-            openAiApi, new GlobalSettingsService(modelFactoryService), mockedRandomizer);
+            openAiApi,
+            new GlobalSettingsService(modelFactoryService),
+            mockedRandomizer,
+            objectMapper);
 
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();

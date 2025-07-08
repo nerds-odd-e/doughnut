@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
@@ -13,12 +14,15 @@ import org.springframework.stereotype.Service;
 public final class NotebookAssistantForNoteServiceFactory {
   private final GlobalSettingsService globalSettingsService;
   private final OpenAiApiHandler openAiApiHandler;
+  private final ObjectMapper objectMapper;
 
   public NotebookAssistantForNoteServiceFactory(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      GlobalSettingsService globalSettingsService) {
+      GlobalSettingsService globalSettingsService,
+      ObjectMapper objectMapper) {
     this.globalSettingsService = globalSettingsService;
     this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    this.objectMapper = objectMapper;
   }
 
   private String getNotebookAssistantId(Notebook notebook) {
@@ -44,7 +48,7 @@ public final class NotebookAssistantForNoteServiceFactory {
   private NotebookAssistantForNoteService getServiceByAssistantId(String assistantId, Note note) {
     OpenAiAssistant assistantServiceForNotebook =
         new OpenAiAssistant(openAiApiHandler, assistantId);
-    return new NotebookAssistantForNoteService(assistantServiceForNotebook, note);
+    return new NotebookAssistantForNoteService(assistantServiceForNotebook, note, objectMapper);
   }
 
   public NoteAutomationService createNoteAutomationService(Note note) {
@@ -54,7 +58,8 @@ public final class NotebookAssistantForNoteServiceFactory {
   }
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
-    return new NoteQuestionGenerationService(globalSettingsService, note, openAiApiHandler);
+    return new NoteQuestionGenerationService(
+        globalSettingsService, note, openAiApiHandler, objectMapper);
   }
 
   public ChatAboutNoteService createChatAboutNoteService(Note note) {

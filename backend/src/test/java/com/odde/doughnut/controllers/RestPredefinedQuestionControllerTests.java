@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -49,12 +50,24 @@ class RestPredefinedQuestionControllerTests {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new RestPredefinedQuestionController(
-            openAiApi, modelFactoryService, currentUser, testabilitySettings);
+            openAiApi,
+            modelFactoryService,
+            currentUser,
+            testabilitySettings,
+            getTestObjectMapper());
   }
 
   RestPredefinedQuestionController nullUserController() {
     return new RestPredefinedQuestionController(
-        openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        openAiApi,
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        testabilitySettings,
+        getTestObjectMapper());
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

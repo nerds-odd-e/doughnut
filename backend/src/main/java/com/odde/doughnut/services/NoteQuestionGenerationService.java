@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -21,12 +20,14 @@ public class NoteQuestionGenerationService {
   private final ObjectMapper objectMapper;
 
   public NoteQuestionGenerationService(
-      GlobalSettingsService globalSettingsService, Note note, OpenAiApiHandler openAiApiHandler) {
+      GlobalSettingsService globalSettingsService,
+      Note note,
+      OpenAiApiHandler openAiApiHandler,
+      ObjectMapper objectMapper) {
     this.globalSettingsService = globalSettingsService;
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
-    this.objectMapper = new ObjectMapper();
-    this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    this.objectMapper = objectMapper;
   }
 
   public MCQWithAnswer generateQuestion(MessageRequest additionalMessage)

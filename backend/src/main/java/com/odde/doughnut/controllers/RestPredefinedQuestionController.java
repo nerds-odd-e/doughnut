@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -36,7 +37,8 @@ class RestPredefinedQuestionController {
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      ObjectMapper objectMapper) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -44,7 +46,8 @@ class RestPredefinedQuestionController {
         new AiQuestionGenerator(
             openAiApi,
             new GlobalSettingsService(modelFactoryService),
-            testabilitySettings.getRandomizer());
+            testabilitySettings.getRandomizer(),
+            objectMapper);
     this.predefinedQuestionService =
         new PredefinedQuestionService(modelFactoryService, aiQuestionGenerator);
   }

@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
@@ -59,12 +60,17 @@ class RestAiControllerTest {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+        new NotebookAssistantForNoteServiceFactory(
+            openAiApi, globalSettingsService, getTestObjectMapper());
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
         new RestAiController(
             notebookAssistantForNoteServiceFactory, new OtherAiServices(openAiApi), currentUser);
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

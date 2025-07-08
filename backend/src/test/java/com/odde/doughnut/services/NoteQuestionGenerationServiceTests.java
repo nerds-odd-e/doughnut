@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
@@ -47,8 +48,13 @@ class NoteQuestionGenerationServiceTests {
     // Initialize common services
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+        new NotebookAssistantForNoteServiceFactory(
+            openAiApi, globalSettingsService, getTestObjectMapper());
     service = notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
@@ -79,12 +80,17 @@ public class RestConversationMessageControllerAiReplyTests {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+        new NotebookAssistantForNoteServiceFactory(
+            openAiApi, globalSettingsService, getTestObjectMapper());
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
         new RestConversationMessageController(
             currentUser, conversationService, notebookAssistantForNoteServiceFactory);
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

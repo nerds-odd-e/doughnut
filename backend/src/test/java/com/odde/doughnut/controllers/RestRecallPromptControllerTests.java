@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -70,12 +71,20 @@ class RestRecallPromptControllerTests {
 
     controller =
         new RestRecallPromptController(
-            openAiApi, makeMe.modelFactoryService, currentUser, testabilitySettings);
+            openAiApi,
+            makeMe.modelFactoryService,
+            currentUser,
+            testabilitySettings,
+            getTestObjectMapper());
   }
 
   RestRecallPromptController nullUserController() {
     return new RestRecallPromptController(
-        openAiApi, modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        openAiApi,
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        testabilitySettings,
+        getTestObjectMapper());
   }
 
   @Nested
@@ -192,7 +201,8 @@ class RestRecallPromptControllerTests {
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
+                    testabilitySettings,
+                    getTestObjectMapper());
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -276,7 +286,8 @@ class RestRecallPromptControllerTests {
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
-                    testabilitySettings);
+                    testabilitySettings,
+                    getTestObjectMapper());
             restAiController.contest(recallPrompt);
           });
     }
@@ -508,5 +519,9 @@ class RestRecallPromptControllerTests {
       assertThat(result.rejected, equalTo(true));
       assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
     }
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 }

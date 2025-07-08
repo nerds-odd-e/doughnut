@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
@@ -39,8 +40,13 @@ class AiOpenAiAssistantFactoryWithDBTest {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, globalSettingsService, new NonRandomizer());
+        new AiQuestionGenerator(
+            openAiApi, globalSettingsService, new NonRandomizer(), getTestObjectMapper());
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

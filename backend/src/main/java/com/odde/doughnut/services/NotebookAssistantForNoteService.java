@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
@@ -9,11 +10,14 @@ import java.util.List;
 
 public class NotebookAssistantForNoteService {
   private final OpenAiAssistant assistantService;
+  private final ObjectMapper objectMapper;
   final Note note;
 
-  public NotebookAssistantForNoteService(OpenAiAssistant openAiAssistant, Note note) {
+  public NotebookAssistantForNoteService(
+      OpenAiAssistant openAiAssistant, Note note, ObjectMapper objectMapper) {
     this.assistantService = openAiAssistant;
     this.note = note;
+    this.objectMapper = objectMapper;
   }
 
   protected AssistantThread createThreadWithNoteInfo(List<MessageRequest> additionalMessages) {

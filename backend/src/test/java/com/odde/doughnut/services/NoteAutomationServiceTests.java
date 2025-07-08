@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -42,7 +43,9 @@ class NoteAutomationServiceTests {
 
     // Initialize common services
     assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
-    service = new NoteAutomationService(new NotebookAssistantForNoteService(assistant, testNote));
+    service =
+        new NoteAutomationService(
+            new NotebookAssistantForNoteService(assistant, testNote, getTestObjectMapper()));
   }
 
   @Test
@@ -55,5 +58,9 @@ class NoteAutomationServiceTests {
     String result = service.suggestTitle();
 
     assertThat(result, is(nullValue()));
+  }
+
+  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+    return new ObjectMapperConfig().objectMapper();
   }
 }

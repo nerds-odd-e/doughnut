@@ -1,6 +1,7 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -17,11 +18,12 @@ import java.util.List;
 public record AiQuestionGenerator(
     OpenAiApi openAiApi,
     GlobalSettingsService globalSettingsService,
-    com.odde.doughnut.models.Randomizer randomizer) {
+    com.odde.doughnut.models.Randomizer randomizer,
+    ObjectMapper objectMapper) {
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, MessageRequest additionalMessage) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService, objectMapper);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
@@ -55,7 +57,7 @@ public record AiQuestionGenerator(
 
   public QuestionEvaluation getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService, objectMapper);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {

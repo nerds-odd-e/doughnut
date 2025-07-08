@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
@@ -31,12 +32,13 @@ class RestRecallPromptController {
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      ObjectMapper objectMapper) {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.recallQuestionService =
         new RecallQuestionService(
-            openAiApi, modelFactoryService, testabilitySettings.getRandomizer());
+            openAiApi, modelFactoryService, testabilitySettings.getRandomizer(), objectMapper);
   }
 
   @GetMapping("/{memoryTracker}/question")
