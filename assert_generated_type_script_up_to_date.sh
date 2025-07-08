@@ -3,7 +3,7 @@
 set -eo pipefail
 
 export savedFolder=/tmp/openapi-backend
-export targetFolder=frontend/src/generated/backend
+export targetFolder=generated/backend
 
 rm -rf "$savedFolder"
 mkdir -p "$savedFolder"
