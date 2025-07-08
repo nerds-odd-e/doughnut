@@ -1,24 +1,30 @@
 <template>
-  <div class="daisy-card daisy-w-96">
+  <div class="daisy-card">
     <div class="daisy-card-body">
       <h3 class="daisy-card-title">Export Note Data</h3>
-      <details :open="expanded">
-        <summary class="daisy-btn daisy-btn-primary w-full" @click="toggleExpanded">Export Descendants (JSON)</summary>
-        <div v-if="expanded" class="mt-4">
+      <details :open="expanded" class="daisy-collapse daisy-bg-base-200 daisy-rounded-box daisy-mt-4">
+        <summary
+          class="daisy-flex daisy-items-center daisy-gap-2 daisy-underline daisy-cursor-pointer daisy-py-2 daisy-px-1"
+          @click="toggleExpanded"
+        >
+          <svg :class="['daisy-transition-transform', 'daisy-duration-200', expanded ? 'daisy-rotate-90' : '']" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          Export Descendants (JSON)
+        </summary>
+        <div v-if="expanded" class="daisy-mt-4">
           <textarea
-            class="daisy-textarea w-full h-48"
+            class="daisy-textarea daisy-textarea-bordered daisy-w-full daisy-h-48 daisy-bg-base-100 daisy-font-mono daisy-text-xs"
             readonly
             :value="jsonData"
             data-testid="descendants-json-textarea"
           />
           <button
-            class="daisy-btn daisy-btn-secondary w-full mt-2"
+            class="daisy-btn daisy-btn-secondary daisy-btn-circle daisy-mt-2 daisy-float-right"
             @click="downloadJson"
             :disabled="!jsonData"
             data-testid="download-json-btn"
+            aria-label="Download JSON"
           >
             <SvgDownload />
-            <span class="ms-2">Download JSON</span>
           </button>
         </div>
       </details>
