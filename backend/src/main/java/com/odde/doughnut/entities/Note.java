@@ -381,9 +381,4 @@ public class Note extends EntityIdentifiedByIdOnly {
           """
         .formatted(prettyString);
   }
-
-  @JsonIgnore
-  public String getGraphRAGDescription() {
-    return getGraphRAGDescription(new ObjectMapper());
-  }
 }
