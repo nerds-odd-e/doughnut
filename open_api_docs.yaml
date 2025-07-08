@@ -2951,32 +2951,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BareNote"
-  /api/notebooks/get-notebook-list:
-    get:
-      tags:
-      - rest-notebook-controller
-      operationId: getNotebookList
-      parameters:
-      - name: mcpToken
-        in: header
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Notebook"
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:

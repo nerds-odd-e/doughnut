@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -202,19 +201,5 @@ class RestNotebookController {
     currentUser.assertLoggedIn();
     currentUser.assertReadAuthorization(notebook);
     obsidianFormatService.importFromObsidian(file, notebook);
-  }
-
-  @GetMapping("/get-notebook-list")
-  public List<Notebook> getNotebookList(@RequestHeader("mcpToken") String mcpToken) {
-    return modelFactoryService
-        .findUserByToken(mcpToken)
-        .map(
-            user -> {
-              Ownership ownership = user.getOwnership();
-              if (ownership == null) return new ArrayList<Notebook>();
-              List<Notebook> notebooks = ownership.getNotebooks();
-              return notebooks != null ? new ArrayList<>(notebooks) : new ArrayList<Notebook>();
-            })
-        .orElse(new ArrayList<Notebook>());
   }
 }
