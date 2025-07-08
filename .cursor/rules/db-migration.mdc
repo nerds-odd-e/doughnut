@@ -1,6 +1,5 @@
 ---
 description: Database migration guildeline
-globs: **/*.sql, **/entities/**/*.java
 alwaysApply: false
 ---
 ## Migration Tool:

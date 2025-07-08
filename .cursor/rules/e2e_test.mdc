@@ -1,6 +1,5 @@
 ---
 description: e2e test /end to end test / system test / integrated test guildeline
-globs: e2e_test/**/*.*
 alwaysApply: false
 ---
 # E2E Testing Practices for Doughnut

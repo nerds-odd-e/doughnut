@@ -1,6 +1,5 @@
 ---
 description: The background question generation feature
-globs: 
 alwaysApply: false
 ---
 # Data Model Summary: Memory Tracking System

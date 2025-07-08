@@ -161,10 +161,15 @@
           </li>
 
           <li>
-            <button class="daisy-btn daisy-w-full" @click="downloadDescendants">
-              <SvgDownload />
-              <span class="ms-2">Download All Descendants</span>
-            </button>
+            <PopButton btn-class="daisy-w-full" title="Export...">
+              <template #button_face>
+                <SvgDownload />
+                <span class="ms-2">Export...</span>
+              </template>
+              <template #default="{ closer }">
+                <NoteExportDialog :note="note" @close-dialog="closer" />
+              </template>
+            </PopButton>
           </li>
 
           <li>
@@ -225,6 +230,7 @@ import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 import SvgDownload from "../../svgs/SvgDownload.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { saveAs } from "file-saver"
+import NoteExportDialog from "./NoteExportDialog.vue"
 
 const { storageAccessor, note } = defineProps<{
   storageAccessor: StorageAccessor
@@ -246,13 +252,5 @@ const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
     emit("note-accessory-updated", na)
   }
   closer()
-}
-
-const downloadDescendants = async () => {
-  const result = await managedApi.restNoteController.getDescendants(note.id)
-  const blob = new Blob([JSON.stringify(result, null, 2)], {
-    type: "application/json",
-  })
-  saveAs(blob, `note-${note.id}-descendants.json`)
 }
 </script>

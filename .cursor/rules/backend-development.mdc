@@ -1,6 +1,5 @@
 ---
 description: Backend development guildelines
-globs: backend/**/*.*
 alwaysApply: false
 ---
 # Backend Unit Test Practices
