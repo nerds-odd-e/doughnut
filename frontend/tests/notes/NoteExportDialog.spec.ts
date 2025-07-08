@@ -46,8 +46,8 @@ describe("NoteExportDialog", () => {
       .withProps({ note })
       .render()
     await fireEvent.click(getByText("Export Descendants (JSON)"))
-    await waitFor(() => getByTestId("download-json-btn"))
-    await fireEvent.click(getByTestId("download-json-btn"))
+    await waitFor(() => getByTestId("download-json-btn-descendants"))
+    await fireEvent.click(getByTestId("download-json-btn-descendants"))
     expect(saveAs).toHaveBeenCalled()
   })
 
@@ -68,5 +68,65 @@ describe("NoteExportDialog", () => {
     await fireEvent.click(getByText("Export Descendants (JSON)"))
     await waitFor(() => getByTestId("descendants-json-textarea"))
     expect(getDescendantsMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("fetches and displays graph JSON when expanded", async () => {
+    const note = makeMe.aNote.please()
+    const graphData = { focusNote: { id: note.id }, relatedNotes: [] }
+    helper.managedApi.restNoteController.getGraph = vi
+      .fn()
+      .mockResolvedValue(graphData)
+    const { getByText, getByTestId, queryByTestId } = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .render()
+    // Initially, textarea is not visible
+    expect(queryByTestId("graph-json-textarea")).toBeNull()
+    // Expand the details
+    await fireEvent.click(getByText("Export Note Graph (JSON)"))
+    await waitFor(() => {
+      const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
+      expect(textarea).toBeTruthy()
+      expect(textarea.value).toContain('"focusNote"')
+    })
+    // Should call API once
+    expect(helper.managedApi.restNoteController.getGraph).toHaveBeenCalledWith(
+      note.id
+    )
+  })
+
+  it("downloads graph JSON when download button is clicked", async () => {
+    const note = makeMe.aNote.please()
+    const graphData = { focusNote: { id: note.id }, relatedNotes: [] }
+    helper.managedApi.restNoteController.getGraph = vi
+      .fn()
+      .mockResolvedValue(graphData)
+    const { getByText, getByTestId } = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .render()
+    await fireEvent.click(getByText("Export Note Graph (JSON)"))
+    await waitFor(() => getByTestId("download-json-btn-graph"))
+    await fireEvent.click(getByTestId("download-json-btn-graph"))
+    expect(saveAs).toHaveBeenCalled()
+  })
+
+  it("does not refetch graph JSON if already loaded when toggling open/close", async () => {
+    const note = makeMe.aNote.please()
+    const graphData = { focusNote: { id: note.id }, relatedNotes: [] }
+    const getGraphMock = vi.fn().mockResolvedValue(graphData)
+    helper.managedApi.restNoteController.getGraph = getGraphMock
+    const { getByText, getByTestId } = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .render()
+    await fireEvent.click(getByText("Export Note Graph (JSON)"))
+    await waitFor(() => getByTestId("graph-json-textarea"))
+    expect(getGraphMock).toHaveBeenCalledTimes(1)
+    // Close and reopen
+    await fireEvent.click(getByText("Export Note Graph (JSON)"))
+    await fireEvent.click(getByText("Export Note Graph (JSON)"))
+    await waitFor(() => getByTestId("graph-json-textarea"))
+    expect(getGraphMock).toHaveBeenCalledTimes(1)
   })
 })
