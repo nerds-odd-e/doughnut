@@ -254,8 +254,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     case 'get_user_info': {
       try {
-        const userInfo =
-          await api.restUserController.getUserInfoByMcpToken(authToken)
+        const userInfo = await api.restUserController.getUserProfile()
         return {
           content: [
             {

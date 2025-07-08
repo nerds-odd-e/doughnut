@@ -76,23 +76,4 @@ export class RestUserControllerService {
             },
         });
     }
-    /**
-     * @param mcpToken
-     * @returns UserDTO OK
-     * @throws ApiError
-     */
-    public getUserInfoByMcpToken(
-        mcpToken: string,
-    ): CancelablePromise<UserDTO> {
-        return this.httpRequest.request({
-            method: 'GET',
-            url: '/api/user/info',
-            headers: {
-                'mcpToken': mcpToken,
-            },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
 }

@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
-import com.odde.doughnut.exceptions.McpTokenException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -67,20 +66,5 @@ class RestUserControllerTest {
     // Check that the token is a valid UUID
     assertThat(userToken.getToken().length(), equalTo(36));
     java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
-  }
-
-  @Test
-  void getUserInfoByToken_validToken() throws McpTokenException {
-    UserToken userToken = controller.generateToken();
-
-    String expectedUserName = userModel.getEntity().getName();
-
-    assertEquals(
-        expectedUserName, controller.getUserInfoByMcpToken(userToken.getToken()).getName());
-  }
-
-  @Test
-  void getUserInfoByToken_invalidToken() {
-    assertThrows(McpTokenException.class, () -> controller.getUserInfoByMcpToken(""));
   }
 }
