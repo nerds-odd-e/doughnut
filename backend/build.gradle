@@ -31,10 +31,6 @@ repositories {
   mavenCentral()
 }
 
-ext {
-	set('springAiVersion', "1.0.0")
-}
-
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -58,14 +54,6 @@ dependencies {
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-  implementation "org.springframework.ai:spring-ai-starter-mcp-server-webmvc"
-  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8'
-}
-
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-	}
 }
 
 test {
