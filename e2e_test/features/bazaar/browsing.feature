@@ -3,15 +3,15 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner"
-      | Title            | Details                          | Parent Title| hideTitleInArticle | showAsBulletInArticle |
-      | Shape            | The form of something            |             | false              | false                 |
-      | Rectangle        | four equal straight sides        | Shape       | false              | false                 |
-      | Triangle         | three sides shape                | Shape       | false              | false                 |
-      | Square           | a square but big                 | Rectangle   | false              | false                 |
-      | In OOP           | a square is not a Rectangle      | Rectangle   | true               | false                 |
-      | interface        | their interfaces are different   | In OOP      | true               | true                  |
-      | precondition     | square has stronger precondition | In OOP      | true               | true                  |
-      | Shapes are good  |                                  | Shape       | false              | false                 |
+      | Title            | Details                          | Parent Title|
+      | Shape            | The form of something            |             |
+      | Rectangle        | four equal straight sides        | Shape       |
+      | Triangle         | three sides shape                | Shape       |
+      | Square           | a square but big                 | Rectangle   |
+      | In OOP           | a square is not a Rectangle      | Rectangle   |
+      | interface        | their interfaces are different   | In OOP      |
+      | precondition     | square has stronger precondition | In OOP      |
+      | Shapes are good  |                                  | Shape       |
     And there is "a specialization of" link between note "Square" and "Rectangle"
     And notebook "Shape" is shared to the Bazaar
 
