@@ -4,8 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
@@ -36,8 +35,7 @@ class AiQuestionGeneratorTests {
   @BeforeEach
   void setup() {
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    var objectMapper = new ObjectMapperConfig().objectMapper();
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi, globalSettingsService, new RealRandomizer(), objectMapper);
@@ -111,8 +109,7 @@ class AiQuestionGeneratorTests {
     // Setup a mocked randomizer
     com.odde.doughnut.models.Randomizer mockedRandomizer =
         mock(com.odde.doughnut.models.Randomizer.class);
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    var objectMapper = new ObjectMapperConfig().objectMapper();
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
         new AiQuestionGenerator(
             openAiApi,

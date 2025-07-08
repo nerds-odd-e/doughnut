@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ class UriAndTitleTest {
     when(note.getId()).thenReturn(123);
 
     UriAndTitle uriAndTitle = UriAndTitle.fromNote(note);
-    ObjectMapper mapper = new ObjectMapper();
+    var mapper = new ObjectMapperConfig().objectMapper();
 
     String json = mapper.writeValueAsString(uriAndTitle);
     assertThat(json, equalTo("\"[Test Note](/n123)\""));
