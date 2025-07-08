@@ -10,7 +10,9 @@ import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js'
-import type { NoteUpdateResult } from './types.js'
+import { DoughnutApi } from '../../generated/backend/DoughnutApi.js'
+import type { NoteUpdateTitleDTO } from '../../generated/backend/models/NoteUpdateTitleDTO.js'
+import type { NoteUpdateDetailsDTO } from '../../generated/backend/models/NoteUpdateDetailsDTO.js'
 
 /**
  * Create an MCP server to connect to Doughnut server
@@ -106,6 +108,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 const DOUGHNUT_API_BASE_URL =
   process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
 const authToken = process.argv[2]
+const api = new DoughnutApi({ BASE: DOUGHNUT_API_BASE_URL, TOKEN: authToken })
 
 /**
  * Handler for the create_note tool.
@@ -153,7 +156,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           newDetails?: string | null
         })
       }
-      // Always use authToken from environment variable
       if (!authToken) {
         return {
           content: [
@@ -174,70 +176,37 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       }
-
-      let titleResult: NoteUpdateResult | null = null
-      let detailsResult: NoteUpdateResult | null = null
-      // Update title if provided
-      if (typeof newTitle === 'string') {
-        const titleResponse = await fetch(
-          `${DOUGHNUT_API_BASE_URL}/api/text_content/${noteId}/title`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ newTitle }),
-          }
-        )
-        if (!titleResponse.ok) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Failed to update note title: ${titleResponse.status} ${await titleResponse.text()}`,
-              },
-            ],
-          }
+      let titleResult: any = null
+      let detailsResult: any = null
+      try {
+        if (typeof newTitle === 'string') {
+          titleResult = await api.restTextContentController.updateNoteTitle(
+            noteId!,
+            { newTitle } as NoteUpdateTitleDTO
+          )
         }
-        titleResult = await titleResponse.json()
-      }
-      // Update details if provided
-      if (typeof newDetails === 'string') {
-        const detailsResponse = await fetch(
-          `${DOUGHNUT_API_BASE_URL}/api/text_content/${noteId}/details`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${authToken}`,
-            },
-            body: JSON.stringify({ details: newDetails }),
-          }
-        )
-        if (!detailsResponse.ok) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `Failed to update note details: ${detailsResponse.status} ${await detailsResponse.text()}`,
-              },
-            ],
-          }
+        if (typeof newDetails === 'string') {
+          detailsResult = await api.restTextContentController.updateNoteDetails(
+            noteId!,
+            { details: newDetails } as NoteUpdateDetailsDTO
+          )
         }
-        detailsResult = await detailsResponse.json()
+      } catch (err: any) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Failed to update note: ${err?.message || err}`,
+            },
+          ],
+        }
       }
-      // Compose result message
       let msg = 'Note updated successfully.'
-      if (
-        titleResult &&
-        titleResult.note &&
-        titleResult.note.topicConstructor
-      ) {
-        msg += ` Title: ${titleResult.note.topicConstructor}.`
+      if (titleResult && titleResult.topicConstructor) {
+        msg += ` Title: ${titleResult.topicConstructor}.`
       }
-      if (detailsResult && detailsResult.note && detailsResult.note.details) {
-        msg += ` Details: ${detailsResult.note.details}.`
+      if (detailsResult && detailsResult.details) {
+        msg += ` Details: ${detailsResult.details}.`
       }
       return {
         content: [
@@ -250,27 +219,19 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     case 'get_notebook_list': {
       try {
-        const response = await fetch(
-          `${DOUGHNUT_API_BASE_URL}/api/notebooks/get-notebook-list`,
-          {
-            method: 'GET',
-            headers: {
-              mcpToken: authToken,
-            },
-          }
-        )
-        const data = await response.json()
-        if (!Array.isArray(data)) {
+        const notebooks =
+          await api.restNotebookController.getNotebookList(authToken)
+        if (!Array.isArray(notebooks)) {
           return {
             content: [
               {
                 type: 'text',
-                text: `ERROR: Unexpected response from get-notebook-list: ${JSON.stringify(data)}`,
+                text: `ERROR: Unexpected response from get-notebook-list: ${JSON.stringify(notebooks)}`,
               },
             ],
           }
         }
-        const noteBookTitle = data.map((n: Notebook) => n.title).join(', ')
+        const noteBookTitle = notebooks.map((n: any) => n.title).join(', ')
         return {
           content: [
             {
@@ -279,72 +240,58 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             },
           ],
         }
-      } catch (err) {
-        const errorMsg = isErrorWithMessage(err) ? err.message : String(err)
+      } catch (err: any) {
         return {
           content: [
             {
               type: 'text',
-              text: `ERROR: ${errorMsg}`,
+              text: `ERROR: ${err?.message || err}`,
             },
           ],
         }
       }
     }
     case 'get_user_info': {
-      const apiUrl = `${DOUGHNUT_API_BASE_URL}/api/user/info`
       try {
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-          headers: {
-            mcpToken: authToken,
-          },
-        })
-        const text = await response.text()
+        const userInfo =
+          await api.restUserController.getUserInfoByMcpToken(authToken)
         return {
           content: [
             {
               type: 'text',
-              text,
+              text: JSON.stringify(userInfo),
             },
           ],
         }
-      } catch (err) {
-        const errorMsg = isErrorWithMessage(err) ? err.message : String(err)
+      } catch (err: any) {
         return {
           content: [
             {
               type: 'text',
-              text: `ERROR: ${errorMsg}`,
+              text: `ERROR: ${err?.message || err}`,
             },
           ],
         }
       }
     }
-
     case 'get_graph_with_note_id': {
-      const apiUrl = `${DOUGHNUT_API_BASE_URL}/api/notes/${request.params.noteId}/graph`
-
       try {
-        const response = await fetch(apiUrl, {
-          method: 'GET',
-        })
-        const text = await response.text()
+        const noteId = Number(request.params.noteId)
+        const graph = await api.restNoteController.getGraph(noteId)
         return {
           content: [
             {
               type: 'text',
-              text,
+              text: JSON.stringify(graph),
             },
           ],
         }
-      } catch (err) {
-        const errorMsg = isErrorWithMessage(err) ? err.message : String(err)
+      } catch (err: any) {
         return {
           content: [
             {
               type: 'text',
-              text: `ERROR: ${errorMsg}`,
+              text: `ERROR: ${err?.message || err}`,
             },
           ],
         }
@@ -369,21 +316,3 @@ main().catch((error) => {
   console.error('Server error:', error)
   process.exit(1)
 })
-
-interface Notebook {
-  title: string
-  // Add other properties if needed
-}
-
-interface ErrorWithMessage {
-  message: string
-}
-
-function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof (error as Record<string, unknown>).message === 'string'
-  )
-}
