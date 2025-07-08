@@ -365,15 +365,25 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public String getGraphRAGDescription() {
+  public String getGraphRAGDescription(ObjectMapper objectMapper) {
     GraphRAGService graphRAGService =
         new GraphRAGService(new CharacterBasedTokenCountingStrategy());
     GraphRAGResult retrieve = graphRAGService.retrieve(this, 5000);
-    String prettyString = new ObjectMapper().valueToTree(retrieve).toPrettyString();
+    String prettyString;
+    try {
+      prettyString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(retrieve);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
     return """
           Focus Note and the notes related to it:
           %s
           """
         .formatted(prettyString);
+  }
+
+  @JsonIgnore
+  public String getGraphRAGDescription() {
+    return getGraphRAGDescription(new ObjectMapper());
   }
 }

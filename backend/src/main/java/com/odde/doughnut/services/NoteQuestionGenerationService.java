@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -17,12 +18,15 @@ public class NoteQuestionGenerationService {
   protected final GlobalSettingsService globalSettingsService;
   private final Note note;
   private final OpenAiApiHandler openAiApiHandler;
+  private final ObjectMapper objectMapper;
 
   public NoteQuestionGenerationService(
       GlobalSettingsService globalSettingsService, Note note, OpenAiApiHandler openAiApiHandler) {
     this.globalSettingsService = globalSettingsService;
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
+    this.objectMapper = new ObjectMapper();
+    this.objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
   public MCQWithAnswer generateQuestion(MessageRequest additionalMessage)
@@ -107,7 +111,7 @@ public class NoteQuestionGenerationService {
 
   private OpenAIChatRequestBuilder getChatRequestBuilder() {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    String noteDescription = note.getGraphRAGDescription();
+    String noteDescription = note.getGraphRAGDescription(objectMapper);
     return new OpenAIChatRequestBuilder().model(modelName).addSystemMessage(noteDescription);
   }
 }
