@@ -228,8 +228,6 @@ import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 import SvgDownload from "../../svgs/SvgDownload.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-import { saveAs } from "file-saver"
 import NoteExportDialog from "./NoteExportDialog.vue"
 
 const { storageAccessor, note } = defineProps<{
@@ -244,8 +242,6 @@ const audioTools = ref(false)
 const router = useRouter()
 
 const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
-
-const { managedApi } = useLoadingApi()
 
 const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
   if (na) {
