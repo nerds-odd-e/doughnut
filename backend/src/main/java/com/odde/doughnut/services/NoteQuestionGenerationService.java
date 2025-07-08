@@ -55,8 +55,7 @@ public class NoteQuestionGenerationService {
         .map(
             jsonNode -> {
               try {
-                MCQWithAnswer question =
-                    new ObjectMapper().treeToValue(jsonNode, MCQWithAnswer.class);
+                MCQWithAnswer question = objectMapper.treeToValue(jsonNode, MCQWithAnswer.class);
 
                 // Validate the question
                 if (question != null
@@ -102,7 +101,7 @@ public class NoteQuestionGenerationService {
     return result.map(
         jsonNode -> {
           try {
-            return new ObjectMapper().treeToValue(jsonNode, QuestionEvaluation.class);
+            return objectMapper.treeToValue(jsonNode, QuestionEvaluation.class);
           } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
           }

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
@@ -30,6 +29,7 @@ class NoteQuestionGenerationServiceTests {
   @Mock OpenAiApi openAiApi;
   GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
+  NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
   private OpenAiAssistant assistant;
@@ -45,9 +45,10 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
-    service = new NoteQuestionGenerationService(globalSettingsService, testNote, openAiApiHandler);
+    notebookAssistantForNoteServiceFactory =
+        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService);
+    service = notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
   }
 
   @Nested
@@ -139,23 +140,16 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldOutputCreatedAtInISOFormatInSystemMessage() throws Exception {
-      // Arrange: set up a note with a known createdAt
-      Note note = makeMe.aNote().please();
-      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-      NoteQuestionGenerationService serviceWithNote =
-          new NoteQuestionGenerationService(globalSettingsService, note, openAiApiHandler);
+      // Use the shared service and testNote from setup
       MCQWithAnswer jsonQuestion = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
-
       // Act
-      serviceWithNote.generateQuestion(null);
-
+      service.generateQuestion(null);
       // Capture the system message (note description)
       ArgumentCaptor<ChatCompletionRequest> requestCaptor =
           ArgumentCaptor.forClass(ChatCompletionRequest.class);
       verify(openAiApi).createChatCompletion(requestCaptor.capture());
       String systemMessage = requestCaptor.getValue().getMessages().get(0).getTextContent();
-
       // Extract createdAt from the JSON in the system message
       java.util.regex.Matcher matcher =
           java.util.regex.Pattern.compile("\\\"createdAt\\\"\\s*:\\s*([^,\n\r}]*)")
