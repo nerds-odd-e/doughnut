@@ -36,7 +36,7 @@ public class RecallPrompt extends AnswerableQuestionInstance {
 
   @JsonIgnore
   public String getQuestionDetails() {
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
     MCQWithAnswer mcqWithAnswer = getPredefinedQuestion().getMcqWithAnswer();
     questionDetails.set(

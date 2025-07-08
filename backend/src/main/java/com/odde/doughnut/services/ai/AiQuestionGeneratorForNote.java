@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -18,7 +17,10 @@ public record AiQuestionGeneratorForNote(
         .flatMap(
             jsonNode -> {
               try {
-                return Optional.of(new ObjectMapper().treeToValue(jsonNode, MCQWithAnswer.class));
+                return Optional.of(
+                    new com.odde.doughnut.configs.ObjectMapperConfig()
+                        .objectMapper()
+                        .treeToValue(jsonNode, MCQWithAnswer.class));
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }

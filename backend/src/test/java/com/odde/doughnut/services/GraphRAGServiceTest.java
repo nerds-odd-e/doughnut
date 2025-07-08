@@ -775,7 +775,7 @@ public class GraphRAGServiceTest {
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      ObjectMapper objectMapper = new ObjectMapper();
+      ObjectMapper objectMapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
       JsonNode jsonNode = objectMapper.valueToTree(result);
 
       assertThat(jsonNode.has("relatedNotes"), is(true));

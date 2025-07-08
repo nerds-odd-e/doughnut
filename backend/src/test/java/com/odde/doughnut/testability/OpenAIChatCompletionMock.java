@@ -1,7 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
   public void mockChatCompletionAndReturnToolCall(Object result, String functionName) {
     mockChatCompletionAndReturnToolCallJsonNode(
-        new ObjectMapper().valueToTree(result), functionName);
+        new ObjectMapperConfig().objectMapper().valueToTree(result), functionName);
   }
 
   public void mockChatCompletionAndReturnToolCallJsonNode(JsonNode arguments, String functionName) {
@@ -30,7 +30,7 @@ public record OpenAIChatCompletionMock(OpenAiApi openAiApi) {
     ChatCompletionResult toBeReturned =
         MakeMe.makeMeWithoutFactoryService()
             .openAiCompletionResult()
-            .choice(new ObjectMapper().valueToTree(result).toString())
+            .choice(new ObjectMapperConfig().objectMapper().valueToTree(result).toString())
             .please();
 
     Mockito.doReturn(Single.just(toBeReturned))

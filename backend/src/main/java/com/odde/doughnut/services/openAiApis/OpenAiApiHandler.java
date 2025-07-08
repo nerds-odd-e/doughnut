@@ -5,7 +5,6 @@ import static java.lang.Thread.sleep;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -187,7 +186,10 @@ public class OpenAiApiHandler {
       SubmitToolOutputRequestItem build =
           SubmitToolOutputRequestItem.builder()
               .toolCallId(entry.getKey())
-              .output(new ObjectMapper().writeValueAsString(entry.getValue()))
+              .output(
+                  new com.odde.doughnut.configs.ObjectMapperConfig()
+                      .objectMapper()
+                      .writeValueAsString(entry.getValue()))
               .build();
       toolOutputRequestItems.add(build);
     }
@@ -233,7 +235,9 @@ public class OpenAiApiHandler {
           .map(
               content -> {
                 try {
-                  return new ObjectMapper().readTree(content);
+                  return new com.odde.doughnut.configs.ObjectMapperConfig()
+                      .objectMapper()
+                      .readTree(content);
                 } catch (JsonProcessingException e) {
                   return null;
                 }

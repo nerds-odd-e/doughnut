@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.assistants.run.*;
 import com.theokanning.openai.client.OpenAiApi;
 import io.reactivex.Single;
@@ -61,7 +60,10 @@ public record OpenAIAssistantCreatedRunMocker(OpenAiApi openAiApi, String thread
                                 .function(
                                     ToolCallFunction.builder()
                                         .name(function_name)
-                                        .arguments(new ObjectMapper().valueToTree(result))
+                                        .arguments(
+                                            new com.odde.doughnut.configs.ObjectMapperConfig()
+                                                .objectMapper()
+                                                .valueToTree(result))
                                         .build())
                                 .build()))
                     .build())

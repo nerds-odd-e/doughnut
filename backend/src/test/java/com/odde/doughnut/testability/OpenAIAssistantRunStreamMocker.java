@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.assistants.StreamEvent;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.assistants.message.MessageContent;
@@ -73,7 +72,10 @@ public final class OpenAIAssistantRunStreamMocker {
   private static String toSSEString(String streamEvent, Object dataObject) {
     String data = null;
     try {
-      data = new ObjectMapper().writeValueAsString(dataObject);
+      data =
+          new com.odde.doughnut.configs.ObjectMapperConfig()
+              .objectMapper()
+              .writeValueAsString(dataObject);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

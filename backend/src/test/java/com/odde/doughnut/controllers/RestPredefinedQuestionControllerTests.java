@@ -7,7 +7,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
@@ -238,7 +237,8 @@ class RestPredefinedQuestionControllerTests {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-          new ObjectMapper()
+          new com.odde.doughnut.configs.ObjectMapperConfig()
+              .objectMapper()
               .readTree(
                   "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),
           "");

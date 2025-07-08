@@ -11,7 +11,9 @@ import com.theokanning.openai.assistants.run.ToolCall;
 
 public final class OpenAiRunRequiredAction extends OpenAiOngoingRun implements OpenAiRunResult {
   private final ObjectMapper objectMapper =
-      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      new com.odde.doughnut.configs.ObjectMapperConfig()
+          .objectMapper()
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   public OpenAiRunRequiredAction(OpenAiApiHandler openAiApiHandler, Run updatedRun, AiTool tool) {
     super(openAiApiHandler, updatedRun, tool);

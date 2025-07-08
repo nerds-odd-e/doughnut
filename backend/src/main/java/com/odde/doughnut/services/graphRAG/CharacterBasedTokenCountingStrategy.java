@@ -5,7 +5,8 @@ import java.nio.charset.StandardCharsets;
 import lombok.SneakyThrows;
 
 public class CharacterBasedTokenCountingStrategy implements TokenCountingStrategy {
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper =
+      new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
 
   @SneakyThrows
   @Override

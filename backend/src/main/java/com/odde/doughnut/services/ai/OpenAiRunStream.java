@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.theokanning.openai.assistants.message.Message;
 import com.theokanning.openai.service.assistant_stream.AssistantSSE;
 import io.reactivex.Flowable;
@@ -26,7 +25,10 @@ public class OpenAiRunStream {
 
             // Handle thread.message.completed event
             if (Objects.equals(sse.getEvent().eventName, "thread.message.completed")) {
-              Message message = new ObjectMapper().readValue(sse.getData(), Message.class);
+              Message message =
+                  new com.odde.doughnut.configs.ObjectMapperConfig()
+                      .objectMapper()
+                      .readValue(sse.getData(), Message.class);
               if (messageConsumer != null) {
                 messageConsumer.accept(message);
               }

@@ -72,7 +72,9 @@ public final class OtherAiServices {
         String jsonContent =
             String.format(
                 "{\"previousNoteDetailsToAppendTo\": %s}",
-                new ObjectMapper().writeValueAsString(previousContent));
+                new com.odde.doughnut.configs.ObjectMapperConfig()
+                    .objectMapper()
+                    .writeValueAsString(previousContent));
         chatAboutNoteRequestBuilder.addUserMessage(
             "Previous note details (in JSON format):\n" + jsonContent);
       } catch (JsonProcessingException e) {
@@ -87,7 +89,8 @@ public final class OtherAiServices {
         .flatMap(
             jsonNode -> {
               try {
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper mapper =
+                    new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 return Optional.of(mapper.treeToValue(jsonNode, NoteDetailsCompletion.class));
               } catch (JsonProcessingException e) {

@@ -8,7 +8,8 @@ import org.junit.jupiter.api.Test;
 
 class FunctionDefinitionTest {
 
-  private final ObjectMapper objectMapper = new ObjectMapper();
+  private final ObjectMapper objectMapper =
+      new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
 
   @Test
   void shouldSerializeWithStrictTrue() throws Exception {

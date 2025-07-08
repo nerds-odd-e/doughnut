@@ -18,7 +18,7 @@ public class OpenAIChatGPTFineTuningExample {
   }
 
   public String toJsonString() {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
     objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     try {
       return objectMapper.writeValueAsString(this);

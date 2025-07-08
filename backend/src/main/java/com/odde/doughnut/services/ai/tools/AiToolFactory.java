@@ -3,7 +3,6 @@ package com.odde.doughnut.services.ai.tools;
 import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.services.ai.*;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -77,7 +76,11 @@ public class AiToolFactory {
         %s
 
         """
-            .formatted(new ObjectMapper().valueToTree(mcq).toString());
+            .formatted(
+                new com.odde.doughnut.configs.ObjectMapperConfig()
+                    .objectMapper()
+                    .valueToTree(mcq)
+                    .toString());
 
     return new InstructionAndSchema(
         messageBody,
@@ -104,7 +107,11 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 %s
 
 """
-            .formatted(new ObjectMapper().valueToTree(mcq).toString());
+            .formatted(
+                new com.odde.doughnut.configs.ObjectMapperConfig()
+                    .objectMapper()
+                    .valueToTree(mcq)
+                    .toString());
 
     return new InstructionAndSchema(
         messageBody, new AiTool("refine_question", "refine the question", MCQWithAnswer.class));
@@ -161,7 +168,11 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
       QuestionContestResult contestResult, MCQWithAnswer mcqWithAnswer) {
     String mcq = null;
     try {
-      mcq = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(mcqWithAnswer);
+      mcq =
+          new com.odde.doughnut.configs.ObjectMapperConfig()
+              .objectMapper()
+              .writerWithDefaultPrettyPrinter()
+              .writeValueAsString(mcqWithAnswer);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

@@ -12,7 +12,9 @@ import java.io.IOException;
 public class MCQToJsonConverter implements AttributeConverter<MultipleChoicesQuestion, String> {
 
   private final ObjectMapper objectMapper =
-      new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      new com.odde.doughnut.configs.ObjectMapperConfig()
+          .objectMapper()
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
   @Override
   public String convertToDatabaseColumn(MultipleChoicesQuestion attribute) {

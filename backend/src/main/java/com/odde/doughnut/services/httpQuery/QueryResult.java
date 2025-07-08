@@ -13,7 +13,7 @@ public record QueryResult(String response) {
 
   public <T> T mapToObject(Class<T> tClass) throws JsonProcessingException {
     if (response == null) return null;
-    ObjectMapper mapper = new ObjectMapper();
+    ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return mapper.readValue(response, tClass);
   }
