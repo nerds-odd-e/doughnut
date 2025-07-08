@@ -20,6 +20,14 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   User user = null;
 
   public CurrentUserFetcherFromRequest(HttpServletRequest request) {
+    String mcpToken = request.getHeader("mcpToken");
+    if (mcpToken != null && !mcpToken.isEmpty()) {
+      user = modelFactoryService.findUserByToken(mcpToken).orElse(null);
+      if (user != null) {
+        externalId = user.getExternalIdentifier();
+        return;
+      }
+    }
     Principal userPrincipal = request.getUserPrincipal();
     if (userPrincipal != null) {
       externalId = userPrincipal.getName();
