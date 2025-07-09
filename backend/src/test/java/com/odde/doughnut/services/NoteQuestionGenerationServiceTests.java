@@ -143,31 +143,5 @@ class NoteQuestionGenerationServiceTests {
       // Verify that a null completion returns null
       assertThat(result, is(nullValue()));
     }
-
-    @Test
-    void shouldOutputCreatedAtInISOFormatInSystemMessage() throws Exception {
-      // Use the shared service and testNote from setup
-      MCQWithAnswer jsonQuestion = makeMe.aMCQWithAnswer().please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
-      // Act
-      service.generateQuestion(null);
-      // Capture the system message (note description)
-      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi).createChatCompletion(requestCaptor.capture());
-      String systemMessage = requestCaptor.getValue().getMessages().get(0).getTextContent();
-      // Extract createdAt from the JSON in the system message
-      java.util.regex.Matcher matcher =
-          java.util.regex.Pattern.compile("\\\"createdAt\\\"\\s*:\\s*([^,\n\r}]*)")
-              .matcher(systemMessage);
-      assertThat(
-          "createdAt field should be present in the system message", matcher.find(), is(true));
-      String createdAtValue = matcher.group(1).trim();
-      // It should start with a quote if it's ISO string, or be a number if not
-      assertThat(
-          "createdAt should be in ISO string format, but was: " + createdAtValue,
-          createdAtValue.startsWith("\""),
-          is(true));
-    }
   }
 }

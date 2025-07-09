@@ -4504,9 +4504,6 @@ components:
           - InboundReferenceToObjectOfReifiedChild
         details:
           type: string
-        createdAt:
-          type: string
-          format: date-time
     FocusNote:
       type: object
       properties:
@@ -4545,9 +4542,6 @@ components:
           - InboundReferenceToObjectOfReifiedChild
         details:
           type: string
-        createdAt:
-          type: string
-          format: date-time
         contextualPath:
           type: array
           items:

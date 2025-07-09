@@ -27,7 +27,6 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
     assertThat(content, containsString("uri"));
     assertThat(content, containsString(DETAILS));
     assertThat(content, containsString(note.getDetails()));
-    assertThat(content, containsString("createdAt"));
   }
 
   @Test

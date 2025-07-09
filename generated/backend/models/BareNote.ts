@@ -11,7 +11,6 @@ export type BareNote = {
     parentUriAndTitle?: string;
     relationToFocusNote?: BareNote.relationToFocusNote;
     details?: string;
-    createdAt?: string;
 };
 export namespace BareNote {
     export enum relationToFocusNote {
