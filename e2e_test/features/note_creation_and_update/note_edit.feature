@@ -51,6 +51,28 @@ Feature: Note Edit
       | li             | Specification by Example |
       | li.ql-indent-1 | Living documentation     |
 
+  @ignore
+  Scenario: Edit a note's details with a markdown table
+    When I update note "LeSS in Action" details using markdown to become:
+      """
+      | Name    | Score |
+      | ------- | ----- |
+      | Alice   |  95   |
+      | Bob     |  88   |
+      """
+    Then I should see the rich content of the note with details:
+      | Tag    | Content |
+      | table  |         |
+      | tr     |         |
+      | td     | Name    |
+      | td     | Score   |
+      | tr     |         |
+      | td     | Alice   |
+      | td     | 95      |
+      | tr     |         |
+      | td     | Bob     |
+      | td     | 88      |
+
   Scenario: Edit a note title should update the sidebar
     Given there are some notes:
       | Title | Parent Title   |
