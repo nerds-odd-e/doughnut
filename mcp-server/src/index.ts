@@ -157,27 +157,23 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         })
       }
       if (!authToken) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: 'DOUGHNUT_API_AUTH_TOKEN environment variable is required.',
-            },
-          ],
-        }
+        return errorResponse(
+          'DOUGHNUT_API_AUTH_TOKEN environment variable is required.',
+          ''
+        )
       }
       if (typeof newTitle !== 'string' && typeof newDetails !== 'string') {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: 'At least one of newTitle or newDetails must be provided.',
-            },
-          ],
-        }
+        return errorResponse(
+          'At least one of newTitle or newDetails must be provided.',
+          ''
+        )
       }
-      let titleResult: any = null
-      let detailsResult: any = null
+      let titleResult:
+        | import('../../generated/backend/models/NoteRealm.js').NoteRealm
+        | null = null
+      let detailsResult:
+        | import('../../generated/backend/models/NoteRealm.js').NoteRealm
+        | null = null
       try {
         if (typeof newTitle === 'string') {
           titleResult = await api.restTextContentController.updateNoteTitle(
@@ -191,22 +187,20 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             { details: newDetails } as NoteUpdateDetailsDTO
           )
         }
-      } catch (err: any) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `Failed to update note: ${err?.message || err}`,
-            },
-          ],
-        }
+      } catch (err) {
+        return errorResponse(err, 'Failed to update note:')
       }
       let msg = 'Note updated successfully.'
-      if (titleResult && titleResult.topicConstructor) {
-        msg += ` Title: ${titleResult.topicConstructor}.`
+      if (
+        titleResult &&
+        titleResult.note &&
+        titleResult.note.noteTopology &&
+        titleResult.note.noteTopology.titleOrPredicate
+      ) {
+        msg += ` Title: ${titleResult.note.noteTopology.titleOrPredicate}.`
       }
-      if (detailsResult && detailsResult.details) {
-        msg += ` Details: ${detailsResult.details}.`
+      if (detailsResult && detailsResult.note && detailsResult.note.details) {
+        msg += ` Details: ${detailsResult.note.details}.`
       }
       return {
         content: [
@@ -221,17 +215,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
         const notebooksViewed = await api.restNotebookController.myNotebooks()
         if (!(notebooksViewed && Array.isArray(notebooksViewed.notebooks))) {
-          return {
-            content: [
-              {
-                type: 'text',
-                text: `ERROR: Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`,
-              },
-            ],
-          }
+          return errorResponse(
+            `Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`
+          )
         }
         const noteBookTitle = notebooksViewed.notebooks
-          .map((n: any) => n.title)
+          .map((n) => n.title)
           .join(', ')
         return {
           content: [
@@ -241,15 +230,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             },
           ],
         }
-      } catch (err: any) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `ERROR: ${err?.message || err}`,
-            },
-          ],
-        }
+      } catch (err) {
+        return errorResponse(err)
       }
     }
     case 'get_user_info': {
@@ -263,15 +245,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             },
           ],
         }
-      } catch (err: any) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `ERROR: ${err?.message || err}`,
-            },
-          ],
-        }
+      } catch (err) {
+        return errorResponse(err)
       }
     }
     case 'get_graph_with_note_id': {
@@ -286,15 +261,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             },
           ],
         }
-      } catch (err: any) {
-        return {
-          content: [
-            {
-              type: 'text',
-              text: `ERROR: ${err?.message || err}`,
-            },
-          ],
-        }
+      } catch (err) {
+        return errorResponse(err)
       }
     }
 
@@ -316,3 +284,23 @@ main().catch((error) => {
   console.error('Server error:', error)
   process.exit(1)
 })
+
+// Helper function for error handling
+function errorResponse(err: unknown, prefix = 'ERROR:') {
+  let msg: string
+  if (err instanceof Error) {
+    msg = `${prefix} ${err.message}`
+  } else if (typeof err === 'string') {
+    msg = `${prefix} ${err}`
+  } else {
+    msg = `${prefix} ${JSON.stringify(err)}`
+  }
+  return {
+    content: [
+      {
+        type: 'text',
+        text: msg,
+      },
+    ],
+  }
+}

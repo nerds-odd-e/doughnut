@@ -1,0 +1,82 @@
+---
+description: mcp server related changes
+alwaysApply: false
+---
+# doughnut-mcp-server MCP Server
+
+A Model Context Protocol server for Doughnut.
+
+Is in the `mcp-server` folder.
+
+This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
+
+- Tools for getting instructions and updating note text content via the Doughnut backend API.
+
+## How to use this MCP Server
+
+Run this command to build the mcp server
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
+```
+
+Add the below command to your AI MCP Server configuration
+
+```json
+{
+  "mcpServers": {
+    "doughnut": {
+      "disabled": false,
+      "timeout": 60,
+      "transportType": "stdio",
+      "command": "node",
+      "args": [
+        "<doughnut root folder>/frontend/public/mcp-server.bundle.mjs"
+      ],
+      "env": {
+        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
+# doughnut-mcp-server MCP Server
+
+A Model Context Protocol server for Doughnut.
+
+Is in the `mcp-server` folder.
+
+This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
+
+- Tools for getting instructions and updating note text content via the Doughnut backend API.
+
+## How to use this MCP Server
+
+Run this command to build the mcp server
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
+```
+
+Add the below command to your AI MCP Server configuration
+
+```json
+{
+  "mcpServers": {
+    "doughnut": {
+      "disabled": false,
+      "timeout": 60,
+      "transportType": "stdio",
+      "command": "node",
+      "args": [
+        "<doughnut root folder>/frontend/public/mcp-server.bundle.mjs"
+      ],
+      "env": {
+        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+```
