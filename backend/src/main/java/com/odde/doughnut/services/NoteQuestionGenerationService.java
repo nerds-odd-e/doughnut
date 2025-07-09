@@ -11,7 +11,6 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.Optional;
-import org.apache.logging.log4j.util.Strings;
 
 public class NoteQuestionGenerationService {
   protected final GlobalSettingsService globalSettingsService;
@@ -59,15 +58,7 @@ public class NoteQuestionGenerationService {
                 MCQWithAnswer question = objectMapper.treeToValue(jsonNode, MCQWithAnswer.class);
 
                 // Validate the question
-                if (question != null
-                    && question.getMultipleChoicesQuestion().getStem() != null
-                    && !Strings.isBlank(question.getMultipleChoicesQuestion().getStem())) {
-                  // Validate the correct choice index is within bounds
-                  int correctChoiceIndex = question.getCorrectChoiceIndex();
-                  int choicesCount = question.getMultipleChoicesQuestion().getChoices().size();
-                  if (correctChoiceIndex < 0 || correctChoiceIndex >= choicesCount) {
-                    return null; // Reject questions with invalid choice indices
-                  }
+                if (question != null && question.isValid()) {
                   return question;
                 }
                 return null;
