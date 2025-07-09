@@ -57,6 +57,14 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(elm.querySelectorAll("ol").length).toBe(1)
       expect(elm?.querySelector("li[data-list='bullet']")).not.toBeNull()
     })
+
+    it("renders markdown table as HTML", () => {
+      const markdown = `| Name    | Score |\n| ------- | ----- |\n| Alice   |  95   |\n| Bob     |  88   |`
+      const html = markdownizer.markdownToHtml(markdown)
+      expect(html).toMatchInlineSnapshot(
+        `"<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>95</td></tr><tr><td>Bob</td><td>88</td></tr></tbody></table>"`
+      )
+    })
   })
 
   describe("Html to markdown", () => {
