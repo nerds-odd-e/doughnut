@@ -147,6 +147,8 @@ export const assumeNotePage = (noteTopology?: string) => {
         const value = noteAttributes[propName]
         if (value) {
           cy.findByRole(propName.toLowerCase()).click()
+          // Only call cy.tick if the clock is mocked
+          cy.state && cy.state('clock') && cy.tick(5000)
           cy.clearFocusedText().type(value).blur()
           cy.get('.dirty').should('not.exist')
         }
