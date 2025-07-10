@@ -71,6 +71,17 @@ public class UserModelSearchTest {
     assertTrue(search().isEmpty());
   }
 
+  @Test
+  void searchResultShouldNotExceedTwenty() {
+    String commonTitle = "CommonTitle";
+    for (int i = 0; i < 25; i++) {
+      makeMe.aNote(commonTitle + i).under(note).please();
+    }
+    searchTerm.setSearchKey("CommonTitle");
+    List<NoteTopology> results = search();
+    assertThat(results.size(), lessThanOrEqualTo(20));
+  }
+
   @Nested
   class ThereIsANoteBookInMyCircle {
     Note noteInTheSameNotebook;

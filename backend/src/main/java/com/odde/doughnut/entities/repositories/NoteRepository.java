@@ -2,7 +2,7 @@ package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
 import java.util.List;
-import java.util.stream.Stream;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -23,15 +23,16 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   Note findFirstInNotebookByTitle(@Param("title") String notebookTitle, @Param("key") String key);
 
   @Query(
-      value = selectFromNote + searchForTitleLike + "  AND n.notebook.ownership.user.id = :userId ")
-  Stream<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern);
+      value = selectFromNote + searchForTitleLike + "  AND n.notebook.ownership.user.id = :userId")
+  List<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern, Pageable pageable);
 
   @Query(
       value =
           selectFromNote
               + " JOIN n.notebook.subscriptions s ON s.user.id = :userId "
               + searchForTitleLike)
-  Stream<Note> searchForUserInAllMySubscriptions(Integer userId, @Param("pattern") String pattern);
+  List<Note> searchForUserInAllMySubscriptions(
+      Integer userId, @Param("pattern") String pattern, Pageable pageable);
 
   @Query(
       value =
@@ -39,10 +40,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + "              JOIN n.notebook.ownership.circle.members m"
               + "                ON m.id = :userId "
               + searchForTitleLike)
-  Stream<Note> searchForUserInAllMyCircle(Integer userId, @Param("pattern") String pattern);
+  List<Note> searchForUserInAllMyCircle(
+      Integer userId, @Param("pattern") String pattern, Pageable pageable);
 
-  @Query(value = selectFromNote + searchForTitleLike + " AND n.notebook.id = :notebookId ")
-  Stream<Note> searchInNotebook(Integer notebookId, @Param("pattern") String pattern);
+  @Query(value = selectFromNote + searchForTitleLike + " AND n.notebook.id = :notebookId")
+  List<Note> searchInNotebook(
+      Integer notebookId, @Param("pattern") String pattern, Pageable pageable);
 
   @Query(
       value =
