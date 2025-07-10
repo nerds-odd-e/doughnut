@@ -202,4 +202,11 @@ class RestNotebookController {
     currentUser.assertReadAuthorization(notebook);
     obsidianFormatService.importFromObsidian(file, notebook);
   }
+
+  @PostMapping("/{notebook}/reindex")
+  @Transactional
+  public void reindexNotebook(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook) {
+    // TODO: implement reindex logic
+  }
 }

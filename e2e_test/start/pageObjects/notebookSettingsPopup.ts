@@ -67,6 +67,11 @@ const notebookSettingsPopup = () => {
       cy.pageIsNotLoading()
       return this
     },
+    reindexNotebook() {
+      cy.findByRole('button', { name: 'Reindex notebook' }).click()
+      cy.pageIsNotLoading()
+      return this
+    },
   }
 }
 

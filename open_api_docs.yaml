@@ -1191,6 +1191,26 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
+  /api/notebooks/{notebook}/reindex:
+    post:
+      tags:
+      - rest-notebook-controller
+      operationId: reindexNotebook
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/notebooks/{notebookId}/obsidian:
     post:
       tags:

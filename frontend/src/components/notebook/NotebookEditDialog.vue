@@ -52,6 +52,9 @@
     <hr/>
     <NotebookAssistantManagementDialog :notebook="notebook" />
   </template>
+  <button class="daisy-btn daisy-btn-secondary daisy-mt-2" @click="reindexNotebook">
+    Reindex notebook
+  </button>
 </template>
 
 <script setup lang="ts">
@@ -132,5 +135,10 @@ const handleObsidianImport = async (event: Event) => {
     alert("Failed to import file")
     console.error("Import error:", error)
   }
+}
+
+const reindexNotebook = async () => {
+  await managedApi.restNotebookController.reindexNotebook(props.notebook.id)
+  router.go(0)
 }
 </script>

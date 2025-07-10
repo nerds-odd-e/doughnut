@@ -13,6 +13,7 @@ Feature: semantical search
 
   @mockBrowserTime
   Scenario Outline: Search at the top level
+    Given I reindex the notebook "Physics"
     When I visit all my notebooks
     And I start searching
     Then I should see "<targets>" as targets only when searching "<search key>"

@@ -77,6 +77,25 @@ export class RestNotebookControllerService {
         });
     }
     /**
+     * @param notebook
+     * @returns any OK
+     * @throws ApiError
+     */
+    public reindexNotebook(
+        notebook: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notebooks/{notebook}/reindex',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * Import Obsidian file
      * @param notebookId Notebook ID
      * @param formData
