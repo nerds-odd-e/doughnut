@@ -35,8 +35,3 @@
     - And the dependencies should be properly injected
 
 ### Completed Tasks
-- [x] Investigated chat completion API capabilities for question evaluation
-  - Confirmed `requestAndGetJsonSchemaResult` can handle our use case
-  - Verified it supports custom system messages for notebook instructions
-  - Checked it maintains the same output format
-- [x] Pass mcpToken as an argument to the MCP server, not as an environment variable (completed)
