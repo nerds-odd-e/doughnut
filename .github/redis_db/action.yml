@@ -1,0 +1,26 @@
+name: "Redis DB Container"
+description: "Run Redis DB container"
+inputs:
+  redis_version:
+    description: "Redis DB Server Version"
+    type: string
+    required: true
+    default: "7"
+  redis_port:
+    description: "Redis DB port"
+    type: number
+    required: true
+    default: 6380
+  redis_container_name:
+    description: "Redis container name"
+    required: false
+    default: "redis-doughnut"
+runs:
+  using: "composite"
+  steps:
+    - name: Start Redis
+      uses: supercharge/redis-github-action@1.8.0
+      with:
+        redis-version: ${{ inputs.redis_version }}
+        redis-port: ${{ inputs.redis_port }}
+        redis-container-name: ${{ inputs.redis_container_name }}

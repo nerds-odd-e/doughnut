@@ -16,6 +16,8 @@ env:
   MYSQL_E2E_DB: "doughnut_e2e_test"
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
   MYSQL_DB_PASSWORD: ${{ secrets.DBPASSWORD }}
+  REDIS_VERSION: "7"
+  REDIS_PORT: "6380"
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,6 +57,11 @@ jobs:
           mysql_db_instance: ${{ env.MYSQL_UT_DB }}
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
+      - name: Setup Redis DB Server
+        uses: ./.github/redis_db
+        with:
+          redis_version: ${{ vars.REDIS_VERSION || env.REDIS_VERSION }}
+          redis_port: ${{ vars.REDIS_PORT || env.REDIS_PORT }}
       - uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
@@ -132,6 +139,11 @@ jobs:
           mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
+      - name: Setup Redis DB Server
+        uses: ./.github/redis_db
+        with:
+          redis_version: ${{ vars.REDIS_VERSION || env.REDIS_VERSION }}
+          redis_port: ${{ vars.REDIS_PORT || env.REDIS_PORT }}
       - name: Setup JDK
         uses: ./.github/setup_jdk
         with:
