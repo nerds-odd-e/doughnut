@@ -53,6 +53,7 @@
           mysql84
           mysql-client
           mysql_jdbc
+          redis
           yamllint
           nixfmt-classic
           hclfmt
@@ -131,6 +132,9 @@
             # Setup MySQL environment
             setup_mysql_env "${pkgs.mysql84}"
 
+            # Setup Redis environment
+            setup_redis_env "${pkgs.redis}"
+
             # Add Python to PATH if enabled
             if [ "''${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
               export PYTHON_PATH="$(dirname $(dirname $(readlink -f $(which python))))"
@@ -152,14 +156,23 @@
                 ./scripts/init_mysql.sh
                 check_mysql_ready
               else
-                log "MySQL is running on port 3309 & ready to go! 🏃"
+                log "MySQL is running on port 3309 & ready to go! \ud83c\udfc3"
+              fi
+
+              # Start Redis if not running
+              if ! lsof -i :6380 -sTCP:LISTEN >/dev/null 2>&1; then
+                log "Starting Redis server..."
+                ./scripts/init_redis.sh
+                check_redis_ready
+              else
+                log "Redis is running on port 6380 & ready to go! \ud83d\ude80"
               fi
             fi
 
             # Print environment information
             print_env_info
 
-            log "Environment setup complete! 🎉"
+            log "Environment setup complete! \ud83c\udf89"
             return 0
           '';
         };

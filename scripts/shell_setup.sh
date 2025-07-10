@@ -79,3 +79,36 @@ check_mysql_ready() {
   log "Error: MySQL failed to start after $MAX_RETRIES attempts! 💀"
   return 1
 }
+
+# Redis environment setup
+setup_redis_env() {
+  export REDIS_BASEDIR="$1"
+  export REDIS_HOME="${PWD}/redis"
+  export REDIS_DATADIR="${REDIS_HOME}/data"
+  export REDIS_CONF_FILE="${REDIS_HOME}/redis.conf"
+  export REDIS_PID_FILE="${REDIS_HOME}/redis.pid"
+  export REDIS_LOG_FILE="${REDIS_HOME}/redis.log"
+  export REDIS_TCP_PORT="6380"
+}
+
+# Check if Redis is ready
+check_redis_ready() {
+  local MAX_RETRIES=30
+  local RETRY_COUNT=0
+
+  while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    if redis-cli -p ${REDIS_TCP_PORT} ping >/dev/null 2>&1; then
+      local response=$(redis-cli -p ${REDIS_TCP_PORT} ping 2>/dev/null)
+      if [ "$response" = "PONG" ]; then
+        log "Redis is ready! \ud83d\ude80"
+        return 0
+      fi
+    fi
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    log "Waiting for Redis to be ready... (attempt $RETRY_COUNT/$MAX_RETRIES)"
+    sleep 1
+  done
+
+  log "Error: Redis failed to start after $MAX_RETRIES attempts! \ud83d\udc80"
+  return 1
+}

@@ -100,5 +100,7 @@ EOF
   fi
   printf "  • MYSQL_HOME:    %s\n" "$MYSQL_HOME"
   printf "  • MYSQL_DATADIR: %s\n" "$MYSQL_DATADIR"
+  printf "  • REDIS_HOME:    %s\n" "$REDIS_HOME"
+  printf "  • REDIS_DATADIR: %s\n" "$REDIS_DATADIR"
   printf "\n"
 }
