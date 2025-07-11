@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
@@ -12,6 +13,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NotebookReindexingService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -42,6 +44,8 @@ class RestNotebookControllerTest {
   private Note topNote;
   RestNotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
+  private NotebookReindexingService notebookReindexingService =
+      mock(NotebookReindexingService.class);
   @Autowired WebApplicationContext webApplicationContext;
 
   @BeforeEach
@@ -51,7 +55,9 @@ class RestNotebookControllerTest {
 
     userModel = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
-    controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new RestNotebookController(
+            modelFactoryService, userModel, testabilitySettings, notebookReindexingService);
   }
 
   @Nested
@@ -59,7 +65,9 @@ class RestNotebookControllerTest {
     @Test
     void whenNotLogin() {
       userModel = modelFactoryService.toUserModel(null);
-      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      controller =
+          new RestNotebookController(
+              modelFactoryService, userModel, testabilitySettings, notebookReindexingService);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -68,7 +76,9 @@ class RestNotebookControllerTest {
       User user = new User();
       userModel = modelFactoryService.toUserModel(user);
       List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
-      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      controller =
+          new RestNotebookController(
+              modelFactoryService, userModel, testabilitySettings, notebookReindexingService);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
@@ -133,7 +143,8 @@ class RestNotebookControllerTest {
           new RestNotebookController(
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
-              testabilitySettings);
+              testabilitySettings,
+              notebookReindexingService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
     }
@@ -172,14 +183,18 @@ class RestNotebookControllerTest {
 
     @Test
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
-      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      controller =
+          new RestNotebookController(
+              modelFactoryService, userModel, testabilitySettings, notebookReindexingService);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
 
     @Test
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
-      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      controller =
+          new RestNotebookController(
+              modelFactoryService, userModel, testabilitySettings, notebookReindexingService);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
@@ -308,7 +323,8 @@ class RestNotebookControllerTest {
           new RestNotebookController(
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
-              testabilitySettings);
+              testabilitySettings,
+              notebookReindexingService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
@@ -400,7 +416,9 @@ class RestNotebookControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       // Arrange
       userModel = makeMe.aNullUserModelPlease();
-      controller = new RestNotebookController(modelFactoryService, userModel, testabilitySettings);
+      controller =
+          new RestNotebookController(
+              modelFactoryService, userModel, testabilitySettings, notebookReindexingService);
 
       // Act & Assert
       ResponseStatusException exception =

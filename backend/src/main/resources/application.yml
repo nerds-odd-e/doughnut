@@ -35,6 +35,11 @@ spring:
       globally_quoted_identifiers: true
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
+  redis:
+    host: 127.0.0.1
+    port: 6380
+    timeout: 2000ms
+    connect-timeout: 2000ms
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
@@ -95,6 +100,11 @@ spring:
       globally_quoted_identifiers: true
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
+  redis:
+    host: 127.0.0.1
+    port: 6380
+    timeout: 2000ms
+    connect-timeout: 2000ms
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}
@@ -146,6 +156,11 @@ spring:
       globally_quoted_identifiers: true
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
+  redis:
+    host: 127.0.0.1
+    port: 6380
+    timeout: 2000ms
+    connect-timeout: 2000ms
   security:
     oauth2:
       client:
@@ -202,6 +217,11 @@ spring:
       globally_quoted_identifiers: true
       globally_quoted_identifiers_skip_column_definitions: true
     open-in-view: false
+  redis:
+    host: 127.0.0.1
+    port: 6380
+    timeout: 2000ms
+    connect-timeout: 2000ms
   github_for_issues:
     repo: nerds-odd-e/doughnut_sandbox
     token: ${GITHUB_FOR_ISSUES_API_TOKEN:-token_not_set}

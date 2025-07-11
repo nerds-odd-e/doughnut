@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NotebookReindexingService;
 import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -40,14 +41,17 @@ class RestNotebookController {
   private final TestabilitySettings testabilitySettings;
 
   private final ObsidianFormatService obsidianFormatService;
+  private final NotebookReindexingService notebookReindexingService;
 
   public RestNotebookController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NotebookReindexingService notebookReindexingService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.notebookReindexingService = notebookReindexingService;
     this.obsidianFormatService =
         new ObsidianFormatService(currentUser.getEntity(), modelFactoryService);
   }
@@ -205,8 +209,9 @@ class RestNotebookController {
 
   @PostMapping("/{notebook}/reindex")
   @Transactional
-  public void reindexNotebook(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook) {
-    // TODO: implement reindex logic
+  public void reindexNotebook(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    notebookReindexingService.reindexNotebook(notebook);
   }
 }
