@@ -118,7 +118,7 @@ install-nix
 nixInstall.sh
 mysql/
 **/mysql/
-redis/redis.pid
+redis/
 
 # gitpod inteliij-projector
 **/.jetbrains
