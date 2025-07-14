@@ -156,7 +156,7 @@
                 ./scripts/init_mysql.sh
                 check_mysql_ready
               else
-                log "MySQL is running on port 3309 & ready to go! 🏃"
+                log "MySQL is running on port 3309 & ready to go! 🐬"
               fi
 
               # Start Redis if not running
@@ -165,7 +165,7 @@
                 ./scripts/init_redis.sh
                 check_redis_ready
               else
-                log "Redis is running on port 6380 & ready to go! 🚀"
+                log "Redis is running on port 6380 & ready to go! 🗄️"
               fi
             fi
 
