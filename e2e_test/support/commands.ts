@@ -173,10 +173,6 @@ Cypress.Commands.add('clickButtonOnCardBody', (noteTopology, buttonTitle) => {
   })
 })
 
-Cypress.Commands.add('startSearching', () => {
-  start.assumeNotePage().toolbarButton('search note').click()
-})
-
 Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
   ({

@@ -9,7 +9,7 @@ import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
 
 When('I start searching', () => {
-  cy.startSearching()
+  start.assumeNotePage().toolbarButton('search note').click()
 })
 
 When(
