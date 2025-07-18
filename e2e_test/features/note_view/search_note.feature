@@ -14,7 +14,7 @@ Feature: search note
 
   @mockBrowserTime
   Scenario Outline: Search at the top level
-    Given I start searching from all my notebooks page
+    When I start searching from all my notebooks page
     Then I should see "<targets>" as targets only when searching "<search key>"
     Examples:
       | search key | targets            |
