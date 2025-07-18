@@ -32,7 +32,7 @@ Feature: search note
       | Temazepam  | Sedative     |
       | Pam        | Sedative     |
     When I start searching from all my notebooks page
-    And I select Exact match only
+    And I choose to find exact match only
     Then I should see "Pam" as targets only when searching "pam"
 
   @mockBrowserTime
