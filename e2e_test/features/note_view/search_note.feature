@@ -22,6 +22,20 @@ Feature: search note
       | Sedatio    | Sedation           |
 
   @mockBrowserTime
+  @ignore
+  Scenario: Search at the top level and find exact match only
+      Given there are some notes:
+      | Title      | Parent Title |
+      | Diazepam   | Sedative     |
+      | Lorazepam  | Sedative     |
+      | Clonazepam | Sedative     |
+      | Temazepam  | Sedative     |
+      | Pam        | Sedative     |
+    When I start searching from all my notebooks page
+    And I select Exact match only
+    Then I should see "Pam" as targets only when searching "pam"
+
+  @mockBrowserTime
   Scenario: Search when adding new note
     Given I am creating a note under "Sedation"
     When I type "ph" in the title
