@@ -8,7 +8,8 @@ import type NotePath from '../support/NotePath'
 import start from '../start'
 import { commonSenseSplit } from '../support/string_util'
 
-When('I start searching', () => {
+When('I start searching from all my notebooks page', () => {
+  start.routerToNotebooksPage()
   start.assumeNotePage().toolbarButton('search note').click()
 })
 
