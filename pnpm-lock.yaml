@@ -22,8 +22,8 @@ importers:
   .:
     dependencies:
       '@cucumber/cucumber':
-        specifier: ^12.0.0
-        version: 12.0.0
+        specifier: ^12.1.0
+        version: 12.1.0
       vitest:
         specifier: 3.2.4
         version: 3.2.4(@types/node@22.16.2)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.89.2)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.0)
@@ -531,8 +531,8 @@ packages:
     engines: {node: 18 || 20 || 22 || >=23}
     hasBin: true
 
-  '@cucumber/cucumber@12.0.0':
-    resolution: {integrity: sha512-cfNIbOlaqR+jbH6EH+JTb8wiA2ANge7P3DleKaEl2HPzYZat3jIuEjtSpIcXl3NREgWyREkwVE3meA/rRAtZIw==}
+  '@cucumber/cucumber@12.1.0':
+    resolution: {integrity: sha512-F72uKHUtHFFn4OAw6r6MoS+PWSMomQoIpW4+W/dcwNYY9oAKVAGyGJkEPIDXX00YtZY+EH3RUcNPlkD+f+dI0Q==}
     engines: {node: 20 || 22 || >=24}
     hasBin: true
 
@@ -553,9 +553,6 @@ packages:
 
   '@cucumber/gherkin@31.0.0':
     resolution: {integrity: sha512-wlZfdPif7JpBWJdqvHk1Mkr21L5vl4EfxVUOS4JinWGf3FLRV6IKUekBv5bb5VX79fkDcfDvESzcQ8WQc07Wgw==}
-
-  '@cucumber/gherkin@32.1.2':
-    resolution: {integrity: sha512-hj1DcaiIpXJg+mo58zpQyP8c6YsUY/NIOK8oWg1XxbXAWkuYNWr9kkM+i8Xxg1yT6YEzn1loLBG6GjL6SPYOZQ==}
 
   '@cucumber/gherkin@32.2.0':
     resolution: {integrity: sha512-X8xuVhSIqlUjxSRifRJ7t0TycVWyX58fygJH3wDNmHINLg9sYEkvQT0SO2G5YlRZnYc11TIFr4YPenscvdlBIw==}
@@ -5455,12 +5452,12 @@ snapshots:
       yaml: 2.8.0
       yup: 1.6.1
 
-  '@cucumber/cucumber@12.0.0':
+  '@cucumber/cucumber@12.1.0':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber-expressions': 18.0.1
-      '@cucumber/gherkin': 32.1.2
-      '@cucumber/gherkin-streams': 5.0.1(@cucumber/gherkin@32.1.2)(@cucumber/message-streams@4.0.1(@cucumber/messages@27.2.0))(@cucumber/messages@27.2.0)
+      '@cucumber/gherkin': 32.2.0
+      '@cucumber/gherkin-streams': 5.0.1(@cucumber/gherkin@32.2.0)(@cucumber/message-streams@4.0.1(@cucumber/messages@27.2.0))(@cucumber/messages@27.2.0)
       '@cucumber/gherkin-utils': 9.2.0
       '@cucumber/html-formatter': 21.13.0(@cucumber/messages@27.2.0)
       '@cucumber/junit-xml-formatter': 0.7.1(@cucumber/messages@27.2.0)
@@ -5505,9 +5502,9 @@ snapshots:
       commander: 9.1.0
       source-map-support: 0.5.21
 
-  '@cucumber/gherkin-streams@5.0.1(@cucumber/gherkin@32.1.2)(@cucumber/message-streams@4.0.1(@cucumber/messages@27.2.0))(@cucumber/messages@27.2.0)':
+  '@cucumber/gherkin-streams@5.0.1(@cucumber/gherkin@32.2.0)(@cucumber/message-streams@4.0.1(@cucumber/messages@27.2.0))(@cucumber/messages@27.2.0)':
     dependencies:
-      '@cucumber/gherkin': 32.1.2
+      '@cucumber/gherkin': 32.2.0
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@27.2.0)
       '@cucumber/messages': 27.2.0
       commander: 9.1.0
@@ -5528,10 +5525,6 @@ snapshots:
   '@cucumber/gherkin@31.0.0':
     dependencies:
       '@cucumber/messages': 26.0.1
-
-  '@cucumber/gherkin@32.1.2':
-    dependencies:
-      '@cucumber/messages': 27.2.0
 
   '@cucumber/gherkin@32.2.0':
     dependencies:
