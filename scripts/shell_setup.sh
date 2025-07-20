@@ -43,6 +43,7 @@ setup_env_vars() {
   export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
   export NODE_PATH="$(dirname $(dirname $(readlink -f $(which node))))"
   export PNPM_HOME="$(dirname $(dirname $(readlink -f $(which pnpm))))"
+  export GRADLE_OPTS="--enable-native-access=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED"
 
   # Base PATH
   export PATH="${JAVA_HOME}/bin:${NODE_PATH}/bin:${PNPM_HOME}/bin:${PATH}"
