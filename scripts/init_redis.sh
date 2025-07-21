@@ -2,6 +2,12 @@
 
 set -uo pipefail
 
+# Source shell setup to get logging function
+if [ -f "$(dirname "$0")/shell_setup.sh" ]; then
+  source "$(dirname "$0")/shell_setup.sh"
+  setup_logging
+fi
+
 # Redis initialization function
 init_redis() {
   local REDIS_PID
@@ -43,7 +49,16 @@ EOF
     # Start Redis server
     redis-server "${REDIS_CONF_FILE}" --daemonize yes
 
-    export REDIS_PID=$!
+    # Wait a moment for Redis to start and write its PID file
+    sleep 1
+
+    # Get the PID from the PID file or by pgrep
+    if [ -f "${REDIS_PID_FILE}" ]; then
+      export REDIS_PID=$(cat "${REDIS_PID_FILE}")
+    else
+      export REDIS_PID=$(pgrep redis-server)
+    fi
+
     # Wait for Redis to be ready
     sleep 2
     log "Redis server started on port ${REDIS_TCP_PORT}"
