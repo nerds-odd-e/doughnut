@@ -79,7 +79,7 @@
     "syncpack": "^13.0.4",
     "typescript": "5.8.3",
     "util": "^0.12.5",
-    "wait-on": "^8.0.3"
+    "wait-on": "^8.0.4"
   },
   "dependencies": {
     "@cucumber/cucumber": "^12.1.0",
