@@ -41,7 +41,7 @@
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.23",
-    "es-toolkit": "^1.39.7",
+    "es-toolkit": "^1.39.8",
     "gsap": "^3.13.0",
     "jsdom": "^26.1.0",
     "optionator": "^0.9.4",
@@ -60,6 +60,6 @@
     "vitest": "3.2.4",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
-    "vue-tsc": "3.0.3"
+    "vue-tsc": "3.0.4"
   }
 }
