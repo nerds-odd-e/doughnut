@@ -9,11 +9,11 @@ The original package name 'com.odd-e.doughnut' is invalid and this project uses 
 For further reference, please consider the following sections:
 
 * [Official Gradle documentation](https://docs.gradle.org)
-* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/3.3/gradle-plugin/index.html)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/3.3/reference/using/devtools.html)
-* [Spring Web](https://docs.spring.io/spring-boot/3.3/reference/web/index.html)
-* [Spring Data JPA](https://docs.spring.io/spring-boot/3.3/how-to/data-access.html)
-* [Flyway Migration](https://docs.spring.io/spring-boot/3.3/how-to/data-initialization.html#howto.data-initialization.migration-tool.flyway)
+* [Spring Boot Gradle Plugin Reference Guide](https://docs.spring.io/spring-boot/3.4/gradle-plugin/index.html)
+* [Spring Boot DevTools](https://docs.spring.io/spring-boot/3.4/reference/using/devtools.html)
+* [Spring Web](https://docs.spring.io/spring-boot/3.4/reference/web/index.html)
+* [Spring Data JPA](https://docs.spring.io/spring-boot/3.4/how-to/data-access.html)
+* [Flyway Migration](https://docs.spring.io/spring-boot/3.4/how-to/data-initialization.html#howto.data-initialization.migration-tool.flyway)
 
 ## Guides
 
