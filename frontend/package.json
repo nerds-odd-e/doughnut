@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": ">=22",
-    "pnpm": ">=10.12.4"
+    "pnpm": ">=10.14.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -60,6 +60,6 @@
     "vitest": "3.2.4",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
-    "vue-tsc": "3.0.4"
+    "vue-tsc": "3.0.5"
   }
 }
