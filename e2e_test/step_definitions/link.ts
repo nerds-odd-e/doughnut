@@ -104,10 +104,6 @@ When(
   }
 )
 
-When('I choose to find exact match only', () => {
-  start.assumeNoteTargetSearchDialog().chooseExactMatchOnly()
-})
-
 Then(
   'I should see {string} has link {string} {string}',
   (noteTopology: string, linkType: string, targetNoteTopics: string) => {

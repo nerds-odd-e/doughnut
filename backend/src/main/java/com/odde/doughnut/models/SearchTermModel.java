@@ -18,8 +18,8 @@ public class SearchTermModel {
 
   public SearchTermModel(User entity, NoteRepository noteRepository, SearchTerm searchTerm) {
     this.user = entity;
-    this.searchTerm = searchTerm;
     this.noteRepository = noteRepository;
+    this.searchTerm = searchTerm;
   }
 
   private static final int SEARCH_RESULT_LIMIT = 20;

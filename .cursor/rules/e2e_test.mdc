@@ -15,6 +15,8 @@ nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_que
 Typically, the developer will start the backend, frontend, mountebank mock services manually.
 If any backend code is changed, the backend server will need to be restarted manually. In case it is running in the agent mode, please pause or stop and remind the programmer to restart the backend service before continue.
 
+If a scenario has the "@focus" tag, the other sceanrios in the same feature file are ignored.
+
 ## Technology Stack
 - Cypress for E2E testing
 - Cucumber plugin for BDD-style tests

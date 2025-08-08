@@ -37,8 +37,5 @@ export const assumeNoteTargetSearchDialog = () => {
       this.linkToTargetAs(toNoteTopic, linkType)
       cy.findByRole('button', { name: 'OK' }).click()
     },
-    chooseExactMatchOnly() {
-      cy.formField('Exact match only').check()
-    },
   }
 }
