@@ -41,4 +41,116 @@ declare module 'vue-router/auto-routes' {
     '/RecentPage': RouteRecordInfo<'/RecentPage', '/RecentPage', Record<never, never>, Record<never, never>>,
     '/UserNewRegisterPage': RouteRecordInfo<'/UserNewRegisterPage', '/UserNewRegisterPage', Record<never, never>, Record<never, never>>,
   }
+
+  /**
+   * Route file to route info map by unplugin-vue-router.
+   * Used by the volar plugin to automatically type useRoute()
+   *
+   * Each key is a file path relative to the project root with 2 properties:
+   * - routes: union of route names of the possible routes when in this page (passed to useRoute<...>())
+   * - views: names of nested views (can be passed to <RouterView name="...">)
+   *
+   * @internal
+   */
+  export interface _RouteFileInfoMap {
+    'src/pages/AdminDashboardPage.vue': {
+      routes: '/AdminDashboardPage'
+      views: never
+    }
+    'src/pages/AnsweredQuestionPage.vue': {
+      routes: '/AnsweredQuestionPage'
+      views: never
+    }
+    'src/pages/AssessmentAndCertificateHistoryPage.vue': {
+      routes: '/AssessmentAndCertificateHistoryPage'
+      views: never
+    }
+    'src/pages/AssessmentPage.vue': {
+      routes: '/AssessmentPage'
+      views: never
+    }
+    'src/pages/AssimilationPage.vue': {
+      routes: '/AssimilationPage'
+      views: never
+    }
+    'src/pages/BazaarPage.vue': {
+      routes: '/BazaarPage'
+      views: never
+    }
+    'src/pages/CircleJoinPage.vue': {
+      routes: '/CircleJoinPage'
+      views: never
+    }
+    'src/pages/CircleShowPage.vue': {
+      routes: '/CircleShowPage'
+      views: never
+    }
+    'src/pages/CirclesPage.vue': {
+      routes: '/CirclesPage'
+      views: never
+    }
+    'src/pages/commons/ContainerPage.vue': {
+      routes: '/commons/ContainerPage'
+      views: never
+    }
+    'src/pages/commons/TeleportToHeadStatus.vue': {
+      routes: '/commons/TeleportToHeadStatus'
+      views: never
+    }
+    'src/pages/FailureReportPage.vue': {
+      routes: '/FailureReportPage'
+      views: never
+    }
+    'src/pages/HomePage.vue': {
+      routes: '/HomePage'
+      views: never
+    }
+    'src/pages/ManageMCPTokensPage.vue': {
+      routes: '/ManageMCPTokensPage'
+      views: never
+    }
+    'src/pages/MessageCenterPage.vue': {
+      routes: '/MessageCenterPage'
+      views: never
+    }
+    'src/pages/NonproductionOnlyLoginPage.vue': {
+      routes: '/NonproductionOnlyLoginPage'
+      views: never
+    }
+    'src/pages/NotebooksPage.vue': {
+      routes: '/NotebooksPage'
+      views: never
+    }
+    'src/pages/NoteShowPage.vue': {
+      routes: '/NoteShowPage'
+      views: never
+    }
+    'src/pages/RaceGamePage.vue': {
+      routes: '/RaceGamePage'
+      views: never
+    }
+    'src/pages/RecallPage.vue': {
+      routes: '/RecallPage'
+      views: never
+    }
+    'src/pages/RecentPage.vue': {
+      routes: '/RecentPage'
+      views: never
+    }
+    'src/pages/UserNewRegisterPage.vue': {
+      routes: '/UserNewRegisterPage'
+      views: never
+    }
+  }
+
+  /**
+   * Get a union of possible route names in a certain route component file.
+   * Used by the volar plugin to automatically type useRoute()
+   *
+   * @internal
+   */
+  export type _RouteNamesForFilePath<FilePath extends string> =
+    _RouteFileInfoMap extends Record<FilePath, infer Info>
+      ? Info['routes']
+      : keyof RouteNamedMap
 }
