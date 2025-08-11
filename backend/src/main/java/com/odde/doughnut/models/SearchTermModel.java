@@ -6,8 +6,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
-import java.util.stream.Stream;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,10 +30,10 @@ public class SearchTermModel {
 
     // First, search for exact matches using dedicated repository methods
     List<Note> exactMatches = searchExactMatches(notebookId);
-    
+
     // Then, search for partial matches with normal limit
     List<Note> partialMatches = searchPartialMatches(notebookId);
-    
+
     // Combine and prioritize exact matches first
     return combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId);
   }
@@ -47,8 +47,8 @@ public class SearchTermModel {
     // Use dedicated repository methods for exact matching
     if (searchTerm.getAllMyCircles()) {
       return Stream.concat(
-          searchExactMatchesInMyNotebooksAndSubscriptions().stream(),
-          noteRepository.searchExactForUserInAllMyCircle(user.getId(), exactSearchKey).stream())
+              searchExactMatchesInMyNotebooksAndSubscriptions().stream(),
+              noteRepository.searchExactForUserInAllMyCircle(user.getId(), exactSearchKey).stream())
           .toList();
     }
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
@@ -59,8 +59,13 @@ public class SearchTermModel {
 
   private List<Note> searchExactMatchesInMyNotebooksAndSubscriptions() {
     return Stream.concat(
-        noteRepository.searchExactForUserInAllMyNotebooks(user.getId(), searchTerm.getTrimmedSearchKey()).stream(),
-        noteRepository.searchExactForUserInAllMySubscriptions(user.getId(), searchTerm.getTrimmedSearchKey()).stream())
+            noteRepository
+                .searchExactForUserInAllMyNotebooks(user.getId(), searchTerm.getTrimmedSearchKey())
+                .stream(),
+            noteRepository
+                .searchExactForUserInAllMySubscriptions(
+                    user.getId(), searchTerm.getTrimmedSearchKey())
+                .stream())
         .toList();
   }
 
@@ -73,8 +78,10 @@ public class SearchTermModel {
     // Use existing LIKE search methods for partial matches
     if (searchTerm.getAllMyCircles()) {
       return Stream.concat(
-          searchPartialMatchesInMyNotebooksAndSubscriptions().stream(),
-          noteRepository.searchForUserInAllMyCircle(user.getId(), getPattern(), getLimitPageable()).stream())
+              searchPartialMatchesInMyNotebooksAndSubscriptions().stream(),
+              noteRepository
+                  .searchForUserInAllMyCircle(user.getId(), getPattern(), getLimitPageable())
+                  .stream())
           .toList();
     }
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
@@ -85,33 +92,43 @@ public class SearchTermModel {
 
   private List<Note> searchPartialMatchesInMyNotebooksAndSubscriptions() {
     return Stream.concat(
-        noteRepository.searchForUserInAllMyNotebooks(user.getId(), getPattern(), getLimitPageable()).stream(),
-        noteRepository.searchForUserInAllMySubscriptions(user.getId(), getPattern(), getLimitPageable()).stream())
+            noteRepository
+                .searchForUserInAllMyNotebooks(user.getId(), getPattern(), getLimitPageable())
+                .stream(),
+            noteRepository
+                .searchForUserInAllMySubscriptions(user.getId(), getPattern(), getLimitPageable())
+                .stream())
         .toList();
   }
 
-  private List<NoteTopology> combineExactAndPartialMatches(List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId) {
+  private List<NoteTopology> combineExactAndPartialMatches(
+      List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId) {
     // Filter out exact matches from partial matches to avoid duplicates
-    List<Note> filteredPartialMatches = partialMatches.stream()
-        .filter(note -> exactMatches.stream().noneMatch(exact -> exact.getId().equals(note.getId())))
-        .toList();
+    List<Note> filteredPartialMatches =
+        partialMatches.stream()
+            .filter(
+                note ->
+                    exactMatches.stream().noneMatch(exact -> exact.getId().equals(note.getId())))
+            .toList();
 
     // Combine exact matches first, then partial matches
-    List<NoteTopology> results = exactMatches.stream()
-        .filter(note -> !note.getId().equals(avoidNoteId))
-        .map(Note::getNoteTopology)
-        .collect(Collectors.toList());
+    List<NoteTopology> results =
+        exactMatches.stream()
+            .filter(note -> !note.getId().equals(avoidNoteId))
+            .map(Note::getNoteTopology)
+            .collect(Collectors.toList());
 
     // If we have exact matches, we can exceed the normal limit to include more partial matches
     // This ensures exact matches are always included even when there are many partial matches
     int remainingSlots = exactMatches.isEmpty() ? 20 : 20 + exactMatches.size();
-    
+
     if (remainingSlots > 0) {
-      results.addAll(filteredPartialMatches.stream()
-          .limit(remainingSlots)
-          .filter(note -> !note.getId().equals(avoidNoteId))
-          .map(Note::getNoteTopology)
-          .collect(Collectors.toList()));
+      results.addAll(
+          filteredPartialMatches.stream()
+              .limit(remainingSlots)
+              .filter(note -> !note.getId().equals(avoidNoteId))
+              .map(Note::getNoteTopology)
+              .collect(Collectors.toList()));
     }
 
     return results;
@@ -129,13 +146,13 @@ public class SearchTermModel {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
     }
-    
+
     // Search for exact matches first
     List<Note> exactMatches = searchExactMatches(null);
-    
+
     // Search for partial matches
     List<Note> partialMatches = searchPartialMatches(null);
-    
+
     return combineExactAndPartialMatches(exactMatches, partialMatches, null);
   }
 
@@ -144,13 +161,14 @@ public class SearchTermModel {
       return List.of();
     }
     Integer avoidNoteId = note != null ? note.getId() : null;
-    
+
     // Search for exact matches first
     List<Note> exactMatches = searchExactMatches(note != null ? note.getNotebook().getId() : null);
-    
+
     // Search for partial matches
-    List<Note> partialMatches = searchPartialMatches(note != null ? note.getNotebook().getId() : null);
-    
+    List<Note> partialMatches =
+        searchPartialMatches(note != null ? note.getNotebook().getId() : null);
+
     return combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId);
   }
 }

@@ -37,7 +37,7 @@ class SearchTermModelExactMatchTest {
 
   @Nested
   class ExactMatchPrioritization {
-    
+
     @Test
     void shouldPutExactMatchFirstWhenSearching() {
       // Given: notes with "pam" in the title and one exact match "Pam"
@@ -45,11 +45,11 @@ class SearchTermModelExactMatchTest {
       makeMe.aNote("Lorazepam").under(parentNote).please();
       makeMe.aNote("Clonazepam").under(parentNote).please();
       Note exactMatch = makeMe.aNote("Pam").under(parentNote).please();
-      
+
       // When: searching for "pam"
       searchTerm.setSearchKey("pam");
       List<NoteTopology> results = searchTermModel.searchForNotesInRelateTo(parentNote);
-      
+
       // Then: exact match should be first
       assertThat(results, hasSize(4));
       assertThat(results.get(0).getTitleOrPredicate(), equalTo("Pam"));
@@ -64,11 +64,11 @@ class SearchTermModelExactMatchTest {
       makeMe.aNote("Lorazepam").under(parentNote).please();
       Note exactMatch2 = makeMe.aNote("pam").under(parentNote).please();
       makeMe.aNote("Clonazepam").under(parentNote).please();
-      
+
       // When: searching for "pam"
       searchTerm.setSearchKey("pam");
       List<NoteTopology> results = searchTermModel.searchForNotesInRelateTo(parentNote);
-      
+
       // Then: exact matches should be first (case-insensitive)
       assertThat(results, hasSize(5));
       assertThat(results.get(0).getTitleOrPredicate(), equalTo("Pam"));
@@ -84,11 +84,11 @@ class SearchTermModelExactMatchTest {
         makeMe.aNote("Diazepam" + i).under(parentNote).please();
       }
       Note exactMatch = makeMe.aNote("Pam").under(parentNote).please();
-      
+
       // When: searching for "pam"
       searchTerm.setSearchKey("pam");
       List<NoteTopology> results = searchTermModel.searchForNotesInRelateTo(parentNote);
-      
+
       // Then: exact match should be included even though there are more than 20 partial matches
       assertThat(results, hasSize(greaterThan(20)));
       assertThat(results.get(0).getTitleOrPredicate(), equalTo("Pam"));
@@ -101,11 +101,11 @@ class SearchTermModelExactMatchTest {
       makeMe.aNote("Diazepam").under(parentNote).please();
       Note exactMatch = makeMe.aNote("PAM").under(parentNote).please();
       makeMe.aNote("Lorazepam").under(parentNote).please();
-      
+
       // When: searching for "pam" (lowercase)
       searchTerm.setSearchKey("pam");
       List<NoteTopology> results = searchTermModel.searchForNotesInRelateTo(parentNote);
-      
+
       // Then: exact match should be first (case-insensitive)
       assertThat(results, hasSize(3));
       assertThat(results.get(0).getTitleOrPredicate(), equalTo("PAM"));
@@ -117,11 +117,11 @@ class SearchTermModelExactMatchTest {
       // Given: some notes
       makeMe.aNote("Diazepam").under(parentNote).please();
       makeMe.aNote("Pam").under(parentNote).please();
-      
+
       // When: searching with empty key
       searchTerm.setSearchKey("");
       List<NoteTopology> results = searchTermModel.searchForNotesInRelateTo(parentNote);
-      
+
       // Then: should return empty list
       assertThat(results, empty());
     }
@@ -131,13 +131,13 @@ class SearchTermModelExactMatchTest {
       // Given: some notes
       makeMe.aNote("Diazepam").under(parentNote).please();
       makeMe.aNote("Pam").under(parentNote).please();
-      
+
       // When: searching with whitespace only
       searchTerm.setSearchKey("   ");
       List<NoteTopology> results = searchTermModel.searchForNotesInRelateTo(parentNote);
-      
+
       // Then: should return empty list
       assertThat(results, empty());
     }
   }
-} 
+}
