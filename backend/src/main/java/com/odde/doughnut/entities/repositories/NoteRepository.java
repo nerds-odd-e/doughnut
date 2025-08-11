@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 public interface NoteRepository extends CrudRepository<Note, Integer> {
   String selectFromNote = "SELECT n FROM Note n";
   String searchForTitleLike = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
+  String searchForTitleExact = " WHERE LOWER(n.topicConstructor) = LOWER(:key) AND n.deletedAt IS NULL ";
 
   @Query(value = selectFromNote + " where n.topicConstructor = :key")
   Note findFirstByTitle(@Param("key") String key);
@@ -25,6 +26,28 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value = selectFromNote + searchForTitleLike + "  AND n.notebook.ownership.user.id = :userId")
   List<Note> searchForUserInAllMyNotebooks(Integer userId, String pattern, Pageable pageable);
+
+  @Query(
+      value = selectFromNote + searchForTitleExact + "  AND n.notebook.ownership.user.id = :userId")
+  List<Note> searchExactForUserInAllMyNotebooks(Integer userId, String key);
+
+  @Query(
+      value =
+          selectFromNote
+              + " JOIN n.notebook.subscriptions s ON s.user.id = :userId "
+              + searchForTitleExact)
+  List<Note> searchExactForUserInAllMySubscriptions(Integer userId, @Param("key") String key);
+
+  @Query(
+      value =
+          selectFromNote
+              + "              JOIN n.notebook.ownership.circle.members m"
+              + "                ON m.id = :userId "
+              + searchForTitleExact)
+  List<Note> searchExactForUserInAllMyCircle(Integer userId, @Param("key") String key);
+
+  @Query(value = selectFromNote + searchForTitleExact + " AND n.notebook.id = :notebookId")
+  List<Note> searchExactInNotebook(Integer notebookId, @Param("key") String key);
 
   @Query(
       value =

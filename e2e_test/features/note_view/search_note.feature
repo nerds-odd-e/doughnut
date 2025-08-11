@@ -22,7 +22,6 @@ Feature: search note
       | Sedatio    | Sedation           |
 
   @mockBrowserTime
-  @ignore
   Scenario: Show exact match first when searching
       Given there are some notes:
       | Title      | Parent Title |
