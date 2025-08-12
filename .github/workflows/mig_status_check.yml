@@ -12,7 +12,7 @@ jobs:
     name: Check GCP MIG Stability
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}

@@ -32,7 +32,7 @@ jobs:
     name: Linting & Types Gen for Frontend
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
@@ -47,7 +47,7 @@ jobs:
     name: Backend Unit tests
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Setup MySQL DB Server
         uses: ./.github/mysql_db
         with:
@@ -74,7 +74,7 @@ jobs:
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/setup_nodejs
         with:
           node_version: ${{ vars.NODE_VERSION }}
@@ -85,7 +85,7 @@ jobs:
     name: Package backend & frontend artifacts for deployment
     runs-on: ${{ vars.RUNNER }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
@@ -126,7 +126,7 @@ jobs:
           - |
             e2e_test/features/w*/**
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: docker/login-action@v3
         with:
           username: ${{ env.DOCKERHUB_USERNAME }}
@@ -184,7 +184,7 @@ jobs:
         E2E-tests,
       ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
@@ -228,7 +228,7 @@ jobs:
   # mobile-unit-test:
   #   runs-on: ${{ vars.RUNNER }}
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v5
   #     - uses: subosito/flutter-action@v2
   #       with:
   #         flutter-version: ${{ vars.FLUTTER_VERSION }}
@@ -248,7 +248,7 @@ jobs:
   #       run: xcrun xctrace list devices
   #     - name: Start Simulator
   #       run: xcrun simctl boot "${{ matrix.device }}"
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v5
   #     - uses: ./.github/starting_backend_actions
   #       with:
   #         java_version: ${{ vars.JAVA_VERSION }}
@@ -272,7 +272,7 @@ jobs:
   #     matrix:
   #       api-level: [34]
   #   steps:
-  #     - uses: actions/checkout@v4
+  #     - uses: actions/checkout@v5
   #     - uses: ./.github/starting_backend_actions
   #       with:
   #         java_version: ${{ vars.JAVA_VERSION }}
