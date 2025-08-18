@@ -21,3 +21,17 @@ Feature: Notebook questions
     And I should see that there are no questions for "LeSS in Action" for the following notes:
       | Title |
       | management  |
+
+  Scenario: Delete a question from the question list in a notebook
+    When I add questions to the following notes in the notebook "LeSS in Action"
+      | Title | Question                |
+      | team  | Who is the team?        |
+      | tech  | What is the technology? |
+    And I delete the following questions for the notes in the notebook "LeSS in Action":
+      | Title | Question                |
+      | team  | Who is the team?        |
+      | tech  | What is the technology? |
+    Then I should see that there are no questions for "LeSS in Action" for the following notes:
+      | Title |
+      | team  |
+      | tech  |
