@@ -1,21 +1,17 @@
 import RichMarkdownEditor from "@/components/form/RichMarkdownEditor.vue"
-import { flushPromises, mount } from "@vue/test-utils"
-import { nextTick } from "vue"
+import { flushPromises } from "@vue/test-utils"
+import helper from "@tests/helpers"
 
 describe("RichMarkdownEditor", () => {
   const mountEditor = async (initialValue: string, options = {}) => {
-    const wrapper = mount(RichMarkdownEditor, {
-      props: {
+    const wrapper = helper
+      .component(RichMarkdownEditor)
+      .withProps({
         modelValue: initialValue,
         ...options,
-      },
-    })
-    await nextTick()
+      })
+      .mount()
     await flushPromises()
-
-    // Wait for Quill initialization and content loading (QuillEditor setTimeout is 100ms)
-    await new Promise((resolve) => setTimeout(resolve, 150))
-
     return wrapper
   }
 
@@ -29,19 +25,11 @@ describe("RichMarkdownEditor", () => {
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
   })
 
-  it("renders markdown headers correctly", async () => {
+  it("will try to unify the markdown", async () => {
     const wrapper = await mountEditor("# Title")
-
-    // The component should render "# Title" as an <h1> element
-    const h1Element = wrapper.find("h1")
-    expect(h1Element.exists()).toBe(true)
-    expect(h1Element.text()).toBe("Title")
-
-    // Also check if the component is properly converting markdown to HTML
-    // The input was "# Title" and it should render as <h1>Title</h1>
-    const editorContent = wrapper.find(".ql-editor")
-    expect(editorContent.exists()).toBe(true)
-    expect(editorContent.html()).toContain("<h1>Title</h1>")
+    await flushPromises()
+    const emitted = wrapper.emitted()["update:modelValue"]
+    expect(emitted![0]![0]).toEqual("Title\n=====")
   })
 
   it.skip("will try to unify the markdown", async () => {

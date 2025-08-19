@@ -4,13 +4,6 @@ export const turndownService = new TurndownService({
   br: "<br>",
 })
 
-turndownService.addRule("h1", {
-  filter: "h1",
-  replacement(content) {
-    return `${content}\n${"=".repeat(content.length)}`
-  },
-})
-
 turndownService.addRule("quillListItem", {
   filter(node) {
     return node.nodeName === "LI" && node.getAttribute("data-list") != null
