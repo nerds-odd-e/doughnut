@@ -22,6 +22,12 @@ const onBlurTextField = () => {
   emits("blur")
 }
 
+const updateQuillContent = (content: string | undefined) => {
+  if (quill.value) {
+    quill.value.root.innerHTML = content ?? ""
+  }
+}
+
 const options: QuillOptions = {
   modules: {
     toolbar: [
@@ -41,7 +47,7 @@ onMounted(() => {
     quill.value = new Quill(editor.value, options)
 
     // Set initial content
-    quill.value.root.innerHTML = localValue.value || ""
+    updateQuillContent(localValue.value)
 
     // Listen for text changes
     quill.value.on("text-change", () => {
@@ -69,7 +75,7 @@ watch(
   (newValue) => {
     if (quill.value && localValue.value !== newValue) {
       localValue.value = newValue
-      quill.value.root.innerHTML = newValue || ""
+      updateQuillContent(newValue)
     }
   }
 )
