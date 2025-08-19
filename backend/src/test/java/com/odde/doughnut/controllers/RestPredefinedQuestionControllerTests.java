@@ -209,6 +209,28 @@ class RestPredefinedQuestionControllerTests {
   }
 
   @Nested
+  class DeleteQuestionFromNote {
+    @Test
+    void authorization() {
+      Note note = makeMe.aNote().please();
+      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteQuestion(note, predefinedQuestion));
+    }
+
+    @Test
+    void persistent() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
+      controller.addQuestionManually(note, predefinedQuestion);
+      makeMe.refresh(note);
+      controller.deleteQuestion(note, predefinedQuestion);
+      assertThat(note.getPredefinedQuestions(), hasSize(0));
+    }
+  }
+
+  @Nested
   class RefineQuestion {
     @Test
     void authorization() {
