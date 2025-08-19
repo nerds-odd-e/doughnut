@@ -19,16 +19,15 @@ Replace the current literal note title search with intelligent semantic search t
 ### Core Components
 
 1. **OpenAI Embeddings API**: Convert text to high-quality vector representations
-2. **Redis Vector Store**: Fast vector similarity search with metadata filtering  
-3. **MySQL Database**: Primary storage for note data (no embedding storage needed)
-4. **Sync Service**: Keep Redis and MySQL in perfect sync for all CRUD operations
+2. **Cloud SQL for MySQL (native vector support)**: Store embeddings in `VECTOR` columns; perform KNN/ANN similarity search using SQL only
+3. **MySQL Database (existing tables)**: Primary storage for note data
 
 ### Data Flow
 
 ```
-Note CRUD → MySQL → Generate Embedding → Redis Vector Store
-                                      ↓
-Search Query → Generate Embedding → Redis Search → MySQL Note Fetch → Results
+Note CRUD → MySQL (store text) → Generate Embedding → MySQL (store in VECTOR)
+                                                       ↓
+Search Query → Generate Embedding → SQL KNN/ANN on VECTOR → Ranked Results
 ```
 
 ## Technical Implementation
@@ -47,57 +46,53 @@ Search Query → Generate Embedding → Redis Search → MySQL Note Fetch → Re
 - **Metadata**: Track chunk index and total chunks
 - **Search**: Aggregate results from all chunks of a note
 
-### 3. Redis Vector Storage
+### 3. MySQL Vector Storage (Cloud SQL for MySQL)
 
-```java
-// Storage Structure
-"embedding:{noteId}" → {
-    vector: float[1536],
-    noteId: Long,
-    notebookId: Long,
-    title: String,
-    createdAt: String,
-    isChunk: Boolean,
-    chunkIndex: Integer
-}
+```sql
+-- Schema (single embedding per note; 1536 dims for text-embedding-3-small)
+ALTER TABLE notes
+  ADD COLUMN embedding VECTOR(1536) USING VARBINARY;
 
-// Notebook Index
-"notebook:{notebookId}:notes" → Set<noteId>
+-- Insert/Update embedding
+UPDATE notes
+SET embedding = string_to_vector('[0.1, 0.2, ...]')
+WHERE id = ?;
+
+-- Optional ANN index for performance
+CREATE VECTOR INDEX notes_embedding_idx
+ON notes(embedding)
+USING SCANN
+QUANTIZER = SQ8
+DISTANCE_MEASURE = l2_squared;
 ```
 
-### 4. CRUD Synchronization
+### 4. CRUD Flow
 
 **Create Note:**
 1. Save note to MySQL
 2. Generate embedding via OpenAI
-3. Store embedding in Redis with metadata
-4. Index by notebook for filtering
+3. Store embedding in MySQL `VECTOR` column
 
 **Update Note:**
-1. Update note in MySQL  
-2. Delete old embeddings from Redis
-3. Generate new embedding
-4. Store new embedding in Redis
+1. Update note in MySQL
+2. Regenerate embedding and update the `VECTOR` column
 
 **Delete Note:**
-1. Delete embeddings from Redis
-2. Delete note from MySQL
-3. Remove from notebook indexes
+1. Delete note row (embedding goes with it)
 
 ### 5. Search Implementation
 
 **Query Process:**
 1. Generate embedding for search query
 2. Filter by allowed notebook IDs
-3. Compute cosine similarity with candidate notes
+3. Compute similarity with candidate notes using SQL (`vector_distance`/`approx_distance`)
 4. Apply similarity threshold (0.7)
 5. Sort by relevance score
 6. Fetch full note data from MySQL
 7. Return ranked results
 
 **Title Weighting:**
-- Apply 2x weight to title matches vs details matches
-- Combine similarity scores: `(titleScore * 2 + detailsScore) / 3`
+- If we later store multiple embeddings (e.g., title vs. details), apply 2x weight to title distances and combine: `(titleScore * 2 + detailsScore) / 3`
 
 ### 6. Fallback Strategy
 
@@ -119,10 +114,10 @@ public SearchResults search(String query) {
 
 ### Phase 1: Basic Semantic Search (2-3 weeks)
 - [ ] OpenAI embedding service integration
-- [ ] Redis vector storage setup
-- [ ] Basic CRUD synchronization
+- [ ] Add `VECTOR(1536)` column to `notes` and DAO support (Cloud SQL for MySQL)
+- [ ] Basic CRUD flow to write/update embeddings
 - [ ] Single embedding per note (no chunking yet)
-- [ ] Simple similarity search
+- [ ] Simple KNN similarity search with SQL (`vector_distance`)
 - [ ] New search endpoint with fallback
 
 ### Phase 2: Enhanced Features (1-2 weeks)  
@@ -136,16 +131,17 @@ public SearchResults search(String query) {
 - [ ] Async embedding generation
 - [ ] Bulk embedding migration for existing notes
 - [ ] Error handling and retry logic
-- [ ] Redis persistence configuration
+- [ ] Create ANN index (`CREATE VECTOR INDEX ... USING SCANN`)
 - [ ] Monitoring and alerting
 
 ## Configuration Requirements
 
-### Redis Setup
-- **Redis version**: 6.2+ (for vector similarity features)
-- **Memory**: ~60MB per 10k notes (1536 dims * 4 bytes * 10k)
-- **Persistence**: Enable AOF for data durability
-- **Hosting**: Google Cloud Memorystore (Redis) recommended
+### Cloud SQL for MySQL (Vector) Setup
+- **Service**: Cloud SQL for MySQL with vector embeddings support
+- **Schema**: `VECTOR(1536) USING VARBINARY` column, optional SCANN vector index
+- **Functions**: `string_to_vector`, `vector_distance` (KNN), `approx_distance` (ANN)
+- **Distance measures**: `l2_squared`, `cosine`, `dot_product`
+- **Access**: Use Cloud SQL Auth Proxy for local development
 
 ### OpenAI API
 - **API Key**: Secure storage in application properties
@@ -160,10 +156,10 @@ openai.api.key=${OPENAI_API_KEY}
 openai.embedding.model=text-embedding-3-small
 openai.embedding.max-tokens=8000
 
-# Redis Configuration  
-spring.redis.host=${REDIS_HOST}
-spring.redis.port=6379
-spring.redis.password=${REDIS_PASSWORD}
+# Database / Cloud SQL
+spring.datasource.url=${JDBC_URL}
+spring.datasource.username=${DB_USER}
+spring.datasource.password=${DB_PASSWORD}
 
 # Search Configuration
 search.similarity.threshold=0.7
@@ -187,7 +183,7 @@ search.chunk.max-chars=32000
 ## Performance Expectations
 
 ### Search Performance
-- **Redis Vector Search**: <50ms for 10k notes
+- **Cloud SQL Vector Search**: Low 10s–100s ms depending on index (KNN vs ANN)
 - **OpenAI Embedding Generation**: 100-300ms per query
 - **Total Search Time**: <400ms end-to-end
 - **Throughput**: 2-5 searches/second per instance
@@ -200,11 +196,10 @@ search.chunk.max-chars=32000
 
 ## Risk Mitigation
 
-### Redis Data Loss
-- **Detection**: Health check on startup
-- **Recovery**: Automatic rebuild from MySQL notes
-- **Cost**: Regenerate embeddings via OpenAI API
-- **Time**: ~30 minutes for 10k notes
+### Vector Feature Availability / Compatibility
+- **Cloud SQL dependency**: Vector features are provided by Cloud SQL for MySQL; standard local MySQL may not support `VECTOR`
+- **Local dev option (preferred)**: Connect to a small Cloud SQL dev instance via Cloud SQL Auth Proxy to keep parity
+- **Local dev fallback**: Feature-flag semantic search off locally (fallback to keyword/full-text) if Cloud SQL is unavailable
 
 ### OpenAI API Issues  
 - **Fallback**: Use MySQL full-text search
@@ -212,11 +207,9 @@ search.chunk.max-chars=32000
 - **Caching**: Cache query embeddings for repeated searches
 - **Monitoring**: Alert on API failures
 
-### Sync Issues
-- **Transaction Management**: Use @Transactional for consistency
-- **Error Handling**: Rollback MySQL on Redis failures
-- **Monitoring**: Track sync failures and inconsistencies
-- **Manual Sync**: Admin endpoint to force re-sync
+### Data Integrity
+- **Transaction Management**: Use @Transactional for note + embedding updates
+- **Monitoring**: Track embedding generation failures and retries
 
 ## Success Metrics
 
@@ -227,7 +220,7 @@ search.chunk.max-chars=32000
 
 ### Technical Metrics  
 - **API Uptime**: 99.9% search availability
-- **Sync Accuracy**: 99.99% MySQL-Redis consistency
+- **Data Consistency**: Notes and embeddings updated atomically
 - **Cost Efficiency**: <$10/month for 10k active notes
 - **Performance**: Handle 100+ concurrent searches
 
