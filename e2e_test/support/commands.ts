@@ -26,7 +26,6 @@
 // @ts-check
 import '@testing-library/cypress/add-commands'
 import 'cypress-file-upload'
-import start from '../start'
 import { commonSenseSplit } from './string_util'
 
 Cypress.Commands.add('pageIsNotLoading', () => {
