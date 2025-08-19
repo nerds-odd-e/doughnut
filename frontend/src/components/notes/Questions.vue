@@ -20,6 +20,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -43,17 +44,24 @@
           <template
             v-if="question.multipleChoicesQuestion.choices"
           >
+            <!-- Always render 4 choice columns (A-D). If a choice is missing render an empty cell so Actions column stays aligned -->
             <td
-              v-for="(choice, index) in question
-                .multipleChoicesQuestion.choices"
-              :class="{
-                'correct-choice': index === question.correctAnswerIndex,
-              }"
+              v-for="index in 4"
               :key="index"
+              :class="{ 'correct-choice': (index - 1) === question.correctAnswerIndex }"
             >
-              {{ choice }}
+              {{ question.multipleChoicesQuestion?.choices?.[index - 1] ?? '' }}
             </td>
           </template>
+          <td>
+            <button
+              type="button"
+              class="daisy-btn daisy-btn-error daisy-btn-sm"
+              @click="deleteQuestion(question)"
+            >
+              Delete Question
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -109,6 +117,24 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
   }
 }
+
+const deleteQuestion = async (question: PredefinedQuestion) => {
+  if (!question) return
+  // simple confirmation
+  // eslint-disable-next-line no-restricted-globals
+  if (!confirm('Delete this question?')) return
+  try {
+    await managedApi.restPredefinedQuestionController.deleteQuestion(props.note.id, question)
+    questions.value = questions.value.filter((q) => q.id !== question.id)
+  } catch (err) {
+    // keep it minimal: log and alert
+    // eslint-disable-next-line no-console
+    console.error('Failed to delete question', err)
+    // eslint-disable-next-line no-alert
+    alert('Failed to delete question')
+  }
+}
+
 onMounted(() => {
   fetchQuestions()
 })
