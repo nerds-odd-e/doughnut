@@ -120,18 +120,20 @@ const toggleApproval = async (questionId?: number) => {
 
 const deleteQuestion = async (question: PredefinedQuestion) => {
   if (!question) return
-  // simple confirmation
-  // eslint-disable-next-line no-restricted-globals
-  if (!confirm('Delete this question?')) return
+  // simple confirmation using window.confirm to satisfy the linter
+  if (!window.confirm("Delete this question?")) return
   try {
-    await managedApi.restPredefinedQuestionController.deleteQuestion(props.note.id, question)
+    await managedApi.restPredefinedQuestionController.deleteQuestion(
+      props.note.id,
+      question
+    )
     questions.value = questions.value.filter((q) => q.id !== question.id)
   } catch (err) {
     // keep it minimal: log and alert
     // eslint-disable-next-line no-console
-    console.error('Failed to delete question', err)
+    console.error("Failed to delete question", err)
     // eslint-disable-next-line no-alert
-    alert('Failed to delete question')
+    alert("Failed to delete question")
   }
 }
 
