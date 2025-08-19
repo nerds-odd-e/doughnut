@@ -118,6 +118,29 @@ export class RestPredefinedQuestionControllerService {
     }
     /**
      * @param note
+     * @param requestBody
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        note: number,
+        requestBody: PredefinedQuestion,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/predefined-questions/{note}/note-questions/{predefinedQuestion}/delete',
+            path: {
+                'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
      * @returns PredefinedQuestion OK
      * @throws ApiError
      */

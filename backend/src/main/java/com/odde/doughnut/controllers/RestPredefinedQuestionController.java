@@ -97,7 +97,7 @@ class RestPredefinedQuestionController {
     return predefinedQuestionService.addQuestion(note, predefinedQuestion);
   }
 
-  @DeleteMapping("/{note}/note-questions/{predefinedQuestion}")
+  @PostMapping("/{note}/note-questions/{predefinedQuestion}/delete")
   @Transactional
   public void deleteQuestion(
       @PathVariable("note") @Schema(type = "integer") Note note,
