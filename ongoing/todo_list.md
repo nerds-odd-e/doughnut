@@ -1,15 +1,15 @@
 ## Semantic Search with Cloud SQL for MySQL (Vector)
 
-- [ ] Create `note_embeddings(note_id, kind[TITLE|DETAILS], context_path, dimensions, embedding)`
+- [x] Create `note_embeddings` table with placeholders (columns: `id, note_id, kind[TITLE|DETAILS], embedding(_raw), created_at, updated_at`; index on `note_id`) via `V200000196__create_note_embeddings.sql`; verified locally
 - [ ] Implement embedding insert/update/delete on note CRUD
 - [ ] Generate embeddings: title uses `path | title`; details use `path | title + "\n\n" + details`
 - [ ] Implement KNN SQL using `vector_distance`; aggregate per note with title-weighting
 - [ ] Add optional ANN index (`CREATE VECTOR INDEX ... USING SCANN`) and benchmark
 - [ ] Local dev: use alternate schema (no VECTOR), feature-flag semantic off to keyword/full-text
 - [ ] Backfill job for existing notes in batches with progress logging
-- [ ] Create env-specific Flyway migration folders: `db/migration-local`, `db/migration-prod`
-- [ ] Replace duplicated migrations with a single shared migration using Flyway placeholders
-- [ ] Configure `spring.flyway.placeholders` per profile in `application.yml`
+- [x] Create env-specific Flyway migration folders: `db/migration-local`, `db/migration-prod` (not needed; replaced by shared migration with placeholders)
+- [x] Replace duplicated migrations with a single shared migration using Flyway placeholders
+- [x] Configure `spring.flyway.placeholders` per profile in `application.yml`
 
 ## Switch to Chat Completion for Question Evaluation
 

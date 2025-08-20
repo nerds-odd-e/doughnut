@@ -27,6 +27,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     clean-on-validation-error: true
+    placeholders:
+      embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      vector_index_statement: ""
   jpa:
     generate-ddl: false
     show-sql: false
@@ -92,6 +95,9 @@ spring:
   flyway:
     clean-on-validation-error: false
     clean-disabled: true
+    placeholders:
+      embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      vector_index_statement: ""
   jpa:
     generate-ddl: false
     show-sql: false
@@ -148,6 +154,14 @@ spring:
   flyway:
     clean-on-validation-error: false
     clean-disabled: true
+    placeholders:
+      embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
+      vector_index_statement: |
+        CREATE VECTOR INDEX note_embeddings_embedding_idx
+        ON note_embeddings(embedding)
+        USING SCANN
+        QUANTIZER = SQ8
+        DISTANCE_MEASURE = l2_squared;
   jpa:
     generate-ddl: false
     show-sql: false
@@ -209,6 +223,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     clean-on-validation-error: true
+    placeholders:
+      embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      vector_index_statement: ""
   jpa:
     generate-ddl: false
     show-sql: true

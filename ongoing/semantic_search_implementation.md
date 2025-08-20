@@ -160,11 +160,12 @@ public SearchResults search(String query) {
 
 ### Phase 1: Basic Semantic Search (2-3 weeks)
 - [ ] OpenAI embedding service integration
-- [ ] New table `note_embeddings(note_id, kind, embedding)`
+- [x] New table `note_embeddings(note_id, kind, embedding)`
 - [ ] CRUD flow to insert/update/delete embeddings on note changes
 - [ ] Single embedding per note (no chunking yet)
 - [ ] Simple KNN similarity search with SQL (`vector_distance`)
 - [ ] New search endpoint with fallback
+- [x] Flyway placeholders configured per profile for embedding column and optional vector index (implemented via `V200000196__create_note_embeddings.sql` and `application.yml`)
 
 ### Phase 2: Enhanced Features (1-2 weeks)  
 - [ ] Large note chunking support
