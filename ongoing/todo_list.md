@@ -7,6 +7,8 @@
 - [ ] Add optional ANN index (`CREATE VECTOR INDEX ... USING SCANN`) and benchmark
 - [ ] Local dev: use alternate schema (no VECTOR), feature-flag semantic off to keyword/full-text
 - [ ] Backfill job for existing notes in batches with progress logging
+- [ ] Create env-specific Flyway migration folders: `db/migration-local`, `db/migration-prod`
+- [ ] Configure `spring.flyway.locations` per profile in `application.yml`
 
 ## Switch to Chat Completion for Question Evaluation
 
