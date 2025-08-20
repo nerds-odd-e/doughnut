@@ -28,7 +28,8 @@ public class NoteEmbeddingJdbcRepository {
     return prodProfile;
   }
 
-  public void insert(Integer noteId, String kind, java.util.List<Float> embeddingFloats) {
+  public void insert(
+      Integer noteId, String kind, java.util.List<? extends Number> embeddingFloats) {
     if (isVectorColumn()) {
       // GCP Cloud SQL VECTOR column: use string_to_vector(JSON)
       String json = floatsToJson(embeddingFloats);
@@ -72,25 +73,20 @@ public class NoteEmbeddingJdbcRepository {
             + embeddingColumn()
             + " FROM note_embeddings WHERE note_id=? AND kind=? ORDER BY id DESC LIMIT 1";
     try {
-      byte[] bytes =
-          jdbcTemplate.queryForObject(
-              sql,
-              (rs, rowNum) -> rs.getBytes(1),
-              noteId,
-              kind);
+      byte[] bytes = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getBytes(1), noteId, kind);
       return Optional.ofNullable(bytes);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
   }
 
-  private static String floatsToJson(java.util.List<Float> floats) {
+  private static String floatsToJson(java.util.List<? extends Number> floats) {
     StringBuilder sb = new StringBuilder(floats.size() * 8);
     sb.append('[');
     for (int i = 0; i < floats.size(); i++) {
       if (i > 0) sb.append(',');
       // Ensure JSON numeric formatting; avoid "NaN"/"Infinity"
-      float f = floats.get(i);
+      float f = floats.get(i).floatValue();
       if (Float.isFinite(f)) {
         sb.append(Float.toString(f));
       } else {
@@ -101,10 +97,11 @@ public class NoteEmbeddingJdbcRepository {
     return sb.toString();
   }
 
-  private static byte[] floatsToBytes(java.util.List<Float> floats) {
+  private static byte[] floatsToBytes(java.util.List<? extends Number> floats) {
     byte[] bytes = new byte[floats.size() * 4];
     for (int i = 0; i < floats.size(); i++) {
-      int intBits = Float.floatToIntBits(floats.get(i));
+      float f = floats.get(i).floatValue();
+      int intBits = Float.floatToIntBits(f);
       // big-endian to be consistent with existing conversion
       bytes[i * 4] = (byte) (intBits >> 24);
       bytes[i * 4 + 1] = (byte) (intBits >> 16);
@@ -114,5 +111,3 @@ public class NoteEmbeddingJdbcRepository {
     return bytes;
   }
 }
-
-

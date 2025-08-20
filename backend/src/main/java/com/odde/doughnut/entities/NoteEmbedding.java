@@ -22,10 +22,7 @@ public class NoteEmbedding extends EntityIdentifiedByIdOnly {
   @Setter
   private EmbeddingKind kind;
 
-  @Transient
-  @Getter
-  @Setter
-  private byte[] embedding;
+  @Transient @Getter @Setter private byte[] embedding;
 
   @Column(name = "created_at")
   @Getter
