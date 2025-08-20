@@ -1,6 +1,13 @@
 ## Semantic Search with Cloud SQL for MySQL (Vector)
 
 - [x] Create `note_embeddings` table with placeholders (columns: `id, note_id, kind[TITLE|DETAILS], embedding(_raw), created_at, updated_at`; index on `note_id`) via `V200000196__create_note_embeddings.sql`; verified locally
+- [x] Replace Redis Vector Storage Service with Note Embedding Service
+  - [x] Create NoteEmbedding entity with proper JPA annotations
+  - [x] Create NoteEmbeddingRepository for database operations
+  - [x] Create NoteEmbeddingService to replace RedisVectorService
+  - [x] Update NotebookReindexingService to use NoteEmbeddingService
+  - [x] Add comprehensive unit tests for new components
+  - [x] Remove all Redis-related code and configuration
 - [ ] Implement embedding insert/update/delete on note CRUD
 - [ ] Generate embeddings: title uses `path | title`; details use `path | title + "\n\n" + details`
 - [ ] Implement KNN SQL using `vector_distance`; aggregate per note with title-weighting

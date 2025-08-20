@@ -39,6 +39,8 @@ public class ModelFactoryService {
 
   @Autowired public NotebookAiAssistantRepository notebookAiAssistantRepository;
 
+  @Autowired public NoteEmbeddingRepository noteEmbeddingRepository;
+
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);
   }

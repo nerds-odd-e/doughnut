@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 class NotebookReindexingServiceTests {
 
   @Mock EmbeddingService embeddingService;
-  @Mock RedisVectorService redisVectorService;
+  @Mock NoteEmbeddingService noteEmbeddingService;
   @Autowired MakeMe makeMe;
 
   NotebookReindexingService service;
@@ -32,7 +32,7 @@ class NotebookReindexingServiceTests {
 
   @BeforeEach
   void setup() {
-    service = new NotebookReindexingService(embeddingService, redisVectorService);
+    service = new NotebookReindexingService(embeddingService, noteEmbeddingService);
     notebook = makeMe.aNotebook().please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
@@ -46,7 +46,7 @@ class NotebookReindexingServiceTests {
 
     service.reindexNotebook(notebook);
 
-    verify(redisVectorService).deleteNotebookEmbeddings(notebook.getId());
+    verify(noteEmbeddingService).deleteNotebookEmbeddings(notebook.getId());
   }
 
   @Test
@@ -57,6 +57,6 @@ class NotebookReindexingServiceTests {
     service.reindexNotebook(notebook);
 
     verify(embeddingService, times(3)).generateEmbedding(any(Note.class)); // head + 2 notes
-    verify(redisVectorService, times(3)).storeEmbedding(any(Note.class), any());
+    verify(noteEmbeddingService, times(3)).storeEmbedding(any(Note.class), any());
   }
 }

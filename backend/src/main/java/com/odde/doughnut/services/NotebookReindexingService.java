@@ -9,17 +9,17 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotebookReindexingService {
   private final EmbeddingService embeddingService;
-  private final RedisVectorService redisVectorService;
+  private final NoteEmbeddingService noteEmbeddingService;
 
   public NotebookReindexingService(
-      EmbeddingService embeddingService, RedisVectorService redisVectorService) {
+      EmbeddingService embeddingService, NoteEmbeddingService noteEmbeddingService) {
     this.embeddingService = embeddingService;
-    this.redisVectorService = redisVectorService;
+    this.noteEmbeddingService = noteEmbeddingService;
   }
 
   public void reindexNotebook(Notebook notebook) {
     // Delete all existing embeddings for this notebook
-    redisVectorService.deleteNotebookEmbeddings(notebook.getId());
+    noteEmbeddingService.deleteNotebookEmbeddings(notebook.getId());
 
     // Generate and store new embeddings for all notes in the notebook
     List<Note> notes = notebook.getNotes();
@@ -31,7 +31,7 @@ public class NotebookReindexingService {
   private void reindexNote(Note note) {
     Optional<List<Float>> embedding = embeddingService.generateEmbedding(note);
     if (embedding.isPresent()) {
-      redisVectorService.storeEmbedding(note, embedding.get());
+      noteEmbeddingService.storeEmbedding(note, embedding.get());
     }
   }
 }
