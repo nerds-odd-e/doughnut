@@ -1,3 +1,6 @@
+-- Drop table and index if they exist first
+DROP TABLE IF EXISTS note_embeddings;
+
 -- Create note_embeddings table (shared migration using Flyway placeholders)
 CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
