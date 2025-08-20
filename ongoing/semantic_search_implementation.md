@@ -48,51 +48,101 @@ Search Query → Generate Embedding → SQL KNN/ANN on VECTOR → Ranked Results
 
 ### 3. MySQL Vector Storage (Cloud SQL for MySQL)
 
-```sql
--- Schema (single embedding per note; 1536 dims for text-embedding-3-small)
-ALTER TABLE notes
-  ADD COLUMN embedding VECTOR(1536) USING VARBINARY;
+Use a dedicated table to store embeddings. A note can have multiple rows: one for the title, and one for the details (if any). Include the note's context path to improve title and details embeddings.
 
--- Insert/Update embedding
-UPDATE notes
-SET embedding = string_to_vector('[0.1, 0.2, ...]')
-WHERE id = ?;
+```sql
+-- Production (Cloud SQL for MySQL with vector support)
+CREATE TABLE note_embeddings (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  note_id BIGINT NOT NULL,
+  kind ENUM('TITLE','DETAILS') NOT NULL,
+  context_path VARCHAR(1024) NULL,
+  dimensions INT NOT NULL DEFAULT 1536,
+  embedding VECTOR(1536) USING VARBINARY NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_note_embeddings_note_id (note_id)
+);
 
 -- Optional ANN index for performance
-CREATE VECTOR INDEX notes_embedding_idx
-ON notes(embedding)
+CREATE VECTOR INDEX note_embeddings_embedding_idx
+ON note_embeddings(embedding)
 USING SCANN
 QUANTIZER = SQ8
 DISTANCE_MEASURE = l2_squared;
 ```
 
+Local development (no network) options:
+
+- Preferred: Use a local schema variant without `VECTOR` and skip semantic search. Keep DDL compatible by using a separate migration profile:
+
+```sql
+-- Local (standard MySQL) schema variant without VECTOR
+CREATE TABLE note_embeddings (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  note_id BIGINT NOT NULL,
+  kind ENUM('TITLE','DETAILS') NOT NULL,
+  context_path VARCHAR(1024) NULL,
+  dimensions INT NOT NULL DEFAULT 1536,
+  embedding_raw VARBINARY(6144) NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_note_embeddings_note_id (note_id)
+);
+```
+
+Notes:
+- Standard MySQL does not accept unknown data types; it cannot "tolerate" `VECTOR(…)` syntax without support. Use environment-specific migrations or a feature flag to avoid executing vector-specific DDL/queries locally.
+- Application logic should avoid issuing vector search SQL in local profile (fallback to keyword/full-text search).
+
 ### 4. CRUD Flow
 
 **Create Note:**
 1. Save note to MySQL
-2. Generate embedding via OpenAI
-3. Store embedding in MySQL `VECTOR` column
+2. Generate embeddings via OpenAI
+   - Title embedding input: `join(contextPath, "/") + " | " + title`
+   - Details embedding input (if not empty): `join(contextPath, "/") + " | " + title + "\n\n" + details`
+3. Insert rows into `note_embeddings` (`kind = 'TITLE'` and optionally `kind = 'DETAILS'`)
 
 **Update Note:**
 1. Update note in MySQL
-2. Regenerate embedding and update the `VECTOR` column
+2. Regenerate relevant embeddings (title and/or details) and upsert rows in `note_embeddings`
 
 **Delete Note:**
-1. Delete note row (embedding goes with it)
+1. Delete `note_embeddings` rows by `note_id`, then delete the note row
 
 ### 5. Search Implementation
 
 **Query Process:**
 1. Generate embedding for search query
 2. Filter by allowed notebook IDs
-3. Compute similarity with candidate notes using SQL (`vector_distance`/`approx_distance`)
-4. Apply similarity threshold (0.7)
-5. Sort by relevance score
+3. Compute similarity with candidate embeddings using SQL (`vector_distance`/`approx_distance`)
+4. Aggregate per `note_id` with weighting (title higher than details)
+5. Apply similarity threshold (0.7)
 6. Fetch full note data from MySQL
 7. Return ranked results
 
 **Title Weighting:**
-- If we later store multiple embeddings (e.g., title vs. details), apply 2x weight to title distances and combine: `(titleScore * 2 + detailsScore) / 3`
+- Apply 2x weight to title vs details. Combine distances per note:
+  - `combined = (titleDistance * 2 + detailsDistance) / 3` (use `COALESCE` if one is missing)
+
+Example KNN query (L2 squared):
+```sql
+WITH q AS (
+  SELECT string_to_vector(:queryVectorJson) AS qv
+)
+SELECT
+  ne.note_id,
+  MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END) AS title_dist,
+  MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END) AS details_dist,
+  ((COALESCE(MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END), 1e9) * 2)
+   + COALESCE(MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END), 1e9)) / 3 AS combined_dist
+FROM note_embeddings ne
+JOIN q
+GROUP BY ne.note_id
+ORDER BY combined_dist ASC
+LIMIT 10;
+```
 
 ### 6. Fallback Strategy
 
@@ -114,8 +164,8 @@ public SearchResults search(String query) {
 
 ### Phase 1: Basic Semantic Search (2-3 weeks)
 - [ ] OpenAI embedding service integration
-- [ ] Add `VECTOR(1536)` column to `notes` and DAO support (Cloud SQL for MySQL)
-- [ ] Basic CRUD flow to write/update embeddings
+- [ ] New table `note_embeddings(note_id, kind, context_path, dimensions, embedding)`
+- [ ] CRUD flow to insert/update/delete embeddings on note changes
 - [ ] Single embedding per note (no chunking yet)
 - [ ] Simple KNN similarity search with SQL (`vector_distance`)
 - [ ] New search endpoint with fallback
@@ -138,10 +188,10 @@ public SearchResults search(String query) {
 
 ### Cloud SQL for MySQL (Vector) Setup
 - **Service**: Cloud SQL for MySQL with vector embeddings support
-- **Schema**: `VECTOR(1536) USING VARBINARY` column, optional SCANN vector index
+- **Schema**: `note_embeddings` table with `embedding VECTOR(1536) USING VARBINARY`, optional SCANN vector index
 - **Functions**: `string_to_vector`, `vector_distance` (KNN), `approx_distance` (ANN)
 - **Distance measures**: `l2_squared`, `cosine`, `dot_product`
-- **Access**: Use Cloud SQL Auth Proxy for local development
+- **Local**: No network; use local schema variant (no `VECTOR`) and disable semantic search via feature flag
 
 ### OpenAI API
 - **API Key**: Secure storage in application properties
@@ -197,9 +247,8 @@ search.chunk.max-chars=32000
 ## Risk Mitigation
 
 ### Vector Feature Availability / Compatibility
-- **Cloud SQL dependency**: Vector features are provided by Cloud SQL for MySQL; standard local MySQL may not support `VECTOR`
-- **Local dev option (preferred)**: Connect to a small Cloud SQL dev instance via Cloud SQL Auth Proxy to keep parity
-- **Local dev fallback**: Feature-flag semantic search off locally (fallback to keyword/full-text) if Cloud SQL is unavailable
+- **Cloud SQL dependency**: Vector features are provided by Cloud SQL for MySQL
+- **Local dev (no network)**: Standard MySQL cannot accept unknown `VECTOR` types. Use environment-specific migrations that avoid `VECTOR` locally and feature-flag semantic search off, falling back to keyword/full-text.
 
 ### OpenAI API Issues  
 - **Fallback**: Use MySQL full-text search

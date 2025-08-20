@@ -1,12 +1,12 @@
 ## Semantic Search with Cloud SQL for MySQL (Vector)
 
-- [ ] Add `VECTOR(1536)` column to `notes` table (Cloud SQL for MySQL)
-- [ ] Implement embedding write/update in DAO/service on note create/update
-- [ ] Implement KNN search SQL using `vector_distance` and wire a new search endpoint
+- [ ] Create `note_embeddings(note_id, kind[TITLE|DETAILS], context_path, dimensions, embedding)`
+- [ ] Implement embedding insert/update/delete on note CRUD
+- [ ] Generate embeddings: title uses `path | title`; details use `path | title + "\n\n" + details`
+- [ ] Implement KNN SQL using `vector_distance`; aggregate per note with title-weighting
 - [ ] Add optional ANN index (`CREATE VECTOR INDEX ... USING SCANN`) and benchmark
-- [ ] Local dev: set up Cloud SQL Auth Proxy and `.env` for JDBC; document steps
-- [ ] Fallback: disable semantic search locally if Cloud SQL is unavailable
-- [ ] One-time migration job to backfill embeddings for existing notes (batched)
+- [ ] Local dev: use alternate schema (no VECTOR), feature-flag semantic off to keyword/full-text
+- [ ] Backfill job for existing notes in batches with progress logging
 
 ## Switch to Chat Completion for Question Evaluation
 
