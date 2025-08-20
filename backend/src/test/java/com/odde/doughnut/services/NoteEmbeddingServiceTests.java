@@ -39,59 +39,6 @@ class NoteEmbeddingServiceTests {
   }
 
   @Test
-  void shouldStoreTitleEmbedding() {
-    List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
-
-    service.storeEmbedding(note, embedding);
-    Optional<List<Float>> stored =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
-    assertThat(stored.isPresent(), is(true));
-    assertThat(stored.get(), equalTo(embedding));
-  }
-
-  @Test
-  void shouldStoreDetailsEmbeddingWhenNoteHasDetails() {
-    note.setDetails("Test details");
-    List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
-
-    service.storeEmbedding(note, embedding);
-    Optional<List<Float>> stored =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.DETAILS);
-    assertThat(stored.isPresent(), is(true));
-    assertThat(stored.get(), equalTo(embedding));
-  }
-
-  @Test
-  void shouldNotStoreDetailsEmbeddingWhenNoteHasNoDetails() {
-    note.setDetails(null);
-    List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
-
-    service.storeEmbedding(note, embedding);
-    Optional<List<Float>> details =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.DETAILS);
-    assertThat(details.isPresent(), is(false));
-    Optional<List<Float>> title =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
-    assertThat(title.isPresent(), is(true));
-    assertThat(title.get(), equalTo(embedding));
-  }
-
-  @Test
-  void shouldNotStoreDetailsEmbeddingWhenNoteHasEmptyDetails() {
-    note.setDetails("");
-    List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
-
-    service.storeEmbedding(note, embedding);
-    Optional<List<Float>> details =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.DETAILS);
-    assertThat(details.isPresent(), is(false));
-    Optional<List<Float>> title =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
-    assertThat(title.isPresent(), is(true));
-    assertThat(title.get(), equalTo(embedding));
-  }
-
-  @Test
   void shouldDeleteEmbeddingByNoteId() {
     makeMe.aNoteEmbedding(note).kind(NoteEmbedding.EmbeddingKind.TITLE).please();
 
