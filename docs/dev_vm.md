@@ -6,7 +6,7 @@
 4. First time login you will be greeted with "Welcome to Ubuntu 24.04!". Click on "Start setup", then "Next" twice (keep default options).
 5. Open a terminal window (press ⌘ (CMD) or ⊞ (Win) to see installed applications) or launch IntelliJ or VScode and open embedded terminal from there. (see fig. below)
 6. Run `cd ~/doughnut`
-7. Run `nix develop` to setup the required tooling and boot up biome server and mysql8 DB server locally
+7. Run `nix develop` to setup the required tooling and boot up biome server and MySQL 8.4 DB server locally
 8. Run `pnpm sut` to bootup backend Java Springboot server and get all needed DB migrations to run (`Ctrl-C` twice to exit)
 9. Run `pnpm verify`. This will run all end-to-end tests in headless mode
 10. If you wish to continue to use git over HTTPS authentication, proceed to setup your GitHub Personal Access Token (since the local doughnut repository is initially cloned via HTTPS)

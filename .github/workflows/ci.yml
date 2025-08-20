@@ -17,6 +17,7 @@ env:
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
   MYSQL_DB_PASSWORD: ${{ secrets.DBPASSWORD }}
   REDIS_VERSION: "7"
+  MYSQL_VERSION: "8.4"
   REDIS_PORT: "6380"
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -51,7 +52,7 @@ jobs:
       - name: Setup MySQL DB Server
         uses: ./.github/mysql_db
         with:
-          mysql_version: ${{ vars.MYSQL_VERSION }}
+          mysql_version: ${{ env.MYSQL_VERSION }}
           mysql_db_host_port: ${{ vars.MYSQL_PORT }}
           mysql_db_container_port: ${{ vars.MYSQL_PORT }}
           mysql_db_instance: ${{ env.MYSQL_UT_DB }}
@@ -133,7 +134,7 @@ jobs:
           password: ${{ env.DOCKERHUB_TOKEN }}
       - uses: ./.github/mysql_db
         with:
-          mysql_version: ${{ vars.MYSQL_VERSION }}
+          mysql_version: ${{ env.MYSQL_VERSION }}
           mysql_db_host_port: ${{ vars.MYSQL_PORT }}
           mysql_db_container_port: ${{ vars.MYSQL_PORT }}
           mysql_db_instance: ${{ env.MYSQL_E2E_DB }}

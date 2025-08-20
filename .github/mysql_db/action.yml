@@ -5,7 +5,7 @@ inputs:
     description: "MySQL DB Server Version"
     type: string
     required: true
-    default: "8.0"
+    default: "8.4"
   mysql_charset:
     description: "MySQL DB server character set"
     required: true
