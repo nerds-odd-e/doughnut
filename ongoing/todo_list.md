@@ -8,7 +8,8 @@
 - [ ] Local dev: use alternate schema (no VECTOR), feature-flag semantic off to keyword/full-text
 - [ ] Backfill job for existing notes in batches with progress logging
 - [ ] Create env-specific Flyway migration folders: `db/migration-local`, `db/migration-prod`
-- [ ] Configure `spring.flyway.locations` per profile in `application.yml`
+- [ ] Replace duplicated migrations with a single shared migration using Flyway placeholders
+- [ ] Configure `spring.flyway.placeholders` per profile in `application.yml`
 
 ## Switch to Chat Completion for Question Evaluation
 

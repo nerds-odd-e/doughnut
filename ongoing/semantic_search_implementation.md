@@ -193,39 +193,36 @@ public SearchResults search(String query) {
 - **Distance measures**: `l2_squared`, `cosine`, `dot_product`
 - **Local**: No network; use local schema variant (no `VECTOR`) and disable semantic search via feature flag
 
-### Environment-Specific Migrations (Flyway Free)
+### Environment-Specific Migrations (Flyway Free, minimal duplication)
 
-- This project includes `FlyWayFreeVersionRealMigration` (manual trigger on startup for non-test) and a no-op `FlywayMigrationStrategy` bean to prevent auto-migrate. We can leverage per-profile Flyway locations to run different migration variants without paid Flyway.
-- Approach:
-  - Create separate directories for environment-specific migrations, e.g.:
-    - `classpath:db/migration` (common, shared for all envs)
-    - `classpath:db/migration-prod` (Cloud SQL vector-enabled DDL)
-    - `classpath:db/migration-local` (standard MySQL DDL without `VECTOR`)
-  - Configure `spring.flyway.locations` per Spring profile in `application.yml`:
+- This project includes `FlyWayFreeVersionRealMigration` (manual trigger on startup for non-test) and a no-op `FlywayMigrationStrategy` bean. To avoid duplicating migrations across folders, use Flyway placeholders in a single shared migration.
 
+Single shared migration example (lives in `db/migration`):
+```sql
+-- V200000200__create_note_embeddings.sql (shared)
+CREATE TABLE note_embeddings (
+  id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  note_id BIGINT NOT NULL,
+  kind ENUM('TITLE','DETAILS') NOT NULL,
+  context_path VARCHAR(1024) NULL,
+  dimensions INT NOT NULL DEFAULT 1536
+);
+
+-- Add environment-specific embedding column
+ALTER TABLE note_embeddings ADD COLUMN ${embedding_column};
+
+-- Optional env-specific vector index (empty in local)
+${vector_index_statement}
+```
+
+Configure placeholders per Spring profile in `application.yml`:
 ```yaml
-# dev (local, no network)
+# dev/test/e2e (local MySQL, no VECTOR support)
 spring:
-  config:
-    activate:
-      on-profile: dev
   flyway:
-    locations: classpath:db/migration,classpath:db/migration-local
-
-# test (unit)
-spring:
-  profiles:
-    active: test
-  flyway:
-    locations: classpath:db/migration,classpath:db/migration-local
-
-# e2e (local MySQL)
-spring:
-  config:
-    activate:
-      on-profile: e2e
-  flyway:
-    locations: classpath:db/migration,classpath:db/migration-local
+    placeholders:
+      embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
+      vector_index_statement: ""
 
 # prod (Cloud SQL with vectors)
 spring:
@@ -233,15 +230,20 @@ spring:
     activate:
       on-profile: prod
   flyway:
-    locations: classpath:db/migration,classpath:db/migration-prod
+    placeholders:
+      embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
+      vector_index_statement: |
+        CREATE VECTOR INDEX note_embeddings_embedding_idx
+        ON note_embeddings(embedding)
+        USING SCANN
+        QUANTIZER = SQ8
+        DISTANCE_MEASURE = l2_squared;
 ```
 
-- Versioning guidance:
-  - Use the same version number for the `note_embeddings` creation migration across envs, but place each variant in its respective folder so only one variant is visible per profile.
-  - Keep all shared migrations in `db/migration` to avoid duplication.
-- Effect:
-  - Local/test/e2e run the local variant (no `VECTOR`), preventing syntax errors.
-  - Prod runs the Cloud SQL variant with `VECTOR(1536)` and optional `CREATE VECTOR INDEX`.
+Notes:
+- Flyway Community supports placeholder replacement with the default `${...}` syntax.
+- Keep all migrations in `db/migration` to maintain a single source of truth. Only the placeholder values change per environment.
+- If a future DDL differs too much for placeholders, add a tiny env-specific follow-up migration that is guarded by another placeholder (emits no-op locally).
 
 ### OpenAI API
 - **API Key**: Secure storage in application properties
