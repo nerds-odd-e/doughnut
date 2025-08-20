@@ -10,8 +10,5 @@ CREATE TABLE note_embeddings (
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
--- Add environment-specific embedding column
-ALTER TABLE note_embeddings ADD COLUMN embedding_raw VARBINARY(6144) NOT NULL;
-
 -- Common indexes
 CREATE INDEX idx_note_embeddings_note_id ON note_embeddings(note_id);
