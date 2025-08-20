@@ -11,12 +11,7 @@ CREATE TABLE note_embeddings (
 );
 
 -- Add environment-specific embedding column
-ALTER TABLE note_embeddings ADD COLUMN ${embedding_column};
+ALTER TABLE note_embeddings ADD COLUMN embedding_raw VARBINARY(6144) NOT NULL;
 
 -- Common indexes
 CREATE INDEX idx_note_embeddings_note_id ON note_embeddings(note_id);
-
--- Optional env-specific vector index (empty in local)
-${vector_index_statement}
-
-
