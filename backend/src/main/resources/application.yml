@@ -157,7 +157,6 @@ spring:
     placeholders:
       embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
       vector_index_statement: |
-        DROP INDEX IF EXISTS note_embeddings_embedding_idx ON note_embeddings;
         CREATE VECTOR INDEX note_embeddings_embedding_idx
         ON note_embeddings(embedding)
         USING SCANN
