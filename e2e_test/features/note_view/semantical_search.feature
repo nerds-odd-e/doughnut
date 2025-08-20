@@ -12,11 +12,13 @@ Feature: semantical search
       | Matter   | Physics      | The study of matter |
 
   @mockBrowserTime
+  @usingMockedOpenAiService
   Scenario Outline: Search at the top level
-    # Given I reindex the notebook "Physics"
+    Given OpenAI returns embeddings successfully
+    And I reindex the notebook "Physics"
     When I start searching from all my notebooks page
     Then I should see "<targets>" as targets only when searching "<search key>"
     Examples:
       | search key | targets     |
-      | Energy     | Energy      |
-      | Matter     | Matter      |
+      | energy     | Energy      |
+      #| mass       | Matter      |

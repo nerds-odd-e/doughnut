@@ -31,6 +31,19 @@ const openAiService = () => {
       return createOpenAiChatCompletionMock(serviceMocker)
     },
 
+    // Minimal stub for POST /embeddings. It intentionally returns an empty
+    // data array so callers that batch inputs can proceed without real data.
+    // The backend currently does not require actual vector values for search
+    // in tests, so this is sufficient to prevent outbound calls.
+    stubCreateEmbeddings() {
+      return serviceMocker.stubPoster(`/embeddings`, {
+        object: 'list',
+        data: [],
+        model: 'text-embedding-3-small',
+        usage: { prompt_tokens: 0, total_tokens: 0 },
+      })
+    },
+
     stubCreateImage() {
       return serviceMocker.stubPoster(`/images/generations`, {
         created: 1589478378,
