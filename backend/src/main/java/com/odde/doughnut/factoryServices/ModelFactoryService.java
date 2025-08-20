@@ -40,6 +40,37 @@ public class ModelFactoryService {
   @Autowired public NotebookAiAssistantRepository notebookAiAssistantRepository;
 
   @Autowired public NoteEmbeddingRepository noteEmbeddingRepository;
+  @Autowired public NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
+
+  public void storeNoteEmbedding(Note note, java.util.List<Float> embedding) {
+    noteEmbeddingJdbcRepository.insert(
+        note.getId(), NoteEmbedding.EmbeddingKind.TITLE.name(), embedding);
+
+    if (note.getDetails() != null && !note.getDetails().trim().isEmpty()) {
+      noteEmbeddingJdbcRepository.insert(
+          note.getId(), NoteEmbedding.EmbeddingKind.DETAILS.name(), embedding);
+    }
+  }
+
+  public void deleteNoteEmbeddingByNoteId(Integer noteId) {
+    noteEmbeddingRepository.deleteByNoteId(noteId);
+  }
+
+  public void deleteNoteEmbeddingsByNotebookId(Integer notebookId) {
+    noteEmbeddingRepository.deleteByNotebookId(notebookId);
+  }
+
+  public java.util.Optional<java.util.List<Float>> getNoteEmbeddingAsFloats(
+      Integer noteId, NoteEmbedding.EmbeddingKind kind) {
+    return noteEmbeddingJdbcRepository
+        .select(noteId, kind.name())
+        .map(
+            bytes -> {
+              NoteEmbedding ne = new NoteEmbedding();
+              ne.setEmbedding(bytes);
+              return ne.getEmbeddingAsFloats();
+            });
+  }
 
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);

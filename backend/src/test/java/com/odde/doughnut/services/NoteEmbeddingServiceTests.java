@@ -3,19 +3,16 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteEmbedding;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 class NoteEmbeddingServiceTests {
 
   @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
-  @Mock NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
+  // Use real DB via ModelFactoryService; no mocks here
   @Autowired MakeMe makeMe;
 
   NoteEmbeddingService service;
@@ -36,9 +33,7 @@ class NoteEmbeddingServiceTests {
 
   @BeforeEach
   void setup() {
-    service =
-        new NoteEmbeddingService(
-            noteEmbeddingRepository, noteEmbeddingJdbcRepository, makeMe.modelFactoryService);
+    service = new NoteEmbeddingService(makeMe.modelFactoryService);
     notebook = makeMe.aNotebook().please();
     note = makeMe.aNote().under(notebook.getHeadNote()).please();
   }
@@ -48,10 +43,10 @@ class NoteEmbeddingServiceTests {
     List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
 
     service.storeEmbedding(note, embedding);
-
-    // Verify that the service called save on the ModelFactoryService
-    // We can't verify the exact calls since ModelFactoryService is not mocked
-    // But we can verify the service doesn't throw exceptions
+    Optional<List<Float>> stored =
+        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
+    assertThat(stored.isPresent(), is(true));
+    assertThat(stored.get(), equalTo(embedding));
   }
 
   @Test
@@ -60,8 +55,10 @@ class NoteEmbeddingServiceTests {
     List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
 
     service.storeEmbedding(note, embedding);
-
-    // Verify that the service doesn't throw exceptions
+    Optional<List<Float>> stored =
+        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.DETAILS);
+    assertThat(stored.isPresent(), is(true));
+    assertThat(stored.get(), equalTo(embedding));
   }
 
   @Test
@@ -70,8 +67,13 @@ class NoteEmbeddingServiceTests {
     List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
 
     service.storeEmbedding(note, embedding);
-
-    // Verify that the service doesn't throw exceptions
+    Optional<List<Float>> details =
+        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.DETAILS);
+    assertThat(details.isPresent(), is(false));
+    Optional<List<Float>> title =
+        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
+    assertThat(title.isPresent(), is(true));
+    assertThat(title.get(), equalTo(embedding));
   }
 
   @Test
@@ -80,21 +82,18 @@ class NoteEmbeddingServiceTests {
     List<Float> embedding = List.of(1.0f, 2.0f, 3.0f);
 
     service.storeEmbedding(note, embedding);
-
-    // Verify that the service doesn't throw exceptions
+    Optional<List<Float>> details =
+        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.DETAILS);
+    assertThat(details.isPresent(), is(false));
+    Optional<List<Float>> title =
+        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
+    assertThat(title.isPresent(), is(true));
+    assertThat(title.get(), equalTo(embedding));
   }
 
   @Test
   void shouldDeleteEmbeddingByNoteId() {
-    makeMe
-        .modelFactoryService
-        .entityManager
-        .createNativeQuery(
-            "INSERT INTO note_embeddings (note_id, kind, created_at, updated_at, embedding_raw) VALUES (:nid, :kind, NOW(), NOW(), :emb)")
-        .setParameter("nid", note.getId())
-        .setParameter("kind", NoteEmbedding.EmbeddingKind.TITLE.name())
-        .setParameter("emb", new byte[] {0})
-        .executeUpdate();
+    makeMe.aNoteEmbedding(note).kind(NoteEmbedding.EmbeddingKind.TITLE).please();
 
     service.deleteEmbedding(note.getId());
 
@@ -109,20 +108,7 @@ class NoteEmbeddingServiceTests {
   void shouldDeleteNotebookEmbeddings() {
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.refresh(notebook);
-    // create embeddings for notes in the notebook using native SQL
-    notebook
-        .getNotes()
-        .forEach(
-            n ->
-                makeMe
-                    .modelFactoryService
-                    .entityManager
-                    .createNativeQuery(
-                        "INSERT INTO note_embeddings (note_id, kind, created_at, updated_at, embedding_raw) VALUES (:nid, :kind, NOW(), NOW(), :emb)")
-                    .setParameter("nid", n.getId())
-                    .setParameter("kind", NoteEmbedding.EmbeddingKind.TITLE.name())
-                    .setParameter("emb", new byte[] {0})
-                    .executeUpdate());
+    notebook.getNotes().forEach(n -> makeMe.aNoteEmbedding(n).please());
 
     service.deleteNotebookEmbeddings(notebook.getId());
 
@@ -139,11 +125,7 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldGetEmbeddingByNoteIdAndKind() {
-    NoteEmbedding mockEmbedding = new NoteEmbedding();
-    mockEmbedding.setEmbeddingFromFloats(List.of(1.0f, 2.0f, 3.0f));
-
-    when(noteEmbeddingJdbcRepository.select(note.getId(), NoteEmbedding.EmbeddingKind.TITLE.name()))
-        .thenReturn(Optional.of(mockEmbedding.getEmbedding()));
+    makeMe.aNoteEmbedding(note).embedding(List.of(1.0f, 2.0f, 3.0f)).please();
 
     Optional<List<Float>> result =
         service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
@@ -154,9 +136,6 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldReturnEmptyWhenEmbeddingNotFound() {
-    when(noteEmbeddingJdbcRepository.select(note.getId(), NoteEmbedding.EmbeddingKind.TITLE.name()))
-        .thenReturn(Optional.empty());
-
     Optional<List<Float>> result =
         service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
 

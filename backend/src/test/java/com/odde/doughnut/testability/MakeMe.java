@@ -144,4 +144,8 @@ public class MakeMe extends MakeMeWithoutDB {
   public ConversationMessageBuilder aConversationMessage(Conversation conversation) {
     return new ConversationMessageBuilder(conversation, this);
   }
+
+  public NoteEmbeddingBuilder aNoteEmbedding(Note note) {
+    return new NoteEmbeddingBuilder(note, this);
+  }
 }
