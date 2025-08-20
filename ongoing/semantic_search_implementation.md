@@ -56,8 +56,6 @@ CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   note_id BIGINT NOT NULL,
   kind ENUM('TITLE','DETAILS') NOT NULL,
-  context_path VARCHAR(1024) NULL,
-  dimensions INT NOT NULL DEFAULT 1536,
   embedding VECTOR(1536) USING VARBINARY NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -82,8 +80,6 @@ CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   note_id BIGINT NOT NULL,
   kind ENUM('TITLE','DETAILS') NOT NULL,
-  context_path VARCHAR(1024) NULL,
-  dimensions INT NOT NULL DEFAULT 1536,
   embedding_raw VARBINARY(6144) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -164,7 +160,7 @@ public SearchResults search(String query) {
 
 ### Phase 1: Basic Semantic Search (2-3 weeks)
 - [ ] OpenAI embedding service integration
-- [ ] New table `note_embeddings(note_id, kind, context_path, dimensions, embedding)`
+- [ ] New table `note_embeddings(note_id, kind, embedding)`
 - [ ] CRUD flow to insert/update/delete embeddings on note changes
 - [ ] Single embedding per note (no chunking yet)
 - [ ] Simple KNN similarity search with SQL (`vector_distance`)
@@ -203,9 +199,7 @@ Single shared migration example (lives in `db/migration`):
 CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   note_id BIGINT NOT NULL,
-  kind ENUM('TITLE','DETAILS') NOT NULL,
-  context_path VARCHAR(1024) NULL,
-  dimensions INT NOT NULL DEFAULT 1536
+  kind ENUM('TITLE','DETAILS') NOT NULL
 );
 
 -- Add environment-specific embedding column
