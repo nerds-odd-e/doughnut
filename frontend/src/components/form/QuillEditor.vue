@@ -22,6 +22,12 @@ const onBlurTextField = () => {
   emits("blur")
 }
 
+const updateQuillContent = (content: string | undefined) => {
+  if (quill.value) {
+    quill.value.root.innerHTML = content ?? ""
+  }
+}
+
 const modules = readonly
   ? { toolbar: false }
   : {
@@ -48,8 +54,8 @@ onMounted(async () => {
     try {
       quill.value = new Quill(editor.value, options)
 
-      // Wait for Quill to be fully initialized and ready
-      await nextTick()
+      // Set initial content
+      updateQuillContent(localValue.value)
 
       // Set up event listeners first before any content operations
       quill.value.on("text-change", (_delta, _oldDelta, source) => {
@@ -82,28 +88,6 @@ onMounted(async () => {
           console.error("Error handling blur:", error)
         }
       })
-
-      // Set initial content with more robust approach
-      if (localValue.value) {
-        // Wait longer to ensure Quill is completely ready
-        setTimeout(() => {
-          if (quill.value) {
-            try {
-              // First try to set content via innerHTML directly (safer for initialization)
-              quill.value.root.innerHTML = localValue.value || ""
-              // Then clear selection to avoid selection errors
-              quill.value.setSelection(null)
-            } catch (error) {
-              // Fallback to setText if innerHTML fails
-              try {
-                quill.value.setText(localValue.value || "")
-              } catch (fallbackError) {
-                // Silent fallback - content initialization errors are not critical
-              }
-            }
-          }
-        }, 100)
-      }
     } catch (error) {
       console.error("Error initializing Quill editor:", error)
     }
@@ -116,40 +100,7 @@ watch(
   (newValue) => {
     if (quill.value && localValue.value !== newValue) {
       localValue.value = newValue
-
-      // Use a longer timeout to ensure Quill is stable and ready
-      setTimeout(() => {
-        if (!quill.value) return
-
-        try {
-          // Check if Quill is in a stable state before proceeding
-          if (!quill.value.root || !quill.value.root.innerHTML) {
-            return
-          }
-
-          // For watch updates, use direct innerHTML first (more reliable)
-          try {
-            if (quill.value.root) {
-              quill.value.root.innerHTML = newValue || ""
-              // Clear selection after direct content change to avoid errors
-              try {
-                quill.value.setSelection(null)
-              } catch (selectionError) {
-                // Ignore selection errors, they're not critical
-              }
-            }
-          } catch (error) {
-            // Fallback to setText
-            try {
-              quill.value.setText(newValue || "")
-            } catch (textError) {
-              console.error("setText also failed in watch:", textError)
-            }
-          }
-        } catch (error) {
-          console.error("Unexpected error in watch:", error)
-        }
-      }, 50) // Increased timeout for better stability
+      updateQuillContent(newValue)
     }
   }
 )
