@@ -41,13 +41,23 @@ class NotebookReindexingServiceTests {
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.refresh(notebook);
+    // Default: mock batched streaming embeddings to return a vector for every note
+    when(embeddingService.streamEmbeddingsForNoteList(any()))
+        .thenAnswer(
+            invocation -> {
+              @SuppressWarnings("unchecked")
+              List<Note> notes = (List<Note>) invocation.getArgument(0);
+              return notes.stream()
+                  .map(
+                      n ->
+                          new EmbeddingService.EmbeddingForNote(
+                              n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
+            });
   }
 
   @Test
   void shouldDeleteOldEmbeddingsBeforeReindexing() {
-    // Arrange: seed some embeddings to be deleted and mock generation
-    when(embeddingService.generateEmbedding(any(Note.class)))
-        .thenReturn(Optional.of(List.of(1.0f, 2.0f, 3.0f)));
+    // Arrange: seed some embeddings to be deleted
     // seed previous embeddings
     notebook.getNotes().forEach(n -> makeMe.aNoteEmbedding(n).please());
 
@@ -67,9 +77,6 @@ class NotebookReindexingServiceTests {
 
   @Test
   void shouldGenerateEmbeddingsForAllNotesInNotebook() {
-    when(embeddingService.generateEmbedding(any(Note.class)))
-        .thenReturn(Optional.of(List.of(1.0f, 2.0f, 3.0f)));
-
     service.reindexNotebook(notebook);
 
     int numNotes = notebook.getNotes().size();
@@ -87,9 +94,6 @@ class NotebookReindexingServiceTests {
   @Test
   void shouldStoreDetailsEmbeddingForNotesWithDetailsOnReindex() {
     // One note with details (default), one more with details explicitly
-    when(embeddingService.generateEmbedding(any(Note.class)))
-        .thenReturn(Optional.of(List.of(1.0f, 2.0f, 3.0f)));
-
     // Ensure at least one child has non-empty details
     makeMe.theNote(notebook.getHeadNote()).details("Has details").please();
     makeMe.refresh(notebook);
@@ -109,9 +113,6 @@ class NotebookReindexingServiceTests {
 
   @Test
   void shouldNotStoreDetailsEmbeddingForNotesWithoutDetailsOnReindex() {
-    when(embeddingService.generateEmbedding(any(Note.class)))
-        .thenReturn(Optional.of(List.of(1.0f, 2.0f, 3.0f)));
-
     // Create a fresh notebook with notes lacking details
     Notebook nb = makeMe.aNotebook().please();
     // Ensure head note also has empty details

@@ -23,15 +23,17 @@ public class NotebookReindexingService {
 
     // Generate and store new embeddings for all notes in the notebook
     List<Note> notes = notebook.getNotes();
-    for (Note note : notes) {
-      reindexNote(note);
-    }
+    embeddingService
+        .streamEmbeddingsForNoteList(notes)
+        .forEach(
+            item ->
+                item.embedding()
+                    .ifPresent(
+                        embedding -> noteEmbeddingService.storeEmbedding(item.note(), embedding)));
   }
 
   private void reindexNote(Note note) {
     Optional<List<Float>> embedding = embeddingService.generateEmbedding(note);
-    if (embedding.isPresent()) {
-      noteEmbeddingService.storeEmbedding(note, embedding.get());
-    }
+    embedding.ifPresent(list -> noteEmbeddingService.storeEmbedding(note, list));
   }
 }
