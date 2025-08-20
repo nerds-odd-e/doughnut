@@ -193,6 +193,56 @@ public SearchResults search(String query) {
 - **Distance measures**: `l2_squared`, `cosine`, `dot_product`
 - **Local**: No network; use local schema variant (no `VECTOR`) and disable semantic search via feature flag
 
+### Environment-Specific Migrations (Flyway Free)
+
+- This project includes `FlyWayFreeVersionRealMigration` (manual trigger on startup for non-test) and a no-op `FlywayMigrationStrategy` bean to prevent auto-migrate. We can leverage per-profile Flyway locations to run different migration variants without paid Flyway.
+- Approach:
+  - Create separate directories for environment-specific migrations, e.g.:
+    - `classpath:db/migration` (common, shared for all envs)
+    - `classpath:db/migration-prod` (Cloud SQL vector-enabled DDL)
+    - `classpath:db/migration-local` (standard MySQL DDL without `VECTOR`)
+  - Configure `spring.flyway.locations` per Spring profile in `application.yml`:
+
+```yaml
+# dev (local, no network)
+spring:
+  config:
+    activate:
+      on-profile: dev
+  flyway:
+    locations: classpath:db/migration,classpath:db/migration-local
+
+# test (unit)
+spring:
+  profiles:
+    active: test
+  flyway:
+    locations: classpath:db/migration,classpath:db/migration-local
+
+# e2e (local MySQL)
+spring:
+  config:
+    activate:
+      on-profile: e2e
+  flyway:
+    locations: classpath:db/migration,classpath:db/migration-local
+
+# prod (Cloud SQL with vectors)
+spring:
+  config:
+    activate:
+      on-profile: prod
+  flyway:
+    locations: classpath:db/migration,classpath:db/migration-prod
+```
+
+- Versioning guidance:
+  - Use the same version number for the `note_embeddings` creation migration across envs, but place each variant in its respective folder so only one variant is visible per profile.
+  - Keep all shared migrations in `db/migration` to avoid duplication.
+- Effect:
+  - Local/test/e2e run the local variant (no `VECTOR`), preventing syntax errors.
+  - Prod runs the Cloud SQL variant with `VECTOR(1536)` and optional `CREATE VECTOR INDEX`.
+
 ### OpenAI API
 - **API Key**: Secure storage in application properties
 - **Rate Limits**: 3,000 RPM for embeddings API
