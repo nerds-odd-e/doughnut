@@ -41,17 +41,7 @@ public class NoteEmbeddingService {
   }
 
   public void deleteNotebookEmbeddings(Integer notebookId) {
-    // Get all notes in the notebook and delete their embeddings
-    List<Note> notes =
-        modelFactoryService
-            .notebookRepository
-            .findById(notebookId)
-            .map(notebook -> notebook.getNotes())
-            .orElse(List.of());
-
-    for (Note note : notes) {
-      deleteEmbedding(note.getId());
-    }
+    noteEmbeddingRepository.deleteByNotebookId(notebookId);
   }
 
   public Optional<List<Float>> getEmbedding(Integer noteId, NoteEmbedding.EmbeddingKind kind) {

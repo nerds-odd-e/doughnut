@@ -3,9 +3,6 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
@@ -29,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NoteEmbeddingServiceTests {
 
-  @Mock NoteEmbeddingRepository noteEmbeddingRepository;
+  @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
   @Mock NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
   @Autowired MakeMe makeMe;
 
@@ -89,19 +86,55 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldDeleteEmbeddingByNoteId() {
+    makeMe
+        .modelFactoryService
+        .entityManager
+        .createNativeQuery(
+            "INSERT INTO note_embeddings (note_id, kind, created_at, updated_at, embedding_raw) VALUES (:nid, :kind, NOW(), NOW(), :emb)")
+        .setParameter("nid", note.getId())
+        .setParameter("kind", NoteEmbedding.EmbeddingKind.TITLE.name())
+        .setParameter("emb", new byte[] {0})
+        .executeUpdate();
+
     service.deleteEmbedding(note.getId());
 
-    verify(noteEmbeddingRepository).deleteByNoteId(note.getId());
+    assertThat(
+        noteEmbeddingRepository
+            .findByNoteIdAndKind(note.getId(), NoteEmbedding.EmbeddingKind.TITLE)
+            .isPresent(),
+        is(false));
   }
 
   @Test
   void shouldDeleteNotebookEmbeddings() {
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.refresh(notebook);
+    // create embeddings for notes in the notebook using native SQL
+    notebook
+        .getNotes()
+        .forEach(
+            n ->
+                makeMe
+                    .modelFactoryService
+                    .entityManager
+                    .createNativeQuery(
+                        "INSERT INTO note_embeddings (note_id, kind, created_at, updated_at, embedding_raw) VALUES (:nid, :kind, NOW(), NOW(), :emb)")
+                    .setParameter("nid", n.getId())
+                    .setParameter("kind", NoteEmbedding.EmbeddingKind.TITLE.name())
+                    .setParameter("emb", new byte[] {0})
+                    .executeUpdate());
 
     service.deleteNotebookEmbeddings(notebook.getId());
 
-    verify(noteEmbeddingRepository, times(3)).deleteByNoteId(any()); // head + 2 notes
+    notebook
+        .getNotes()
+        .forEach(
+            n ->
+                assertThat(
+                    noteEmbeddingRepository
+                        .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.TITLE)
+                        .isPresent(),
+                    is(false)));
   }
 
   @Test
