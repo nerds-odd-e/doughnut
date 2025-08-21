@@ -55,14 +55,24 @@
   
   <!-- Reindex Section -->
   <div class="daisy-mt-4">
-    <button 
-      class="daisy-btn daisy-btn-secondary" 
-      @click="reindexNotebook"
-      :disabled="isIndexing"
-    >
-      <span v-if="isIndexing">Indexing...</span>
-      <span v-else>Reindex notebook</span>
-    </button>
+    <div class="daisy-flex daisy-gap-2">
+      <button 
+        class="daisy-btn daisy-btn-secondary" 
+        @click="reindexNotebook"
+        :disabled="isIndexing"
+      >
+        <span v-if="isIndexing">Indexing...</span>
+        <span v-else>Reindex notebook</span>
+      </button>
+      <button 
+        class="daisy-btn daisy-btn-secondary" 
+        @click="updateIndexNotebook"
+        :disabled="isIndexing"
+      >
+        <span v-if="isIndexing">Indexing...</span>
+        <span v-else>Update index</span>
+      </button>
+    </div>
   </div>
 
   <!-- Indexing Complete Confirmation Dialog -->
@@ -171,6 +181,21 @@ const reindexNotebook = async () => {
   } catch (error) {
     console.error("Reindex error:", error)
     alert("Failed to reindex notebook")
+  } finally {
+    isIndexing.value = false
+  }
+}
+
+const updateIndexNotebook = async () => {
+  isIndexing.value = true
+  try {
+    await managedApi.restNotebookController.updateNotebookIndex(
+      props.notebook.id
+    )
+    showIndexingComplete.value = true
+  } catch (error) {
+    console.error("Update index error:", error)
+    alert("Failed to update notebook index")
   } finally {
     isIndexing.value = false
   }
