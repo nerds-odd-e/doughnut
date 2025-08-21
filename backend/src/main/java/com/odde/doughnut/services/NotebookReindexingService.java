@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,8 +31,5 @@ public class NotebookReindexingService {
                         embedding -> noteEmbeddingService.storeEmbedding(item.note(), embedding)));
   }
 
-  private void reindexNote(Note note) {
-    Optional<List<Float>> embedding = embeddingService.generateEmbedding(note);
-    embedding.ifPresent(list -> noteEmbeddingService.storeEmbedding(note, list));
-  }
+  // Single-note reindexing is currently not used. Keep notebook-level batching for efficiency.
 }

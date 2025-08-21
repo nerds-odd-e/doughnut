@@ -14,7 +14,6 @@ import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
 import io.reactivex.Single;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -39,34 +38,43 @@ class EmbeddingServiceTests {
   }
 
   @Test
-  void shouldGenerateEmbeddingForNote() {
-    Note note = makeMe.aNote().titleConstructor("Test Title").details("Test details").please();
+  void shouldStreamEmbeddingsForNotes() {
+    Note note1 = makeMe.aNote().titleConstructor("T1").details("D1").please();
+    Note note2 = makeMe.aNote().titleConstructor("T2").details("D2").please();
 
-    Embedding embedding = new Embedding();
-    embedding.setEmbedding(List.of(1.0f, 2.0f, 3.0f));
+    Embedding embedding1 = new Embedding();
+    embedding1.setEmbedding(List.of(1.0f, 2.0f));
+    Embedding embedding2 = new Embedding();
+    embedding2.setEmbedding(List.of(3.0f, 4.0f));
 
     EmbeddingResult result = new EmbeddingResult();
-    result.setData(List.of(embedding));
+    result.setData(List.of(embedding1, embedding2));
 
     when(openAiApi.createEmbeddings(any(EmbeddingRequest.class))).thenReturn(Single.just(result));
 
-    Optional<List<Float>> resultEmbedding = service.generateEmbedding(note);
+    var streamed = service.streamEmbeddingsForNoteList(List.of(note1, note2)).toList();
 
-    assertThat(resultEmbedding.isPresent(), is(true));
-    assertThat(resultEmbedding.get(), equalTo(List.of(1.0f, 2.0f, 3.0f)));
+    assertThat(streamed.size(), equalTo(2));
+    assertThat(streamed.get(0).note(), equalTo(note1));
+    assertThat(streamed.get(0).embedding().get(), equalTo(List.of(1.0f, 2.0f)));
+    assertThat(streamed.get(1).note(), equalTo(note2));
+    assertThat(streamed.get(1).embedding().get(), equalTo(List.of(3.0f, 4.0f)));
   }
 
   @Test
-  void shouldReturnEmptyWhenNoEmbeddingData() {
-    Note note = makeMe.aNote().please();
+  void shouldEmitEmptyEmbeddingsWhenNoEmbeddingData() {
+    Note note1 = makeMe.aNote().please();
+    Note note2 = makeMe.aNote().please();
 
     EmbeddingResult result = new EmbeddingResult();
     result.setData(List.of()); // Empty result
 
     when(openAiApi.createEmbeddings(any(EmbeddingRequest.class))).thenReturn(Single.just(result));
 
-    Optional<List<Float>> resultEmbedding = service.generateEmbedding(note);
+    var streamed = service.streamEmbeddingsForNoteList(List.of(note1, note2)).toList();
 
-    assertThat(resultEmbedding.isPresent(), is(false));
+    assertThat(streamed.size(), equalTo(2));
+    assertThat(streamed.get(0).embedding().isPresent(), is(false));
+    assertThat(streamed.get(1).embedding().isPresent(), is(false));
   }
 }

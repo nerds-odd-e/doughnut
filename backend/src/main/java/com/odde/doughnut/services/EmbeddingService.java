@@ -28,11 +28,6 @@ public class EmbeddingService {
     this.openAiApi = openAiApi;
   }
 
-  public Optional<List<Float>> generateEmbedding(Note note) {
-    String content = combineNoteContent(note);
-    return createEmbeddingForText(content);
-  }
-
   /**
    * Stream embeddings for a stream of notes. Notes are batched internally with a batch size of 64
    * to reduce API round-trips. The output stream preserves input order and emits one result per
@@ -97,20 +92,6 @@ public class EmbeddingService {
   /** Convenience wrapper when a List is provided. */
   public Stream<EmbeddingForNote> streamEmbeddingsForNoteList(List<Note> notes) {
     return streamEmbeddingsForNotes(notes.stream());
-  }
-
-  private Optional<List<Float>> createEmbeddingForText(String content) {
-    EmbeddingRequest request =
-        EmbeddingRequest.builder().model("text-embedding-3-small").input(List.of(content)).build();
-
-    EmbeddingResult result = blockGet(openAiApi.createEmbeddings(request));
-
-    if (result != null && result.getData() != null && !result.getData().isEmpty()) {
-      @SuppressWarnings("unchecked")
-      List<Float> embedding = (List<Float>) result.getData().get(0).getEmbedding();
-      return Optional.of(embedding);
-    }
-    return Optional.empty();
   }
 
   private String combineNoteContent(Note note) {
