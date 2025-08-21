@@ -80,6 +80,116 @@ public class NoteEmbeddingJdbcRepository {
     }
   }
 
+  public static class SimilarNoteRow {
+    public final Integer noteId;
+    public final float titleDist;
+    public final float detailsDist;
+    public final float combinedDist;
+
+    public SimilarNoteRow(Integer noteId, float titleDist, float detailsDist, float combinedDist) {
+      this.noteId = noteId;
+      this.titleDist = titleDist;
+      this.detailsDist = detailsDist;
+      this.combinedDist = combinedDist;
+    }
+  }
+
+  /**
+   * Perform semantic KNN search (Cloud SQL vector functions). Returns empty when vector column is
+   * unavailable (non-prod), so callers can fallback to literal search.
+   */
+  public java.util.List<SimilarNoteRow> semanticKnnSearch(
+      Integer userId,
+      Integer notebookId,
+      boolean allMyNotebooksAndSubscriptions,
+      boolean allMyCircles,
+      java.util.List<? extends Number> queryEmbedding,
+      int limit) {
+    if (!isVectorColumn()) {
+      return java.util.List.of();
+    }
+
+    String embeddingJson = floatsToJson(queryEmbedding);
+
+    String scopeClause;
+    java.util.List<Object> params = new java.util.ArrayList<>();
+    // First parameter is the embedding JSON for string_to_vector
+    params.add(embeddingJson);
+
+    if (Boolean.TRUE.equals(allMyCircles)) {
+      scopeClause =
+          " (o.user_id = ? OR EXISTS (SELECT 1 FROM subscription s WHERE s.user_id = ? AND s.notebook_id = nb.id) "
+              + " OR EXISTS (SELECT 1 FROM circle_user cu WHERE cu.user_id = ? AND cu.circle_id = o.circle_id)) ";
+      params.add(userId);
+      params.add(userId);
+      params.add(userId);
+    } else if (Boolean.TRUE.equals(allMyNotebooksAndSubscriptions)) {
+      scopeClause =
+          " (o.user_id = ? OR EXISTS (SELECT 1 FROM subscription s WHERE s.user_id = ? AND s.notebook_id = nb.id)) ";
+      params.add(userId);
+      params.add(userId);
+    } else if (notebookId != null) {
+      scopeClause = " (nb.id = ?) ";
+      params.add(notebookId);
+    } else {
+      // No scope → nothing (mirror current literal search behavior when not specifying a scope)
+      return java.util.List.of();
+    }
+
+    String sql =
+        "WITH q AS (SELECT string_to_vector(?) AS qv) "
+            + "SELECT ne.note_id, "
+            + " MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance("
+            + embeddingColumn()
+            + ", q.qv, 'distance_measure=l2_squared') END) AS title_dist, "
+            + " MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance("
+            + embeddingColumn()
+            + ", q.qv, 'distance_measure=l2_squared') END) AS details_dist, "
+            + " ((COALESCE(MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance("
+            + embeddingColumn()
+            + ", q.qv, 'distance_measure=l2_squared') END), 1e9) * 2) "
+            + "  + COALESCE(MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance("
+            + embeddingColumn()
+            + ", q.qv, 'distance_measure=l2_squared') END), 1e9)) / 3 AS combined_dist "
+            + "FROM note_embeddings ne "
+            + "JOIN q "
+            + "JOIN note n ON n.id = ne.note_id AND n.deleted_at IS NULL "
+            + "JOIN notebook nb ON nb.id = n.notebook_id AND nb.deleted_at IS NULL "
+            + "LEFT JOIN ownership o ON o.id = nb.ownership_id "
+            + "WHERE "
+            + scopeClause
+            + " GROUP BY ne.note_id "
+            + " ORDER BY combined_dist ASC "
+            + " LIMIT ?";
+
+    params.add(limit);
+
+    return jdbcTemplate.query(
+        sql,
+        ps -> {
+          for (int i = 0; i < params.size(); i++) {
+            Object p = params.get(i);
+            if (p instanceof String s) {
+              ps.setString(i + 1, s);
+            } else if (p instanceof Integer ii) {
+              ps.setInt(i + 1, ii);
+            } else if (p instanceof Long l) {
+              ps.setLong(i + 1, l);
+            } else if (p instanceof Number n) {
+              ps.setDouble(i + 1, n.doubleValue());
+            } else {
+              ps.setObject(i + 1, p);
+            }
+          }
+        },
+        (rs, rowNum) ->
+            new SimilarNoteRow(
+                rs.getInt("note_id"),
+                rs.getFloat("title_dist"),
+                rs.getFloat("details_dist"),
+                rs.getFloat("combined_dist")));
+  }
+
   private static String floatsToJson(java.util.List<? extends Number> floats) {
     StringBuilder sb = new StringBuilder(floats.size() * 8);
     sb.append('[');

@@ -14,6 +14,29 @@ export class RestSearchControllerService {
      * @returns NoteSearchResult OK
      * @throws ApiError
      */
+    public semanticSearchWithin(
+        note: number,
+        requestBody: SearchTerm,
+    ): CancelablePromise<Array<NoteSearchResult>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/{note}/semantic-search',
+            path: {
+                'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param note
+     * @param requestBody
+     * @returns NoteSearchResult OK
+     * @throws ApiError
+     */
     public searchForLinkTargetWithin(
         note: number,
         requestBody: SearchTerm,
@@ -24,6 +47,24 @@ export class RestSearchControllerService {
             path: {
                 'note': note,
             },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns NoteSearchResult OK
+     * @throws ApiError
+     */
+    public semanticSearch(
+        requestBody: SearchTerm,
+    ): CancelablePromise<Array<NoteSearchResult>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/semantic-search',
             body: requestBody,
             mediaType: 'application/json',
             errors: {

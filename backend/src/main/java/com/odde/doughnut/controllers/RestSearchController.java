@@ -53,4 +53,29 @@ class RestSearchController {
     currentUser.assertLoggedIn();
     return noteSearchService.searchForNotesInRelationTo(currentUser.getEntity(), searchTerm, note);
   }
+
+  @PostMapping("/semantic-search")
+  @Transactional
+  public List<NoteSearchResult> semanticSearch(@Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
+    currentUser.assertLoggedIn();
+    return noteSearchService.semanticSearchForNotes(currentUser.getEntity(), searchTerm);
+  }
+
+  @PostMapping("/{note}/semantic-search")
+  @Transactional
+  public List<NoteSearchResult> semanticSearchWithin(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody SearchTerm searchTerm)
+      throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
+    currentUser.assertLoggedIn();
+    return noteSearchService.semanticSearchForNotesInRelationTo(
+        currentUser.getEntity(), searchTerm, note);
+  }
 }

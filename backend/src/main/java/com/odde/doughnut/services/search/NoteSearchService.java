@@ -4,7 +4,9 @@ import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.EmbeddingService;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,9 +20,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class NoteSearchService {
   private final NoteRepository noteRepository;
+  private final NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
+  private final EmbeddingService embeddingService;
 
-  public NoteSearchService(NoteRepository noteRepository) {
+  public NoteSearchService(
+      NoteRepository noteRepository,
+      NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository,
+      EmbeddingService embeddingService) {
     this.noteRepository = noteRepository;
+    this.noteEmbeddingJdbcRepository = noteEmbeddingJdbcRepository;
+    this.embeddingService = embeddingService;
   }
 
   public List<NoteSearchResult> searchForNotes(User user, SearchTerm searchTerm) {
@@ -44,6 +53,75 @@ public class NoteSearchService {
     List<Note> exactMatches = searchExactMatches(user, searchTerm, notebookId);
     List<Note> partialMatches = searchPartialMatches(user, searchTerm, notebookId);
     return combineExactAndPartialMatches(exactMatches, partialMatches, avoidNoteId);
+  }
+
+  public List<NoteSearchResult> semanticSearchForNotes(User user, SearchTerm searchTerm) {
+    if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
+      return List.of();
+    }
+    return semanticSearchInternal(user, searchTerm, null, null);
+  }
+
+  public List<NoteSearchResult> semanticSearchForNotesInRelationTo(
+      User user, SearchTerm searchTerm, Note note) {
+    if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
+      return List.of();
+    }
+    Integer avoidNoteId = note != null ? note.getId() : null;
+    Integer notebookId = note != null ? note.getNotebook().getId() : null;
+    return semanticSearchInternal(user, searchTerm, notebookId, avoidNoteId);
+  }
+
+  private List<NoteSearchResult> semanticSearchInternal(
+      User user, SearchTerm searchTerm, Integer notebookId, Integer avoidNoteId) {
+    List<Float> queryEmbedding =
+        embeddingService.generateQueryEmbedding(searchTerm.getTrimmedSearchKey());
+    if (queryEmbedding.isEmpty()) {
+      return combineExactAndPartialMatches(
+          searchExactMatches(user, searchTerm, notebookId),
+          searchPartialMatches(user, searchTerm, notebookId),
+          avoidNoteId);
+    }
+
+    boolean allMyNotebooksAndSubscriptions =
+        Boolean.TRUE.equals(searchTerm.getAllMyNotebooksAndSubscriptions());
+    boolean allMyCircles = Boolean.TRUE.equals(searchTerm.getAllMyCircles());
+
+    var rows =
+        noteEmbeddingJdbcRepository.semanticKnnSearch(
+            user.getId(),
+            notebookId,
+            allMyNotebooksAndSubscriptions,
+            allMyCircles,
+            queryEmbedding,
+            20);
+
+    if (rows.isEmpty()) {
+      // Fallback to literal search when semantic is unavailable (e.g., local dev)
+      return combineExactAndPartialMatches(
+          searchExactMatches(user, searchTerm, notebookId),
+          searchPartialMatches(user, searchTerm, notebookId),
+          avoidNoteId);
+    }
+
+    java.util.Map<Integer, Float> noteIdToDistance = new java.util.HashMap<>();
+    java.util.List<Integer> orderedIds = new java.util.ArrayList<>();
+    for (var r : rows) {
+      if (avoidNoteId != null && avoidNoteId.equals(r.noteId)) continue;
+      orderedIds.add(r.noteId);
+      noteIdToDistance.put(r.noteId, r.combinedDist);
+    }
+    if (orderedIds.isEmpty()) return List.of();
+
+    // Fetch entities and map preserving order
+    List<Note> notes = (List<Note>) noteRepository.findAllById(orderedIds);
+    java.util.Map<Integer, Note> idToNote =
+        notes.stream().collect(java.util.stream.Collectors.toMap(Note::getId, n -> n));
+    return orderedIds.stream()
+        .map(id -> idToNote.get(id))
+        .filter(java.util.Objects::nonNull)
+        .map(n -> new NoteSearchResult(n.getNoteTopology(), noteIdToDistance.get(n.getId())))
+        .toList();
   }
 
   private List<Note> searchExactMatches(User user, SearchTerm searchTerm, Integer notebookId) {
