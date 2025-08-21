@@ -59,6 +59,25 @@ export class RestNotebookControllerService {
     }
     /**
      * @param notebook
+     * @returns any OK
+     * @throws ApiError
+     */
+    public updateNotebookIndex(
+        notebook: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notebooks/{notebook}/update-index',
+            path: {
+                'notebook': notebook,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param notebook
      * @returns Notebook OK
      * @throws ApiError
      */

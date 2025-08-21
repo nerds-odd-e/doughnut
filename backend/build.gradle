@@ -110,4 +110,8 @@ tasks.register("migrateTestDB", JavaExec) {
 // Register and configure the generateOpenAPIDocs task
 tasks.register('generateOpenAPIDocs', JavaExec) {
   configureSpringBootTask(delegate, 'Generate OpenAPI documentation', "generateOpenAPIDocs")
+  // Exclude devtools to avoid non-zero exit due to restart hooks
+  classpath = sourceSets.main.runtimeClasspath.filter { file ->
+    !file.name.contains('spring-boot-devtools')
+  }
 }
