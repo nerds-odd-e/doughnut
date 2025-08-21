@@ -3,7 +3,7 @@ import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 
 describe("SearchResults.vue", () => {
-  it("reproduces cache bug: same trimmed key triggers second API call", async () => {
+  it("uses cache for same trimmed key (no second API call)", async () => {
     vi.useFakeTimers()
 
     const result = [

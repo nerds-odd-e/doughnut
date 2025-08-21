@@ -129,7 +129,7 @@ const relativeSearch = async (
 const debounced = debounce((callback) => callback(), 500)
 
 const search = () => {
-  if (Object.hasOwn(cachedSearches.value, "trimmedSearchKey")) {
+  if (Object.hasOwn(cachedSearches.value, trimmedSearchKey.value)) {
     return
   }
 
