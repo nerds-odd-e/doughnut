@@ -114,4 +114,9 @@ tasks.register('generateOpenAPIDocs', JavaExec) {
   classpath = sourceSets.main.runtimeClasspath.filter { file ->
     !file.name.contains('spring-boot-devtools')
   }
+  // Start with settings that avoid DB requirement while keeping beans available for scanning
+  systemProperty("spring.main.lazy-initialization", "true")
+  systemProperty("spring.flyway.enabled", "false")
+  systemProperty("spring.jpa.properties.hibernate.dialect", "org.hibernate.dialect.MySQLDialect")
+  systemProperty("spring.datasource.hikari.initialization-fail-timeout", "0")
 }
