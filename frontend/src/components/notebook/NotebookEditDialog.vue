@@ -52,9 +52,31 @@
     <hr/>
     <NotebookAssistantManagementDialog :notebook="notebook" />
   </template>
-  <button class="daisy-btn daisy-btn-secondary daisy-mt-2" @click="reindexNotebook">
-    Reindex notebook
-  </button>
+  
+  <!-- Reindex Section -->
+  <div class="daisy-mt-4">
+    <button 
+      class="daisy-btn daisy-btn-secondary" 
+      @click="reindexNotebook"
+      :disabled="isIndexing"
+    >
+      <span v-if="isIndexing">Indexing...</span>
+      <span v-else>Reindex notebook</span>
+    </button>
+  </div>
+
+  <!-- Indexing Complete Confirmation Dialog -->
+  <div v-if="showIndexingComplete" class="daisy-modal daisy-modal-open">
+    <div class="daisy-modal-box">
+      <h3 class="daisy-font-bold daisy-text-lg">Indexing Complete</h3>
+      <p class="daisy-py-4">The notebook has been successfully reindexed.</p>
+      <div class="daisy-modal-action">
+        <button class="daisy-btn daisy-btn-primary" @click="closeIndexingComplete">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -94,6 +116,10 @@ const errors = ref({
   numberOfQuestionsInAssessment: undefined as string | undefined,
   certificateExpiry: undefined as string | undefined,
 })
+
+// Indexing state
+const isIndexing = ref(false)
+const showIndexingComplete = ref(false)
 
 const processForm = () => {
   managedApi.restNotebookController
@@ -138,7 +164,19 @@ const handleObsidianImport = async (event: Event) => {
 }
 
 const reindexNotebook = async () => {
-  await managedApi.restNotebookController.reindexNotebook(props.notebook.id)
-  router.go(0)
+  isIndexing.value = true
+  try {
+    await managedApi.restNotebookController.reindexNotebook(props.notebook.id)
+    showIndexingComplete.value = true
+  } catch (error) {
+    console.error("Reindex error:", error)
+    alert("Failed to reindex notebook")
+  } finally {
+    isIndexing.value = false
+  }
+}
+
+const closeIndexingComplete = () => {
+  showIndexingComplete.value = false
 }
 </script>
