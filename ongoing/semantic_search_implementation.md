@@ -205,9 +205,6 @@ CREATE TABLE note_embeddings (
 
 -- Add environment-specific embedding column
 ALTER TABLE note_embeddings ADD COLUMN ${embedding_column};
-
--- Optional env-specific vector index (empty in local)
-${vector_index_statement}
 ```
 
 Configure placeholders per Spring profile in `application.yml`:
@@ -217,7 +214,6 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
-      vector_index_statement: ""
 
 # prod (Cloud SQL with vectors)
 spring:
@@ -227,12 +223,6 @@ spring:
   flyway:
     placeholders:
       embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
-      vector_index_statement: |
-        CREATE VECTOR INDEX note_embeddings_embedding_idx
-        ON note_embeddings(embedding)
-        USING SCANN
-        QUANTIZER = SQ8
-        DISTANCE_MEASURE = l2_squared;
 ```
 
 Notes:
