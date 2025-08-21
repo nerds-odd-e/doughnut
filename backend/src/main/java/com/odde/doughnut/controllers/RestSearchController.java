@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -32,7 +32,7 @@ class RestSearchController {
 
   @PostMapping("/search")
   @Transactional
-  public List<NoteTopology> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
+  public List<NoteSearchResult> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {
     if (searchTerm == null) {
       throw new IllegalArgumentException("SearchTerm cannot be null");
@@ -43,7 +43,7 @@ class RestSearchController {
 
   @PostMapping("/{note}/search")
   @Transactional
-  public List<NoteTopology> searchForLinkTargetWithin(
+  public List<NoteSearchResult> searchForLinkTargetWithin(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {

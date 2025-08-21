@@ -88,6 +88,7 @@ export type { NoteDetailsCompletion } from './models/NoteDetailsCompletion';
 export type { NoteInfo } from './models/NoteInfo';
 export type { NoteMoveDTO } from './models/NoteMoveDTO';
 export type { NoteRealm } from './models/NoteRealm';
+export type { NoteSearchResult } from './models/NoteSearchResult';
 export type { NotesTestData } from './models/NotesTestData';
 export type { NoteTestData } from './models/NoteTestData';
 export { NoteTopology } from './models/NoteTopology';

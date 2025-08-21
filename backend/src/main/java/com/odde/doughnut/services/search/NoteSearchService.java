@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.search;
 
-import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -23,7 +23,7 @@ public class NoteSearchService {
     this.noteRepository = noteRepository;
   }
 
-  public List<NoteTopology> searchForNotes(User user, SearchTerm searchTerm) {
+  public List<NoteSearchResult> searchForNotes(User user, SearchTerm searchTerm) {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
     }
@@ -33,7 +33,7 @@ public class NoteSearchService {
     return combineExactAndPartialMatches(exactMatches, partialMatches, null);
   }
 
-  public List<NoteTopology> searchForNotesInRelationTo(
+  public List<NoteSearchResult> searchForNotesInRelationTo(
       User user, SearchTerm searchTerm, Note note) {
     if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
       return List.of();
@@ -112,7 +112,7 @@ public class NoteSearchService {
         .toList();
   }
 
-  private List<NoteTopology> combineExactAndPartialMatches(
+  private List<NoteSearchResult> combineExactAndPartialMatches(
       List<Note> exactMatches, List<Note> partialMatches, Integer avoidNoteId) {
     List<Note> filteredPartialMatches =
         partialMatches.stream()
@@ -121,10 +121,10 @@ public class NoteSearchService {
                     exactMatches.stream().noneMatch(exact -> exact.getId().equals(note.getId())))
             .toList();
 
-    List<NoteTopology> results =
+    List<NoteSearchResult> results =
         exactMatches.stream()
             .filter(note -> !note.getId().equals(avoidNoteId))
-            .map(Note::getNoteTopology)
+            .map(note -> new NoteSearchResult(note.getNoteTopology(), /* distance= */ 0.0f))
             .collect(Collectors.toList());
 
     int remainingSlots = exactMatches.isEmpty() ? 20 : 20 + exactMatches.size();
@@ -134,7 +134,7 @@ public class NoteSearchService {
           filteredPartialMatches.stream()
               .limit(remainingSlots)
               .filter(note -> !note.getId().equals(avoidNoteId))
-              .map(Note::getNoteTopology)
+              .map(note -> new NoteSearchResult(note.getNoteTopology(), /* distance= */ 0.9f))
               .collect(Collectors.toList()));
     }
 

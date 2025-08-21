@@ -3,7 +3,7 @@ package com.odde.doughnut.models;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -45,12 +45,12 @@ class NoteSearchServiceExactMatchTest {
       Note exactMatch = makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteTopology> results =
+      List<NoteSearchResult> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(4));
-      assertThat(results.get(0).getTitleOrPredicate(), equalTo("Pam"));
-      assertThat(results.get(0).getId(), equalTo(exactMatch.getId()));
+      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("Pam"));
+      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
     @Test
@@ -62,14 +62,14 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Clonazepam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteTopology> results =
+      List<NoteSearchResult> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(5));
-      assertThat(results.get(0).getTitleOrPredicate(), equalTo("Pam"));
-      assertThat(results.get(1).getTitleOrPredicate(), equalTo("pam"));
-      assertThat(results.get(0).getId(), equalTo(exactMatch1.getId()));
-      assertThat(results.get(1).getId(), equalTo(exactMatch2.getId()));
+      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("Pam"));
+      assertThat(results.get(1).getNoteTopology().getTitleOrPredicate(), equalTo("pam"));
+      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch1.getId()));
+      assertThat(results.get(1).getNoteTopology().getId(), equalTo(exactMatch2.getId()));
     }
 
     @Test
@@ -80,12 +80,12 @@ class NoteSearchServiceExactMatchTest {
       Note exactMatch = makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteTopology> results =
+      List<NoteSearchResult> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(greaterThan(20)));
-      assertThat(results.get(0).getTitleOrPredicate(), equalTo("Pam"));
-      assertThat(results.get(0).getId(), equalTo(exactMatch.getId()));
+      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("Pam"));
+      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
     @Test
@@ -95,12 +95,12 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Lorazepam").under(parentNote).please();
 
       searchTerm.setSearchKey("pam");
-      List<NoteTopology> results =
+      List<NoteSearchResult> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(3));
-      assertThat(results.get(0).getTitleOrPredicate(), equalTo("PAM"));
-      assertThat(results.get(0).getId(), equalTo(exactMatch.getId()));
+      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("PAM"));
+      assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
     @Test
@@ -109,7 +109,7 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("");
-      List<NoteTopology> results =
+      List<NoteSearchResult> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, empty());
@@ -121,7 +121,7 @@ class NoteSearchServiceExactMatchTest {
       makeMe.aNote("Pam").under(parentNote).please();
 
       searchTerm.setSearchKey("   ");
-      List<NoteTopology> results =
+      List<NoteSearchResult> results =
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, empty());

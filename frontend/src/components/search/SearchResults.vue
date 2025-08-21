@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import type { SearchTerm } from "@/generated/backend"
 import { NoteTopology } from "@/generated/backend"
+import type { NoteSearchResult } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
@@ -77,14 +78,14 @@ const oldSearchTerm = ref<SearchTerm>({
 })
 
 const cache = ref<{
-  global: Record<string, NoteTopology[]>
-  local: Record<string, NoteTopology[]>
+  global: Record<string, NoteSearchResult[]>
+  local: Record<string, NoteSearchResult[]>
 }>({
   global: {},
   local: {},
 })
 
-const recentResult = ref<NoteTopology[] | undefined>()
+const recentResult = ref<NoteSearchResult[] | undefined>()
 const timeoutId = ref<ReturnType<typeof setTimeout>>()
 
 // Computed properties
@@ -100,9 +101,16 @@ const cachedResult = computed(
   () => cachedSearches.value[trimmedSearchKey.value]
 )
 
-const searchResult = computed(() =>
-  cachedResult.value ? cachedResult.value : recentResult.value
-)
+const searchResult = computed(() => {
+  const raw = cachedResult.value ? cachedResult.value : recentResult.value
+  if (!raw) return undefined
+  // Support both new API (NoteSearchResult) and legacy (NoteTopology) shapes
+  return (raw as Array<NoteSearchResult | NoteTopology>).map((r) =>
+    "noteTopology" in (r as NoteSearchResult)
+      ? (r as NoteSearchResult).noteTopology
+      : (r as NoteTopology)
+  ) as NoteTopology[]
+})
 
 // Methods
 const relativeSearch = async (

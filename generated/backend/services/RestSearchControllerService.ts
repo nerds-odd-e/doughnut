@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { NoteTopology } from '../models/NoteTopology';
+import type { NoteSearchResult } from '../models/NoteSearchResult';
 import type { SearchTerm } from '../models/SearchTerm';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -11,13 +11,13 @@ export class RestSearchControllerService {
     /**
      * @param note
      * @param requestBody
-     * @returns NoteTopology OK
+     * @returns NoteSearchResult OK
      * @throws ApiError
      */
     public searchForLinkTargetWithin(
         note: number,
         requestBody: SearchTerm,
-    ): CancelablePromise<Array<NoteTopology>> {
+    ): CancelablePromise<Array<NoteSearchResult>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{note}/search',
@@ -33,12 +33,12 @@ export class RestSearchControllerService {
     }
     /**
      * @param requestBody
-     * @returns NoteTopology OK
+     * @returns NoteSearchResult OK
      * @throws ApiError
      */
     public searchForLinkTarget(
         requestBody: SearchTerm,
-    ): CancelablePromise<Array<NoteTopology>> {
+    ): CancelablePromise<Array<NoteSearchResult>> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/search',

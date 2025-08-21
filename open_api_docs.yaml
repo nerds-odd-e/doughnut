@@ -995,7 +995,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteTopology"
+                  $ref: "#/components/schemas/NoteSearchResult"
   /api/notes/{note}/review-setting:
     post:
       tags:
@@ -1077,7 +1077,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteTopology"
+                  $ref: "#/components/schemas/NoteSearchResult"
   /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
     post:
       tags:
@@ -3949,6 +3949,16 @@ components:
           type: boolean
       required:
       - searchKey
+    NoteSearchResult:
+      type: object
+      properties:
+        noteTopology:
+          $ref: "#/components/schemas/NoteTopology"
+        distance:
+          type: number
+          format: float
+      required:
+      - noteTopology
     RecallSetting:
       type: object
       properties:

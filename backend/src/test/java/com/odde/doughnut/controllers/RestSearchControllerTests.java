@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -63,8 +62,35 @@ class RestSearchControllerTests {
 
       assertThat(result, hasSize(2));
       assertThat(
-          result.stream().map(NoteTopology::getTitleOrPredicate).toList(),
+          result.stream().map(r -> r.getNoteTopology().getTitleOrPredicate()).toList(),
           containsInAnyOrder("Java Programming", "JavaScript Basics"));
+      // partial matches should have distance 0.9 for now
+      assertThat(result.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
+    }
+
+    @Test
+    void shouldSetDistanceZeroForExactMatchesAndPointNineForPartialMatches()
+        throws UnexpectedNoAccessRightException {
+      makeMe.aNote("Java").creatorAndOwner(userModel).please();
+      makeMe.aNote("Java Programming").creatorAndOwner(userModel).please();
+
+      SearchTerm searchTerm = new SearchTerm();
+      searchTerm.setSearchKey("Java");
+      searchTerm.setAllMyNotebooksAndSubscriptions(true);
+
+      var result = controller.searchForLinkTarget(searchTerm);
+
+      assertThat(result, hasSize(greaterThanOrEqualTo(2)));
+      assertThat(
+          result.stream()
+              .filter(r -> r.getNoteTopology().getTitleOrPredicate().equals("Java"))
+              .allMatch(r -> r.getDistance().equals(0.0f)),
+          is(true));
+      assertThat(
+          result.stream()
+              .filter(r -> !r.getNoteTopology().getTitleOrPredicate().equals("Java"))
+              .allMatch(r -> r.getDistance().equals(0.9f)),
+          is(true));
     }
 
     @Test
@@ -133,7 +159,7 @@ class RestSearchControllerTests {
       // note itself
       assertThat(result, hasSize(greaterThanOrEqualTo(2)));
       assertThat(
-          result.stream().map(NoteTopology::getTitleOrPredicate).toList(),
+          result.stream().map(r -> r.getNoteTopology().getTitleOrPredicate()).toList(),
           hasItems("Child Java Note", "Unrelated Java Note"));
     }
 

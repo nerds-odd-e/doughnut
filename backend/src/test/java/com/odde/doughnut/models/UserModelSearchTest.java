@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Circle;
@@ -41,7 +42,7 @@ public class UserModelSearchTest {
     anotherUser = makeMe.aUser().toModelPlease();
   }
 
-  private List<NoteTopology> search() {
+  private List<NoteSearchResult> search() {
     return noteSearchService.searchForNotesInRelationTo(user, searchTerm, note);
   }
 
@@ -60,7 +61,9 @@ public class UserModelSearchTest {
   void theSearchIsCaseInsensitive() {
     Note anotherNote = makeMe.aNote("Some Note").under(note).please();
     searchTerm.setSearchKey("not");
-    assertThat(search(), contains(anotherNote.getNoteTopology()));
+    assertThat(
+        search().stream().map(NoteSearchResult::getNoteTopology).toList(),
+        contains(anotherNote.getNoteTopology()));
   }
 
   @Test
@@ -77,7 +80,7 @@ public class UserModelSearchTest {
       makeMe.aNote(commonTitle + i).under(note).please();
     }
     searchTerm.setSearchKey("CommonTitle");
-    List<NoteTopology> results = search();
+    List<NoteSearchResult> results = search();
     assertThat(results.size(), lessThanOrEqualTo(20));
   }
 
@@ -125,7 +128,7 @@ public class UserModelSearchTest {
       searchTerm.setSearchKey(commonPhrase);
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
-      List<NoteTopology> actual = search();
+      List<NoteTopology> actual = search().stream().map(NoteSearchResult::getNoteTopology).toList();
       assertThat(actual, hasSize(expectedCount));
       assertThat(
           actual,
