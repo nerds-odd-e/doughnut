@@ -34,6 +34,9 @@ class RestSearchController {
   @Transactional
   public List<NoteTopology> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
     currentUser.assertLoggedIn();
     return noteSearchService.searchForNotes(currentUser.getEntity(), searchTerm);
   }
@@ -44,6 +47,9 @@ class RestSearchController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {
+    if (searchTerm == null) {
+      throw new IllegalArgumentException("SearchTerm cannot be null");
+    }
     currentUser.assertLoggedIn();
     return noteSearchService.searchForNotesInRelationTo(currentUser.getEntity(), searchTerm, note);
   }
