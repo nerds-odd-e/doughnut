@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteEmbedding;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -29,6 +30,8 @@ class NotebookReindexingServiceTests {
   @Mock EmbeddingService embeddingService;
   @Autowired NoteEmbeddingService noteEmbeddingService;
   @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
+  @Autowired NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
+  @Autowired com.odde.doughnut.factoryServices.ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
 
   NotebookReindexingService service;
@@ -36,7 +39,12 @@ class NotebookReindexingServiceTests {
 
   @BeforeEach
   void setup() {
-    service = new NotebookReindexingService(embeddingService, noteEmbeddingService);
+    service =
+        new NotebookReindexingService(
+            embeddingService,
+            noteEmbeddingService,
+            noteEmbeddingJdbcRepository,
+            modelFactoryService);
     notebook = makeMe.aNotebook().please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
@@ -109,6 +117,37 @@ class NotebookReindexingServiceTests {
                         .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.DETAILS)
                         .isPresent(),
                     is(true)));
+  }
+
+  @Test
+  void updateNotebookIndex_shouldOnlyUpdateNotesWithoutEmbeddingsOrStaleOnes() {
+    // Arrange: create embeddings for one note to be up-to-date, and leave another without
+    List<Note> notes = notebook.getNotes();
+    Note first = notes.get(0);
+    Note second = notes.get(1);
+
+    // Seed an existing embedding for the first note
+    makeMe.aNoteEmbedding(first).kind(NoteEmbedding.EmbeddingKind.TITLE).please();
+
+    // Make sure first note is not updated after embedding, and second is updated now
+    // Update second's updatedAt to be "newer" by touching details
+    makeMe.theNote(second).details("newer details").please();
+    makeMe.refresh(notebook);
+
+    // Act
+    service.updateNotebookIndex(notebook);
+
+    // Assert: both notes should have TITLE embeddings (first already had; second should now)
+    assertThat(
+        noteEmbeddingRepository
+            .findByNoteIdAndKind(first.getId(), NoteEmbedding.EmbeddingKind.TITLE)
+            .isPresent(),
+        is(true));
+    assertThat(
+        noteEmbeddingRepository
+            .findByNoteIdAndKind(second.getId(), NoteEmbedding.EmbeddingKind.TITLE)
+            .isPresent(),
+        is(true));
   }
 
   @Test

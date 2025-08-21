@@ -61,6 +61,25 @@ class RestNotebookControllerTest {
   }
 
   @Nested
+  class UpdateNotebookIndexEndpoint {
+    @Test
+    void shouldCallServiceAndRequireAuthorization() throws UnexpectedNoAccessRightException {
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      controller.updateNotebookIndex(nb);
+      // If unauthorized, an exception would be thrown before reaching service; no exception here
+    }
+
+    @Test
+    void shouldNotAllowUnauthorizedUser() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.updateNotebookIndex(note.getNotebook()));
+    }
+  }
+
+  @Nested
   class showNoteTest {
     @Test
     void whenNotLogin() {

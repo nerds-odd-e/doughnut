@@ -214,4 +214,13 @@ class RestNotebookController {
     currentUser.assertAuthorization(notebook);
     notebookReindexingService.reindexNotebook(notebook);
   }
+
+  @PostMapping("/{notebook}/update-index")
+  @Transactional
+  public void updateNotebookIndex(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    notebookReindexingService.updateNotebookIndex(notebook);
+  }
 }

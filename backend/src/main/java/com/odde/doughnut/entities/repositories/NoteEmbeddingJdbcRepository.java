@@ -190,6 +190,27 @@ public class NoteEmbeddingJdbcRepository {
                 rs.getFloat("combined_dist")));
   }
 
+  /**
+   * Return note IDs in a notebook that need index update: either no TITLE embedding exists yet, or
+   * the note.updated_at is newer than the latest TITLE embedding updated_at.
+   */
+  public java.util.List<Integer> selectNoteIdsNeedingIndexUpdateByNotebookId(Integer notebookId) {
+    String sql =
+        "WITH last_title_embedding AS (\n"
+            + "  SELECT ne.note_id, MAX(ne.updated_at) AS last_updated\n"
+            + "  FROM note_embeddings ne\n"
+            + "  WHERE ne.kind = 'TITLE'\n"
+            + "  GROUP BY ne.note_id\n"
+            + ")\n"
+            + "SELECT n.id\n"
+            + "FROM note n\n"
+            + "LEFT JOIN last_title_embedding e ON e.note_id = n.id\n"
+            + "WHERE n.notebook_id = ? AND n.deleted_at IS NULL\n"
+            + "  AND (e.last_updated IS NULL OR n.updated_at > e.last_updated)";
+
+    return jdbcTemplate.query(sql, ps -> ps.setInt(1, notebookId), (rs, rowNum) -> rs.getInt(1));
+  }
+
   private static String floatsToJson(java.util.List<? extends Number> floats) {
     StringBuilder sb = new StringBuilder(floats.size() * 8);
     sb.append('[');
