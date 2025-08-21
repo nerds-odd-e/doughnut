@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 public class EmbeddingService {
   private final OpenAiApi openAiApi;
   private static final int BATCH_SIZE = 64;
-  private static final int MAX_TOKENS_PER_INPUT = 8000; // per-item token cap
+  private static final int MAX_TOKENS_PER_INPUT = 4000; // per-item token cap
 
   public EmbeddingService(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
