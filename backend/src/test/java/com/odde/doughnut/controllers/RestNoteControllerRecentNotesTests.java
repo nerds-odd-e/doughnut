@@ -38,11 +38,7 @@ class RestNoteControllerRecentNotesTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            noteSearchService);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Test
@@ -76,11 +72,7 @@ class RestNoteControllerRecentNotesTests {
     userModel = makeMe.aNullUserModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            noteSearchService);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }

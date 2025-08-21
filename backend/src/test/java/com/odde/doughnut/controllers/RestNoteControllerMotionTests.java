@@ -43,11 +43,7 @@ class RestNoteControllerMotionTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            noteSearchService);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 

@@ -29,6 +29,7 @@ import { RestNoteCreationControllerService } from './services/RestNoteCreationCo
 import { RestPredefinedQuestionControllerService } from './services/RestPredefinedQuestionControllerService';
 import { RestRecallPromptControllerService } from './services/RestRecallPromptControllerService';
 import { RestRecallsControllerService } from './services/RestRecallsControllerService';
+import { RestSearchControllerService } from './services/RestSearchControllerService';
 import { RestSubscriptionControllerService } from './services/RestSubscriptionControllerService';
 import { RestTextContentControllerService } from './services/RestTextContentControllerService';
 import { RestUserControllerService } from './services/RestUserControllerService';
@@ -60,6 +61,7 @@ export class DoughnutApi {
     public readonly restPredefinedQuestionController: RestPredefinedQuestionControllerService;
     public readonly restRecallPromptController: RestRecallPromptControllerService;
     public readonly restRecallsController: RestRecallsControllerService;
+    public readonly restSearchController: RestSearchControllerService;
     public readonly restSubscriptionController: RestSubscriptionControllerService;
     public readonly restTextContentController: RestTextContentControllerService;
     public readonly restUserController: RestUserControllerService;
@@ -102,6 +104,7 @@ export class DoughnutApi {
         this.restPredefinedQuestionController = new RestPredefinedQuestionControllerService(this.request);
         this.restRecallPromptController = new RestRecallPromptControllerService(this.request);
         this.restRecallsController = new RestRecallsControllerService(this.request);
+        this.restSearchController = new RestSearchControllerService(this.request);
         this.restSubscriptionController = new RestSubscriptionControllerService(this.request);
         this.restTextContentController = new RestTextContentControllerService(this.request);
         this.restUserController = new RestUserControllerService(this.request);

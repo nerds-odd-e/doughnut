@@ -7,10 +7,8 @@ import type { NoteAccessoriesDTO } from '../models/NoteAccessoriesDTO';
 import type { NoteAccessory } from '../models/NoteAccessory';
 import type { NoteInfo } from '../models/NoteInfo';
 import type { NoteRealm } from '../models/NoteRealm';
-import type { NoteTopology } from '../models/NoteTopology';
 import type { RecallSetting } from '../models/RecallSetting';
 import type { RedirectToNoteResponse } from '../models/RedirectToNoteResponse';
-import type { SearchTerm } from '../models/SearchTerm';
 import type { WikidataAssociationCreation } from '../models/WikidataAssociationCreation';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -29,29 +27,6 @@ export class RestNoteControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{note}/updateWikidataId',
-            path: {
-                'note': note,
-            },
-            body: requestBody,
-            mediaType: 'application/json',
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param note
-     * @param requestBody
-     * @returns NoteTopology OK
-     * @throws ApiError
-     */
-    public searchForLinkTargetWithin(
-        note: number,
-        requestBody: SearchTerm,
-    ): CancelablePromise<Array<NoteTopology>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/{note}/search',
             path: {
                 'note': note,
             },
@@ -99,24 +74,6 @@ export class RestNoteControllerService {
             path: {
                 'note': note,
             },
-            errors: {
-                500: `Internal Server Error`,
-            },
-        });
-    }
-    /**
-     * @param requestBody
-     * @returns NoteTopology OK
-     * @throws ApiError
-     */
-    public searchForLinkTarget(
-        requestBody: SearchTerm,
-    ): CancelablePromise<Array<NoteTopology>> {
-        return this.httpRequest.request({
-            method: 'POST',
-            url: '/api/notes/search',
-            body: requestBody,
-            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },

@@ -19,6 +19,9 @@ version = '0.0.1-SNAPSHOT'
 java {
   sourceCompatibility = 24
   targetCompatibility = 24
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(24)
+  }
 }
 
 configurations {
@@ -61,6 +64,18 @@ test {
   useJUnitPlatform()
   testLogging {
     exceptionFormat = 'full'
+  }
+}
+
+// A lightweight test task for environments without DB/Redis (e.g. Cursor background agent)
+tasks.register("testFast", Test) {
+  useJUnitPlatform()
+  testLogging {
+    exceptionFormat = 'full'
+  }
+  // Only run pure unit tests that do not require Spring Boot or external services
+  filter {
+    includeTestsMatching 'com.odde.doughnut.algorithms.*'
   }
 }
 

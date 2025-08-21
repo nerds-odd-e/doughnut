@@ -1,0 +1,52 @@
+/* generated using openapi-typescript-codegen -- do not edit */
+/* istanbul ignore file */
+/* tslint:disable */
+/* eslint-disable */
+import type { NoteTopology } from '../models/NoteTopology';
+import type { SearchTerm } from '../models/SearchTerm';
+import type { CancelablePromise } from '../core/CancelablePromise';
+import type { BaseHttpRequest } from '../core/BaseHttpRequest';
+export class RestSearchControllerService {
+    constructor(public readonly httpRequest: BaseHttpRequest) {}
+    /**
+     * @param note
+     * @param requestBody
+     * @returns NoteTopology OK
+     * @throws ApiError
+     */
+    public searchForLinkTargetWithin(
+        note: number,
+        requestBody: SearchTerm,
+    ): CancelablePromise<Array<NoteTopology>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/{note}/search',
+            path: {
+                'note': note,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param requestBody
+     * @returns NoteTopology OK
+     * @throws ApiError
+     */
+    public searchForLinkTarget(
+        requestBody: SearchTerm,
+    ): CancelablePromise<Array<NoteTopology>> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/notes/search',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+}

@@ -967,7 +967,7 @@ paths:
   /api/notes/{note}/search:
     post:
       tags:
-      - rest-note-controller
+      - rest-search-controller
       operationId: searchForLinkTargetWithin
       parameters:
       - name: note
@@ -1055,7 +1055,7 @@ paths:
   /api/notes/search:
     post:
       tags:
-      - rest-note-controller
+      - rest-search-controller
       operationId: searchForLinkTarget
       requestBody:
         content:

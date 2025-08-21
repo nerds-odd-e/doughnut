@@ -25,6 +25,12 @@ To run frontend unit test:
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
+To run e2e test (we usually assume the frontend, backend and mountebank services are already running):
+
+```
+nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+```
+
 # Development preferences
 
 ## High Cohesion

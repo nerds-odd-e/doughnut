@@ -110,12 +110,12 @@ const relativeSearch = async (
   searchTerm: SearchTerm
 ) => {
   if (noteId) {
-    return managedApi.restNoteController.searchForLinkTargetWithin(
+    return managedApi.restSearchController.searchForLinkTargetWithin(
       noteId,
       searchTerm
     )
   }
-  return managedApi.restNoteController.searchForLinkTarget(searchTerm)
+  return managedApi.restSearchController.searchForLinkTarget(searchTerm)
 }
 
 const debounced = debounce((callback) => callback(), 500)

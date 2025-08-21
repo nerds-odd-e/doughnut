@@ -20,8 +20,8 @@ describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    helper.managedApi.restNoteController.searchForLinkTarget = mockedSearch
-    helper.managedApi.restNoteController.searchForLinkTargetWithin =
+    helper.managedApi.restSearchController.searchForLinkTarget = mockedSearch
+    helper.managedApi.restSearchController.searchForLinkTargetWithin =
       mockedSearchWithin
     helper.managedApi.restNoteCreationController.createNote =
       mockedCreateNote.mockResolvedValue({})

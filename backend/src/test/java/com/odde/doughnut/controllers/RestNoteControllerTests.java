@@ -49,11 +49,7 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService,
-            userModel,
-            httpClientAdapter,
-            testabilitySettings,
-            noteSearchService);
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Nested
@@ -285,28 +281,26 @@ class RestNoteControllerTests {
     @BeforeEach
     void setup() {
       userModel = makeMe.aNullUserModelPlease();
-      controller =
-          new RestNoteController(
-              modelFactoryService,
-              userModel,
-              httpClientAdapter,
-              testabilitySettings,
-              noteSearchService);
     }
 
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
       SearchTerm searchTerm = new SearchTerm();
-      assertThrows(ResponseStatusException.class, () -> controller.searchForLinkTarget(searchTerm));
+      RestSearchController searchController =
+          new RestSearchController(userModel, noteSearchService);
+      assertThrows(
+          ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
     }
 
     @Test
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
+      RestSearchController searchController =
+          new RestSearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.searchForLinkTargetWithin(note, searchTerm));
+          () -> searchController.searchForLinkTargetWithin(note, searchTerm));
     }
   }
 
