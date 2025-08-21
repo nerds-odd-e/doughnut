@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
-import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
@@ -125,10 +124,6 @@ public class ModelFactoryService {
 
   public Authorization toAuthorization(User entity) {
     return new Authorization(entity, this);
-  }
-
-  public SearchTermModel toSearchTermModel(User entity, SearchTerm searchTerm) {
-    return new SearchTermModel(entity, noteRepository, searchTerm);
   }
 
   public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(

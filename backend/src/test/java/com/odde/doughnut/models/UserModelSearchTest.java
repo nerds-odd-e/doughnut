@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserModelSearchTest {
   @Autowired MakeMe makeMe;
-  SearchTermModel searchTermModel;
+  @Autowired NoteSearchService noteSearchService;
   User user;
   UserModel anotherUser;
   Note note;
@@ -37,13 +38,11 @@ public class UserModelSearchTest {
   void setup() {
     user = makeMe.aUser().please();
     note = makeMe.aNote().creatorAndOwner(user).please();
-    searchTermModel =
-        new SearchTermModel(user, makeMe.modelFactoryService.noteRepository, searchTerm);
     anotherUser = makeMe.aUser().toModelPlease();
   }
 
   private List<NoteTopology> search() {
-    return searchTermModel.searchForNotesInRelateTo(note);
+    return noteSearchService.searchForNotesInRelationTo(user, searchTerm, note);
   }
 
   @Test

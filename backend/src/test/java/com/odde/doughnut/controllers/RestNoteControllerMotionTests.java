@@ -12,6 +12,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
+import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ class RestNoteControllerMotionTests {
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
+  @Autowired NoteSearchService noteSearchService;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -41,7 +43,11 @@ class RestNoteControllerMotionTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            noteSearchService);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 

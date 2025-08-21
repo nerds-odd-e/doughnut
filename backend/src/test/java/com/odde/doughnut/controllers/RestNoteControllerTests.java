@@ -13,6 +13,7 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
+import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
@@ -37,6 +38,7 @@ class RestNoteControllerTests {
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
+  @Autowired NoteSearchService noteSearchService;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -47,7 +49,11 @@ class RestNoteControllerTests {
 
     controller =
         new RestNoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            noteSearchService);
   }
 
   @Nested
@@ -281,7 +287,11 @@ class RestNoteControllerTests {
       userModel = makeMe.aNullUserModelPlease();
       controller =
           new RestNoteController(
-              modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+              modelFactoryService,
+              userModel,
+              httpClientAdapter,
+              testabilitySettings,
+              noteSearchService);
     }
 
     @Test

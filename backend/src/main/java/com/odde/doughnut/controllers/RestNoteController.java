@@ -9,7 +9,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
-import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.WikidataService;
@@ -18,6 +17,7 @@ import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
 import com.odde.doughnut.services.graphRAG.FocusNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
+import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -40,16 +40,19 @@ class RestNoteController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final WikidataService wikidataService;
+  private final NoteSearchService noteSearchService;
   private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteSearchService noteSearchService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.noteSearchService = noteSearchService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -124,9 +127,7 @@ class RestNoteController {
   public List<NoteTopology> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-    SearchTermModel searchTermModel =
-        modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
-    return searchTermModel.searchForNotes();
+    return noteSearchService.searchForNotes(currentUser.getEntity(), searchTerm);
   }
 
   @PostMapping("/{note}/search")
@@ -136,9 +137,7 @@ class RestNoteController {
       @Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();
-    SearchTermModel searchTermModel =
-        modelFactoryService.toSearchTermModel(currentUser.getEntity(), searchTerm);
-    return searchTermModel.searchForNotesInRelateTo(note);
+    return noteSearchService.searchForNotesInRelationTo(currentUser.getEntity(), searchTerm, note);
   }
 
   @PostMapping(value = "/{note}/delete")
