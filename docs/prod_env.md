@@ -62,4 +62,23 @@ PACKER_LOG=1 packer build packer.json
 ```
 
 Expect to see following log line towards end of Packer build stdout log:
-`--> googlecompute: A disk image was created: doughnut-debian12-mysql80-base-saltstack`
+`--> googlecompute: A disk image was created: doughnut-debian12-mysql84-base-saltstack`
+
+## 4. Production Database (Cloud SQL for MySQL)
+
+- Instance: `doughnut-db-instance` (Cloud SQL, MySQL 8.4)
+- Private DNS target for app: `db-server` (maps to the instance's private IP)
+- Vector support: enabled via Cloud SQL flag `cloudsql_vector=on`
+
+Enable/verify vector flag:
+
+```bash
+gcloud sql instances patch doughnut-db-instance \
+  --database-flags=cloudsql_vector=on
+gcloud sql instances describe doughnut-db-instance \
+  --format="table(settings.databaseFlags[].name, settings.databaseFlags[].value)"
+```
+
+Operational note: creating a Cloud SQL VECTOR index may fail with
+"Vector index: not enough data to train" if the table has too few embeddings.
+Run index creation after sufficient data exists.
