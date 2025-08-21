@@ -27,7 +27,6 @@
     "backend:test_only": "backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel",
     "backend:test": "pnpm backend:format && (backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test || (echo 'Migration failed! 💀' && exit 1)) && pnpm backend:test_only",
     "backend:verify": "pnpm backend:test",
-    "backend:test:fast": "backend/gradlew -p backend testFast --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "backend:generateOpenAPIDocs": "backend/gradlew -p backend generateOpenAPIDocs -Dspring.profiles.active=test --build-cache",
