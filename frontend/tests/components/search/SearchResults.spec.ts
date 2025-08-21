@@ -13,8 +13,13 @@ describe("SearchResults.vue", () => {
 
     const firstSpy = vitest.fn().mockResolvedValue(result)
     const withinSpy = vitest.fn().mockResolvedValue(result)
+    const semanticSpy = vitest.fn().mockResolvedValue([])
+    const semanticWithinSpy = vitest.fn().mockResolvedValue([])
     helper.managedApi.restSearchController.searchForLinkTarget = firstSpy
     helper.managedApi.restSearchController.searchForLinkTargetWithin = withinSpy
+    helper.managedApi.restSearchController.semanticSearch = semanticSpy
+    helper.managedApi.restSearchController.semanticSearchWithin =
+      semanticWithinSpy
 
     const wrapper = helper
       .component(SearchResults)
@@ -36,7 +41,9 @@ describe("SearchResults.vue", () => {
     await flushPromises()
 
     expect(firstSpy).toHaveBeenCalledTimes(1)
+    expect(semanticSpy).toHaveBeenCalledTimes(1)
     expect(withinSpy).toHaveBeenCalledTimes(1)
+    expect(semanticWithinSpy).toHaveBeenCalledTimes(1)
 
     vi.useRealTimers()
   })
@@ -55,10 +62,15 @@ describe("SearchResults.vue", () => {
 
     const mockTop = vitest.fn().mockResolvedValueOnce(firstBatch)
     const mockWithin = vitest.fn().mockResolvedValueOnce(secondBatch)
+    const mockSemanticTop = vitest.fn().mockResolvedValueOnce([])
+    const mockSemanticWithin = vitest.fn().mockResolvedValueOnce([])
 
     helper.managedApi.restSearchController.searchForLinkTarget = mockTop
     helper.managedApi.restSearchController.searchForLinkTargetWithin =
       mockWithin
+    helper.managedApi.restSearchController.semanticSearch = mockSemanticTop
+    helper.managedApi.restSearchController.semanticSearchWithin =
+      mockSemanticWithin
 
     const wrapper = helper
       .component(SearchResults)
@@ -80,7 +92,9 @@ describe("SearchResults.vue", () => {
 
     // Ensure both endpoints were used once
     expect(mockTop).toHaveBeenCalledTimes(1)
+    expect(mockSemanticTop).toHaveBeenCalledTimes(1)
     expect(mockWithin).toHaveBeenCalledTimes(1)
+    expect(mockSemanticWithin).toHaveBeenCalledTimes(1)
 
     // After second call, results should be merged and ordered by distance
     // We expect ids in order of ascending distance after merge: id=1 (0.1), id=2 (0.4), id=3 (0.8)

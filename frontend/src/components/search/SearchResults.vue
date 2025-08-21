@@ -126,6 +126,19 @@ const relativeSearch = async (
   return managedApi.restSearchController.searchForLinkTarget(searchTerm)
 }
 
+const semanticRelativeSearch = async (
+  noteId: undefined | Doughnut.ID,
+  searchTerm: SearchTerm
+) => {
+  if (noteId) {
+    return managedApi.restSearchController.semanticSearchWithin(
+      noteId,
+      searchTerm
+    )
+  }
+  return managedApi.restSearchController.semanticSearch(searchTerm)
+}
+
 const debounced = debounce((callback) => callback(), 500)
 
 const mergeUniqueAndSortByDistance = (
@@ -163,9 +176,14 @@ const search = () => {
 
   timeoutId.value = debounced(async () => {
     const originalTrimmedKey = trimmedSearchKey.value
-    const result = await relativeSearch(props.noteId, searchTerm.value)
+    // perform literal and semantic searches in parallel
+    const [literalRes, semanticRes] = await Promise.all([
+      relativeSearch(props.noteId, searchTerm.value),
+      semanticRelativeSearch(props.noteId, searchTerm.value),
+    ])
+    const combined = [...literalRes, ...semanticRes]
     const existing = cachedSearches.value[originalTrimmedKey] ?? []
-    const merged = mergeUniqueAndSortByDistance(existing, result)
+    const merged = mergeUniqueAndSortByDistance(existing, combined)
     cachedSearches.value[originalTrimmedKey] = merged
     recentResult.value = cachedSearches.value[originalTrimmedKey]
   })
