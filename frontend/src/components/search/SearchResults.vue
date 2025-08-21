@@ -128,16 +128,46 @@ const relativeSearch = async (
 
 const debounced = debounce((callback) => callback(), 500)
 
+const mergeUniqueAndSortByDistance = (
+  existing: NoteSearchResult[],
+  incoming: NoteSearchResult[]
+): NoteSearchResult[] => {
+  const byId = new Map<number, NoteSearchResult>()
+  const getId = (r: NoteSearchResult) => r.noteTopology.id as number
+
+  const chooseBetter = (a: NoteSearchResult, b: NoteSearchResult) => {
+    const da = a.distance ?? Infinity
+    const db = b.distance ?? Infinity
+    return db < da ? b : a
+  }
+
+  existing.forEach((r) => {
+    byId.set(getId(r), r)
+  })
+  incoming.forEach((r) => {
+    const id = getId(r)
+    const prev = byId.get(id)
+    byId.set(id, prev ? chooseBetter(prev, r) : r)
+  })
+
+  return Array.from(byId.values()).sort(
+    (a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity)
+  )
+}
+
 const search = () => {
-  if (Object.hasOwn(cachedSearches.value, trimmedSearchKey.value)) {
-    return
+  // ensure an entry exists for this key
+  if (!Object.hasOwn(cachedSearches.value, trimmedSearchKey.value)) {
+    cachedSearches.value[trimmedSearchKey.value] = []
   }
 
   timeoutId.value = debounced(async () => {
     const originalTrimmedKey = trimmedSearchKey.value
     const result = await relativeSearch(props.noteId, searchTerm.value)
-    recentResult.value = result
-    cachedSearches.value[originalTrimmedKey] = result
+    const existing = cachedSearches.value[originalTrimmedKey] ?? []
+    const merged = mergeUniqueAndSortByDistance(existing, result)
+    cachedSearches.value[originalTrimmedKey] = merged
+    recentResult.value = cachedSearches.value[originalTrimmedKey]
   })
 }
 
