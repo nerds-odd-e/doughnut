@@ -37,6 +37,7 @@ Search Query → Generate Embedding → SQL KNN/ANN on VECTOR → Ranked Results
 - **Model**: `text-embedding-3-small` ($0.00002/1k tokens)
 - **Input**: `note.topicConstructor + " " + note.details`
 - **Output**: 1536-dimension vector
+- **Per-item token cap (current)**: 4,000
 - **Cost**: ~$0.02 per million tokens (very affordable)
 
 ### 2. Large Note Handling
@@ -72,7 +73,7 @@ DISTANCE_MEASURE = l2_squared;
 
 Local development (no network) options:
 
-- Preferred: Use a local schema variant without `VECTOR` and skip semantic search. Keep DDL compatible by using a separate migration profile:
+- Implemented: Use a local schema variant without `VECTOR` and store raw bytes in `embedding_raw`. Semantic search runs locally by selecting latest embeddings and computing L2 distance in-app. Keep DDL compatible by using a separate migration profile:
 
 ```sql
 -- Local (standard MySQL) schema variant without VECTOR
@@ -88,8 +89,8 @@ CREATE TABLE note_embeddings (
 ```
 
 Notes:
-- Standard MySQL does not accept unknown data types; it cannot "tolerate" `VECTOR(…)` syntax without support. Use environment-specific migrations or a feature flag to avoid executing vector-specific DDL/queries locally.
-- Application logic should avoid issuing vector search SQL in local profile (fallback to keyword/full-text search).
+- Standard MySQL does not accept unknown data types; it cannot "tolerate" `VECTOR(…)` syntax without support. We use Flyway placeholders to add `embedding` in prod and `embedding_raw` locally.
+- Application logic on local profile performs non-vector semantic search by loading latest embeddings and computing L2 squared distance within the application.
 
 ### 4. CRUD Flow
 
@@ -111,10 +112,10 @@ Notes:
 
 **Query Process:**
 1. Generate embedding for search query
-2. Filter by allowed notebook IDs
-3. Compute similarity with candidate embeddings using SQL (`vector_distance`/`approx_distance`)
+2. Filter by allowed notebook IDs and user scope (notebooks, subscriptions, circles)
+3. Compute similarity with candidate embeddings using SQL (`vector_distance`) or in-app (local)
 4. Aggregate per `note_id` with weighting (title higher than details)
-5. Apply similarity threshold (0.7)
+5. Apply similarity threshold (0.5)
 6. Fetch full note data from MySQL
 7. Return ranked results
 
@@ -142,35 +143,24 @@ LIMIT 10;
 
 ### 6. Fallback Strategy
 
-```java
-public SearchResults search(String query) {
-    // Try semantic search first
-    List<Note> semanticResults = semanticSearchService.search(query, 10);
-    
-    // Fallback to MySQL full-text if no semantic results
-    if (semanticResults.isEmpty()) {
-        semanticResults = mysqlFullTextService.search(query, 10);
-    }
-    
-    return combineAndRank(semanticResults);
-}
-```
+Not implemented yet. Current endpoints return only semantic results.
 
 ## Implementation Phases
 
 ### Phase 1: Basic Semantic Search (2-3 weeks)
-- [ ] OpenAI embedding service integration
+- [x] OpenAI embedding service integration
 - [x] New table `note_embeddings(note_id, kind, embedding)`
-- [ ] CRUD flow to insert/update/delete embeddings on note changes
-- [ ] Single embedding per note (no chunking yet)
-- [ ] Simple KNN similarity search with SQL (`vector_distance`)
-- [ ] New search endpoint with fallback
+- [ ] CRUD flow to insert/update/delete embeddings on note changes (currently via notebook reindex/incremental update)
+- [x] Single embedding per note (TITLE only; no chunking yet)
+- [x] Simple KNN similarity search with SQL (`vector_distance`) with local non-vector fallback
+- [x] New semantic search endpoints
+- [ ] Fallback to keyword/full-text when semantic returns none
 - [x] Flyway placeholders configured per profile for embedding column and optional vector index (implemented via `V200000196__create_note_embeddings.sql` and `application.yml`)
 
 ### Phase 2: Enhanced Features (1-2 weeks)  
 - [ ] Large note chunking support
-- [ ] Notebook filtering implementation
-- [ ] Title vs details weighting
+- [x] Notebook filtering implementation
+- [x] Title vs details weighting
 - [ ] Search result caching
 - [ ] Performance monitoring
 
@@ -188,7 +178,7 @@ public SearchResults search(String query) {
 - **Schema**: `note_embeddings` table with `embedding VECTOR(1536) USING VARBINARY`, optional SCANN vector index
 - **Functions**: `string_to_vector`, `vector_distance` (KNN), `approx_distance` (ANN)
 - **Distance measures**: `l2_squared`, `cosine`, `dot_product`
-- **Local**: No network; use local schema variant (no `VECTOR`) and disable semantic search via feature flag
+- **Local**: Use local schema variant (no `VECTOR`) and run in-app distance search instead of SQL vector functions
 
 ### Environment-Specific Migrations (Flyway Free, minimal duplication)
 
@@ -231,17 +221,15 @@ Notes:
 - If a future DDL differs too much for placeholders, add a tiny env-specific follow-up migration that is guarded by another placeholder (emits no-op locally).
 
 ### OpenAI API
-- **API Key**: Secure storage in application properties
+- **API Token**: `openai.token` in `application.yml`
 - **Rate Limits**: 3,000 RPM for embeddings API
-- **Retry Logic**: Exponential backoff for failures
-- **Monitoring**: Track usage and costs
+- **Retry Logic**: Exponential backoff for failures (TBD)
+- **Monitoring**: Track usage and costs (TBD)
 
 ### Application Properties
 ```properties
 # OpenAI Configuration
-openai.api.key=${OPENAI_API_KEY}
-openai.embedding.model=text-embedding-3-small
-openai.embedding.max-tokens=8000
+openai.token=${OPENAI_API_TOKEN}
 
 # Database / Cloud SQL
 spring.datasource.url=${JDBC_URL}
@@ -249,7 +237,7 @@ spring.datasource.username=${DB_USER}
 spring.datasource.password=${DB_PASSWORD}
 
 # Search Configuration
-search.similarity.threshold=0.7
+search.similarity.threshold=0.5
 search.title.weight=2.0
 search.chunk.max-chars=32000
 ```
