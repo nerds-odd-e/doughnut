@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar-container daisy-w-full daisy-h-full">
     <div class="daisy-flex daisy-flex-col daisy-h-full">
-      <ul v-if="user" class="daisy-menu daisy-w-full daisy-flex-1">
+      <ul v-if="user" class="top-menu daisy-menu daisy-w-full daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" role="button" :title="item.label" :key="item.name" class="daisy-menu-item">
           <NavigationItem v-bind="{ ...item }" />
@@ -22,7 +22,7 @@
             :is-active="false"
           >
             <template #dropdown="slotProps">
-              <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow daisy-max-w-52 daisy-overflow-hidden">
+              <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-100 daisy-rounded-box daisy-w-52 daisy-shadow daisy-max-w-52 daisy-overflow-hidden daisy-z-[1000]">
                 <li v-if="user?.admin" class="daisy-menu-item hover:daisy-bg-base-200">
                   <router-link :to="{ name: 'adminDashboard' }" class="daisy-menu-title daisy-justify-start daisy-text-primary hover:daisy-text-primary-focus daisy-w-full daisy-text-left daisy-truncate" @click="slotProps.closeDropdown">
                     Admin Dashboard
@@ -200,7 +200,7 @@ const showUserSettingsDialog = () => {
     height: auto;
     display: block;
 
-    .daisy-menu {
+    .top-menu {
       flex-direction: row;
       flex-wrap: nowrap;
       justify-content: center;
@@ -223,9 +223,7 @@ const showUserSettingsDialog = () => {
     display: none;
   }
 
-  .daisy-dropdown {
-    @apply daisy-dropdown-end;
-  }
+  .daisy-dropdown { @apply daisy-dropdown-end; }
 }
 
 </style>

@@ -3,8 +3,7 @@
     class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
     :class="{
       'daisy-text-primary daisy-bg-primary/10': isActive,
-      'hover:daisy-bg-base-content/5': !isActive,
-      'daisy-dropdown daisy-dropdown-end lg:daisy-dropdown-right': hasDropdown
+      'hover:daisy-bg-base-content/5': !isActive
     }"
   >
     <router-link
@@ -21,7 +20,7 @@
       <span class="label">{{ label }}</span>
     </router-link>
 
-    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown">
+    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown daisy-dropdown-end lg:daisy-dropdown-right">
       <summary
         tabindex="0"
         role="button"
