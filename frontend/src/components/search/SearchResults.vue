@@ -14,7 +14,11 @@
       />
     </div>
 
-    <div v-if="!searchResult || searchResult.length === 0">
+    <div v-if="searchResult === undefined">
+      <em>Searching ...</em>
+    </div>
+
+    <div v-else-if="searchResult.length === 0">
       <em>No matching notes found.</em>
     </div>
 
@@ -169,11 +173,6 @@ const mergeUniqueAndSortByDistance = (
 }
 
 const search = () => {
-  // ensure an entry exists for this key
-  if (!Object.hasOwn(cachedSearches.value, trimmedSearchKey.value)) {
-    cachedSearches.value[trimmedSearchKey.value] = []
-  }
-
   timeoutId.value = debounced(async () => {
     const originalTrimmedKey = trimmedSearchKey.value
     // perform literal and semantic searches in parallel

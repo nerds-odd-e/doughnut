@@ -4,6 +4,57 @@ import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 
 describe("SearchResults.vue", () => {
+  it("shows 'Searching ...' before results arrive", async () => {
+    vi.useFakeTimers()
+
+    const delayed = new Promise<Array<unknown>>((resolve) =>
+      setTimeout(() => resolve([]), 1)
+    )
+
+    helper.managedApi.restSearchController.searchForLinkTarget = vi
+      .fn()
+      .mockReturnValue(delayed)
+    helper.managedApi.restSearchController.semanticSearch = vi
+      .fn()
+      .mockReturnValue(delayed)
+
+    const wrapper = helper
+      .component(SearchResults)
+      .withProps({ inputSearchKey: "q", isDropdown: true })
+      .mount()
+
+    await nextTick()
+    vi.advanceTimersByTime(100)
+
+    expect(wrapper.text()).toContain("Searching ...")
+
+    vi.useRealTimers()
+  })
+
+  it("shows 'No matching notes found.' when results are empty", async () => {
+    vi.useFakeTimers()
+
+    const empty: Array<unknown> = []
+    helper.managedApi.restSearchController.searchForLinkTarget = vi
+      .fn()
+      .mockResolvedValue(empty)
+    helper.managedApi.restSearchController.semanticSearch = vi
+      .fn()
+      .mockResolvedValue(empty)
+
+    const wrapper = helper
+      .component(SearchResults)
+      .withProps({ inputSearchKey: "z", isDropdown: true })
+      .mount()
+
+    await nextTick()
+    vi.advanceTimersByTime(600)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("No matching notes found.")
+
+    vi.useRealTimers()
+  })
   it("triggers second API call for same trimmed key when context changes", async () => {
     vi.useFakeTimers()
 
