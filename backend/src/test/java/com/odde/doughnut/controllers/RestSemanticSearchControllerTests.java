@@ -21,8 +21,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -33,7 +33,7 @@ class RestSemanticSearchControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired NoteSearchService noteSearchService;
 
-  @MockBean(name = "testableOpenAiApi")
+  @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
   private UserModel userModel;
