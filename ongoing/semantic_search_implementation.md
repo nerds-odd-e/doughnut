@@ -35,7 +35,13 @@ Search Query → Generate Embedding → SQL KNN/ANN on VECTOR → Ranked Results
 ### 1. OpenAI Integration
 
 - **Model**: `text-embedding-3-small` ($0.00002/1k tokens)
-- **Input**: `note.topicConstructor + " " + note.details`
+- **Input (structured text)**:
+```
+Context: {ancestorPath}
+Title: {title}
+Details:
+{details}
+```
 - **Output**: 1536-dimension vector
 - **Per-item token cap (current)**: 4,000
 - **Cost**: ~$0.02 per million tokens (very affordable)
@@ -97,8 +103,20 @@ Notes:
 **Create Note:**
 1. Save note to MySQL
 2. Generate embeddings via OpenAI
-   - Title embedding input: `join(contextPath, "/") + " | " + title`
-   - Details embedding input (if not empty): `join(contextPath, "/") + " | " + title + "\n\n" + details`
+   - Combined embedding input (Phase 1):
+```
+Context: {ancestorPath}
+Title: {title}
+Details:
+{details}
+```
+   - Details chunk input (Phase 2, if chunking enabled): for each chunk `chunk_i` of details
+```
+Context: {ancestorPath}
+Title: {title}
+Details:
+{chunk_i}
+```
 3. Insert rows into `note_embeddings` (`kind = 'TITLE'` and optionally `kind = 'DETAILS'`)
 
 **Update Note:**
@@ -170,8 +188,13 @@ Not implemented yet. Current endpoints return only semantic results.
 Both `TITLE` and `DETAILS` rows currently reuse the same embedding built from `title + details`. This makes the per-kind weighting ineffective, and short titles can lose precision if mixed with long details.
 
 ### Decision
-- Use a **single combined embedding** per note for Phase 1 (stored as a `TITLE` row) built from:
-  - `join(contextPath, "/") + " | " + title + (detailsPresent ? "\n\n" + details : "")`
+- Use a **single combined embedding** per note for Phase 1 (stored as a `TITLE` row) with structured input:
+```
+Context: {ancestorPath}
+Title: {title}
+Details:
+{optionalDetails}
+```
 - Keep truncation using the existing `CharacterBasedTokenCountingStrategy` and token cap.
 - Include the ancestor context path to anchor meaning and disambiguate titles.
 
