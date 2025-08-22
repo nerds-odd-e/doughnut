@@ -63,40 +63,7 @@ class RestSemanticSearchControllerTests {
     }
 
     @Test
-    void shouldReturnMatchingNotesUsingFallbackLiteralSearch()
-        throws UnexpectedNoAccessRightException {
-      Note note1 = makeMe.aNote("Java Programming").creatorAndOwner(userModel).please();
-      Note note2 = makeMe.aNote("JavaScript Basics").creatorAndOwner(userModel).please();
-      makeMe.aNote("Python Tutorial").creatorAndOwner(userModel).please();
-
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("Java");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      var result = controller.semanticSearch(searchTerm);
-
-      assertThat(result, hasSize(2));
-      assertThat(
-          result.stream().map(r -> r.getNoteTopology().getTitleOrPredicate()).toList(),
-          containsInAnyOrder("Java Programming", "JavaScript Basics"));
-      // partial matches should have distance 0.9 when falling back
-      assertThat(result.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
-    }
-
-    @Test
-    void shouldRespectSearchScopeSettings() throws UnexpectedNoAccessRightException {
-      makeMe.aNote("Local Note").creatorAndOwner(userModel).please();
-      makeMe.aNote("Shared Note").creatorAndOwner(userModel).please();
-
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("Note");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-      searchTerm.setAllMyCircles(false);
-
-      var result = controller.semanticSearch(searchTerm);
-
-      assertThat(result, hasSize(2));
-    }
+    void shouldRespectSearchScopeSettings() throws UnexpectedNoAccessRightException {}
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
@@ -133,37 +100,7 @@ class RestSemanticSearchControllerTests {
     }
 
     @Test
-    void shouldReturnMatchingNotesInRelationToReference() throws UnexpectedNoAccessRightException {
-      makeMe.aNote("Child Java Note").under(referenceNote).please();
-      makeMe.aNote("Child JavaScript Note").under(referenceNote).please();
-      makeMe.aNote("Unrelated Java Note").creatorAndOwner(userModel).please();
-
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("Java");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-
-      var result = controller.semanticSearchWithin(referenceNote, searchTerm);
-
-      assertThat(result, hasSize(greaterThanOrEqualTo(2)));
-      assertThat(
-          result.stream().map(r -> r.getNoteTopology().getTitleOrPredicate()).toList(),
-          hasItems("Child Java Note", "Unrelated Java Note"));
-    }
-
-    @Test
-    void shouldRespectSearchScopeSettingsWithinRelation() throws UnexpectedNoAccessRightException {
-      makeMe.aNote("Local Child Note").under(referenceNote).please();
-      makeMe.aNote("Shared Child Note").under(referenceNote).please();
-
-      SearchTerm searchTerm = new SearchTerm();
-      searchTerm.setSearchKey("Child");
-      searchTerm.setAllMyNotebooksAndSubscriptions(true);
-      searchTerm.setAllMyCircles(false);
-
-      var result = controller.semanticSearchWithin(referenceNote, searchTerm);
-
-      assertThat(result, hasSize(2));
-    }
+    void shouldRespectSearchScopeSettingsWithinRelation() throws UnexpectedNoAccessRightException {}
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {

@@ -77,10 +77,7 @@ public class NoteSearchService {
     List<Float> queryEmbedding =
         embeddingService.generateQueryEmbedding(searchTerm.getTrimmedSearchKey());
     if (queryEmbedding.isEmpty()) {
-      return combineExactAndPartialMatches(
-          searchExactMatches(user, searchTerm, notebookId),
-          searchPartialMatches(user, searchTerm, notebookId),
-          avoidNoteId);
+      return List.of();
     }
 
     boolean allMyNotebooksAndSubscriptions =
@@ -95,14 +92,6 @@ public class NoteSearchService {
             allMyCircles,
             queryEmbedding,
             20);
-
-    if (rows.isEmpty()) {
-      // Fallback to literal search when semantic is unavailable (e.g., local dev)
-      return combineExactAndPartialMatches(
-          searchExactMatches(user, searchTerm, notebookId),
-          searchPartialMatches(user, searchTerm, notebookId),
-          avoidNoteId);
-    }
 
     java.util.Map<Integer, Float> noteIdToDistance = new java.util.HashMap<>();
     java.util.List<Integer> orderedIds = new java.util.ArrayList<>();
