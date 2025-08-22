@@ -15,6 +15,10 @@ export const assumeNoteTargetSearchDialog = () => {
       return this
     },
     expectExactLinkTargets: (targets: string[]) => {
+      if (targets.length === 0) {
+        cy.findByText('No matching notes found.').should('be.visible')
+        return
+      }
       cy.get('.search-result .daisy-card-title')
         .then((elms) => Cypress._.map(elms, 'innerText'))
         .should('deep.equal', targets)
