@@ -1,6 +1,6 @@
 ## Semantic Search with Cloud SQL for MySQL (Vector)
 
-- [x] Create `note_embeddings` table with placeholders (columns: `id, note_id, kind[TITLE|DETAILS], embedding(_raw), created_at, updated_at`; index on `note_id`) via `V200000196__create_note_embeddings.sql`; verified locally
+- [x] Create `note_embeddings` table with placeholders (columns: `id, note_id, embedding(_raw), created_at, updated_at`; index on `note_id`) via `V200000196__create_note_embeddings.sql`; verified locally
 - [x] Replace Redis Vector Storage Service with Note Embedding Service
   - [x] Create NoteEmbedding entity with proper JPA annotations
   - [x] Create NoteEmbeddingRepository for database operations
@@ -9,11 +9,11 @@
   - [x] Add comprehensive unit tests for new components
   - [x] Remove all Redis-related code and configuration
 - [ ] Implement embedding insert/update/delete on note CRUD
-- [ ] Generate a single combined embedding per note (Phase 1): `path | title + optional details`
+- [x] Generate a single combined embedding per note (Phase 1): `path | title + optional details`
 - [ ] Update `EmbeddingService` to build combined input with context path and truncation
-- [ ] Update `ModelFactoryService.storeNoteEmbedding` to insert only the combined vector (as TITLE)
+- [x] Update `ModelFactoryService.storeNoteEmbedding` to insert only the combined vector
 - [ ] Add optional short-query boost (≤ 3 words) to emphasize title precision
-- [x] Implement KNN SQL using `vector_distance`; aggregate per note with title-weighting
+- [x] Implement KNN SQL using `vector_distance`; use single-embedding distance
 - [ ] Phase 2: Chunk long details, store as DETAILS rows, aggregate best chunk per note
 - [ ] Add optional ANN index (`CREATE VECTOR INDEX ... USING SCANN`) and benchmark
 - [ ] Local dev: use alternate schema (no VECTOR), feature-flag semantic off to keyword/full-text

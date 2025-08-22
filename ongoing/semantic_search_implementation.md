@@ -55,14 +55,13 @@ Details:
 
 ### 3. MySQL Vector Storage (Cloud SQL for MySQL)
 
-Use a dedicated table to store embeddings. A note can have multiple rows: one for the title, and one for the details (if any). Include the note's context path to improve title and details embeddings.
+Use a dedicated table to store embeddings. We now store a single combined embedding per note. Include the note's context path to improve the embedding quality.
 
 ```sql
 -- Production (Cloud SQL for MySQL with vector support)
 CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   note_id BIGINT NOT NULL,
-  kind ENUM('TITLE','DETAILS') NOT NULL,
   embedding VECTOR(1536) USING VARBINARY NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -86,7 +85,6 @@ Local development (no network) options:
 CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   note_id BIGINT NOT NULL,
-  kind ENUM('TITLE','DETAILS') NOT NULL,
   embedding_raw VARBINARY(6144) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -102,7 +100,7 @@ Notes:
 
 **Create Note:**
 1. Save note to MySQL
-2. Generate embeddings via OpenAI
+2. Generate a single combined embedding via OpenAI
    - Combined embedding input (Phase 1):
 ```
 Context: {ancestorPath}
@@ -117,11 +115,11 @@ Title: {title}
 Details:
 {chunk_i}
 ```
-3. Insert rows into `note_embeddings` (`kind = 'TITLE'` and optionally `kind = 'DETAILS'`)
+3. Insert one row into `note_embeddings` per note
 
 **Update Note:**
 1. Update note in MySQL
-2. Regenerate relevant embeddings (title and/or details) and upsert rows in `note_embeddings`
+2. Regenerate the combined embedding and upsert the row in `note_embeddings`
 
 **Delete Note:**
 1. Delete `note_embeddings` rows by `note_id`, then delete the note row
@@ -132,14 +130,13 @@ Details:
 1. Generate embedding for search query
 2. Filter by allowed notebook IDs and user scope (notebooks, subscriptions, circles)
 3. Compute similarity with candidate embeddings using SQL (`vector_distance`) or in-app (local)
-4. Aggregate per `note_id` with weighting (title higher than details)
+4. Use the per-note distance directly (single embedding)
 5. Apply similarity threshold (0.5)
 6. Fetch full note data from MySQL
 7. Return ranked results
 
 **Title Weighting:**
-- Apply 2x weight to title vs details. Combine distances per note:
-  - `combined = (titleDistance * 2 + detailsDistance) / 3` (use `COALESCE` if one is missing)
+- Not applicable now. With a single combined embedding per note, combined distance equals that embedding's distance.
 
 Example KNN query (L2 squared):
 ```sql
@@ -148,13 +145,11 @@ WITH q AS (
 )
 SELECT
   ne.note_id,
-  MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END) AS title_dist,
-  MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END) AS details_dist,
-  ((COALESCE(MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END), 1e9) * 2)
-   + COALESCE(MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') END), 1e9)) / 3 AS combined_dist
+  vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') AS title_dist,
+  1e9 AS details_dist,
+  vector_distance(ne.embedding, q.qv, 'distance_measure=l2_squared') AS combined_dist
 FROM note_embeddings ne
 JOIN q
-GROUP BY ne.note_id
 ORDER BY combined_dist ASC
 LIMIT 10;
 ```
@@ -167,10 +162,10 @@ Not implemented yet. Current endpoints return only semantic results.
 
 ### Phase 1: Basic Semantic Search (2-3 weeks)
 - [x] OpenAI embedding service integration
-- [x] New table `note_embeddings(note_id, kind, embedding)`
+- [x] New table `note_embeddings(note_id, embedding)`
 - [x] CRUD flow to insert/update/delete embeddings on note changes (currently via notebook reindex/incremental update)
 - [x] Initial approach: single embedding per note
-- [ ] Refine: generate separate embeddings for TITLE and DETAILS
+- [x] Drop `kind` column; migrate existing data by deleting `DETAILS` and dropping column
 - [x] Simple KNN similarity search with SQL (`vector_distance`) with local non-vector fallback
 - [x] New semantic search endpoints
 - [x] Flyway placeholders configured per profile for embedding column and optional vector index (implemented via `V200000196__create_note_embeddings.sql` and `application.yml`)
@@ -178,7 +173,7 @@ Not implemented yet. Current endpoints return only semantic results.
 ### Phase 2: Enhanced Features (1-2 weeks)  
 - [ ] Large note chunking support
 - [x] Notebook filtering implementation
-- [x] Title vs details weighting
+- [x] Title vs details weighting — no longer applicable with single embedding (simplified)
 - [ ] Search result caching
 - [ ] Performance monitoring
 
@@ -199,11 +194,10 @@ Details:
 - Include the ancestor context path to anchor meaning and disambiguate titles.
 
 ### Large/Long Notes (Phase 2)
-- For notes with long/heterogeneous details, **chunk the details** (e.g., ~250–500 tokens per chunk), prepend the same context header and title to each chunk, and store chunks as `DETAILS` rows.
-- At search time, aggregate per note by taking the best (minimum) chunk distance and then combine with the note’s main combined embedding if needed.
+- For notes with long/heterogeneous details, **chunk the details** (e.g., ~250–500 tokens per chunk), prepend the same context header and title to each chunk, and store additional rows with a future schema extension (e.g., a `chunk_index` column). Aggregation would take the minimum chunk distance.
 
 ### Search Aggregation
-- Current SQL/non-prod logic already supports per-kind aggregation. With Phase 1 (single combined embedding as `TITLE`), it naturally works.
+- Current SQL/non-prod logic uses the single combined embedding distance directly.
 - Optional heuristic: for very short queries (≤ 3 words), boost the main embedding’s influence (or reduce any details/chunk influence) to emphasize entity-name matches.
 
 ### Ancestor/Path Context
@@ -213,7 +207,7 @@ Details:
 - Mixing details into a title-only vector can weaken name-precision for very short queries, but for general semantic matching a combined embedding with path context is effective. We mitigate precision issues for short queries via a small boost heuristic rather than duplicating vectors.
 
 ### Implementation Notes
-- Update embedding generation to produce one combined input per note (Phase 1) and store it as a `TITLE` row.
+- Update embedding generation to produce one combined input per note (Phase 1) and store a single row per note.
 - Reuse existing search logic; it remains compatible and needs no structural change.
 - Add details chunking later (Phase 2) only for long notes to avoid truncation.
 
@@ -242,8 +236,7 @@ Single shared migration example (lives in `db/migration`):
 -- V200000200__create_note_embeddings.sql (shared)
 CREATE TABLE note_embeddings (
   id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  note_id BIGINT NOT NULL,
-  kind ENUM('TITLE','DETAILS') NOT NULL
+  note_id BIGINT NOT NULL
 );
 
 -- Add environment-specific embedding column
