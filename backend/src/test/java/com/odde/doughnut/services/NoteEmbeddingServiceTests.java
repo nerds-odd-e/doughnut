@@ -45,9 +45,8 @@ class NoteEmbeddingServiceTests {
     service.deleteEmbedding(note.getId());
 
     assertThat(
-        noteEmbeddingRepository
-            .findByNoteIdAndKind(note.getId(), NoteEmbedding.EmbeddingKind.TITLE)
-            .isPresent(),
+        noteEmbeddingRepository.existsByNoteIdAndKind(
+            note.getId(), NoteEmbedding.EmbeddingKind.TITLE),
         is(false));
   }
 
@@ -64,9 +63,8 @@ class NoteEmbeddingServiceTests {
         .forEach(
             n ->
                 assertThat(
-                    noteEmbeddingRepository
-                        .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.TITLE)
-                        .isPresent(),
+                    noteEmbeddingRepository.existsByNoteIdAndKind(
+                        n.getId(), NoteEmbedding.EmbeddingKind.TITLE),
                     is(false)));
   }
 

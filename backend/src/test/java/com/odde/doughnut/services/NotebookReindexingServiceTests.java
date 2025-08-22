@@ -77,9 +77,8 @@ class NotebookReindexingServiceTests {
         .forEach(
             n ->
                 assertThat(
-                    noteEmbeddingRepository
-                        .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.TITLE)
-                        .isPresent(),
+                    noteEmbeddingRepository.existsByNoteIdAndKind(
+                        n.getId(), NoteEmbedding.EmbeddingKind.TITLE),
                     is(true)));
   }
 
@@ -92,9 +91,8 @@ class NotebookReindexingServiceTests {
         notebook.getNotes().stream()
             .filter(
                 n ->
-                    noteEmbeddingRepository
-                        .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.TITLE)
-                        .isPresent())
+                    noteEmbeddingRepository.existsByNoteIdAndKind(
+                        n.getId(), NoteEmbedding.EmbeddingKind.TITLE))
             .count();
     assertThat((int) regeneratedCount, equalTo(numNotes));
   }
@@ -113,9 +111,8 @@ class NotebookReindexingServiceTests {
         .forEach(
             n ->
                 assertThat(
-                    noteEmbeddingRepository
-                        .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.DETAILS)
-                        .isPresent(),
+                    noteEmbeddingRepository.existsByNoteIdAndKind(
+                        n.getId(), NoteEmbedding.EmbeddingKind.DETAILS),
                     is(true)));
   }
 
@@ -139,14 +136,12 @@ class NotebookReindexingServiceTests {
 
     // Assert: both notes should have TITLE embeddings (first already had; second should now)
     assertThat(
-        noteEmbeddingRepository
-            .findByNoteIdAndKind(first.getId(), NoteEmbedding.EmbeddingKind.TITLE)
-            .isPresent(),
+        noteEmbeddingRepository.existsByNoteIdAndKind(
+            first.getId(), NoteEmbedding.EmbeddingKind.TITLE),
         is(true));
     assertThat(
-        noteEmbeddingRepository
-            .findByNoteIdAndKind(second.getId(), NoteEmbedding.EmbeddingKind.TITLE)
-            .isPresent(),
+        noteEmbeddingRepository.existsByNoteIdAndKind(
+            second.getId(), NoteEmbedding.EmbeddingKind.TITLE),
         is(true));
   }
 
@@ -166,9 +161,8 @@ class NotebookReindexingServiceTests {
         .forEach(
             n ->
                 assertThat(
-                    noteEmbeddingRepository
-                        .findByNoteIdAndKind(n.getId(), NoteEmbedding.EmbeddingKind.DETAILS)
-                        .isPresent(),
+                    noteEmbeddingRepository.existsByNoteIdAndKind(
+                        n.getId(), NoteEmbedding.EmbeddingKind.DETAILS),
                     is(false)));
   }
 }
