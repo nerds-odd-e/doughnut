@@ -44,11 +44,6 @@ public class ModelFactoryService {
   public void storeNoteEmbedding(Note note, java.util.List<Float> embedding) {
     noteEmbeddingJdbcRepository.insert(
         note.getId(), NoteEmbedding.EmbeddingKind.TITLE.name(), embedding);
-
-    if (note.getDetails() != null && !note.getDetails().trim().isEmpty()) {
-      noteEmbeddingJdbcRepository.insert(
-          note.getId(), NoteEmbedding.EmbeddingKind.DETAILS.name(), embedding);
-    }
   }
 
   public void deleteNoteEmbeddingByNoteId(Integer noteId) {
