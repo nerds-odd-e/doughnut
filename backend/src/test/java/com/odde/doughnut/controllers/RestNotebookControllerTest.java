@@ -5,17 +5,15 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
-import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.EmbeddingService;
-import com.odde.doughnut.services.NoteEmbeddingService;
+import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -31,6 +29,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
@@ -46,27 +45,33 @@ class RestNotebookControllerTest {
   private Note topNote;
   RestNotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
-  private EmbeddingService embeddingService = mock(EmbeddingService.class);
-  private NoteEmbeddingService noteEmbeddingService = mock(NoteEmbeddingService.class);
-  private NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository =
-      mock(NoteEmbeddingJdbcRepository.class);
+  @Autowired NotebookIndexingService notebookIndexingService;
   @Autowired WebApplicationContext webApplicationContext;
+  @MockitoBean com.odde.doughnut.services.EmbeddingService embeddingService;
 
   @BeforeEach
   void setup() {
     // Setup MockMvc
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
+    when(embeddingService.streamEmbeddingsForNoteList(org.mockito.ArgumentMatchers.any()))
+        .thenAnswer(
+            invocation -> {
+              @SuppressWarnings("unchecked")
+              java.util.List<com.odde.doughnut.entities.Note> notes =
+                  (java.util.List<com.odde.doughnut.entities.Note>) invocation.getArgument(0);
+              return notes.stream()
+                  .map(
+                      n ->
+                          new com.odde.doughnut.services.EmbeddingService.EmbeddingForNote(
+                              n, java.util.Optional.of(java.util.List.of(1.0f, 2.0f, 3.0f))));
+            });
+
     userModel = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     controller =
         new RestNotebookController(
-            modelFactoryService,
-            userModel,
-            testabilitySettings,
-            embeddingService,
-            noteEmbeddingService,
-            noteEmbeddingJdbcRepository);
+            modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
   }
 
   @Nested
@@ -95,12 +100,7 @@ class RestNotebookControllerTest {
       userModel = modelFactoryService.toUserModel(null);
       controller =
           new RestNotebookController(
-              modelFactoryService,
-              userModel,
-              testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -111,12 +111,7 @@ class RestNotebookControllerTest {
       List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
       controller =
           new RestNotebookController(
-              modelFactoryService,
-              userModel,
-              testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
@@ -182,9 +177,7 @@ class RestNotebookControllerTest {
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              notebookIndexingService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
     }
@@ -225,12 +218,7 @@ class RestNotebookControllerTest {
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller =
           new RestNotebookController(
-              modelFactoryService,
-              userModel,
-              testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
@@ -239,12 +227,7 @@ class RestNotebookControllerTest {
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
       controller =
           new RestNotebookController(
-              modelFactoryService,
-              userModel,
-              testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
@@ -353,16 +336,10 @@ class RestNotebookControllerTest {
   @Nested
   class DownloadForObsidian {
     private Notebook notebook;
-    private Note note1;
-    private Note note2;
 
     @BeforeEach
     void setup() {
       notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
-      note1 =
-          makeMe.aNote("First Note").under(notebook.getHeadNote()).details("Content 1").please();
-      note2 =
-          makeMe.aNote("Second Note").under(notebook.getHeadNote()).details("Content 2").please();
       makeMe.refresh(notebook);
     }
 
@@ -374,9 +351,7 @@ class RestNotebookControllerTest {
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              notebookIndexingService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
@@ -470,12 +445,7 @@ class RestNotebookControllerTest {
       userModel = makeMe.aNullUserModelPlease();
       controller =
           new RestNotebookController(
-              modelFactoryService,
-              userModel,
-              testabilitySettings,
-              embeddingService,
-              noteEmbeddingService,
-              noteEmbeddingJdbcRepository);
+              modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
 
       // Act & Assert
       ResponseStatusException exception =
