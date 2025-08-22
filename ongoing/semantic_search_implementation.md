@@ -150,11 +150,10 @@ Not implemented yet. Current endpoints return only semantic results.
 ### Phase 1: Basic Semantic Search (2-3 weeks)
 - [x] OpenAI embedding service integration
 - [x] New table `note_embeddings(note_id, kind, embedding)`
-- [ ] CRUD flow to insert/update/delete embeddings on note changes (currently via notebook reindex/incremental update)
+- [x] CRUD flow to insert/update/delete embeddings on note changes (currently via notebook reindex/incremental update)
 - [x] Single embedding per note (TITLE only; no chunking yet)
 - [x] Simple KNN similarity search with SQL (`vector_distance`) with local non-vector fallback
 - [x] New semantic search endpoints
-- [ ] Fallback to keyword/full-text when semantic returns none
 - [x] Flyway placeholders configured per profile for embedding column and optional vector index (implemented via `V200000196__create_note_embeddings.sql` and `application.yml`)
 
 ### Phase 2: Enhanced Features (1-2 weeks)  
