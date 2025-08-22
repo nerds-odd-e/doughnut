@@ -114,10 +114,27 @@ public class EmbeddingService {
   private String combineNoteContent(Note note) {
     String title = note.getTopicConstructor() != null ? note.getTopicConstructor() : "";
     String details = note.getDetails() != null ? note.getDetails() : "";
-    String combined = (title + " " + details).trim();
-    // Use the current implementation strategy for truncation to keep cohesion
+
+    // Build ancestor path like: A/B/C
+    String ancestorPath =
+        note.getAncestors().stream()
+            .map(n -> n.getTopicConstructor() == null ? "" : n.getTopicConstructor())
+            .filter(s -> !s.isBlank())
+            .collect(java.util.stream.Collectors.joining(" \u203A "));
+
+    StringBuilder sb = new StringBuilder(256);
+    if (!ancestorPath.isBlank()) {
+      sb.append("Context: ").append(ancestorPath).append('\n');
+    }
+    sb.append("Title: ").append(title).append('\n');
+    sb.append("Details:\n");
+    if (!details.isBlank()) {
+      sb.append(details);
+    }
+
+    String structured = sb.toString();
     return new com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy()
-        .truncateByApproxTokens(combined, MAX_TOKENS_PER_INPUT);
+        .truncateByApproxTokens(structured, MAX_TOKENS_PER_INPUT);
   }
 
   public static class EmbeddingForNote {

@@ -39,7 +39,10 @@ class EmbeddingServiceTests {
 
   @Test
   void shouldStreamEmbeddingsForNotes() {
-    Note note1 = makeMe.aNote().titleConstructor("T1").details("D1").please();
+    // Build a small ancestor chain to verify separator rendering
+    Note root = makeMe.aNote().titleConstructor("Root").please();
+    Note parent = makeMe.aNote().under(root).titleConstructor("Parent").please();
+    Note note1 = makeMe.aNote().under(parent).titleConstructor("T1").details("D1").please();
     Note note2 = makeMe.aNote().titleConstructor("T2").details("D2").please();
 
     Embedding embedding1 = new Embedding();
@@ -50,7 +53,20 @@ class EmbeddingServiceTests {
     EmbeddingResult result = new EmbeddingResult();
     result.setData(List.of(embedding1, embedding2));
 
-    when(openAiApi.createEmbeddings(any(EmbeddingRequest.class))).thenReturn(Single.just(result));
+    when(openAiApi.createEmbeddings(any(EmbeddingRequest.class)))
+        .thenAnswer(
+            invocation -> {
+              EmbeddingRequest req = invocation.getArgument(0);
+              // Ensure the input contains our structured fields and the "›" separator
+              Object input = req.getInput();
+              java.util.List<?> list = (java.util.List<?>) input;
+              String first = String.valueOf(list.get(0));
+              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Context:"));
+              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Root \u203A Parent"));
+              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Title: T1"));
+              org.junit.jupiter.api.Assertions.assertTrue(first.contains("Details:"));
+              return Single.just(result);
+            });
 
     var streamed = service.streamEmbeddingsForNoteList(List.of(note1, note2)).toList();
 
