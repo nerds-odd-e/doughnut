@@ -38,6 +38,12 @@
     >
       <template #button="{ noteTopology }">
         <slot name="button" :note-topology="noteTopology" />
+        <small
+          v-if="distanceById[String(noteTopology.id)] != null"
+          class="similarity-distance"
+        >
+          {{ Number(distanceById[String(noteTopology.id)]).toFixed(3) }}
+        </small>
       </template>
     </Cards>
   </div>
@@ -114,6 +120,17 @@ const searchResult = computed(() => {
       ? (r as NoteSearchResult).noteTopology
       : (r as NoteTopology)
   ) as NoteTopology[]
+})
+
+const distanceById = computed<Record<string, number>>(() => {
+  const map: Record<string, number> = {}
+  const list = cachedResult.value ?? recentResult.value ?? []
+  list.forEach((r) => {
+    const id = String((r as NoteSearchResult).noteTopology.id as number)
+    const d = (r as NoteSearchResult).distance
+    if (d != null) map[id] = d
+  })
+  return map
 })
 
 // Methods
