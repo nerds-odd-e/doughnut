@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.context.annotation.SessionScope;
 
 @Configuration
 public class OpenAiApiConfig {
 
   @Bean
-  @SessionScope
   @Qualifier("testableOpenAiApi")
   public OpenAiApiExtended getTestableOpenAiApi(
       @Value("${spring.openai.token}") String openAiToken,
