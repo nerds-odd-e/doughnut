@@ -53,23 +53,24 @@
     <NotebookAssistantManagementDialog :notebook="notebook" />
   </template>
   
-  <!-- Reindex Section -->
+  <!-- Notebook Indexing Section -->
   <div class="daisy-mt-4">
+    <h4 class="daisy-text-lg daisy-mb-2">Notebook Indexing</h4>
     <div class="daisy-flex daisy-gap-2">
       <button 
         class="daisy-btn daisy-btn-secondary" 
         @click="reindexNotebook"
         :disabled="isIndexing"
       >
-        <span v-if="isIndexing">Indexing...</span>
-        <span v-else>Reindex notebook</span>
+        <span v-if="isIndexing">Working...</span>
+        <span v-else>Reset notebook index</span>
       </button>
       <button 
         class="daisy-btn daisy-btn-secondary" 
         @click="updateIndexNotebook"
         :disabled="isIndexing"
       >
-        <span v-if="isIndexing">Indexing...</span>
+        <span v-if="isIndexing">Working...</span>
         <span v-else>Update index</span>
       </button>
     </div>
@@ -78,8 +79,8 @@
   <!-- Indexing Complete Confirmation Dialog -->
   <div v-if="showIndexingComplete" class="daisy-modal daisy-modal-open">
     <div class="daisy-modal-box">
-      <h3 class="daisy-font-bold daisy-text-lg">Indexing Complete</h3>
-      <p class="daisy-py-4">The notebook has been successfully reindexed.</p>
+      <h3 class="daisy-font-bold daisy-text-lg">Index operation complete</h3>
+      <p class="daisy-py-4">Notebook index has been updated.</p>
       <div class="daisy-modal-action">
         <button class="daisy-btn daisy-btn-primary" @click="closeIndexingComplete">
           OK
@@ -176,11 +177,13 @@ const handleObsidianImport = async (event: Event) => {
 const reindexNotebook = async () => {
   isIndexing.value = true
   try {
-    await managedApi.restNotebookController.reindexNotebook(props.notebook.id)
+    await managedApi.restNotebookController.resetNotebookIndex(
+      props.notebook.id
+    )
     showIndexingComplete.value = true
   } catch (error) {
-    console.error("Reindex error:", error)
-    alert("Failed to reindex notebook")
+    console.error("Reset index error:", error)
+    alert("Failed to reset notebook index")
   } finally {
     isIndexing.value = false
   }

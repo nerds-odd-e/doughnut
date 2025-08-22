@@ -100,12 +100,12 @@ export class RestNotebookControllerService {
      * @returns any OK
      * @throws ApiError
      */
-    public reindexNotebook(
+    public resetNotebookIndex(
         notebook: number,
     ): CancelablePromise<any> {
         return this.httpRequest.request({
             method: 'POST',
-            url: '/api/notebooks/{notebook}/reindex',
+            url: '/api/notebooks/{notebook}/reset-index',
             path: {
                 'notebook': notebook,
             },

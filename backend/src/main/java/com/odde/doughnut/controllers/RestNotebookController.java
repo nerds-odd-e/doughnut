@@ -5,12 +5,14 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.NotebookReindexingService;
+import com.odde.doughnut.services.EmbeddingService;
+import com.odde.doughnut.services.NoteEmbeddingService;
 import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -41,17 +43,23 @@ class RestNotebookController {
   private final TestabilitySettings testabilitySettings;
 
   private final ObsidianFormatService obsidianFormatService;
-  private final NotebookReindexingService notebookReindexingService;
+  private final EmbeddingService embeddingService;
+  private final NoteEmbeddingService noteEmbeddingService;
+  private final NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
 
   public RestNotebookController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
-      NotebookReindexingService notebookReindexingService) {
+      EmbeddingService embeddingService,
+      NoteEmbeddingService noteEmbeddingService,
+      NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.notebookReindexingService = notebookReindexingService;
+    this.embeddingService = embeddingService;
+    this.noteEmbeddingService = noteEmbeddingService;
+    this.noteEmbeddingJdbcRepository = noteEmbeddingJdbcRepository;
     this.obsidianFormatService =
         new ObsidianFormatService(currentUser.getEntity(), modelFactoryService);
   }
@@ -207,20 +215,35 @@ class RestNotebookController {
     obsidianFormatService.importFromObsidian(file, notebook);
   }
 
-  @PostMapping("/{notebook}/reindex")
-  @Transactional
-  public void reindexNotebook(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
-    notebookReindexingService.reindexNotebook(notebook);
-  }
-
   @PostMapping("/{notebook}/update-index")
   @Transactional
   public void updateNotebookIndex(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    notebookReindexingService.updateNotebookIndex(notebook);
+    List<Integer> candidateIds =
+        noteEmbeddingJdbcRepository.selectNoteIdsNeedingIndexUpdateByNotebookId(notebook.getId());
+    if (candidateIds.isEmpty()) return;
+
+    @SuppressWarnings("unchecked")
+    List<Note> candidates =
+        (List<Note>) modelFactoryService.noteRepository.findAllById(candidateIds);
+
+    embeddingService
+        .streamEmbeddingsForNoteList(candidates)
+        .forEach(
+            item ->
+                item.embedding()
+                    .ifPresent(
+                        embedding -> noteEmbeddingService.storeEmbedding(item.note(), embedding)));
+  }
+
+  @PostMapping("/{notebook}/reset-index")
+  @Transactional
+  public void resetNotebookIndex(
+      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(notebook);
+    noteEmbeddingService.deleteNotebookEmbeddings(notebook.getId());
   }
 }

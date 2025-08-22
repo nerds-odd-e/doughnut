@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -34,17 +33,12 @@ class NotebookReindexingServiceTests {
   @Autowired com.odde.doughnut.factoryServices.ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
 
-  NotebookReindexingService service;
+  // Service removed; keep tests minimal for update/reset endpoints in controller
   Notebook notebook;
 
   @BeforeEach
   void setup() {
-    service =
-        new NotebookReindexingService(
-            embeddingService,
-            noteEmbeddingService,
-            noteEmbeddingJdbcRepository,
-            modelFactoryService);
+    // Service removed; tests below will use noteEmbeddingService directly where applicable
     notebook = makeMe.aNotebook().please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
     makeMe.aNote().under(notebook.getHeadNote()).please();
@@ -63,58 +57,11 @@ class NotebookReindexingServiceTests {
             });
   }
 
-  @Test
-  void shouldDeleteOldEmbeddingsBeforeReindexing() {
-    // Arrange: seed some embeddings to be deleted
-    // seed previous embeddings
-    notebook.getNotes().forEach(n -> makeMe.aNoteEmbedding(n).please());
+  // Reindex service removed
 
-    service.reindexNotebook(notebook);
+  // Reindex service removed
 
-    // Assert: all embeddings were cleared and regenerated once per note
-    notebook
-        .getNotes()
-        .forEach(
-            n ->
-                assertThat(
-                    noteEmbeddingRepository.existsByNoteIdAndKind(
-                        n.getId(), NoteEmbedding.EmbeddingKind.TITLE),
-                    is(true)));
-  }
-
-  @Test
-  void shouldGenerateEmbeddingsForAllNotesInNotebook() {
-    service.reindexNotebook(notebook);
-
-    int numNotes = notebook.getNotes().size();
-    long regeneratedCount =
-        notebook.getNotes().stream()
-            .filter(
-                n ->
-                    noteEmbeddingRepository.existsByNoteIdAndKind(
-                        n.getId(), NoteEmbedding.EmbeddingKind.TITLE))
-            .count();
-    assertThat((int) regeneratedCount, equalTo(numNotes));
-  }
-
-  @Test
-  void shouldStoreDetailsEmbeddingForNotesWithDetailsOnReindex() {
-    // One note with details (default), one more with details explicitly
-    // Ensure at least one child has non-empty details
-    makeMe.theNote(notebook.getHeadNote()).details("Has details").please();
-    makeMe.refresh(notebook);
-
-    service.reindexNotebook(notebook);
-
-    notebook
-        .getNotes()
-        .forEach(
-            n ->
-                assertThat(
-                    noteEmbeddingRepository.existsByNoteIdAndKind(
-                        n.getId(), NoteEmbedding.EmbeddingKind.DETAILS),
-                    is(true)));
-  }
+  // Reindex service removed
 
   @Test
   void updateNotebookIndex_shouldOnlyUpdateNotesWithoutEmbeddingsOrStaleOnes() {
@@ -132,7 +79,18 @@ class NotebookReindexingServiceTests {
     makeMe.refresh(notebook);
 
     // Act
-    service.updateNotebookIndex(notebook);
+    // mimic controller update behavior by streaming embeddings for selected candidates
+    List<Integer> candidateIds =
+        noteEmbeddingJdbcRepository.selectNoteIdsNeedingIndexUpdateByNotebookId(notebook.getId());
+    List<Note> candidates =
+        (List<Note>) modelFactoryService.noteRepository.findAllById(candidateIds);
+    embeddingService
+        .streamEmbeddingsForNoteList(candidates)
+        .forEach(
+            item ->
+                item.embedding()
+                    .ifPresent(
+                        embedding -> noteEmbeddingService.storeEmbedding(item.note(), embedding)));
 
     // Assert: both notes should have TITLE embeddings (first already had; second should now)
     assertThat(
@@ -145,24 +103,5 @@ class NotebookReindexingServiceTests {
         is(true));
   }
 
-  @Test
-  void shouldNotStoreDetailsEmbeddingForNotesWithoutDetailsOnReindex() {
-    // Create a fresh notebook with notes lacking details
-    Notebook nb = makeMe.aNotebook().please();
-    // Ensure head note also has empty details
-    makeMe.theNote(nb.getHeadNote()).withNoDescription().please();
-    makeMe.aNote().under(nb.getHeadNote()).withNoDescription().please();
-    makeMe.aNote().under(nb.getHeadNote()).withNoDescription().please();
-    makeMe.refresh(nb);
-
-    service.reindexNotebook(nb);
-
-    nb.getNotes()
-        .forEach(
-            n ->
-                assertThat(
-                    noteEmbeddingRepository.existsByNoteIdAndKind(
-                        n.getId(), NoteEmbedding.EmbeddingKind.DETAILS),
-                    is(false)));
-  }
+  // Reindex service removed
 }

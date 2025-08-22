@@ -1269,11 +1269,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Notebook"
-  /api/notebooks/{notebook}/reindex:
+  /api/notebooks/{notebook}/reset-index:
     post:
       tags:
       - rest-notebook-controller
-      operationId: reindexNotebook
+      operationId: resetNotebookIndex
       parameters:
       - name: notebook
         in: path
