@@ -9,8 +9,12 @@
   - [x] Add comprehensive unit tests for new components
   - [x] Remove all Redis-related code and configuration
 - [ ] Implement embedding insert/update/delete on note CRUD
-- [ ] Generate embeddings: title uses `path | title`; details use `path | title + "\n\n" + details`
-- [ ] Implement KNN SQL using `vector_distance`; aggregate per note with title-weighting
+- [ ] Generate a single combined embedding per note (Phase 1): `path | title + optional details`
+- [ ] Update `EmbeddingService` to build combined input with context path and truncation
+- [ ] Update `ModelFactoryService.storeNoteEmbedding` to insert only the combined vector (as TITLE)
+- [ ] Add optional short-query boost (≤ 3 words) to emphasize title precision
+- [x] Implement KNN SQL using `vector_distance`; aggregate per note with title-weighting
+- [ ] Phase 2: Chunk long details, store as DETAILS rows, aggregate best chunk per note
 - [ ] Add optional ANN index (`CREATE VECTOR INDEX ... USING SCANN`) and benchmark
 - [ ] Local dev: use alternate schema (no VECTOR), feature-flag semantic off to keyword/full-text
 - [ ] Backfill job for existing notes in batches with progress logging

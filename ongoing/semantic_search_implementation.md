@@ -151,7 +151,8 @@ Not implemented yet. Current endpoints return only semantic results.
 - [x] OpenAI embedding service integration
 - [x] New table `note_embeddings(note_id, kind, embedding)`
 - [x] CRUD flow to insert/update/delete embeddings on note changes (currently via notebook reindex/incremental update)
-- [x] Single embedding per note (TITLE only; no chunking yet)
+- [x] Initial approach: single embedding per note
+- [ ] Refine: generate separate embeddings for TITLE and DETAILS
 - [x] Simple KNN similarity search with SQL (`vector_distance`) with local non-vector fallback
 - [x] New semantic search endpoints
 - [x] Flyway placeholders configured per profile for embedding column and optional vector index (implemented via `V200000196__create_note_embeddings.sql` and `application.yml`)
@@ -162,6 +163,36 @@ Not implemented yet. Current endpoints return only semantic results.
 - [x] Title vs details weighting
 - [ ] Search result caching
 - [ ] Performance monitoring
+
+## Design Decision Update: Single vs Multiple Embeddings and Context Path
+
+### Problem
+Both `TITLE` and `DETAILS` rows currently reuse the same embedding built from `title + details`. This makes the per-kind weighting ineffective, and short titles can lose precision if mixed with long details.
+
+### Decision
+- Use a **single combined embedding** per note for Phase 1 (stored as a `TITLE` row) built from:
+  - `join(contextPath, "/") + " | " + title + (detailsPresent ? "\n\n" + details : "")`
+- Keep truncation using the existing `CharacterBasedTokenCountingStrategy` and token cap.
+- Include the ancestor context path to anchor meaning and disambiguate titles.
+
+### Large/Long Notes (Phase 2)
+- For notes with long/heterogeneous details, **chunk the details** (e.g., ~250–500 tokens per chunk), prepend the same context header and title to each chunk, and store chunks as `DETAILS` rows.
+- At search time, aggregate per note by taking the best (minimum) chunk distance and then combine with the note’s main combined embedding if needed.
+
+### Search Aggregation
+- Current SQL/non-prod logic already supports per-kind aggregation. With Phase 1 (single combined embedding as `TITLE`), it naturally works.
+- Optional heuristic: for very short queries (≤ 3 words), boost the main embedding’s influence (or reduce any details/chunk influence) to emphasize entity-name matches.
+
+### Ancestor/Path Context
+- Prepend the note’s ancestor path in the combined input for better scope and disambiguation (e.g., `Science/Physics/Quantum | Schrödinger equation`).
+
+### Answer to “Does including the details strengthen or weaken title matches?”
+- Mixing details into a title-only vector can weaken name-precision for very short queries, but for general semantic matching a combined embedding with path context is effective. We mitigate precision issues for short queries via a small boost heuristic rather than duplicating vectors.
+
+### Implementation Notes
+- Update embedding generation to produce one combined input per note (Phase 1) and store it as a `TITLE` row.
+- Reuse existing search logic; it remains compatible and needs no structural change.
+- Add details chunking later (Phase 2) only for long notes to avoid truncation.
 
 ### Phase 3: Production Optimization (1 week)
 - [ ] Async embedding generation
