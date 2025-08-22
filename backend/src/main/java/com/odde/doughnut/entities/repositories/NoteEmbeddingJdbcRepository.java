@@ -13,7 +13,7 @@ public class NoteEmbeddingJdbcRepository {
   private final JdbcTemplate jdbcTemplate;
   private final boolean prodProfile;
   private final String embeddingColumnName; // "embedding" (prod) or "embedding_raw" (others)
-  private static final float DEFAULT_MAX_COMBINED_DISTANCE = .5f;
+  private static final float DEFAULT_MAX_COMBINED_DISTANCE = 1.5f;
 
   public NoteEmbeddingJdbcRepository(JdbcTemplate jdbcTemplate, Environment environment) {
     this.jdbcTemplate = jdbcTemplate;
