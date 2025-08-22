@@ -68,7 +68,7 @@ const notebookSettingsPopup = () => {
       return this
     },
     reindexNotebook() {
-      cy.findByRole('button', { name: 'Reindex notebook' }).click()
+      cy.findByRole('button', { name: 'Update index' }).click()
       // Wait for the indexing to complete and confirmation dialog to appear
       cy.findByRole('button', { name: 'OK' }).should('be.visible')
       cy.findByRole('button', { name: 'OK' }).click()
