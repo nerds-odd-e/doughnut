@@ -10,9 +10,7 @@ public interface NoteEmbeddingRepository extends CrudRepository<NoteEmbedding, I
 
   void deleteByNoteId(Integer noteId);
 
-  void deleteByNoteIdAndKind(Integer noteId, NoteEmbedding.EmbeddingKind kind);
-
-  boolean existsByNoteIdAndKind(Integer noteId, NoteEmbedding.EmbeddingKind kind);
+  boolean existsByNoteId(Integer noteId);
 
   @Modifying
   @Query("DELETE FROM NoteEmbedding ne WHERE ne.note.notebook.id = :notebookId")

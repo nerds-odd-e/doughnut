@@ -29,42 +29,39 @@ public class NoteEmbeddingJdbcRepository {
     return prodProfile;
   }
 
-  public void insert(
-      Integer noteId, String kind, java.util.List<? extends Number> embeddingFloats) {
+  public void insert(Integer noteId, java.util.List<? extends Number> embeddingFloats) {
     if (isVectorColumn()) {
       // GCP Cloud SQL VECTOR column: use string_to_vector(JSON)
       String json = floatsToJson(embeddingFloats);
       String sql =
-          "INSERT INTO note_embeddings (note_id, kind, created_at, updated_at, "
+          "INSERT INTO note_embeddings (note_id, created_at, updated_at, "
               + embeddingColumn()
-              + ") VALUES (?, ?, NOW(), NOW(), string_to_vector(?))";
+              + ") VALUES (?, NOW(), NOW(), string_to_vector(?))";
       jdbcTemplate.update(
           sql,
           (PreparedStatementSetter)
               ps -> {
                 ps.setInt(1, noteId);
-                ps.setString(2, kind);
-                ps.setString(3, json);
+                ps.setString(2, json);
               });
     } else {
       // Local VARBINARY column
       byte[] bytes = floatsToBytes(embeddingFloats);
       String sql =
-          "INSERT INTO note_embeddings (note_id, kind, created_at, updated_at, "
+          "INSERT INTO note_embeddings (note_id, created_at, updated_at, "
               + embeddingColumn()
-              + ") VALUES (?, ?, NOW(), NOW(), ?)";
+              + ") VALUES (?, NOW(), NOW(), ?)";
       jdbcTemplate.update(
           sql,
           (PreparedStatementSetter)
               ps -> {
                 ps.setInt(1, noteId);
-                ps.setString(2, kind);
-                ps.setBytes(3, bytes);
+                ps.setBytes(2, bytes);
               });
     }
   }
 
-  public Optional<byte[]> select(Integer noteId, String kind) {
+  public Optional<byte[]> select(Integer noteId) {
     if (isVectorColumn()) {
       // Not needed for current flows; return empty to avoid relying on vector-to-bytes conversion
       return Optional.empty();
@@ -72,9 +69,9 @@ public class NoteEmbeddingJdbcRepository {
     String sql =
         "SELECT "
             + embeddingColumn()
-            + " FROM note_embeddings WHERE note_id=? AND kind=? ORDER BY id DESC LIMIT 1";
+            + " FROM note_embeddings WHERE note_id=? ORDER BY id DESC LIMIT 1";
     try {
-      byte[] bytes = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getBytes(1), noteId, kind);
+      byte[] bytes = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> rs.getBytes(1), noteId);
       return Optional.ofNullable(bytes);
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
@@ -133,18 +130,13 @@ public class NoteEmbeddingJdbcRepository {
     String sql =
         "WITH q AS (SELECT string_to_vector(?) AS qv) "
             + "SELECT ne.note_id, "
-            + " MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance("
+            + " vector_distance("
             + embeddingColumn()
-            + ", q.qv, 'distance_measure=l2_squared') END) AS title_dist, "
-            + " MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance("
+            + ", q.qv, 'distance_measure=l2_squared') AS title_dist, "
+            + " 1e9 AS details_dist, "
+            + " vector_distance("
             + embeddingColumn()
-            + ", q.qv, 'distance_measure=l2_squared') END) AS details_dist, "
-            + " ((COALESCE(MIN(CASE WHEN ne.kind='TITLE' THEN vector_distance("
-            + embeddingColumn()
-            + ", q.qv, 'distance_measure=l2_squared') END), 1e9) * 2) "
-            + "  + COALESCE(MIN(CASE WHEN ne.kind='DETAILS' THEN vector_distance("
-            + embeddingColumn()
-            + ", q.qv, 'distance_measure=l2_squared') END), 1e9)) / 3 AS combined_dist "
+            + ", q.qv, 'distance_measure=l2_squared') AS combined_dist "
             + "FROM note_embeddings ne "
             + "JOIN q "
             + "JOIN note n ON n.id = ne.note_id AND n.deleted_at IS NULL "
@@ -152,7 +144,6 @@ public class NoteEmbeddingJdbcRepository {
             + "LEFT JOIN ownership o ON o.id = nb.ownership_id "
             + "WHERE "
             + scope.whereClause
-            + " GROUP BY ne.note_id "
             + " HAVING combined_dist <= ? "
             + " ORDER BY combined_dist ASC "
             + " LIMIT ?";
@@ -192,15 +183,14 @@ public class NoteEmbeddingJdbcRepository {
    */
   public java.util.List<Integer> selectNoteIdsNeedingIndexUpdateByNotebookId(Integer notebookId) {
     String sql =
-        "WITH last_title_embedding AS (\n"
+        "WITH last_embedding AS (\n"
             + "  SELECT ne.note_id, MAX(ne.updated_at) AS last_updated\n"
             + "  FROM note_embeddings ne\n"
-            + "  WHERE ne.kind = 'TITLE'\n"
             + "  GROUP BY ne.note_id\n"
             + ")\n"
             + "SELECT n.id\n"
             + "FROM note n\n"
-            + "LEFT JOIN last_title_embedding e ON e.note_id = n.id\n"
+            + "LEFT JOIN last_embedding e ON e.note_id = n.id\n"
             + "WHERE n.notebook_id = ? AND n.deleted_at IS NULL\n"
             + "  AND (e.last_updated IS NULL OR n.updated_at > e.last_updated)";
 

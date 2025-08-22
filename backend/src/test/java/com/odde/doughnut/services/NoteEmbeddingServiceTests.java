@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteEmbedding;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingRepository;
 import com.odde.doughnut.testability.MakeMe;
@@ -40,14 +39,11 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldDeleteEmbeddingByNoteId() {
-    makeMe.aNoteEmbedding(note).kind(NoteEmbedding.EmbeddingKind.TITLE).please();
+    makeMe.aNoteEmbedding(note).please();
 
     service.deleteEmbedding(note.getId());
 
-    assertThat(
-        noteEmbeddingRepository.existsByNoteIdAndKind(
-            note.getId(), NoteEmbedding.EmbeddingKind.TITLE),
-        is(false));
+    assertThat(noteEmbeddingRepository.existsByNoteId(note.getId()), is(false));
   }
 
   @Test
@@ -60,20 +56,14 @@ class NoteEmbeddingServiceTests {
 
     notebook
         .getNotes()
-        .forEach(
-            n ->
-                assertThat(
-                    noteEmbeddingRepository.existsByNoteIdAndKind(
-                        n.getId(), NoteEmbedding.EmbeddingKind.TITLE),
-                    is(false)));
+        .forEach(n -> assertThat(noteEmbeddingRepository.existsByNoteId(n.getId()), is(false)));
   }
 
   @Test
   void shouldGetEmbeddingByNoteIdAndKind() {
     makeMe.aNoteEmbedding(note).embedding(List.of(1.0f, 2.0f, 3.0f)).please();
 
-    Optional<List<Float>> result =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
+    Optional<List<Float>> result = service.getEmbedding(note.getId());
 
     assertThat(result.isPresent(), is(true));
     assertThat(result.get(), equalTo(List.of(1.0f, 2.0f, 3.0f)));
@@ -81,8 +71,7 @@ class NoteEmbeddingServiceTests {
 
   @Test
   void shouldReturnEmptyWhenEmbeddingNotFound() {
-    Optional<List<Float>> result =
-        service.getEmbedding(note.getId(), NoteEmbedding.EmbeddingKind.TITLE);
+    Optional<List<Float>> result = service.getEmbedding(note.getId());
 
     assertThat(result.isPresent(), is(false));
   }

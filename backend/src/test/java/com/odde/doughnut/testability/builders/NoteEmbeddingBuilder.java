@@ -9,17 +9,13 @@ import java.util.List;
 public class NoteEmbeddingBuilder extends EntityBuilder<NoteEmbedding> {
   private final Note note;
   private List<Float> embedding = List.of(0.0f);
-  private NoteEmbedding.EmbeddingKind kind = NoteEmbedding.EmbeddingKind.TITLE;
 
   public NoteEmbeddingBuilder(Note note, MakeMe makeMe) {
     super(makeMe, new NoteEmbedding());
     this.note = note;
   }
 
-  public NoteEmbeddingBuilder kind(NoteEmbedding.EmbeddingKind kind) {
-    this.kind = kind;
-    return this;
-  }
+  // kind removed; single embedding per note
 
   public NoteEmbeddingBuilder embedding(List<Float> embedding) {
     this.embedding = embedding;
@@ -39,8 +35,7 @@ public class NoteEmbeddingBuilder extends EntityBuilder<NoteEmbedding> {
   @Override
   public NoteEmbedding please(boolean persistNeeded) {
     // Insert via the JDBC repository to respect env-specific column types
-    makeMe.modelFactoryService.noteEmbeddingJdbcRepository.insert(
-        note.getId(), kind.name(), embedding);
+    makeMe.modelFactoryService.noteEmbeddingJdbcRepository.insert(note.getId(), embedding);
     // Return transient entity (not actually persisted via JPA)
     return entity;
   }

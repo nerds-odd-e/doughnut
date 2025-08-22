@@ -29,7 +29,6 @@ class NoteEmbeddingTests {
     note = makeMe.aNote().please();
     noteEmbedding = new NoteEmbedding();
     noteEmbedding.setNote(note);
-    noteEmbedding.setKind(NoteEmbedding.EmbeddingKind.TITLE);
     noteEmbedding.setEmbeddingFromFloats(List.of(1.0f, 2.0f, 3.0f));
   }
 

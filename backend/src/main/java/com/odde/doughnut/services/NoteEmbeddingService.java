@@ -1,7 +1,6 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteEmbedding;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class NoteEmbeddingService {
     modelFactoryService.deleteNoteEmbeddingsByNotebookId(notebookId);
   }
 
-  public Optional<List<Float>> getEmbedding(Integer noteId, NoteEmbedding.EmbeddingKind kind) {
-    return modelFactoryService.getNoteEmbeddingAsFloats(noteId, kind);
+  public Optional<List<Float>> getEmbedding(Integer noteId) {
+    return modelFactoryService.getNoteEmbeddingAsFloats(noteId);
   }
 }

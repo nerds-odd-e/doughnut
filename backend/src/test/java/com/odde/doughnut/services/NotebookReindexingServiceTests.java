@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteEmbedding;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingRepository;
@@ -71,7 +70,7 @@ class NotebookReindexingServiceTests {
     Note second = notes.get(1);
 
     // Seed an existing embedding for the first note
-    makeMe.aNoteEmbedding(first).kind(NoteEmbedding.EmbeddingKind.TITLE).please();
+    makeMe.aNoteEmbedding(first).please();
 
     // Make sure first note is not updated after embedding, and second is updated now
     // Update second's updatedAt to be "newer" by touching details
@@ -93,14 +92,8 @@ class NotebookReindexingServiceTests {
                         embedding -> noteEmbeddingService.storeEmbedding(item.note(), embedding)));
 
     // Assert: both notes should have TITLE embeddings (first already had; second should now)
-    assertThat(
-        noteEmbeddingRepository.existsByNoteIdAndKind(
-            first.getId(), NoteEmbedding.EmbeddingKind.TITLE),
-        is(true));
-    assertThat(
-        noteEmbeddingRepository.existsByNoteIdAndKind(
-            second.getId(), NoteEmbedding.EmbeddingKind.TITLE),
-        is(true));
+    assertThat(noteEmbeddingRepository.existsByNoteId(first.getId()), is(true));
+    assertThat(noteEmbeddingRepository.existsByNoteId(second.getId()), is(true));
   }
 
   // Reindex service removed

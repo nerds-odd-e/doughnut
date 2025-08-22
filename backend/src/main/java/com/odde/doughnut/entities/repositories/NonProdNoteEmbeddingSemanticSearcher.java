@@ -20,14 +20,14 @@ class NonProdNoteEmbeddingSemanticSearcher {
       List<? extends Number> queryEmbedding,
       int limit,
       float maxCombinedDistance) {
-    int candidateRowsLimit = NON_PROD_CANDIDATE_CAP_NOTES * 2; // title + details
+    int candidateRowsLimit = NON_PROD_CANDIDATE_CAP_NOTES;
 
     String sql =
         "WITH latest AS (\n"
-            + "  SELECT ne.note_id, ne.kind, "
+            + "  SELECT ne.note_id, "
             + embeddingColumnName
             + " AS emb,\n"
-            + "         ROW_NUMBER() OVER (PARTITION BY ne.note_id, ne.kind ORDER BY ne.updated_at DESC) rn\n"
+            + "         ROW_NUMBER() OVER (PARTITION BY ne.note_id ORDER BY ne.updated_at DESC) rn\n"
             + "  FROM note_embeddings ne\n"
             + "  JOIN note n ON n.id = ne.note_id AND n.deleted_at IS NULL\n"
             + "  JOIN notebook nb ON nb.id = n.notebook_id AND nb.deleted_at IS NULL\n"
@@ -35,7 +35,7 @@ class NonProdNoteEmbeddingSemanticSearcher {
             + "  WHERE "
             + scopeWhereClause
             + "\n)\n"
-            + "SELECT note_id, kind, emb FROM latest WHERE rn = 1 LIMIT ?";
+            + "SELECT note_id, emb FROM latest WHERE rn = 1 LIMIT ?";
 
     List<Object> params = new ArrayList<>(scopeParams);
     params.add(candidateRowsLimit);
@@ -59,38 +59,30 @@ class NonProdNoteEmbeddingSemanticSearcher {
                 }
               }
             },
-            (rs, rowNum) ->
-                new NonProdEmbeddingRow(
-                    rs.getInt("note_id"), rs.getString("kind"), rs.getBytes("emb")));
+            (rs, rowNum) -> new NonProdEmbeddingRow(rs.getInt("note_id"), rs.getBytes("emb")));
 
     float[] query = toFloatArray(queryEmbedding);
     Map<Integer, Float> titleDistances = new HashMap<>();
-    Map<Integer, Float> detailsDistances = new HashMap<>();
 
     for (NonProdEmbeddingRow r : rows) {
       if (r.bytes == null || r.bytes.length == 0) continue;
       float[] vec = bytesToFloats(r.bytes);
       if (vec.length != query.length) continue; // skip mismatched dimensions
       float dist = l2SquaredDistance(query, vec);
-      if ("TITLE".equals(r.kind)) {
-        titleDistances.put(r.noteId, dist);
-      } else if ("DETAILS".equals(r.kind)) {
-        detailsDistances.put(r.noteId, dist);
-      }
+      titleDistances.put(r.noteId, dist);
     }
 
     Set<Integer> noteIds = new HashSet<>();
     noteIds.addAll(titleDistances.keySet());
-    noteIds.addAll(detailsDistances.keySet());
+    // detailsDistances removed
 
     List<NoteEmbeddingJdbcRepository.SimilarNoteRow> result = new ArrayList<>(noteIds.size());
     for (Integer nid : noteIds) {
       Float td = titleDistances.get(nid);
-      Float dd = detailsDistances.get(nid);
-      float combined = combinedDistance(td, dd);
+      float combined = td == null ? MISSING_DIST : td;
       result.add(
           new NoteEmbeddingJdbcRepository.SimilarNoteRow(
-              nid, td == null ? MISSING_DIST : td, dd == null ? MISSING_DIST : dd, combined));
+              nid, td == null ? MISSING_DIST : td, MISSING_DIST, combined));
     }
 
     result.removeIf(r -> r.combinedDist > maxCombinedDistance);
@@ -133,20 +125,12 @@ class NonProdNoteEmbeddingSemanticSearcher {
     return sum;
   }
 
-  private static float combinedDistance(Float titleDist, Float detailsDist) {
-    float td = titleDist == null ? MISSING_DIST : titleDist;
-    float dd = detailsDist == null ? MISSING_DIST : detailsDist;
-    return (td * 2f + dd) / 3f;
-  }
-
   private static class NonProdEmbeddingRow {
     final Integer noteId;
-    final String kind;
     final byte[] bytes;
 
-    NonProdEmbeddingRow(Integer noteId, String kind, byte[] bytes) {
+    NonProdEmbeddingRow(Integer noteId, byte[] bytes) {
       this.noteId = noteId;
-      this.kind = kind;
       this.bytes = bytes;
     }
   }

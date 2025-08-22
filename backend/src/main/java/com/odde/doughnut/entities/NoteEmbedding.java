@@ -16,12 +16,6 @@ public class NoteEmbedding extends EntityIdentifiedByIdOnly {
   @Setter
   private Note note;
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "kind")
-  @Getter
-  @Setter
-  private EmbeddingKind kind;
-
   @Transient @Getter @Setter private byte[] embedding;
 
   @Column(name = "created_at")
@@ -34,10 +28,7 @@ public class NoteEmbedding extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp updatedAt;
 
-  public enum EmbeddingKind {
-    TITLE,
-    DETAILS
-  }
+  // EmbeddingKind removed; we only store a single embedding per note now
 
   public void setEmbeddingFromFloats(List<Float> floats) {
     this.embedding = new byte[floats.size() * 4];
