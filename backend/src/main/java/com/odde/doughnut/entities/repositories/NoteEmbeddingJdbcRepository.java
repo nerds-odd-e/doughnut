@@ -105,36 +105,28 @@ public class NoteEmbeddingJdbcRepository {
       boolean allMyCircles,
       java.util.List<? extends Number> queryEmbedding,
       int limit) {
-    if (!isVectorColumn()) {
+    Scope scope = buildScope(userId, notebookId, allMyNotebooksAndSubscriptions, allMyCircles);
+    if (scope == null) {
       return java.util.List.of();
+    }
+
+    if (!isVectorColumn()) {
+      return new NonProdNoteEmbeddingSemanticSearcher()
+          .search(
+              jdbcTemplate,
+              embeddingColumn(),
+              scope.whereClause,
+              scope.params,
+              queryEmbedding,
+              limit);
     }
 
     String embeddingJson = floatsToJson(queryEmbedding);
 
-    String scopeClause;
     java.util.List<Object> params = new java.util.ArrayList<>();
     // First parameter is the embedding JSON for string_to_vector
     params.add(embeddingJson);
-
-    if (Boolean.TRUE.equals(allMyCircles)) {
-      scopeClause =
-          " (o.user_id = ? OR EXISTS (SELECT 1 FROM subscription s WHERE s.user_id = ? AND s.notebook_id = nb.id) "
-              + " OR EXISTS (SELECT 1 FROM circle_user cu WHERE cu.user_id = ? AND cu.circle_id = o.circle_id)) ";
-      params.add(userId);
-      params.add(userId);
-      params.add(userId);
-    } else if (Boolean.TRUE.equals(allMyNotebooksAndSubscriptions)) {
-      scopeClause =
-          " (o.user_id = ? OR EXISTS (SELECT 1 FROM subscription s WHERE s.user_id = ? AND s.notebook_id = nb.id)) ";
-      params.add(userId);
-      params.add(userId);
-    } else if (notebookId != null) {
-      scopeClause = " (nb.id = ?) ";
-      params.add(notebookId);
-    } else {
-      // No scope → nothing (mirror current literal search behavior when not specifying a scope)
-      return java.util.List.of();
-    }
+    params.addAll(scope.params);
 
     String sql =
         "WITH q AS (SELECT string_to_vector(?) AS qv) "
@@ -157,7 +149,7 @@ public class NoteEmbeddingJdbcRepository {
             + "JOIN notebook nb ON nb.id = n.notebook_id AND nb.deleted_at IS NULL "
             + "LEFT JOIN ownership o ON o.id = nb.ownership_id "
             + "WHERE "
-            + scopeClause
+            + scope.whereClause
             + " GROUP BY ne.note_id "
             + " ORDER BY combined_dist ASC "
             + " LIMIT ?";
@@ -240,5 +232,45 @@ public class NoteEmbeddingJdbcRepository {
       bytes[i * 4 + 3] = (byte) intBits;
     }
     return bytes;
+  }
+
+  private static class Scope {
+    final String whereClause;
+    final java.util.List<Object> params;
+
+    Scope(String whereClause, java.util.List<Object> params) {
+      this.whereClause = whereClause;
+      this.params = params;
+    }
+  }
+
+  private Scope buildScope(
+      Integer userId,
+      Integer notebookId,
+      boolean allMyNotebooksAndSubscriptions,
+      boolean allMyCircles) {
+    String scopeClause;
+    java.util.List<Object> params = new java.util.ArrayList<>();
+
+    if (Boolean.TRUE.equals(allMyCircles)) {
+      scopeClause =
+          " (o.user_id = ? OR EXISTS (SELECT 1 FROM subscription s WHERE s.user_id = ? AND s.notebook_id = nb.id) "
+              + " OR EXISTS (SELECT 1 FROM circle_user cu WHERE cu.user_id = ? AND cu.circle_id = o.circle_id)) ";
+      params.add(userId);
+      params.add(userId);
+      params.add(userId);
+    } else if (Boolean.TRUE.equals(allMyNotebooksAndSubscriptions)) {
+      scopeClause =
+          " (o.user_id = ? OR EXISTS (SELECT 1 FROM subscription s WHERE s.user_id = ? AND s.notebook_id = nb.id)) ";
+      params.add(userId);
+      params.add(userId);
+    } else if (notebookId != null) {
+      scopeClause = " (nb.id = ?) ";
+      params.add(notebookId);
+    } else {
+      return null;
+    }
+
+    return new Scope(scopeClause, params);
   }
 }

@@ -6,19 +6,15 @@ Feature: semantical search
     Given I am logged in as an existing user
     And I have a notebook with the head note "Physics" and details "The study of nature"
     And I have a notebook with the head note "Chemistry" and details "The study of substances"
-    And there are some notes:
-      | Title    | Parent Title | Details             |
-      | Energy   | Physics      | The study of energy |
-      | Matter   | Physics      | The study of matter |
 
-  @mockBrowserTime
-  @usingMockedOpenAiService
-  Scenario Outline: Search at the top level
+  @mockBrowserTime @usingMockedOpenAiService
+  Scenario Outline: Search with semantic search
     Given OpenAI returns embeddings successfully
     And I reindex the notebook "Physics"
     When I start searching from all my notebooks page
     Then I should see "<targets>" as targets only when searching "<search key>"
+
     Examples:
-      | search key | targets     |
-      | energy     | Energy      |
-      #| mass       | Matter      |
+      | search key     | targets |
+      | matching       | Physics |
+      #| something else |         |
