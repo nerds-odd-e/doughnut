@@ -18,7 +18,8 @@ class NonProdNoteEmbeddingSemanticSearcher {
       String scopeWhereClause,
       List<Object> scopeParams,
       List<? extends Number> queryEmbedding,
-      int limit) {
+      int limit,
+      float maxCombinedDistance) {
     int candidateRowsLimit = NON_PROD_CANDIDATE_CAP_NOTES * 2; // title + details
 
     String sql =
@@ -92,6 +93,7 @@ class NonProdNoteEmbeddingSemanticSearcher {
               nid, td == null ? MISSING_DIST : td, dd == null ? MISSING_DIST : dd, combined));
     }
 
+    result.removeIf(r -> r.combinedDist > maxCombinedDistance);
     result.sort(java.util.Comparator.comparingDouble(r -> r.combinedDist));
     if (result.size() > limit) {
       return result.subList(0, limit);

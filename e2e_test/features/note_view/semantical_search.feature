@@ -15,6 +15,7 @@ Feature: semantical search
     Then I should see "<targets>" as targets only when searching "<search key>"
 
     Examples:
-      | search key     | targets |
-      | matching       | Physics |
+      | search key | targets            |
+      | matching   | Physics            |
+      | chemistry  | Chemistry, Physics |
       #| something else |         |

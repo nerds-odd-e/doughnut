@@ -13,6 +13,7 @@ public class NoteEmbeddingJdbcRepository {
   private final JdbcTemplate jdbcTemplate;
   private final boolean prodProfile;
   private final String embeddingColumnName; // "embedding" (prod) or "embedding_raw" (others)
+  private static final float DEFAULT_MAX_COMBINED_DISTANCE = .5f;
 
   public NoteEmbeddingJdbcRepository(JdbcTemplate jdbcTemplate, Environment environment) {
     this.jdbcTemplate = jdbcTemplate;
@@ -118,7 +119,8 @@ public class NoteEmbeddingJdbcRepository {
               scope.whereClause,
               scope.params,
               queryEmbedding,
-              limit);
+              limit,
+              DEFAULT_MAX_COMBINED_DISTANCE);
     }
 
     String embeddingJson = floatsToJson(queryEmbedding);
@@ -151,9 +153,11 @@ public class NoteEmbeddingJdbcRepository {
             + "WHERE "
             + scope.whereClause
             + " GROUP BY ne.note_id "
+            + " HAVING combined_dist <= ? "
             + " ORDER BY combined_dist ASC "
             + " LIMIT ?";
 
+    params.add(DEFAULT_MAX_COMBINED_DISTANCE);
     params.add(limit);
 
     return jdbcTemplate.query(
