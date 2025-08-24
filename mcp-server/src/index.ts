@@ -13,6 +13,11 @@ import {
 import { DoughnutApi } from '../../generated/backend/DoughnutApi.js'
 import type { NoteUpdateTitleDTO } from '../../generated/backend/models/NoteUpdateTitleDTO.js'
 import type { NoteUpdateDetailsDTO } from '../../generated/backend/models/NoteUpdateDetailsDTO.js'
+import {
+  createErrorResponse,
+  validateNoteUpdateParams,
+  getEnvironmentConfig,
+} from './utils.js'
 
 /**
  * Create an MCP server to connect to Doughnut server
@@ -103,12 +108,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 })
 
 /**
- * Get Doughnut API base URL from environment or use default.
+ * Get Doughnut API configuration from environment.
  */
-const DOUGHNUT_API_BASE_URL =
-  process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
-const authToken = process.env.DOUGHNUT_API_AUTH_TOKEN
-const api = new DoughnutApi({ BASE: DOUGHNUT_API_BASE_URL, TOKEN: authToken })
+const config = getEnvironmentConfig()
+const api = new DoughnutApi({
+  BASE: config.apiBaseUrl,
+  TOKEN: config.authToken,
+})
 
 /**
  * Handler for the create_note tool.
@@ -156,17 +162,15 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           newDetails?: string | null
         })
       }
-      if (!authToken) {
-        return errorResponse(
-          'DOUGHNUT_API_AUTH_TOKEN environment variable is required.',
-          ''
+      if (!config.authToken) {
+        return createErrorResponse(
+          'DOUGHNUT_API_AUTH_TOKEN environment variable is required.'
         )
       }
-      if (typeof newTitle !== 'string' && typeof newDetails !== 'string') {
-        return errorResponse(
-          'At least one of newTitle or newDetails must be provided.',
-          ''
-        )
+
+      const validation = validateNoteUpdateParams(noteId, newTitle, newDetails)
+      if (!validation.isValid) {
+        return createErrorResponse(validation.error!)
       }
       let titleResult:
         | import('../../generated/backend/models/NoteRealm.js').NoteRealm
@@ -188,7 +192,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           )
         }
       } catch (err) {
-        return errorResponse(err, 'Failed to update note:')
+        return createErrorResponse(err, 'Failed to update note:')
       }
       let msg = 'Note updated successfully.'
       if (
@@ -215,7 +219,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       try {
         const notebooksViewed = await api.restNotebookController.myNotebooks()
         if (!(notebooksViewed && Array.isArray(notebooksViewed.notebooks))) {
-          return errorResponse(
+          return createErrorResponse(
             `Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`
           )
         }
@@ -231,7 +235,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        return errorResponse(err)
+        return createErrorResponse(err)
       }
     }
     case 'get_user_info': {
@@ -246,7 +250,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        return errorResponse(err)
+        return createErrorResponse(err)
       }
     }
     case 'get_graph_with_note_id': {
@@ -262,7 +266,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           ],
         }
       } catch (err) {
-        return errorResponse(err)
+        return createErrorResponse(err)
       }
     }
 
@@ -284,23 +288,3 @@ main().catch((error) => {
   console.error('Server error:', error)
   process.exit(1)
 })
-
-// Helper function for error handling
-function errorResponse(err: unknown, prefix = 'ERROR:') {
-  let msg: string
-  if (err instanceof Error) {
-    msg = `${prefix} ${err.message}`
-  } else if (typeof err === 'string') {
-    msg = `${prefix} ${err}`
-  } else {
-    msg = `${prefix} ${JSON.stringify(err)}`
-  }
-  return {
-    content: [
-      {
-        type: 'text',
-        text: msg,
-      },
-    ],
-  }
-}

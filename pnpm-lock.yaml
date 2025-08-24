@@ -232,6 +232,9 @@ importers:
 
   mcp-server:
     devDependencies:
+      '@biomejs/biome':
+        specifier: 2.2.0
+        version: 2.2.0
       '@modelcontextprotocol/sdk':
         specifier: ^1.12.3
         version: 1.17.2
@@ -244,6 +247,9 @@ importers:
       typescript:
         specifier: 5.9.2
         version: 5.9.2
+      vitest:
+        specifier: 3.2.4
+        version: 3.2.4(@types/node@22.17.1)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.90.0)(terser@5.43.1)(tsx@4.20.3)(yaml@2.8.1)
 
 packages:
 

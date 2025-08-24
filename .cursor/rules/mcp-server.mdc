@@ -12,15 +12,55 @@ This is a TypeScript-based MCP server that demonstrates core MCP concepts by pro
 
 - Tools for getting instructions and updating note text content via the Doughnut backend API.
 
-## How to use this MCP Server
+## Development
 
-Run this command to build the mcp server
+### Building the MCP Server
+
+Run this command to build the mcp server:
 
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
 ```
 
-Add the below command to your AI MCP Server configuration
+### Running Unit Tests
+
+The MCP server has comprehensive unit tests using Vitest. Run tests with:
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm mcp-server:test
+```
+
+Or from the root directory:
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm mcp-server:test
+```
+
+### Formatting Code
+
+Format the MCP server code with:
+
+```sh
+CURSOR_DEV=true nix develop -c pnpm mcp-server:format
+```
+
+### Test Coverage
+
+The unit tests cover:
+- Utility functions (error handling, parameter validation, environment configuration)
+- Server configuration and tool definitions
+- Tool schema validation
+- Response format validation
+
+## CI/CD Integration
+
+- Unit tests run as part of the "Frontend & MCP Unit Tests" job in GitHub Actions
+- Formatting is included in the `pnpm format:all` command
+- Tests are automatically executed on every push to main branch
+
+## How to use this MCP Server
+
+Add the below command to your AI MCP Server configuration:
 
 ```json
 {
@@ -41,42 +81,12 @@ Add the below command to your AI MCP Server configuration
   }
 }
 ```
-# doughnut-mcp-server MCP Server
 
-A Model Context Protocol server for Doughnut.
+## Available Tools
 
-Is in the `mcp-server` folder.
-
-This is a TypeScript-based MCP server that demonstrates core MCP concepts by providing:
-
-- Tools for getting instructions and updating note text content via the Doughnut backend API.
-
-## How to use this MCP Server
-
-Run this command to build the mcp server
-
-```sh
-CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
-```
-
-Add the below command to your AI MCP Server configuration
-
-```json
-{
-  "mcpServers": {
-    "doughnut": {
-      "disabled": false,
-      "timeout": 60,
-      "transportType": "stdio",
-      "command": "node",
-      "args": [
-        "<doughnut root folder>/frontend/public/mcp-server.bundle.mjs"
-      ],
-      "env": {
-        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
-        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
-      }
-    }
-  }
-}
-```
+- `get_instruction` - Get instruction about Doughnut
+- `get_sampleapi` - Get sample API response
+- `update_note_text_content` - Update the title and/or details of a note by note ID
+- `get_user_info` - Get user information
+- `get_notebook_list` - Get list of user's notebooks
+- `get_graph_with_note_id` - Get graph data for a specific note

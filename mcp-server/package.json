@@ -18,12 +18,17 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
-    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.mjs --format=esm"
+    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.mjs --format=esm",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "format": "biome check --write src/"
   },
   "devDependencies": {
     "@modelcontextprotocol/sdk": "^1.12.3",
     "@types/node": "^22.15.30",
     "esbuild": "^0.25.9",
-    "typescript": "5.9.2"
+    "typescript": "5.9.2",
+    "vitest": "3.2.4",
+    "@biomejs/biome": "2.2.0"
   }
 }
