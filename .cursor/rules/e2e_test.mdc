@@ -12,6 +12,8 @@ We usually don't run all the e2e test locally, since it will take too much time,
 nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
+Note: don't use `cypress run -- --sepc`. The empty `--` will ignore the `--spec` parameter after it.
+
 Typically, the developer will start the backend, frontend, mountebank mock services manually.
 If any backend code is changed, the backend server will need to be restarted manually. In case it is running in the agent mode, please pause or stop and remind the programmer to restart the backend service before continue.
 
