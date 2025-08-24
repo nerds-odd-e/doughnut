@@ -19,7 +19,7 @@
     "postinstall": "syncpack fix-mismatches",
     "build": "tsc && node -e \"require('fs').chmodSync('build/index.js', '755')\"",
     "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=../frontend/public/mcp-server.bundle.mjs --format=esm",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest --watch",
     "format": "biome check --write src/"
   },
