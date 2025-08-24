@@ -21,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 
 const props = defineProps({
   questions: {
@@ -30,9 +30,13 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["close-dialog"]);
-
 const questionsToDelete = ref<string[]>([]);
+
+watchEffect(() => {
+  questionsToDelete.value = [...props.questions];
+});
+
+const emit = defineEmits(["close-dialog"]);
 
 const submitDelete = () => {
   emit("close-dialog", questionsToDelete.value);

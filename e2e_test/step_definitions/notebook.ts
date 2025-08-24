@@ -197,10 +197,10 @@ Then(
       .routerToNotebooksPage()
       .notebookCard(notebook)
       .openNotebookQuestions()
-    noteTitles.rows().forEach((title: string[]) => {
-      const titleName = title[0]!
-      const question = title[1]!
-      notebookQuestionsPage.deleteQuestion(question)
-    })
+
+    const titleName = noteTitles.rows()[0][0]
+    const allQuestions = noteTitles.rows().map((row: string[]) => row[1]!);
+
+    notebookQuestionsPage.deleteQuestions(titleName).deleteQuestions(allQuestions)
   }
 )

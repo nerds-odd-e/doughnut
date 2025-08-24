@@ -120,14 +120,20 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
   }
   questions.value.push(newQuestion)
 }
-const questionDeleted = (deletedQuestion: string[]) => {
+const questionDeleted = async (deletedQuestion: string[]) => {
   if (!Array.isArray(deletedQuestion) || deletedQuestion.length === 0) {
     return;
   }
   
+  const questionsToDelete = questions.value.filter(
+    (q) => deletedQuestion.includes(q.multipleChoicesQuestion.stem)
+  );
+
   questions.value = questions.value.filter(
     (q) => !deletedQuestion.includes(q.multipleChoicesQuestion.stem)
   );
+
+  await managedApi.restPredefinedQuestionController.deleteQuestion(props.note.id, questionsToDelete)
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {

@@ -1,4 +1,5 @@
 import { addQuestionPage } from './addQuestionPage'
+import { deleteQuestionPage } from './deleteQuestionPage'
 
 export default () => ({
   addQuestionPage: (topicName: string) => {
@@ -23,13 +24,12 @@ export default () => ({
       .findByText(question)
       .should('exist')
   },
-  deleteQuestion: (topicName: string, question: string) => {
+  deleteQuestions: (topicName: string) => {
     cy.get('.notebook-questions-list')
       .findByText(topicName)
       .parent()
-      .findByText(question)
-      .parent()
       .findByRole('button', { name: 'Delete Question' })
       .click()
+    return deleteQuestionPage()
   },
 })
