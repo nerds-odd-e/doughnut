@@ -850,6 +850,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
+  /api/predefined-questions/{note}/note-questions/{predefinedQuestion}/delete:
+    post:
+      tags:
+      - rest-predefined-question-controller
+      operationId: deleteQuestion
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PredefinedQuestion"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/predefined-questions/generate-question-without-save:
     post:
       tags:
