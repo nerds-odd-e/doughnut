@@ -12,6 +12,20 @@ This is a TypeScript-based MCP server that demonstrates core MCP concepts by pro
 
 - Tools for getting instructions and updating note text content via the Doughnut backend API.
 
+## Structure (minimal)
+
+```
+mcp-server/src/
+  index.ts        // boot: create context, start stdio
+  server.ts       // assemble server, list tools, route calls
+  context.ts      // read env, create DoughnutApi
+  api.ts          // DoughnutApi factory
+  schemas.ts      // tool input schemas (shared)
+  tools/index.ts  // tool registry + handlers
+  types.ts        // shared types
+  utils.ts        // error + validation helpers
+```
+
 ## Development
 
 ### Building the MCP Server
@@ -21,6 +35,8 @@ Run this command to build the mcp server:
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle
 ```
+
+Note: Rebuild the bundle before running the e2e `mcp_services.feature`.
 
 ### Running Unit Tests
 
@@ -51,6 +67,7 @@ The unit tests cover:
 - Server configuration and tool definitions
 - Tool schema validation
 - Response format validation
+ - Behavior-focused assertions that are insensitive to internal structure
 
 ## CI/CD Integration
 

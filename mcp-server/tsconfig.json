@@ -4,11 +4,15 @@
     "module": "Node16",
     "moduleResolution": "Node16",
     "outDir": "./build",
-    "rootDir": "./src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@generated/*": ["../generated/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "build"]

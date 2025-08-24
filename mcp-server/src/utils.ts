@@ -1,7 +1,12 @@
+import type { ToolResponse } from './types.js'
+
 /**
  * Helper function for error handling
  */
-export function createErrorResponse(err: unknown, prefix = 'ERROR:') {
+export function createErrorResponse(
+  err: unknown,
+  prefix = 'ERROR:'
+): ToolResponse {
   let msg: string
   if (err instanceof Error) {
     msg = `${prefix} ${err.message}`
@@ -13,8 +18,19 @@ export function createErrorResponse(err: unknown, prefix = 'ERROR:') {
   return {
     content: [
       {
-        type: 'text',
+        type: 'text' as const,
         text: msg,
+      },
+    ],
+  }
+}
+
+export function textResponse(message: string): ToolResponse {
+  return {
+    content: [
+      {
+        type: 'text' as const,
+        text: message,
       },
     ],
   }
