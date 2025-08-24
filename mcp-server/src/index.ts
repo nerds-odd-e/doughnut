@@ -107,7 +107,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
  */
 const DOUGHNUT_API_BASE_URL =
   process.env.DOUGHNUT_API_BASE_URL || 'http://localhost:9081'
-const authToken = process.argv[2]
+const authToken = process.env.DOUGHNUT_API_AUTH_TOKEN
 const api = new DoughnutApi({ BASE: DOUGHNUT_API_BASE_URL, TOKEN: authToken })
 
 /**
