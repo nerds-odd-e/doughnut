@@ -84,6 +84,7 @@ declare module 'vue' {
     NotebookQuestionsDialog: typeof import('./src/components/notebook/NotebookQuestionsDialog.vue')['default']
     NoteConversation: typeof import('./src/components/conversations/NoteConversation.vue')['default']
     NoteDeleteButton: typeof import('./src/components/notes/core/NoteDeleteButton.vue')['default']
+    NoteDeleteQuestion: typeof import('./src/components/notes/NoteDeleteQuestion.vue')['default']
     NoteEditableDetails: typeof import('./src/components/notes/core/NoteEditableDetails.vue')['default']
     NoteEditableTitle: typeof import('./src/components/notes/core/NoteEditableTitle.vue')['default']
     NoteEditImageDialog: typeof import('./src/components/notes/accessory/NoteEditImageDialog.vue')['default']

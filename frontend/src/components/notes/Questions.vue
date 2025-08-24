@@ -11,6 +11,17 @@
         />
       </template>
     </PopButton>
+    <PopButton btn-class="daisy-btn daisy-btn-primary" title="Delete Question">
+      <template #default="{ closer }">
+        <NoteDeleteQuestion
+          :questions="questionStrings" 
+          @close-dialog="
+            closer();
+            questionDeleted($event);
+          "
+        />
+      </template>
+    </PopButton>
     <table class="question-table daisy-mt-2" v-if="questions.length">
       <thead>
         <tr>
@@ -75,10 +86,11 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
+import NoteDeleteQuestion from "./NoteDeleteQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
@@ -88,6 +100,10 @@ const props = defineProps({
     type: Object as PropType<Note>,
     required: true,
   },
+})
+
+const questionStrings = computed(() => {
+  return questions.value.map(q => q.multipleChoicesQuestion.stem)
 })
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
@@ -103,6 +119,15 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
     return
   }
   questions.value.push(newQuestion)
+}
+const questionDeleted = (deletedQuestion: string[]) => {
+  if (!Array.isArray(deletedQuestion) || deletedQuestion.length === 0) {
+    return;
+  }
+  
+  questions.value = questions.value.filter(
+    (q) => !deletedQuestion.includes(q.multipleChoicesQuestion.stem)
+  );
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
