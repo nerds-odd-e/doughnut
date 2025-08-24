@@ -71,7 +71,7 @@ Add the below command to your AI MCP Server configuration:
       "transportType": "stdio",
       "command": "node",
       "args": [
-        "<doughnut root folder>/frontend/public/mcp-server.bundle.mjs"
+        "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
       ],
       "env": {
         "DOUGHNUT_API_BASE_URL": "http://localhost:9081",

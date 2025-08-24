@@ -1,10 +1,7 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
-import fs from 'fs'
-import os from 'os'
 import path from 'path'
-import http from 'http'
-import https from 'https'
+import fs from 'fs'
 
 interface MaybeChildProcess {
   child?: { kill: () => void }
@@ -16,27 +13,6 @@ interface MaybeDisconnect {
 class McpClient {
   client: Client | null = null
   transport: StdioClientTransport | null = null
-
-  async #downloadFile(fileUrl: string, dest: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const proto = fileUrl.startsWith('https') ? https : http
-      const file = fs.createWriteStream(dest)
-      proto.get(fileUrl, (response) => {
-        if (response.statusCode !== 200) {
-          reject(
-            new Error(
-              `Failed to download MCP server bundle: ${response.statusCode} ${response.statusMessage}`
-            )
-          )
-          return
-        }
-        response.pipe(file)
-        file.on('finish', () => {
-          file.close(() => resolve())
-        })
-      })
-    })
-  }
 
   async spawnAndConnectMcpServer({
     baseUrl,
@@ -60,16 +36,23 @@ class McpClient {
       }
     )
 
-    const MCP_SERVER_URL = `${baseUrl}/mcp-server.bundle.mjs`
-    const tempDir = os.tmpdir()
-    const tempFile = path.join(tempDir, 'mcp-server.bundle.mjs')
-
-    // Always fetch the latest bundle before starting
-    await this.#downloadFile(MCP_SERVER_URL, tempFile)
-    // Let the SDK spawn the process: pass command as array ['node', tempFile]
+    // Resolve local MCP server bundle built under mcp-server/dist relative to repo root
+    const repoRoot = path.resolve(__dirname, '..', '..')
+    const bundlePath = path.join(
+      repoRoot,
+      'mcp-server',
+      'dist',
+      'mcp-server.bundle.mjs'
+    )
+    if (!fs.existsSync(bundlePath)) {
+      throw new Error(
+        `MCP server bundle not found at ${bundlePath}. Please build it first: \n  CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle`
+      )
+    }
+    // Let the SDK spawn the process: pass command as array ['node', bundlePath]
     this.transport = new StdioClientTransport({
       command: process.execPath,
-      args: [tempFile],
+      args: [bundlePath],
       env: {
         DOUGHNUT_API_BASE_URL: baseUrl,
         DOUGHNUT_API_AUTH_TOKEN: mcpToken,
