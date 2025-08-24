@@ -39,14 +39,12 @@ describe('Tool Schema Validation', () => {
           description: 'The ID of the note to update.',
         },
         newTitle: {
-          type: 'string',
+          type: ['string', 'null'],
           description: 'The new title for the note.',
-          nullable: true,
         },
         newDetails: {
-          type: 'string',
+          type: ['string', 'null'],
           description: 'The new details for the note.',
-          nullable: true,
         },
       },
       required: ['noteId'],
@@ -55,8 +53,10 @@ describe('Tool Schema Validation', () => {
     expect(schema.type).toBe('object')
     expect(schema.required).toContain('noteId')
     expect(schema.properties.noteId.type).toBe('integer')
-    expect(schema.properties.newTitle.nullable).toBe(true)
-    expect(schema.properties.newDetails.nullable).toBe(true)
+    expect(schema.properties.newTitle.type).toContain('string')
+    expect(schema.properties.newTitle.type).toContain('null')
+    expect(schema.properties.newDetails.type).toContain('string')
+    expect(schema.properties.newDetails.type).toContain('null')
   })
 
   test('simple tools should have basic object schema', () => {

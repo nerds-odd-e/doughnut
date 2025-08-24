@@ -1,5 +1,9 @@
 import type { ToolDescriptor } from '../types.js'
-import { emptyObjectSchema, updateNoteTextContentSchema } from '../schemas.js'
+import {
+  emptyObjectSchema,
+  updateNoteTextContentSchema,
+  getGraphWithNoteIdSchema,
+} from '../schemas.js'
 import {
   createErrorResponse,
   textResponse,
@@ -63,7 +67,9 @@ export const tools: ToolDescriptor[] = [
         return createErrorResponse(err, 'Failed to update note:')
       }
       let msg = 'Note updated successfully.'
-      const titleRes = titleResult as { note?: { noteTopology?: { titleOrPredicate?: string } } } | null
+      const titleRes = titleResult as {
+        note?: { noteTopology?: { titleOrPredicate?: string } }
+      } | null
       if (titleRes?.note?.noteTopology?.titleOrPredicate) {
         msg += ` Title: ${titleRes.note.noteTopology.titleOrPredicate}.`
       }
@@ -118,14 +124,14 @@ export const tools: ToolDescriptor[] = [
   {
     name: 'get_graph_with_note_id',
     description: 'Get graph with note id',
-    inputSchema: emptyObjectSchema,
+    inputSchema: getGraphWithNoteIdSchema,
     handle: async (ctx, args, request) => {
       const api = ctx.api
       try {
         // Support both args.noteId and request.params.noteId (for compatibility)
         const noteId = Number(
           (args as { noteId?: number }).noteId ??
-            ((request as { params?: { noteId?: number } }).params?.noteId)
+            (request as { params?: { noteId?: number } }).params?.noteId
         )
         const graph = await api.restNoteController.getGraph(noteId)
         return textResponse(JSON.stringify(graph))

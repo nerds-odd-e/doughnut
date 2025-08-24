@@ -1,5 +1,7 @@
 export const emptyObjectSchema = {
   type: 'object',
+  properties: {},
+  additionalProperties: false,
 } as const
 
 export const updateNoteTextContentSchema = {
@@ -10,15 +12,26 @@ export const updateNoteTextContentSchema = {
       description: 'The ID of the note to update.',
     },
     newTitle: {
-      type: 'string',
+      type: ['string', 'null'],
       description: 'The new title for the note.',
-      nullable: true,
     },
     newDetails: {
-      type: 'string',
+      type: ['string', 'null'],
       description: 'The new details for the note.',
-      nullable: true,
+    },
+  },
+  additionalProperties: false,
+  required: ['noteId'],
+} as const
+
+export const getGraphWithNoteIdSchema = {
+  type: 'object',
+  properties: {
+    noteId: {
+      type: 'integer',
+      description: 'The ID of the note to fetch graph for.',
     },
   },
   required: ['noteId'],
+  additionalProperties: false,
 } as const

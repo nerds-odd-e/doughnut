@@ -8,7 +8,7 @@ import type { ServerContext, ToolDescriptor } from './types.js'
 export function createServer(tools: ToolDescriptor[], context: ServerContext) {
   const server = new Server(
     { name: 'doughnut-mcp-server', version: '0.1.0' },
-    { capabilities: { resources: {}, tools: {}, prompts: {} } }
+    { capabilities: { tools: {} } }
   )
 
   server.setRequestHandler(ListToolsRequestSchema, async () => {
@@ -30,7 +30,9 @@ export function createServer(tools: ToolDescriptor[], context: ServerContext) {
       arguments?: Record<string, unknown>
     }
     const args: Record<string, unknown> =
-      rp.arguments && typeof rp.arguments === 'object' ? rp.arguments : (request.params as unknown as Record<string, unknown>)
+      rp.arguments && typeof rp.arguments === 'object'
+        ? rp.arguments
+        : (request.params as unknown as Record<string, unknown>)
     return await tool.handle(context, args, request)
   })
 
