@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
@@ -85,5 +86,19 @@ public class PredefinedQuestionService {
       return modelFactoryService.save(regenerated);
     }
     return modelFactoryService.save(result);
+  }
+
+  public void deleteQuestions(Note note, List<PredefinedQuestion> predefinedQuestions) {
+    Notebook parentNotebook = note.getNotebook();
+    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    
+    for (PredefinedQuestion predefinedQuestion : predefinedQuestions)
+    {
+      note.getPredefinedQuestions().remove(predefinedQuestion);
+      predefinedQuestion.setNote(null);
+      
+      modelFactoryService.remove(predefinedQuestion);
+      modelFactoryService.save(parentNotebook);  
+    }
   }
 }
