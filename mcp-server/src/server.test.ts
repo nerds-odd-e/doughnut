@@ -82,6 +82,4 @@ describe('Tool Response Formats', () => {
     expect(expectedResponse.content[0].type).toBe('text')
     expect(expectedResponse.content[0].text).toContain('Doughnut')
   })
-
-
 })
