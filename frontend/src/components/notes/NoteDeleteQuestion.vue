@@ -8,7 +8,7 @@
         v-model="questionsToDelete"
         class="checkbox checkbox-primary"
       />
-      <label :for="`question-${index}`" class="text-base">{{ question }}</label>
+      <label :for="`question-${index}`" class="text-base">{{ question.multipleChoicesQuestion.stem }}</label>
     </div>
 
     <button
@@ -22,15 +22,16 @@
 
 <script setup lang="ts">
 import { ref, watchEffect } from "vue";
+import type { PredefinedQuestion } from "@/generated/backend";
 
 const props = defineProps({
   questions: {
-    type: Array as () => string[],
+    type: Array as () => PredefinedQuestion[],
     required: true,
   },
 });
 
-const questionsToDelete = ref<string[]>([]);
+const questionsToDelete = ref<PredefinedQuestion[]>([]);
 
 watchEffect(() => {
   questionsToDelete.value = [...props.questions];

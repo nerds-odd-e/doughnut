@@ -14,7 +14,7 @@
     <PopButton btn-class="daisy-btn daisy-btn-primary" title="Delete Question">
       <template #default="{ closer }">
         <NoteDeleteQuestion
-          :questions="questionStrings" 
+          :questions="questions" 
           @close-dialog="
             closer();
             questionDeleted($event);
@@ -86,7 +86,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { onMounted, ref, computed } from "vue"
+import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@/generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
@@ -102,9 +102,6 @@ const props = defineProps({
   },
 })
 
-const questionStrings = computed(() => {
-  return questions.value.map(q => q.multipleChoicesQuestion.stem)
-})
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
 
@@ -120,17 +117,17 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
   }
   questions.value.push(newQuestion)
 }
-const questionDeleted = async (deletedQuestion: string[]) => {
+const questionDeleted = async (deletedQuestion: PredefinedQuestion[]) => {
   if (!Array.isArray(deletedQuestion) || deletedQuestion.length === 0) {
     return;
   }
   
   const questionsToDelete = questions.value.filter(
-    (q) => deletedQuestion.includes(q.multipleChoicesQuestion.stem)
+    (q) => deletedQuestion.includes(q)
   );
 
   questions.value = questions.value.filter(
-    (q) => !deletedQuestion.includes(q.multipleChoicesQuestion.stem)
+    (q) => !deletedQuestion.includes(q)
   );
 
   await managedApi.restPredefinedQuestionController.deleteQuestion(props.note.id, questionsToDelete)
