@@ -18,12 +18,7 @@ export const tools: ToolDescriptor[] = [
     handle: async () =>
       textResponse('Doughnut is a Personal Knowledge Management tool'),
   },
-  {
-    name: 'get_sampleapi',
-    description: 'Get sample api',
-    inputSchema: emptyObjectSchema,
-    handle: async () => textResponse('Sample API'),
-  },
+
   {
     name: 'update_note_text_content',
     description:

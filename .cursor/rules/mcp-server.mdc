@@ -102,7 +102,7 @@ Add the below command to your AI MCP Server configuration:
 ## Available Tools
 
 - `get_instruction` - Get instruction about Doughnut
-- `get_sampleapi` - Get sample API response
+
 - `update_note_text_content` - Update the title and/or details of a note by note ID
 - `get_user_info` - Get user information
 - `get_notebook_list` - Get list of user's notebooks

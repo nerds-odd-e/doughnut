@@ -13,7 +13,6 @@ describe('MCP Server Configuration', () => {
   test('should define expected tools', () => {
     const expectedTools = [
       'get_instruction',
-      'get_sampleapi',
       'update_note_text_content',
       'get_user_info',
       'get_notebook_list',
@@ -25,7 +24,7 @@ describe('MCP Server Configuration', () => {
     expect(expectedTools).toContain('update_note_text_content')
     expect(expectedTools).toContain('get_user_info')
     expect(expectedTools).toContain('get_notebook_list')
-    expect(expectedTools).toHaveLength(6)
+    expect(expectedTools).toHaveLength(5)
   })
 })
 
@@ -84,18 +83,5 @@ describe('Tool Response Formats', () => {
     expect(expectedResponse.content[0].text).toContain('Doughnut')
   })
 
-  test('should return correct response format for get_sampleapi', () => {
-    const expectedResponse = {
-      content: [
-        {
-          type: 'text',
-          text: 'Sample API',
-        },
-      ],
-    }
 
-    expect(expectedResponse.content).toHaveLength(1)
-    expect(expectedResponse.content[0].type).toBe('text')
-    expect(expectedResponse.content[0].text).toBe('Sample API')
-  })
 })
