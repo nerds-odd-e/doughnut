@@ -146,16 +146,18 @@ export const tools: ToolDescriptor[] = [
       const { query } = args as { query: string }
       try {
         // Use the backend search endpoint to get relevant notes
-        const searchTerm = { searchKey: query }
+        const searchTerm = { searchKey: query,
+          allMyNotebooksAndSubscriptions: true
+         }
         const results =
           await api.restSearchController.searchForLinkTarget(searchTerm)
         // Return the most relevant note id (0 or 1)
         if (
           Array.isArray(results) &&
           results.length > 0 &&
-          typeof results[0].noteId === 'number'
+          typeof results[0].noteTopology.id === 'number'
         ) {
-          return textResponse(results[0].noteId.toString())
+          return textResponse(results[0].noteTopology.id.toString())
         }
         return textResponse('No relevant note found.')
       } catch (err) {
