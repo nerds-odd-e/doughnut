@@ -158,20 +158,6 @@ When(
   }
 )
 
-Then(
-  '"{string}" note is added to "{string}" notebook',
-  (noteTitle: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
-      (response) => {
-        const actualResponse = response as unknown as ApiResponse
-        const found = actualResponse.content.some((item) =>
-          item.text.includes(notebookTitle)
-        )
-        expect(found).to.be.true
-      }
-    )
-  }
-)
 
 // --- Add note with details to notebook ---
 When(
@@ -186,17 +172,3 @@ When(
   }
 )
 
-Then(
-  '"{string}" note with details "{string}" is added to "{string}" notebook',
-  (noteTitle: string, details: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
-      (response) => {
-        const actualResponse = response as unknown as ApiResponse
-        const found = actualResponse.content.some((item) =>
-          item.text.includes(notebookTitle)
-        )
-        expect(found).to.be.true
-      }
-    )
-  }
-)

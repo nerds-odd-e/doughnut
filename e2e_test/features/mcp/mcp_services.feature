@@ -29,13 +29,27 @@ Feature: MCP (Model Context Protocol) Services
   Scenario: Add note to notebook
     Given I have a notebook with the head note "Lord of the Rings"
     When AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Frodo"
-    Then "Frodo" note is added to "Lord of the Rings" notebook
+    Then I should see the note tree in the sidebar
+      | note-title        |
+      | Lord of the Rings |
+      | Frodo             |
+    And I should see "Lord of the Rings" with these children
+      | note-title        |
+      | Lord of the Rings |
+      | Frodo             |
   
   @ignore
   Scenario: Add note with details to notebook
     Given I have a notebook with the head note "Lord of the Rings"
     When AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Sam" and details "holdo"
-    Then "Sam" note with details "holdo" is added to "Lord of the Rings" notebook
+    Then I should see the note tree in the sidebar
+      | note-title        |
+      | Lord of the Rings |
+      | Sam               |
+    And I should see "Lord of the Rings" with these children
+      | note-title        |
+      | Lord of the Rings |
+      | Sam               |
 
   @ignore
   Scenario: Add note to user select notebook
@@ -44,4 +58,11 @@ Feature: MCP (Model Context Protocol) Services
     When I add a note with title "Sam" and details "holdo" without notebook title
     Then AI agent calls the "get_notebook_list" MCP tool and show me the notebook list
     And AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Sam" and details "holdo"
-    And "Sam" note with details "holdo" is added to "Lord of the Rings" notebook
+    Then I should see the note tree in the sidebar
+      | note-title        |
+      | Lord of the Rings |
+      | Sam               |
+    And I should see "Lord of the Rings" with these children
+      | note-title        |
+      | Lord of the Rings |
+      | Sam               |
