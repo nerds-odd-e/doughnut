@@ -146,9 +146,10 @@ export const tools: ToolDescriptor[] = [
       const { query } = args as { query: string }
       try {
         // Use the backend search endpoint to get relevant notes
-        const searchTerm = { searchKey: query,
-          allMyNotebooksAndSubscriptions: true
-         }
+        const searchTerm = {
+          searchKey: query,
+          allMyNotebooksAndSubscriptions: true,
+        }
         const results =
           await api.restSearchController.searchForLinkTarget(searchTerm)
         // Return the most relevant note id (0 or 1)
