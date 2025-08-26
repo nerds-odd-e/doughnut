@@ -35,6 +35,9 @@ export type ServerApi = {
   restSearchController: {
     searchForLinkTarget: (searchTerm: { searchKey: string }) => Promise<unknown>
   }
+  mcpNoteCreationController: {
+    createNote: (noteId: number, noteTitle: string) => Promise<unknown>
+  }
 }
 
 export type ServerContext = {

@@ -1,4 +1,6 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, expect, vi } from 'vitest'
+import { tools } from './tools/index'
+import type { ToolDescriptor } from './types.js'
 
 // Test the server configuration and tool definitions
 describe('MCP Server Configuration', () => {
@@ -81,5 +83,36 @@ describe('Tool Response Formats', () => {
     expect(expectedResponse.content).toHaveLength(1)
     expect(expectedResponse.content[0].type).toBe('text')
     expect(expectedResponse.content[0].text).toContain('Doughnut')
+  })
+})
+
+// Test for add_note tool
+describe('add_note tool', () => {
+  test('should call API and return success', async () => {
+    const addNoteTool = tools.find((t: ToolDescriptor) => t.name === 'add_note')
+    expect(addNoteTool).toBeDefined()
+
+    const mockCreateNote = vi.fn().mockResolvedValue(undefined)
+    const mockApi = {
+      mcpNoteCreationController: {
+        createNote: mockCreateNote,
+      },
+    }
+    const ctx = { api: mockApi }
+
+    const args = { noteId: 123, noteTitle: 'Test Note' }
+
+    const result = await addNoteTool.handle(ctx, args, { params: args })
+
+    expect(mockCreateNote).toHaveBeenCalledWith(123, 'Test Note')
+
+    expect(result).toEqual({
+      content: [
+        {
+          type: 'text',
+          text: 'All Good',
+        },
+      ],
+    })
   })
 })

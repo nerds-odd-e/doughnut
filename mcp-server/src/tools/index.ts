@@ -3,6 +3,7 @@ import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
   getGraphWithNoteIdSchema,
+  addNotewithNoteIdSchema,
   getRelevantNoteIdSchema,
 } from '../schemas.js'
 import {
@@ -131,6 +132,31 @@ export const tools: ToolDescriptor[] = [
         )
         const graph = await api.restNoteController.getGraph(noteId)
         return textResponse(JSON.stringify(graph))
+      } catch (err) {
+        return createErrorResponse(err)
+      }
+    },
+  },
+  {
+    name: 'add_note',
+    description: 'Add a note to the notebook',
+    inputSchema: addNotewithNoteIdSchema,
+    handle: async (ctx, args, request) => {
+      const api = ctx.api
+      try {
+        const noteId = Number(
+          (args as { noteId?: number }).noteId ??
+            (request as { params?: { noteId?: number } }).params?.noteId
+        )
+
+        const noteTitle = String(
+          (args as { noteTitle?: string }).noteTitle ??
+            (request as { params?: { noteTitle?: string } }).params?.noteTitle
+        )
+
+        await api.mcpNoteCreationController.createNote(noteId, noteTitle)
+
+        return textResponse('All Good')
       } catch (err) {
         return createErrorResponse(err)
       }
