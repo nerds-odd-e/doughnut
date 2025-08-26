@@ -41,6 +41,7 @@ Then('the response should contain {string}', (expectedResponse: string) => {
   })
 })
 
+// Search-related steps
 Then(
   'the search results should include a note with the title {string}',
   (noteTitle: string) => {
@@ -101,3 +102,55 @@ Then('the search results should be blank', () => {
     expect(actualResponse.content).to.have.length(0)
   })
 })
+
+// --- Add note to notebook ---
+When(
+  'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string}',
+  (notebookTitle: string, noteTitle: string) => {
+    cy.task('callMcpTool', {
+      apiName: 'add_note',
+      params: { notebookTitle, noteTitle }
+    }).then((response) => {
+      cy.wrap(response).as('MCPAddNoteResponse')
+    })
+  }
+)
+
+Then(
+  '"{string}" note is added to "{string}" notebook',
+  (noteTitle: string, notebookTitle: string) => {
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      const found = actualResponse.content.some((item) =>
+        item.text.includes(notebookTitle)
+      )
+      expect(found).to.be.true
+    })
+  }
+)
+
+// --- Add note with details to notebook ---
+When(
+  'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string} and details {string}',
+  (notebookTitle: string, noteTitle: string, details: string) => {
+    cy.task('callMcpTool', {
+      apiName: 'add_note',
+      params: { notebookTitle, noteTitle, details }
+    }).then((response) => {
+      cy.wrap(response).as('MCPAddNoteResponse')
+    })
+  }
+)
+
+Then(
+  '"{string}" note with details "{string}" is added to "{string}" notebook',
+  (noteTitle: string, details: string, notebookTitle: string) => {
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      const found = actualResponse.content.some((item) =>
+        item.text.includes(notebookTitle)
+      )
+      expect(found).to.be.true
+    })
+  }
+)

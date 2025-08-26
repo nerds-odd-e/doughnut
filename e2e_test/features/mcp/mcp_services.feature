@@ -25,7 +25,7 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "Lord of the Rings"
     Then the response should contain "Harry Potter"
 
-@ignore
+  @ignore
   Scenario: Add note to notebook
     Given I have a notebook with the head note "Lord of the Rings"
     When AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Frodo"
@@ -41,8 +41,7 @@ Feature: MCP (Model Context Protocol) Services
   Scenario: Add note to user select notebook
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
-    When AI agent calls the "add_note" MCP tool without notebook title
-    Then AI agent calls the "get_notebook_list" MCP tool and show user the list
+    When I add a note with title "Sam" and details "holdo" without notebook title
+    Then AI agent calls the "get_notebook_list" MCP tool and show me the notebook list
     And AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Sam" and details "holdo"
     And "Sam" note with details "holdo" is added to "Lord of the Rings" notebook
-
