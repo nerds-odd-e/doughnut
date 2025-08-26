@@ -26,18 +26,20 @@ When('I call the {string} MCP tool', (apiName: string) => {
 
 When('I search for notes with the term {string}', (searchTerm: string) => {
   cy.task('callMcpTool', {
-    apiName: 'get_relevant_note_id',
-    args: { term: searchTerm },
+    apiName: 'get_relevant_note',
+    args: { query: searchTerm },
   }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
 })
 
-// Use the literal expected response directly from the feature file
 Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
     const actualResponse = response as unknown as ApiResponse
-    expect(actualResponse.content[0]!.text).to.contain(expectedResponse)
+    const found = actualResponse.content.some((item) =>
+      item.text.includes(expectedResponse)
+    )
+    expect(found).to.be.true
   })
 })
 
@@ -104,6 +106,16 @@ Then('the search results should be blank', () => {
   cy.get('@MCPApiResponse').then((response) => {
     const actualResponse = response as unknown as ApiResponse
     expect(actualResponse.content).to.have.length(0)
+  })
+})
+
+Then('the response should contain {string}', (expectedResponse: string) => {
+  cy.get('@MCPApiResponse').then((response) => {
+    const actualResponse = response as unknown as ApiResponse
+    const found = actualResponse.content.some((item) =>
+      item.text.includes(expectedResponse)
+    )
+    expect(found).to.be.true
   })
 })
 

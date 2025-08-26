@@ -1,4 +1,3 @@
-
 @ignore
 @TerminateMCPServerWhenTeardown
 Feature: AI developer learns from Doughnut via MCP
@@ -13,9 +12,6 @@ Feature: AI developer learns from Doughnut via MCP
 
   Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
     When I search for notes with the term "<search_term>"
-    Then the search results should include a note with the title "<note_title>"
-    When I get the note ID from the search result for "<note_title>"
-    And I call the "get_graph_with_note_id" MCP tool with that note ID
     Then the response should contain "<note_title>"
     And the response should contain "focusNote"
 
@@ -26,10 +22,9 @@ Feature: AI developer learns from Doughnut via MCP
 
   Scenario Outline: AI developer learns from Doughnut via MCP (unhappy case)
     When I search for notes with the term "<search_term>"
-    Then the search results should not include a note with the title "<note_title>"
-    Then the search results should be blank
+    Then the response should contain "No relevant note found."
 
     Examples:
-      | search_term | note_title |
-      | Frodo       |           |
-      | Hermione    |           |
+      | search_term |
+      | Frodo       |
+      | Hermione    |
