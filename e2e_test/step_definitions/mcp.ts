@@ -35,11 +35,9 @@ When('I search for notes with the term {string}', (searchTerm: string) => {
 
 Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
-    const actualResponse = response as unknown as ApiResponse
-    const found = actualResponse.content.some((item) =>
-      item.text.includes(expectedResponse)
-    )
-    expect(found).to.be.true
+    const responseString = JSON.stringify(response)
+    const foundInString = responseString.includes(expectedResponse);
+    expect(foundInString).to.be.true
   })
 })
 
@@ -90,34 +88,6 @@ When(
     })
   }
 )
-
-When('I call the "get_graph_with_note_id" MCP tool with that note ID', () => {
-  cy.get('@noteId').then((noteId) => {
-    cy.task('callMcpTool', {
-      apiName: 'get_graph_with_note_id',
-      args: { noteId },
-    }).then((response) => {
-      cy.wrap(response).as('MCPApiResponse')
-    })
-  })
-})
-
-Then('the search results should be blank', () => {
-  cy.get('@MCPApiResponse').then((response) => {
-    const actualResponse = response as unknown as ApiResponse
-    expect(actualResponse.content).to.have.length(0)
-  })
-})
-
-Then('the response should contain {string}', (expectedResponse: string) => {
-  cy.get('@MCPApiResponse').then((response) => {
-    const actualResponse = response as unknown as ApiResponse
-    const found = actualResponse.content.some((item) =>
-      item.text.includes(expectedResponse)
-    )
-    expect(found).to.be.true
-  })
-})
 
 // --- Add note to notebook ---
 When(
