@@ -1480,6 +1480,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SpellingResultDTO"
+  /api/mcp/notes/{parentNote}/create:
+    post:
+      tags:
+      - mcp-note-creation-controller
+      operationId: createNote_1
+      parameters:
+      - name: parentNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteCreationDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteCreationRresult"
   /api/links/{link}:
     post:
       tags:

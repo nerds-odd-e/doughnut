@@ -156,6 +156,7 @@ export type { WikidataEntityData } from './models/WikidataEntityData';
 export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
 export { AssimilationControllerService } from './services/AssimilationControllerService';
+export { McpNoteCreationControllerService } from './services/McpNoteCreationControllerService';
 export { RaceGameControllerService } from './services/RaceGameControllerService';
 export { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 export { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
