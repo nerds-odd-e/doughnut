@@ -3,7 +3,6 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
-import type { NoteCreationRresult } from '../models/NoteCreationRresult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class McpNoteCreationControllerService {
@@ -11,13 +10,13 @@ export class McpNoteCreationControllerService {
     /**
      * @param parentNote
      * @param requestBody
-     * @returns NoteCreationRresult OK
+     * @returns string OK
      * @throws ApiError
      */
     public createNote1(
         parentNote: number,
         requestBody: NoteCreationDTO,
-    ): CancelablePromise<NoteCreationRresult> {
+    ): CancelablePromise<string> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/mcp/notes/{parentNote}/create',

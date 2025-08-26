@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationRresult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -44,17 +43,19 @@ public class McpNoteCreationController {
             modelFactoryService);
   }
 
-  @PostMapping(value = "/{parentNote}/create")
+  @PostMapping(value = "/create")
   @Transactional
-  public NoteCreationRresult createNote(
+  public String createNote(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertAuthorization(parentNote);
-    return noteConstructionService.createNoteWithWikidataService(
+    noteConstructionService.createNoteWithWikidataService(
         parentNote,
         noteCreation,
         currentUser.getEntity(),
         wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
+
+    return "All Good";
   }
 }

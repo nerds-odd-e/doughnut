@@ -1,4 +1,5 @@
 import type { ToolDescriptor } from '../types.js'
+import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
 import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
@@ -149,12 +150,16 @@ export const tools: ToolDescriptor[] = [
             (request as { params?: { noteId?: number } }).params?.noteId
         )
 
-        const noteTitle = String(
-          (args as { noteTitle?: string }).noteTitle ??
-            (request as { params?: { noteTitle?: string } }).params?.noteTitle
+        
+        const newTitle = String(
+          (args as { newTitle?: string }).newTitle ??
+            (request as { params?: { newTitle?: string } }).params?.newTitle
         )
-
-        await api.mcpNoteCreationController.createNote(noteId, noteTitle)
+        
+        const noteCreationDto:NoteCreationDTO =  {
+          newTitle: newTitle
+        }
+        await api.mcpNoteCreationController.createNote1(noteId, noteCreationDto)
 
         return textResponse('All Good')
       } catch (err) {

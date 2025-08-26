@@ -1509,7 +1509,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationRresult"
+                type: string
   /api/links/{link}:
     post:
       tags:
