@@ -32,6 +32,9 @@ export type ServerApi = {
   restNoteController: {
     getGraph: (noteId: number) => Promise<unknown>
   }
+  restSearchController: {
+    searchForLinkTarget: (searchTerm: { searchKey: string }) => Promise<unknown>
+  }
 }
 
 export type ServerContext = {

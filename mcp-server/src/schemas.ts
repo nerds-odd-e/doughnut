@@ -35,3 +35,15 @@ export const getGraphWithNoteIdSchema = {
   required: ['noteId'],
   additionalProperties: false,
 } as const
+
+export const getRelevantNoteIdSchema = {
+  type: 'object',
+  properties: {
+    query: {
+      type: 'string',
+      description: 'The user search request. The most relevant note id (if any) will be returned.',
+    },
+  },
+  required: ['query'],
+  additionalProperties: false,
+} as const

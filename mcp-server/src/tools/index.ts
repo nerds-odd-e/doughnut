@@ -3,6 +3,7 @@ import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
   getGraphWithNoteIdSchema,
+  getRelevantNoteIdSchema,
 } from '../schemas.js'
 import {
   createErrorResponse,
@@ -130,6 +131,27 @@ export const tools: ToolDescriptor[] = [
         )
         const graph = await api.restNoteController.getGraph(noteId)
         return textResponse(JSON.stringify(graph))
+      } catch (err) {
+        return createErrorResponse(err)
+      }
+    },
+  },
+  {
+    name: 'get_relevant_note_id',
+    description: 'Given a user search request, returns the most relevant note id (0 or 1 noteId).',
+    inputSchema: getRelevantNoteIdSchema,
+    handle: async (ctx, args) => {
+      const api = ctx.api
+      const { query } = args as { query: string }
+      try {
+        // Use the backend search endpoint to get relevant notes
+        const searchTerm = { searchKey: query }
+        const results = await api.restSearchController.searchForLinkTarget(searchTerm)
+        // Return the most relevant note id (0 or 1)
+        if (Array.isArray(results) && results.length > 0 && typeof results[0].noteId === 'number') {
+          return textResponse(results[0].noteId.toString())
+        }
+        return textResponse('No relevant note found.')
       } catch (err) {
         return createErrorResponse(err)
       }
