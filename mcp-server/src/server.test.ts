@@ -1,5 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import { tools } from './tools/index'
+import type { ToolDescriptor } from './types.js'
 
 // Test the server configuration and tool definitions
 describe('MCP Server Configuration', () => {
@@ -90,26 +91,28 @@ describe('add_note tool', () => {
   test('should call API and return success', async () => {
     // Import the tools array
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const addNoteTool = tools.find((t: any) => t.name === 'add_note')
+    const addNoteTool = tools.find((t: ToolDescriptor) => t.name === 'add_note')
     expect(addNoteTool).toBeDefined()
 
     // Mock context and API
     const mockCreateNote = vi.fn().mockResolvedValue(undefined)
     const mockApi = {
       mcpNoteCreationController: {
-        createNote: mockCreateNote,
+        createNote1: mockCreateNote,
       },
     }
     const ctx = { api: mockApi }
 
     // Arguments for the tool
-    const args = { noteId: 123, noteTitle: 'Test Note' }
+    const args = { noteId: 123, newTitle: 'Test Note' }
 
     // Call the tool's handle function
     const result = await addNoteTool.handle(ctx, args, { params: args })
 
     // Assert API was called with correct arguments
-    expect(mockCreateNote).toHaveBeenCalledWith(123, 'Test Note')
+    expect(mockCreateNote).toHaveBeenCalledWith(123, {
+      newTitle: 'Test Note',
+    })
     // Assert the response is as expected
     expect(result).toEqual({
       content: [

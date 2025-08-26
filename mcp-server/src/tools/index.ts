@@ -150,14 +150,13 @@ export const tools: ToolDescriptor[] = [
             (request as { params?: { noteId?: number } }).params?.noteId
         )
 
-        
         const newTitle = String(
           (args as { newTitle?: string }).newTitle ??
             (request as { params?: { newTitle?: string } }).params?.newTitle
         )
-        
-        const noteCreationDto:NoteCreationDTO =  {
-          newTitle: newTitle
+
+        const noteCreationDto: NoteCreationDTO = {
+          newTitle: newTitle,
         }
         await api.mcpNoteCreationController.createNote1(noteId, noteCreationDto)
 

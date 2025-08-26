@@ -47,7 +47,7 @@ export const addNotewithNoteIdSchema = {
       type: ['string', 'null'],
       description: 'The new title for the note.',
     },
-  }
+  },
 } as const
 
 export const getRelevantNoteIdSchema = {
