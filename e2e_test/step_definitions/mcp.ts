@@ -77,9 +77,13 @@ When(
       const note = actualResponse.content.find((item) =>
         item.text.includes(noteTitle)
       )
-      if (!note) throw new Error('Note not found in search results')
+      if (!note) {
+        throw new Error('Note not found in search results')
+      }
       const match = note.text.match(/id[:=]\s*(\d+)/i)
-      if (!match) throw new Error('Note ID not found in note text')
+      if (!match) {
+        throw new Error('Note ID not found in note text')
+      }
       cy.wrap(Number(match[1])).as('noteId')
     })
   }
@@ -109,7 +113,7 @@ When(
   (notebookTitle: string, noteTitle: string) => {
     cy.task('callMcpTool', {
       apiName: 'add_note',
-      params: { notebookTitle, noteTitle }
+      params: { notebookTitle, noteTitle },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
@@ -119,13 +123,15 @@ When(
 Then(
   '"{string}" note is added to "{string}" notebook',
   (noteTitle: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then((response) => {
-      const actualResponse = response as unknown as ApiResponse
-      const found = actualResponse.content.some((item) =>
-        item.text.includes(notebookTitle)
-      )
-      expect(found).to.be.true
-    })
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
+      (response) => {
+        const actualResponse = response as unknown as ApiResponse
+        const found = actualResponse.content.some((item) =>
+          item.text.includes(notebookTitle)
+        )
+        expect(found).to.be.true
+      }
+    )
   }
 )
 
@@ -135,7 +141,7 @@ When(
   (notebookTitle: string, noteTitle: string, details: string) => {
     cy.task('callMcpTool', {
       apiName: 'add_note',
-      params: { notebookTitle, noteTitle, details }
+      params: { notebookTitle, noteTitle, details },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
@@ -145,13 +151,15 @@ When(
 Then(
   '"{string}" note with details "{string}" is added to "{string}" notebook',
   (noteTitle: string, details: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then((response) => {
-      const actualResponse = response as unknown as ApiResponse
-      const found = actualResponse.content.some((item) =>
-        item.text.includes(notebookTitle)
-      )
-      expect(found).to.be.true
-    })
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
+      (response) => {
+        const actualResponse = response as unknown as ApiResponse
+        const found = actualResponse.content.some((item) =>
+          item.text.includes(notebookTitle)
+        )
+        expect(found).to.be.true
+      }
+    )
   }
 )
 
@@ -161,7 +169,7 @@ When(
   (notebookTitle: string, noteTitle: string) => {
     cy.task('callMcpTool', {
       apiName: 'add_note',
-      params: { notebookTitle, noteTitle }
+      params: { notebookTitle, noteTitle },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
@@ -171,13 +179,15 @@ When(
 Then(
   '"{string}" note is added to "{string}" notebook',
   (noteTitle: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then((response) => {
-      const actualResponse = response as unknown as ApiResponse
-      const found = actualResponse.content.some((item) =>
-        item.text.includes(notebookTitle)
-      )
-      expect(found).to.be.true
-    })
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
+      (response) => {
+        const actualResponse = response as unknown as ApiResponse
+        const found = actualResponse.content.some((item) =>
+          item.text.includes(notebookTitle)
+        )
+        expect(found).to.be.true
+      }
+    )
   }
 )
 
@@ -187,7 +197,7 @@ When(
   (notebookTitle: string, noteTitle: string, details: string) => {
     cy.task('callMcpTool', {
       apiName: 'add_note',
-      params: { notebookTitle, noteTitle, details }
+      params: { notebookTitle, noteTitle, details },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
@@ -197,12 +207,14 @@ When(
 Then(
   '"{string}" note with details "{string}" is added to "{string}" notebook',
   (noteTitle: string, details: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then((response) => {
-      const actualResponse = response as unknown as ApiResponse
-      const found = actualResponse.content.some((item) =>
-        item.text.includes(notebookTitle)
-      )
-      expect(found).to.be.true
-    })
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
+      (response) => {
+        const actualResponse = response as unknown as ApiResponse
+        const found = actualResponse.content.some((item) =>
+          item.text.includes(notebookTitle)
+        )
+        expect(found).to.be.true
+      }
+    )
   }
 )
