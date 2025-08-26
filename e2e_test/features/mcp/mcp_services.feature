@@ -24,3 +24,9 @@ Feature: MCP (Model Context Protocol) Services
     When I call the "get_notebook_list" MCP tool
     Then the response should contain "Lord of the Rings"
     Then the response should contain "Harry Potter"
+
+@ignore
+  Scenario: Add note to notebook
+    Given I have a notebook with the head note "Lord of the Rings"
+    When AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Frodo"
+    Then "Frodo" note is added to "Lord of the Rings" notebook     
