@@ -138,7 +138,8 @@ export const tools: ToolDescriptor[] = [
   },
   {
     name: 'get_relevant_note_id',
-    description: 'Given a user search request, returns the most relevant note id (0 or 1 noteId).',
+    description:
+      'Given a user search request, returns the most relevant note id (0 or 1 noteId).',
     inputSchema: getRelevantNoteIdSchema,
     handle: async (ctx, args) => {
       const api = ctx.api
@@ -146,9 +147,14 @@ export const tools: ToolDescriptor[] = [
       try {
         // Use the backend search endpoint to get relevant notes
         const searchTerm = { searchKey: query }
-        const results = await api.restSearchController.searchForLinkTarget(searchTerm)
+        const results =
+          await api.restSearchController.searchForLinkTarget(searchTerm)
         // Return the most relevant note id (0 or 1)
-        if (Array.isArray(results) && results.length > 0 && typeof results[0].noteId === 'number') {
+        if (
+          Array.isArray(results) &&
+          results.length > 0 &&
+          typeof results[0].noteId === 'number'
+        ) {
           return textResponse(results[0].noteId.toString())
         }
         return textResponse('No relevant note found.')

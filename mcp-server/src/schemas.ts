@@ -41,7 +41,8 @@ export const getRelevantNoteIdSchema = {
   properties: {
     query: {
       type: 'string',
-      description: 'The user search request. The most relevant note id (if any) will be returned.',
+      description:
+        'The user search request. The most relevant note id (if any) will be returned.',
     },
   },
   required: ['query'],
