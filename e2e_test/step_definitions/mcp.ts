@@ -25,7 +25,10 @@ When('I call the {string} MCP tool', (apiName: string) => {
 })
 
 When('I search for notes with the term {string}', (searchTerm: string) => {
-  cy.task('callMcpTool', { apiName: 'search_notes', args: { term: searchTerm } }).then((response) => {
+  cy.task('callMcpTool', {
+    apiName: 'search_notes',
+    args: { term: searchTerm },
+  }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
 })
@@ -38,37 +41,55 @@ Then('the response should contain {string}', (expectedResponse: string) => {
   })
 })
 
-Then('the search results should include a note with the title {string}', (noteTitle: string) => {
-  cy.get('@MCPApiResponse').then((response) => {
-    const actualResponse = response as unknown as ApiResponse
-    const found = actualResponse.content.some(item => item.text.includes(noteTitle))
-    expect(found).to.be.true
-  })
-})
+Then(
+  'the search results should include a note with the title {string}',
+  (noteTitle: string) => {
+    cy.get('@MCPApiResponse').then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      const found = actualResponse.content.some((item) =>
+        item.text.includes(noteTitle)
+      )
+      expect(found).to.be.true
+    })
+  }
+)
 
-Then('the search results should not include a note with the title {string}', (noteTitle: string) => {
-  cy.get('@MCPApiResponse').then((response) => {
-    const actualResponse = response as unknown as ApiResponse
-    const found = actualResponse.content.some(item => item.text.includes(noteTitle))
-    expect(found).to.be.false
-  })
-})
+Then(
+  'the search results should not include a note with the title {string}',
+  (noteTitle: string) => {
+    cy.get('@MCPApiResponse').then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      const found = actualResponse.content.some((item) =>
+        item.text.includes(noteTitle)
+      )
+      expect(found).to.be.false
+    })
+  }
+)
 
-When('I get the note ID from the search result for {string}', (noteTitle: string) => {
-  cy.get('@MCPApiResponse').then((response) => {
-    const actualResponse = response as unknown as ApiResponse
-    // Assume note ID is present in the text as "id: <number>" or similar
-    const note = actualResponse.content.find(item => item.text.includes(noteTitle))
-    if (!note) throw new Error('Note not found in search results')
-    const match = note.text.match(/id[:=]\s*(\d+)/i)
-    if (!match) throw new Error('Note ID not found in note text')
-    cy.wrap(Number(match[1])).as('noteId')
-  })
-})
+When(
+  'I get the note ID from the search result for {string}',
+  (noteTitle: string) => {
+    cy.get('@MCPApiResponse').then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      // Assume note ID is present in the text as "id: <number>" or similar
+      const note = actualResponse.content.find((item) =>
+        item.text.includes(noteTitle)
+      )
+      if (!note) throw new Error('Note not found in search results')
+      const match = note.text.match(/id[:=]\s*(\d+)/i)
+      if (!match) throw new Error('Note ID not found in note text')
+      cy.wrap(Number(match[1])).as('noteId')
+    })
+  }
+)
 
 When('I call the "get_graph_with_note_id" MCP tool with that note ID', () => {
   cy.get('@noteId').then((noteId) => {
-    cy.task('callMcpTool', { apiName: 'get_graph_with_note_id', args: { noteId } }).then((response) => {
+    cy.task('callMcpTool', {
+      apiName: 'get_graph_with_note_id',
+      args: { noteId },
+    }).then((response) => {
       cy.wrap(response).as('MCPApiResponse')
     })
   })
