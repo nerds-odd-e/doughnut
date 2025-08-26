@@ -43,7 +43,7 @@ public class McpNoteCreationController {
             modelFactoryService);
   }
 
-  @PostMapping(value = "/create")
+  @PostMapping(value = "/{parentNote}/create")
   @Transactional
   public String createNote(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
