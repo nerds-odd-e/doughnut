@@ -168,9 +168,9 @@ export const tools: ToolDescriptor[] = [
     },
   },
   {
-    name: 'get_relevant_note_id',
+    name: 'get_relevant_note',
     description:
-      'Given a user search request, returns the most relevant note id (0 or 1 noteId).',
+      'Given a user search request, returns the most relevant note information',
     inputSchema: getRelevantNoteIdSchema,
     handle: async (ctx, args) => {
       const api = ctx.api
@@ -189,7 +189,9 @@ export const tools: ToolDescriptor[] = [
           results.length > 0 &&
           typeof results[0].noteTopology.id === 'number'
         ) {
-          return textResponse(results[0].noteTopology.id.toString())
+          const noteId = results[0].noteTopology.id.toString()
+          const graph = await api.restNoteController.getGraph(noteId)
+          return textResponse(JSON.stringify(graph))
         }
         return textResponse('No relevant note found.')
       } catch (err) {
