@@ -36,7 +36,7 @@ When('I search for notes with the term {string}', (searchTerm: string) => {
 Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
     const responseString = JSON.stringify(response)
-    const foundInString = responseString.includes(expectedResponse);
+    const foundInString = responseString.includes(expectedResponse)
     expect(foundInString).to.be.true
   })
 })
