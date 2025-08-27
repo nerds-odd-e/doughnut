@@ -116,18 +116,27 @@ export const tools: ToolDescriptor[] = [
         const notebooksViewed = await api.restNotebookController.myNotebooks()
         const viewed = notebooksViewed as { notebooks?: unknown }
         const notebooks = Array.isArray(viewed.notebooks)
-          ? (viewed.notebooks as Array<{ title?: string }>)
+          ? (viewed.notebooks as Array<{ title?: string; headNoteId?: number }>)
           : null
         if (!notebooks) {
           return createErrorResponse(
             `Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`
           )
         }
-        const noteBookTitle = notebooks
-          .map((n) => n.title ?? '')
-          .filter((t) => t && t.length > 0)
-          .join(', ')
-        return textResponse(noteBookTitle)
+        // Return notebooks with headNoteId included
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify(
+                notebooks.map((n) => ({
+                  title: n.title ?? '',
+                  headNoteId: n.headNoteId ?? null,
+                }))
+              ),
+            },
+          ],
+        }
       } catch (err) {
         return createErrorResponse(err)
       }
