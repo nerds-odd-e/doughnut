@@ -4,7 +4,7 @@ import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
   getGraphWithNoteIdSchema,
-  addNotewithNoteIdSchema,
+  addNotewithNoteTitleSchema,
   getRelevantNoteSchema,
 } from '../schemas.js'
 import {
@@ -12,6 +12,7 @@ import {
   textResponse,
   validateNoteUpdateParams,
 } from '../utils.js'
+import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 
 interface ArgsWithArgs {
   args: string
@@ -171,14 +172,15 @@ export const tools: ToolDescriptor[] = [
   },
   {
     name: 'add_note',
-    description: 'Add a note to the notebook',
-    inputSchema: addNotewithNoteIdSchema,
+    description:
+      'Add a note to a notebook, if the user specifies a notebook directly call add_note. If the user does not specify a notebook, call get_notebook_list to find a relevant notebook to add the note to, call then call add_note. Returns the title of the created note',
+    inputSchema: addNotewithNoteTitleSchema,
     handle: async (ctx, args, request) => {
       const api = ctx.api
       try {
-        const noteId = Number(
-          (args as { noteId?: number }).noteId ??
-            (request as { params?: { noteId?: number } }).params?.noteId
+        const noteTitle = String(
+          (args as { noteTitle?: string }).noteTitle ??
+            (request as { params?: { noteTitle?: number } }).params?.noteTitle
         )
 
         const newTitle = String(
@@ -186,12 +188,17 @@ export const tools: ToolDescriptor[] = [
             (request as { params?: { newTitle?: string } }).params?.newTitle
         )
 
-        const noteCreationDto: NoteCreationDTO = {
+        const noteCreationDTO: NoteCreationDTO = {
           newTitle: newTitle,
         }
-        await api.mcpNoteCreationController.createNote1(noteId, noteCreationDto)
+        const mcpCreationDto: McpNoteAddDTO = {
+          parentNote: noteTitle,
+          noteCreationDTO: noteCreationDTO,
+        }
+        const response: string =
+          await api.mcpNoteCreationController.createNote1(mcpCreationDto)
 
-        return textResponse('All Good')
+        return textResponse(JSON.stringify(response))
       } catch (err) {
         return createErrorResponse(err)
       }

@@ -15,4 +15,12 @@ public class NoteSearchResult {
   private NoteTopology noteTopology;
 
   private Float distance;
+
+  public NoteTopology getNoteTopology() {
+    return this.noteTopology;
+  }
+
+  public Float getDistance() {
+    return this.distance;
+  }
 }

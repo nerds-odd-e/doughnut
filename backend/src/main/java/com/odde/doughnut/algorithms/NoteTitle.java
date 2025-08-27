@@ -48,4 +48,8 @@ public class NoteTitle {
   public List<TitleFragment> getSubtitles() {
     return getTitleFragments(true);
   }
+
+  public String getTitle() {
+    return this.title;
+  }
 }
