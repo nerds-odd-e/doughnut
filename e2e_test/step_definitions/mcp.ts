@@ -158,7 +158,6 @@ When(
   }
 )
 
-
 // --- Add note with details to notebook ---
 When(
   'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string} and details {string}',
@@ -171,4 +170,3 @@ When(
     })
   }
 )
-
