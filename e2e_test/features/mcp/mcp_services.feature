@@ -14,9 +14,9 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "<expected_response>"
 
     Examples:
-      | api_name        | expected_response                                 |
-      | get_instruction  | Doughnut is a Personal Knowledge Management tool |
-      | get_user_info    | Old Learner                                      |
+      | api_name        | expected_response                                |
+      | get_instruction | Doughnut is a Personal Knowledge Management tool |
+      | get_user_info   | Old Learner                                      |
 
   Scenario: Get notebook list
     Given I have a notebook with the head note "Lord of the Rings"
@@ -27,8 +27,14 @@ Feature: MCP (Model Context Protocol) Services
 
   @ignore
   Scenario: Add note to notebook
-    Given I have a notebook with the head note "Lord of the Rings"
-    When AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Frodo"
+    Given I have a notebook with head note "Books I read" and notes:
+      | Title             | Parent Title | 
+      | Lord of the Rings | Books I read | 
+      | Harry Potter      | Books I read | 
+    #And the phrase "Lord of the Rings" and "suitable parent for `Frodo`" have similarity distance of 0.3 [mock]
+    And the only suitable parent for phrase "Frodo" is "Lord of the Rings"
+    When AI agent via MCP look for a suitable parent note for "Frodo"
+    And AI agent add note via MCP tool to add note "Frodo" under "Lord of the Rings"
     Then I should see the note tree in the sidebar
       | note-title        |
       | Lord of the Rings |
@@ -37,7 +43,7 @@ Feature: MCP (Model Context Protocol) Services
       | note-title        |
       | Lord of the Rings |
       | Frodo             |
-  
+
   @ignore
   Scenario: Add note with details to notebook
     Given I have a notebook with the head note "Lord of the Rings"
