@@ -50,7 +50,7 @@ export const addNotewithNoteIdSchema = {
   },
 } as const
 
-export const getRelevantNoteIdSchema = {
+export const getRelevantNoteSchema = {
   type: 'object',
   properties: {
     query: {

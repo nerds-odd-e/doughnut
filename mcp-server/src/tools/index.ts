@@ -5,7 +5,7 @@ import {
   updateNoteTextContentSchema,
   getGraphWithNoteIdSchema,
   addNotewithNoteIdSchema,
-  getRelevantNoteIdSchema,
+  getRelevantNoteSchema,
 } from '../schemas.js'
 import {
   createErrorResponse,
@@ -170,7 +170,7 @@ export const tools: ToolDescriptor[] = [
     name: 'get_relevant_note',
     description:
       'Given a user search request, returns the most relevant note information',
-    inputSchema: getRelevantNoteIdSchema,
+    inputSchema: getRelevantNoteSchema,
     handle: async (ctx, args) => {
       const api = ctx.api
       const { query } = args as { query: string }
