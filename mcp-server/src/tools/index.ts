@@ -173,16 +173,23 @@ export const tools: ToolDescriptor[] = [
     inputSchema: getRelevantNoteSchema,
     handle: async (ctx, args) => {
       const api = ctx.api
-      const { query } = args as { query: string }
+      let query = ''
+      if (typeof args === 'object' && args !== null) {
+        if ('args' in args && typeof args.args === 'string') {
+          query = args.args
+        } else if ('query' in args) {
+          query = (args as { query: string }).query
+        }
+      } else if (typeof args === 'string') {
+        query = args
+      }
       try {
-        // Use the backend search endpoint to get relevant notes
         const searchTerm = {
           searchKey: query,
           allMyNotebooksAndSubscriptions: true,
         }
         const results =
           await api.restSearchController.searchForLinkTarget(searchTerm)
-        // Return the most relevant note id (0 or 1)
         if (
           Array.isArray(results) &&
           results.length > 0 &&
@@ -192,7 +199,9 @@ export const tools: ToolDescriptor[] = [
           const graph = await api.restNoteController.getGraph(noteId)
           return textResponse(JSON.stringify(graph))
         }
-        return textResponse(`${JSON.stringify(args)}·No·relevant·note·found.`)
+        return textResponse(
+          `${JSON.stringify(args)}·${query}·No relevant note found.`
+        )
       } catch (err) {
         return createErrorResponse(err)
       }

@@ -1,4 +1,3 @@
-@ignore
 @TerminateMCPServerWhenTeardown
 Feature: AI developer learns from Doughnut via MCP
   As a new developer, I want to use AI to learn from doughnut knowledge base via MCP

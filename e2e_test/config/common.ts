@@ -180,7 +180,7 @@ const commonConfig = {
           args,
         }: {
           apiName: string
-          args: Record<string, unknown>
+          args: string
         }) {
           return await mcpClient.callMcpToolWithArgs({ apiName, args })
         },
