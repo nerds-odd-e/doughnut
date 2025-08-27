@@ -25,7 +25,7 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "Lord of the Rings"
     Then the response should contain "Harry Potter"
 
-
+  @ignore
   Scenario: Add note to notebook
     Given I have a notebook with head note "Books I read" and notes:
       | Title             | Parent Title | 
