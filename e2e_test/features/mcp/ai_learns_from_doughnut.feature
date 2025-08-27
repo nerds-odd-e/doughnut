@@ -10,7 +10,6 @@ Feature: AI developer learns from Doughnut via MCP
     And I have a notebook with the head note "Lord of the Rings" and details "Test"
     And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
 
-@focus
   Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
     When I search for notes with the term "<search_term>" 
     Then the response should contain "<note_title>"
