@@ -16,7 +16,7 @@ Feature: AI developer learns from Doughnut via MCP
     Examples:
       | search_term | note_title           |
       | Lord        | Lord of the Rings    |
-  #    | Harry       | Harry Potter         |
+      | Harry       | Harry Potter         |
 
   Scenario Outline: AI developer learns from Doughnut via MCP (unhappy case)
     When I search for notes with the term "<search_term>"
