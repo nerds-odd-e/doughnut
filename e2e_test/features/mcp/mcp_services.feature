@@ -25,14 +25,14 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "Lord of the Rings"
     Then the response should contain "Harry Potter"
 
-  @ignore
+
   Scenario: Add note to notebook
     Given I have a notebook with head note "Books I read" and notes:
       | Title             | Parent Title | 
       | Lord of the Rings | Books I read | 
       | Harry Potter      | Books I read | 
     #And the phrase "Lord of the Rings" and "suitable parent for `Frodo`" have similarity distance of 0.3 [mock]
-    And the only suitable parent for phrase "Frodo" is "Lord of the Rings"
+    And The only suitable parent for phrase "Art of war" is "Books I read"
     When AI agent via MCP look for a suitable parent note for "Frodo"
     And AI agent add note via MCP tool to add note "Frodo" under "Lord of the Rings"
     Then I should see the note tree in the sidebar

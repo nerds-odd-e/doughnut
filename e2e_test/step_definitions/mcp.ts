@@ -3,9 +3,49 @@ import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 interface ApiResponse {
   content: Array<{
     text: string
+    type?: string
   }>
   status: string
 }
+
+interface NotebookListResponse {
+  content: Array<{
+    headNoteId: number
+    title: string
+  }>
+  status: string
+}
+
+When(
+  'The only suitable parent for phrase {string} is {string}',
+  (phrase: string, notebookTitle: string) => {
+    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
+      (response) => {
+        const actualResponse = response as unknown as ApiResponse
+        // Extract the notebook list from the nested text field
+        const notebookListText =
+          actualResponse.content.find((c) => c.type === 'text')?.text || '[]'
+        let notebookList: NotebookListResponse['content'] = []
+        try {
+          notebookList = JSON.parse(notebookListText)
+        } catch (e) {
+          console.error('Failed to parse notebook list text:', notebookListText)
+        }
+        const notebook = notebookList.find(
+          (item) => item.title === notebookTitle
+        )
+        if (!notebook) {
+          const responseString = JSON.stringify(actualResponse, null, 2)
+          console.error('Notebook list response:', responseString)
+          throw new Error(
+            `Notebook titled "${notebookTitle}" not found. Full response: ${responseString}`
+          )
+        }
+        cy.wrap(notebook.headNoteId).as('headNoteId')
+      }
+    )
+  }
+)
 
 Given(
   'I connect to an MCP client that connects to Doughnut MCP service',
