@@ -19,6 +19,8 @@ describe('MCP Server Configuration', () => {
       'get_user_info',
       'get_notebook_list',
       'get_graph_with_note_id',
+      'add_note',
+      'get_relevant_note',
     ]
 
     // Test that we have the expected tool names
@@ -26,7 +28,10 @@ describe('MCP Server Configuration', () => {
     expect(expectedTools).toContain('update_note_text_content')
     expect(expectedTools).toContain('get_user_info')
     expect(expectedTools).toContain('get_notebook_list')
-    expect(expectedTools).toHaveLength(5)
+    expect(expectedTools).toContain('get_graph_with_note_id')
+    expect(expectedTools).toContain('add_note')
+    expect(expectedTools).toContain('get_relevant_note')
+    expect(expectedTools).toHaveLength(7)
   })
 })
 
@@ -144,40 +149,125 @@ describe('add_note tool', () => {
   })
 })
 
-// Test for extractQueryFromArgs function
-
-import { extractQueryFromArgs } from './tools/index.js'
-
-describe('extractQueryFromArgs', () => {
-  test('should return query when args is a string', () => {
-    expect(extractQueryFromArgs('test query')).toBe('test query')
+// Test for get_relevant_note tool
+describe('get_relevant_note tool', () => {
+  // Helper function to create mock API
+  const createMockApi = (searchResult: unknown[], graphResult?: unknown) => ({
+    restTextContentController: {
+      updateNoteTitle: vi.fn(),
+      updateNoteDetails: vi.fn(),
+    },
+    restUserController: {
+      getUserProfile: vi.fn(),
+    },
+    restNotebookController: {
+      myNotebooks: vi.fn(),
+    },
+    restNoteController: {
+      getGraph: vi
+        .fn()
+        .mockResolvedValue(
+          graphResult || { note: { id: 123, title: 'Test Note' } }
+        ),
+    },
+    restSearchController: {
+      searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
+    },
+    mcpNoteCreationController: {
+      createNote1: vi.fn(),
+    },
   })
 
-  test('should return query when args is an object with args property as string', () => {
-    expect(extractQueryFromArgs({ args: 'query in args' })).toBe(
-      'query in args'
+  // Helper function to run the test
+  const runQueryExtractionTest = async (
+    args: unknown,
+    expectedSearchKey: string,
+    shouldFindNote = true
+  ) => {
+    const getRelevantNoteTool = tools.find(
+      (t: ToolDescriptor) => t.name === 'get_relevant_note'
     )
-  })
+    expect(getRelevantNoteTool).toBeDefined()
 
-  test('should return query when args is an object with query property', () => {
-    expect(extractQueryFromArgs({ query: 'query in query' })).toBe(
-      'query in query'
+    const searchResult = shouldFindNote ? [{ noteTopology: { id: 123 } }] : []
+    const mockApi = createMockApi(searchResult)
+    const ctx = { api: mockApi }
+
+    // Call the tool's handle function
+    if (!getRelevantNoteTool) {
+      throw new Error('get_relevant_note tool not found')
+    }
+    const result = await getRelevantNoteTool.handle(
+      ctx,
+      args as unknown as Record<string, unknown>
     )
-  })
 
-  test('should return empty string when args is null', () => {
-    expect(extractQueryFromArgs(null)).toBe('')
-  })
+    // Assert search was called with correct arguments
+    expect(
+      mockApi.restSearchController.searchForLinkTarget
+    ).toHaveBeenCalledWith({
+      searchKey: expectedSearchKey,
+      allMyNotebooksAndSubscriptions: true,
+    })
 
-  test('should return empty string when args is undefined', () => {
-    expect(extractQueryFromArgs(undefined)).toBe('')
-  })
+    // Assert the response
+    if (shouldFindNote) {
+      expect(result.content[0].text).toContain('Test Note')
+    } else {
+      expect(result.content[0].text).toBe('No relevant note found.')
+    }
+  }
 
-  test('should return empty string when args is an object without args or query', () => {
-    expect(extractQueryFromArgs({ foo: 'bar' })).toBe('')
-  })
+  // Test data for different argument types
+  const testCases = [
+    {
+      name: 'should extract query when args is a string',
+      args: 'test query',
+      expectedSearchKey: 'test query',
+      shouldFindNote: true,
+    },
+    {
+      name: 'should extract query when args is an object with args property as string',
+      args: { args: 'query in args' },
+      expectedSearchKey: 'query in args',
+      shouldFindNote: true,
+    },
+    {
+      name: 'should extract query when args is an object with query property',
+      args: { query: 'query in query' },
+      expectedSearchKey: 'query in query',
+      shouldFindNote: true,
+    },
+    {
+      name: 'should return empty string when args is null',
+      args: null,
+      expectedSearchKey: '',
+      shouldFindNote: false,
+    },
+    {
+      name: 'should return empty string when args is undefined',
+      args: undefined,
+      expectedSearchKey: '',
+      shouldFindNote: false,
+    },
+    {
+      name: 'should return empty string when args is an object without args or query',
+      args: { foo: 'bar' },
+      expectedSearchKey: '',
+      shouldFindNote: false,
+    },
+    {
+      name: 'should return empty string when args is a number',
+      args: 123,
+      expectedSearchKey: '',
+      shouldFindNote: false,
+    },
+  ]
 
-  test('should return empty string when args is a number', () => {
-    expect(extractQueryFromArgs(123)).toBe('')
+  // Run all test cases
+  testCases.forEach(({ name, args, expectedSearchKey, shouldFindNote }) => {
+    test(name, async () => {
+      await runQueryExtractionTest(args, expectedSearchKey, shouldFindNote)
+    })
   })
 })
