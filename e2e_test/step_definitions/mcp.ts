@@ -28,7 +28,7 @@ When(
         let notebookList: NotebookListResponse['content'] = []
         try {
           notebookList = JSON.parse(notebookListText)
-        } catch (e) {
+        } catch (_e) {
           console.error('Failed to parse notebook list text:', notebookListText)
         }
         const notebook = notebookList.find(

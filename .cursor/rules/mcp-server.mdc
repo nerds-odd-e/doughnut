@@ -1,7 +1,3 @@
----
-description: mcp server related changes
-alwaysApply: false
----
 # doughnut-mcp-server MCP Server
 
 A Model Context Protocol server for Doughnut.
@@ -15,16 +11,25 @@ This is a TypeScript-based MCP server that demonstrates core MCP concepts by pro
 ## Structure (minimal)
 
 ```
-mcp-server/src/
-  index.ts        // boot: create context, start stdio
-  server.ts       // assemble server, list tools, route calls
-  context.ts      // read env, create DoughnutApi
-  api.ts          // DoughnutApi factory
-  schemas.ts      // tool input schemas (shared)
-  tools/index.ts  // tool registry + handlers
-  types.ts        // shared types
-  utils.ts        // error + validation helpers
+mcp-server/
+  src/                    # Production source code
+    index.ts              # boot: create context, start stdio
+    server.ts             # assemble server, list tools, route calls
+    context.ts            # read env, create DoughnutApi
+    api.ts                # DoughnutApi factory
+    schemas.ts            # tool input schemas (shared)
+    tools/index.ts        # tool registry + handlers
+    types.ts              # shared types
+    utils.ts              # error + validation helpers
+  tests/                  # Unit tests (separate from production code)
+    server.test.ts        # Server and tools tests
+    utils.test.ts         # Utility functions tests
+  vitest.config.ts        # Test configuration
+  tsconfig.json           # TypeScript configuration
+  package.json            # Dependencies and scripts
 ```
+
+**Important**: Tests are kept in a separate `tests/` folder, not mixed with production code in the `src/` folder. This maintains clean separation between production and test code, making the codebase more organized and maintainable.
 
 ## Development
 
@@ -40,7 +45,7 @@ Note: Rebuild the bundle before running the e2e `mcp_services.feature`.
 
 ### Running Unit Tests
 
-The MCP server has comprehensive unit tests using Vitest. Run tests with:
+The MCP server has comprehensive unit tests using Vitest. **Tests are located in the `tests/` folder**, not mixed with production code. Run tests with:
 
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:test
@@ -51,6 +56,19 @@ Or from the root directory:
 ```sh
 CURSOR_DEV=true nix develop -c pnpm mcp-server:test
 ```
+
+### Test Organization
+
+- **Production code**: Located in `src/` folder
+- **Test files**: Located in `tests/` folder with `.test.ts` extension
+- **Test configuration**: `vitest.config.ts` points to `tests/**/*.test.ts`
+- **TypeScript config**: `tsconfig.json` includes both `src/` and `tests/` folders
+
+This separation ensures:
+- Clean, organized codebase structure
+- Easy identification of production vs. test code
+- Better maintainability and readability
+- Standard practice followed by most TypeScript projects
 
 ### Formatting Code
 
@@ -67,7 +85,7 @@ The unit tests cover:
 - Server configuration and tool definitions
 - Tool schema validation
 - Response format validation
- - Behavior-focused assertions that are insensitive to internal structure
+- Behavior-focused assertions that are insensitive to internal structure
 
 ## CI/CD Integration
 
@@ -102,8 +120,9 @@ Add the below command to your AI MCP Server configuration:
 ## Available Tools
 
 - `get_instruction` - Get instruction about Doughnut
-
 - `update_note_text_content` - Update the title and/or details of a note by note ID
 - `get_user_info` - Get user information
 - `get_notebook_list` - Get list of user's notebooks
 - `get_graph_with_note_id` - Get graph data for a specific note
+- `add_note` - Add a note to a notebook
+- `get_relevant_note` - Search for relevant notes based on a query
