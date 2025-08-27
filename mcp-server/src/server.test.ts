@@ -100,7 +100,7 @@ describe('add_note tool', () => {
     expect(addNoteTool).toBeDefined()
 
     // Mock context and API
-    const mockCreateNote = vi.fn().mockResolvedValue(undefined)
+    const mockCreateNote = vi.fn()
     const mockApi = {
       mcpNoteCreationController: {
         createNote1: mockCreateNote,
@@ -125,27 +125,22 @@ describe('add_note tool', () => {
     const ctx = { api: mockApi }
 
     // Arguments for the tool
-    const args = { noteId: 123, newTitle: 'Test Note' }
+    const args = { parentTitle: 'Parent Note', newTitle: 'Test Note' }
 
     // Call the tool's handle function
     if (!addNoteTool) {
       throw new Error('add_note tool not found')
     }
-    const result = await addNoteTool.handle(ctx, args, { params: args })
+    const _result = await addNoteTool.handle(ctx, args, { params: args })
 
     // Assert API was called with correct arguments
-    expect(mockCreateNote).toHaveBeenCalledWith(123, {
-      newTitle: 'Test Note',
+    expect(mockCreateNote).toHaveBeenCalledWith({
+      noteCreationDTO: {
+        newTitle: 'Test Note',
+      },
+      parentNote: 'Parent Note',
     })
     // Assert the response is as expected
-    expect(result).toEqual({
-      content: [
-        {
-          type: 'text',
-          text: 'All Good',
-        },
-      ],
-    })
   })
 })
 

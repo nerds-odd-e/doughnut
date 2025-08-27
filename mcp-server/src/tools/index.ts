@@ -178,9 +178,10 @@ export const tools: ToolDescriptor[] = [
     handle: async (ctx, args, request) => {
       const api = ctx.api
       try {
-        const noteTitle = String(
-          (args as { noteTitle?: string }).noteTitle ??
-            (request as { params?: { noteTitle?: number } }).params?.noteTitle
+        const parentTitle = String(
+          (args as { parentTitle?: string }).parentTitle ??
+            (request as { params?: { parentTitle?: number } }).params
+              ?.parentTitle
         )
 
         const newTitle = String(
@@ -192,7 +193,7 @@ export const tools: ToolDescriptor[] = [
           newTitle: newTitle,
         }
         const mcpCreationDto: McpNoteAddDTO = {
-          parentNote: noteTitle,
+          parentNote: parentTitle,
           noteCreationDTO: noteCreationDTO,
         }
         const response: string =
