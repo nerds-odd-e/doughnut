@@ -1,5 +1,5 @@
 import { describe, test, expect, vi } from 'vitest'
-import { tools } from './tools/index'
+import { tools } from './tools/index.js'
 import type { ToolDescriptor } from './types.js'
 
 // Test the server configuration and tool definitions
@@ -100,6 +100,22 @@ describe('add_note tool', () => {
       mcpNoteCreationController: {
         createNote1: mockCreateNote,
       },
+      restTextContentController: {
+        updateNoteTitle: vi.fn(),
+        updateNoteDetails: vi.fn(),
+      },
+      restUserController: {
+        getUserProfile: vi.fn(),
+      },
+      restNotebookController: {
+        myNotebooks: vi.fn(),
+      },
+      restNoteController: {
+        getGraph: vi.fn(),
+      },
+      restSearchController: {
+        searchForLinkTarget: vi.fn(),
+      },
     }
     const ctx = { api: mockApi }
 
@@ -107,6 +123,9 @@ describe('add_note tool', () => {
     const args = { noteId: 123, newTitle: 'Test Note' }
 
     // Call the tool's handle function
+    if (!addNoteTool) {
+      throw new Error('add_note tool not found')
+    }
     const result = await addNoteTool.handle(ctx, args, { params: args })
 
     // Assert API was called with correct arguments
@@ -122,5 +141,43 @@ describe('add_note tool', () => {
         },
       ],
     })
+  })
+})
+
+// Test for extractQueryFromArgs function
+
+import { extractQueryFromArgs } from './tools/index.js'
+
+describe('extractQueryFromArgs', () => {
+  test('should return query when args is a string', () => {
+    expect(extractQueryFromArgs('test query')).toBe('test query')
+  })
+
+  test('should return query when args is an object with args property as string', () => {
+    expect(extractQueryFromArgs({ args: 'query in args' })).toBe(
+      'query in args'
+    )
+  })
+
+  test('should return query when args is an object with query property', () => {
+    expect(extractQueryFromArgs({ query: 'query in query' })).toBe(
+      'query in query'
+    )
+  })
+
+  test('should return empty string when args is null', () => {
+    expect(extractQueryFromArgs(null)).toBe('')
+  })
+
+  test('should return empty string when args is undefined', () => {
+    expect(extractQueryFromArgs(undefined)).toBe('')
+  })
+
+  test('should return empty string when args is an object without args or query', () => {
+    expect(extractQueryFromArgs({ foo: 'bar' })).toBe('')
+  })
+
+  test('should return empty string when args is a number', () => {
+    expect(extractQueryFromArgs(123)).toBe('')
   })
 })

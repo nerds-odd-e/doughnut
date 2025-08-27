@@ -13,13 +13,21 @@ import {
   validateNoteUpdateParams,
 } from '../utils.js'
 
-function extractQueryFromArgs(args: unknown): string {
+interface ArgsWithArgs {
+  args: string
+}
+
+interface ArgsWithQuery {
+  query: string
+}
+
+export function extractQueryFromArgs(args: unknown): string {
   let query = ''
   if (typeof args === 'object' && args !== null) {
-    if ('args' in args && typeof (args as any).args === 'string') {
-      query = (args as any).args
+    if ('args' in args && typeof (args as ArgsWithArgs).args === 'string') {
+      query = (args as ArgsWithArgs).args
     } else if ('query' in args) {
-      query = (args as { query: string }).query
+      query = (args as ArgsWithQuery).query
     }
   } else if (typeof args === 'string') {
     query = args
