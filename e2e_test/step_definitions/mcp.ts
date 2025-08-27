@@ -25,7 +25,7 @@ When('I call the {string} MCP tool', (apiName: string) => {
 })
 
 When('I search for notes with the term {string}', (searchTerm: string) => {
-  cy.task('callMcpTool', {
+  cy.task('callMcpToolWithArgs', {
     apiName: 'get_relevant_note',
     args: { query: searchTerm },
   }).then((response) => {

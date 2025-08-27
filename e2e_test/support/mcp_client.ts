@@ -71,6 +71,21 @@ class McpClient {
     return result
   }
 
+  async callMcpToolWithArgs({
+    apiName,
+    args,
+  }: {
+    apiName: string
+    args: Record<string, unknown>
+  }) {
+    if (!this.client) throw new Error('MCP client is not connected')
+    const result = await this.client.callTool({
+      name: apiName,
+      args,
+    })
+    return result
+  }
+
   async disconnectMcpServer() {
     if (
       this.transport &&

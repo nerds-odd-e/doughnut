@@ -192,7 +192,7 @@ export const tools: ToolDescriptor[] = [
           const graph = await api.restNoteController.getGraph(noteId)
           return textResponse(JSON.stringify(graph))
         }
-        return textResponse('No relevant note found.')
+        return textResponse(`${JSON.stringify(args)}·No·relevant·note·found.`)
       } catch (err) {
         return createErrorResponse(err)
       }
