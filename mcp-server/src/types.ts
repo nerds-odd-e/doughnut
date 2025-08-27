@@ -1,4 +1,4 @@
-import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
+import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 
 export type NoteUpdateResult = {
   note?: {
@@ -38,10 +38,7 @@ export type ServerApi = {
     searchForLinkTarget: (searchTerm: { searchKey: string }) => Promise<unknown>
   }
   mcpNoteCreationController: {
-    createNote1: (
-      noteId: number,
-      noteCreationDto: NoteCreationDTO
-    ) => Promise<unknown>
+    createNote1: (mcpCreationDTO: McpNoteAddDTO) => Promise<string>
   }
 }
 

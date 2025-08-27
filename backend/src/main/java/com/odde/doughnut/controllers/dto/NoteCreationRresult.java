@@ -9,4 +9,8 @@ import org.springframework.lang.NonNull;
 public class NoteCreationRresult {
   @NonNull private final NoteRealm created;
   @NonNull private final NoteRealm parent;
+
+  public NoteRealm getCreated() {
+    return this.created;
+  }
 }

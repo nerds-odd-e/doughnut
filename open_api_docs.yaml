@@ -1480,22 +1480,16 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SpellingResultDTO"
-  /api/mcp/notes/{parentNote}/create:
+  /api/mcp/notes/create:
     post:
       tags:
       - mcp-note-creation-controller
       operationId: createNote_1
-      parameters:
-      - name: parentNote
-        in: path
-        required: true
-        schema:
-          type: integer
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NoteCreationDTO"
+              $ref: "#/components/schemas/McpNoteAddDTO"
         required: true
       responses:
         "500":
@@ -3826,6 +3820,8 @@ components:
           $ref: "#/components/schemas/NoteTopology"
         parentOrSubjectNoteTopology:
           $ref: "#/components/schemas/NoteTopology"
+        title:
+          type: string
       required:
       - id
       - titleOrPredicate
@@ -4150,6 +4146,13 @@ components:
           type: boolean
       required:
       - note
+    McpNoteAddDTO:
+      type: object
+      properties:
+        parentNote:
+          type: string
+        noteCreationDTO:
+          $ref: "#/components/schemas/NoteCreationDTO"
     LinkCreation:
       type: object
       properties:

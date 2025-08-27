@@ -14,4 +14,12 @@ public class NoteTopology {
   private LinkType linkType;
   private NoteTopology objectNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;
+
+  public int getId() {
+    return this.id;
+  }
+
+  public String getTitle() {
+    return this.titleOrPredicate;
+  }
 }

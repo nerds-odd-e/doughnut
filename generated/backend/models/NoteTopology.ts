@@ -9,6 +9,7 @@ export type NoteTopology = {
     linkType?: NoteTopology.linkType;
     objectNoteTopology?: NoteTopology;
     parentOrSubjectNoteTopology?: NoteTopology;
+    title?: string;
 };
 export namespace NoteTopology {
     export enum linkType {
