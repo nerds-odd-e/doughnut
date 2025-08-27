@@ -13,6 +13,20 @@ import {
   validateNoteUpdateParams,
 } from '../utils.js'
 
+function extractQueryFromArgs(args: unknown): string {
+  let query = ''
+  if (typeof args === 'object' && args !== null) {
+    if ('args' in args && typeof (args as any).args === 'string') {
+      query = (args as any).args
+    } else if ('query' in args) {
+      query = (args as { query: string }).query
+    }
+  } else if (typeof args === 'string') {
+    query = args
+  }
+  return query
+}
+
 export const tools: ToolDescriptor[] = [
   {
     name: 'get_instruction',
@@ -173,16 +187,7 @@ export const tools: ToolDescriptor[] = [
     inputSchema: getRelevantNoteSchema,
     handle: async (ctx, args) => {
       const api = ctx.api
-      let query = ''
-      if (typeof args === 'object' && args !== null) {
-        if ('args' in args && typeof args.args === 'string') {
-          query = args.args
-        } else if ('query' in args) {
-          query = (args as { query: string }).query
-        }
-      } else if (typeof args === 'string') {
-        query = args
-      }
+      const query = extractQueryFromArgs(args)
       try {
         const searchTerm = {
           searchKey: query,
