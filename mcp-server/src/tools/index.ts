@@ -221,9 +221,7 @@ export const tools: ToolDescriptor[] = [
         ) {
           const noteId = results[0].noteTopology.id.toString()
           const graph = await api.restNoteController.getGraph(noteId)
-          return textResponse(
-            `${JSON.stringify(args)}::${JSON.stringify(graph)}`
-          )
+          return textResponse(JSON.stringify(graph))
         }
         return textResponse(`No relevant note found.`)
       } catch (err) {
