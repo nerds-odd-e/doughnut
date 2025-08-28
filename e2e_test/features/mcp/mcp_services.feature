@@ -74,3 +74,25 @@ Feature: MCP (Model Context Protocol) Services
       | note-title        |
       | Lord of the Rings |
       | Sam               |
+
+  Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
+    Given I have a notebook with the head note "Lord of the Rings" and details "Test"
+    And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
+    When I search for notes with the term "<search_term>" 
+    Then the response should contain "<note_title>"
+
+    Examples:
+      | search_term | note_title           |
+      | Lord        | Lord of the Rings    |
+      | Harry       | Harry Potter         |
+
+  Scenario Outline: AI developer learns from Doughnut via MCP (unhappy case)
+    Given I have a notebook with the head note "Lord of the Rings" and details "Test"
+    And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
+    When I search for notes with the term "<search_term>"
+    Then the response should contain "No relevant note found."
+
+    Examples:
+      | search_term |
+      | Frodo       |
+      | Hermione    |
