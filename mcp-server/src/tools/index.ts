@@ -1,5 +1,6 @@
 import type { ToolDescriptor } from '../types.js'
 import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
+import { z } from 'zod'
 import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
@@ -14,33 +15,23 @@ import {
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 
-interface ArgsWithQuery {
-  query: string
-}
-
 type QueryString = {
   query: string
 }
 
+// Zod schema for query arguments
+const QueryArgsSchema = z.union([z.string(), z.object({ query: z.string() })])
+
 export function extractQueryFromArgs(args: unknown): QueryString {
-  if (typeof args === 'string') {
-    return { query: args }
-  }
-
-  if (typeof args !== 'object' || args === null) {
+  try {
+    const parsed = QueryArgsSchema.parse(args)
+    if (typeof parsed === 'string') {
+      return { query: parsed }
+    }
+    return parsed
+  } catch (_error) {
     throw new Error('Invalid Input.')
   }
-
-  if (!('query' in args)) {
-    throw new Error('Invalid Input.')
-  }
-
-  const queryValue = (args as ArgsWithQuery).query
-  if (typeof queryValue !== 'string') {
-    throw new Error('Invalid Input.')
-  }
-
-  return { query: queryValue }
 }
 
 export const tools: ToolDescriptor[] = [
