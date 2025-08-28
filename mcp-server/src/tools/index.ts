@@ -214,14 +214,20 @@ export const tools: ToolDescriptor[] = [
         }
         const results =
           await api.restSearchController.searchForLinkTarget(searchTerm)
-        if (
-          Array.isArray(results) &&
-          results.length > 0 &&
-          typeof results[0].noteTopology.id === 'number'
-        ) {
-          const noteId = results[0].noteTopology.id.toString()
-          const graph = await api.restNoteController.getGraph(noteId)
-          return textResponse(JSON.stringify(graph))
+        if (Array.isArray(results) && results.length > 0) {
+          // Find the first valid note with proper structure
+          for (const result of results) {
+            if (
+              result &&
+              typeof result === 'object' &&
+              result.noteTopology &&
+              typeof result.noteTopology.id === 'number'
+            ) {
+              const noteId = result.noteTopology.id.toString()
+              const graph = await api.restNoteController.getGraph(noteId)
+              return textResponse(JSON.stringify(graph))
+            }
+          }
         }
         return textResponse(`No relevant note found.`)
       } catch (err) {
