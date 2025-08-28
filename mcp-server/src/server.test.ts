@@ -220,7 +220,7 @@ describe('get_relevant_note tool', () => {
       args: { query: 'query in query' },
       expectedSearchKey: 'query in query',
       shouldFindNote: true,
-    }
+    },
   ]
 
   // Run all test cases
