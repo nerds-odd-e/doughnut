@@ -10,7 +10,7 @@ Feature: AI developer learns from Doughnut via MCP
     And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
 
   Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
-    When I search for notes with the term "<search_term>" 
+    When AI search for notes with the term "<search_term>" 
     Then the response should contain "<note_title>"
 
     Examples:
@@ -19,7 +19,7 @@ Feature: AI developer learns from Doughnut via MCP
       | Harry       | Harry Potter         |
 
   Scenario Outline: AI developer learns from Doughnut via MCP (unhappy case)
-    When I search for notes with the term "<search_term>"
+    When AI search for notes with the term "<search_term>"
     Then the response should contain "No relevant note found."
 
     Examples:

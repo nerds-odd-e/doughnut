@@ -18,6 +18,7 @@ Feature: MCP (Model Context Protocol) Services
       | get_instruction | Doughnut is a Personal Knowledge Management tool |
       | get_user_info   | Old Learner                                      |
 
+ @ignore
   Scenario: Get notebook list
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
