@@ -13,8 +13,6 @@ import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
 
-let mcpResponse: string | undefined
-
 defineParameterType({
   name: 'notepath',
   regexp: /.*/,

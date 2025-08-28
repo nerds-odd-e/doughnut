@@ -81,7 +81,7 @@ class McpClient {
     if (!this.client) throw new Error('MCP client is not connected')
     const result = await this.client.callTool({
       name: apiName,
-      args,
+      query: args,
     })
     return result
   }

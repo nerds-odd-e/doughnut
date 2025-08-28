@@ -14,26 +14,16 @@ import {
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 
-interface ArgsWithArgs {
-  args: string
-}
-
 interface ArgsWithQuery {
   query: string
 }
 
 export function extractQueryFromArgs(args: unknown): string {
-  let query = ''
   if (typeof args === 'object' && args !== null) {
-    if ('args' in args && typeof (args as ArgsWithArgs).args === 'string') {
-      query = (args as ArgsWithArgs).args
-    } else if ('query' in args) {
-      query = (args as ArgsWithQuery).query
-    }
-  } else if (typeof args === 'string') {
-    query = args
+    return (args as ArgsWithQuery).query
+  } else {
+    return args as string
   }
-  return query
 }
 
 export const tools: ToolDescriptor[] = [
@@ -227,7 +217,9 @@ export const tools: ToolDescriptor[] = [
         ) {
           const noteId = results[0].noteTopology.id.toString()
           const graph = await api.restNoteController.getGraph(noteId)
-          return textResponse(JSON.stringify(graph))
+          return textResponse(
+            `${JSON.stringify(args)}::${JSON.stringify(graph)}`
+          )
         }
         return textResponse(`No relevant note found.`)
       } catch (err) {
