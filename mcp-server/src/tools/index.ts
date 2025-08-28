@@ -18,11 +18,15 @@ interface ArgsWithQuery {
   query: string
 }
 
-export function extractQueryFromArgs(args: unknown): string {
+type QueryString = {
+  query: string
+}
+
+export function extractQueryFromArgs(args: unknown): QueryString {
   if (typeof args === 'object' && args !== null) {
-    return (args as ArgsWithQuery).query
+    return { query: (args as ArgsWithQuery).query }
   } else {
-    return args as string
+    return { query: args as string }
   }
 }
 
@@ -205,7 +209,7 @@ export const tools: ToolDescriptor[] = [
       const query = extractQueryFromArgs(args)
       try {
         const searchTerm = {
-          searchKey: query,
+          searchKey: query.query,
           allMyNotebooksAndSubscriptions: true,
         }
         const results =
