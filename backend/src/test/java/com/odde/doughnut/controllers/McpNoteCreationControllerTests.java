@@ -82,10 +82,8 @@ class McpNoteCreationControllerTests {
       searchResult.setNoteTopology(noteTopology);
 
       MockNoteSearchServiceReturn(Arrays.asList(searchResult));
-      var mcpNoteDTO = new McpNoteAddDTO();
-      mcpNoteDTO.parentNote = "Lord of the Rings";
-      mcpNoteDTO.noteCreationDTO = noteCreation;
-      var response = controller.createNote(mcpNoteDTO);
+
+      var response = controller.createNote(GeneratorMcpNoteAddDTO("Lord of the Rings"));
       assertEquals("Added new note to parent Notebook Lord of the Rings", response);
     }
 
@@ -94,11 +92,7 @@ class McpNoteCreationControllerTests {
         throws UnexpectedNoAccessRightException, BindException, IOException, InterruptedException {
 
       MockNoteSearchServiceReturn(new ArrayList<>());
-      var mcpNoteDTO = new McpNoteAddDTO();
-      mcpNoteDTO.parentNote = "Harry Potter";
-      mcpNoteDTO.noteCreationDTO = noteCreation;
-
-      var response = controller.createNote(mcpNoteDTO);
+      var response = controller.createNote(GeneratorMcpNoteAddDTO("Harry Potter"));
 
       assertEquals("This parent does not exist", response);
     }
@@ -107,6 +101,13 @@ class McpNoteCreationControllerTests {
       when(noteSearchService.searchForNotes(
               org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
           .thenReturn(noteSearchResults);
+    }
+
+    private McpNoteAddDTO GeneratorMcpNoteAddDTO(String parentNote) {
+      var mcpNoteDTO = new McpNoteAddDTO();
+      mcpNoteDTO.parentNote = parentNote;
+      mcpNoteDTO.noteCreationDTO = noteCreation;
+      return mcpNoteDTO;
     }
   }
 }
