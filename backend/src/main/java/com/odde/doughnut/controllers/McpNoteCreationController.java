@@ -75,6 +75,9 @@ public class McpNoteCreationController {
           noteSearchService.searchForNotes(currentUser.getEntity(), mySearchTerm);
 
       results.sort(Comparator.comparing(NoteSearchResult::getDistance));
+      if (results.isEmpty()) {
+        throw new UnexpectedNoAccessRightException();
+      }
       int parentId = results.get(0).getNoteTopology().getId();
       Optional<Note> parentNoteObj = noteRepository.findById(parentId);
 
@@ -95,8 +98,6 @@ public class McpNoteCreationController {
           noteCreation.noteCreationDTO.getNewTitle(), noteCreation.parentNote);
     } catch (UnexpectedNoAccessRightException e) {
       return "This parent does not exist";
-    } catch (Exception e) {
-      throw e;
     }
   }
 }

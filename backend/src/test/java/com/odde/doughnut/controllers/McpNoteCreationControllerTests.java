@@ -17,6 +17,7 @@ import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -66,14 +67,6 @@ class McpNoteCreationControllerTests {
     lordOfTheRingsNote.setTopicConstructor("Lord of the Rings");
     when(noteRepository.findById(org.mockito.ArgumentMatchers.any()))
         .thenReturn(java.util.Optional.of(lordOfTheRingsNote));
-
-    var noteTopology = new NoteTopology();
-    noteTopology.setId(1);
-    var searchResult = new NoteSearchResult();
-    searchResult.setNoteTopology(noteTopology);
-    when(noteSearchService.searchForNotes(
-            org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
-        .thenReturn((Arrays.asList(searchResult)));
   }
 
   @Nested
@@ -82,20 +75,35 @@ class McpNoteCreationControllerTests {
     @Test
     void shouldCreateNoteSuccessfully()
         throws UnexpectedNoAccessRightException, BindException, IOException, InterruptedException {
+      var noteTopology = new NoteTopology();
+      noteTopology.setId(1);
+      var searchResult = new NoteSearchResult();
+      searchResult.setNoteTopology(noteTopology);
+
+      when(noteSearchService.searchForNotes(
+              org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
+          .thenReturn((Arrays.asList(searchResult)));
       var mcpNoteDTO = new McpNoteAddDTO();
       mcpNoteDTO.parentNote = "Lord of the Rings";
       mcpNoteDTO.noteCreationDTO = noteCreation;
       var response = controller.createNote(mcpNoteDTO);
       assertEquals("Added new note to parent Notebook Lord of the Rings", response);
     }
-    /*
+
     @Test
-    void shouldThrowWhenCreatingNoteWithoutAccess() {
-      Note otherNote = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
-      BindException exception =
-          assertThrows(
-              BindException.class, () -> controller.createNote(otherNote, noteCreation));
-      assertThat(exception.getMessage(), containsString("No access rights"));
-    }*/
+    void whenNotebookNotExistsShouldReturnParentDoesNotExist()
+        throws UnexpectedNoAccessRightException, BindException, IOException, InterruptedException {
+      ArrayList<NoteSearchResult> listName = new ArrayList<>();
+      when(noteSearchService.searchForNotes(
+              org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
+          .thenReturn((listName));
+      var mcpNoteDTO = new McpNoteAddDTO();
+      mcpNoteDTO.parentNote = "Harry Potter";
+      mcpNoteDTO.noteCreationDTO = noteCreation;
+
+      var response = controller.createNote(mcpNoteDTO);
+
+      assertEquals("This parent does not exist", response);
+    }
   }
 }
