@@ -64,7 +64,7 @@ When('I call the {string} MCP tool', (apiName: string) => {
   })
 })
 
-When('AI search for notes with the term {string}', (searchTerm: string) => {
+When('I search for notes with the term {string}', (searchTerm: string) => {
   cy.task('callMcpToolWithArgs', {
     apiName: 'get_relevant_note',
     args: searchTerm,
@@ -135,7 +135,7 @@ When(
   (noteTitle: string, notebookTitle: string) => {
     cy.task('callMcpTool', {
       apiName: 'add_note',
-      params: { parentTitle: notebookTitle, newTitle: noteTitle },
+      params: { noteId: Number(notebookTitle), newTitle: noteTitle },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
