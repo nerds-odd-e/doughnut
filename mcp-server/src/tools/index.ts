@@ -23,11 +23,24 @@ type QueryString = {
 }
 
 export function extractQueryFromArgs(args: unknown): QueryString {
-  if (typeof args === 'object' && args !== null) {
-    return { query: (args as ArgsWithQuery).query }
-  } else {
-    return { query: args as string }
+  if (typeof args === 'string') {
+    return { query: args }
   }
+
+  if (typeof args !== 'object' || args === null) {
+    throw new Error('Invalid Input.')
+  }
+
+  if (!('query' in args)) {
+    throw new Error('Invalid Input.')
+  }
+
+  const queryValue = (args as ArgsWithQuery).query
+  if (typeof queryValue !== 'string') {
+    throw new Error('Invalid Input.')
+  }
+
+  return { query: queryValue }
 }
 
 export const tools: ToolDescriptor[] = [
@@ -206,8 +219,9 @@ export const tools: ToolDescriptor[] = [
     inputSchema: getRelevantNoteSchema,
     handle: async (ctx, args) => {
       const api = ctx.api
-      const query = extractQueryFromArgs(args)
+
       try {
+        const query = extractQueryFromArgs(args)
         const searchTerm = {
           searchKey: query.query,
           allMyNotebooksAndSubscriptions: true,
@@ -231,6 +245,10 @@ export const tools: ToolDescriptor[] = [
         }
         return textResponse(`No relevant note found.`)
       } catch (err) {
+        // For validation errors from extractQueryFromArgs, return the message directly
+        if (err instanceof Error && err.message === 'Invalid Input.') {
+          return textResponse('Invalid Input.')
+        }
         return createErrorResponse(err)
       }
     },

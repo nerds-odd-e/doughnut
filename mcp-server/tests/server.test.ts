@@ -128,7 +128,7 @@ describe('get_relevant_note tool', () => {
     const mockContext = { api: mockApi }
 
     const result = await tool.handle(mockContext, { query: ['test'] })
-    expect(result.content[0].text).toBe('Input error.')
+    expect(result.content[0].text).toBe('Invalid Input.')
   })
 
   test('should handle number arguments', async () => {
@@ -149,7 +149,7 @@ describe('get_relevant_note tool', () => {
     const mockContext = { api: mockApi }
 
     const result = await tool.handle(mockContext, { query: 123 })
-    expect(result.content[0].text).toBe('Input error.')
+    expect(result.content[0].text).toBe('Invalid Input.')
   })
 
   test('should handle string arguments', async () => {
@@ -170,7 +170,7 @@ describe('get_relevant_note tool', () => {
     const mockContext = { api: mockApi }
 
     const result = await tool.handle(mockContext, { test: 'test' })
-    expect(result.content[0].text).toBe('Input error.')
+    expect(result.content[0].text).toBe('Invalid Input.')
   })
 
   test('should handle string arguments', async () => {
