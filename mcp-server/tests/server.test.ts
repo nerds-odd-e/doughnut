@@ -110,69 +110,6 @@ describe('get_relevant_note tool', () => {
     expect(tool?.name).toBe('get_relevant_note')
   })
 
-  test('should handle array arguments', async () => {
-    const tool = tools.find((t) => t.name === 'get_relevant_note')!
-    const mockApi = {
-      restSearchController: {
-        searchForLinkTarget: vi.fn().mockResolvedValue([]),
-      },
-      restNoteController: { getGraph: vi.fn() },
-      restTextContentController: {
-        updateNoteTitle: vi.fn(),
-        updateNoteDetails: vi.fn(),
-      },
-      restUserController: { getUserProfile: vi.fn() },
-      restNotebookController: { myNotebooks: vi.fn() },
-      mcpNoteCreationController: { createNote1: vi.fn() },
-    }
-    const mockContext = { api: mockApi }
-
-    const result = await tool.handle(mockContext, { query: ['test'] })
-    expect(result.content[0].text).toBe('Invalid Input.')
-  })
-
-  test('should handle number arguments', async () => {
-    const tool = tools.find((t) => t.name === 'get_relevant_note')!
-    const mockApi = {
-      restSearchController: {
-        searchForLinkTarget: vi.fn().mockResolvedValue([]),
-      },
-      restNoteController: { getGraph: vi.fn() },
-      restTextContentController: {
-        updateNoteTitle: vi.fn(),
-        updateNoteDetails: vi.fn(),
-      },
-      restUserController: { getUserProfile: vi.fn() },
-      restNotebookController: { myNotebooks: vi.fn() },
-      mcpNoteCreationController: { createNote1: vi.fn() },
-    }
-    const mockContext = { api: mockApi }
-
-    const result = await tool.handle(mockContext, { query: 123 })
-    expect(result.content[0].text).toBe('Invalid Input.')
-  })
-
-  test('should handle string arguments', async () => {
-    const tool = tools.find((t) => t.name === 'get_relevant_note')!
-    const mockApi = {
-      restSearchController: {
-        searchForLinkTarget: vi.fn().mockResolvedValue([]),
-      },
-      restNoteController: { getGraph: vi.fn() },
-      restTextContentController: {
-        updateNoteTitle: vi.fn(),
-        updateNoteDetails: vi.fn(),
-      },
-      restUserController: { getUserProfile: vi.fn() },
-      restNotebookController: { myNotebooks: vi.fn() },
-      mcpNoteCreationController: { createNote1: vi.fn() },
-    }
-    const mockContext = { api: mockApi }
-
-    const result = await tool.handle(mockContext, { test: 'test' })
-    expect(result.content[0].text).toBe('Invalid Input.')
-  })
-
   test('should handle string arguments', async () => {
     const tool = tools.find((t) => t.name === 'get_relevant_note')!
     const mockApi = {

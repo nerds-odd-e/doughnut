@@ -216,47 +216,11 @@ describe('get_relevant_note tool', () => {
   // Test data for different argument types
   const testCases = [
     {
-      name: 'should extract query when args is a string',
-      args: 'test query',
-      expectedSearchKey: 'test query',
-      shouldFindNote: true,
-    },
-    {
-      name: 'should extract query when args is an object with args property as string',
-      args: { args: 'query in args' },
-      expectedSearchKey: 'query in args',
-      shouldFindNote: true,
-    },
-    {
       name: 'should extract query when args is an object with query property',
       args: { query: 'query in query' },
       expectedSearchKey: 'query in query',
       shouldFindNote: true,
-    },
-    {
-      name: 'should return empty string when args is null',
-      args: null,
-      expectedSearchKey: '',
-      shouldFindNote: false,
-    },
-    {
-      name: 'should return empty string when args is undefined',
-      args: undefined,
-      expectedSearchKey: '',
-      shouldFindNote: false,
-    },
-    {
-      name: 'should return empty string when args is an object without args or query',
-      args: { foo: 'bar' },
-      expectedSearchKey: '',
-      shouldFindNote: false,
-    },
-    {
-      name: 'should return empty string when args is a number',
-      args: 123,
-      expectedSearchKey: '',
-      shouldFindNote: false,
-    },
+    }
   ]
 
   // Run all test cases

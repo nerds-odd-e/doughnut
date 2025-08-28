@@ -14,7 +14,6 @@ import {
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 
-
 export const tools: ToolDescriptor[] = [
   {
     name: 'get_instruction',
