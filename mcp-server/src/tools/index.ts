@@ -1,4 +1,4 @@
-import type { ToolDescriptor } from '../types.js'
+import type { ServerApi, ToolDescriptor } from '../types.js'
 import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
 import { z } from 'zod'
 import {
@@ -161,8 +161,7 @@ export const tools: ToolDescriptor[] = [
           (args as { noteId?: number }).noteId ??
             (request as { params?: { noteId?: number } }).params?.noteId
         )
-        const graph = await api.restNoteController.getGraph(noteId)
-        return textResponse(JSON.stringify(graph))
+        return await GetNoteByNoteId(api, noteId)
       } catch (err) {
         return createErrorResponse(err)
       }
@@ -229,8 +228,7 @@ export const tools: ToolDescriptor[] = [
               typeof result.noteTopology.id === 'number'
             ) {
               const noteId = result.noteTopology.id.toString()
-              const graph = await api.restNoteController.getGraph(noteId)
-              return textResponse(JSON.stringify(graph))
+              return await GetNoteByNoteId(api, noteId)
             }
           }
         }
@@ -245,3 +243,8 @@ export const tools: ToolDescriptor[] = [
     },
   },
 ]
+
+async function GetNoteByNoteId(api: ServerApi, noteId: number) {
+  const graph = await api.restNoteController.getGraph(noteId)
+  return textResponse(JSON.stringify(graph))
+}
