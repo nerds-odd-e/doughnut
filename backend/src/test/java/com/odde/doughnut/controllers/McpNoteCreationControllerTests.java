@@ -19,6 +19,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -80,9 +81,7 @@ class McpNoteCreationControllerTests {
       var searchResult = new NoteSearchResult();
       searchResult.setNoteTopology(noteTopology);
 
-      when(noteSearchService.searchForNotes(
-              org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
-          .thenReturn((Arrays.asList(searchResult)));
+      MockNoteSearchServiceReturn(Arrays.asList(searchResult));
       var mcpNoteDTO = new McpNoteAddDTO();
       mcpNoteDTO.parentNote = "Lord of the Rings";
       mcpNoteDTO.noteCreationDTO = noteCreation;
@@ -93,10 +92,8 @@ class McpNoteCreationControllerTests {
     @Test
     void whenNotebookNotExistsShouldReturnParentDoesNotExist()
         throws UnexpectedNoAccessRightException, BindException, IOException, InterruptedException {
-      ArrayList<NoteSearchResult> listName = new ArrayList<>();
-      when(noteSearchService.searchForNotes(
-              org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
-          .thenReturn((listName));
+
+      MockNoteSearchServiceReturn(new ArrayList<>());
       var mcpNoteDTO = new McpNoteAddDTO();
       mcpNoteDTO.parentNote = "Harry Potter";
       mcpNoteDTO.noteCreationDTO = noteCreation;
@@ -104,6 +101,12 @@ class McpNoteCreationControllerTests {
       var response = controller.createNote(mcpNoteDTO);
 
       assertEquals("This parent does not exist", response);
+    }
+
+    private void MockNoteSearchServiceReturn(List<NoteSearchResult> noteSearchResults) {
+      when(noteSearchService.searchForNotes(
+              org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
+          .thenReturn(noteSearchResults);
     }
   }
 }
