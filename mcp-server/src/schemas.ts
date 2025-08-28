@@ -39,12 +39,12 @@ export const getGraphWithNoteIdSchema = {
 export const addNotewithNoteTitleSchema = {
   type: 'object',
   properties: {
-    noteTitle: {
+    parentTitle: {
       type: 'string',
       description: 'The title of the PARENT note to add the new note to.',
     },
     newTitle: {
-      type: ['string', 'null'],
+      type: ['string'],
       description: 'The new title for the note.',
     },
   },

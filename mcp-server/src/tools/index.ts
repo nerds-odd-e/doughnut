@@ -13,6 +13,7 @@ import {
   validateNoteUpdateParams,
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
+import type { McpAddNoteResponse } from '@generated/backend/models/McpAddNoteResponse.js'
 
 export const tools: ToolDescriptor[] = [
   {
@@ -152,19 +153,14 @@ export const tools: ToolDescriptor[] = [
     description:
       'Add a note to a notebook, if the user specifies a notebook directly call add_note. If the user does not specify a notebook, call get_notebook_list to find a relevant notebook to add the note to, call then call add_note. Returns the title of the created note',
     inputSchema: addNotewithNoteTitleSchema,
-    handle: async (ctx, args, request) => {
+    handle: async (ctx, args) => {
       const api = ctx.api
       try {
         const parentTitle = String(
-          (args as { parentTitle?: string }).parentTitle ??
-            (request as { params?: { parentTitle?: number } }).params
-              ?.parentTitle
+          (args as { parentTitle?: string }).parentTitle
         )
 
-        const newTitle = String(
-          (args as { newTitle?: string }).newTitle ??
-            (request as { params?: { newTitle?: string } }).params?.newTitle
-        )
+        const newTitle = String((args as { newTitle?: string }).newTitle)
 
         const noteCreationDTO: NoteCreationDTO = {
           newTitle: newTitle,
@@ -173,7 +169,7 @@ export const tools: ToolDescriptor[] = [
           parentNote: parentTitle,
           noteCreationDTO: noteCreationDTO,
         }
-        const response: string =
+        const response: McpAddNoteResponse =
           await api.mcpNoteCreationController.createNote1(mcpCreationDto)
 
         return textResponse(JSON.stringify(response))

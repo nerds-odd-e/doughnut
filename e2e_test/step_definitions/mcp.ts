@@ -143,10 +143,10 @@ When(
 // --- Add note to notebook ---
 When(
   'AI agent add note via MCP tool to add note {string} under {string}',
-  (noteTitle: string, notebookTitle: string) => {
-    cy.task('callMcpTool', {
+  (noteTitle: string, parentTitle: string) => {
+    cy.task('callMcpToolWithArgs', {
       apiName: 'add_note',
-      params: { noteId: Number(notebookTitle), newTitle: noteTitle },
+      args: JSON.stringify({ parentTitle: parentTitle, newTitle: noteTitle }),
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
@@ -172,7 +172,7 @@ Then(
 When(
   'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string} and details {string}',
   (notebookTitle: string, noteTitle: string, details: string) => {
-    cy.task('callMcpTool', {
+    cy.task('callMcpToolWithArgs', {
       apiName: 'add_note',
       params: { notebookTitle, noteTitle, details },
     }).then((response) => {
