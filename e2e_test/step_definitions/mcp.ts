@@ -135,7 +135,7 @@ When(
   (noteTitle: string, notebookTitle: string) => {
     cy.task('callMcpTool', {
       apiName: 'add_note',
-      params: { noteId: Number(notebookTitle), newTitle: noteTitle },
+      params: { parentTitle: notebookTitle, newTitle: noteTitle },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })

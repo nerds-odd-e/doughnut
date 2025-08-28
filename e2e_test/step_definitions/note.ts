@@ -23,33 +23,6 @@ defineParameterType({
   },
 })
 
-// When AI agent calls the "add_note" MCP tool with notebook title {string} and title {string}
-When(
-  'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string}',
-  (notebookTitle: string, noteTitle: string) => {
-    // Find the notebook and add a note as its child
-    cy.wrap(null).then(() => {
-      // Find the notebook by title
-      // Use testability API to inject a child note under the notebook
-      start
-        .testability()
-        .injectNotes([{ Title: noteTitle, 'Parent Title': notebookTitle }])
-    })
-  }
-)
-
-// Then {string} note is added to {string} notebook
-Then(
-  '{string} note is added to {string} notebook',
-  (noteTitle: string, notebookTitle: string) => {
-    // Go to the notebook and check for the child note
-    start.jumpToNotePage(notebookTitle)
-    cy.get('main').within(() => {
-      cy.findCardTitle(noteTitle).should('exist')
-    })
-  }
-)
-
 Given(
   'I have a notebook with head note {string} and notes:',
   (notebookTitle: string, data: DataTable) => {
@@ -74,34 +47,6 @@ Given(
     start.testability().injectNotes([{ Title: noteTopology }])
   }
 )
-
-// When I call the "{string}" MCP tool
-When('I call the {string} MCP tool', (toolName: string) => {
-  // For "get_notebook_list", simulate the MCP tool by fetching all notebook titles
-  if (toolName === 'get_notebook_list') {
-    // Use the testability API to get all notebooks (simulate MCP response)
-    cy.wrap(null)
-      .then(() => {
-        // Assume start.testability().getAllNotebooks() returns a promise of notebook objects with Title
-        return start.testability().getAllNotebooks?.() ?? []
-      })
-      .then((notebooks: Array<{ Title: string }>) => {
-        mcpResponse = notebooks.map((n) => n.Title).join(', ')
-      })
-  } else {
-    mcpResponse = ''
-  }
-})
-
-// Then the response should contain "{string}"
-Then('the response should contain {string}', (expected: string) => {
-  cy.wrap(null).then(() => {
-    expect(
-      mcpResponse,
-      `Expected response to contain "${expected}"`
-    ).to.contain(expected)
-  })
-})
 
 Given(
   'I have a notebook with the head note {string} which skips review',
