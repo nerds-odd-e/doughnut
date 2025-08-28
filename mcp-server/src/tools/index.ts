@@ -1,6 +1,5 @@
 import type { ServerApi, ToolDescriptor } from '../types.js'
 import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
-import { z } from 'zod'
 import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
@@ -15,24 +14,6 @@ import {
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 
-type QueryString = {
-  query: string
-}
-
-// Zod schema for query arguments
-const QueryArgsSchema = z.union([z.string(), z.object({ query: z.string() })])
-
-export function extractQueryFromArgs(args: unknown): QueryString {
-  try {
-    const parsed = QueryArgsSchema.parse(args)
-    if (typeof parsed === 'string') {
-      return { query: parsed }
-    }
-    return parsed
-  } catch (_error) {
-    throw new Error('Invalid Input.')
-  }
-}
 
 export const tools: ToolDescriptor[] = [
   {
@@ -211,9 +192,9 @@ export const tools: ToolDescriptor[] = [
       const api = ctx.api
 
       try {
-        const query = extractQueryFromArgs(args)
+        const query = args.query as string
         const searchTerm = {
-          searchKey: query.query,
+          searchKey: query,
           allMyNotebooksAndSubscriptions: true,
         }
         const results =
@@ -234,7 +215,6 @@ export const tools: ToolDescriptor[] = [
         }
         return textResponse(`No relevant note found.`)
       } catch (err) {
-        // For validation errors from extractQueryFromArgs, return the message directly
         if (err instanceof Error && err.message === 'Invalid Input.') {
           return textResponse('Invalid Input.')
         }
