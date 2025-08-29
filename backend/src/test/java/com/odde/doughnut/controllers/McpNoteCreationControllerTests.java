@@ -84,7 +84,8 @@ class McpNoteCreationControllerTests {
       MockNoteSearchServiceReturn(Arrays.asList(searchResult));
 
       var response = controller.createNote(GeneratorMcpNoteAddDTO("Lord of the Rings"));
-      assertEquals("Added new note to parent Notebook Lord of the Rings", response.response);
+      assertEquals(
+          "Added new note to parent Notebook Lord of the Rings", response.getBody().response);
     }
 
     @Test
@@ -94,7 +95,7 @@ class McpNoteCreationControllerTests {
       MockNoteSearchServiceReturn(new ArrayList<>());
       var response = controller.createNote(GeneratorMcpNoteAddDTO("Harry Potter"));
 
-      assertEquals("This parent does not exist", response.response);
+      assertEquals("This parent does not exist", response.getBody().response);
     }
 
     private void MockNoteSearchServiceReturn(List<NoteSearchResult> noteSearchResults) {

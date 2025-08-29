@@ -23,6 +23,8 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -64,9 +66,11 @@ public class McpNoteCreationController {
 
   @PostMapping(value = "/create")
   @Transactional
-  public McpAddNoteResponseDTO createNote(@Valid @RequestBody McpNoteAddDTO noteCreation)
+  public ResponseEntity<McpAddNoteResponseDTO> createNote(
+      @Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     try {
+      var response = new McpAddNoteResponseDTO();
       SearchTerm mySearchTerm = new SearchTerm();
       mySearchTerm.setSearchKey(noteCreation.parentNote);
       mySearchTerm.setAllMyNotebooksAndSubscriptions(true);
@@ -83,7 +87,7 @@ public class McpNoteCreationController {
       Optional<Note> parentNoteObj = noteRepository.findById(parentId);
 
       if (parentNoteObj.isEmpty()) {
-        throw new UnexpectedNoAccessRightException();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
       }
 
       currentUser.assertAuthorization(parentNoteObj.get());
@@ -93,16 +97,15 @@ public class McpNoteCreationController {
           noteCreation.noteCreationDTO,
           currentUser.getEntity(),
           wikidataService.wrapWikidataIdWithApi(noteCreation.noteCreationDTO.wikidataId));
-      var response = new McpAddNoteResponseDTO();
       response.response =
           String.format(
               "Added %s to parent Notebook %s",
               noteCreation.noteCreationDTO.getNewTitle(), noteCreation.parentNote);
-      return response;
+      return ResponseEntity.ok(response);
     } catch (UnexpectedNoAccessRightException e) {
       var response = new McpAddNoteResponseDTO();
       response.response = "This parent does not exist";
-      return response;
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
   }
 }
