@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.McpAddNoteResponseDTO;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -20,8 +20,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +32,6 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/mcp/notes")
 public class McpNoteCreationController {
-
-  private static final Logger log = LoggerFactory.getLogger(McpNoteCreationController.class);
-  private static final ObjectMapper objectMapper = new ObjectMapper();
 
   private final UserModel currentUser;
   private final WikidataService wikidataService;
@@ -70,42 +65,60 @@ public class McpNoteCreationController {
       @Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     try {
-      var response = new McpAddNoteResponseDTO();
-      SearchTerm mySearchTerm = new SearchTerm();
-      mySearchTerm.setSearchKey(noteCreation.parentNote);
-      mySearchTerm.setAllMyNotebooksAndSubscriptions(true);
-      mySearchTerm.setAllMyCircles(true);
 
-      List<NoteSearchResult> results =
-          noteSearchService.searchForNotes(currentUser.getEntity(), mySearchTerm);
+      var parentNoteObj = FindParentNote(currentUser.getEntity(), noteCreation);
 
-      results.sort(Comparator.comparing(NoteSearchResult::getDistance));
-      if (results.isEmpty()) {
-        throw new UnexpectedNoAccessRightException();
-      }
-      int parentId = results.get(0).getNoteTopology().getId();
-      Optional<Note> parentNoteObj = noteRepository.findById(parentId);
-
-      if (parentNoteObj.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+      if (parentNoteObj.equals(new Note())) {
+        return ConstructNotFoundResponse();
       }
 
-      currentUser.assertAuthorization(parentNoteObj.get());
+      currentUser.assertAuthorization(parentNoteObj);
 
       noteConstructionService.createNoteWithWikidataService(
-          parentNoteObj.get(),
+          parentNoteObj,
           noteCreation.noteCreationDTO,
           currentUser.getEntity(),
           wikidataService.wrapWikidataIdWithApi(noteCreation.noteCreationDTO.wikidataId));
-      response.response =
-          String.format(
-              "Added %s to parent Notebook %s",
-              noteCreation.noteCreationDTO.getNewTitle(), noteCreation.parentNote);
-      return ResponseEntity.ok(response);
+
+      return ConstructOkResponse(
+          noteCreation.noteCreationDTO.getNewTitle(), noteCreation.parentNote);
+
     } catch (UnexpectedNoAccessRightException e) {
-      var response = new McpAddNoteResponseDTO();
-      response.response = "This parent does not exist";
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+
+      return ConstructNotFoundResponse();
     }
+  }
+
+  private Note FindParentNote(User currentUser, McpNoteAddDTO noteCreation)
+      throws UnexpectedNoAccessRightException {
+    SearchTerm mySearchTerm = new SearchTerm();
+    mySearchTerm.setSearchKey(noteCreation.parentNote);
+    mySearchTerm.setAllMyNotebooksAndSubscriptions(true);
+    mySearchTerm.setAllMyCircles(true);
+
+    List<NoteSearchResult> results = noteSearchService.searchForNotes(currentUser, mySearchTerm);
+
+    results.sort(Comparator.comparing(NoteSearchResult::getDistance));
+    if (results.isEmpty()) {
+      throw new UnexpectedNoAccessRightException();
+    }
+    int parentId = results.get(0).getNoteTopology().getId();
+    Optional<Note> parentNoteObj = noteRepository.findById(parentId);
+
+    return parentNoteObj.orElseGet(Note::new);
+  }
+
+  private ResponseEntity<McpAddNoteResponseDTO> ConstructOkResponse(
+      String newTitle, String parentTitle) {
+    var response = new McpAddNoteResponseDTO();
+    response.response = String.format("Added %s to parent Notebook %s", newTitle, parentTitle);
+
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  private ResponseEntity<McpAddNoteResponseDTO> ConstructNotFoundResponse() {
+    var response = new McpAddNoteResponseDTO();
+    response.response = "This parent does not exist";
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
 }

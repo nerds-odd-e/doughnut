@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -84,6 +85,7 @@ class McpNoteCreationControllerTests {
       MockNoteSearchServiceReturn(Arrays.asList(searchResult));
 
       var response = controller.createNote(GeneratorMcpNoteAddDTO("Lord of the Rings"));
+      assertEquals(HttpStatus.OK, response.getStatusCode());
       assertEquals(
           "Added new note to parent Notebook Lord of the Rings", response.getBody().response);
     }
@@ -95,6 +97,7 @@ class McpNoteCreationControllerTests {
       MockNoteSearchServiceReturn(new ArrayList<>());
       var response = controller.createNote(GeneratorMcpNoteAddDTO("Harry Potter"));
 
+      assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
       assertEquals("This parent does not exist", response.getBody().response);
     }
 
