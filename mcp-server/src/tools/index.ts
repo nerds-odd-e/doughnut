@@ -194,18 +194,20 @@ export const tools: ToolDescriptor[] = [
         }
         const results =
           await api.restSearchController.searchForLinkTarget(searchTerm)
+
+        // Use zod to validate each result item
+        const { z } = await import('zod')
+        const resultSchema = z.object({
+          noteTopology: z.object({
+            id: z.number(),
+          }),
+        })
+
         if (Array.isArray(results) && results.length > 0) {
-          // Find the first valid note with proper structure
-          for (const result of results) {
-            if (
-              result &&
-              typeof result === 'object' &&
-              result.noteTopology &&
-              typeof result.noteTopology.id === 'number'
-            ) {
-              const noteId = result.noteTopology.id.toString()
-              return await GetNoteByNoteId(api, noteId)
-            }
+          const parseResult = resultSchema.safeParse(results[0])
+          if (parseResult.success) {
+            const noteId = parseResult.data.noteTopology.id
+            return await GetNoteByNoteId(api, noteId)
           }
         }
         return textResponse(`No relevant note found.`)
