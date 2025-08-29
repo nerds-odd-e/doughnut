@@ -14,6 +14,7 @@ import {
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 import type { McpAddNoteResponse } from '@generated/backend/models/McpAddNoteResponse.js'
+import { z } from 'zod'
 
 export const tools: ToolDescriptor[] = [
   {
@@ -196,7 +197,6 @@ export const tools: ToolDescriptor[] = [
           await api.restSearchController.searchForLinkTarget(searchTerm)
 
         // Use zod to validate each result item
-        const { z } = await import('zod')
         const resultSchema = z.object({
           noteTopology: z.object({
             id: z.number(),
