@@ -65,7 +65,7 @@ export type { InitialInfo } from './models/InitialInfo';
 export type { JsonNode } from './models/JsonNode';
 export type { LastError } from './models/LastError';
 export { LinkCreation } from './models/LinkCreation';
-export type { McpAddNoteResponse } from './models/McpAddNoteResponse';
+export type { McpAddNoteResponseDTO } from './models/McpAddNoteResponseDTO';
 export type { McpNoteAddDTO } from './models/McpNoteAddDTO';
 export type { MCQWithAnswer } from './models/MCQWithAnswer';
 export type { MemoryTracker } from './models/MemoryTracker';

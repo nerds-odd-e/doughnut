@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type McpAddNoteResponse = {
+export type McpAddNoteResponseDTO = {
     response?: string;
 };
 

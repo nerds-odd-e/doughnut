@@ -1503,7 +1503,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/McpAddNoteResponse"
+                $ref: "#/components/schemas/McpAddNoteResponseDTO"
   /api/links/{link}:
     post:
       tags:
@@ -4153,7 +4153,7 @@ components:
           type: string
         noteCreationDTO:
           $ref: "#/components/schemas/NoteCreationDTO"
-    McpAddNoteResponse:
+    McpAddNoteResponseDTO:
       type: object
       properties:
         response:

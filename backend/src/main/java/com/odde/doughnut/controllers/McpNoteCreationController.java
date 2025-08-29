@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.McpAddNoteResponseDTO;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
@@ -19,7 +20,6 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.Nested;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,14 +62,9 @@ public class McpNoteCreationController {
     this.noteRepository = noteRepository;
   }
 
-  @Nested
-  class McpAddNoteResponse {
-    public String response;
-  }
-
   @PostMapping(value = "/create")
   @Transactional
-  public McpAddNoteResponse createNote(@Valid @RequestBody McpNoteAddDTO noteCreation)
+  public McpAddNoteResponseDTO createNote(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     try {
       SearchTerm mySearchTerm = new SearchTerm();
@@ -98,14 +93,14 @@ public class McpNoteCreationController {
           noteCreation.noteCreationDTO,
           currentUser.getEntity(),
           wikidataService.wrapWikidataIdWithApi(noteCreation.noteCreationDTO.wikidataId));
-      var response = new McpAddNoteResponse();
+      var response = new McpAddNoteResponseDTO();
       response.response =
           String.format(
               "Added %s to parent Notebook %s",
               noteCreation.noteCreationDTO.getNewTitle(), noteCreation.parentNote);
       return response;
     } catch (UnexpectedNoAccessRightException e) {
-      var response = new McpAddNoteResponse();
+      var response = new McpAddNoteResponseDTO();
       response.response = "This parent does not exist";
       return response;
     }

@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-import type { McpAddNoteResponse } from '../models/McpAddNoteResponse';
+import type { McpAddNoteResponseDTO } from '../models/McpAddNoteResponseDTO';
 import type { McpNoteAddDTO } from '../models/McpNoteAddDTO';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -10,12 +10,12 @@ export class McpNoteCreationControllerService {
     constructor(public readonly httpRequest: BaseHttpRequest) {}
     /**
      * @param requestBody
-     * @returns McpAddNoteResponse OK
+     * @returns McpAddNoteResponseDTO OK
      * @throws ApiError
      */
     public createNote1(
         requestBody: McpNoteAddDTO,
-    ): CancelablePromise<McpAddNoteResponse> {
+    ): CancelablePromise<McpAddNoteResponseDTO> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/mcp/notes/create',
