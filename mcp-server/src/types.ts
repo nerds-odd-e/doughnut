@@ -26,9 +26,6 @@ export type ServerApi = {
       body: { details: string }
     ) => Promise<unknown>
   }
-  restUserController: {
-    getUserProfile: () => Promise<unknown>
-  }
   restNotebookController: {
     myNotebooks: () => Promise<unknown>
   }

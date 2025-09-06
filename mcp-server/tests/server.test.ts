@@ -15,7 +15,6 @@ describe('MCP Server Configuration', () => {
   test('should define expected tools', () => {
     const expectedTools = [
       'update_note_text_content',
-      'get_user_info',
       'get_notebook_list',
       'get_graph_with_note_id',
       'add_note',
@@ -24,12 +23,11 @@ describe('MCP Server Configuration', () => {
 
     // Test that we have the expected tool names
     expect(expectedTools).toContain('update_note_text_content')
-    expect(expectedTools).toContain('get_user_info')
     expect(expectedTools).toContain('get_notebook_list')
     expect(expectedTools).toContain('get_graph_with_note_id')
     expect(expectedTools).toContain('add_note')
     expect(expectedTools).toContain('get_relevant_note')
-    expect(expectedTools).toHaveLength(6)
+    expect(expectedTools).toHaveLength(5)
   })
 })
 
@@ -109,7 +107,6 @@ describe('get_relevant_note tool', () => {
         updateNoteTitle: vi.fn(),
         updateNoteDetails: vi.fn(),
       },
-      restUserController: { getUserProfile: vi.fn() },
       restNotebookController: { myNotebooks: vi.fn() },
       mcpNoteCreationController: { createNote1: vi.fn() },
     }
@@ -142,17 +139,6 @@ describe('get_notebook_list tool', () => {
   })
 })
 
-// Test for get_user_info tool
-describe('get_user_info tool', () => {
-  test('should call API and return success', async () => {
-    const getUserInfoTool = tools.find(
-      (t: ToolDescriptor) => t.name === 'get_user_info'
-    )
-    expect(getUserInfoTool).toBeDefined()
-    expect(getUserInfoTool?.name).toBe('get_user_info')
-  })
-})
-
 // Test for update_note_text_content tool
 describe('update_note_text_content tool', () => {
   test('should call API and return success', async () => {
@@ -169,7 +155,6 @@ describe('tools array', () => {
   test('should contain all expected tools', () => {
     const expectedTools = [
       'update_note_text_content',
-      'get_user_info',
       'get_notebook_list',
       'get_graph_with_note_id',
       'add_note',

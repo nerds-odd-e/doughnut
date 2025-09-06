@@ -15,7 +15,6 @@ describe('MCP Server Configuration', () => {
   test('should define expected tools', () => {
     const expectedTools = [
       'update_note_text_content',
-      'get_user_info',
       'get_notebook_list',
       'get_graph_with_note_id',
       'add_note',
@@ -24,12 +23,11 @@ describe('MCP Server Configuration', () => {
 
     // Test that we have the expected tool names
     expect(expectedTools).toContain('update_note_text_content')
-    expect(expectedTools).toContain('get_user_info')
     expect(expectedTools).toContain('get_notebook_list')
     expect(expectedTools).toContain('get_graph_with_note_id')
     expect(expectedTools).toContain('add_note')
     expect(expectedTools).toContain('get_relevant_note')
-    expect(expectedTools).toHaveLength(6)
+    expect(expectedTools).toHaveLength(5)
   })
 })
 
@@ -96,9 +94,6 @@ describe('add_note tool', () => {
       restTextContentController: {
         updateNoteTitle: vi.fn(),
         updateNoteDetails: vi.fn(),
-      },
-      restUserController: {
-        getUserProfile: vi.fn(),
       },
       restNotebookController: {
         myNotebooks: vi.fn(),

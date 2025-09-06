@@ -9,13 +9,6 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid MCP token
     And I connect to an MCP client that connects to Doughnut MCP service
 
-  Scenario Outline: MCP Tools
-    When I call the "<api_name>" MCP tool
-    Then the response should contain "<expected_response>"
-
-    Examples:
-      | api_name        | expected_response                                |
-      | get_user_info   | Old Learner                                      |
 
  @ignore
   Scenario: Get notebook list

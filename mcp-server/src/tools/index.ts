@@ -13,7 +13,7 @@ import {
   validateNoteUpdateParams,
 } from '../utils.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
-import type { McpAddNoteResponse } from '@generated/backend/models/McpAddNoteResponse.js'
+import type { McpAddNoteResponseDTO } from '@generated/backend/models/McpAddNoteResponseDTO.js'
 import { z } from 'zod'
 
 export const tools: ToolDescriptor[] = [
@@ -71,20 +71,6 @@ export const tools: ToolDescriptor[] = [
         msg += ` Details: ${detailsRes.note.details}.`
       }
       return textResponse(msg)
-    },
-  },
-  {
-    name: 'get_user_info',
-    description: 'Get user info',
-    inputSchema: emptyObjectSchema,
-    handle: async (ctx) => {
-      const api = ctx.api
-      try {
-        const userInfo = await api.restUserController.getUserProfile()
-        return textResponse(JSON.stringify(userInfo))
-      } catch (err) {
-        return createErrorResponse(err)
-      }
     },
   },
   {
@@ -162,7 +148,7 @@ export const tools: ToolDescriptor[] = [
           parentNote: parentTitle,
           noteCreationDTO: noteCreationDTO,
         }
-        const response: McpAddNoteResponse =
+        const response: McpAddNoteResponseDTO =
           await api.mcpNoteCreationController.createNote1(mcpCreationDto)
 
         return textResponse(JSON.stringify(response))
