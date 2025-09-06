@@ -10,7 +10,6 @@ Feature: MCP (Model Context Protocol) Services
     And I connect to an MCP client that connects to Doughnut MCP service
 
 
- @ignore
   Scenario: Get notebook list
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
