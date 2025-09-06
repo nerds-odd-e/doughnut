@@ -184,6 +184,15 @@ const commonConfig = {
         }) {
           return await mcpClient.callMcpToolWithArgs({ apiName, args })
         },
+        async callMcpToolWithParams({
+          apiName,
+          params,
+        }: {
+          apiName: string
+          params: Record<string, any>
+        }) {
+          return await mcpClient.callMcpToolWithParams({ apiName, params })
+        },
         async disconnectMcpServer() {
           return await mcpClient.disconnectMcpServer()
         },

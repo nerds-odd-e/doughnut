@@ -8,14 +8,6 @@ interface ApiResponse {
   status: string
 }
 
-interface NotebookListResponse {
-  content: Array<{
-    headNoteId: number
-    title: string
-  }>
-  status: string
-}
-
 Given(
   'I connect to an MCP client that connects to Doughnut MCP service',
   () => {
@@ -113,9 +105,9 @@ When(
 When(
   'AI agent add note via MCP tool to add note {string} under {string}',
   (noteTitle: string, parentTitle: string) => {
-    cy.task('callMcpToolWithArgs', {
+    cy.task('callMcpToolWithParams', {
       apiName: 'add_note',
-      args: JSON.stringify({ parentTitle: parentTitle, newTitle: noteTitle }),
+      params: { parentTitle: parentTitle, newTitle: noteTitle },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
@@ -141,9 +133,9 @@ Then(
 When(
   'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string} and details {string}',
   (notebookTitle: string, noteTitle: string, details: string) => {
-    cy.task('callMcpToolWithArgs', {
+    cy.task('callMcpToolWithParams', {
       apiName: 'add_note',
-      params: { notebookTitle, noteTitle, details },
+      params: { parentTitle: notebookTitle, newTitle: noteTitle, details },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })
