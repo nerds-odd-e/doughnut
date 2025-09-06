@@ -18,14 +18,6 @@ import { z } from 'zod'
 
 export const tools: ToolDescriptor[] = [
   {
-    name: 'get_instruction',
-    description: 'Get instruction',
-    inputSchema: emptyObjectSchema,
-    handle: async () =>
-      textResponse('Doughnut is a Personal Knowledge Management tool'),
-  },
-
-  {
     name: 'update_note_text_content',
     description:
       'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided. Authentication token is taken from the mcpToken argument.',
