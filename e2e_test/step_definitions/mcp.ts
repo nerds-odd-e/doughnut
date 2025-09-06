@@ -28,18 +28,18 @@ When('I call the {string} MCP tool', (apiName: string) => {
 Then('the {string} is fed into the correct MCP tool', (searchTerm: string) => {
   // Determine the correct MCP tool based on the search term
   // For demonstration, assume 'get_relevant_note' is the correct tool for any search term
-  cy.task('callMcpToolWithArgs', {
+  cy.task('callMcpToolWithParams', {
     apiName: 'get_relevant_note',
-    args: searchTerm,
+    params: { query: searchTerm },
   }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
 })
 
 When('I search for notes with the term {string}', (searchTerm: string) => {
-  cy.task('callMcpToolWithArgs', {
+  cy.task('callMcpToolWithParams', {
     apiName: 'get_relevant_note',
-    args: searchTerm,
+    params: { query: searchTerm },
   }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })

@@ -175,15 +175,6 @@ const commonConfig = {
         async callMcpTool({ apiName }: { apiName: string }) {
           return await mcpClient.callMcpTool({ apiName })
         },
-        async callMcpToolWithArgs({
-          apiName,
-          args,
-        }: {
-          apiName: string
-          args: string
-        }) {
-          return await mcpClient.callMcpToolWithArgs({ apiName, args })
-        },
         async callMcpToolWithParams({
           apiName,
           params,
