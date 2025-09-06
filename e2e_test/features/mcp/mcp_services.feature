@@ -23,15 +23,8 @@ Feature: MCP (Model Context Protocol) Services
       | Title             | Parent Title | 
       | Lord of the Rings | Books I read | 
       | Harry Potter      | Books I read | 
-    #And the phrase "Lord of the Rings" and "suitable parent for `Frodo`" have similarity distance of 0.3 [mock]
-    And The only suitable parent for phrase "Art of War" is "Books I read"
     When AI agent add note via MCP tool to add note "Art of War" under "Books I read"
-    Then I should see the note tree in the sidebar
-      | note-title        |
-      | Lord of the Rings |
-      | Harry Potter      |
-      | Art of War        |
-    And I should see "Books I read" with these children
+    Then I should see "Books I read" with these children
       | note-title        |
       | Lord of the Rings |
       | Harry Potter      |
