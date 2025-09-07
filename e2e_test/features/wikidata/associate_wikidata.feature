@@ -38,6 +38,7 @@ Feature: associate wikidata ID to note
       | Q2 | https://en.wikipedia.org/TDD | https://en.wikipedia.org/TDD     |
 
   @usingRealWikidataService
+  @focus
   Scenario: Associate note to wikipedia via wikidata using real service
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different label "Count von Count"
