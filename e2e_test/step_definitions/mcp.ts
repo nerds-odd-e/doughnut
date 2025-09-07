@@ -36,14 +36,17 @@ Then('the {string} is fed into the correct MCP tool', (searchTerm: string) => {
   })
 })
 
-When('AI agent searchs for relevant notes using MCP tool with the term {string}', (searchTerm: string) => {
-  cy.task('callMcpToolWithParams', {
-    apiName: 'get_relevant_note',
-    params: { query: searchTerm },
-  }).then((response) => {
-    cy.wrap(response).as('MCPApiResponse')
-  })
-})
+When(
+  'AI agent searchs for relevant notes using MCP tool with the term {string}',
+  (searchTerm: string) => {
+    cy.task('callMcpToolWithParams', {
+      apiName: 'get_relevant_note',
+      params: { query: searchTerm },
+    }).then((response) => {
+      cy.wrap(response).as('MCPApiResponse')
+    })
+  }
+)
 
 Then('the response should contain {string}', (expectedResponse: string) => {
   cy.get('@MCPApiResponse').then((response) => {
