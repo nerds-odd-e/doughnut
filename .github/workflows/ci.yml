@@ -34,6 +34,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - name: Check for @focus tags in e2e test feature files
+        run: ./scripts/check_focus_tags.sh
       - uses: ./.github/setup_jdk
         with:
           java_version: ${{ vars.JAVA_VERSION }}
