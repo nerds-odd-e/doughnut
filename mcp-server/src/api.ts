@@ -1,4 +1,4 @@
-import { DoughnutApi } from '../../generated/backend/DoughnutApi.js'
+import { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 
 export type ApiConfig = {
   apiBaseUrl: string
