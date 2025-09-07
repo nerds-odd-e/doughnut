@@ -7,7 +7,7 @@ import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import routes from "@/routes/routes"
-import type { User } from "@/generated/backend"
+import type { User } from "@generated/backend"
 
 interface NoteStorageProps {
   storageAccessor?: ReturnType<typeof createNoteStorage>

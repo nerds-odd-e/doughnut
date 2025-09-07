@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { Certificate } from "@/generated/backend"
+import type { Certificate } from "@generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })

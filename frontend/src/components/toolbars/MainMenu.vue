@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import type { User } from "@/generated/backend"
+import type { User } from "@generated/backend"
 import type { PropType } from "vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"

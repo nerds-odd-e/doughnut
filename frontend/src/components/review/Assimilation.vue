@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note } from "@/generated/backend"
+import type { Note } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"

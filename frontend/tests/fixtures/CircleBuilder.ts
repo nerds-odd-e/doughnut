@@ -1,4 +1,4 @@
-import type { Circle } from "@/generated/backend"
+import type { Circle } from "@generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

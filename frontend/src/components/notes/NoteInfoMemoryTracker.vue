@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
-import type { MemoryTracker } from "@/generated/backend"
+import type { MemoryTracker } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import SvgNoReview from "../svgs/SvgNoReview.vue"

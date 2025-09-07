@@ -6,7 +6,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import type { SpellingResultDTO, MemoryTrackerLite } from "@/generated/backend"
+import type { SpellingResultDTO, MemoryTrackerLite } from "@generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({

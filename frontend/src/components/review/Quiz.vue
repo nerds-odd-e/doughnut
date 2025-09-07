@@ -68,7 +68,7 @@ import type {
   AnswerSpellingDTO,
   SpellingResultDTO,
   MemoryTrackerLite,
-} from "@/generated/backend"
+} from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"

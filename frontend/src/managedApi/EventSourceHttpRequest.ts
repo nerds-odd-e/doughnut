@@ -1,7 +1,7 @@
-import type { OpenAPIConfig } from "@/generated/backend"
-import { BaseHttpRequest, CancelablePromise } from "@/generated/backend"
-import type { ApiRequestOptions } from "@/generated/backend/core/ApiRequestOptions"
-import { getQueryString } from "@/generated/backend/core/request"
+import type { OpenAPIConfig } from "@generated/backend"
+import { BaseHttpRequest, CancelablePromise } from "@generated/backend"
+import type { ApiRequestOptions } from "@generated/backend/core/ApiRequestOptions"
+import { getQueryString } from "@generated/backend/core/request"
 import createEventSourceWithBody from "./createEventSourceWithBody"
 
 // getUrl

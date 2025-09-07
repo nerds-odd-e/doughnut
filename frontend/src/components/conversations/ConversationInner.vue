@@ -64,7 +64,7 @@ import type {
   User,
   ConversationMessage,
   Conversation,
-} from "@/generated/backend"
+} from "@generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"

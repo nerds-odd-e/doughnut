@@ -1,4 +1,4 @@
-import type { AnsweredQuestion, Conversation, Note } from "@/generated/backend"
+import type { AnsweredQuestion, Conversation, Note } from "@generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 import NoteBuilder from "./NoteBuilder"

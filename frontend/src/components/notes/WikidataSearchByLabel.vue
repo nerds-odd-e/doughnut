@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import type { WikidataSearchEntity } from "@/generated/backend"
+import type { WikidataSearchEntity } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"

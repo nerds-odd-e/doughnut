@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { useRouter } from "vue-router"
-import type { Notebook } from "@/generated/backend"
+import type { Notebook } from "@generated/backend"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
 import SvgAdd from "../svgs/SvgAdd.vue"

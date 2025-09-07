@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import type { User } from "@/generated/backend"
+import type { User } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "@/components/form/TextInput.vue"
 import ContainerPage from "./commons/ContainerPage.vue"

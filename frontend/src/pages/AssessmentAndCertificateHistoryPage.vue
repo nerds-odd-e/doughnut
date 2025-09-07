@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
-import type { AssessmentAttempt } from "@/generated/backend"
+import type { AssessmentAttempt } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "./commons/ContainerPage.vue"
 

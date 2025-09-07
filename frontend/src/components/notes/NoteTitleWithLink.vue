@@ -10,7 +10,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { NoteTopology } from "@/generated/backend"
+import { NoteTopology } from "@generated/backend"
 import NoteTitleComponent from "./core/NoteTitleComponent.vue"
 
 defineProps({

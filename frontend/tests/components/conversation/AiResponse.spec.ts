@@ -7,7 +7,7 @@ import {
   type Message,
   type MessageDelta,
   type TitleReplacement,
-} from "@/generated/backend"
+} from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
 

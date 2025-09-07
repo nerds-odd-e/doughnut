@@ -3,8 +3,8 @@ import type {
   NoteMoveDTO,
   NoteRealm,
   WikidataAssociationCreation,
-} from "@/generated/backend"
-import { LinkCreation, type NoteCreationDTO } from "@/generated/backend"
+} from "@generated/backend"
+import { LinkCreation, type NoteCreationDTO } from "@generated/backend"
 import ManagedApi from "@/managedApi/ManagedApi"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"

@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteAccessoriesDTO, NoteAccessory } from "@/generated/backend"
+import type { NoteAccessoriesDTO, NoteAccessory } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import ImageFormBody from "./ImageFormBody.vue"

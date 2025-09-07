@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { NoteRealm } from "@/generated/backend"
+import type { NoteRealm } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"

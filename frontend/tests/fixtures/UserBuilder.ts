@@ -1,4 +1,4 @@
-import type { User } from "@/generated/backend/models/User"
+import type { User } from "@generated/backend/models/User"
 import Builder from "./Builder"
 import generateId from "./generateId"
 

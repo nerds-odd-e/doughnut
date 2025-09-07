@@ -1,4 +1,4 @@
-import type { SuggestedQuestionForFineTuning } from "@/generated/backend"
+import type { SuggestedQuestionForFineTuning } from "@generated/backend"
 import Builder from "./Builder"
 
 class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFineTuning> {

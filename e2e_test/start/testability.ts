@@ -1,10 +1,10 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { Randomization } from './../../frontend/src/generated/backend/models/Randomization'
-import type { QuestionSuggestionParams } from '../../frontend/src/generated/backend/models/QuestionSuggestionParams'
+import type { Randomization } from '@generated/backend/models/Randomization'
+import type { QuestionSuggestionParams } from '@generated/backend/models/QuestionSuggestionParams'
 import type ServiceMocker from '../support/ServiceMocker'
-import type { NoteTestData } from './../../frontend/src/generated/backend/models/NoteTestData'
-import type { PredefinedQuestionsTestData } from './../../frontend/src/generated/backend/models/PredefinedQuestionsTestData'
+import type { NoteTestData } from '@generated/backend/models/NoteTestData'
+import type { PredefinedQuestionsTestData } from '@generated/backend/models/PredefinedQuestionsTestData'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)

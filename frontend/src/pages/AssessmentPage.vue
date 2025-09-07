@@ -10,7 +10,7 @@ import { onMounted, ref } from "vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import Assessment from "@/components/assessment/Assessment.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { AssessmentAttempt } from "@/generated/backend"
+import type { AssessmentAttempt } from "@generated/backend"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({

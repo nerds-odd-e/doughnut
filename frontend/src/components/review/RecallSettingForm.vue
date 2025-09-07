@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import type { RecallSetting } from "@/generated/backend"
+import type { RecallSetting } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 import { defineComponent, computed, ref } from "vue"

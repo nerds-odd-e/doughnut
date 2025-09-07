@@ -60,7 +60,7 @@ import { cloneDeep } from "es-toolkit"
 import type {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
-} from "@/generated/backend"
+} from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"

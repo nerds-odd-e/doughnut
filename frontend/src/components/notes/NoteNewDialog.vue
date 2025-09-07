@@ -48,7 +48,7 @@ import type {
   WikidataSearchEntity,
   Note,
   NoteCreationDTO,
-} from "@/generated/backend"
+} from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref } from "vue"

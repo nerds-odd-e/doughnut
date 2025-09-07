@@ -6,8 +6,8 @@ import type {
   JsonNode,
   RestAiControllerService,
   Run,
-} from "@/generated/backend"
-import { DummyForGeneratingTypes } from "@/generated/backend"
+} from "@generated/backend"
+import { DummyForGeneratingTypes } from "@generated/backend"
 
 describe("aiReplyState", () => {
   const mockContext = {

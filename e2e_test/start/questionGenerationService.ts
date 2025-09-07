@@ -1,4 +1,4 @@
-import type { MCQWithAnswer } from '../../frontend/src/generated/backend/models/MCQWithAnswer'
+import type { MCQWithAnswer } from '@generated/backend/models/MCQWithAnswer'
 import mock_services from './mock_services'
 
 export const questionGenerationService = () => ({

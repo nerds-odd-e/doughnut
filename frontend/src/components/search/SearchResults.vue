@@ -50,9 +50,9 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchTerm } from "@/generated/backend"
-import { NoteTopology } from "@/generated/backend"
-import type { NoteSearchResult } from "@/generated/backend"
+import type { SearchTerm } from "@generated/backend"
+import { NoteTopology } from "@generated/backend"
+import type { NoteSearchResult } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"

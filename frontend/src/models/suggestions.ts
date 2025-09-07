@@ -1,4 +1,4 @@
-import type { NoteDetailsCompletion, ToolCallResult } from "@/generated/backend"
+import type { NoteDetailsCompletion, ToolCallResult } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 
 interface BaseSuggestion {

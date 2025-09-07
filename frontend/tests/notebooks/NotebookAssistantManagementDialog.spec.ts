@@ -3,7 +3,7 @@ import { saveAs } from "file-saver"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { NotebookAiAssistant } from "@/generated/backend"
+import type { NotebookAiAssistant } from "@generated/backend"
 
 vitest.mock("file-saver", () => ({ saveAs: vitest.fn() }))
 

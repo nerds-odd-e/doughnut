@@ -22,7 +22,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type { AnswerDTO, RecallPrompt } from "@/generated/backend"
+import type { AnswerDTO, RecallPrompt } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"

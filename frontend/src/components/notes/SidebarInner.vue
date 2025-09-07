@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import type { Note, NoteRealm } from "@/generated/backend"
+import type { Note, NoteRealm } from "@generated/backend"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { ref, watch } from "vue"

@@ -109,7 +109,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue"
-import type { Note } from "@/generated/backend"
+import type { Note } from "@generated/backend"
 import { saveAs } from "file-saver"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import SvgDownload from "../../svgs/SvgDownload.vue"

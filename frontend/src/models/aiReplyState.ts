@@ -5,9 +5,9 @@ import type {
   RunStep,
   DeltaOfRunStep,
   ToolCallResult,
-} from "@/generated/backend"
-import { DummyForGeneratingTypes } from "@/generated/backend"
-import type { RestAiControllerService } from "@/generated/backend/services/RestAiControllerService"
+} from "@generated/backend"
+import { DummyForGeneratingTypes } from "@generated/backend"
+import type { RestAiControllerService } from "@generated/backend/services/RestAiControllerService"
 import { type Suggestion } from "./suggestions"
 
 export type AiReplyState = {

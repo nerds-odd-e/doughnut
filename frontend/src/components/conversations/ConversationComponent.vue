@@ -47,7 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import type { User, Conversation } from "@/generated/backend"
+import type { User, Conversation } from "@generated/backend"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"

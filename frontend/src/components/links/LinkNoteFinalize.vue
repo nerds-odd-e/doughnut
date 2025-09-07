@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { Note } from "@/generated/backend"
-import { LinkCreation, NoteTopology } from "@/generated/backend"
+import type { Note } from "@generated/backend"
+import { LinkCreation, NoteTopology } from "@generated/backend"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"

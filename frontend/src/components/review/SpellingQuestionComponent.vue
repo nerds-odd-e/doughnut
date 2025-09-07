@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { SpellingQuestion } from "@/generated/backend"
+import type { SpellingQuestion } from "@generated/backend"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"

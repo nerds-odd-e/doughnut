@@ -1,5 +1,5 @@
 import SuggestQuestionForFineTuning from "@/components/ai/SuggestQuestionForFineTuning.vue"
-import type { PredefinedQuestion } from "@/generated/backend"
+import type { PredefinedQuestion } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"

@@ -32,7 +32,7 @@
 import { ref } from "vue"
 import TextInput from "../form/TextInput.vue"
 import SearchResults from "./SearchResults.vue"
-import type { NoteTopology } from "@/generated/backend"
+import type { NoteTopology } from "@generated/backend"
 
 defineProps<{
   noteId?: number

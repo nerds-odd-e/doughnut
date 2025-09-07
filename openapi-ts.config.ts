@@ -5,7 +5,7 @@ export default defineConfig({
   input: path.resolve('./open_api_docs.yaml'),
   client: 'legacy/fetch',
   output: {
-    path: path.resolve('./frontend/src/generated/backend'),
+    path: path.resolve('./generated/backend'),
     name: 'DoughnutApi',
     clean: true,
   },

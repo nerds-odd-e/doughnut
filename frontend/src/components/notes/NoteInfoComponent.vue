@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import type { MemoryTracker, NoteInfo } from "@/generated/backend"
+import type { MemoryTracker, NoteInfo } from "@generated/backend"
 import { ref, computed } from "vue"
 import RecallSettingForm from "../review/RecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
