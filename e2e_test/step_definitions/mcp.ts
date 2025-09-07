@@ -25,17 +25,6 @@ When('AI agent calls the {string} MCP tool', (apiName: string) => {
   })
 })
 
-Then('the {string} is fed into the correct MCP tool', (searchTerm: string) => {
-  // Determine the correct MCP tool based on the search term
-  // For demonstration, assume 'get_relevant_note' is the correct tool for any search term
-  cy.task('callMcpToolWithParams', {
-    apiName: 'get_relevant_note',
-    params: { query: searchTerm },
-  }).then((response) => {
-    cy.wrap(response).as('MCPApiResponse')
-  })
-})
-
 When(
   'AI agent searchs for relevant notes using MCP tool with the term {string}',
   (searchTerm: string) => {

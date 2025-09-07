@@ -32,7 +32,6 @@ Feature: MCP (Model Context Protocol) Services
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
     And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
     When AI agent searchs for relevant notes using MCP tool with the term "<search_term>"
-    Then the "<search_term>" is fed into the correct MCP tool
     Then the response should contain "<note_title>"
 
     Examples:
