@@ -9,7 +9,7 @@ import createNoteStorage from "./store/createNoteStorage"
 import type { ApiStatus } from "./managedApi/ManagedApi"
 import ManagedApi from "./managedApi/ManagedApi"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
-import type { User } from "./generated/backend"
+import type { User } from "@generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 
