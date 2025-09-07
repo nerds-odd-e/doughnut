@@ -17,7 +17,7 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "Lord of the Rings"
     Then the response should contain "Harry Potter"
 
-  Scenario: Add note to notebook
+  Scenario: Adding note to a known parent note
     Given I have a notebook with head note "Books I read" and notes:
       | Title             | Parent Title | 
       | Lord of the Rings | Books I read | 
