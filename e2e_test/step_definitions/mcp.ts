@@ -20,7 +20,7 @@ Given(
 
 // Use the literal API names directly from the feature file
 When('AI agent calls the {string} MCP tool', (apiName: string) => {
-  cy.task('callMcpTool', { apiName }).then((response) => {
+  cy.task('callMcpToolWithParams', { apiName, params: {} }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
 })
