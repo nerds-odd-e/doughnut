@@ -59,40 +59,6 @@ Then(
   }
 )
 
-Then(
-  'the search results should not include a note with the title {string}',
-  (noteTitle: string) => {
-    cy.get('@MCPApiResponse').then((response) => {
-      const actualResponse = response as unknown as ApiResponse
-      const found = actualResponse.content.some((item) =>
-        item.text.includes(noteTitle)
-      )
-      expect(found).to.be.false
-    })
-  }
-)
-
-When(
-  'I get the note ID from the search result for {string}',
-  (noteTitle: string) => {
-    cy.get('@MCPApiResponse').then((response) => {
-      const actualResponse = response as unknown as ApiResponse
-      // Assume note ID is present in the text as "id: <number>" or similar
-      const note = actualResponse.content.find((item) =>
-        item.text.includes(noteTitle)
-      )
-      if (!note) {
-        throw new Error('Note not found in search results')
-      }
-      const match = note.text.match(/id[:=]\s*(\d+)/i)
-      if (!match) {
-        throw new Error('Note ID not found in note text')
-      }
-      cy.wrap(Number(match[1])).as('noteId')
-    })
-  }
-)
-
 // --- Add note to notebook ---
 When(
   'AI agent adds note via MCP tool to add note {string} under {string}',
