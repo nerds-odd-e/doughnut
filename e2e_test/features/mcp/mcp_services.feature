@@ -30,19 +30,6 @@ Feature: MCP (Model Context Protocol) Services
       | Art of War        |
 
   @ignore
-  Scenario: Add note with details to notebook
-    Given I have a notebook with the head note "Lord of the Rings"
-    When AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Sam" and details "holdo"
-    Then I should see the note tree in the sidebar
-      | note-title        |
-      | Lord of the Rings |
-      | Sam               |
-    And I should see "Lord of the Rings" with these children
-      | note-title        |
-      | Lord of the Rings |
-      | Sam               |
-
-  @ignore
   Scenario: Add note to user select notebook
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"

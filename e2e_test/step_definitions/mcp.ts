@@ -154,16 +154,3 @@ When(
     })
   }
 )
-
-// --- Add note with details to notebook ---
-When(
-  'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string} and details {string}',
-  (notebookTitle: string, noteTitle: string, details: string) => {
-    cy.task('callMcpTool', {
-      apiName: 'add_note',
-      params: { notebookTitle, noteTitle, details },
-    }).then((response) => {
-      cy.wrap(response).as('MCPAddNoteResponse')
-    })
-  }
-)
