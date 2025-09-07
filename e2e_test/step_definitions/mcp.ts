@@ -36,7 +36,7 @@ Then('the {string} is fed into the correct MCP tool', (searchTerm: string) => {
   })
 })
 
-When('I search for notes with the term {string}', (searchTerm: string) => {
+When('AI agent searchs for relevant notes using MCP tool with the term {string}', (searchTerm: string) => {
   cy.task('callMcpToolWithParams', {
     apiName: 'get_relevant_note',
     params: { query: searchTerm },

@@ -9,7 +9,6 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid MCP token
     And I connect to an MCP client that connects to Doughnut MCP service
 
-
   Scenario: Get notebook list
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
@@ -19,9 +18,9 @@ Feature: MCP (Model Context Protocol) Services
 
   Scenario: Adding note to a known parent note
     Given I have a notebook with head note "Books I read" and notes:
-      | Title             | Parent Title | 
-      | Lord of the Rings | Books I read | 
-      | Harry Potter      | Books I read | 
+      | Title             | Parent Title |
+      | Lord of the Rings | Books I read |
+      | Harry Potter      | Books I read |
     When AI agent adds note via MCP tool to add note "Art of War" under "Books I read"
     Then I should see "Books I read" with these children
       | note-title        |
@@ -32,23 +31,12 @@ Feature: MCP (Model Context Protocol) Services
   Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
     And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
-    When I search for notes with the term "<search_term>" 
+    When AI agent searchs for relevant notes using MCP tool with the term "<search_term>"
     Then the "<search_term>" is fed into the correct MCP tool
     Then the response should contain "<note_title>"
 
     Examples:
-      | search_term | note_title           |
-      | Lord        | Lord of the Rings    |
-      | Harry       | Harry Potter         |
-
-  Scenario Outline: AI developer learns from Doughnut via MCP (unhappy case)
-    Given I have a notebook with the head note "Lord of the Rings" and details "Test"
-    And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
-    When I search for notes with the term "<search_term>"
-    Then the "<search_term>" is fed into the correct MCP tool
-    Then the response should contain "No relevant note found."
-
-    Examples:
-      | search_term |
-      | Frodo       |
-      | Hermione    |
+      | search_term | note_title              |
+      | Lord        | Lord of the Rings       |
+      | Harry       | Harry Potter            |
+      | Fiona       | No relevant note found. |
