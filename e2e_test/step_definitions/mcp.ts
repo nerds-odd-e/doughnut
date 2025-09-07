@@ -19,7 +19,7 @@ Given(
 )
 
 // Use the literal API names directly from the feature file
-When('I call the {string} MCP tool', (apiName: string) => {
+When('AI agent calls the {string} MCP tool', (apiName: string) => {
   cy.task('callMcpTool', { apiName }).then((response) => {
     cy.wrap(response).as('MCPApiResponse')
   })
@@ -103,52 +103,11 @@ When(
 
 // --- Add note to notebook ---
 When(
-  'AI agent add note via MCP tool to add note {string} under {string}',
+  'AI agent adds note via MCP tool to add note {string} under {string}',
   (noteTitle: string, parentTitle: string) => {
     cy.task('callMcpToolWithParams', {
       apiName: 'add_note',
       params: { parentTitle: parentTitle, newTitle: noteTitle },
-    }).then((response) => {
-      cy.wrap(response).as('MCPAddNoteResponse')
-    })
-  }
-)
-
-Then(
-  '"{string}" note is added to "{string}" notebook',
-  (noteTitle: string, notebookTitle: string) => {
-    cy.task('callMcpTool', { apiName: 'get_notebook_list' }).then(
-      (response) => {
-        const actualResponse = response as unknown as ApiResponse
-        const found = actualResponse.content.some((item) =>
-          item.text.includes(notebookTitle)
-        )
-        expect(found).to.be.true
-      }
-    )
-  }
-)
-
-// --- Add note with details to notebook ---
-When(
-  'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string} and details {string}',
-  (notebookTitle: string, noteTitle: string, details: string) => {
-    cy.task('callMcpToolWithParams', {
-      apiName: 'add_note',
-      params: { parentTitle: notebookTitle, newTitle: noteTitle, details },
-    }).then((response) => {
-      cy.wrap(response).as('MCPAddNoteResponse')
-    })
-  }
-)
-
-// --- Add note to notebook ---
-When(
-  'AI agent calls the "add_note" MCP tool with notebook title {string} and title {string}',
-  (notebookTitle: string, noteTitle: string) => {
-    cy.task('callMcpTool', {
-      apiName: 'add_note',
-      params: { notebookTitle, noteTitle },
     }).then((response) => {
       cy.wrap(response).as('MCPAddNoteResponse')
     })

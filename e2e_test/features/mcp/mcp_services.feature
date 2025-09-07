@@ -13,7 +13,7 @@ Feature: MCP (Model Context Protocol) Services
   Scenario: Get notebook list
     Given I have a notebook with the head note "Lord of the Rings"
     And I have a notebook with the head note "Harry Potter"
-    When I call the "get_notebook_list" MCP tool
+    When AI agent calls the "get_notebook_list" MCP tool
     Then the response should contain "Lord of the Rings"
     Then the response should contain "Harry Potter"
 
@@ -22,28 +22,12 @@ Feature: MCP (Model Context Protocol) Services
       | Title             | Parent Title | 
       | Lord of the Rings | Books I read | 
       | Harry Potter      | Books I read | 
-    When AI agent add note via MCP tool to add note "Art of War" under "Books I read"
+    When AI agent adds note via MCP tool to add note "Art of War" under "Books I read"
     Then I should see "Books I read" with these children
       | note-title        |
       | Lord of the Rings |
       | Harry Potter      |
       | Art of War        |
-
-  @ignore
-  Scenario: Add note to user select notebook
-    Given I have a notebook with the head note "Lord of the Rings"
-    And I have a notebook with the head note "Harry Potter"
-    When I add a note with title "Sam" and details "holdo" without notebook title
-    Then AI agent calls the "get_notebook_list" MCP tool and show me the notebook list
-    And AI agent calls the "add_note" MCP tool with notebook title "Lord of the Rings" and title "Sam" and details "holdo"
-    Then I should see the note tree in the sidebar
-      | note-title        |
-      | Lord of the Rings |
-      | Sam               |
-    And I should see "Lord of the Rings" with these children
-      | note-title        |
-      | Lord of the Rings |
-      | Sam               |
 
   Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
