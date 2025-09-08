@@ -1,6 +1,21 @@
 import { describe, test, expect, vi } from 'vitest'
 import { tools } from './tools/index.js'
 import type { ToolDescriptor } from './types.js'
+import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
+
+// Type for partial mock of DoughnutApi used in tests
+type MockDoughnutApi = Pick<
+  DoughnutApi,
+  | 'mcpNoteCreationController'
+  | 'restTextContentController'
+  | 'restNotebookController'
+  | 'restNoteController'
+  | 'restSearchController'
+> & {
+  restUserController?: {
+    getUserProfile: ReturnType<typeof vi.fn>
+  }
+}
 
 // Test the server configuration and tool definitions
 describe('MCP Server Configuration', () => {
@@ -85,7 +100,7 @@ describe('add_note tool', () => {
     const addNoteTool = tools.find((t: ToolDescriptor) => t.name === 'add_note')
     expect(addNoteTool).toBeDefined()
 
-    // Mock context and API
+    // Mock context and API - create a partial mock that matches DoughnutApi structure
     const mockCreateNote = vi.fn()
     const mockApi = {
       mcpNoteCreationController: {
@@ -104,7 +119,7 @@ describe('add_note tool', () => {
       restSearchController: {
         searchForLinkTarget: vi.fn(),
       },
-    }
+    } as MockDoughnutApi
     const ctx = { api: mockApi }
 
     // Arguments for the tool
@@ -130,31 +145,32 @@ describe('add_note tool', () => {
 // Test for get_relevant_note tool
 describe('get_relevant_note tool', () => {
   // Helper function to create mock API
-  const createMockApi = (searchResult: unknown[], graphResult?: unknown) => ({
-    restTextContentController: {
-      updateNoteTitle: vi.fn(),
-      updateNoteDetails: vi.fn(),
-    },
-    restUserController: {
-      getUserProfile: vi.fn(),
-    },
-    restNotebookController: {
-      myNotebooks: vi.fn(),
-    },
-    restNoteController: {
-      getGraph: vi
-        .fn()
-        .mockResolvedValue(
-          graphResult || { note: { id: 123, title: 'Test Note' } }
-        ),
-    },
-    restSearchController: {
-      searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
-    },
-    mcpNoteCreationController: {
-      createNote1: vi.fn(),
-    },
-  })
+  const createMockApi = (searchResult: unknown[], graphResult?: unknown) =>
+    ({
+      restTextContentController: {
+        updateNoteTitle: vi.fn(),
+        updateNoteDetails: vi.fn(),
+      },
+      restUserController: {
+        getUserProfile: vi.fn(),
+      },
+      restNotebookController: {
+        myNotebooks: vi.fn(),
+      },
+      restNoteController: {
+        getGraph: vi
+          .fn()
+          .mockResolvedValue(
+            graphResult || { note: { id: 123, title: 'Test Note' } }
+          ),
+      },
+      restSearchController: {
+        searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
+      },
+      mcpNoteCreationController: {
+        createNote1: vi.fn(),
+      },
+    }) as MockDoughnutApi
 
   // Helper function to run the test
   const runQueryExtractionTest = async (

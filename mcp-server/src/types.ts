@@ -1,12 +1,4 @@
-import type { McpAddNoteResponseDTO } from '@generated/backend/models/McpAddNoteResponseDTO.js'
-import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
-
-export type NoteUpdateResult = {
-  note?: {
-    topicConstructor?: string
-    details?: string
-  }
-}
+import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 
 export type ToolResponseContent = { type: 'text'; text: string }
 
@@ -14,36 +6,8 @@ export type ToolResponse = {
   content: ToolResponseContent[]
 }
 
-// Minimal API surface used by tools
-export type ServerApi = {
-  restTextContentController: {
-    updateNoteTitle: (
-      noteId: number,
-      body: { newTitle: string }
-    ) => Promise<unknown>
-    updateNoteDetails: (
-      noteId: number,
-      body: { details: string }
-    ) => Promise<unknown>
-  }
-  restNotebookController: {
-    myNotebooks: () => Promise<unknown>
-  }
-  restNoteController: {
-    getGraph: (noteId: number) => Promise<unknown>
-  }
-  restSearchController: {
-    searchForLinkTarget: (searchTerm: { searchKey: string }) => Promise<unknown>
-  }
-  mcpNoteCreationController: {
-    createNote1: (
-      mcpCreationDTO: McpNoteAddDTO
-    ) => Promise<McpAddNoteResponseDTO>
-  }
-}
-
 export type ServerContext = {
-  api: ServerApi
+  api: DoughnutApi
   authToken?: string
 }
 

@@ -1,4 +1,5 @@
-import type { ServerApi, ToolDescriptor } from '../types.js'
+import type { ToolDescriptor } from '../types.js'
+import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
 import {
   emptyObjectSchema,
@@ -199,7 +200,7 @@ export const tools: ToolDescriptor[] = [
   },
 ]
 
-async function GetNoteByNoteId(api: ServerApi, noteId: number) {
+async function GetNoteByNoteId(api: DoughnutApi, noteId: number) {
   const graph = await api.restNoteController.getGraph(noteId)
   return textResponse(JSON.stringify(graph))
 }
