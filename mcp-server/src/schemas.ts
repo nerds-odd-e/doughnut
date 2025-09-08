@@ -62,3 +62,36 @@ export const getRelevantNoteSchema = {
   required: ['query'],
   additionalProperties: false,
 } as const
+
+// Zod schemas for runtime validation and type safety
+import { z } from 'zod'
+
+export const UpdateNoteParamsSchema = z.object({
+  noteId: z.number(),
+  newTitle: z.string().nullable().optional(),
+  newDetails: z.string().nullable().optional(),
+})
+
+export const NoteIdParamsSchema = z.object({
+  noteId: z.number(),
+})
+
+export const AddNoteParamsSchema = z.object({
+  parentTitle: z.string(),
+  newTitle: z.string(),
+})
+
+export const SearchNoteParamsSchema = z.object({
+  query: z.string(),
+})
+
+export const SearchResultSchema = z.object({
+  noteTopology: z.object({
+    id: z.number(),
+  }),
+})
+
+export type UpdateNoteParams = z.infer<typeof UpdateNoteParamsSchema>
+export type NoteIdParams = z.infer<typeof NoteIdParamsSchema>
+export type AddNoteParams = z.infer<typeof AddNoteParamsSchema>
+export type SearchNoteParams = z.infer<typeof SearchNoteParamsSchema>

@@ -1,21 +1,28 @@
 import type { ToolDescriptor } from '../types.js'
-import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
+import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
+import type { McpAddNoteResponseDTO } from '@generated/backend/models/McpAddNoteResponseDTO.js'
 import {
   emptyObjectSchema,
   updateNoteTextContentSchema,
   getGraphWithNoteIdSchema,
   addNotewithNoteTitleSchema,
   getRelevantNoteSchema,
+  UpdateNoteParamsSchema,
+  AddNoteParamsSchema,
+  SearchNoteParamsSchema,
+  SearchResultSchema,
 } from '../schemas.js'
 import {
   createErrorResponse,
   textResponse,
-  validateNoteUpdateParams,
+  jsonResponse,
+  createToolHandler,
+  extractParams,
+  getNoteById,
+  extractNoteId,
+  formatNotebookListResponse,
 } from '../utils.js'
-import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
-import type { McpAddNoteResponseDTO } from '@generated/backend/models/McpAddNoteResponseDTO.js'
-import { z } from 'zod'
 
 export const tools: ToolDescriptor[] = [
   {
@@ -23,43 +30,43 @@ export const tools: ToolDescriptor[] = [
     description:
       'Update the title and/or details of a note by note ID. At least one of newTitle or newDetails must be provided. Authentication token is taken from the mcpToken argument.',
     inputSchema: updateNoteTextContentSchema,
-    handle: async (ctx, args) => {
-      const { noteId, newTitle, newDetails } = args as {
-        noteId?: number
-        newTitle?: string | null
-        newDetails?: string | null
-      }
+    handle: createToolHandler(async (ctx, args, request) => {
       if (!ctx.authToken) {
         return createErrorResponse(
           'DOUGHNUT_API_AUTH_TOKEN environment variable is required.'
         )
       }
-      const validation = validateNoteUpdateParams(
-        typeof noteId === 'number' ? noteId : undefined,
-        newTitle,
-        newDetails
-      )
-      if (!validation.isValid) return createErrorResponse(validation.error!)
 
-      const api = ctx.api
+      const validation = extractParams(args, UpdateNoteParamsSchema)
+      if (!validation.success) {
+        return createErrorResponse(validation.error)
+      }
+
+      const { noteId, newTitle, newDetails } = validation.data
+
+      // Validate at least one field is provided
+      if (typeof newTitle !== 'string' && typeof newDetails !== 'string') {
+        return createErrorResponse(
+          'At least one of newTitle or newDetails must be provided.'
+        )
+      }
+
       let titleResult: unknown = null
       let detailsResult: unknown = null
-      try {
-        if (typeof newTitle === 'string') {
-          titleResult = await api.restTextContentController.updateNoteTitle(
-            noteId!,
-            { newTitle }
-          )
-        }
-        if (typeof newDetails === 'string') {
-          detailsResult = await api.restTextContentController.updateNoteDetails(
-            noteId!,
-            { details: newDetails }
-          )
-        }
-      } catch (err) {
-        return createErrorResponse(err, 'Failed to update note:')
+
+      if (typeof newTitle === 'string') {
+        titleResult = await ctx.api.restTextContentController.updateNoteTitle(
+          noteId,
+          { newTitle }
+        )
       }
+      if (typeof newDetails === 'string') {
+        detailsResult =
+          await ctx.api.restTextContentController.updateNoteDetails(noteId, {
+            details: newDetails,
+          })
+      }
+
       let msg = 'Note updated successfully.'
       const titleRes = titleResult as {
         note?: { noteTopology?: { titleOrPredicate?: string } }
@@ -72,135 +79,101 @@ export const tools: ToolDescriptor[] = [
         msg += ` Details: ${detailsRes.note.details}.`
       }
       return textResponse(msg)
-    },
+    }),
   },
   {
     name: 'get_notebook_list',
     description: 'Get notebook list',
     inputSchema: emptyObjectSchema,
-    handle: async (ctx) => {
-      const api = ctx.api
-      try {
-        const notebooksViewed = await api.restNotebookController.myNotebooks()
-        const viewed = notebooksViewed as { notebooks?: unknown }
-        const notebooks = Array.isArray(viewed.notebooks)
-          ? (viewed.notebooks as Array<{ title?: string; headNoteId?: number }>)
-          : null
-        if (!notebooks) {
-          return createErrorResponse(
-            `Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`
-          )
-        }
-        // Return notebooks with headNoteId included
-        return {
-          content: [
-            {
-              type: 'text',
-              text: JSON.stringify(
-                notebooks.map((n) => ({
-                  title: n.title ?? '',
-                  headNoteId: n.headNoteId ?? null,
-                }))
-              ),
-            },
-          ],
-        }
-      } catch (err) {
-        return createErrorResponse(err)
+    handle: createToolHandler(async (ctx) => {
+      const notebooksViewed = await ctx.api.restNotebookController.myNotebooks()
+      const viewed = notebooksViewed as { notebooks?: unknown }
+      const notebooks = Array.isArray(viewed.notebooks)
+        ? (viewed.notebooks as Array<{ title?: string; headNoteId?: number }>)
+        : null
+
+      if (!notebooks) {
+        return createErrorResponse(
+          `Unexpected response from myNotebooks: ${JSON.stringify(notebooksViewed)}`
+        )
       }
-    },
+
+      return formatNotebookListResponse(notebooks)
+    }),
   },
   {
     name: 'get_graph_with_note_id',
     description: 'Get graph with note id',
     inputSchema: getGraphWithNoteIdSchema,
-    handle: async (ctx, args, request) => {
-      const api = ctx.api
-      try {
-        // Support both args.noteId and request.params.noteId (for compatibility)
-        const noteId = Number(
-          (args as { noteId?: number }).noteId ??
-            (request as { params?: { noteId?: number } }).params?.noteId
-        )
-        return await GetNoteByNoteId(api, noteId)
-      } catch (err) {
-        return createErrorResponse(err)
+    handle: createToolHandler(async (ctx, args, request) => {
+      const noteId = extractNoteId(args, request)
+      if (noteId === null) {
+        return createErrorResponse('noteId must be provided as a number')
       }
-    },
+      return await getNoteById(ctx.api, noteId)
+    }),
   },
   {
     name: 'add_note',
     description:
       'Add a note to a notebook, if the user specifies a notebook directly call add_note. If the user does not specify a notebook, call get_notebook_list to find a relevant notebook to add the note to, call then call add_note. Returns the title of the created note',
     inputSchema: addNotewithNoteTitleSchema,
-    handle: async (ctx, args) => {
-      const api = ctx.api
-      try {
-        const parentTitle = String(
-          (args as { parentTitle?: string }).parentTitle
-        )
-
-        const newTitle = String((args as { newTitle?: string }).newTitle)
-
-        const noteCreationDTO: NoteCreationDTO = {
-          newTitle: newTitle,
-        }
-        const mcpCreationDto: McpNoteAddDTO = {
-          parentNote: parentTitle,
-          noteCreationDTO: noteCreationDTO,
-        }
-        const response: McpAddNoteResponseDTO =
-          await api.mcpNoteCreationController.createNote1(mcpCreationDto)
-
-        return textResponse(JSON.stringify(response))
-      } catch (err) {
-        return createErrorResponse(err)
+    handle: createToolHandler(async (ctx, args, request) => {
+      const validation = extractParams(args, AddNoteParamsSchema)
+      if (!validation.success) {
+        return createErrorResponse(validation.error)
       }
-    },
+
+      const { parentTitle, newTitle } = validation.data
+
+      const noteCreationDTO: NoteCreationDTO = {
+        newTitle: newTitle,
+      }
+      const mcpCreationDto: McpNoteAddDTO = {
+        parentNote: parentTitle,
+        noteCreationDTO: noteCreationDTO,
+      }
+      const response: McpAddNoteResponseDTO =
+        await ctx.api.mcpNoteCreationController.createNote1(mcpCreationDto)
+
+      return jsonResponse(response)
+    }),
   },
   {
     name: 'get_relevant_note',
     description:
       'Given a user search request, returns the most relevant note information',
     inputSchema: getRelevantNoteSchema,
-    handle: async (ctx, args) => {
-      const api = ctx.api
+    handle: createToolHandler(async (ctx, args, request) => {
+      const validation = extractParams(args, SearchNoteParamsSchema)
+      if (!validation.success) {
+        return createErrorResponse(validation.error)
+      }
+
+      const { query } = validation.data
+      const searchTerm = {
+        searchKey: query,
+        allMyNotebooksAndSubscriptions: true,
+      }
 
       try {
-        const query = args.query as string
-        const searchTerm = {
-          searchKey: query,
-          allMyNotebooksAndSubscriptions: true,
-        }
         const results =
-          await api.restSearchController.searchForLinkTarget(searchTerm)
-
-        // Use zod to validate each result item
-        const resultSchema = z.object({
-          noteTopology: z.object({
-            id: z.number(),
-          }),
-        })
+          await ctx.api.restSearchController.searchForLinkTarget(searchTerm)
 
         if (Array.isArray(results) && results.length > 0) {
-          const parseResult = resultSchema.safeParse(results[0])
+          const parseResult = SearchResultSchema.safeParse(results[0])
           if (parseResult.success) {
             const noteId = parseResult.data.noteTopology.id
-            return await GetNoteByNoteId(api, noteId)
+            return await getNoteById(ctx.api, noteId)
           }
         }
-        return textResponse(`No relevant note found.`)
+        return textResponse('No relevant note found.')
       } catch (err) {
         if (err instanceof Error && err.message === 'Invalid Input.') {
           return textResponse('Invalid Input.')
         }
-        return createErrorResponse(err)
+        throw err // Let createToolHandler handle other errors
       }
-    },
+    }),
   },
 ]
-
-async function GetNoteByNoteId(api: DoughnutApi, noteId: number) {
-  const graph = await api.restNoteController.getGraph(noteId)
-  return textResponse(JSON.stringify(graph))
-}
