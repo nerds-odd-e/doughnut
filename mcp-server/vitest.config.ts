@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitest/config'
+import { resolve } from 'node:path'
 
 export default defineConfig({
   test: {
@@ -10,6 +11,11 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: ['node_modules/', 'build/', 'tests/**/*.test.ts'],
+    },
+  },
+  resolve: {
+    alias: {
+      '@generated': resolve(__dirname, '../generated'),
     },
   },
 })
