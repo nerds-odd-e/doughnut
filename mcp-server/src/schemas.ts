@@ -51,9 +51,3 @@ export const updateNoteTextContentSchema = z.toJSONSchema(
 export const getGraphWithNoteIdSchema = z.toJSONSchema(NoteIdParamsSchema)
 export const addNotewithNoteTitleSchema = z.toJSONSchema(AddNoteParamsSchema)
 export const getRelevantNoteSchema = z.toJSONSchema(SearchNoteParamsSchema)
-
-// TypeScript types inferred from Zod schemas
-export type UpdateNoteParams = z.infer<typeof UpdateNoteParamsSchema>
-export type NoteIdParams = z.infer<typeof NoteIdParamsSchema>
-export type AddNoteParams = z.infer<typeof AddNoteParamsSchema>
-export type SearchNoteParams = z.infer<typeof SearchNoteParamsSchema>
