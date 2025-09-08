@@ -1,6 +1,70 @@
 import { describe, test, expect, vi } from 'vitest'
 import { tools } from '../src/tools/index.js'
 import type { ToolDescriptor, ServerContext } from '../src/types.js'
+import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
+
+// Type for partial mock of DoughnutApi used in tests
+type MockDoughnutApi = {
+  mcpNoteCreationController: {
+    createNote1: ReturnType<typeof vi.fn>
+    httpRequest: ReturnType<typeof vi.fn>
+  }
+  restTextContentController: {
+    updateNoteTitle: ReturnType<typeof vi.fn>
+    updateNoteDetails: ReturnType<typeof vi.fn>
+    httpRequest: ReturnType<typeof vi.fn>
+  }
+  restNotebookController: {
+    myNotebooks: ReturnType<typeof vi.fn>
+    httpRequest: ReturnType<typeof vi.fn>
+  }
+  restNoteController: {
+    getGraph: ReturnType<typeof vi.fn>
+    httpRequest: ReturnType<typeof vi.fn>
+  }
+  restSearchController: {
+    searchForLinkTarget: ReturnType<typeof vi.fn>
+    httpRequest: ReturnType<typeof vi.fn>
+  }
+  restUserController?: {
+    getUserProfile: ReturnType<typeof vi.fn>
+    httpRequest: ReturnType<typeof vi.fn>
+  }
+}
+
+// Helper function to create a mock API
+function createMockApi(
+  overrides: Partial<MockDoughnutApi> = {}
+): MockDoughnutApi {
+  return {
+    mcpNoteCreationController: {
+      createNote1: vi.fn(),
+      httpRequest: vi.fn(),
+    },
+    restTextContentController: {
+      updateNoteTitle: vi.fn(),
+      updateNoteDetails: vi.fn(),
+      httpRequest: vi.fn(),
+    },
+    restNotebookController: {
+      myNotebooks: vi.fn(),
+      httpRequest: vi.fn(),
+    },
+    restNoteController: {
+      getGraph: vi.fn(),
+      httpRequest: vi.fn(),
+    },
+    restSearchController: {
+      searchForLinkTarget: vi.fn(),
+      httpRequest: vi.fn(),
+    },
+    restUserController: {
+      getUserProfile: vi.fn(),
+      httpRequest: vi.fn(),
+    },
+    ...overrides,
+  }
+}
 
 // Test the server configuration and tool definitions
 describe('MCP Server Configuration', () => {
@@ -80,40 +144,118 @@ describe('Tool Response Formats', () => {
 // Test for add_note tool
 describe('add_note tool', () => {
   test('should call API and return success', async () => {
+    // Import the tools array
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const addNoteTool = tools.find((t: ToolDescriptor) => t.name === 'add_note')
     expect(addNoteTool).toBeDefined()
-    expect(addNoteTool?.name).toBe('add_note')
+
+    // Mock context and API using helper function
+    const mockCreateNote = vi.fn()
+    const mockApi = createMockApi({
+      mcpNoteCreationController: {
+        createNote1: mockCreateNote,
+        httpRequest: vi.fn(),
+      },
+    })
+    const ctx = { api: mockApi as unknown as DoughnutApi }
+
+    // Arguments for the tool
+    const args = { parentTitle: 'Parent Note', newTitle: 'Test Note' }
+
+    // Call the tool's handle function
+    if (!addNoteTool) {
+      throw new Error('add_note tool not found')
+    }
+    const _result = await addNoteTool.handle(ctx, args, { params: args })
+
+    // Assert API was called with correct arguments
+    expect(mockCreateNote).toHaveBeenCalledWith({
+      noteCreationDTO: {
+        newTitle: 'Test Note',
+      },
+      parentNote: 'Parent Note',
+    })
+    // Assert the response is as expected
   })
 })
 
 // Test for get_relevant_note tool
 describe('get_relevant_note tool', () => {
-  test('should be defined', () => {
-    const tool = tools.find(
+  // Helper function to create mock API for get_relevant_note tests
+  const createRelevantNoteMockApi = (
+    searchResult: unknown[],
+    graphResult?: unknown
+  ) =>
+    createMockApi({
+      restNoteController: {
+        getGraph: vi
+          .fn()
+          .mockResolvedValue(
+            graphResult || { note: { id: 123, title: 'Test Note' } }
+          ),
+        httpRequest: vi.fn(),
+      },
+      restSearchController: {
+        searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
+        httpRequest: vi.fn(),
+      },
+    })
+
+  // Helper function to run the test
+  const runQueryExtractionTest = async (
+    args: unknown,
+    expectedSearchKey: string,
+    shouldFindNote = true
+  ) => {
+    const getRelevantNoteTool = tools.find(
       (t: ToolDescriptor) => t.name === 'get_relevant_note'
     )
-    expect(tool).toBeDefined()
-    expect(tool?.name).toBe('get_relevant_note')
-  })
+    expect(getRelevantNoteTool).toBeDefined()
 
-  test('should handle string arguments', async () => {
-    const tool = tools.find((t) => t.name === 'get_relevant_note')!
-    const mockApi = {
-      restSearchController: {
-        searchForLinkTarget: vi.fn().mockResolvedValue([]),
-      },
-      restNoteController: { getGraph: vi.fn() },
-      restTextContentController: {
-        updateNoteTitle: vi.fn(),
-        updateNoteDetails: vi.fn(),
-      },
-      restNotebookController: { myNotebooks: vi.fn() },
-      mcpNoteCreationController: { createNote1: vi.fn() },
+    const searchResult = shouldFindNote ? [{ noteTopology: { id: 123 } }] : []
+    const mockApi = createRelevantNoteMockApi(searchResult)
+    const ctx = { api: mockApi as unknown as DoughnutApi }
+
+    // Call the tool's handle function
+    if (!getRelevantNoteTool) {
+      throw new Error('get_relevant_note tool not found')
     }
-    const mockContext = { api: mockApi }
+    const result = await getRelevantNoteTool.handle(
+      ctx,
+      args as unknown as Record<string, unknown>
+    )
 
-    const result = await tool.handle(mockContext, { query: 'test' })
-    expect(result.content[0].text).toBe('No relevant note found.')
+    // Assert search was called with correct arguments
+    expect(
+      mockApi.restSearchController.searchForLinkTarget
+    ).toHaveBeenCalledWith({
+      searchKey: expectedSearchKey,
+      allMyNotebooksAndSubscriptions: true,
+    })
+
+    // Assert the response
+    if (shouldFindNote) {
+      expect(result.content[0].text).toContain('Test Note')
+    } else {
+      expect(result.content[0].text).toBe('No relevant note found.')
+    }
+  }
+
+  // Test data for different argument types
+  const testCases = [
+    {
+      name: 'should extract query when args is an object with query property',
+      args: { query: 'query in query' },
+      expectedSearchKey: 'query in query',
+      shouldFindNote: true,
+    },
+  ]
+
+  // Run all test cases
+  testCases.forEach(({ name, args, expectedSearchKey, shouldFindNote }) => {
+    test(name, async () => {
+      await runQueryExtractionTest(args, expectedSearchKey, shouldFindNote)
+    })
   })
 })
 
