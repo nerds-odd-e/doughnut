@@ -124,8 +124,8 @@ importers:
         specifier: 2.0.3
         version: 2.0.3
       turndown:
-        specifier: ^7.2.0
-        version: 7.2.0
+        specifier: ^7.2.1
+        version: 7.2.1
       vue-content-loader:
         specifier: 2.0.1
         version: 2.0.1(vue@3.5.21(typescript@5.9.2))
@@ -4490,8 +4490,8 @@ packages:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
 
-  turndown@7.2.0:
-    resolution: {integrity: sha512-eCZGBN4nNNqM9Owkv9HAtWRYfLA4h909E/WGAWWBpmB275ehNhZyk87/Tpvjbp0jjNl9XwCsbe6bm6CqFsgD+A==}
+  turndown@7.2.1:
+    resolution: {integrity: sha512-7YiPJw6rLClQL3oUKN3KgMaXeJJ2lAyZItclgKDurqnH61so4k4IH/qwmMva0zpuJc/FhRExBBnk7EbeFANlgQ==}
 
   tweetnacl@0.14.5:
     resolution: {integrity: sha512-KXXFFdAbFXY4geFIwoyNK+f5Z1b7swfXABfL7HXCmoIWMKU3dmS26672A4EeQtDzLKy7SXmfBu51JolvEKwtGA==}
@@ -9661,7 +9661,7 @@ snapshots:
 
   tunnel@0.0.6: {}
 
-  turndown@7.2.0:
+  turndown@7.2.1:
     dependencies:
       '@mixmark-io/domino': 2.2.0
 
