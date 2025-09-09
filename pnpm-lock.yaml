@@ -55,8 +55,8 @@ importers:
         specifier: ^4.0.5
         version: 4.0.5
       '@types/jquery':
-        specifier: ^3.5.32
-        version: 3.5.32
+        specifier: ^3.5.33
+        version: 3.5.33
       '@types/node':
         specifier: ^22.15.30
         version: 22.17.1
@@ -73,8 +73,8 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5
       got:
-        specifier: ^14.4.7
-        version: 14.4.7
+        specifier: ^14.4.8
+        version: 14.4.8
       jsdom:
         specifier: ^26.1.0
         version: 26.1.0
@@ -1180,8 +1180,8 @@ packages:
   '@types/http-cache-semantics@4.0.4':
     resolution: {integrity: sha512-1m0bIFVc7eJWyve9S0RnuRgcQqF/Xd5QsUZAZeQFr1Q3/p9JWoQQEqmVy+DPTNpGXwhgIetAoYF8JSc33q29QA==}
 
-  '@types/jquery@3.5.32':
-    resolution: {integrity: sha512-b9Xbf4CkMqS02YH8zACqN1xzdxc3cO735Qe5AbSUFmyOiaWAbcpqh9Wna+Uk0vgACvoQHpWDg2rGdHkYPLmCiQ==}
+  '@types/jquery@3.5.33':
+    resolution: {integrity: sha512-SeyVJXlCZpEki5F0ghuYe+L+PprQta6nRZqhONt9F13dWBtR/ftoaIbdRQ7cis7womE+X2LKhsDdDtkkDhJS6g==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -2640,8 +2640,8 @@ packages:
     resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
 
-  got@14.4.7:
-    resolution: {integrity: sha512-DI8zV1231tqiGzOiOzQWDhsBmncFW7oQDH6Zgy6pDPrqJuVZMtoSgPLLsBZQj8Jg4JFfwoOsDA8NGtLQLnIx2g==}
+  got@14.4.8:
+    resolution: {integrity: sha512-vxwU4HuR0BIl+zcT1LYrgBjM+IJjNElOjCzs0aPgHorQyr/V6H6Y73Sn3r3FOlUffvWD+Q5jtRuGWaXkU8Jbhg==}
     engines: {node: '>=20'}
 
   graceful-fs@4.2.11:
@@ -6008,7 +6008,7 @@ snapshots:
 
   '@types/http-cache-semantics@4.0.4': {}
 
-  '@types/jquery@3.5.32':
+  '@types/jquery@3.5.33':
     dependencies:
       '@types/sizzle': 2.3.9
 
@@ -7725,7 +7725,7 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  got@14.4.7:
+  got@14.4.8:
     dependencies:
       '@sindresorhus/is': 7.0.2
       '@szmarczak/http-timer': 5.0.1
