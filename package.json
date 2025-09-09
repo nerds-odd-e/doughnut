@@ -62,7 +62,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^23.1.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5",
     "@biomejs/biome": "2.2.3",
-    "@modelcontextprotocol/sdk": "^1.12.3",
+    "@modelcontextprotocol/sdk": "^1.17.5",
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.33",
