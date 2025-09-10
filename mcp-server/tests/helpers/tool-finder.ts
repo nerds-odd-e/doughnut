@@ -9,8 +9,3 @@ export function findTool(toolName: string): ToolDescriptor {
   }
   return tool
 }
-
-// Helper function to get all expected tool names
-export function getExpectedToolNames(): string[] {
-  return ['get_graph_with_note_id', 'add_note', 'get_relevant_note']
-}

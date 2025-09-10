@@ -1,6 +1,10 @@
 import { describe, test, expect } from 'vitest'
 import { tools } from '../src/tools/index.js'
-import { getExpectedToolNames } from './helpers/index.js'
+
+// Helper function to get all expected tool names
+function getExpectedToolNames(): string[] {
+  return ['get_graph_with_note_id', 'add_note', 'get_relevant_note']
+}
 
 describe('MCP Server Configuration', () => {
   test('should have correct server metadata', () => {
