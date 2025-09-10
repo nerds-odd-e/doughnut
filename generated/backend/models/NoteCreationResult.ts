@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NoteRealm } from './NoteRealm';
-export type NoteCreationRresult = {
+export type NoteCreationResult = {
     created: NoteRealm;
     parent: NoteRealm;
 };

@@ -6,7 +6,7 @@ import org.springframework.lang.NonNull;
 
 @Data
 @AllArgsConstructor
-public class NoteCreationRresult {
+public class NoteCreationResult {
   @NonNull private final NoteRealm created;
   @NonNull private final NoteRealm parent;
 

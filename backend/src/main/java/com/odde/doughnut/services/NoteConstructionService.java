@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteCreationRresult;
+import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -68,13 +68,13 @@ public record NoteConstructionService(
                     }));
   }
 
-  public NoteCreationRresult createNoteWithWikidataService(
+  public NoteCreationResult createNoteWithWikidataService(
       Note parentNote, NoteCreationDTO noteCreation, User user, WikidataIdWithApi wikidataIdWithApi)
       throws InterruptedException, IOException, BindException {
     try {
       Note note =
           createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
-      return new NoteCreationRresult(
+      return new NoteCreationResult(
           new NoteViewer(user, note).toJsonObject(),
           new NoteViewer(user, parentNote).toJsonObject());
     } catch (DuplicateWikidataIdException e) {

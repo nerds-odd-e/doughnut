@@ -903,7 +903,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationRresult"
+                $ref: "#/components/schemas/NoteCreationResult"
   /api/notes/{parentNote}/create:
     post:
       tags:
@@ -933,7 +933,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteCreationRresult"
+                $ref: "#/components/schemas/NoteCreationResult"
   /api/notes/{note}/updateWikidataId:
     post:
       tags:
@@ -4002,7 +4002,7 @@ components:
           pattern: ^$|Q\d+
       required:
       - newTitle
-    NoteCreationRresult:
+    NoteCreationResult:
       type: object
       properties:
         created:

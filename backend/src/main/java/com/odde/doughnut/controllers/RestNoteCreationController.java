@@ -41,7 +41,7 @@ class RestNoteCreationController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  public NoteCreationRresult createNote(
+  public NoteCreationResult createNote(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
@@ -55,7 +55,7 @@ class RestNoteCreationController {
 
   @PostMapping(value = "/{referenceNote}/create-after")
   @Transactional
-  public NoteCreationRresult createNoteAfter(
+  public NoteCreationResult createNoteAfter(
       @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
@@ -71,7 +71,7 @@ class RestNoteCreationController {
             currentUser.getEntity(),
             wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
-    return new NoteCreationRresult(
+    return new NoteCreationResult(
         new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
         new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject());
   }

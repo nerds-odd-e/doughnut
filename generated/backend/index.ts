@@ -85,7 +85,7 @@ export type { NotebookCertificateApproval } from './models/NotebookCertificateAp
 export type { NotebookSettings } from './models/NotebookSettings';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
 export type { NoteCreationDTO } from './models/NoteCreationDTO';
-export type { NoteCreationRresult } from './models/NoteCreationRresult';
+export type { NoteCreationResult } from './models/NoteCreationResult';
 export type { NoteDetailsCompletion } from './models/NoteDetailsCompletion';
 export type { NoteInfo } from './models/NoteInfo';
 export type { NoteMoveDTO } from './models/NoteMoveDTO';

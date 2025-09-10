@@ -3,7 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { NoteCreationDTO } from '../models/NoteCreationDTO';
-import type { NoteCreationRresult } from '../models/NoteCreationRresult';
+import type { NoteCreationResult } from '../models/NoteCreationResult';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestNoteCreationControllerService {
@@ -11,13 +11,13 @@ export class RestNoteCreationControllerService {
     /**
      * @param referenceNote
      * @param requestBody
-     * @returns NoteCreationRresult OK
+     * @returns NoteCreationResult OK
      * @throws ApiError
      */
     public createNoteAfter(
         referenceNote: number,
         requestBody: NoteCreationDTO,
-    ): CancelablePromise<NoteCreationRresult> {
+    ): CancelablePromise<NoteCreationResult> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{referenceNote}/create-after',
@@ -34,13 +34,13 @@ export class RestNoteCreationControllerService {
     /**
      * @param parentNote
      * @param requestBody
-     * @returns NoteCreationRresult OK
+     * @returns NoteCreationResult OK
      * @throws ApiError
      */
     public createNote(
         parentNote: number,
         requestBody: NoteCreationDTO,
-    ): CancelablePromise<NoteCreationRresult> {
+    ): CancelablePromise<NoteCreationResult> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/notes/{parentNote}/create',
