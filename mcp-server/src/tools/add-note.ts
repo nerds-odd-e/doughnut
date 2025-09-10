@@ -16,7 +16,7 @@ const AddNoteParamsSchema = z.object({
 // Tool definition with co-located logic
 export const addNoteTool = createTool(
   'add_note',
-  'Add a note to a notebook, if the user specifies a notebook directly call add_note. If the user does not specify a notebook, call get_notebook_list to find a relevant notebook to add the note to, call then call add_note. Returns the title of the created note',
+  'Add a note to a notebook. Returns the title of the created note',
   AddNoteParamsSchema
 ).handle(async (ctx, { parentTitle, newTitle }) => {
   const noteCreationDTO: NoteCreationDTO = {

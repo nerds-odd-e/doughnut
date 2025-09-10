@@ -9,13 +9,6 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid MCP token
     And I connect to an MCP client that connects to Doughnut MCP service
 
-  Scenario: Get notebook list
-    Given I have a notebook with the head note "Lord of the Rings"
-    And I have a notebook with the head note "Harry Potter"
-    When AI agent calls the "get_notebook_list" MCP tool
-    Then the response should contain "Lord of the Rings"
-    Then the response should contain "Harry Potter"
-
   Scenario: Adding note to a known parent note
     Given I have a notebook with head note "Books I read" and notes:
       | Title             | Parent Title |
