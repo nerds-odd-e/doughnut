@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.McpAddNoteResponseDTO;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
+import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
@@ -21,8 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -61,32 +59,21 @@ public class McpNoteCreationController {
 
   @PostMapping(value = "/create")
   @Transactional
-  public ResponseEntity<McpAddNoteResponseDTO> createNote(
-      @Valid @RequestBody McpNoteAddDTO noteCreation)
+  public NoteCreationResult createNote(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    try {
+    var parentNoteObj = FindParentNote(currentUser.getEntity(), noteCreation);
 
-      var parentNoteObj = FindParentNote(currentUser.getEntity(), noteCreation);
-
-      if (parentNoteObj.equals(new Note())) {
-        return ConstructNotFoundResponse();
-      }
-
-      currentUser.assertAuthorization(parentNoteObj);
-
-      noteConstructionService.createNoteWithWikidataService(
-          parentNoteObj,
-          noteCreation.noteCreationDTO,
-          currentUser.getEntity(),
-          wikidataService.wrapWikidataIdWithApi(noteCreation.noteCreationDTO.wikidataId));
-
-      return ConstructOkResponse(
-          noteCreation.noteCreationDTO.getNewTitle(), noteCreation.parentNote);
-
-    } catch (UnexpectedNoAccessRightException e) {
-
-      return ConstructNotFoundResponse();
+    if (parentNoteObj.equals(new Note())) {
+      throw new UnexpectedNoAccessRightException();
     }
+
+    currentUser.assertAuthorization(parentNoteObj);
+
+    return noteConstructionService.createNoteWithWikidataService(
+        parentNoteObj,
+        noteCreation.noteCreationDTO,
+        currentUser.getEntity(),
+        wikidataService.wrapWikidataIdWithApi(noteCreation.noteCreationDTO.wikidataId));
   }
 
   private Note FindParentNote(User currentUser, McpNoteAddDTO noteCreation)
@@ -106,19 +93,5 @@ public class McpNoteCreationController {
     Optional<Note> parentNoteObj = noteRepository.findById(parentId);
 
     return parentNoteObj.orElseGet(Note::new);
-  }
-
-  private ResponseEntity<McpAddNoteResponseDTO> ConstructOkResponse(
-      String newTitle, String parentTitle) {
-    var response = new McpAddNoteResponseDTO();
-    response.response = String.format("Added %s to parent Notebook %s", newTitle, parentTitle);
-
-    return ResponseEntity.status(HttpStatus.OK).body(response);
-  }
-
-  private ResponseEntity<McpAddNoteResponseDTO> ConstructNotFoundResponse() {
-    var response = new McpAddNoteResponseDTO();
-    response.response = "This parent does not exist";
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
 }

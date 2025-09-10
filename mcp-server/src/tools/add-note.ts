@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
-import type { McpAddNoteResponseDTO } from '@generated/backend/models/McpAddNoteResponseDTO.js'
+import type { NoteCreationResult } from '@generated/backend/models/NoteCreationResult.js'
 import { createTool } from './tool-builder.js'
 import { jsonResponse } from '../helpers.js'
 
@@ -26,8 +26,11 @@ export const addNoteTool = createTool(
     parentNote: parentTitle,
     noteCreationDTO: noteCreationDTO,
   }
-  const response: McpAddNoteResponseDTO =
+  const result: NoteCreationResult =
     await ctx.api.mcpNoteCreationController.createNote1(mcpCreationDto)
 
-  return jsonResponse(response)
+  return jsonResponse({
+    title: result.created.note.noteTopology.titleOrPredicate,
+    message: `Added "${result.created.note.noteTopology.titleOrPredicate}" to parent "${result.parent.note.noteTopology.titleOrPredicate}"`,
+  })
 })
