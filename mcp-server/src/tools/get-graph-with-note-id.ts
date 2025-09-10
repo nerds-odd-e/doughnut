@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { createErrorResponse, getNoteById, extractNoteId } from '../utils.js'
+import { createErrorResponse, getNoteById, extractNoteId } from '../helpers.js'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({

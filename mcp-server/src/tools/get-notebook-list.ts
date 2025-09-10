@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { createErrorResponse, formatNotebookListResponse } from '../utils.js'
+import { createErrorResponse } from '../helpers.js'
 
 // Schema definition co-located with the tool
 const EmptyObjectSchema = z.object({})
@@ -23,5 +23,17 @@ export const getNotebookListTool = createTool(
     )
   }
 
-  return formatNotebookListResponse(notebooks)
+  return {
+    content: [
+      {
+        type: 'text',
+        text: JSON.stringify(
+          notebooks.map((n) => ({
+            title: n.title ?? '',
+            headNoteId: n.headNoteId ?? null,
+          }))
+        ),
+      },
+    ],
+  }
 })

@@ -3,7 +3,7 @@ import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.
 import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
 import type { McpAddNoteResponseDTO } from '@generated/backend/models/McpAddNoteResponseDTO.js'
 import { createTool } from './tool-builder.js'
-import { jsonResponse } from '../utils.js'
+import { jsonResponse } from '../helpers.js'
 
 // Schema definition co-located with the tool
 const AddNoteParamsSchema = z.object({

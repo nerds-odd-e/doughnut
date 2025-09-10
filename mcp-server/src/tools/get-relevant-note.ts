@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { textResponse, getNoteById } from '../utils.js'
+import { textResponse, getNoteById } from '../helpers.js'
 
 // Schema definitions co-located with the tool
 const SearchNoteParamsSchema = z.object({

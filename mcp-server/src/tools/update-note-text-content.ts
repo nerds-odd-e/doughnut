@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { createErrorResponse, textResponse } from '../utils.js'
+import { createErrorResponse, textResponse } from '../helpers.js'
 
 // Schema definition co-located with the tool
 const UpdateNoteParamsSchema = z.object({

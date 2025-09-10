@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { ToolDescriptor, ServerContext } from '../types.js'
-import { createToolHandler, extractParams } from '../utils.js'
+import { createToolHandler, extractParams } from '../helpers.js'
 
 /**
  * A tool builder that co-locates schema definition, validation, and handler logic
