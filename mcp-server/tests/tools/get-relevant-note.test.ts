@@ -3,18 +3,8 @@ import { createMockApi, createMockContext, findTool } from '../helpers/index.js'
 
 describe('get_relevant_note tool', () => {
   // Helper function to create mock API for get_relevant_note tests
-  const createRelevantNoteMockApi = (
-    searchResult: unknown[],
-    graphResult?: unknown
-  ) =>
+  const createRelevantNoteMockApi = (searchResult: unknown[]) =>
     createMockApi({
-      restNoteController: {
-        getGraph: vi
-          .fn()
-          .mockResolvedValue(
-            graphResult || { note: { id: 123, title: 'Test Note' } }
-          ),
-      },
       restSearchController: {
         searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
       },
@@ -28,7 +18,9 @@ describe('get_relevant_note tool', () => {
   ) => {
     const getRelevantNoteTool = findTool('get_relevant_note')
 
-    const searchResult = shouldFindNote ? [{ noteTopology: { id: 123 } }] : []
+    const searchResult = shouldFindNote
+      ? [{ noteTopology: { id: 123, titleOrPredicate: 'Test Note' } }]
+      : []
     const mockApi = createRelevantNoteMockApi(searchResult)
     const ctx = createMockContext(mockApi)
 
@@ -48,7 +40,10 @@ describe('get_relevant_note tool', () => {
 
     // Assert the response
     if (shouldFindNote) {
-      expect(result.content[0].text).toContain('Test Note')
+      // Now we expect the NoteSearchResult JSON structure
+      const responseText = result.content[0].text
+      expect(responseText).toContain('"noteTopology"')
+      expect(responseText).toContain('"id":123')
     } else {
       expect(result.content[0].text).toBe('No relevant note found.')
     }

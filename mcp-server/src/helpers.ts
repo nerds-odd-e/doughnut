@@ -1,6 +1,5 @@
 import type { z } from 'zod'
 import type { ToolResponse, ServerContext } from './types.js'
-import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 
 /**
  * Helper functions for the MCP server
@@ -98,13 +97,4 @@ export function createToolHandler<T extends Record<string, unknown>>(
       return createErrorResponse(err)
     }
   }
-}
-
-// Note operations
-export async function getNoteById(
-  api: DoughnutApi,
-  noteId: number
-): Promise<ToolResponse> {
-  const graph = await api.restNoteController.getGraph(noteId)
-  return jsonResponse(graph)
 }

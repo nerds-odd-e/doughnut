@@ -1,20 +1,15 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { textResponse, getNoteById } from '../helpers.js'
+import { textResponse, jsonResponse } from '../helpers.js'
+import type { NoteSearchResult } from '../../generated/backend/models/NoteSearchResult.js'
 
 // Schema definitions co-located with the tool
 const SearchNoteParamsSchema = z.object({
   query: z
     .string()
     .describe(
-      'The user search request. The most relevant note id (if any) will be returned.'
+      'The user search request. The most relevant note information (if any) will be returned.'
     ),
-})
-
-const SearchResultSchema = z.object({
-  noteTopology: z.object({
-    id: z.number(),
-  }),
 })
 
 // Tool definition with co-located logic
@@ -33,11 +28,8 @@ export const getRelevantNoteTool = createTool(
       await ctx.api.restSearchController.searchForLinkTarget(searchTerm)
 
     if (Array.isArray(results) && results.length > 0) {
-      const parseResult = SearchResultSchema.safeParse(results[0])
-      if (parseResult.success) {
-        const noteId = parseResult.data.noteTopology.id
-        return await getNoteById(ctx.api, noteId)
-      }
+      const firstResult = results[0] as NoteSearchResult
+      return jsonResponse(firstResult)
     }
     return textResponse('No relevant note found.')
   } catch (err) {

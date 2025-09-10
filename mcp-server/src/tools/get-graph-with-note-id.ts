@@ -1,11 +1,22 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { createErrorResponse, getNoteById, extractNoteId } from '../helpers.js'
+import { createErrorResponse, extractNoteId, jsonResponse } from '../helpers.js'
+import type { ToolResponse } from '../types.js'
+import type { DoughnutApi } from '../../generated/backend/DoughnutApi.js'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({
   noteId: z.number().describe('The ID of the note to fetch graph for.'),
 })
+
+// Note operations
+async function getNoteById(
+  api: DoughnutApi,
+  noteId: number
+): Promise<ToolResponse> {
+  const graph = await api.restNoteController.getGraph(noteId)
+  return jsonResponse(graph)
+}
 
 // Tool definition with co-located logic
 export const getGraphWithNoteIdTool = createTool(
