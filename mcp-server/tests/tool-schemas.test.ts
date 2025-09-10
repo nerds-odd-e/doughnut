@@ -3,35 +3,6 @@ import { tools } from '../src/tools/index.js'
 import type { ServerContext } from '../src/types.js'
 
 describe('Tool Schema Validation', () => {
-  test('update_note_text_content should have correct schema', () => {
-    const schema = {
-      type: 'object',
-      properties: {
-        noteId: {
-          type: 'integer',
-          description: 'The ID of the note to update.',
-        },
-        newTitle: {
-          type: ['string', 'null'],
-          description: 'The new title for the note.',
-        },
-        newDetails: {
-          type: ['string', 'null'],
-          description: 'The new details for the note.',
-        },
-      },
-      required: ['noteId'],
-    }
-
-    expect(schema.type).toBe('object')
-    expect(schema.required).toContain('noteId')
-    expect(schema.properties.noteId.type).toBe('integer')
-    expect(schema.properties.newTitle.type).toContain('string')
-    expect(schema.properties.newTitle.type).toContain('null')
-    expect(schema.properties.newDetails.type).toContain('string')
-    expect(schema.properties.newDetails.type).toContain('null')
-  })
-
   test('simple tools should have basic object schema', () => {
     const basicSchema = {
       type: 'object',

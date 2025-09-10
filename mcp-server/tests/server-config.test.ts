@@ -18,7 +18,7 @@ describe('MCP Server Configuration', () => {
     expectedTools.forEach((toolName) => {
       expect(expectedTools).toContain(toolName)
     })
-    expect(expectedTools).toHaveLength(5)
+    expect(expectedTools).toHaveLength(4)
   })
 })
 

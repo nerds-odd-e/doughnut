@@ -13,7 +13,6 @@ export function findTool(toolName: string): ToolDescriptor {
 // Helper function to get all expected tool names
 export function getExpectedToolNames(): string[] {
   return [
-    'update_note_text_content',
     'get_notebook_list',
     'get_graph_with_note_id',
     'add_note',
