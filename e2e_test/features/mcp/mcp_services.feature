@@ -32,3 +32,16 @@ Feature: MCP (Model Context Protocol) Services
       | Lord        | Lord of the Rings       |
       | Harry       | Harry Potter            |
       | Fiona       | No relevant note found. |
+
+  Scenario: AI agent gets relevant note and then fetches its graph
+    Given I have a notebook with head note "Programming Concepts" and notes:
+      | Title                | Parent Title           |
+      | Object Oriented      | Programming Concepts   |
+      | Functional           | Programming Concepts   |
+      | Classes              | Object Oriented        |
+      | Inheritance          | Object Oriented        |
+    When AI agent searchs for relevant notes using MCP tool with the term "Object"
+    Then the response should contain "Object Oriented"
+    When AI agent extracts note ID from the search result and calls get graph MCP tool
+    Then the graph response should contain the focus note "Object Oriented"
+    And the graph response should contain related notes

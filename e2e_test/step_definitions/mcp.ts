@@ -71,3 +71,67 @@ When(
     })
   }
 )
+
+// --- Get graph workflow ---
+When(
+  'AI agent extracts note ID from the search result and calls get graph MCP tool',
+  () => {
+    cy.get('@MCPApiResponse').then((searchResponse) => {
+      const responseData = searchResponse as unknown as ApiResponse
+      const responseText = responseData.content[0].text
+      const searchResult = JSON.parse(responseText)
+
+      // Check if noteTopology exists and has id
+      if (!(searchResult.noteTopology && searchResult.noteTopology.id)) {
+        throw new Error(`Invalid search result structure: ${responseText}`)
+      }
+
+      const noteId = searchResult.noteTopology.id
+
+      cy.task('callMcpToolWithParams', {
+        apiName: 'get_graph_with_note_id',
+        params: { noteId: noteId },
+      }).then((graphResponse) => {
+        cy.wrap(graphResponse).as('MCPGraphResponse')
+      })
+    })
+  }
+)
+
+Then(
+  'the graph response should contain the focus note {string}',
+  (noteTitle: string) => {
+    cy.get('@MCPGraphResponse').then((response) => {
+      const responseString = JSON.stringify(response)
+      expect(responseString).to.contain('focusNote')
+      expect(responseString).to.contain(noteTitle)
+    })
+  }
+)
+
+Then('the graph response should contain related notes', () => {
+  cy.get('@MCPGraphResponse').then((response) => {
+    const actualResponse = response as unknown as ApiResponse
+    const responseText = actualResponse.content[0].text
+    const graphResult = JSON.parse(responseText)
+
+    expect(graphResult).to.have.property('relatedNotes')
+    expect(graphResult.relatedNotes).to.be.an('array')
+    expect(graphResult.relatedNotes.length).to.be.greaterThan(0)
+
+    // Verify the related notes contain the expected content from our test scenario
+    const relatedNoteTitles = graphResult.relatedNotes.map(
+      (note: any) => note.title
+    )
+
+    // Should contain the parent note
+    expect(relatedNoteTitles).to.include('Programming Concepts')
+
+    // Should contain the child notes
+    expect(relatedNoteTitles).to.include('Classes')
+    expect(relatedNoteTitles).to.include('Inheritance')
+
+    // Should contain the sibling note
+    expect(relatedNoteTitles).to.include('Functional')
+  })
+})
