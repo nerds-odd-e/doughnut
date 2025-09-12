@@ -68,7 +68,7 @@
     "@types/jquery": "^3.5.33",
     "@types/node": "^22.15.30",
     "adm-zip": "^0.5.16",
-    "cypress": "15.1.0",
+    "cypress": "15.2.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.4.8",
