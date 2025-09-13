@@ -1,10 +1,10 @@
 import type { ToolDescriptor } from '../types.js'
-import { getGraphWithNoteIdTool } from './get-graph-with-note-id.js'
+import { getNoteGraphTool } from './get-graph-with-note-id.js'
 import { addNoteTool } from './add-note.js'
-import { getRelevantNoteTool } from './get-relevant-note.js'
+import { findMostRelevantNoteTool } from './get-relevant-note.js'
 
 export const tools: ToolDescriptor[] = [
-  getGraphWithNoteIdTool.build(),
+  getNoteGraphTool.build(),
   addNoteTool.build(),
-  getRelevantNoteTool.build(),
+  findMostRelevantNoteTool.build(),
 ]

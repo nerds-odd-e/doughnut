@@ -29,7 +29,7 @@ When(
   'AI agent searchs for relevant notes using MCP tool with the term {string}',
   (searchTerm: string) => {
     cy.task('callMcpToolWithParams', {
-      apiName: 'get_relevant_note',
+      apiName: 'find_most_relevant_note',
       params: { query: searchTerm },
     }).then((response) => {
       cy.wrap(response).as('MCPApiResponse')
@@ -89,7 +89,7 @@ When(
       const noteId = searchResult.noteTopology.id
 
       cy.task('callMcpToolWithParams', {
-        apiName: 'get_graph_with_note_id',
+        apiName: 'get_note_graph',
         params: { noteId: noteId },
       }).then((graphResponse) => {
         cy.wrap(graphResponse).as('MCPGraphResponse')
