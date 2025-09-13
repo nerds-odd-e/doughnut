@@ -40,7 +40,7 @@ Feature: MCP (Model Context Protocol) Services
       | Functional           | Programming Concepts   |
       | Classes              | Object Oriented        |
       | Inheritance          | Object Oriented        |
-    When AI agent searchs for relevant notes using MCP tool with the term "Object"
+    When AI agent searchs for relevant notes using MCP tool with the term "Object Oriented"
     Then the response should contain "Object Oriented"
     When AI agent extracts note ID from the search result and calls get graph MCP tool
     Then the graph response should contain the focus note "Object Oriented"
