@@ -44,6 +44,37 @@ public class PredefinedQuestionService {
     return question;
   }
 
+  public PredefinedQuestion updateQuestion(
+      PredefinedQuestion question, PredefinedQuestion updatedData) {
+    // Update the question fields
+    question
+        .getMultipleChoicesQuestion()
+        .setStem(updatedData.getMultipleChoicesQuestion().getStem());
+    question
+        .getMultipleChoicesQuestion()
+        .setChoices(updatedData.getMultipleChoicesQuestion().getChoices());
+    question.setCorrectAnswerIndex(updatedData.getCorrectAnswerIndex());
+
+    // Update the parent notebook timestamp
+    Notebook parentNotebook = question.getNote().getNotebook();
+    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(parentNotebook);
+
+    // Save and return the updated question
+    modelFactoryService.save(question);
+    return question;
+  }
+
+  public void deleteQuestion(PredefinedQuestion question) {
+    // Update the parent notebook timestamp
+    Notebook parentNotebook = question.getNote().getNotebook();
+    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(parentNotebook);
+
+    // Delete the question
+    modelFactoryService.remove(question);
+  }
+
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
     MCQWithAnswer mcqWithAnswer = predefinedQuestion.getMcqWithAnswer();
     QuestionEvaluation questionContestResult =
