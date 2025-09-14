@@ -17,8 +17,16 @@ apply plugin: 'io.spring.dependency-management'
 group = 'com.odde'
 version = '0.0.1-SNAPSHOT'
 java {
-  sourceCompatibility = 24
-  targetCompatibility = 24
+  sourceCompatibility = 17
+  targetCompatibility = 17
+}
+
+compileJava {
+  options.compilerArgs += ["-Xlint:unchecked", "-Xlint:deprecation", "--enable-preview"]
+}
+
+bootRun {
+  jvmArgs = ["--enable-preview"]
 }
 
 configurations {

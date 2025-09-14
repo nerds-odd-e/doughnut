@@ -27,7 +27,7 @@ public class ChatMessageForFineTuning {
     if (chatMessage instanceof AssistantMessage assistantMessage) {
       List<ChatToolCall> toolCalls = assistantMessage.getToolCalls();
       if (toolCalls != null) {
-        ChatFunctionCall function = toolCalls.getFirst().getFunction();
+        ChatFunctionCall function = toolCalls.get(0).getFunction();
         chatMessageForFineTuning.functionCall = ChatFunctionCallForFineTuning.from(function);
       }
     }

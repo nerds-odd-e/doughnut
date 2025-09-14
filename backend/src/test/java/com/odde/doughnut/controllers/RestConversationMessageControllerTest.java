@@ -70,7 +70,7 @@ class RestConversationMessageControllerTest {
     var conversationDetail = conversation.getConversationMessages();
     assertEquals(1, conversations.size());
     assertEquals(1, conversationDetail.size());
-    assertEquals(feedback, conversationDetail.getFirst().getMessage());
+    assertEquals(feedback, conversationDetail.get(0).getMessage());
   }
 
   @Test
@@ -289,7 +289,7 @@ class RestConversationMessageControllerTest {
       List<Conversation> conversations =
           (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
-      Conversation conversation = conversations.getFirst();
+      Conversation conversation = conversations.get(0);
       assertEquals(conversation.getConversationInitiator(), currentUser.getEntity());
     }
 
@@ -299,7 +299,7 @@ class RestConversationMessageControllerTest {
       makeMe.refresh(conversation);
       List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
       assertEquals(1, conversationMessages.size());
-      ConversationMessage message = conversationMessages.getFirst();
+      ConversationMessage message = conversationMessages.get(0);
       assertEquals(message.getMessage(), msg);
     }
   }

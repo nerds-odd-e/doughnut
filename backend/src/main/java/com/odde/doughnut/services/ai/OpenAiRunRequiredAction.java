@@ -31,7 +31,8 @@ public final class OpenAiRunRequiredAction extends OpenAiOngoingRun implements O
 
   public ToolCall getLastToolCall() {
     RequiredAction requiredAction = run.getRequiredAction();
-    return requiredAction.getSubmitToolOutputs().getToolCalls().getLast();
+    var toolCalls = requiredAction.getSubmitToolOutputs().getToolCalls();
+    return toolCalls.get(toolCalls.size() - 1);
   }
 
   private ToolCall getTheOnlyToolCall() {
@@ -40,6 +41,6 @@ public final class OpenAiRunRequiredAction extends OpenAiOngoingRun implements O
     if (size != 1) {
       throw new RuntimeException("Unexpected number of tool calls: " + size);
     }
-    return requiredAction.getSubmitToolOutputs().getToolCalls().getFirst();
+    return requiredAction.getSubmitToolOutputs().getToolCalls().get(0);
   }
 }

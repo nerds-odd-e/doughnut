@@ -243,14 +243,14 @@ public class RestAssessmentControllerTests {
     void shouldReturnOnePassAssessmentHistory() {
       makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 4).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
-      assertTrue(assessmentHistories.getFirst().getIsPass());
+      assertTrue(assessmentHistories.get(0).getIsPass());
     }
 
     @Test
     void shouldReturnOneFailAssessmentHistory() {
       makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 2).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
-      assertFalse(assessmentHistories.getFirst().getIsPass());
+      assertFalse(assessmentHistories.get(0).getIsPass());
     }
   }
 }

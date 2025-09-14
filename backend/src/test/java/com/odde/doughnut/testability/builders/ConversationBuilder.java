@@ -21,7 +21,7 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
               .withOneQuestion()
               .please(needPersist)
               .getAssessmentQuestionInstances()
-              .getFirst();
+              .get(0);
       forAnAssessmentQuestionInstance(instance);
     }
     if (this.entity.getConversationInitiator() == null) {
