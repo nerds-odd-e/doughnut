@@ -135,4 +135,46 @@ export class RestPredefinedQuestionControllerService {
             },
         });
     }
+    /**
+     * @param predefinedQuestion
+     * @param requestBody
+     * @returns PredefinedQuestion OK
+     * @throws ApiError
+     */
+    public updateQuestion(
+        predefinedQuestion: number,
+        requestBody: PredefinedQuestion,
+    ): CancelablePromise<PredefinedQuestion> {
+        return this.httpRequest.request({
+            method: 'PUT',
+            url: '/api/predefined-questions/{predefinedQuestion}',
+            path: {
+                'predefinedQuestion': predefinedQuestion,
+            },
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param predefinedQuestion
+     * @returns void
+     * @throws ApiError
+     */
+    public deleteQuestion(
+        predefinedQuestion: number,
+    ): CancelablePromise<void> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/predefined-questions/{predefinedQuestion}',
+            path: {
+                'predefinedQuestion': predefinedQuestion,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }
