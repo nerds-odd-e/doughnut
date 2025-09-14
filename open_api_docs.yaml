@@ -651,66 +651,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/race/reset:
-    post:
-      tags:
-      - race-game-controller
-      operationId: resetGame
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RaceGameRequestDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-  /api/race/go_super:
-    post:
-      tags:
-      - race-game-controller
-      operationId: rollDiceSuper
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RaceGameRequestDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-  /api/race/go_normal:
-    post:
-      tags:
-      - race-game-controller
-      operationId: rollDiceNormal
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RaceGameRequestDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -2807,30 +2747,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
-  /api/race/current_progress:
-    get:
-      tags:
-      - race-game-controller
-      operationId: getCurrentProgress
-      parameters:
-      - name: playerId
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RaceGameProgressDTO"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3956,11 +3872,6 @@ components:
       - answer
       - predefinedQuestion
       - recallPromptId
-    RaceGameRequestDTO:
-      type: object
-      properties:
-        playerId:
-          type: string
     QuestionSuggestionCreationParams:
       type: object
       properties:
@@ -4568,28 +4479,6 @@ components:
       required:
       - toRepeatCount
       - totalAssimilatedCount
-    CurrentProgressDTO:
-      type: object
-      properties:
-        carPosition:
-          type: integer
-          format: int32
-        carHp:
-          type: integer
-          format: int32
-        roundCount:
-          type: integer
-          format: int32
-        lastDiceFace:
-          type: integer
-          format: int32
-        displayName:
-          type: string
-    RaceGameProgressDTO:
-      type: object
-      properties:
-        currentProgress:
-          $ref: "#/components/schemas/CurrentProgressDTO"
     NoteInfo:
       type: object
       properties:

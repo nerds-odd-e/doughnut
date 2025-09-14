@@ -7,7 +7,6 @@ import type { OpenAPIConfig } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
 import { AssimilationControllerService } from './services/AssimilationControllerService';
 import { McpNoteCreationControllerService } from './services/McpNoteCreationControllerService';
-import { RaceGameControllerService } from './services/RaceGameControllerService';
 import { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 import { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 import { RestAiControllerService } from './services/RestAiControllerService';
@@ -40,7 +39,6 @@ type HttpRequestConstructor = new (config: OpenAPIConfig) => BaseHttpRequest;
 export class DoughnutApi {
     public readonly assimilationController: AssimilationControllerService;
     public readonly mcpNoteCreationController: McpNoteCreationControllerService;
-    public readonly raceGameController: RaceGameControllerService;
     public readonly restAiAssistantCreationController: RestAiAssistantCreationControllerService;
     public readonly restAiAudioController: RestAiAudioControllerService;
     public readonly restAiController: RestAiControllerService;
@@ -84,7 +82,6 @@ export class DoughnutApi {
         });
         this.assimilationController = new AssimilationControllerService(this.request);
         this.mcpNoteCreationController = new McpNoteCreationControllerService(this.request);
-        this.raceGameController = new RaceGameControllerService(this.request);
         this.restAiAssistantCreationController = new RestAiAssistantCreationControllerService(this.request);
         this.restAiAudioController = new RestAiAudioControllerService(this.request);
         this.restAiController = new RestAiControllerService(this.request);

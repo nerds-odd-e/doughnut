@@ -10,10 +10,6 @@ import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
 import { notebookCard } from './pageObjects/notebookCard'
 import downloadChecker from './downloadChecker'
-import {
-  assumeRaceGamePage,
-  routerToRaceGamePage,
-} from './pageObjects/raceGamePage'
 const start = {
   ...basicActions,
   questionGenerationService,
@@ -23,8 +19,6 @@ const start = {
   recall,
   assumeCirclePage,
   notebookCard,
-  assumeRaceGamePage,
-  routerToRaceGamePage,
   ...downloadChecker(),
 }
 export default start

@@ -103,11 +103,6 @@ const routes = [
     meta: { useNoteStorageAccessor: true },
   },
   {
-    path: "/d/race",
-    name: "race",
-    component: () => import("@/pages/RaceGamePage.vue"),
-  },
-  {
     path: "/d/failure-report-list/show/:failureReportId",
     name: "failureReport",
     component: FailureReportPage,
