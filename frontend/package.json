@@ -42,7 +42,7 @@
     "daisyui": "^4.12.23",
     "es-toolkit": "^1.39.10",
     "gsap": "^3.13.0",
-    "jsdom": "^26.1.0",
+    "jsdom": "^27.0.0",
     "optionator": "^0.9.4",
     "postcss": "^8.5.4",
     "postcss-load-config": "^6.0.1",
@@ -60,6 +60,6 @@
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
     "vue": "3.5.21",
-    "vue-tsc": "3.0.6"
+    "vue-tsc": "3.0.7"
   }
 }

@@ -28,7 +28,7 @@ importers:
         version: 12.2.0
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+        version: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
       vue-toastification:
         specifier: 2.0.0-rc.5
         version: 2.0.0-rc.5(vue@3.5.21(typescript@5.9.2))
@@ -76,8 +76,8 @@ importers:
         specifier: ^14.4.8
         version: 14.4.8
       jsdom:
-        specifier: ^26.1.0
-        version: 26.1.0
+        specifier: ^27.0.0
+        version: 27.0.0(postcss@8.5.6)
       mountebank:
         specifier: ^2.9.1
         version: 2.9.1
@@ -173,8 +173,8 @@ importers:
         specifier: ^3.13.0
         version: 3.13.0
       jsdom:
-        specifier: ^26.1.0
-        version: 26.1.0
+        specifier: ^27.0.0
+        version: 27.0.0(postcss@8.5.6)
       optionator:
         specifier: ^0.9.4
         version: 0.9.4
@@ -216,19 +216,19 @@ importers:
         version: 5.1.4(typescript@5.9.2)(vite@7.1.5(@types/node@22.18.3)(jiti@1.21.7)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+        version: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
       vitest-dom:
         specifier: ^0.1.1
-        version: 0.1.1(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
+        version: 0.1.1(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
       vitest-fetch-mock:
         specifier: ^0.4.5
-        version: 0.4.5(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
+        version: 0.4.5(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1))
       vue:
         specifier: 3.5.21
         version: 3.5.21(typescript@5.9.2)
       vue-tsc:
-        specifier: 3.0.6
-        version: 3.0.6(typescript@5.9.2)
+        specifier: 3.0.7
+        version: 3.0.7(typescript@5.9.2)
 
   mcp-server:
     devDependencies:
@@ -249,7 +249,7 @@ importers:
         version: 5.9.2
       vitest:
         specifier: 3.2.4
-        version: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+        version: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
       zod:
         specifier: ^4.1.8
         version: 4.1.8
@@ -279,8 +279,14 @@ packages:
     resolution: {integrity: sha512-60vepv88RwcJtSHrD6MjIL6Ta3SOYbgfnkHb+ppAVK+o9mXprRtulx7VlRl3lN3bbvysAfCS7WMVfhUYemB0IQ==}
     engines: {node: '>= 16'}
 
-  '@asamuzakjp/css-color@3.2.0':
-    resolution: {integrity: sha512-K1A6z8tS3XsmCMM86xoWdn7Fkdn9m6RSVtocUrJYIwZnFVkng/PvkEoWtOWmP+Scc6saYWHWZYbndEEXxl24jw==}
+  '@asamuzakjp/css-color@4.0.4':
+    resolution: {integrity: sha512-cKjSKvWGmAziQWbCouOsFwb14mp1betm8Y7Fn+yglDMUUu3r9DCbJ9iJbeFDenLMqFbIMC0pQP8K+B8LAxX3OQ==}
+
+  '@asamuzakjp/dom-selector@6.5.4':
+    resolution: {integrity: sha512-RNSNk1dnB8lAn+xdjlRoM4CzdVrHlmXZtSXAWs2jyl4PiBRWqTZr9ML5M710qgd9RPTBsVG6P0SLy7dwy0Foig==}
+
+  '@asamuzakjp/nwsapi@2.3.9':
+    resolution: {integrity: sha512-n8GuYSrI9bF7FFZ/SjhwevlHc8xaVlb/7HmHelnc/PZXBD2ZR49NnN9sMMuDdEGPeeRQ5d0hqlSlEpgCX3Wl0Q==}
 
   '@babel/code-frame@7.27.1':
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
@@ -522,6 +528,12 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@csstools/css-tokenizer': ^3.0.4
+
+  '@csstools/css-syntax-patches-for-csstree@1.0.14':
+    resolution: {integrity: sha512-zSlIxa20WvMojjpCSy8WrNpcZ61RqfTfX3XTaOeVlGJrt/8HF3YbzgFZa01yTbT4GWQLwfTcC3EB8i3XnB647Q==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      postcss: ^8.4
 
   '@csstools/css-tokenizer@3.0.4':
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
@@ -1310,14 +1322,6 @@ packages:
   '@vue/devtools-api@6.6.4':
     resolution: {integrity: sha512-sGhTPMuXqZ1rVOk32RylztWkfXTRhuS7vgAKv0zjqk8gbsHkJ7xfFf+jbySxt7tWObEJwyKaHMikV/WGDiQm8g==}
 
-  '@vue/language-core@3.0.6':
-    resolution: {integrity: sha512-e2RRzYWm+qGm8apUHW1wA5RQxzNhkqbbKdbKhiDUcmMrNAZGyM8aTiL3UrTqkaFI5s7wJRGGrp4u3jgusuBp2A==}
-    peerDependencies:
-      typescript: '*'
-    peerDependenciesMeta:
-      typescript:
-        optional: true
-
   '@vue/language-core@3.0.7':
     resolution: {integrity: sha512-0sqqyqJ0Gn33JH3TdIsZLCZZ8Gr4kwlg8iYOnOrDDkJKSjFurlQY/bEFQx5zs7SX2C/bjMkmPYq/NiyY1fTOkw==}
     peerDependencies:
@@ -1548,6 +1552,9 @@ packages:
 
   bcrypt-pbkdf@1.0.2:
     resolution: {integrity: sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==}
+
+  bidi-js@1.0.3:
+    resolution: {integrity: sha512-RKshQI1R3YQ+n9YJz2QQ147P66ELpa1FQEg20Dk8oW9t2KgLbpDLLp9aGZ7y8WHSshDknG0bknqGw5/tyCs5tw==}
 
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
@@ -1875,6 +1882,10 @@ packages:
   css-selector-tokenizer@0.8.0:
     resolution: {integrity: sha512-Jd6Ig3/pe62/qe5SBPTN8h8LeUg/pT4lLgtavPf7updwwHpvFzxvOQBHYj2LZDMjUnBzgvIUSjRcf6oT5HzHFg==}
 
+  css-tree@3.1.0:
+    resolution: {integrity: sha512-0eW44TGN5SQXU1mWSkKwFstI/22X2bG1nYzZTYMAWjylYURhse752YgbE4Cx46AC+bAvI+/dYTPRk1LqSUnu6w==}
+    engines: {node: ^10 || ^12.20.0 || ^14.13.0 || >=15.0.0}
+
   css.escape@1.5.1:
     resolution: {integrity: sha512-YUifsXXuknHlUsmlgyY0PKzgPOr7/FjCePfHNt0jxm83wHZi44VDMQ7/fGNkjY3/jV1MC+1CmZbaHzugyeRtpg==}
 
@@ -1893,9 +1904,9 @@ packages:
     resolution: {integrity: sha512-AZL67abkUzIuvcHqk7c09cezpGNcxUxU4Ioi/05xHk4DQeTkWmGYftIE6ctU6AEt+Gn4n1lDStOtj7FKycP71A==}
     engines: {node: '>=8'}
 
-  cssstyle@4.6.0:
-    resolution: {integrity: sha512-2z+rWdzbbSZv6/rhtvzvqeZQHrBaqgogqt85sqFNbabZOuFbCVFb8kPeEtZjiKkbrm395irpNKiYeFeLiQnFPg==}
-    engines: {node: '>=18'}
+  cssstyle@5.3.0:
+    resolution: {integrity: sha512-RveJPnk3m7aarYQ2bJ6iw+Urh55S6FzUiqtBq+TihnTDP4cI8y/TYDqGOyqgnG1J1a6BxJXZsV9JFSTulm9Z7g==}
+    engines: {node: '>=20'}
 
   csstype@3.1.3:
     resolution: {integrity: sha512-M1uQkMl8rQK/szD0LNhtqxIPLpimGm8sOBwU7lLnCpSbTyY3yeU1Vc7l4KT5zT4s/yOxHH5O7tIuuLOCnLADRw==}
@@ -1930,9 +1941,9 @@ packages:
     resolution: {integrity: sha512-Jy/tj3ldjZJo63sVAvg6LHt2mHvl4V6AgRAmNDtLdm7faqtsx+aJG42rsyCo9JCoRVKwPFzKlIPx3DIibwSIaQ==}
     engines: {node: '>=12'}
 
-  data-urls@5.0.0:
-    resolution: {integrity: sha512-ZYP5VBHshaDAiVZxjbRVcFJpc+4xGgT0bK3vzy1HLN8jTO975HEbuYzZJcHoQEY5K1a0z8YayJkyVETa08eNTg==}
-    engines: {node: '>=18'}
+  data-urls@6.0.0:
+    resolution: {integrity: sha512-BnBS08aLUM+DKamupXs3w2tJJoqU+AkaE/+6vQxi/G/DPmIZFJJp9Dkb1kM03AZx8ADehDUZgsNxju3mPXZYIA==}
+    engines: {node: '>=20'}
 
   dayjs@1.11.18:
     resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
@@ -3012,9 +3023,9 @@ packages:
       canvas:
         optional: true
 
-  jsdom@26.1.0:
-    resolution: {integrity: sha512-Cvc9WUhxSMEo4McES3P7oK3QaXldCfNWp7pl2NNeiIFlCoLr3kfq9kb1fxftiwk1FLV7CvpvDfonxtzUDeSOPg==}
-    engines: {node: '>=18'}
+  jsdom@27.0.0:
+    resolution: {integrity: sha512-lIHeR1qlIRrIN5VMccd8tI2Sgw6ieYXSVktcSHaNe3Z5nE/tcPQYQWOq00wxMvYOsz+73eAkNenVvmPC6bba9A==}
+    engines: {node: '>=20'}
     peerDependencies:
       canvas: ^3.0.0
     peerDependenciesMeta:
@@ -3233,6 +3244,9 @@ packages:
   math-intrinsics@1.1.0:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
+
+  mdn-data@2.12.2:
+    resolution: {integrity: sha512-IEn+pegP1aManZuckezWCO+XZQDplx1366JoVhTpMpBB1sPey/SbveZQUosKiKiGYjg1wH4pMlNgXbCiYgihQA==}
 
   media-typer@1.1.0:
     resolution: {integrity: sha512-aisnrDP4GNe06UcKFnV5bfMNPBUw4jsLGaWwWfnH3v02GnBuXX2MCVn5RbrWo0j3pczUilYblq7fQ7Nw2t5XKw==}
@@ -3902,6 +3916,10 @@ packages:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
 
+  require-from-string@2.0.2:
+    resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
+    engines: {node: '>=0.10.0'}
+
   requirejs-config-file@4.0.0:
     resolution: {integrity: sha512-jnIre8cbWOyvr8a5F2KuqBnY+SDA4NXr/hzEZJG79Mxm2WiFQz2dzhC8ibtPJS7zkmBEl1mxSwp5HhC1W4qpxw==}
     engines: {node: '>=10.13.0'}
@@ -4349,8 +4367,15 @@ packages:
   tldts-core@6.1.86:
     resolution: {integrity: sha512-Je6p7pkk+KMzMv2XXKmAE3McmolOQFdxkKw0R8EYNr7sELW46JqnNeTX8ybPiQgvg1ymCoF8LXs5fzFaZvJPTA==}
 
+  tldts-core@7.0.14:
+    resolution: {integrity: sha512-viZGNK6+NdluOJWwTO9olaugx0bkKhscIdriQQ+lNNhwitIKvb+SvhbYgnCz6j9p7dX3cJntt4agQAKMXLjJ5g==}
+
   tldts@6.1.86:
     resolution: {integrity: sha512-WMi/OQ2axVTf/ykqCQgXiIct+mSQDFdH2fkwhPwgEwvJ1kSzZRiinb0zF2Xb8u4+OqPChmyI6MEu4EezNJz+FQ==}
+    hasBin: true
+
+  tldts@7.0.14:
+    resolution: {integrity: sha512-lMNHE4aSI3LlkMUMicTmAG3tkkitjOQGDTFboPJwAg2kJXKP1ryWEyqujktg5qhrFZOkk5YFzgkxg3jErE+i5w==}
     hasBin: true
 
   tmp@0.2.5:
@@ -4374,6 +4399,10 @@ packages:
 
   tough-cookie@5.1.2:
     resolution: {integrity: sha512-FVDYdxtnj0G6Qm/DhNPSb8Ju59ULcup3tuJxkFb5K8Bv2pUXILbf0xZWU8PX8Ov19OXljbUyveOFwRMwkXzO+A==}
+    engines: {node: '>=16'}
+
+  tough-cookie@6.0.0:
+    resolution: {integrity: sha512-kXuRi1mtaKMrsLUxz3sQYvVl37B0Ns6MzfrtV5DvJceE9bPyspOqk9xxv7XbZWcfLWbFmm997vl83qUWVJA64w==}
     engines: {node: '>=16'}
 
   tr46@3.0.0:
@@ -4748,8 +4777,8 @@ packages:
     peerDependencies:
       vue: ^3.0.2
 
-  vue-tsc@3.0.6:
-    resolution: {integrity: sha512-Tbs8Whd43R2e2nxez4WXPvvdjGbW24rOSgRhLOHXzWiT4pcP4G7KeWh0YCn18rF4bVwv7tggLLZ6MJnO6jXPBg==}
+  vue-tsc@3.0.7:
+    resolution: {integrity: sha512-BSMmW8GGEgHykrv7mRk6zfTdK+tw4MBZY/x6fFa7IkdXK3s/8hQRacPjG9/8YKFDIWGhBocwi6PlkQQ/93OgIQ==}
     hasBin: true
     peerDependencies:
       typescript: '>=5.0.0'
@@ -4782,6 +4811,10 @@ packages:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
 
+  webidl-conversions@8.0.0:
+    resolution: {integrity: sha512-n4W4YFyz5JzOfQeA8oN7dUYpR+MBP3PIUsn2jLjWXwK5ASUzt0Jc/A5sAUZoCYFJRGF0FBKJ+1JjN43rNdsQzA==}
+    engines: {node: '>=20'}
+
   webpack-virtual-modules@0.6.2:
     resolution: {integrity: sha512-66/V2i5hQanC51vBQKPH4aI8NMAcBW59FVBs+rC7eGHupMyfn34q7rZIE+ETlJ+XTevqfUhVVBgSUNSW2flEUQ==}
 
@@ -4805,9 +4838,9 @@ packages:
     resolution: {integrity: sha512-RKT8HExMpoYx4igMiVMY83lN6UeITKJlBQ+vR/8ZJ8OCdSiN3RwCq+9gH0+Xzj0+5IrM6i4j/6LuvzbZIQgEcQ==}
     engines: {node: '>=12'}
 
-  whatwg-url@14.2.0:
-    resolution: {integrity: sha512-De72GdQZzNTUBBChsXueQUnPKDkg/5A5zp7pFDuQAj5UFoENpiACU0wlCvzpAGnTkj++ihpKwKyYewn/XNUbKw==}
-    engines: {node: '>=18'}
+  whatwg-url@15.0.0:
+    resolution: {integrity: sha512-+0q+Pc6oUhtbbeUfuZd4heMNOLDJDdagYxv756mCf9vnLF+NTj4zvv5UyYNkHJpc3CJIesMVoEIOdhi7L9RObA==}
+    engines: {node: '>=20'}
 
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
@@ -4978,13 +5011,22 @@ snapshots:
       '@types/json-schema': 7.0.15
       js-yaml: 4.1.0
 
-  '@asamuzakjp/css-color@3.2.0':
+  '@asamuzakjp/css-color@4.0.4':
     dependencies:
       '@csstools/css-calc': 2.1.4(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-color-parser': 3.1.0(@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4))(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-parser-algorithms': 3.0.5(@csstools/css-tokenizer@3.0.4)
       '@csstools/css-tokenizer': 3.0.4
-      lru-cache: 10.4.3
+      lru-cache: 11.2.1
+
+  '@asamuzakjp/dom-selector@6.5.4':
+    dependencies:
+      '@asamuzakjp/nwsapi': 2.3.9
+      bidi-js: 1.0.3
+      css-tree: 3.1.0
+      is-potential-custom-element-name: 1.0.1
+
+  '@asamuzakjp/nwsapi@2.3.9': {}
 
   '@babel/code-frame@7.27.1':
     dependencies:
@@ -5273,6 +5315,10 @@ snapshots:
   '@csstools/css-parser-algorithms@3.0.5(@csstools/css-tokenizer@3.0.4)':
     dependencies:
       '@csstools/css-tokenizer': 3.0.4
+
+  '@csstools/css-syntax-patches-for-csstree@1.0.14(postcss@8.5.6)':
+    dependencies:
+      postcss: 8.5.6
 
   '@csstools/css-tokenizer@3.0.4': {}
 
@@ -6069,19 +6115,6 @@ snapshots:
 
   '@vue/devtools-api@6.6.4': {}
 
-  '@vue/language-core@3.0.6(typescript@5.9.2)':
-    dependencies:
-      '@volar/language-core': 2.4.23
-      '@vue/compiler-dom': 3.5.21
-      '@vue/compiler-vue2': 2.7.16
-      '@vue/shared': 3.5.21
-      alien-signals: 2.0.7
-      muggle-string: 0.4.1
-      path-browserify: 1.0.1
-      picomatch: 4.0.3
-    optionalDependencies:
-      typescript: 5.9.2
-
   '@vue/language-core@3.0.7(typescript@5.9.2)':
     dependencies:
       '@volar/language-core': 2.4.23
@@ -6300,6 +6333,10 @@ snapshots:
   bcrypt-pbkdf@1.0.2:
     dependencies:
       tweetnacl: 0.14.5
+
+  bidi-js@1.0.3:
+    dependencies:
+      require-from-string: 2.0.2
 
   binary-extensions@2.3.0: {}
 
@@ -6623,6 +6660,11 @@ snapshots:
       cssesc: 3.0.0
       fastparse: 1.1.2
 
+  css-tree@3.1.0:
+    dependencies:
+      mdn-data: 2.12.2
+      source-map-js: 1.2.1
+
   css.escape@1.5.1: {}
 
   cssesc@3.0.0: {}
@@ -6635,10 +6677,13 @@ snapshots:
     dependencies:
       cssom: 0.3.8
 
-  cssstyle@4.6.0:
+  cssstyle@5.3.0(postcss@8.5.6):
     dependencies:
-      '@asamuzakjp/css-color': 3.2.0
-      rrweb-cssom: 0.8.0
+      '@asamuzakjp/css-color': 4.0.4
+      '@csstools/css-syntax-patches-for-csstree': 1.0.14(postcss@8.5.6)
+      css-tree: 3.1.0
+    transitivePeerDependencies:
+      - postcss
 
   csstype@3.1.3: {}
 
@@ -6716,10 +6761,10 @@ snapshots:
       whatwg-mimetype: 3.0.0
       whatwg-url: 11.0.0
 
-  data-urls@5.0.0:
+  data-urls@6.0.0:
     dependencies:
       whatwg-mimetype: 4.0.0
-      whatwg-url: 14.2.0
+      whatwg-url: 15.0.0
 
   dayjs@1.11.18: {}
 
@@ -7939,30 +7984,31 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  jsdom@26.1.0:
+  jsdom@27.0.0(postcss@8.5.6):
     dependencies:
-      cssstyle: 4.6.0
-      data-urls: 5.0.0
+      '@asamuzakjp/dom-selector': 6.5.4
+      cssstyle: 5.3.0(postcss@8.5.6)
+      data-urls: 6.0.0
       decimal.js: 10.6.0
       html-encoding-sniffer: 4.0.0
       http-proxy-agent: 7.0.2
       https-proxy-agent: 7.0.6
       is-potential-custom-element-name: 1.0.1
-      nwsapi: 2.2.22
       parse5: 7.3.0
       rrweb-cssom: 0.8.0
       saxes: 6.0.0
       symbol-tree: 3.2.4
-      tough-cookie: 5.1.2
+      tough-cookie: 6.0.0
       w3c-xmlserializer: 5.0.0
-      webidl-conversions: 7.0.0
+      webidl-conversions: 8.0.0
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
-      whatwg-url: 14.2.0
+      whatwg-url: 15.0.0
       ws: 8.18.3
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
+      - postcss
       - supports-color
       - utf-8-validate
 
@@ -8172,6 +8218,8 @@ snapshots:
   marked@16.3.0: {}
 
   math-intrinsics@1.1.0: {}
+
+  mdn-data@2.12.2: {}
 
   media-typer@1.1.0: {}
 
@@ -8837,6 +8885,8 @@ snapshots:
 
   require-directory@2.1.1: {}
 
+  require-from-string@2.0.2: {}
+
   requirejs-config-file@4.0.0:
     dependencies:
       esprima: 4.0.1
@@ -9364,9 +9414,15 @@ snapshots:
 
   tldts-core@6.1.86: {}
 
+  tldts-core@7.0.14: {}
+
   tldts@6.1.86:
     dependencies:
       tldts-core: 6.1.86
+
+  tldts@7.0.14:
+    dependencies:
+      tldts-core: 7.0.14
 
   tmp@0.2.5: {}
 
@@ -9388,6 +9444,10 @@ snapshots:
   tough-cookie@5.1.2:
     dependencies:
       tldts: 6.1.86
+
+  tough-cookie@6.0.0:
+    dependencies:
+      tldts: 7.0.14
 
   tr46@3.0.0:
     dependencies:
@@ -9705,7 +9765,7 @@ snapshots:
       tsx: 4.20.5
       yaml: 2.8.1
 
-  vitest-dom@0.1.1(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)):
+  vitest-dom@0.1.1(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)):
     dependencies:
       aria-query: 5.3.2
       chalk: 5.6.2
@@ -9713,13 +9773,13 @@ snapshots:
       dom-accessibility-api: 0.6.3
       lodash-es: 4.17.21
       redent: 4.0.0
-      vitest: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
 
-  vitest-fetch-mock@0.4.5(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)):
+  vitest-fetch-mock@0.4.5(vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)):
     dependencies:
-      vitest: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
+      vitest: 3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1)
 
-  vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@26.1.0)(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1):
+  vitest@3.2.4(@types/node@22.18.3)(jiti@1.21.7)(jsdom@27.0.0(postcss@8.5.6))(sass@1.92.1)(terser@5.44.0)(tsx@4.20.5)(yaml@2.8.1):
     dependencies:
       '@types/chai': 5.2.2
       '@vitest/expect': 3.2.4
@@ -9746,7 +9806,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 22.18.3
-      jsdom: 26.1.0
+      jsdom: 27.0.0(postcss@8.5.6)
     transitivePeerDependencies:
       - jiti
       - less
@@ -9778,10 +9838,10 @@ snapshots:
     dependencies:
       vue: 3.5.21(typescript@5.9.2)
 
-  vue-tsc@3.0.6(typescript@5.9.2):
+  vue-tsc@3.0.7(typescript@5.9.2):
     dependencies:
       '@volar/typescript': 2.4.23
-      '@vue/language-core': 3.0.6(typescript@5.9.2)
+      '@vue/language-core': 3.0.7(typescript@5.9.2)
       typescript: 5.9.2
 
   vue@3.5.21(typescript@5.9.2):
@@ -9819,6 +9879,8 @@ snapshots:
 
   webidl-conversions@7.0.0: {}
 
+  webidl-conversions@8.0.0: {}
+
   webpack-virtual-modules@0.6.2: {}
 
   whatwg-encoding@2.0.0:
@@ -9838,10 +9900,10 @@ snapshots:
       tr46: 3.0.0
       webidl-conversions: 7.0.0
 
-  whatwg-url@14.2.0:
+  whatwg-url@15.0.0:
     dependencies:
       tr46: 5.1.1
-      webidl-conversions: 7.0.0
+      webidl-conversions: 8.0.0
 
   which-boxed-primitive@1.1.1:
     dependencies:
