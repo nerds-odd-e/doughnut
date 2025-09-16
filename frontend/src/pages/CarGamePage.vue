@@ -116,12 +116,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import carScar0 from "@/assets/car-scar0.png"
-import carScar1 from "@/assets/car-scar1.png"
-import carScar2 from "@/assets/car-scar2.png"
-import carScar3 from "@/assets/car-scar3.png"
-import carScar4 from "@/assets/car-scar4.png"
-import carScar5 from "@/assets/car-scar5.png"
-import carScar6 from "@/assets/car-scar6.png"
 
 // Game state
 const diceResult = ref(6)
