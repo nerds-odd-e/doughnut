@@ -2,56 +2,30 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "game")
 public class Game extends EntityIdentifiedByIdOnly {
 
-  @Column(name = "name")
-  @Getter
-  @Setter
-  private String name;
+  @Column(name = "num_of_players")
+  private Integer numberOfPlayers;
 
-  @Column(name = "no_players")
-  @Getter
-  @Setter
-  private Integer noPlayers;
+  @Column(name = "winner")
+  private String winner;
 
-  @Column(name = "winning_step")
-  @Getter
-  @Setter
-  private Integer winningStep;
-
-  @Column(name = "name_of_winner")
-  @Getter
-  @Setter
-  private String nameOfWinner;
+  @Column(name = "max_steps")
+  private int maxSteps;
 
   @Column(name = "created_at")
-  @Getter
-  @Setter
   private Timestamp createdAt;
 
-  @Column(name = "updated_at")
-  @Getter
-  @Setter
-  private Timestamp updatedAt;
+  @Column(name = "end_date")
+  private Timestamp endDate;
 
-  public Game(
-      Integer id, String name, Integer noPlayers, String nameOfWinner, Integer winningStep) {
-    this.id = id;
-    this.name = name;
-    this.noPlayers = noPlayers;
-    this.nameOfWinner = nameOfWinner;
-    this.createdAt = new Timestamp(System.currentTimeMillis());
-    this.updatedAt = this.createdAt;
-    this.winningStep = winningStep;
-  }
-
-  public Game() {
-    this.createdAt = new Timestamp(System.currentTimeMillis());
-    this.updatedAt = this.createdAt;
-  }
+  @Column(name = "update_date")
+  private Timestamp updatedDate;
 }
