@@ -11,13 +11,12 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/games")
@@ -35,7 +34,9 @@ public class RestGameController {
 
   @PostMapping("")
   @Transactional
-  @Operation(summary = "Create a new game", description = "Creates a new game with the specified name and number of players")
+  @Operation(
+      summary = "Create a new game",
+      description = "Creates a new game with the specified name and number of players")
   public ResponseEntity<Game> createGame(@Valid @RequestBody GameCreationDTO gameCreation) {
     currentUser.assertLoggedIn();
 
@@ -63,8 +64,7 @@ public class RestGameController {
     currentUser.assertLoggedIn();
 
     Optional<Game> game = modelFactoryService.gameRepository.findById(gameId);
-    return game.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    return game.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   @PutMapping("/{gameId}")
@@ -100,7 +100,9 @@ public class RestGameController {
 
   @DeleteMapping("/{gameId}")
   @Transactional
-  @Operation(summary = "Delete game", description = "Deletes a game and all associated players and steps")
+  @Operation(
+      summary = "Delete game",
+      description = "Deletes a game and all associated players and steps")
   public ResponseEntity<Void> deleteGame(
       @PathVariable @Parameter(description = "Game ID") @Schema(type = "integer") Integer gameId) {
     currentUser.assertLoggedIn();
@@ -145,7 +147,9 @@ public class RestGameController {
   }
 
   @GetMapping("/{gameId}/players")
-  @Operation(summary = "Get players in game", description = "Retrieves all players in a specific game")
+  @Operation(
+      summary = "Get players in game",
+      description = "Retrieves all players in a specific game")
   public ResponseEntity<List<Player>> getPlayersInGame(
       @PathVariable @Parameter(description = "Game ID") @Schema(type = "integer") Integer gameId) {
     currentUser.assertLoggedIn();
@@ -157,19 +161,20 @@ public class RestGameController {
   @GetMapping("/players/{playerId}")
   @Operation(summary = "Get player by ID", description = "Retrieves a specific player by ID")
   public ResponseEntity<Player> getPlayer(
-      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer") Integer playerId) {
+      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer")
+          Integer playerId) {
     currentUser.assertLoggedIn();
 
     Optional<Player> player = modelFactoryService.playerRepository.findById(playerId);
-    return player.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    return player.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   @DeleteMapping("/players/{playerId}")
   @Transactional
   @Operation(summary = "Delete player", description = "Deletes a player and all their steps")
   public ResponseEntity<Void> deletePlayer(
-      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer") Integer playerId) {
+      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer")
+          Integer playerId) {
     currentUser.assertLoggedIn();
 
     Optional<Player> playerOpt = modelFactoryService.playerRepository.findById(playerId);
@@ -193,7 +198,8 @@ public class RestGameController {
   @Transactional
   @Operation(summary = "Add step for player", description = "Adds a new step for a specific player")
   public ResponseEntity<Step> addStep(
-      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer") Integer playerId,
+      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer")
+          Integer playerId,
       @Valid @RequestBody StepCreationDTO stepCreation) {
     currentUser.assertLoggedIn();
 
@@ -202,20 +208,23 @@ public class RestGameController {
       return ResponseEntity.notFound().build();
     }
 
-    Step step = new Step(
-        stepCreation.getMove(),
-        stepCreation.getDamage(),
-        stepCreation.getCurrentStep(),
-        playerId
-    );
+    Step step =
+        new Step(
+            stepCreation.getMove(),
+            stepCreation.getDamage(),
+            stepCreation.getCurrentStep(),
+            playerId);
     Step savedStep = modelFactoryService.save(step);
     return ResponseEntity.status(HttpStatus.CREATED).body(savedStep);
   }
 
   @GetMapping("/players/{playerId}/steps")
-  @Operation(summary = "Get steps for player", description = "Retrieves all steps for a specific player")
+  @Operation(
+      summary = "Get steps for player",
+      description = "Retrieves all steps for a specific player")
   public ResponseEntity<List<Step>> getStepsForPlayer(
-      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer") Integer playerId) {
+      @PathVariable @Parameter(description = "Player ID") @Schema(type = "integer")
+          Integer playerId) {
     currentUser.assertLoggedIn();
 
     List<Step> steps = modelFactoryService.stepRepository.findByPlayerId(playerId);
@@ -229,8 +238,7 @@ public class RestGameController {
     currentUser.assertLoggedIn();
 
     Optional<Step> step = modelFactoryService.stepRepository.findById(stepId);
-    return step.map(ResponseEntity::ok)
-        .orElse(ResponseEntity.notFound().build());
+    return step.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
   }
 
   @DeleteMapping("/steps/{stepId}")
@@ -252,7 +260,9 @@ public class RestGameController {
   // Game Statistics
 
   @GetMapping("/{gameId}/stats")
-  @Operation(summary = "Get game statistics", description = "Retrieves statistics for a specific game")
+  @Operation(
+      summary = "Get game statistics",
+      description = "Retrieves statistics for a specific game")
   public ResponseEntity<GameStatsDTO> getGameStats(
       @PathVariable @Parameter(description = "Game ID") @Schema(type = "integer") Integer gameId) {
     currentUser.assertLoggedIn();

@@ -1,10 +1,9 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
-import java.sql.Timestamp;
 
 @Entity
 @Table(name = "game")
@@ -40,18 +39,19 @@ public class Game extends EntityIdentifiedByIdOnly {
   @Setter
   private Timestamp updatedAt;
 
-    public Game(Integer id, String name, Integer noPlayers, String nameOfWinner, Integer winningStep) {
-        this.id = id;
-        this.name = name;
-        this.noPlayers = noPlayers;
-        this.nameOfWinner = nameOfWinner;
-        this.createdAt = new Timestamp(System.currentTimeMillis());
-        this.updatedAt = this.createdAt;
-        this.winningStep = winningStep;
-    }
+  public Game(
+      Integer id, String name, Integer noPlayers, String nameOfWinner, Integer winningStep) {
+    this.id = id;
+    this.name = name;
+    this.noPlayers = noPlayers;
+    this.nameOfWinner = nameOfWinner;
+    this.createdAt = new Timestamp(System.currentTimeMillis());
+    this.updatedAt = this.createdAt;
+    this.winningStep = winningStep;
+  }
 
-    public Game() {
-        this.createdAt = new Timestamp(System.currentTimeMillis());
-        this.updatedAt = this.createdAt;
-    }
+  public Game() {
+    this.createdAt = new Timestamp(System.currentTimeMillis());
+    this.updatedAt = this.createdAt;
+  }
 }
