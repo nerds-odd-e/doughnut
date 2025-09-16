@@ -1,0 +1,6 @@
+CREATE TABLE player (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255),
+    cur_steps VARCHAR(255),
+    damage INT UNSIGNED
+);
