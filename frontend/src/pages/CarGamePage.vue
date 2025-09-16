@@ -131,15 +131,15 @@ const diceRolling = ref(false)
 // Dice rolling functionality
 const rollDice = async () => {
   if (diceRolling.value) return
-  
+
   diceRolling.value = true
-  
+
   // Animate dice rolling
   for (let i = 0; i < 10; i++) {
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
     diceResult.value = Math.floor(Math.random() * 6) + 1
   }
-  
+
   // Final result
   diceResult.value = Math.floor(Math.random() * 6) + 1
   diceRolling.value = false
@@ -148,16 +148,14 @@ const rollDice = async () => {
 // Car animation classes
 const getCarAnimationClass = (index: number) => {
   const animations = [
-    'hover:daisy-animate-bounce',
-    'hover:daisy-animate-pulse', 
-    'hover:daisy-animate-ping'
+    "hover:daisy-animate-bounce",
+    "hover:daisy-animate-pulse",
+    "hover:daisy-animate-ping",
   ]
   return animations[index % animations.length]
 }
 
-const carScars = [
-  carScar0,
-]
+const carScars = [carScar0]
 </script>
 
 <style>
