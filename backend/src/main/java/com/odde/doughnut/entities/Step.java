@@ -7,14 +7,24 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "player")
-public class Player extends EntityIdentifiedByIdOnly {
+@Table(name = "step")
+public class Step extends EntityIdentifiedByIdOnly {
 
-  @Column(name = "name")
+  @Column(name = "move")
+  @Getter
+  @Setter
+  private String move;
+
+  @Column(name = "damage")
+  @Getter
+  @Setter
+  private Integer damage;
+
+  @Column(name = "current_step")
   @Getter
   @Setter
   @NotNull
-  private String name;
+  private Integer currentStep;
 
   @Column(name = "create_date")
   @Getter
@@ -28,20 +38,22 @@ public class Player extends EntityIdentifiedByIdOnly {
   @NotNull
   private Timestamp updateDate;
 
-  @Column(name = "id_of_game")
+  @Column(name = "player_id")
   @Getter
   @Setter
   @NotNull
-  private Integer idOfGame;
+  private Integer playerId;
 
-  public Player() {
+  public Step() {
     this.createDate = new Timestamp(System.currentTimeMillis());
     this.updateDate = new Timestamp(System.currentTimeMillis());
   }
 
-  public Player(String name, Integer idOfGame) {
+  public Step(String move, Integer damage, Integer currentStep, Integer playerId) {
     this();
-    this.name = name;
-    this.idOfGame = idOfGame;
+    this.move = move;
+    this.damage = damage;
+    this.currentStep = currentStep;
+    this.playerId = playerId;
   }
 }

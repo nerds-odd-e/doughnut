@@ -116,12 +116,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import carScar0 from "@/assets/car-scar0.png"
-import carScar1 from "@/assets/car-scar1.png"
-import carScar2 from "@/assets/car-scar2.png"
-import carScar3 from "@/assets/car-scar3.png"
-import carScar4 from "@/assets/car-scar4.png"
-import carScar5 from "@/assets/car-scar5.png"
-import carScar6 from "@/assets/car-scar6.png"
 
 // Game state
 const diceResult = ref(6)
@@ -131,15 +125,15 @@ const diceRolling = ref(false)
 // Dice rolling functionality
 const rollDice = async () => {
   if (diceRolling.value) return
-  
+
   diceRolling.value = true
-  
+
   // Animate dice rolling
   for (let i = 0; i < 10; i++) {
-    await new Promise(resolve => setTimeout(resolve, 100))
+    await new Promise((resolve) => setTimeout(resolve, 100))
     diceResult.value = Math.floor(Math.random() * 6) + 1
   }
-  
+
   // Final result
   diceResult.value = Math.floor(Math.random() * 6) + 1
   diceRolling.value = false
@@ -148,16 +142,14 @@ const rollDice = async () => {
 // Car animation classes
 const getCarAnimationClass = (index: number) => {
   const animations = [
-    'hover:daisy-animate-bounce',
-    'hover:daisy-animate-pulse', 
-    'hover:daisy-animate-ping'
+    "hover:daisy-animate-bounce",
+    "hover:daisy-animate-pulse",
+    "hover:daisy-animate-ping",
   ]
   return animations[index % animations.length]
 }
 
-const carScars = [
-  carScar0,
-]
+const carScars = [carScar0]
 </script>
 
 <style>

@@ -30,8 +30,8 @@ public class NonProductConfiguration {
     http.authorizeHttpRequests(
             auth ->
                 auth.requestMatchers(
-                        "/users/identify" // in non-product env, we use frontend to identify user
-                        )
+                        "/users/identify", // in non-product env, we use frontend to identify user
+                        "/api/games")
                     .permitAll())
         .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
 

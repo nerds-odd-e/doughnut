@@ -24,11 +24,12 @@ import CarGamePage from "@/pages/CarGamePage.vue"
 // when refreshing the page or directly accessing the URL.
 const routes = [
   { path: "/", name: "root", component: HomePage },
-  { path: "/car-game/:uuid", 
-    name: "carGame", 
+  {
+    path: "/car-game/:uuid",
+    name: "carGame",
     component: CarGamePage,
     props: true,
-    meta: { useNoteStorageAccessor: true }, 
+    meta: { useNoteStorageAccessor: true },
   },
   {
     path: `/d/answers/:recallPromptId`,
