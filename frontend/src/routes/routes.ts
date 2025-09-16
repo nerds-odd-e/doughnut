@@ -17,20 +17,12 @@ import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
-import CarGamePage from "@/pages/CarGamePage.vue"
 
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly
 // when refreshing the page or directly accessing the URL.
 const routes = [
   { path: "/", name: "root", component: HomePage },
-  {
-    path: "/car-game/:uuid",
-    name: "carGame",
-    component: CarGamePage,
-    props: true,
-    meta: { useNoteStorageAccessor: true },
-  },
   {
     path: `/d/answers/:recallPromptId`,
     name: "answer",
