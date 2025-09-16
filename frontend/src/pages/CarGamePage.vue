@@ -28,7 +28,7 @@
             </div>
 
             <!-- Game Board Area -->
-            <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-w-full daisy-max-w-5xl daisy-h-[500px] daisy-rounded-3xl daisy-relative daisy-mb-12 daisy-shadow-2xl daisy-border daisy-border-white/30 daisy-overflow-hidden">
+            <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-w-full daisy-max-w-6xl daisy-h-[500px] daisy-rounded-3xl daisy-relative daisy-mb-12 daisy-shadow-2xl daisy-border daisy-border-white/30 daisy-overflow-hidden">
                 <!-- Racing track background -->
                 <div class="daisy-absolute daisy-inset-0 daisy-bg-gradient-to-r daisy-from-green-200 daisy-to-green-300 daisy-opacity-30"></div>
                 
@@ -42,7 +42,7 @@
                     <div v-for="(carScar, index) in carScars"
                          :key="carScar"
                          class="daisy-w-28 daisy-h-12 daisy-rounded-xl daisy-relative daisy-shadow-lg daisy-transform daisy-transition-all daisy-duration-300 hover:daisy-scale-105"
-                         :class="getCarAnimationClass(index)">
+                         :class="getCarStyle(index)">
                         <img :src="carScar" alt="car scar" class="daisy-w-full daisy-h-full daisy-object-cover daisy-object-center daisy-rounded-xl" />
                         <!-- Car glow effect -->
                         <div class="daisy-absolute daisy-inset-0 daisy-bg-gradient-to-r daisy-from-yellow-400/20 daisy-to-orange-400/20 daisy-rounded-xl daisy-animate-pulse"></div>
@@ -50,13 +50,14 @@
                 </div>
 
                 <!-- Progress Bar/Track -->
-                <div class="daisy-absolute daisy-bottom-12 daisy-left-1/2 daisy-transform -daisy-translate-x-1/2 daisy-w-4/5">
+                <div class="daisy-absolute daisy-bottom-12 daisy-left-1/2 daisy-transform -daisy-translate-x-1/2 daisy-w-[90%]">
                     <!-- Blue track line with gradient -->
                     <div class="daisy-h-3 daisy-bg-gradient-to-r daisy-from-blue-400 daisy-to-blue-600 daisy-rounded-full daisy-relative daisy-shadow-lg">
                         <!-- Progress marker with enhanced styling -->
                         <div class="daisy-absolute daisy-left-16 daisy-top-0 daisy-transform -daisy-translate-y-3">
                             <div class="daisy-w-0 daisy-h-0 daisy-border-l-6 daisy-border-r-6 daisy-border-b-6 daisy-border-l-transparent daisy-border-r-transparent daisy-border-b-yellow-400 daisy-drop-shadow-lg"></div>
-                            <div class="daisy-text-center daisy-mt-3 daisy-text-white daisy-font-bold daisy-text-lg daisy-bg-yellow-400 daisy-px-3 daisy-py-1 daisy-rounded-full daisy-shadow-lg">{{ diceResult }}</div>
+                            <div class="daisy-text-center daisy-mt-3 daisy-text-white daisy-font-bold daisy-text-lg daisy-bg-yellow-400 daisy-px-3 daisy-py-1 daisy-rounded-full daisy-shadow-lg"
+                            :class="getMarkerPosition()">{{ totalSteps }}</div>
                         </div>
                         
                         <!-- Track markers -->
@@ -75,7 +76,7 @@
                 <!-- Dice Result Display -->
                 <div class="daisy-bg-white/90 daisy-backdrop-blur-sm daisy-w-32 daisy-h-20 daisy-rounded-2xl daisy-flex daisy-items-center daisy-justify-center daisy-shadow-xl daisy-border daisy-border-white/30 daisy-transform daisy-transition-all daisy-duration-500"
                      :class="diceRolling ? 'daisy-scale-110 daisy-rotate-12' : 'daisy-scale-100 daisy-rotate-0'">
-                    <span class="daisy-text-5xl daisy-font-bold daisy-bg-gradient-to-r daisy-from-purple-600 daisy-to-pink-600 daisy-bg-clip-text daisy-text-transparent">{{ diceResult }}</span>
+                    <span class="daisy-text-5xl daisy-font-bold daisy-bg-gradient-to-r daisy-from-purple-600 daisy-to-pink-600 daisy-bg-clip-text daisy-text-transparent">{{ totalSteps }}</span>
                 </div>
                 
                 <!-- Dice Button -->
@@ -98,7 +99,7 @@
             <div class="daisy-mt-12 daisy-flex daisy-space-x-8 daisy-animate-fade-in">
                 <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-px-6 daisy-py-4 daisy-rounded-xl daisy-shadow-lg daisy-border daisy-border-white/30">
                     <div class="daisy-text-center">
-                        <div class="daisy-text-2xl daisy-font-bold daisy-text-gray-800">0</div>
+                        <div class="daisy-text-2xl daisy-font-bold daisy-text-gray-800">{{ numberOfRounds }}</div>
                         <div class="daisy-text-sm daisy-text-gray-600">Rounds</div>
                     </div>
                 </div>
@@ -121,9 +122,14 @@ import carScar0 from "@/assets/car-scar0.png"
 const diceResult = ref(6)
 const currentPlayer = ref(1)
 const diceRolling = ref(false)
+const numberOfRounds = ref(0)
+const totalSteps = ref(0)
+const damage = ref(0)
 
 // Dice rolling functionality
 const rollDice = async () => {
+
+    //TODO: call API to roll the dice
   if (diceRolling.value) return
 
   diceRolling.value = true
@@ -137,16 +143,23 @@ const rollDice = async () => {
   // Final result
   diceResult.value = Math.floor(Math.random() * 6) + 1
   diceRolling.value = false
+
+  numberOfRounds.value++
+  totalSteps.value += (diceResult.value % 2 == 0 ? 2 : 1) - damage.value
 }
 
 // Car animation classes
-const getCarAnimationClass = (index: number) => {
+const getCarStyle = (index: number) => {
   const animations = [
     "hover:daisy-animate-bounce",
     "hover:daisy-animate-pulse",
     "hover:daisy-animate-ping",
   ]
-  return animations[index % animations.length]
+  return animations[index % animations.length] + ' car-position-' + (totalSteps.value)
+}
+
+const getMarkerPosition = () => {
+  return 'car-position-' + (totalSteps.value)
 }
 
 const carScars = [carScar0]
@@ -189,6 +202,87 @@ const carScars = [carScar0]
 .daisy-animate-bounce-in {
   animation: bounce-in 1s ease-out;
 }
+
+.car-position-1 {
+  transform: translateX(1vw) !important;
+}
+
+.car-position-2 {
+  transform: translateX(4vw) !important;
+}
+
+.car-position-3 {
+  transform: translateX(7vw) !important;
+}
+
+.car-position-4 {
+  transform: translateX(10vw) !important;
+}
+
+.car-position-5 {
+  transform: translateX(13vw) !important;
+}
+
+.car-position-6 {
+  transform: translateX(16vw) !important;
+}
+
+.car-position-7 {
+  transform: translateX(19vw) !important;
+}
+
+.car-position-8 {
+  transform: translateX(22vw) !important;
+}
+
+.car-position-9 {
+  transform: translateX(25vw) !important;
+}
+
+.car-position-10 {
+  transform: translateX(28vw) !important;
+}
+
+.car-position-11 {
+  transform: translateX(31vw) !important;
+}
+
+.car-position-12 {
+  transform: translateX(34vw) !important;
+}
+
+.car-position-13 {
+  transform: translateX(37vw) !important;
+}
+
+.car-position-14 {
+  transform: translateX(40vw) !important;
+}
+
+.car-position-15 {
+  transform: translateX(43vw) !important;
+}
+
+.car-position-16 {
+  transform: translateX(46vw) !important;
+}
+
+.car-position-17 {
+  transform: translateX(49vw) !important;
+}
+
+.car-position-18 {
+  transform: translateX(52vw) !important;
+}
+
+.car-position-19 {
+  transform: translateX(55vw) !important;
+}
+
+.car-position-20 {
+  transform: translateX(58vw) !important;
+}
+
 </style>
   
   
