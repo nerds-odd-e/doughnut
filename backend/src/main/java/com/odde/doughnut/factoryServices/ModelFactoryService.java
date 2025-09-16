@@ -40,9 +40,6 @@ public class ModelFactoryService {
 
   @Autowired public NoteEmbeddingRepository noteEmbeddingRepository;
   @Autowired public NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
-  @Autowired public GameRepository gameRepository;
-  @Autowired public PlayerRepository playerRepository;
-  @Autowired public StepRepository stepRepository;
 
   public void storeNoteEmbedding(Note note, java.util.List<Float> embedding) {
     noteEmbeddingJdbcRepository.insert(note.getId(), embedding);
