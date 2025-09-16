@@ -9,7 +9,9 @@ public class CommonConfiguration {
   void commonConfig(HttpSecurity http) throws Exception {
     http.authorizeHttpRequests(
             auth ->
-                auth.requestMatchers("/users/identify").authenticated().anyRequest().permitAll())
+                auth.requestMatchers("/users/identify").authenticated()
+                    .requestMatchers("/api/games/**").permitAll()
+                    .anyRequest().permitAll())
         .logout(
             l ->
                 l.logoutUrl("/logout")
