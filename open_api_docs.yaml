@@ -1550,6 +1550,25 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
+  /api/games/join:
+    post:
+      tags:
+      - rest-game-controller
+      operationId: joinGame
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int32
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:

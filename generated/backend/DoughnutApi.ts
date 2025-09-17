@@ -18,6 +18,7 @@ import { RestConversationMessageControllerService } from './services/RestConvers
 import { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
 import { RestFailureReportControllerService } from './services/RestFailureReportControllerService';
 import { RestFineTuningDataControllerService } from './services/RestFineTuningDataControllerService';
+import { RestGameControllerService } from './services/RestGameControllerService';
 import { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 import { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
 import { RestLinkControllerService } from './services/RestLinkControllerService';
@@ -50,6 +51,7 @@ export class DoughnutApi {
     public readonly restCurrentUserInfoController: RestCurrentUserInfoControllerService;
     public readonly restFailureReportController: RestFailureReportControllerService;
     public readonly restFineTuningDataController: RestFineTuningDataControllerService;
+    public readonly restGameController: RestGameControllerService;
     public readonly restGlobalSettingsController: RestGlobalSettingsControllerService;
     public readonly restHealthCheckController: RestHealthCheckControllerService;
     public readonly restLinkController: RestLinkControllerService;
@@ -93,6 +95,7 @@ export class DoughnutApi {
         this.restCurrentUserInfoController = new RestCurrentUserInfoControllerService(this.request);
         this.restFailureReportController = new RestFailureReportControllerService(this.request);
         this.restFineTuningDataController = new RestFineTuningDataControllerService(this.request);
+        this.restGameController = new RestGameControllerService(this.request);
         this.restGlobalSettingsController = new RestGlobalSettingsControllerService(this.request);
         this.restHealthCheckController = new RestHealthCheckControllerService(this.request);
         this.restLinkController = new RestLinkControllerService(this.request);

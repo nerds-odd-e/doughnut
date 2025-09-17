@@ -166,6 +166,7 @@ export { RestConversationMessageControllerService } from './services/RestConvers
 export { RestCurrentUserInfoControllerService } from './services/RestCurrentUserInfoControllerService';
 export { RestFailureReportControllerService } from './services/RestFailureReportControllerService';
 export { RestFineTuningDataControllerService } from './services/RestFineTuningDataControllerService';
+export { RestGameControllerService } from './services/RestGameControllerService';
 export { RestGlobalSettingsControllerService } from './services/RestGlobalSettingsControllerService';
 export { RestHealthCheckControllerService } from './services/RestHealthCheckControllerService';
 export { RestLinkControllerService } from './services/RestLinkControllerService';
