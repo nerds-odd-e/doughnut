@@ -11,6 +11,14 @@ Given('I am a player and in the game screen, round 0', function () {
   // TODO: implement step
 })
 
+When('a new player joins', function () {
+  cy.visit('/d/car-game/abc')
+})
+
+Then('the player count is {string}', (numberOfPlayers: string) => {
+  cy.get('#number-of-players').should('contain.text', numberOfPlayers)
+})
+
 When(
   'I choose to play the normal mode and roll the dice',
   function (this: { initialPosition: number }) {

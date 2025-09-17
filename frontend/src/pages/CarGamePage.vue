@@ -16,6 +16,16 @@
                 </div>
             </div>
         </div>
+        <div class="daisy-absolute daisy-top-6 daisy-left-6 daisy-z-10">
+            <div class="daisy-bg-white/90 daisy-backdrop-blur-sm daisy-px-6 daisy-py-3 daisy-rounded-2xl daisy-shadow-lg daisy-border daisy-border-white/20">
+                <div class="daisy-flex daisy-items-center daisy-space-x-2">
+                    <div class="daisy-w-3 daisy-h-3 daisy-bg-green-500 daisy-rounded-full daisy-animate-pulse"></div>
+                    <span id="number-of-players" class="daisy-text-gray-800 daisy-font-semibold daisy-text-lg">Number Of
+                     Players: {{ 1
+                    }}</span>
+                </div>
+            </div>
+        </div>
 
         <!-- Main Game Board -->
         <div class="daisy-flex daisy-flex-col daisy-items-center daisy-justify-center daisy-min-h-screen daisy-p-8 daisy-relative daisy-z-10">
@@ -31,7 +41,7 @@
             <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-w-full daisy-max-w-6xl daisy-h-[500px] daisy-rounded-3xl daisy-relative daisy-mb-12 daisy-shadow-2xl daisy-border daisy-border-white/30 daisy-overflow-hidden">
                 <!-- Racing track background -->
                 <div class="daisy-absolute daisy-inset-0 daisy-bg-gradient-to-r daisy-from-green-200 daisy-to-green-300 daisy-opacity-30"></div>
-                
+
                 <!-- Track lines -->
                 <div class="daisy-absolute daisy-top-1/2 daisy-left-0 daisy-w-full daisy-h-1 daisy-bg-white daisy-opacity-60 daisy-transform -daisy-translate-y-1/2"></div>
                 <div class="daisy-absolute daisy-top-1/2 daisy-left-0 daisy-w-full daisy-h-1 daisy-bg-white daisy-opacity-40 daisy-transform -daisy-translate-y-1/2 daisy-mt-8"></div>
@@ -59,7 +69,7 @@
                             <div class="player-position daisy-text-center daisy-mt-3 daisy-text-white daisy-font-bold daisy-text-lg daisy-bg-yellow-400 daisy-px-3 daisy-py-1 daisy-rounded-full daisy-shadow-lg"
                             :class="getMarkerPosition()">{{ totalSteps }}</div>
                         </div>
-                        
+
                         <!-- Track markers -->
                         <div class="daisy-absolute daisy-top-0 daisy-left-0 daisy-w-full daisy-h-full daisy-flex daisy-justify-between daisy-items-center daisy-px-4">
                             <div v-for="i in 10" :key="i" class="daisy-w-1 daisy-h-1 daisy-bg-white daisy-rounded-full daisy-opacity-60"></div>
@@ -78,9 +88,9 @@
                      :class="diceRolling ? 'daisy-scale-110 daisy-rotate-12' : 'daisy-scale-100 daisy-rotate-0'">
                     <span id="dice-result-display" class="daisy-text-5xl daisy-font-bold daisy-bg-gradient-to-r daisy-from-purple-600 daisy-to-pink-600 daisy-bg-clip-text daisy-text-transparent">{{ diceResult }}</span>
                 </div>
-                
+
                 <!-- Dice Button -->
-                <button 
+                <button
                     id="roll-dice-button"
                     @click="rollDice"
                     :disabled="diceRolling"
@@ -120,7 +130,7 @@
         </div>
     </div>
 </template>
-  
+
 <script setup lang="ts">
 import { onMounted, ref } from "vue"
 import carScar0 from "@/assets/car-scar0.png"
@@ -302,5 +312,4 @@ onMounted(() => {
 }
 
 </style>
-  
-  
+
