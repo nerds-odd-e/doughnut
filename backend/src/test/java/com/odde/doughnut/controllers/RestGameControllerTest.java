@@ -12,18 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class RestGameControllerTest {
-    @Autowired
-    RestGameController restGameController;
+  @Autowired RestGameController restGameController;
 
-    @Test
-    void testJoinGame_Case1() {
-        int playerId = restGameController.joinGame();
-        assertEquals(1, playerId);
-    }
+  @Test
+  void testJoinGame_Case1() {
+    int playerId = restGameController.joinGame();
+    assertEquals(1, playerId);
+  }
 
-    @Test
-    void testJoinGame() {
-        int playerId = restGameController.joinGame();
-        assertEquals(1, playerId);
-    }
+  @Test
+  void testJoinGame() {
+    int playerId = restGameController.joinGame();
+    assertEquals(1, playerId);
+  }
 }

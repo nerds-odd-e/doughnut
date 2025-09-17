@@ -8,16 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/games")
 public class RestGameController {
-    private final ModelFactoryService modelFactoryService;
+  private final ModelFactoryService modelFactoryService;
 
-    public RestGameController(ModelFactoryService modelFactoryService) {
-        this.modelFactoryService = modelFactoryService;
-    }
+  public RestGameController(ModelFactoryService modelFactoryService) {
+    this.modelFactoryService = modelFactoryService;
+  }
 
-    @PostMapping("/join")
-    public int joinGame() {
-        // Implementation for joining a game
+  @PostMapping("/join")
+  public int joinGame() {
+    // Implementation for joining a game
 
-        return 1;
-    }
+    return 1;
+  }
 }
