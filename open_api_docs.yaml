@@ -4110,6 +4110,35 @@ components:
       properties:
         asFirstChild:
           type: boolean
+    Games:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        numberOfPlayers:
+          type: integer
+          format: int32
+        winner:
+          type: string
+        maxSteps:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        updatedDate:
+          type: string
+          format: date-time
+        rounds:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rounds"
+      required:
+      - id
     Players:
       type: object
       properties:
@@ -4123,9 +4152,45 @@ components:
         createDate:
           type: string
           format: date-time
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/Rounds"
       required:
       - id
       - name
+    Rounds:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        player:
+          $ref: "#/components/schemas/Players"
+        game:
+          $ref: "#/components/schemas/Games"
+        roundNo:
+          type: integer
+          format: int32
+        mode:
+          type: string
+        dice:
+          type: integer
+          format: int32
+        damage:
+          type: integer
+          format: int32
+        step:
+          type: integer
+          format: int32
+        createDate:
+          type: string
+          format: date-time
+        updateDate:
+          type: string
+          format: date-time
+      required:
+      - id
     ConversationMessage:
       type: object
       properties:
