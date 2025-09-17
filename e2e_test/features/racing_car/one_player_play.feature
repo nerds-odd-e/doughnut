@@ -1,4 +1,4 @@
-Feature: one player play game with super mode only
+Feature: one player play game
 
   Background:
     Given I am a player and in the game screen, round 0
@@ -28,3 +28,8 @@ Feature: one player play game with super mode only
     Then the total damage becomes 7
     And the car cannot move
 
+  @ignore
+  Scenario: Single player can play the normal mode
+    When I choose to play the normal mode and roll the dice
+    Then the total damage becomes 0
+    And the car moves 1 or 2 steps
