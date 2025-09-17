@@ -27,8 +27,8 @@ Feature: one player play game
     Then the total damage should be 7
     And the the car moves 0 steps
 
-  @ignore
+
   Scenario: Single player can play the normal mode
-    When I choose to play the normal mode and roll the dice
-    Then the total damage becomes 0
-    And the car moves 1 or 2 steps
+    #When I choose to play the normal mode and roll the dice
+    #Then the total damage becomes 0
+    #And the car moves 1 or 2 steps

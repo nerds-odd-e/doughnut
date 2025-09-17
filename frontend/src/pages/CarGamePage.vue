@@ -56,7 +56,7 @@
                         <!-- Progress marker with enhanced styling -->
                         <div class="daisy-absolute daisy-left-16 daisy-top-0 daisy-transform -daisy-translate-y-3">
                             <div class="daisy-w-0 daisy-h-0 daisy-border-l-6 daisy-border-r-6 daisy-border-b-6 daisy-border-l-transparent daisy-border-r-transparent daisy-border-b-yellow-400 daisy-drop-shadow-lg"></div>
-                            <div class="daisy-text-center daisy-mt-3 daisy-text-white daisy-font-bold daisy-text-lg daisy-bg-yellow-400 daisy-px-3 daisy-py-1 daisy-rounded-full daisy-shadow-lg"
+                            <div class="player-position daisy-text-center daisy-mt-3 daisy-text-white daisy-font-bold daisy-text-lg daisy-bg-yellow-400 daisy-px-3 daisy-py-1 daisy-rounded-full daisy-shadow-lg"
                             :class="getMarkerPosition()">{{ totalSteps }}</div>
                         </div>
                         
