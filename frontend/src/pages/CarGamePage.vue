@@ -76,7 +76,7 @@
                 <!-- Dice Result Display -->
                 <div class="daisy-bg-white/90 daisy-backdrop-blur-sm daisy-w-32 daisy-h-20 daisy-rounded-2xl daisy-flex daisy-items-center daisy-justify-center daisy-shadow-xl daisy-border daisy-border-white/30 daisy-transform daisy-transition-all daisy-duration-500"
                      :class="diceRolling ? 'daisy-scale-110 daisy-rotate-12' : 'daisy-scale-100 daisy-rotate-0'">
-                    <span id="dice-result-display" class="daisy-text-5xl daisy-font-bold daisy-bg-gradient-to-r daisy-from-purple-600 daisy-to-pink-600 daisy-bg-clip-text daisy-text-transparent">{{ totalSteps }}</span>
+                    <span id="dice-result-display" class="daisy-text-5xl daisy-font-bold daisy-bg-gradient-to-r daisy-from-purple-600 daisy-to-pink-600 daisy-bg-clip-text daisy-text-transparent">{{ diceResult }}</span>
                 </div>
                 
                 <!-- Dice Button -->

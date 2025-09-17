@@ -29,6 +29,6 @@ Feature: one player play game
 
 
   Scenario: Single player can play the normal mode
-    #When I choose to play the normal mode and roll the dice
+    When I choose to play the normal mode and roll the dice
     #Then the total damage becomes 0
     #And the car moves 1 or 2 steps
