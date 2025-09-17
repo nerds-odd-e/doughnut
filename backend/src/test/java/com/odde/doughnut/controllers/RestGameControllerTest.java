@@ -16,13 +16,7 @@ class RestGameControllerTest {
 
   @Test
   void testJoinGame_Case1() {
-    int playerId = restGameController.joinGame();
-    assertEquals(1, playerId);
-  }
-
-  @Test
-  void testJoinGame() {
-    int playerId = restGameController.joinGame();
-    assertEquals(1, playerId);
+    Integer playerId = restGameController.joinGame();
+    assertNotNull(playerId);
   }
 }

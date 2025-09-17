@@ -2,10 +2,9 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
+import java.sql.Date;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.CreatedDate;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -21,6 +20,5 @@ public class Players extends EntityIdentifiedByIdOnly {
   private Boolean isAdmin;
 
   @Column(name = "create_date")
-  @CreatedDate
-  private Timestamp createDate;
+  private Date createDate = new Date(System.currentTimeMillis());
 }
