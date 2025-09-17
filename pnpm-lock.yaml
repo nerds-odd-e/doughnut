@@ -103,8 +103,8 @@ importers:
         specifier: ^0.12.5
         version: 0.12.5
       wait-on:
-        specifier: ^8.0.4
-        version: 8.0.5
+        specifier: ^9.0.0
+        version: 9.0.0
 
   frontend:
     dependencies:
@@ -4804,9 +4804,9 @@ packages:
     resolution: {integrity: sha512-o8qghlI8NZHU1lLPrpi2+Uq7abh4GGPpYANlalzWxyWteJOCsr/P+oPBA49TOLu5FTZO4d3F9MnWJfiMo4BkmA==}
     engines: {node: '>=18'}
 
-  wait-on@8.0.5:
-    resolution: {integrity: sha512-J3WlS0txVHkhLRb2FsmRg3dkMTCV1+M6Xra3Ho7HzZDHpE7DCOnoSoCJsZotrmW3uRMhvIJGSKUKrh/MeF4iag==}
-    engines: {node: '>=12.0.0'}
+  wait-on@9.0.0:
+    resolution: {integrity: sha512-bKOl7CJ4zGhKW4qvoasLM5t2NtLUcc1Ar2N6XeYCQpW0w+DMdLC0YH1JUH3bTWDCsHblapHMzhtFmmPc+ITNJw==}
+    engines: {node: '>=20.0.0'}
     hasBin: true
 
   wcwidth@1.0.1:
@@ -9868,7 +9868,7 @@ snapshots:
     dependencies:
       xml-name-validator: 5.0.0
 
-  wait-on@8.0.5:
+  wait-on@9.0.0:
     dependencies:
       axios: 1.12.2
       joi: 18.0.1
