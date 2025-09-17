@@ -1,7 +1,9 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -21,11 +23,14 @@ public class Games extends EntityIdentifiedByIdOnly {
   private int maxSteps;
 
   @Column(name = "created_at")
-  private Timestamp createdAt;
+  private LocalDateTime createdAt;
 
   @Column(name = "end_date")
-  private Timestamp endDate;
+  private LocalDateTime endDate;
 
   @Column(name = "update_date")
-  private Timestamp updatedDate;
+  private LocalDateTime updatedDate;
+
+  @OneToMany(mappedBy = "game")
+  private List<Rounds> rounds = new ArrayList<>();
 }

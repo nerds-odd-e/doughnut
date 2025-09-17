@@ -1,9 +1,10 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.CreatedDate;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -11,11 +12,13 @@ import lombok.EqualsAndHashCode;
 @Table(name = "rounds")
 public class Rounds extends EntityIdentifiedByIdOnly {
 
-  @Column(name = "player_id")
-  private Integer player_id;
+  @ManyToOne
+  @JoinColumn(name = "player_id")
+  private Players player;
 
-  @Column(name = "game_id")
-  private Integer game_id;
+  @ManyToOne
+  @JoinColumn(name = "game_id")
+  private Games game;
 
   @Column(name = "round_no")
   private Integer roundNo;
@@ -33,8 +36,9 @@ public class Rounds extends EntityIdentifiedByIdOnly {
   private Integer step;
 
   @Column(name = "create_date")
-  private Timestamp createDate;
+  @CreatedDate
+  private LocalDateTime createDate;
 
   @Column(name = "update_date")
-  private Timestamp updateDate;
+  private LocalDateTime updateDate;
 }

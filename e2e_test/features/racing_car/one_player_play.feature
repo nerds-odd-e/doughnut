@@ -22,11 +22,10 @@ Feature: one player play game
 
   @ignore
   Scenario: Car cannot move when total damage exceeds 6
-    Given the total damage is 6
-    When I roll a dice
-    And the dice roll result is 6
-    Then the total damage becomes 7
-    And the car cannot move
+    Given I am on round 6 with 6 damage
+    When I roll a dice and get 6
+    Then the total damage should be 7
+    And the the car moves 0 steps
 
   @ignore
   Scenario: Single player can play the normal mode
