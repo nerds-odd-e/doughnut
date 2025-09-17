@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, When } from '@badeball/cypress-cucumber-preprocessor'
+import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
 
 Given('I am a player and in the game screen, round 0', function () {
   cy.visit('/d/car-game/abc')
@@ -39,3 +39,13 @@ When(
       })
   }
 )
+
+Then('the total damage becomes {int}', function (number) {
+  // Get the text content and compare it to the expected number
+  cy.get('.dammage-position')
+    .invoke('text')
+    .then((damageText) => {
+      const damageValue = parseInt(damageText.trim())
+      expect(damageValue).to.equal(number)
+    })
+})

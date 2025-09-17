@@ -106,6 +106,12 @@
                 </div>
                 <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-px-6 daisy-py-4 daisy-rounded-xl daisy-shadow-lg daisy-border daisy-border-white/30">
                     <div class="daisy-text-center">
+                        <div class="daisy-text-2xl daisy-font-bold daisy-text-gray-800 dammage-position">{{ damage }}</div>
+                        <div class="daisy-text-sm daisy-text-gray-600">Damage</div>
+                    </div>
+                </div>
+                <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-px-6 daisy-py-4 daisy-rounded-xl daisy-shadow-lg daisy-border daisy-border-white/30">
+                    <div class="daisy-text-center">
                         <div class="daisy-text-2xl daisy-font-bold daisy-text-gray-800">🏆</div>
                         <div class="daisy-text-sm daisy-text-gray-600">Best Score</div>
                     </div>
