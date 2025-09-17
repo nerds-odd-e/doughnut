@@ -2,6 +2,8 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -28,4 +30,7 @@ public class Games extends EntityIdentifiedByIdOnly {
 
   @Column(name = "update_date")
   private Timestamp updatedDate;
+
+  @OneToMany(mappedBy = "game")
+  private List<Round> rounds = new ArrayList<>();
 }

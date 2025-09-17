@@ -11,11 +11,13 @@ import lombok.EqualsAndHashCode;
 @Table(name = "rounds")
 public class Rounds extends EntityIdentifiedByIdOnly {
 
-  @Column(name = "player_id")
-  private Integer player_id;
+  @ManyToOne
+  @JoinColumn(name = "player_id")
+  private Player player;
 
-  @Column(name = "game_id")
-  private Integer game_id;
+  @ManyToOne
+  @JoinColumn(name = "game_id")
+  private Game game;
 
   @Column(name = "round_no")
   private Integer roundNo;
