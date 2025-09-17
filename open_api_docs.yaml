@@ -1567,8 +1567,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: integer
-                format: int32
+                $ref: "#/components/schemas/Players"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -4111,6 +4110,22 @@ components:
       properties:
         asFirstChild:
           type: boolean
+    Players:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        isAdmin:
+          type: boolean
+        createDate:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
     ConversationMessage:
       type: object
       properties:

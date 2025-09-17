@@ -17,6 +17,7 @@ import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
+import CarGamePage from "@/pages/CarGamePage.vue"
 
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly
@@ -127,6 +128,11 @@ const routes = [
     path: "/d/generate-token",
     name: "manageMCPTokens",
     component: ManageMCPTokensPage,
+  },
+  {
+    path: `/d/car-game/:uuid`,
+    name: "carGame",
+    component: CarGamePage,
   },
 ] as RouteRecordRaw[]
 

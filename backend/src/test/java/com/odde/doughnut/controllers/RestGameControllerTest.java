@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.entities.Players;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +17,7 @@ class RestGameControllerTest {
 
   @Test
   void testJoinGame_Case1() {
-    Integer playerId = restGameController.joinGame();
-    assertNotNull(playerId);
+    Players player = restGameController.joinGame();
+    assertNotNull(player);
   }
 }

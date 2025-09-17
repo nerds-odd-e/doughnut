@@ -24,6 +24,7 @@ declare module 'vue-router/auto-routes' {
     '/AssessmentPage': RouteRecordInfo<'/AssessmentPage', '/AssessmentPage', Record<never, never>, Record<never, never>>,
     '/AssimilationPage': RouteRecordInfo<'/AssimilationPage', '/AssimilationPage', Record<never, never>, Record<never, never>>,
     '/BazaarPage': RouteRecordInfo<'/BazaarPage', '/BazaarPage', Record<never, never>, Record<never, never>>,
+    '/CarGamePage': RouteRecordInfo<'/CarGamePage', '/CarGamePage', Record<never, never>, Record<never, never>>,
     '/CircleJoinPage': RouteRecordInfo<'/CircleJoinPage', '/CircleJoinPage', Record<never, never>, Record<never, never>>,
     '/CircleShowPage': RouteRecordInfo<'/CircleShowPage', '/CircleShowPage', Record<never, never>, Record<never, never>>,
     '/CirclesPage': RouteRecordInfo<'/CirclesPage', '/CirclesPage', Record<never, never>, Record<never, never>>,
@@ -74,6 +75,10 @@ declare module 'vue-router/auto-routes' {
     }
     'src/pages/BazaarPage.vue': {
       routes: '/BazaarPage'
+      views: never
+    }
+    'src/pages/CarGamePage.vue': {
+      routes: '/CarGamePage'
       views: never
     }
     'src/pages/CircleJoinPage.vue': {

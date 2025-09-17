@@ -95,6 +95,7 @@ export { NoteTopology } from './models/NoteTopology';
 export type { NoteUpdateDetailsDTO } from './models/NoteUpdateDetailsDTO';
 export type { NoteUpdateTitleDTO } from './models/NoteUpdateTitleDTO';
 export type { Ownership } from './models/Ownership';
+export type { Players } from './models/Players';
 export type { PredefinedQuestion } from './models/PredefinedQuestion';
 export type { PredefinedQuestionsTestData } from './models/PredefinedQuestionsTestData';
 export type { PredefinedQuestionTestData } from './models/PredefinedQuestionTestData';
