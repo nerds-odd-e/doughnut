@@ -8,8 +8,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "game")
-public class Game extends EntityIdentifiedByIdOnly {
+@Table(name = "games")
+public class Games extends EntityIdentifiedByIdOnly {
 
   @Column(name = "num_of_players")
   private Integer numberOfPlayers;

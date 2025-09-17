@@ -10,8 +10,8 @@ import org.springframework.data.annotation.CreatedDate;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "player")
-public class Player extends EntityIdentifiedByIdOnly {
+@Table(name = "players")
+public class Players extends EntityIdentifiedByIdOnly {
 
   @Column(name = "name")
   @NotNull
