@@ -49,3 +49,30 @@ Then('the total damage becomes {int}', function (number) {
       expect(damageValue).to.equal(number)
     })
 })
+
+When(
+  'I choose the super mode and I roll the dice',
+  () => {
+  }
+)
+
+Then('the dice number has value in range 1-6', () => {
+  cy.get('#dice-result-display').invoke('text').should((text) => {
+      expect(Number(text)).to.be.greaterThan(0).and.to.be.lessThan(7)
+  })
+})
+Then('the car moves 5 steps', () => {
+
+})
+Then('the total steps should be 5', () => {
+
+})
+Then('the total damage should be 1', () => {
+
+})
+Then('the round number becomes 2', () => {
+
+})
+
+
+
