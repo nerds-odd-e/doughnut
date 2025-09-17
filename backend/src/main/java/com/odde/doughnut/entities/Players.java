@@ -26,6 +26,6 @@ public class Players extends EntityIdentifiedByIdOnly {
   @CreatedDate
   private LocalDateTime createDate;
 
-    @OneToMany(mappedBy = "player")
-    private List<Round> players = new ArrayList<>();
+  @OneToMany(mappedBy = "player")
+  private List<Rounds> players = new ArrayList<>();
 }
