@@ -2,37 +2,29 @@ Feature: one player play game with super mode only
 
   Background:
     Given I am a player and in the game screen, round 0
-  
+
   @ignore
-  Scenario: Start play a new game
-    When I am start the round 1 with the dice number roll equal 5
-    Then The car moves 5 steps.
-    And Total step equals 5
-    And Total damage equals 1
-    And The round number become 2
-    When I am start the round 2 with the dice number roll equal 4
-    And the current damage is 1
-    Then The car moves 3 steps.
-    And Total step equals 8
-    And Total damage equals 2
-    And The round number become 3
-    When I am start the round 3 with the dice number roll equal 1
-    And the current damage is 2
-    Then The car don't moves.
-    And Total step equals 8
-    And Total damage equals 3
-    And The round number become 4
-    When I am start the round 4 with the dice number roll equal 6
-    And the current damage is 3
-    Then The car moves 3 steps.
-    And Total step equals 11
-    And Total damage equals 4
-    And The round number become 5
-  
+  Scenario Outline: Player progresses through rounds
+    Given I am on round <round_number> with <current_damage> damage
+    When I roll the dice and get <dice_roll>
+    Then the car moves <steps_moved> steps
+    And the total steps should be <total_steps>
+    And the total damage should be <total_damage>
+    And the round number becomes <next_round>
+
+    Examples:
+      | round_number | current_damage | dice_roll | steps_moved | total_steps | total_damage | next_round |
+      | 1            | 0              | 5         | 5           | 5           | 1            | 2          |
+      | 2            | 1              | 4         | 3           | 8           | 2            | 3          |
+      | 3            | 2              | 1         | 0           | 8           | 3            | 4          |
+      | 4            | 3              | 6         | 3           | 11          | 4            | 5          |
+
+
   @ignore
-  Scenario: playing game with total damaged is 6
-    When I rolling a dice
-    And The number equal 6
-    Then the total damaged is 7
-    And the car can't move
+  Scenario: Car cannot move when total damage exceeds 6
+    Given the total damage is 6
+    When I roll a dice
+    And the dice roll result is 6
+    Then the total damage becomes 7
+    And the car cannot move
 
