@@ -22,8 +22,8 @@ public class Games extends EntityIdentifiedByIdOnly {
   @Column(name = "max_steps")
   private int maxSteps;
 
-  @Column(name = "created_at")
-  private LocalDateTime createdAt;
+  @Column(name = "created_date")
+  private LocalDateTime createdDate;
 
   @Column(name = "end_date")
   private LocalDateTime endDate;
