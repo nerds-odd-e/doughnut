@@ -11,11 +11,12 @@ Given('I am a player and in the game screen, round 0', function () {
   // TODO: implement step
 })
 
-When('a new player joins', function () {
+When('A new player joins the game', function () {
   cy.visit('/d/car-game/abc')
+  cy.findByText('0', { selector: '.player-position' }).should('exist')
 })
 
-Then('the player count is {string}', (numberOfPlayers: string) => {
+Then('The player count is {string}', (numberOfPlayers: string) => {
   cy.get('#number-of-players').should('contain.text', numberOfPlayers)
 })
 
