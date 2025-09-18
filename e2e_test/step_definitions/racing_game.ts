@@ -58,11 +58,21 @@ Then('the total damage becomes {int}', function (number) {
     })
 })
 
+When('I choose the super mode and I roll the dice', () => {
+  cy.get('#switch-mode-super-btn').click()
+  cy.get('#roll-dice-button').click()
+})
+
 Then('the dice number has value in range 1-6', () => {
   cy.get('#dice-result-display')
     .invoke('text')
     .should((text) => {
-      expect(Number(text)).to.be.greaterThan(0).and.to.be.lessThan(7)
+      expect(
+        Number(text),
+        'The dice number result should be greater than 0 and less than 7'
+      )
+        .to.be.greaterThan(0)
+        .and.to.be.lessThan(7)
     })
 })
 

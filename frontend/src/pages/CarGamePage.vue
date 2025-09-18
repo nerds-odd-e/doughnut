@@ -88,7 +88,14 @@
                      :class="diceRolling ? 'daisy-scale-110 daisy-rotate-12' : 'daisy-scale-100 daisy-rotate-0'">
                     <span id="dice-result-display" class="daisy-text-5xl daisy-font-bold daisy-bg-gradient-to-r daisy-from-purple-600 daisy-to-pink-600 daisy-bg-clip-text daisy-text-transparent">{{ diceResult }}</span>
                 </div>
-
+                <div class="btn-group">
+                  <button
+                    id="switch-mode-super-btn"
+                    class="daisy-text-white daisy-font-bold daisy-py-4 daisy-px-10 daisy-rounded-2xl daisy-transition-all daisy-duration-300 daisy-shadow-lg hover:daisy-shadow-xl daisy-transform hover:daisy-scale-105 daisy-border daisy-border-white/20 daisy-relative daisy-overflow-hidden"
+                    >
+                    Super
+                  </button>
+                </div>
                 <!-- Dice Button -->
                 <button
                     id="roll-dice-button"
