@@ -1,6 +1,6 @@
 <template>
   <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
-    <NoteRealmLoader v-bind="{ noteId, storageAccessor }">
+    <NoteRealmLoader v-bind="{ noteId, storageAccessor }" :key="reloadKey">
       <template #default="{ noteRealm }">
         <TeleportToHeadStatus>
           <button
@@ -54,7 +54,7 @@
                 asMarkdown,
                 conversationButton: noConversationButton,
               }"
-              @note-accessory-updated="updatedNoteAccessory = $event"
+              @note-accessory-updated="onNoteAccessoryUpdated"
               @edit-as-markdown="asMarkdown = $event"
             />
             <div
@@ -164,6 +164,10 @@ const currentUser = inject<Ref<User | undefined>>("currentUser")
 const readonly = computed(() => !currentUser?.value)
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
+const reloadKey = ref(0)
+const onNoteAccessoryUpdated = () => {
+  reloadKey.value += 1
+}
 const asMarkdown = ref(false)
 
 const toLocalDateString = (date: string) => {
@@ -189,4 +193,3 @@ const toLocalDateString = (date: string) => {
   overflow: hidden;
 }
 </style>
-

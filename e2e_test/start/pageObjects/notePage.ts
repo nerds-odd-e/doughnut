@@ -178,6 +178,8 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
 
     updateNoteImage(attributes: Record<string, string>) {
+      // Before upload, the image should not be visible (simulate new upload)
+      cy.get('#note-image').should('not.exist')
       this.editNoteImage()
         .click()
         .submitWith(
@@ -187,6 +189,8 @@ export const assumeNotePage = (noteTopology?: string) => {
             'Use Parent Image',
           ])
         )
+      // After upload and dialog closes, the image should be visible
+      cy.get('#note-image').should('be.visible')
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {
