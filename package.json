@@ -72,7 +72,7 @@
     "cypress": "15.2.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
-    "got": "^14.4.8",
+    "got": "^14.4.9",
     "jsdom": "^27.0.0",
     "npm-run-all2": "^8.0.4",
     "openapi-typescript-codegen": "^0.29.0",
