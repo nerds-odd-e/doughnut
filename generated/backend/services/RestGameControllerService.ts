@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { Players } from '../models/Players';
+import type { Rounds } from '../models/Rounds';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestGameControllerService {
@@ -15,6 +16,25 @@ export class RestGameControllerService {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/games/join',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @param id
+     * @returns Rounds OK
+     * @throws ApiError
+     */
+    public rollDice(
+        id: number,
+    ): CancelablePromise<Rounds> {
+        return this.httpRequest.request({
+            method: 'POST',
+            url: '/api/games/dice/{id}',
+            query: {
+                'id': id,
+            },
             errors: {
                 500: `Internal Server Error`,
             },

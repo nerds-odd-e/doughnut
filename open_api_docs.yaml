@@ -1568,6 +1568,31 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/Players"
+  /api/games/dice/{id}:
+    post:
+      tags:
+      - rest-game-controller
+      operationId: rollDice
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Rounds"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:

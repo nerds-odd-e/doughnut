@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Players;
+import com.odde.doughnut.entities.Rounds;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,5 +26,16 @@ public class RestGameController {
     player.setName(playerName);
     modelFactoryService.playersRepository.save(player);
     return player;
+  }
+
+  @PostMapping("/dice/{id}")
+  public Rounds rollDice(@RequestParam int id) {
+    // Implementation for joining a game
+    int dice = 5;
+    Rounds round = new Rounds();
+    round.setStep(1);
+    round.setDamage(0);
+    round.setDice(5);
+    return round;
   }
 }
