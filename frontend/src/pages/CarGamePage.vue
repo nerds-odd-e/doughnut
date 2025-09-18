@@ -90,9 +90,17 @@
                 </div>
                 <div class="btn-group">
                   <button
+                    id="switch-mode-normal-btn"
+                    @click.prevent="switchToNormal()"
+                    class="daisy-font-bold daisy-py-4 daisy-px-10 daisy-rounded-2xl daisy-transition-all daisy-duration-300 daisy-shadow-lg hover:daisy-shadow-xl daisy-transform hover:daisy-scale-105 daisy-border daisy-border-white/20 daisy-relative daisy-overflow-hidden"
+                    :class="{'daisy-bg-white': !isNormalMode, 'daisy-text-white daisy-bg-blue-500': isNormalMode}">
+                    Normal
+                  </button>
+                  <button
                     id="switch-mode-super-btn"
-                    class="daisy-text-white daisy-font-bold daisy-py-4 daisy-px-10 daisy-rounded-2xl daisy-transition-all daisy-duration-300 daisy-shadow-lg hover:daisy-shadow-xl daisy-transform hover:daisy-scale-105 daisy-border daisy-border-white/20 daisy-relative daisy-overflow-hidden"
-                    >
+                    @click.prevent="switchToSuper()"
+                    class="daisy-font-bold daisy-py-4 daisy-px-10 daisy-rounded-2xl daisy-transition-all daisy-duration-300 daisy-shadow-lg hover:daisy-shadow-xl daisy-transform hover:daisy-scale-105 daisy-border daisy-border-white/20 daisy-relative daisy-overflow-hidden"
+                    :class="{'daisy-bg-white': !isSuperMode, 'daisy-text-white daisy-bg-blue-500': isSuperMode}">
                     Super
                   </button>
                 </div>
@@ -117,7 +125,7 @@
             <div class="daisy-mt-12 daisy-flex daisy-space-x-8 daisy-animate-fade-in">
                 <div class="daisy-bg-white/80 daisy-backdrop-blur-sm daisy-px-6 daisy-py-4 daisy-rounded-xl daisy-shadow-lg daisy-border daisy-border-white/30">
                     <div class="daisy-text-center">
-                        <div class="daisy-text-2xl daisy-font-bold daisy-text-gray-800">{{ numberOfRounds }}</div>
+                        <div class="daisy-text-2xl daisy-font-bold daisy-text-gray-800 current-round">{{ numberOfRounds }}</div>
                         <div class="daisy-text-sm daisy-text-gray-600">Rounds</div>
                     </div>
                 </div>
@@ -139,12 +147,17 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue"
+import { onMounted, ref, computed } from "vue"
 import carScar0 from "@/assets/car-scar0.png"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { Players, Rounds } from "@generated/backend"
 
 const { managedApi } = useLoadingApi()
+
+const GAME_MODE = Object.freeze({
+  NORMAL: 1,
+  SUPER: 2,
+})
 
 // Game state
 const diceResult = ref(6)
@@ -154,6 +167,10 @@ const diceRolling = ref(false)
 const numberOfRounds = ref(0)
 const totalSteps = ref(0)
 const damage = ref(0)
+const gameMode = ref<number>(GAME_MODE.NORMAL)
+
+const isNormalMode = computed(() => gameMode.value === GAME_MODE.NORMAL)
+const isSuperMode = computed(() => gameMode.value === GAME_MODE.SUPER)
 
 // Dice rolling functionality
 const rollDice = async () => {
@@ -186,7 +203,9 @@ const rollDice = async () => {
   diceRolling.value = false
 
   numberOfRounds.value++
-  // damage.value++
+  if (isSuperMode.value) {
+    damage.value++
+  }
   totalSteps.value += (diceResult.value % 2 === 0 ? 2 : 1) - damage.value
 }
 
@@ -208,6 +227,12 @@ const carScars = [carScar0]
 const fetchCarScars = async () => {
   const player = await managedApi.restGameController.joinGame()
   currentPlayer.value = player
+}
+const switchToSuper = () => {
+  gameMode.value = GAME_MODE.SUPER
+}
+const switchToNormal = () => {
+  gameMode.value = GAME_MODE.NORMAL
 }
 
 const fetchListPlayers = async () => {

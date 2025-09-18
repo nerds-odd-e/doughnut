@@ -67,8 +67,7 @@ Then('the car moves 1 or 2 steps', () => {
     })
 })
 
-When('I choose the super mode and I roll the dice', () => {
-  cy.get('#switch-mode-super-btn').click()
+When('I roll the dice', () => {
   cy.get('#roll-dice-button').click()
 })
 
@@ -85,10 +84,19 @@ Then('the dice number has value in range 1-6', () => {
     })
 })
 
+When('I choose the super mode and I roll the dice', () => {
+  cy.get('#switch-mode-super-btn').click()
+  cy.get('#roll-dice-button').click()
+})
+
 Then('the total damage should be {int}', (totalDamage: number) => {
   cy.get('.damage-position')
     .invoke('text')
     .should((text) => {
       expect(Number(text)).to.be.equal(totalDamage)
     })
+})
+
+Then('the round number becomes {int}', (nextRound: number) => {
+  cy.get('.current-round').should('have.text', nextRound.toString())
 })
