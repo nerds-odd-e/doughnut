@@ -50,7 +50,7 @@ When(
 
 Then('the total damage becomes {int}', function (number) {
   // Get the text content and compare it to the expected number
-  cy.get('.dammage-position')
+  cy.get('.damage-position')
     .invoke('text')
     .then((damageText) => {
       const damageValue = parseInt(damageText.trim())

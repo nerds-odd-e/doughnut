@@ -186,7 +186,7 @@ const rollDice = async () => {
   diceRolling.value = false
 
   numberOfRounds.value++
-  damage.value++
+  // damage.value++
   totalSteps.value += (diceResult.value % 2 === 0 ? 2 : 1) - damage.value
 }
 
