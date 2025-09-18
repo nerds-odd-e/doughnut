@@ -77,13 +77,13 @@ class ConversationMessageServiceTest {
       makeMe.refresh(conversation);
       List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
       assertEquals(1, conversationMessages.size());
-      assertEquals(message, conversationMessages.getFirst().getMessage());
+      assertEquals(message, conversationMessages.get(0).getMessage());
     }
 
     private Conversation getConversation() {
       AssessmentAttempt assessmentAttempt = createAssessmentAttempt();
       AssessmentQuestionInstance assessmentQuestionInstance =
-          assessmentAttempt.getAssessmentQuestionInstances().getFirst();
+          assessmentAttempt.getAssessmentQuestionInstances().get(0);
       return makeMe
           .aConversation()
           .forAnAssessmentQuestionInstance(assessmentQuestionInstance)

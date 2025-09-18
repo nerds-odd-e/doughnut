@@ -20,6 +20,7 @@
           <th>B</th>
           <th>C</th>
           <th>D</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -54,6 +55,24 @@
               {{ choice }}
             </td>
           </template>
+          <td>
+            <div class="daisy-btn-group">
+              <button
+                class="daisy-btn daisy-btn-sm daisy-btn-outline"
+                @click="openEditModal(question)"
+                title="Edit Question"
+              >
+                Edit
+              </button>
+              <button
+                class="daisy-btn daisy-btn-sm daisy-btn-outline daisy-btn-error"
+                @click="openDeleteModal(question)"
+                title="Delete Question"
+              >
+                Delete
+              </button>
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -71,6 +90,34 @@
       />
     </template>
   </Modal>
+
+  <!-- Edit Question Modal -->
+  <Modal
+    v-if="editingQuestion !== undefined"
+    @close_request="editingQuestion = undefined"
+  >
+    <template #body>
+      <QuestionEditModal
+        :question="editingQuestion"
+        @close="editingQuestion = undefined"
+        @question-updated="onQuestionUpdated"
+      />
+    </template>
+  </Modal>
+
+  <!-- Delete Question Modal -->
+  <Modal
+    v-if="deletingQuestion !== undefined"
+    @close_request="deletingQuestion = undefined"
+  >
+    <template #body>
+      <QuestionDeleteDialog
+        :question="deletingQuestion"
+        @close="deletingQuestion = undefined"
+        @question-deleted="onQuestionDeleted"
+      />
+    </template>
+  </Modal>
 </template>
 
 <script setup lang="ts">
@@ -80,6 +127,8 @@ import type { Note, PredefinedQuestion } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
+import QuestionEditModal from "./QuestionEditModal.vue"
+import QuestionDeleteDialog from "./QuestionDeleteDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 
 const { managedApi } = useLoadingApi()
@@ -91,6 +140,8 @@ const props = defineProps({
 })
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
+const editingQuestion = ref<PredefinedQuestion | undefined>()
+const deletingQuestion = ref<PredefinedQuestion | undefined>()
 
 const fetchQuestions = async () => {
   questions.value =
@@ -109,6 +160,26 @@ const toggleApproval = async (questionId?: number) => {
     await managedApi.restPredefinedQuestionController.toggleApproval(questionId)
   }
 }
+
+const openEditModal = (question: PredefinedQuestion) => {
+  editingQuestion.value = question
+}
+
+const openDeleteModal = (question: PredefinedQuestion) => {
+  deletingQuestion.value = question
+}
+
+const onQuestionUpdated = (updatedQuestion: PredefinedQuestion) => {
+  const index = questions.value.findIndex(q => q.id === updatedQuestion.id)
+  if (index !== -1) {
+    questions.value[index] = updatedQuestion
+  }
+}
+
+const onQuestionDeleted = (questionId: number) => {
+  questions.value = questions.value.filter(q => q.id !== questionId)
+}
+
 onMounted(() => {
   fetchQuestions()
 })

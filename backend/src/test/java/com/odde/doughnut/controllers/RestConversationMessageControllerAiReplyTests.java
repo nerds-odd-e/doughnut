@@ -171,7 +171,8 @@ public class RestConversationMessageControllerAiReplyTests {
       assertThat(conversation.getConversationMessages().size()).isEqualTo(initialMessageCount + 1);
 
       // Verify the content of the added message
-      ConversationMessage lastMessage = conversation.getConversationMessages().getLast();
+      List<ConversationMessage> messages = conversation.getConversationMessages();
+      ConversationMessage lastMessage = messages.get(messages.size() - 1);
       assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
     }
 
