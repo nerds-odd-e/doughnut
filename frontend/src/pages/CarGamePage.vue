@@ -142,7 +142,6 @@ const { managedApi } = useLoadingApi()
 // Game state
 const diceResult = ref(6)
 const currentPlayer = ref<Players>()
-const listPlayers = ref<Players[]>()
 const diceRolling = ref(false)
 const numberOfRounds = ref(0)
 const totalSteps = ref(0)
