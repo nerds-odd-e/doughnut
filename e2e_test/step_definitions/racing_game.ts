@@ -58,6 +58,15 @@ Then('the total damage becomes {int}', function (number) {
     })
 })
 
+Then('the car moves 1 or 2 steps', () => {
+  cy.get('.player-position')
+    .invoke('text')
+    .then((positionText) => {
+      const positionValue = parseInt(positionText.trim())
+      expect(positionValue).to.be.greaterThan(0).and.to.be.lessThan(3)
+    })
+})
+
 When('I choose the super mode and I roll the dice', () => {
   cy.get('#switch-mode-super-btn').click()
   cy.get('#roll-dice-button').click()
@@ -76,11 +85,10 @@ Then('the dice number has value in range 1-6', () => {
     })
 })
 
-Then('the car moves 1 or 2 steps', () => {
-  cy.get('.player-position')
+Then('the total damage should be {int}', (totalDamage: number) => {
+  cy.get('.damage-position')
     .invoke('text')
-    .then((positionText) => {
-      const positionValue = parseInt(positionText.trim())
-      expect(positionValue).to.be.greaterThan(0).and.to.be.lessThan(3)
+    .should((text) => {
+      expect(Number(text)).to.be.equal(totalDamage)
     })
 })
