@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import net.minidev.json.annotate.JsonIgnore;
 import org.springframework.data.annotation.CreatedDate;
 
 @Data
@@ -27,5 +28,6 @@ public class Players extends EntityIdentifiedByIdOnly {
   private LocalDateTime createDate;
 
   @OneToMany(mappedBy = "player")
+  @JsonIgnore
   private List<Rounds> players = new ArrayList<>();
 }

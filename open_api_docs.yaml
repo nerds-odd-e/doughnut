@@ -3158,6 +3158,26 @@ paths:
             '*/*':
               schema:
                 type: string
+  /api/games/fetch:
+    get:
+      tags:
+      - rest-game-controller
+      operationId: fetchPlayers
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Players"
   /api/fine-tuning/all-suggested-questions-for-fine-tuning:
     get:
       tags:

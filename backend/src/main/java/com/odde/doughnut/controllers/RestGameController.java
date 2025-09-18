@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Players;
 import com.odde.doughnut.entities.Rounds;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import java.util.List;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,18 @@ public class RestGameController {
     player.setName(playerName);
     modelFactoryService.playersRepository.save(player);
     return player;
+  }
+
+  @GetMapping("/fetch")
+  public List<Players> fetchPlayers() {
+    Players player1 = new Players();
+    player1.setName("Player1");
+    Players player2 = new Players();
+    player2.setName("Player2");
+    Players player3 = new Players();
+    player2.setName("Player3");
+    List<Players> playersList = List.of(player1, player2, player3);
+    return playersList;
   }
 
   @PostMapping("/dice/{id}")

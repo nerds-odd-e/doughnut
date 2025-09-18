@@ -21,8 +21,8 @@
                 <div class="daisy-flex daisy-items-center daisy-space-x-2">
                     <div class="daisy-w-3 daisy-h-3 daisy-bg-green-500 daisy-rounded-full daisy-animate-pulse"></div>
                     <span id="number-of-players" class="daisy-text-gray-800 daisy-font-semibold daisy-text-lg">Number Of
-                     Players: {{ 2
-                    }}</span>
+                     Players: {{ listPlayers ? listPlayers.length : 0 }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -142,6 +142,7 @@ const { managedApi } = useLoadingApi()
 // Game state
 const diceResult = ref(6)
 const currentPlayer = ref<Players>()
+const listPlayers = ref<Players[]>()
 const diceRolling = ref(false)
 const numberOfRounds = ref(0)
 const totalSteps = ref(0)
@@ -201,8 +202,14 @@ const fetchCarScars = async () => {
   currentPlayer.value = player
 }
 
+const fetchListPlayers = async () => {
+  const playersList = await managedApi.restGameController.fetchPlayers()
+  listPlayers.value = playersList
+}
+
 onMounted(() => {
   fetchCarScars()
+  fetchListPlayers()
 })
 </script>
 

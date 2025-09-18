@@ -40,4 +40,17 @@ export class RestGameControllerService {
             },
         });
     }
+    /**
+     * @returns Players OK
+     * @throws ApiError
+     */
+    public fetchPlayers(): CancelablePromise<Array<Players>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/games/fetch',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }
