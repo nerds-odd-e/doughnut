@@ -31,11 +31,11 @@ public class RestGameController {
   @PostMapping("/dice/{id}")
   public Rounds rollDice(@RequestParam int id) {
     // Implementation for joining a game
-    int dice = 5;
+    int dice = (int) (Math.random() * 6) + 1;
     Rounds round = new Rounds();
     round.setStep(1);
     round.setDamage(0);
-    round.setDice(5);
+    round.setDice(dice);
     return round;
   }
 }
