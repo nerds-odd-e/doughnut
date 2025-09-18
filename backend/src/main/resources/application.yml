@@ -4,6 +4,9 @@ spring:
     active: "test"
   config:
     import: db-test.properties
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
   logging:
     level:
       root: OFF

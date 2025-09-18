@@ -2,9 +2,10 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.data.annotation.CreatedDate;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -36,9 +37,9 @@ public class Rounds extends EntityIdentifiedByIdOnly {
   private Integer step;
 
   @Column(name = "create_date")
-  @CreatedDate
-  private LocalDateTime createDate;
+  //  @CreatedDate
+  private Date createDate;
 
   @Column(name = "update_date")
-  private LocalDateTime updateDate;
+  private Date updateDate;
 }

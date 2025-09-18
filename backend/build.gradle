@@ -53,7 +53,9 @@ dependencies {
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
   runtimeOnly 'com.mysql:mysql-connector-j:9.3.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2' // Use the version compatible with your Jackson version
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 

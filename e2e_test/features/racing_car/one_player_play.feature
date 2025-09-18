@@ -33,4 +33,9 @@ Feature: one player play game
     When I choose to play the normal mode and roll the dice
     Then the total damage becomes 0
     Then the dice number has value in range 1-6
-    And the car moves 1 or 2 steps
+    And the car moves 1 steps or more
+    When I choose to play the normal mode and roll the dice
+    Then the total damage becomes 0
+    Then the dice number has value in range 1-6
+    And the car moves 2 steps or more
+

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,8 +25,7 @@ public class Players extends EntityIdentifiedByIdOnly {
   private Boolean isAdmin;
 
   @Column(name = "create_date")
-  @CreatedDate
-  private LocalDateTime createDate;
+  private Date createDate;
 
   @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
   @JsonIgnore
