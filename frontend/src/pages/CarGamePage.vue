@@ -155,6 +155,11 @@ const rollDice = async () => {
 
   diceRolling.value = true
 
+  for (let i = 0; i < 10; i++) {
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    diceResult.value = Math.floor(Math.random() * 6) + 1
+  }
+
   // Animate dice rolling  // get result from API
   const result: Rounds = await managedApi.restGameController.rollDice(
     currentPlayer.value.id
@@ -167,11 +172,6 @@ const rollDice = async () => {
     result?.dice > 6
   )
     return
-
-  for (let i = 0; i < 10; i++) {
-    await new Promise((resolve) => setTimeout(resolve, 100))
-    diceResult.value = Math.floor(Math.random() * 6) + 1
-  }
 
   // Final result
   diceResult.value = result.dice

@@ -65,3 +65,12 @@ Then('the dice number has value in range 1-6', () => {
       expect(Number(text)).to.be.greaterThan(0).and.to.be.lessThan(7)
     })
 })
+
+Then('the car moves 1 or 2 steps', () => {
+  cy.get('.player-position')
+    .invoke('text')
+    .then((positionText) => {
+      const positionValue = parseInt(positionText.trim())
+      expect(positionValue).to.be.greaterThan(0).and.to.be.lessThan(3)
+    })
+})
