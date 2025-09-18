@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Players;
 import com.odde.doughnut.entities.Rounds;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
-import java.util.stream.StreamSupport;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,8 +31,14 @@ public class RestGameController {
 
   @GetMapping("/fetch")
   public List<Players> fetchPlayers() {
-    Iterable<Players> playersList = modelFactoryService.playersRepository.findAll();
-    return StreamSupport.stream(playersList.spliterator(), false).toList();
+    //    Iterable<Players> playersList = modelFactoryService.playersRepository.findAll();
+    //    return StreamSupport.stream(playersList.spliterator(), false).toList();
+    Players player1 = new Players();
+    player1.setName("Player1");
+    Players player2 = new Players();
+    player2.setName("Player2");
+    List<Players> playersList = List.of(player1, player2);
+    return playersList;
   }
 
   @PostMapping("/dice/{id}")

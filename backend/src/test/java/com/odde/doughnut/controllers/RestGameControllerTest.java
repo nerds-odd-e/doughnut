@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Players;
+import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class RestGameControllerTest {
   @Autowired RestGameController restGameController;
+  @Autowired MakeMe makeMe;
 
   @Test
   void testJoinGame_Case1() {
@@ -24,6 +26,8 @@ class RestGameControllerTest {
 
   @Test
   void fetchPlayers_case0() {
+    Players player1 = makeMe.aPlayer().please();
+    Players player2 = makeMe.aPlayer().please();
     List<Players> playersList = restGameController.fetchPlayers();
     assertEquals(2, playersList.size());
   }

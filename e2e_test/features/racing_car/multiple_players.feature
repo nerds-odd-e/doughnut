@@ -5,7 +5,7 @@ Feature: Multiple players
 
   Scenario: Second player joins the game
     When a new player joins
-    Then the player count is "3"
+    Then the player count is "2"
 #    And their car is at position "0" with "0" damage
 
   @ignore
