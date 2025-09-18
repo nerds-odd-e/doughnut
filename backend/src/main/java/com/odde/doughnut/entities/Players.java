@@ -27,7 +27,7 @@ public class Players extends EntityIdentifiedByIdOnly {
   @CreatedDate
   private LocalDateTime createDate;
 
-  @OneToMany(mappedBy = "player")
+  @OneToMany(mappedBy = "player",fetch = FetchType.EAGER)
   @JsonIgnore
-  private List<Rounds> players = new ArrayList<>();
+  private List<Rounds> rounds = new ArrayList<>();
 }

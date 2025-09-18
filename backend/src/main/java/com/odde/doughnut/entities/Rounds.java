@@ -12,11 +12,11 @@ import org.springframework.data.annotation.CreatedDate;
 @Table(name = "rounds")
 public class Rounds extends EntityIdentifiedByIdOnly {
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "player_id")
   private Players player;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "game_id")
   private Games game;
 

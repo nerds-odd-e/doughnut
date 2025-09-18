@@ -38,22 +38,27 @@ public class RestGameController {
     return StreamSupport.stream(playersList.spliterator(), false).toList();
   }
 
-  @PostMapping("/dice/{id}")
-  public Rounds rollDice(@RequestParam int id, @RequestParam String mode) {
+    @PostMapping("/dice/{id}")
+    public Rounds rollDice(@RequestParam("id") Integer id, @RequestParam String mode) {
     if (mode.equals("SUPER")) {
       return racingGameService.rollDiceSuper(id);
     }
     return rollDiceNormal(id);
   }
 
-  public Rounds rollDiceNormal(int id) {
-    // Implementation for joining a game
-    int dice = (int) (Math.random() * 6) + 1;
-    Rounds round = new Rounds();
-    round.setStep(1);
-    round.setDamage(0);
-    round.setDice(dice);
-    round.setMode("NORMAL");
-    return round;
-  }
+
+    public Rounds rollDiceNormal(int id) {
+        // Implementation for joining a game
+        var player = modelFactoryService.playersRepository.findById(id).orElse(null);
+        if (player == null) return null;
+        int dice = (int) (Math.random() * 6) + 1;
+        Rounds round = new Rounds();
+        round.setPlayer(player);
+        round.setStep(1);
+        round.setDamage(0);
+        round.setDice(dice);
+        round.setMode("NORMAL");
+        var res = modelFactoryService.roundsRepository.save(round);
+        return res;
+    }
 }

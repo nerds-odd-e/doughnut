@@ -6,6 +6,8 @@ import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.NotebookService;
 import jakarta.persistence.EntityManager;
+
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +36,8 @@ public class ModelFactoryService {
   @Autowired public UserTokenRepository userTokenRepository;
   @Autowired public PlayersRepository playersRepository;
   @Autowired public GamesRepository gamesRepository;
+  @Autowired public RoundsRepository roundsRepository;
+  
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
