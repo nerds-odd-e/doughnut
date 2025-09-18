@@ -5504,7 +5504,6 @@ var StdioServerTransport = class {
 };
 
 // src/index.ts
-var globalMcpToken = process.argv[2];
 var server = new Server(
   {
     name: "doughnut-mcp-server",
@@ -5568,7 +5567,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "get_notebook_list",
-        description: "Get notebook list (Not ready for use)",
+        description: "Get notebook list",
         inputSchema: {
           type: "object"
         }
@@ -5704,14 +5703,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     case "get_notebook_list": {
       const mcpToken = `${request.params.mcpToken}`;
-      const apiUrl = `${request.params.baseUrl}/api/notebooks/get-notebook-list`;
       try {
-        const response = await fetch(apiUrl, {
-          method: "GET",
-          headers: {
-            mcpToken: globalMcpToken || mcpToken
+        const response = await fetch(
+          `${DOUGHNUT_API_BASE_URL}/api/notebooks/get-notebook-list`,
+          {
+            method: "GET",
+            headers: {
+              mcpToken: authToken || mcpToken
+            }
           }
-        });
+        );
         const data = await response.json();
         const noteBookTitle = data.map((n) => n.title).join(", ");
         return {
@@ -5766,14 +5767,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
     }
     case "get_graph_with_note_id": {
-      const mcpToken = `${request.params.mcpToken}`;
       const apiUrl = `${request.params.baseUrl}/api/notes/${request.params.noteId}/graph`;
       try {
         const response = await fetch(apiUrl, {
-          method: "GET",
-          headers: {
-            mcpToken
-          }
+          method: "GET"
         });
         const text = await response.text();
         return {

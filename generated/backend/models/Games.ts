@@ -8,7 +8,7 @@ export type Games = {
     numberOfPlayers?: number;
     winner?: string;
     maxSteps?: number;
-    createdAt?: string;
+    createdDate?: string;
     endDate?: string;
     updatedDate?: string;
     rounds?: Array<Rounds>;
