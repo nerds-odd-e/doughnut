@@ -33,6 +33,7 @@ public class ModelFactoryService {
   @Autowired public RecallPromptRepository recallPromptRepository;
   @Autowired public UserTokenRepository userTokenRepository;
   @Autowired public PlayersRepository playersRepository;
+  @Autowired public GamesRepository gamesRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
