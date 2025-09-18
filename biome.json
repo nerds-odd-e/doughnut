@@ -9,7 +9,6 @@
   "files": {
     "includes": [
       "**",
-      "!**/.direnv",
       "!**/.git",
       "!**/.github",
       "!**/.gradle",
