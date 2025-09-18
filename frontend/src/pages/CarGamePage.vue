@@ -54,13 +54,7 @@
                          class="daisy-w-28 daisy-h-12 daisy-rounded-xl daisy-relative daisy-shadow-lg daisy-transform daisy-transition-all daisy-duration-300 hover:daisy-scale-105"
                          :class="getCarStyle(index)">
                         <img :src="carScar" alt="car scar" class="daisy-w-full daisy-h-full daisy-object-cover daisy-object-center daisy-rounded-xl" />
-                        <!-- Car glow effect -->
-                        <div class="daisy-absolute daisy-inset-0 daisy-bg-gradient-to-r daisy-from-yellow-400/20 daisy-to-orange-400/20 daisy-rounded-xl daisy-animate-pulse"></div>
-                    </div>
-                </div>
-
-                <!-- Progress Bar/Track -->
-                <div class="daisy-absolute daisy-bottom-12 daisy-left-1/2 daisy-transform -daisy-translate-x-1/2 daisy-w-[90%]">
+                        5174lass="daisy-absolute daisy-bottom-12 daisy-left-1/2 daisy-transform -daisy-translate-x-1/2 daisy-w-[90%]">
                     <!-- Blue track line with gradient -->
                     <div class="daisy-h-3 daisy-bg-gradient-to-r daisy-from-blue-400 daisy-to-blue-600 daisy-rounded-full daisy-relative daisy-shadow-lg">
                         <!-- Progress marker with enhanced styling -->
@@ -135,7 +129,7 @@
 import { onMounted, ref } from "vue"
 import carScar0 from "@/assets/car-scar0.png"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { Players } from "@generated/backend"
+import type { Players, Rounds } from "@generated/backend"
 
 const { managedApi } = useLoadingApi()
 
@@ -149,19 +143,32 @@ const damage = ref(0)
 
 // Dice rolling functionality
 const rollDice = async () => {
+  if (currentPlayer.value === undefined) return
   //TODO: call API to roll the dice
   if (diceRolling.value) return
 
   diceRolling.value = true
 
-  // Animate dice rolling
+  // Animate dice rolling  // get result from API
+  const result: Rounds = await managedApi.restGameController.rollDice(
+    currentPlayer.value.id
+  )
+
+  if (
+    result === undefined ||
+    result?.dice === undefined ||
+    result?.dice < 1 ||
+    result?.dice > 6
+  )
+    return
+
   for (let i = 0; i < 10; i++) {
     await new Promise((resolve) => setTimeout(resolve, 100))
     diceResult.value = Math.floor(Math.random() * 6) + 1
   }
 
   // Final result
-  diceResult.value = Math.floor(Math.random() * 6) + 1
+  diceResult.value = result.dice
   diceRolling.value = false
 
   numberOfRounds.value++
