@@ -21,7 +21,7 @@
                 <div class="daisy-flex daisy-items-center daisy-space-x-2">
                     <div class="daisy-w-3 daisy-h-3 daisy-bg-green-500 daisy-rounded-full daisy-animate-pulse"></div>
                     <span id="number-of-players" class="daisy-text-gray-800 daisy-font-semibold daisy-text-lg">Number Of
-                     Players: {{ 2 }}
+                     Players: {{ listPlayers ? listPlayers.length : 0 }}
                     </span>
                 </div>
             </div>
@@ -241,9 +241,9 @@ const fetchListPlayers = async () => {
   listPlayers.value = playersList
 }
 
-onMounted(() => {
-  fetchCarScars()
-  fetchListPlayers()
+onMounted(async () => {
+  await fetchCarScars()
+  await fetchListPlayers()
 })
 </script>
 
@@ -366,4 +366,3 @@ onMounted(() => {
 }
 
 </style>
-
