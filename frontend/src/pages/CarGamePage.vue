@@ -54,7 +54,13 @@
                          class="daisy-w-28 daisy-h-12 daisy-rounded-xl daisy-relative daisy-shadow-lg daisy-transform daisy-transition-all daisy-duration-300 hover:daisy-scale-105"
                          :class="getCarStyle(index)">
                         <img :src="carScar" alt="car scar" class="daisy-w-full daisy-h-full daisy-object-cover daisy-object-center daisy-rounded-xl" />
-                        5174lass="daisy-absolute daisy-bottom-12 daisy-left-1/2 daisy-transform -daisy-translate-x-1/2 daisy-w-[90%]">
+                          <!-- Car glow effect -->
+                          <div class="daisy-absolute daisy-inset-0 daisy-bg-gradient-to-r daisy-from-yellow-400/20 daisy-to-orange-400/20 daisy-rounded-xl daisy-animate-pulse"></div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar/Track -->
+                <div class="daisy-absolute daisy-bottom-12 daisy-left-1/2 daisy-transform -daisy-translate-x-1/2 daisy-w-[90%]">
                     <!-- Blue track line with gradient -->
                     <div class="daisy-h-3 daisy-bg-gradient-to-r daisy-from-blue-400 daisy-to-blue-600 daisy-rounded-full daisy-relative daisy-shadow-lg">
                         <!-- Progress marker with enhanced styling -->
