@@ -76,7 +76,7 @@ Then('the car moves {int} steps or more', (step) => {
     .invoke('text')
     .then((positionText) => {
       const positionValue = parseInt(positionText.trim())
-      expect(positionValue).to.be.greaterThan(step-1)
+      expect(positionValue).to.be.greaterThan(step - 1)
     })
 })
 

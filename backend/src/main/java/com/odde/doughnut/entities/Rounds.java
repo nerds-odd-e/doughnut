@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Date;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
