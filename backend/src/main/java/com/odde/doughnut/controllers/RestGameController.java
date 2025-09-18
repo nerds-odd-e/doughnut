@@ -37,13 +37,32 @@ public class RestGameController {
   }
 
   @PostMapping("/dice/{id}")
-  public Rounds rollDice(@RequestParam int id) {
+  public Rounds rollDice(@RequestParam int id, @RequestParam String mode) {
+    if (mode.equals("SUPER")) {
+      return rollDiceSuper(id);
+    }
+    return rollDiceNormal(id);
+  }
+
+  public Rounds rollDiceNormal(int id) {
     // Implementation for joining a game
     int dice = (int) (Math.random() * 6) + 1;
     Rounds round = new Rounds();
     round.setStep(1);
     round.setDamage(0);
     round.setDice(dice);
+    round.setMode("NORMAL");
+    return round;
+  }
+
+  public Rounds rollDiceSuper(int id) {
+    // Implementation for joining a game
+    int dice = (int) (Math.random() * 6) + 1;
+    Rounds round = new Rounds();
+    round.setStep(1);
+    round.setDamage(1);
+    round.setDice(dice);
+    round.setMode("SUPER");
     return round;
   }
 }

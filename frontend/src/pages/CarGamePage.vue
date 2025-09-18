@@ -155,8 +155,8 @@ import type { Players, Rounds } from "@generated/backend"
 const { managedApi } = useLoadingApi()
 
 const GAME_MODE = Object.freeze({
-  NORMAL: 1,
-  SUPER: 2,
+  NORMAL: "NORMAL",
+  SUPER: "SUPER",
 })
 
 // Game state
@@ -167,7 +167,7 @@ const diceRolling = ref(false)
 const numberOfRounds = ref(0)
 const totalSteps = ref(0)
 const damage = ref(0)
-const gameMode = ref<number>(GAME_MODE.NORMAL)
+const gameMode = ref<string>(GAME_MODE.NORMAL)
 
 const isNormalMode = computed(() => gameMode.value === GAME_MODE.NORMAL)
 const isSuperMode = computed(() => gameMode.value === GAME_MODE.SUPER)
@@ -187,7 +187,8 @@ const rollDice = async () => {
 
   // Animate dice rolling  // get result from API
   const result: Rounds = await managedApi.restGameController.rollDice(
-    currentPlayer.value.id
+    currentPlayer.value.id,
+    gameMode.value
   )
 
   if (
@@ -203,8 +204,8 @@ const rollDice = async () => {
   diceRolling.value = false
 
   numberOfRounds.value++
-  if (isSuperMode.value) {
-    damage.value++
+  if (isSuperMode.value && result.damage !== undefined) {
+    damage.value = result.damage
   }
   totalSteps.value += (diceResult.value % 2 === 0 ? 2 : 1) - damage.value
 }

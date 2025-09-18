@@ -1580,6 +1580,11 @@ paths:
         schema:
           type: integer
           format: int32
+      - name: mode
+        in: query
+        required: true
+        schema:
+          type: string
       responses:
         "500":
           description: Internal Server Error

@@ -23,17 +23,20 @@ export class RestGameControllerService {
     }
     /**
      * @param id
+     * @param mode
      * @returns Rounds OK
      * @throws ApiError
      */
     public rollDice(
         id: number,
+        mode: string,
     ): CancelablePromise<Rounds> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/games/dice/{id}',
             query: {
                 'id': id,
+                'mode': mode,
             },
             errors: {
                 500: `Internal Server Error`,
