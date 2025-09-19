@@ -8,6 +8,6 @@ export type Players = {
     name: string;
     isAdmin?: boolean;
     createDate?: string;
-    players?: Array<Rounds>;
+    rounds?: Array<Rounds>;
 };
 

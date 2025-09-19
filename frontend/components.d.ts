@@ -114,7 +114,6 @@ declare module 'vue' {
     ObjectRight: typeof import('./src/components/svgs/link_types/ObjectRight.vue')['default']
     ObsidianImportDialog: typeof import('./src/components/notes/ObsidianImportDialog.vue')['default']
     Person: typeof import('./src/components/svgs/link_types/Person.vue')['default']
-    PlayerList: typeof import('./src/components/PlayerList.vue')['default']
     PopButton: typeof import('./src/components/commons/Popups/PopButton.vue')['default']
     Popups: typeof import('./src/components/commons/Popups/Popups.vue')['default']
     ProgressBar: typeof import('./src/components/commons/ProgressBar.vue')['default']

@@ -20,6 +20,10 @@ Then('The player count is {string}', (numberOfPlayers: string) => {
   cy.get('#number-of-players').should('contain.text', numberOfPlayers)
 })
 
+Then('display players name is and total steps', function () {
+  cy.get('#players-name').should('exist')
+})
+
 When(
   'I choose to play the normal mode and roll the dice',
   function (this: { initialPosition: number }) {

@@ -17,10 +17,4 @@ Feature: Multiple players
     And A new player joins the game
     Then The player count is "4"
 
-  @ignore
-  Scenario: the game had one player and a new player joins the game and the number of players increases
-    Given The number of players is 1
-    When A new player joins the game
-    Then The number of players are 2
-
 

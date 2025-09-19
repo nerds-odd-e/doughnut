@@ -4202,7 +4202,7 @@ components:
         createDate:
           type: string
           format: date-time
-        players:
+        rounds:
           type: array
           items:
             $ref: "#/components/schemas/Rounds"
