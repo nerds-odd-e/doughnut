@@ -8,8 +8,6 @@ Feature: one player play game
    Then the total steps shown should match the backend response
     And the total damage shown should match the backend response
 
-
-
   @ignore
   Scenario: Car cannot move when total damage exceeds 6
     Given I am on round 6 with 6 damage

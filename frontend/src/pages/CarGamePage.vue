@@ -120,7 +120,7 @@
                 >
                     <span class="daisy-relative daisy-z-10 daisy-flex daisy-items-center daisy-space-x-2">
                         <span>🎲</span>
-                        <span>{{ diceRolling ? 'Rolling...' : 'Roll Dice' }}</span>
+                        <span id="roll-dice-button-text">{{ diceRolling ? 'Rolling...' : 'Roll Dice' }}</span>
                     </span>
                     <!-- Button shine effect -->
                     <div class="daisy-absolute daisy-inset-0 daisy-bg-gradient-to-r daisy-from-transparent daisy-via-white/20 daisy-to-transparent daisy-transform -daisy-skew-x-12 daisy-translate-x-full daisy-transition-transform daisy-duration-1000 hover:daisy-translate-x-[-200%]"></div>
@@ -203,15 +203,18 @@ const rollDice = async () => {
 
   // Final result
   diceResult.value = result.dice
-  diceRolling.value = false
+
 
   numberOfRounds.value++
   if (isSuperMode.value && result.damage !== undefined) {
     damage.value = result.damage
   }
+
+  // Update total steps
   if (result.step !== undefined) {
     totalSteps.value = result.step
   }
+  diceRolling.value = false
 
   await fetchListPlayers()
 }
