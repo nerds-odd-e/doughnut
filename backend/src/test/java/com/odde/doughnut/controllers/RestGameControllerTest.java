@@ -36,7 +36,7 @@ class RestGameControllerTest {
   }
 
   @Test
-  void fetchPlayers_case0() {
+  void fetchPlayers_case_multiplayers_join() {
     Players player1 = makeMe.aPlayer().please();
     Players player2 = makeMe.aPlayer().please();
     List<Players> playersList = restGameController.fetchPlayers();

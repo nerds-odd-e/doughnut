@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Date;
 import lombok.Data;
@@ -11,12 +12,14 @@ import lombok.EqualsAndHashCode;
 @Table(name = "rounds")
 public class Rounds extends EntityIdentifiedByIdOnly {
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne
   @JoinColumn(name = "player_id")
+  @JsonIgnore
   private Players player;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "game_id")
+  @JsonIgnore
   private Games game;
 
   @Column(name = "round_no")

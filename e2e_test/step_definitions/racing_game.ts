@@ -20,6 +20,13 @@ Then('The player count is {string}', (numberOfPlayers: string) => {
   cy.get('#number-of-players').should('contain.text', numberOfPlayers)
 })
 
+Then(
+  'The players name displays {string} records',
+  (numberOfPlayersName: string) => {
+    cy.get('#players-name-list').should('contain.text', numberOfPlayersName)
+  }
+)
+
 Then('display players name is and total steps', function () {
   cy.get('#players-name').should('exist')
 })

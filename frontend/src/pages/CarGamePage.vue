@@ -24,6 +24,12 @@
                      Players: {{ listPlayers ? listPlayers.length : 0 }}
                     </span>
                 </div>
+                <ul class="daisy-mt-4 daisy-max-h-64 daisy-overflow-auto daisy-text-gray-700 daisy-text-sm">
+                    <li v-for="player in listPlayers" :key="player.id" class="daisy-flex daisy-justify-between daisy-py-1 daisy-border-b daisy-border-gray-200">
+                        <span id="players-name-list">{{ player.name }}</span>
+                        <span id="players-steps" >{{ player.rounds ? player.rounds.reduce((acc, round) => acc + (round.step ?? 0), 0) : 0 }} steps</span>
+                    </li>
+                </ul>
             </div>
         </div>
 
@@ -110,7 +116,7 @@
                     @click="rollDice"
                     :disabled="diceRolling"
                     class="daisy-bg-gradient-to-r daisy-from-blue-600 daisy-to-purple-600 hover:daisy-from-blue-700 hover:daisy-to-purple-700 daisy-text-white daisy-font-bold daisy-py-4 daisy-px-10 daisy-rounded-2xl daisy-transition-all daisy-duration-300 daisy-shadow-lg hover:daisy-shadow-xl daisy-transform hover:daisy-scale-105 daisy-border daisy-border-white/20 daisy-relative daisy-overflow-hidden"
-                    :class="diceRolling ? 'daisy-opacity-50 daisy-cursor-not-allowed' : 'daisy-opacity-100'"
+                    :class="diceRolling ? 'daisy-opacity-50 daisy-cursomanagedApi.restGameController.fetchPlayersr-not-allowed' : 'daisy-opacity-100'"
                 >
                     <span class="daisy-relative daisy-z-10 daisy-flex daisy-items-center daisy-space-x-2">
                         <span>🎲</span>
@@ -204,6 +210,8 @@ const rollDice = async () => {
     damage.value = result.damage
   }
   totalSteps.value += (diceResult.value % 2 === 0 ? 2 : 1) - damage.value
+
+  await fetchListPlayers()
 }
 
 // Car animation classes

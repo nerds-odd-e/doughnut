@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import net.minidev.json.annotate.JsonIgnore;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -25,7 +24,6 @@ public class Players extends EntityIdentifiedByIdOnly {
   @Column(name = "create_date")
   private Date createDate;
 
-  @OneToMany(mappedBy = "player", fetch = FetchType.EAGER)
-  @JsonIgnore
+  @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   private List<Rounds> rounds = new ArrayList<>();
 }

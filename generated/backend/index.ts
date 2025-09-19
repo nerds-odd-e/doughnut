@@ -53,7 +53,6 @@ export type { FileSearchTool } from './models/FileSearchTool';
 export { FocusNote } from './models/FocusNote';
 export type { Function } from './models/Function';
 export type { FunctionTool } from './models/FunctionTool';
-export type { Games } from './models/Games';
 export type { GithubIssue } from './models/GithubIssue';
 export type { GlobalAiModelSettings } from './models/GlobalAiModelSettings';
 export type { GraphRAGResult } from './models/GraphRAGResult';

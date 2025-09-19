@@ -8,7 +8,7 @@ Feature: Multiple players
     Given I am a player and in the game screen, round 0
     When A new player joins the game
     Then The player count is "2"
-#    And their car is at position "0" with "0" damage
+    And The players name displays "2" records
 
   Scenario: Multiple players join the game
     When A new player joins the game

@@ -4160,35 +4160,6 @@ components:
       properties:
         asFirstChild:
           type: boolean
-    Games:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        numberOfPlayers:
-          type: integer
-          format: int32
-        winner:
-          type: string
-        maxSteps:
-          type: integer
-          format: int32
-        createdDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-        updatedDate:
-          type: string
-          format: date-time
-        rounds:
-          type: array
-          items:
-            $ref: "#/components/schemas/Rounds"
-      required:
-      - id
     Players:
       type: object
       properties:
@@ -4215,10 +4186,6 @@ components:
         id:
           type: integer
           format: int32
-        player:
-          $ref: "#/components/schemas/Players"
-        game:
-          $ref: "#/components/schemas/Games"
         roundNo:
           type: integer
           format: int32

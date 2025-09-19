@@ -67,6 +67,7 @@ public class RestGameController {
 
       int dice = (int) (Math.random() * 6) + 1;
       round.setRoundNo(player.get().getRounds().size() + 1);
+      round.setPlayer(player.get());
       round.setDamage(0);
       round.setDice(dice);
       round.setUpdateDate(new Date());
