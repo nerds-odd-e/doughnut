@@ -204,7 +204,6 @@ const rollDice = async () => {
   // Final result
   diceResult.value = result.dice
 
-
   numberOfRounds.value++
   if (isSuperMode.value && result.damage !== undefined) {
     damage.value = result.damage
