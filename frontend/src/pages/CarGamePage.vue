@@ -27,7 +27,7 @@
                 <ul class="daisy-mt-4 daisy-max-h-64 daisy-overflow-auto daisy-text-gray-700 daisy-text-sm">
                     <li v-for="player in listPlayers" :key="player.id" class="daisy-flex daisy-justify-between daisy-py-1 daisy-border-b daisy-border-gray-200">
                         <span id="players-name-list">{{ player.name }}</span>
-                        <span id="players-steps" >{{ player.rounds ? player.rounds.reduce((acc, round) => acc + (round.step ?? 0), 0) : 0 }} steps</span>
+                        <span id="players-steps" >{{ player.rounds && player.rounds.length > 0 ? player.rounds[player.rounds.length - 1].step ?? 0 : 0 }} steps</span>
                     </li>
                 </ul>
             </div>
