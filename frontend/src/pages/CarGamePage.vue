@@ -168,6 +168,7 @@ const numberOfRounds = ref(0)
 const totalSteps = ref(0)
 const damage = ref(0)
 const gameMode = ref<string>(GAME_MODE.NORMAL)
+const MAX_STEPS = 20;
 
 const isNormalMode = computed(() => gameMode.value === GAME_MODE.NORMAL)
 const isSuperMode = computed(() => gameMode.value === GAME_MODE.SUPER)
@@ -212,11 +213,11 @@ const getCarStyle = (index: number) => {
     "hover:daisy-animate-pulse",
     "hover:daisy-animate-ping",
   ]
-  return `${animations[index % animations.length]} car-position-${totalSteps.value}`
+  return `${animations[index % animations.length]} car-position-${totalSteps.value%MAX_STEPS}`
 }
 
 const getMarkerPosition = () => {
-  return `car-position-${totalSteps.value}`
+  return `car-position-${totalSteps.value%MAX_STEPS}`
 }
 
 const carScars = [carScar0]
