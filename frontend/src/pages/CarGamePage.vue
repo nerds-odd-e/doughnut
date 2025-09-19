@@ -114,7 +114,7 @@
                 <button
                     id="roll-dice-button"
                     @click="rollDice"
-                    :disabled="diceRolling"
+                    :disabled="diceRolling || currentPlayer === undefined"
                     class="daisy-bg-gradient-to-r daisy-from-blue-600 daisy-to-purple-600 hover:daisy-from-blue-700 hover:daisy-to-purple-700 daisy-text-white daisy-font-bold daisy-py-4 daisy-px-10 daisy-rounded-2xl daisy-transition-all daisy-duration-300 daisy-shadow-lg hover:daisy-shadow-xl daisy-transform hover:daisy-scale-105 daisy-border daisy-border-white/20 daisy-relative daisy-overflow-hidden"
                     :class="diceRolling ? 'daisy-opacity-50 daisy-cursomanagedApi.restGameController.fetchPlayersr-not-allowed' : 'daisy-opacity-100'"
                 >
@@ -187,7 +187,7 @@ const rollDice = async () => {
 
   diceRolling.value = true
 
-  // Animate dice rolling  // get result from API
+  // get result from API
   const result: Rounds = await managedApi.restGameController.rollDice(
     currentPlayer.value.id,
     gameMode.value

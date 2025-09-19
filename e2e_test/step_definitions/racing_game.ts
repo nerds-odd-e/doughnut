@@ -43,10 +43,10 @@ When(
         this.initialPosition = parseInt(initialPosition.trim())
       })
 
-    cy.get('#roll-dice-button').click()
-
     // Wait for the dice roll animation to complete
     cy.get('#roll-dice-button').should('not.be.disabled')
+
+    cy.get('#roll-dice-button').click()
 
     // Get the new position value after rolling dice
     cy.get('.player-position')
