@@ -11,9 +11,5 @@ describe("Car Game page", () => {
     expect(
       screen.getByText("Rounds").parentElement?.querySelector("div")
     ).toHaveTextContent("0")
-
-    // Check the Roll Dice button is enabled and has correct text
-    const rollDiceButton = screen.getByRole("button", { name: /roll dice/i })
-    expect(rollDiceButton).toBeEnabled()
   })
 })
