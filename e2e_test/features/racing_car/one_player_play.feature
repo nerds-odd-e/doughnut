@@ -6,6 +6,7 @@ Feature: one player play game
   Scenario: Super mode roll shows correct result
   When I choose the super mode and I roll the dice
    Then the total steps shown should match the backend response
+    And the total damage shown should match the backend response
 
 
 

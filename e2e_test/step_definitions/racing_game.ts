@@ -133,16 +133,22 @@ When(
   }
 )
 
-Then(
-  'the total steps shown should match the backend response',
-  function (this) {
-    expect(backendResponse).to.have.property('step')
-    cy.log(this)
-    cy.get('.player-position')
-      .invoke('text')
-      .then((text) => {
-        const uiSteps = parseInt(text.trim())
-        expect(uiSteps).to.equal(backendResponse.step)
-      })
-  }
-)
+Then('the total steps shown should match the backend response', function () {
+  expect(backendResponse).to.have.property('step')
+  cy.get('.player-position')
+    .invoke('text')
+    .then((text) => {
+      const uiSteps = parseInt(text.trim())
+      expect(uiSteps).to.equal(backendResponse.step)
+    })
+})
+
+Then('the total damage shown should match the backend response', function () {
+  expect(backendResponse).to.have.property('step')
+  cy.get('.damage-position')
+    .invoke('text')
+    .then((text) => {
+      const uiDamage = parseInt(text.trim())
+      expect(uiDamage).to.equal(backendResponse.damage)
+    })
+})
