@@ -18,10 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/games")
 public class RestGameController {
   private final ModelFactoryService modelFactoryService;
-  private final RacingGameService racingGameService = new RacingGameService();
+  private final RacingGameService racingGameService;
 
   public RestGameController(ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
+    this.racingGameService = new RacingGameService(this.modelFactoryService);
   }
 
   @PostMapping("/join")
