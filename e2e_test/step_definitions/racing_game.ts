@@ -4,6 +4,7 @@
 // @ts-check
 
 import { Given, When, Then } from '@badeball/cypress-cucumber-preprocessor'
+import type { Rounds } from '@generated/backend'
 
 Given('I am a player and in the game screen, round 0', function () {
   cy.visit('/d/car-game/abc')
@@ -91,10 +92,10 @@ Then('the dice number has value in range 1-6', () => {
     })
 })
 
-When('I choose the super mode and I roll the dice', () => {
-  cy.get('#switch-mode-super-btn').click()
-  cy.get('#roll-dice-button').click()
-})
+// When('I choose the super mode and I roll the dice', () => {
+//   cy.get('#switch-mode-super-btn').click()
+//   cy.get('#roll-dice-button').click()
+// })
 
 Then('the total damage should be {int}', (totalDamage: number) => {
   cy.get('.damage-position')
@@ -107,3 +108,41 @@ Then('the total damage should be {int}', (totalDamage: number) => {
 Then('the round number becomes {int}', (nextRound: number) => {
   cy.get('.current-round').should('have.text', nextRound.toString())
 })
+
+Then('the total steps should be {int}', (totalSteps: number) => {
+  cy.get('.player-position').should('have.text', totalSteps.toString())
+})
+
+let backendResponse: Rounds
+
+When(
+  'I choose the super mode and I roll the dice',
+  function (this: { nextStepMove }) {
+    cy.intercept('POST', '/api/games/dice/%7Bid%7D?id=1&mode=SUPER').as(
+      'rollDice'
+    ) // adjust the URL as needed
+
+    cy.get('#switch-mode-super-btn').click()
+    cy.get('#roll-dice-button').click()
+
+    cy.wait('@rollDice').then((interception) => {
+      backendResponse = interception.response?.body
+      this.nextStepMove = backendResponse
+      cy.log('Backend Response:', JSON.stringify(backendResponse))
+    })
+  }
+)
+
+Then(
+  'the total steps shown should match the backend response',
+  function (this) {
+    expect(backendResponse).to.have.property('step')
+    cy.log(this)
+    cy.get('.player-position')
+      .invoke('text')
+      .then((text) => {
+        const uiSteps = parseInt(text.trim())
+        expect(uiSteps).to.equal(backendResponse.step)
+      })
+  }
+)

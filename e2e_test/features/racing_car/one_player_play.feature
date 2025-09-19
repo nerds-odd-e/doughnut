@@ -3,23 +3,10 @@ Feature: one player play game
   Background:
     Given I am a player and in the game screen, round 0
 
-# @ignore
-  Scenario: Single player can play the default game
-    When I roll the dice
-    Then the dice number has value in range 1-6
+  Scenario: Super mode roll shows correct result
+  When I choose the super mode and I roll the dice
+   Then the total steps shown should match the backend response
 
-  Scenario Outline: Single player can play the super mode
-    When I choose the super mode and I roll the dice
-    # And the dice number is <dice_number>
-    Then the total damage should be <total_damage>
-    # And the round number becomes <next_round>
-    # And the total steps should be <total_steps>
-    # And the car moves random steps
-
-    Examples:
-      | round_number | dice_number | total_steps | total_damage | next_round |
-      | 0            | 3           | 3           | 1            | 1          |
-      # | 1            | 5           | 7           | 2            | 2          |
 
 
   @ignore

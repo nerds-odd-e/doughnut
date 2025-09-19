@@ -209,7 +209,9 @@ const rollDice = async () => {
   if (isSuperMode.value && result.damage !== undefined) {
     damage.value = result.damage
   }
-  totalSteps.value += (diceResult.value % 2 === 0 ? 2 : 1) - damage.value
+  if (result.step !== undefined) {
+    totalSteps.value = result.step
+  }
 
   await fetchListPlayers()
 }
