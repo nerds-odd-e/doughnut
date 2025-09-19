@@ -24,9 +24,9 @@
                      Players: {{ listPlayers ? listPlayers.length : 0 }}
                     </span>
                 </div>
-                <ul class="daisy-mt-4 daisy-max-h-64 daisy-overflow-auto daisy-text-gray-700 daisy-text-sm">
+                <ul class="daisy-mt-4 daisy-overflow-auto daisy-text-gray-700 daisy-text-sm max-h-screen">
                     <li v-for="player in listPlayers" :key="player.id" class="daisy-flex daisy-justify-between daisy-py-1 daisy-border-b daisy-border-gray-200">
-                        <span id="players-name-list">{{ player.name }}</span>
+                        <span id="players-name-list">{{ player.id }}</span>
                         <span id="players-steps" >{{ player.rounds?.length ? player.rounds[player.rounds.length - 1]?.step ?? 0 : 0 }} steps</span>
                     </li>
                 </ul>
