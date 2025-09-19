@@ -250,7 +250,7 @@ const fetchListPlayers = async () => {
 onMounted(async () => {
   await fetchCarScars()
   await fetchListPlayers()
-  setInterval(fetchListPlayers,5000)
+  setInterval(fetchListPlayers, 5000)
 })
 </script>
 
