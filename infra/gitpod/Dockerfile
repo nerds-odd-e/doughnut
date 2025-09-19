@@ -51,7 +51,6 @@ RUN apt-get install -y \
     fasd \
     fzf \
     neovim \
-    direnv \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \

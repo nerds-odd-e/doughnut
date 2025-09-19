@@ -32,7 +32,7 @@ git config user.email "your_email@your_domain.com"
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
-- From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), boot up your `nix` development environment (with `direnv` just `cd` to the `doughtnut` source directory, else, `nix develop` to prepare End-to-End testing tooling setup.
+- From the root of the `doughnut` codebase (path `/workspace/doughnut`), boot up your nix development environment by running `nix develop` to prepare the End-to-End testing tooling setup.
 - From root of `doughnut` source path, execute `pnpm verify` to execute the full headless cypress End-to-End test suite.
 
 ### Running java springboot unit tests

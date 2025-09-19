@@ -29,13 +29,13 @@ git add --renormalize .
 ```
 
 Boot up your doughnut development environment.
-MySQL DB server wil be started and initialised on entering the local cloned `doughnut` source directory via `direnv` else run `nix develop`.
+MySQL DB server wil be started and initialised after you run `nix develop`.
 
 ```bash
 cd doughnut
 ```
 
-All development tool commands henceforth should work when in the `nix` development environment that will be bootstrapped by `direnv` (if installed and configured correctly), else run `nix develop` to get the necessary tooling installed correctly.
+All development tool commands henceforth should work when in the `nix` development environment; if not already in that environment, run `nix develop` to get the necessary tooling installed correctly.
 Run E2E profile springboot backend server with gradle (backend app started on port 9081)
 
 ```bash

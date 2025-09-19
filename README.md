@@ -48,18 +48,6 @@ For developers on macOS 15 Sequoia, please run the below if you face issue insta
 curl --proto '=https' --tlsv1.2 -sSf -L https://github.com/NixOS/nix/raw/master/scripts/sequoia-nixbld-user-migration.sh | bash -
 ```
 
-Install `direnv` and activate `direnv`
-**macOS:** `brew install direnv`
-**Ubuntu/Debian (includes WSL2 with Ubuntu):** `sudo apt-get install -y direnv`
-**Fedora:** `sudo dnf install direnv`
-Change directory to your cloned `doughnut` folder path and run the below:
-
-```bash
-echo 'eval "$(direnv hook bash)"' >> ~/.bashrc
-echo 'eval "$(direnv hook zsh)"' >> ~/.zshrc
-direnv allow
-```
-
 Subsequently, each time your change directory into your `doughnut` cloned folder, `nix` flakes will be auto loaded. Each time you change directory away from `doughnut` directory, the `nix` environment will be auto unloaded.
 
 Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
@@ -79,8 +67,6 @@ the [local development environment nix setup](./docs/nix.md).
 ### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 From the root of your doughnut directory, start your doughnut nix development environment with
-
-If you have `direnv` installed & configured right, just `cd` to the path where you cloned `doughnut` Github source code and the `nix` develop environment will autoload, **OTHERWISE** run:
 
 ```bash
 nix develop
@@ -242,7 +228,6 @@ Local test accounts:
 ### 12. Teardown and cleanup
 
 - pnpm: To clean up packages installed by pnpm, you can run pnpm store prune to remove unused packages from the store. To remove all packages for a specific project, navigate to the project directory and run pnpm recursive uninstall to uninstall all dependencies in the project and its subdirectories.
-- direnv: To stop direnv from automatically loading the environment, you can simply delete the .envrc/ file in the project directory or run direnv deny in the project directory. To uninstall direnv, use the package manager you installed it with (e.g., brew uninstall direnv for macOS).
 - Nix: If you want to remove the Nix package manager and all packages installed through it, you can run sudo rm -rf /nix to delete the Nix store. To uninstall Nix completely, follow the [official Nix documentation for uninstallation](https://nix.dev/manual/nix/2.22/installation/uninstall) instructions.
 
 [Miro board](https://miro.com/app/board/uXjVNNaWVeA=/?share_link_id=753160038592)
