@@ -5,9 +5,7 @@ import com.odde.doughnut.entities.Players;
 import com.odde.doughnut.entities.Rounds;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.RacingGameService;
-import java.util.List;
-import java.util.stream.StreamSupport;
-import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +28,7 @@ public class RestGameController {
   public Players joinGame() {
     Games game = new Games();
     game.setNumberOfPlayers(4);
-    //      game.setCreatedAt(LocalDateTime.now());
+    game.setCreatedDate(new Date());
     game.setUpdatedDate(new Date());
     game.setEndDate(new Date());
     game.setMaxSteps(6);
@@ -65,21 +63,28 @@ public class RestGameController {
     Rounds round = new Rounds();
     Optional<Players> player = modelFactoryService.playersRepository.findById(id);
     if (player.isPresent()) {
-      player.get().getRounds().add(round);
+
       int dice = (int) (Math.random() * 6) + 1;
       round.setRoundNo(player.get().getRounds().size() + 1);
       round.setDamage(0);
       round.setDice(dice);
       round.setUpdateDate(new Date());
       round.setCreateDate(new Date());
-      int sum =
+      Optional<Rounds> rounds =
           player.get().getRounds().stream()
-              .mapToInt(r -> r.getDice() % 2 == 1 ? 1 : 2) // odd: +1, even: +2
-              .sum();
-
-      round.setStep(sum);
+              .sorted(
+                  Comparator.comparing(Rounds::getUpdateDate)
+                      .reversed()) // Sort by updateDate in descending order
+              .findFirst();
+      round.setStep(
+          rounds.isPresent() ? rounds.get().getStep() + getMovingStep(dice) : getMovingStep(dice));
+      player.get().getRounds().add(round);
       modelFactoryService.playersRepository.save(player.get());
     }
     return round;
+  }
+
+  public Integer getMovingStep(Integer dice) {
+    return dice % 2 == 0 ? 2 : 1;
   }
 }

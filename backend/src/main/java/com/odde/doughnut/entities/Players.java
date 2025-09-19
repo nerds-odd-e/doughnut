@@ -2,14 +2,12 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import net.minidev.json.annotate.JsonIgnore;
-import org.springframework.data.annotation.CreatedDate;
 
 @Data
 @EqualsAndHashCode(callSuper = false)

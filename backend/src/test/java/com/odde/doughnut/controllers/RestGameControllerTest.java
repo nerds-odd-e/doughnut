@@ -29,7 +29,7 @@ class RestGameControllerTest {
   void testDice() {
     Players player = restGameController.joinGame();
     assertNotNull(player);
-    Rounds round = restGameController.rollDice(player.getId());
+    Rounds round = restGameController.rollDice(player.getId(), "NORMAL");
     assertNotNull(round);
     // just check if the dice is in range 1-6
     assertTrue(round.getDice() >= 1 && round.getDice() <= 6);
