@@ -1550,54 +1550,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NoteRealm"
-  /api/games/join:
-    post:
-      tags:
-      - rest-game-controller
-      operationId: joinGame
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Players"
-  /api/games/dice/{id}:
-    post:
-      tags:
-      - rest-game-controller
-      operationId: rollDice
-      parameters:
-      - name: id
-        in: query
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: mode
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/Rounds"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -3163,26 +3115,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/games/fetch:
-    get:
-      tags:
-      - rest-game-controller
-      operationId: fetchPlayers
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Players"
   /api/fine-tuning/all-suggested-questions-for-fine-tuning:
     get:
       tags:
@@ -4160,54 +4092,6 @@ components:
       properties:
         asFirstChild:
           type: boolean
-    Players:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          type: string
-        isAdmin:
-          type: boolean
-        createDate:
-          type: string
-          format: date-time
-        rounds:
-          type: array
-          items:
-            $ref: "#/components/schemas/Rounds"
-      required:
-      - id
-      - name
-    Rounds:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        roundNo:
-          type: integer
-          format: int32
-        mode:
-          type: string
-        dice:
-          type: integer
-          format: int32
-        damage:
-          type: integer
-          format: int32
-        step:
-          type: integer
-          format: int32
-        createDate:
-          type: string
-          format: date-time
-        updateDate:
-          type: string
-          format: date-time
-      required:
-      - id
     ConversationMessage:
       type: object
       properties:

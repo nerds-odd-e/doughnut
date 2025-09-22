@@ -35,10 +35,6 @@ public class MakeMe extends MakeMeWithoutDB {
     return new NoteBuilder(this);
   }
 
-  public PlayersBuilder aPlayer() {
-    return new PlayersBuilder(this);
-  }
-
   public NoteBuilder aNote(String title) {
     return aNote().titleConstructor(title);
   }

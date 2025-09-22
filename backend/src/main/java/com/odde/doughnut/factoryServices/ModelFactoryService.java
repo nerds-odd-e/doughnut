@@ -32,9 +32,6 @@ public class ModelFactoryService {
   @Autowired public NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
   @Autowired public RecallPromptRepository recallPromptRepository;
   @Autowired public UserTokenRepository userTokenRepository;
-  @Autowired public PlayersRepository playersRepository;
-  @Autowired public GamesRepository gamesRepository;
-  @Autowired public RoundsRepository roundsRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
