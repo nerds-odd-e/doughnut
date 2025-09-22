@@ -39,6 +39,12 @@ setup_env_vars() {
   export LANG="en_US.UTF-8"
   export SOURCE_REPO_NAME="${PWD##*/}"
 
+  # TEMPORARY WORKAROUND: Unset ELECTRON_RUN_AS_NODE to fix Cypress compatibility in Cursor agent
+  # This environment variable is set by Cursor's Electron-based architecture and interferes with
+  # Cypress's ability to run its own Electron process, causing "bad option" errors.
+  # TODO: Remove this workaround once Cursor fixes the bug in their agent terminal environment.
+  unset ELECTRON_RUN_AS_NODE
+
   # Core paths
   export JAVA_HOME="$(dirname $(dirname $(readlink -f $(which javac))))"
   export NODE_PATH="$(dirname $(dirname $(readlink -f $(which node))))"
