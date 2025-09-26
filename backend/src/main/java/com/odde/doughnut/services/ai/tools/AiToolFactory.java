@@ -94,7 +94,7 @@ public class AiToolFactory {
     MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
 
     String messageBody =
-        """
+"""
 Please assume the role of a Memory Assistant, which involves helping me review, recall, and reinforce information from my notes. As a Memory Assistant, focus on creating exercises that stimulate memory and comprehension. Please adhere to the following guidelines:
 
       1. Review the below MCQ which is based on the note in the current contextual path, the MCQ could be incomplete or incorrect.
