@@ -95,7 +95,7 @@ public class AssessmentService {
   private void getLastAssessmentAttemptAndItMustBePassed(Notebook notebook, User user) {
     getMyAssessments(user).stream()
         .filter(assessmentAttempt -> assessmentAttempt.getNotebook().equals(notebook))
-        .reduce((_, second) -> second)
+        .reduce((first, second) -> second)
         .filter(AssessmentAttempt::getIsPass)
         .orElseThrow(
             () ->

@@ -6,14 +6,14 @@ public sealed interface OpenAiRunResult permits OpenAiRunRequiredAction, OpenAiR
   default <T> T getAssumedToolCallArgument(Class<T> expectedType) throws JsonProcessingException {
     return switch (this) {
       case OpenAiRunRequiredAction action -> expectedType.cast(action.getTheOnlyArgument());
-      case OpenAiRunCompleted _ -> null;
+      case OpenAiRunCompleted completed -> null;
     };
   }
 
   default <T> T getLastToolCallArgument(Class<T> expectedType) throws JsonProcessingException {
     return switch (this) {
       case OpenAiRunRequiredAction action -> expectedType.cast(action.getLastArgument());
-      case OpenAiRunCompleted _ -> null;
+      case OpenAiRunCompleted completed -> null;
     };
   }
 }

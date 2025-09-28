@@ -76,7 +76,7 @@ public class ModelFactoryService {
     if (!asFirstChild) {
       List<Note> children = targetNote.getChildren();
       if (!children.isEmpty()) {
-        return motionOfMoveAfter(sourceNote, children.getLast(), false);
+        return motionOfMoveAfter(sourceNote, children.get(children.size() - 1), false);
       }
     }
     return motionOfMoveAfter(sourceNote, targetNote, true);
