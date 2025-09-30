@@ -158,3 +158,26 @@ Given('I have a valid MCP token', () => {
     .generateToken()
     .as('savedMcpToken')
 })
+
+Given('I have no MCP token with label {string}', (label: string) => {
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .checkTokenWithLabelNotExists(label)
+})
+
+When('I create an MCP token with label {string}', (label: string) => {
+  start.mainMenu().userOptions().manageMCPTokens().generateToken(label)
+})
+
+Then(
+  'I can see the token with label {string} in the list of tokens',
+  (label: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageMCPTokens()
+      .checkTokenWithLabelExists(label)
+  }
+)
