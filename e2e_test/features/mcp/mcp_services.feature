@@ -9,6 +9,18 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid MCP token
     And I connect to an MCP client that connects to Doughnut MCP service
 
+  @skip
+  Scenario Outline: Creating a new MCP token with a label
+    Given I have no MCP token with label "<token_label>"
+    When I create an MCP token with label "<token_label>"
+    Then I can see the token with label "<token_label>" in the list of tokens
+
+    Examples:
+      | token_label |
+      | Lord        |
+      | Harry       |
+      | Fiona       |
+
   Scenario: Adding note to a known parent note
     Given I have a notebook with head note "Books I read" and notes:
       | Title             | Parent Title |
