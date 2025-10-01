@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,15 +70,15 @@ class RestUserControllerTest {
     java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
   }
 
-  /*void getTokensTest() {
-      TokenConfigDTO tokenConfig = new TokenConfigDTO();
-      tokenConfig.setLabel("TEST_LABEL");
+  @Test
+  void getTokensTest() {
+    TokenConfigDTO tokenConfig = new TokenConfigDTO();
+    tokenConfig.setLabel("TEST_LABEL");
 
-      UserToken userToken = controller.generateToken(tokenConfig);
-      List<TokenConfigDTO> getTokens = controller.getTokens();
+    UserToken userToken = controller.generateToken(tokenConfig);
+    List<UserToken> getTokens = controller.getTokens();
 
-      assertThat(getTokens.stream().anyMatch(el -> el), equalTo("TEST_LABEL"));
-
-      assertThat(getTokens.size(), equalTo(1));
-  }*/
+    assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("TEST_LABEL")));
+    assertThat(getTokens.size(), equalTo(1));
+  }
 }

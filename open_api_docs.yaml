@@ -56,6 +56,7 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/TokenConfigDTO"
+        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -2629,7 +2630,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/TokenConfigDTO"
+                  $ref: "#/components/schemas/UserToken"
   /api/user/current-user-info:
     get:
       tags:
@@ -3553,6 +3554,8 @@ components:
           type: integer
           format: int32
         token:
+          type: string
+        label:
           type: string
       required:
       - id

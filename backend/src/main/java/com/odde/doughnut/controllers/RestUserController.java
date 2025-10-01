@@ -56,23 +56,23 @@ class RestUserController {
 
   @PostMapping("/generate-token")
   @Transactional
-  public UserToken generateToken(@Valid @RequestBody(required = false) TokenConfigDTO tokenConfig) {
+  public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
 
     String uuid = UUID.randomUUID().toString();
 
     // save token to DB
-    UserToken userToken = new UserToken(user.getId(), uuid);
+    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
     userToken = modelFactoryService.save(userToken);
     return userToken;
   }
 
   @GetMapping("/get-tokens")
   @Transactional
-  public List<TokenConfigDTO> getTokens() {
-    TokenConfigDTO dummyToken = new TokenConfigDTO();
-    dummyToken.setLabel("TEST_LABEL");
-    return List.of(dummyToken);
+  public List<UserToken> getTokens() {
+    currentUser.assertLoggedIn();
+    User user = currentUser.getEntity();
+    return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
 }

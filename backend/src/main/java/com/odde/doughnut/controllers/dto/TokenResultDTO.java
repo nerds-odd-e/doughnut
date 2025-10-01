@@ -7,10 +7,16 @@ import lombok.Getter;
 import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TokenConfigDTO {
+public class TokenResultDTO {
   @NotNull
-  @Size(max = 100)
+  @Size(min = 0, max = 100)
   @Getter
   @Setter
   private String label;
+
+  @NotNull
+  @Size(min = 0, max = 100)
+  @Getter
+  @Setter
+  private String id;
 }

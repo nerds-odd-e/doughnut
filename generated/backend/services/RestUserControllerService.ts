@@ -47,7 +47,7 @@ export class RestUserControllerService {
      * @throws ApiError
      */
     public generateToken(
-        requestBody?: TokenConfigDTO,
+        requestBody: TokenConfigDTO,
     ): CancelablePromise<UserToken> {
         return this.httpRequest.request({
             method: 'POST',
@@ -83,10 +83,10 @@ export class RestUserControllerService {
         });
     }
     /**
-     * @returns TokenConfigDTO OK
+     * @returns UserToken OK
      * @throws ApiError
      */
-    public getTokens(): CancelablePromise<Array<TokenConfigDTO>> {
+    public getTokens(): CancelablePromise<Array<UserToken>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/user/get-tokens',

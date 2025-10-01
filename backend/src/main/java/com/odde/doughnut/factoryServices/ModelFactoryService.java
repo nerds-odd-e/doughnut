@@ -95,6 +95,11 @@ public class ModelFactoryService {
     return this.findUserById(usertoken.getUserId());
   }
 
+  public Optional<List<UserToken>> findTokensByUser(Integer id) {
+    List<UserToken> usertokens = userTokenRepository.findByUserId(id);
+    return Optional.ofNullable(usertokens);
+  }
+
   public UserModel toUserModel(User user) {
     return new UserModel(user, this);
   }

@@ -20,9 +20,15 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @NotNull
   private String token;
 
-  public UserToken(Integer userId, @NotNull String token) {
+  @Column(name = "label")
+  @Getter
+  @Setter
+  private String label;
+
+  public UserToken(Integer userId, @NotNull String token, String label) {
     this.userId = userId;
     this.token = token;
+    this.label = label;
   }
 
   public UserToken() {}

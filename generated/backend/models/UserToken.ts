@@ -6,5 +6,6 @@ export type UserToken = {
     id: number;
     userId?: number;
     token: string;
+    label?: string;
 };
 
