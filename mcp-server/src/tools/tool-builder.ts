@@ -47,7 +47,10 @@ export class ToolBuilder<TSchema extends z.ZodSchema> {
     return {
       name: this.name,
       description: this.description,
-      inputSchema: z.toJSONSchema(this.schema) as Record<string, unknown>,
+      inputSchema: z.toJSONSchema(this.schema, { target: 'draft-7' }) as Record<
+        string,
+        unknown
+      >,
       handle: createToolHandler(async (ctx, args, request) => {
         const validation = extractParams(args, this.schema)
         if (!validation.success) {
