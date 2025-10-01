@@ -74,7 +74,7 @@ const copied = ref(false)
 const loadTokens = async () => {
   try {
     const res = await managedApi.restUserController.getTokens()
-    tokens.value = res
+    tokens.value = res.map((t) => ({ label: t.label || ''}))
     // Also get tokens from local storage for now
     if (localStorage.getItem("mcpTokens")) {
       tokens.value.push(
