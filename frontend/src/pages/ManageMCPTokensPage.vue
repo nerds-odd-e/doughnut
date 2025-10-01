@@ -71,22 +71,41 @@ const token = ref<string | null>(null)
 const loading = ref(false)
 const copied = ref(false)
 
-// Get tokens from local storage for now
-if (localStorage.getItem("mcpTokens")) {
-  tokens.value = JSON.parse(localStorage.getItem("mcpTokens") || "[]")
+const loadTokens = async () => {
+  try {
+    const res = await managedApi.restUserController.getTokens()
+    tokens.value = res
+    // Also get tokens from local storage for now
+    if (localStorage.getItem("mcpTokens")) {
+      tokens.value.push(
+        ...JSON.parse(localStorage.getItem("mcpTokens") || "[]")
+      )
+    }
+  } catch (error) {
+    console.error("Error loading tokens:", error)
+  }
 }
+
+loadTokens()
 
 const generateToken = async () => {
   loading.value = true
   copied.value = false
   try {
-    const res = await managedApi.restUserController.generateToken()
+    const res = await managedApi.restUserController.generateToken({
+      label: tokenFormData.value.label,
+    })
     token.value = res.token
-
-    // Store the label locally for now
+    // use label from form data for now
     tokens.value.push({ label: tokenFormData.value.label })
-    localStorage.setItem("mcpTokens", JSON.stringify(tokens.value))
-
+    // Also store tokens in local storage for now
+    localStorage.setItem(
+      "mcpTokens",
+      JSON.stringify([
+        { label: tokenFormData.value.label },
+        ...JSON.parse(localStorage.getItem("mcpTokens") || "[]"),
+      ])
+    )
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {
