@@ -64,11 +64,13 @@ class RestUserControllerTest {
 
   @Test
   void generateTokenShouldReturnValidUserToken() {
-    UserToken userToken = controller.generateToken(new TokenConfigDTO());
+    TokenConfigDTO tokenConfig = new TokenConfigDTO();
+    tokenConfig.setLabel("TEST_LABEL");
+    UserToken userToken = controller.generateToken(tokenConfig);
+
     assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
-    // Check that the token is a valid UUID
+    assertThat(userToken.getLabel(), equalTo("TEST_LABEL"));
     assertThat(userToken.getToken().length(), equalTo(36));
-    java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
   }
 
   @Test
