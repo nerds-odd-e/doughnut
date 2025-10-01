@@ -150,12 +150,12 @@ Then('the new MCP Token should be a valid UUID', () => {
   )
 })
 
-Given('I have a valid MCP token', () => {
+Given('I have a valid MCP token with label {string}', (label: string) => {
   start
     .mainMenu()
     .userOptions()
     .manageMCPTokens()
-    .generateToken()
+    .generateToken(label)
     .as('savedMcpToken')
 })
 
