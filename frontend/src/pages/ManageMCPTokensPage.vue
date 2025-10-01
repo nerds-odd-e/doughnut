@@ -74,13 +74,7 @@ const copied = ref(false)
 const loadTokens = async () => {
   try {
     const res = await managedApi.restUserController.getTokens()
-    tokens.value = res.map((t) => ({ label: t.label || ''}))
-    // Also get tokens from local storage for now
-    if (localStorage.getItem("mcpTokens")) {
-      tokens.value.push(
-        ...JSON.parse(localStorage.getItem("mcpTokens") || "[]")
-      )
-    }
+    tokens.value = res.map((t) => ({ label: t.label || "" }))
   } catch (error) {
     console.error("Error loading tokens:", error)
   }
@@ -96,16 +90,7 @@ const generateToken = async () => {
       label: tokenFormData.value.label,
     })
     token.value = res.token
-    // use label from form data for now
-    tokens.value.push({ label: tokenFormData.value.label })
-    // Also store tokens in local storage for now
-    localStorage.setItem(
-      "mcpTokens",
-      JSON.stringify([
-        { label: tokenFormData.value.label },
-        ...JSON.parse(localStorage.getItem("mcpTokens") || "[]"),
-      ])
-    )
+    tokens.value.push({ label: res.label || "" })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {
