@@ -2784,11 +2784,10 @@ paths:
           type: integer
       - name: tokenLimit
         in: query
-        required: false
+        required: true
         schema:
           type: integer
           format: int32
-          default: 5000
       responses:
         "500":
           description: Internal Server Error

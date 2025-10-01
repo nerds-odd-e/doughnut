@@ -87,8 +87,8 @@ export function extractTokenLimit(
     return argsTokenLimit
   }
 
-  const requestTokenLimit = (request as { params?: { tokenLimit?: number } })?.params
-    ?.tokenLimit
+  const requestTokenLimit = (request as { params?: { tokenLimit?: number } })
+    ?.params?.tokenLimit
   if (typeof requestTokenLimit === 'number') {
     return requestTokenLimit
   }

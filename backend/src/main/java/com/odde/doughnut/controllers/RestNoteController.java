@@ -200,8 +200,7 @@ class RestNoteController {
 
   @GetMapping("/{note}/graph")
   public GraphRAGResult getGraph(
-      @PathVariable("note") @Schema(type = "integer") Note note,
-      @RequestParam(defaultValue = "5000") int tokenLimit)
+      @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
 

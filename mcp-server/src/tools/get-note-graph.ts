@@ -1,6 +1,11 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { createErrorResponse, extractNoteId, extractTokenLimit, jsonResponse } from '../helpers.js'
+import {
+  createErrorResponse,
+  extractNoteId,
+  extractTokenLimit,
+  jsonResponse,
+} from '../helpers.js'
 import type { ToolResponse } from '../types.js'
 import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 
@@ -14,7 +19,7 @@ const NoteIdParamsSchema = z.object({
   tokenLimit: z
     .number()
     .describe(
-      "A valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window."
+      'A valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window.'
     ),
 })
 
