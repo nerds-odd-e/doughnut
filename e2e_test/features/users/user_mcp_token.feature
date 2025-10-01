@@ -18,3 +18,9 @@ Feature: User MCP token
       | Lord        |
       | Harry       |
       | Fiona       |
+
+  @skip
+  Scenario: Delete an MCP token
+    Given I have a valid MCP token with label "To be deleted"
+    When I delete the MCP token with label "To be deleted"
+    Then I cannot use the token to access MCP services
