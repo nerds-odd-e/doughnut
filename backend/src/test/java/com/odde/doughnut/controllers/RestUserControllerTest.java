@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
@@ -17,6 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -61,10 +64,16 @@ class RestUserControllerTest {
 
   @Test
   void generateTokenShouldReturnValidUserToken() {
-    UserToken userToken = controller.generateToken();
+    UserToken userToken = controller.generateToken(new TokenConfigDTO());
     assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
     // Check that the token is a valid UUID
     assertThat(userToken.getToken().length(), equalTo(36));
     java.util.UUID.fromString(userToken.getToken()); // will throw if not valid UUID
   }
+
+    @Test
+    void getTokensTest() {
+        List<TokenConfigDTO> getTokens = controller.getTokens();
+        assertThat(getTokens.size(), equalTo(1));
+    }
 }
