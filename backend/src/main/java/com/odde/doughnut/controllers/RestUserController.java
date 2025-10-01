@@ -57,7 +57,7 @@ class RestUserController {
 
   @PostMapping("/generate-token")
   @Transactional
-  public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
+  public UserToken generateToken(@Valid @RequestBody(required = false) TokenConfigDTO tokenConfig) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
 
