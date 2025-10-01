@@ -136,3 +136,48 @@ Then('the graph response should contain related notes', () => {
     expect(relatedNoteTitles).to.include('Functional')
   })
 })
+
+// 
+
+
+When('AI agent extracts note ID and calls get graph MCP tool with token limit {string}', (limit: string) => {
+  cy.get('@MCPApiResponse').then((searchResponse) => {
+    const responseData = searchResponse as unknown as ApiResponse
+    const responseText = responseData.content[0]?.text || ""
+    const searchResult = JSON.parse(responseText)
+
+    // Check if noteTopology exists and has id
+    if (!(searchResult.noteTopology && searchResult.noteTopology.id)) {
+      throw new Error(`Invalid search result structure: ${responseText}`)
+    }
+
+    const noteId = searchResult.noteTopology.id
+    const tokenLimit = parseInt(limit, 10);
+
+    cy.task('callMcpToolWithParams', {
+      apiName: 'get_note_graph',
+      params: { noteId: noteId, tokenLimit: tokenLimit },
+    }).then((graphResponse) => {
+      cy.wrap(graphResponse).as('MCPGraphResponse')
+    })
+  })
+});
+
+
+Then('the graph response should show appropriate content for limit {string}', (limit: string) => {
+  cy.get('@MCPGraphResponse').then((response) => {
+    const tokenLimit = parseInt(limit, 10);
+    const actualResponse = response as unknown as ApiResponse;
+    const responseText = actualResponse.content[0]?.text || "";
+
+    console.log(responseText)
+
+    if (tokenLimit === 0) {
+      expect(responseText).to.contain("token parameter is not provided");
+    } else if (tokenLimit === 10) {
+      expect(responseText).to.contain("Some related notes found, provided context window limit is insufficient.");
+    } else if (tokenLimit === 1000) {
+      expect(responseText).to.contain("Object Oriented");
+    }
+  });
+})
