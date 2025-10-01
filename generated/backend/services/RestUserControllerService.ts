@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { TokenConfigDTO } from '../models/TokenConfigDTO';
 import type { User } from '../models/User';
 import type { UserDTO } from '../models/UserDTO';
 import type { UserToken } from '../models/UserToken';
@@ -41,13 +42,18 @@ export class RestUserControllerService {
         });
     }
     /**
+     * @param requestBody
      * @returns UserToken OK
      * @throws ApiError
      */
-    public generateToken(): CancelablePromise<UserToken> {
+    public generateToken(
+        requestBody?: TokenConfigDTO,
+    ): CancelablePromise<UserToken> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/user/generate-token',
+            body: requestBody,
+            mediaType: 'application/json',
             errors: {
                 500: `Internal Server Error`,
             },
@@ -71,6 +77,19 @@ export class RestUserControllerService {
             },
             body: requestBody,
             mediaType: 'application/json',
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
+     * @returns TokenConfigDTO OK
+     * @throws ApiError
+     */
+    public getTokens(): CancelablePromise<Array<TokenConfigDTO>> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/user/get-tokens',
             errors: {
                 500: `Internal Server Error`,
             },

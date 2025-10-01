@@ -130,6 +130,7 @@ export type { TextFromAudioWithCallInfo } from './models/TextFromAudioWithCallIn
 export type { TimeTravel } from './models/TimeTravel';
 export type { TimeTravelRelativeToNow } from './models/TimeTravelRelativeToNow';
 export type { TitleReplacement } from './models/TitleReplacement';
+export type { TokenConfigDTO } from './models/TokenConfigDTO';
 export type { Tool } from './models/Tool';
 export type { ToolCall } from './models/ToolCall';
 export type { ToolCallCodeInterpreter } from './models/ToolCallCodeInterpreter';
