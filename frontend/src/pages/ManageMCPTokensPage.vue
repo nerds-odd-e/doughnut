@@ -74,7 +74,7 @@ const copied = ref(false)
 const loadTokens = async () => {
   try {
     const res = await managedApi.restUserController.getTokens()
-    tokens.value = res.map((t) => ({ label: t.label || "" }))
+    tokens.value = res.map((t) => ({ label: t.label }))
   } catch (error) {
     console.error("Error loading tokens:", error)
   }
@@ -90,7 +90,7 @@ const generateToken = async () => {
       label: tokenFormData.value.label,
     })
     token.value = res.token
-    tokens.value.push({ label: res.label || "" })
+    tokens.value.push({ label: res.label })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {

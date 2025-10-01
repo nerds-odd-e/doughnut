@@ -3559,6 +3559,7 @@ components:
           type: string
       required:
       - id
+      - label
       - token
     TimeTravelRelativeToNow:
       type: object

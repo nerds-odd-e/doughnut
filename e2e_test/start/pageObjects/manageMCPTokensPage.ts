@@ -2,7 +2,7 @@ import submittableForm from 'start/submittableForm'
 
 export const manageMCPTokensPage = () => {
   return {
-    generateToken(label?: string) {
+    generateToken(label: string) {
       cy.findByRole('button', { name: 'Generate Token' }).click()
       submittableForm.submitWith({
         Label: label,
