@@ -40,6 +40,6 @@ const closeDialog = () => {
 }
 
 defineExpose({
-  closeDialog
+  closeDialog,
 })
 </script>

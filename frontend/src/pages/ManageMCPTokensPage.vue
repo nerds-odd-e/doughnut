@@ -66,7 +66,7 @@ const popbutton = ref<InstanceType<typeof PopButton> | null>(null)
 
 const tokenFormData = ref({ label: "" })
 
-const tokens = ref<Array<{ label: string; }>>([])
+const tokens = ref<Array<{ label: string }>>([])
 const token = ref<string | null>(null)
 const loading = ref(false)
 const copied = ref(false)
@@ -86,7 +86,7 @@ const generateToken = async () => {
     // Store the label locally for now
     tokens.value.push({ label: tokenFormData.value.label })
     localStorage.setItem("mcpTokens", JSON.stringify(tokens.value))
-    
+
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {
