@@ -38,4 +38,8 @@ const show = ref(false)
 const closeDialog = () => {
   show.value = false
 }
+
+defineExpose({
+  closeDialog
+})
 </script>

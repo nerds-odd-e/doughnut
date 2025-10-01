@@ -9,7 +9,6 @@ Feature: MCP (Model Context Protocol) Services
     And I have a valid MCP token
     And I connect to an MCP client that connects to Doughnut MCP service
 
-  @skip
   Scenario Outline: Creating a new MCP token with a label
     Given I have no MCP token with label "<token_label>"
     When I create an MCP token with label "<token_label>"
