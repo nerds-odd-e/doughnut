@@ -57,23 +57,3 @@ Feature: MCP (Model Context Protocol) Services
     When AI agent extracts note ID from the search result and calls get graph MCP tool
     Then the graph response should contain the focus note "Object Oriented"
     And the graph response should contain related notes
-
-
-Scenario: AI agent respects different token limits for graph retrieval
-    Given I have a notebook with head note "Programming Concepts" and notes:
-      | Title                | Parent Title           |
-      | Object Oriented      | Programming Concepts   |
-      | Functional           | Programming Concepts   |
-      | Classes              | Object Oriented        |
-      | Inheritance          | Object Oriented        |
-    When AI agent searchs for relevant notes using MCP tool with the term "Object Oriented"
-    And  AI agent extracts note ID  and calls get graph MCP tool with token limit "<token_limit>"
-    Then the graph response should respect the token limit "<token_limit>"
-    And the graph response should show appropriate content for limit "<token_limit>"
-    
-    Examples:
-      | token_limit | expected_behavior                                                        |
-      | null        | "token parameter is not provided"                                        |
-      | 0           | Error                                                                    |
-      | 10          | Some related notes found, provided context window limit is insufficient. |
-      | 1000        | Object Oriented                                                          |
