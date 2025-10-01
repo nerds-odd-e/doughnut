@@ -219,7 +219,9 @@ directory:
 1 directory, 6 files
 ```
 
-### 7. [Manual testing locally](./docs/manual_testing_locally.md)
+### 7. [Integrating MCP server for IDE](./.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
+
+### 8. [Manual testing locally](./docs/manual_testing_locally.md)
 
 When you have the backend and frontend running, you can manually test the application.
 
@@ -231,15 +233,15 @@ Local test accounts:
 - User: 'another_old_learner', Password: 'password'
 - User: 'admin', Password: 'password'
 
-### 8. [Style Guide & Code linting/formating](./docs/linting_formating.md)
+### 9. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 
-### 9. [Production environment](./docs/prod_env.md)
+### 10. [Production environment](./docs/prod_env.md)
 
-### 10. [Doughnut source code secrets management](./docs/secrets_management.md)
+### 11. [Doughnut source code secrets management](./docs/secrets_management.md)
 
-### 11. Architecture and Design documentation
+### 12. Architecture and Design documentation
 
-### 12. Teardown and cleanup
+### 13. Teardown and cleanup
 
 - pnpm: To clean up packages installed by pnpm, you can run pnpm store prune to remove unused packages from the store. To remove all packages for a specific project, navigate to the project directory and run pnpm recursive uninstall to uninstall all dependencies in the project and its subdirectories.
 - direnv: To stop direnv from automatically loading the environment, you can simply delete the .envrc/ file in the project directory or run direnv deny in the project directory. To uninstall direnv, use the package manager you installed it with (e.g., brew uninstall direnv for macOS).
