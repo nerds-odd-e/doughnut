@@ -59,13 +59,9 @@ class RestUserController {
   public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
-
     String uuid = UUID.randomUUID().toString();
-
-    // save token to DB
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
-    userToken = modelFactoryService.save(userToken);
-    return userToken;
+    return modelFactoryService.save(userToken);
   }
 
   @GetMapping("/get-tokens")

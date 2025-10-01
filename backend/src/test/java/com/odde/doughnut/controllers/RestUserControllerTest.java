@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -72,10 +73,11 @@ class RestUserControllerTest {
 
   @Test
   void getTokensTest() {
-    TokenConfigDTO tokenConfig = new TokenConfigDTO();
-    tokenConfig.setLabel("TEST_LABEL");
+    UserToken userToken =
+        makeMe.aUserToken(userModel.getEntity().getId(), "ABC", "TEST_LABEL").please();
+    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
+    modelFactoryService.save(userToken);
 
-    UserToken userToken = controller.generateToken(tokenConfig);
     List<UserToken> getTokens = controller.getTokens();
 
     assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("TEST_LABEL")));
