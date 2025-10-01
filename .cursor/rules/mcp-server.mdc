@@ -95,8 +95,9 @@ The unit tests cover:
 
 ## How to use this MCP Server
 
-Add the below command to your AI MCP Server configuration:
+Add the below command to your AI MCP Server configuration.
 
+For Cursor:
 ```json
 {
   "mcpServers": {
@@ -115,6 +116,25 @@ Add the below command to your AI MCP Server configuration:
     }
   }
 }
+```
+
+For VS Code (you need to put the following content into `./.vscode/mcp.json`):
+```json
+{
+  "servers": {
+    "doughnut": {
+      "command": "node",
+      "args": [
+        "<doughnut root folder>/mcp-server/dist/mcp-server.bundle.mjs"
+      ],
+      "env": {
+        "DOUGHNUT_API_BASE_URL": "http://localhost:9081",
+        "DOUGHNUT_API_AUTH_TOKEN": "your-token-here"
+      }
+    }
+  }
+}
+
 ```
 
 ## Available Tools
