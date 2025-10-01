@@ -26,7 +26,7 @@ When('AI agent calls the {string} MCP tool', (apiName: string) => {
 })
 
 When(
-  'AI agent searchs for relevant notes using MCP tool with the term {string}',
+  'AI agent searches for relevant notes using MCP tool with the term {string}',
   (searchTerm: string) => {
     cy.task('callMcpToolWithParams', {
       apiName: 'find_most_relevant_note',
@@ -134,5 +134,40 @@ Then('the graph response should contain related notes', () => {
 
     // Should contain the sibling note
     expect(relatedNoteTitles).to.include('Functional')
+  })
+})
+
+When(
+  'AI agent extracts note ID and calls get graph MCP tool with token limit {string}',
+  (limit: string) => {
+    cy.get('@MCPApiResponse').then((searchResponse) => {
+      const responseData = searchResponse as unknown as ApiResponse
+      const responseText = responseData.content[0]?.text || ''
+      const searchResult = JSON.parse(responseText)
+
+      // Check if noteTopology exists and has id
+      if (!(searchResult.noteTopology && searchResult.noteTopology.id)) {
+        throw new Error(`Invalid search result structure: ${responseText}`)
+      }
+
+      const noteId = searchResult.noteTopology.id
+      const tokenLimit = parseInt(limit)
+
+      cy.task('callMcpToolWithParams', {
+        apiName: 'get_note_graph',
+        params: { noteId: noteId, tokenLimit: tokenLimit },
+      }).then((graphResponse) => {
+        cy.wrap(graphResponse).as('MCPGraphResponse')
+      })
+    })
+  }
+)
+
+Then('the graph response should show {string}', (expectedBehavior: string) => {
+  cy.get('@MCPGraphResponse').then((response) => {
+    const actualResponse = response as unknown as ApiResponse
+    const responseText = actualResponse.content[0]?.text || ''
+
+    expect(responseText).to.contain(expectedBehavior)
   })
 })
