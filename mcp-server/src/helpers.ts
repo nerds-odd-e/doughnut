@@ -82,12 +82,12 @@ export function extractTokenLimit(
   args: Record<string, unknown>,
   request?: unknown
 ): number | null {
-  const argsTokenLimit = (args as { tokenLimit?: number }).tokenLimit
+  const argsTokenLimit = (args as { tokenLimit: number }).tokenLimit
   if (typeof argsTokenLimit === 'number') {
     return argsTokenLimit
   }
 
-  const requestTokenLimit = (request as { params?: { tokenLimit?: number } })
+  const requestTokenLimit = (request as { params?: { tokenLimit: number } })
     ?.params?.tokenLimit
   if (typeof requestTokenLimit === 'number') {
     return requestTokenLimit

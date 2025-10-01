@@ -58,7 +58,7 @@ You MUST provide a valid token limit to ensure the response fits within constrai
 
 Navigation Pattern:
 1. Use 'find_most_relevant_note' to find relevant notes
-2. Extract note ID from search results  
+2. Extract note ID from search results
 3. Use this tool to explore relationships and context
 4. Follow related notes for deeper exploration`,
   NoteIdParamsSchema
@@ -69,8 +69,12 @@ Navigation Pattern:
   }
 
   const tokenLimit = extractTokenLimit(args, request)
-  if (tokenLimit === null) {
+
+  if (tokenLimit === null || isNaN(tokenLimit)) {
     return createErrorResponse('tokenLimit must be provided as a number')
+  }
+  if (tokenLimit === 0) {
+    return createErrorResponse('tokenLimit must be a positive number')
   }
 
   // You can use the tokenLimit variable as needed in your logic here
