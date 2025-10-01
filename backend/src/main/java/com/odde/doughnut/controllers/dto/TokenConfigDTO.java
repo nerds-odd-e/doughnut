@@ -8,9 +8,9 @@ import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TokenConfigDTO {
-    @NotNull
-    @Size(min = 0, max = 100)
-    @Getter
-    @Setter
-    private String label;
+  @NotNull
+  @Size(min = 0, max = 100)
+  @Getter
+  @Setter
+  private String label;
 }

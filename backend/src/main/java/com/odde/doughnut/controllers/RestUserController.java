@@ -11,7 +11,6 @@ import com.odde.doughnut.models.UserModel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,11 +68,11 @@ class RestUserController {
     return userToken;
   }
 
-    @GetMapping("/get-tokens")
-    @Transactional
-    public List<TokenConfigDTO> getTokens() {
-        TokenConfigDTO dummyToken = new TokenConfigDTO();
-        dummyToken.setLabel("TEST_LABEL");
-        return List.of(dummyToken);
-    }
+  @GetMapping("/get-tokens")
+  @Transactional
+  public List<TokenConfigDTO> getTokens() {
+    TokenConfigDTO dummyToken = new TokenConfigDTO();
+    dummyToken.setLabel("TEST_LABEL");
+    return List.of(dummyToken);
+  }
 }
