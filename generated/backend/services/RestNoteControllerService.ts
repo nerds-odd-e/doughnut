@@ -192,7 +192,7 @@ export class RestNoteControllerService {
      */
     public getGraph(
         note: number,
-        tokenLimit: number = 5000,
+        tokenLimit: number,
     ): CancelablePromise<GraphRAGResult> {
         return this.httpRequest.request({
             method: 'GET',

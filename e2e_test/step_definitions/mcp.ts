@@ -87,10 +87,11 @@ When(
       }
 
       const noteId = searchResult.noteTopology.id
+      const tokenLimit = 3000 // Set a token limit appropriate for your context window
 
       cy.task('callMcpToolWithParams', {
         apiName: 'get_note_graph',
-        params: { noteId: noteId },
+        params: { noteId: noteId, tokenLimit: tokenLimit },
       }).then((graphResponse) => {
         cy.wrap(graphResponse).as('MCPGraphResponse')
       })

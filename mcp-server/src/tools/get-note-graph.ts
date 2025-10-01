@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
-import { createErrorResponse, extractNoteId, jsonResponse } from '../helpers.js'
+import { createErrorResponse, extractNoteId, extractTokenLimit, jsonResponse } from '../helpers.js'
 import type { ToolResponse } from '../types.js'
 import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
 
@@ -11,14 +11,20 @@ const NoteIdParamsSchema = z.object({
     .describe(
       "Numeric ID of the note to explore. Obtain this from 'find_most_relevant_note' results or user-provided ID."
     ),
+  tokenLimit: z
+    .number()
+    .describe(
+      "A valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window."
+    ),
 })
 
 // Note operations
 async function getNoteById(
   api: DoughnutApi,
-  noteId: number
+  noteId: number,
+  tokenLimit: number
 ): Promise<ToolResponse> {
-  const graph = await api.restNoteController.getGraph(noteId)
+  const graph = await api.restNoteController.getGraph(noteId, tokenLimit)
   return jsonResponse(graph)
 }
 
@@ -41,6 +47,9 @@ Use Cases:
 - Building comprehensive understanding of a topic
 
 You MUST obtain a valid note ID first using 'find_most_relevant_note' unless the user explicitly provides a numeric note ID.
+You MUST provide a valid token limit to ensure the response fits within constraints alongside with the note ID. Your choice of the limit should consider the currently available context window. Example of a valid token limits:
+1. If the note is short and the context window is large, you might set a higher token limit (e.g., 5000 tokens).
+2. If the note is long or the context window is small, you might need to set a lower token limit (e.g., 500 tokens).
 
 Navigation Pattern:
 1. Use 'find_most_relevant_note' to find relevant notes
@@ -53,5 +62,12 @@ Navigation Pattern:
   if (noteId === null) {
     return createErrorResponse('noteId must be provided as a number')
   }
-  return await getNoteById(ctx.api, noteId)
+
+  const tokenLimit = extractTokenLimit(args, request)
+  if (tokenLimit === null) {
+    return createErrorResponse('tokenLimit must be provided as a number')
+  }
+
+  // You can use the tokenLimit variable as needed in your logic here
+  return await getNoteById(ctx.api, noteId, tokenLimit)
 })

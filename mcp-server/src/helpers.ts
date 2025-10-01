@@ -78,6 +78,24 @@ export function extractNoteId(
   return null
 }
 
+export function extractTokenLimit(
+  args: Record<string, unknown>,
+  request?: unknown
+): number | null {
+  const argsTokenLimit = (args as { tokenLimit?: number }).tokenLimit
+  if (typeof argsTokenLimit === 'number') {
+    return argsTokenLimit
+  }
+
+  const requestTokenLimit = (request as { params?: { tokenLimit?: number } })?.params
+    ?.tokenLimit
+  if (typeof requestTokenLimit === 'number') {
+    return requestTokenLimit
+  }
+
+  return null
+}
+
 // Tool handler wrapper
 export function createToolHandler<T extends Record<string, unknown>>(
   handler: (
