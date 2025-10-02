@@ -159,6 +159,10 @@ Given('I have a valid MCP token with label {string}', (label: string) => {
     .as('savedMcpToken')
 })
 
+When('I delete the MCP token with label {string}', (label: string) => {
+  start.mainMenu().userOptions().manageMCPTokens().deleteToken(label)
+})
+
 Given('I have no MCP token with label {string}', (label: string) => {
   start
     .mainMenu()

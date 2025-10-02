@@ -9,6 +9,11 @@ export const manageMCPTokensPage = () => {
       })
       return cy.get('[data-testid="token-result"]').invoke('text')
     },
+    deleteToken(label: string) {
+      cy.contains('tr', label).within(() => {
+        cy.findByRole('button', { name: 'Delete' }).click()
+      })
+    },
     checkTokenWithLabelNotExists(label: string) {
       cy.findByText(label).should('not.exist')
     },
