@@ -38,7 +38,7 @@ Feature: MCP (Model Context Protocol) Services
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
     When AI agent searches for relevant notes using MCP tool with the term "Lord"
     Then the response should contain "No MCP notebook is set for this user."
-  
+
   @skip
   Scenario: User selects a notebook as MCP_Notebook
     Given I have a notebook with the head note "Cats" and details "nice cat"
@@ -76,7 +76,7 @@ Feature: MCP (Model Context Protocol) Services
       | token_limit | expected_behavior                    |
       | 10          | Functional                           |
       | 1000        | Programming Concepts                 |
-    @focus
+
   Scenario Outline: AI agent respects different token limits for graph retrieval with error handling
     Given I have a notebook with head note "Programming Concepts" and notes:
       | Title           | Parent Title         |
