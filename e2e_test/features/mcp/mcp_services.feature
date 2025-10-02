@@ -74,6 +74,23 @@ Feature: MCP (Model Context Protocol) Services
 
     Examples:
       | token_limit | expected_behavior                    |
+      | 10          | Functional                           |
+      | 1000        | Programming Concepts                 |
+    @focus
+  Scenario Outline: AI agent respects different token limits for graph retrieval with error handling
+    Given I have a notebook with head note "Programming Concepts" and notes:
+      | Title           | Parent Title         |
+      | Object Oriented | Programming Concepts |
+      | Functional      | Programming Concepts |
+      | Classes         | Object Oriented      |
+      | Inheritance     | Object Oriented      |
+
+    When AI agent searches for relevant notes using MCP tool with the term "Functional"
+    Then the response should contain "Functional"
+    When AI agent extracts note ID and calls get graph MCP tool with token limit "<token_limit>"
+    Then the graph response should contain an error with "<error_message>"
+
+    Examples:
+      | token_limit | error_message                        |
       | 0           | tokenLimit must be a positive number |
-      | 10          | Programming Concepts                 |
-      | 1000        | Functional                           |
+      | 5           | tokenLimit too low to fetch any note |

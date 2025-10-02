@@ -76,7 +76,9 @@ Navigation Pattern:
   if (tokenLimit === 0) {
     return createErrorResponse('tokenLimit must be a positive number')
   }
-
+  if (tokenLimit <= 5) {
+    return createErrorResponse('tokenLimit too low to fetch any note')
+  }
   // You can use the tokenLimit variable as needed in your logic here
   return await getNoteById(ctx.api, noteId, tokenLimit)
 })

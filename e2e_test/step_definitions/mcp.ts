@@ -171,3 +171,12 @@ Then('the graph response should show {string}', (expectedBehavior: string) => {
     expect(responseText).to.contain(expectedBehavior)
   })
 })
+
+Then('the graph response should contain an error with {string}', (expectedError: string) => {
+  cy.get('@MCPGraphResponse').then((response) => {
+    const actualResponse = response as unknown as ApiResponse
+    const responseText = actualResponse.content[0]?.text || ''
+
+    expect(responseText).to.contain(expectedError)
+  })
+})

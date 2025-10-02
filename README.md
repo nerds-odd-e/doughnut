@@ -219,7 +219,7 @@ directory:
 1 directory, 6 files
 ```
 
-### 7. [Integrating MCP server for IDE](./.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
+### 7. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 
 ### 8. [Manual testing locally](./docs/manual_testing_locally.md)
 
