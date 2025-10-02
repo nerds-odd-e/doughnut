@@ -46,6 +46,14 @@ Feature: MCP (Model Context Protocol) Services
     Then the graph response should contain the focus note "Object Oriented"
     And the graph response should contain related notes
 
+  @skip
+  Scenario: AI return a warning message when no MCP notebook is set
+    Given I have a notebook with the head note "Lord of the Rings" and details "Test"
+    When AI agent searchs for relevant notes using MCP tool with the term "Lord"
+    Then the response should contain "No MCP notebook is set for this user."
+
+  @skip
+  Scenario: AI agent respects different token limits for graph retrieval
 
   Scenario Outline: AI agent respects different token limits for graph retrieval
     Given I have a notebook with head note "Programming Concepts" and notes:
