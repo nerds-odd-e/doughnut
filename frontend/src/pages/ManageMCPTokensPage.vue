@@ -45,6 +45,11 @@
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
+            <div class="daisy-flex daisy-justify-end">
+              <button class="daisy-btn daisy-btn-error daisy-btn-xs">Delete</button>
+            </div>
+          </td>
         </tr>
         <tr v-if="tokens.length === 0">
           <td class="daisy-px-4 daisy-py-2 daisy-text-gray-400">No tokens yet</td>
