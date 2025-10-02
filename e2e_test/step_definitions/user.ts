@@ -134,12 +134,12 @@ Then('I should be on the welcome page and asked to login', () => {
   cy.findByRole('button', { name: 'Login via Github' }).click()
 })
 
-When('I generate a new MCP token', () => {
+When('I generate a new MCP token with label {string}', (label: string) => {
   start
     .mainMenu()
     .userOptions()
     .manageMCPTokens()
-    .generateToken()
+    .generateToken(label)
     .as('generatedMcpToken')
 })
 

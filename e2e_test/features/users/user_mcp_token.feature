@@ -5,7 +5,7 @@ Feature: User MCP token
     Given I am logged in as "old_learner"
 
   Scenario: Generate MCP token
-    When I generate a new MCP token
+    When I generate a new MCP token with label "Initial Token"
     Then the new MCP Token should be a valid UUID
 
   Scenario Outline: Creating a new MCP token with a label
