@@ -120,13 +120,11 @@ const props = defineProps({
 const {
   skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
-  selectMCPNotebook,
   certificateExpiry = "1y",
 } = props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
-  selectMCPNotebook,
   numberOfQuestionsInAssessment,
   certificateExpiry,
 })
