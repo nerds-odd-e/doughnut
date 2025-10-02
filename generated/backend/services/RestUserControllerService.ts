@@ -95,4 +95,23 @@ export class RestUserControllerService {
             },
         });
     }
+    /**
+     * @param id
+     * @returns any OK
+     * @throws ApiError
+     */
+    public deleteToken(
+        id: number,
+    ): CancelablePromise<any> {
+        return this.httpRequest.request({
+            method: 'DELETE',
+            url: '/api/user/token/{tokenId}',
+            query: {
+                'id': id,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
 }

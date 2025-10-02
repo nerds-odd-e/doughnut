@@ -84,4 +84,17 @@ class RestUserControllerTest {
     assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("TEST_LABEL")));
     assertThat(getTokens.size(), equalTo(1));
   }
+
+  @Test
+  void deleteTokenTest() {
+    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("DELETE_LABEL").please();
+    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
+    modelFactoryService.save(userToken);
+
+    controller.deleteToken(userToken.getId());
+
+    List<UserToken> getTokens = controller.getTokens();
+    assertFalse(getTokens.stream().anyMatch(el -> el.getId().equals(userToken.getId())));
+    assertThat(getTokens.size(), equalTo(0));
+  }
 }

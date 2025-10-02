@@ -3464,6 +3464,27 @@ paths:
                 type: array
                 items:
                   type: string
+  /api/user/token/{tokenId}:
+    delete:
+      tags:
+      - rest-user-controller
+      operationId: deleteToken
+      parameters:
+      - name: id
+        in: query
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
   /api/failure-reports/delete:
     delete:
       tags:

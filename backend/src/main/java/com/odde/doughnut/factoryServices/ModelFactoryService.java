@@ -100,6 +100,10 @@ public class ModelFactoryService {
     return Optional.ofNullable(usertokens);
   }
 
+  public void deleteToken(Integer tokenId) {
+    userTokenRepository.deleteById(tokenId);
+  }
+
   public UserModel toUserModel(User user) {
     return new UserModel(user, this);
   }

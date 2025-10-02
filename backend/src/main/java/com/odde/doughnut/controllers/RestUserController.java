@@ -71,4 +71,12 @@ class RestUserController {
     User user = currentUser.getEntity();
     return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
+
+  @DeleteMapping("/token/{tokenId}")
+  public void deleteToken(Integer id) {
+    currentUser.assertLoggedIn();
+    User user = currentUser.getEntity();
+
+    modelFactoryService.deleteToken(id);
+  }
 }
