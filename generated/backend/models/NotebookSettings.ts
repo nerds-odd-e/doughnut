@@ -4,6 +4,7 @@
 /* eslint-disable */
 export type NotebookSettings = {
     skipMemoryTrackingEntirely?: boolean;
+    selectMCPNotebook?: boolean;
     numberOfQuestionsInAssessment?: number;
     certificateExpiry?: string;
 };

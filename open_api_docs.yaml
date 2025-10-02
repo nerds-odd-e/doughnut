@@ -3834,6 +3834,8 @@ components:
       properties:
         skipMemoryTrackingEntirely:
           type: boolean
+        selectMCPNotebook:
+          type: boolean
         numberOfQuestionsInAssessment:
           type: integer
           format: int32

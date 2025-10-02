@@ -10,7 +10,7 @@
       scope-name="notebook"
       field="selectMCPNotebook"
       label="Select Mcp Notebook"
-      hint="If selected, this notebook will be used by the MCP tool for AI agents to search for relevant notes."
+      v-model="formData.selectMCPNotebook"
       :error-message="errors.selectMCPNotebook"
     />
     <TextInput
@@ -119,12 +119,14 @@ const props = defineProps({
 // Form data
 const {
   skipMemoryTrackingEntirely,
+  selectMCPNotebook,
   numberOfQuestionsInAssessment,
   certificateExpiry = "1y",
 } = props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
+  selectMCPNotebook,
   numberOfQuestionsInAssessment,
   certificateExpiry,
 })
