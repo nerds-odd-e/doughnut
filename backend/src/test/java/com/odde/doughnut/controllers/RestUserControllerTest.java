@@ -75,8 +75,7 @@ class RestUserControllerTest {
 
   @Test
   void getTokensTest() {
-    UserToken userToken =
-        makeMe.aUserToken(userModel.getEntity().getId(), "ABC", "TEST_LABEL").please();
+    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("TEST_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 

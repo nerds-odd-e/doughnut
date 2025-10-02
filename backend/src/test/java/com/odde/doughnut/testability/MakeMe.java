@@ -31,8 +31,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return new UserBuilder(this, "admin");
   }
 
-  public UserTokenBuilder aUserToken(Integer userId, String token, String label) {
-    return new UserTokenBuilder(this, new UserToken(userId, token, label));
+  public UserTokenBuilder aUserToken() {
+    return new UserTokenBuilder(this);
   }
 
   public NoteBuilder aNote() {
