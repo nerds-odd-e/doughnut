@@ -189,3 +189,7 @@ Then('I should see popup {string}', (message: string) => {
     expect(text).to.equal(message)
   })
 })
+
+When('I select the notebook {string} as MCP_Notebook', (noteTitle: string) => {
+  start.routerToNotebooksPage().notebookCard(noteTitle).editNotebookSettings()
+})

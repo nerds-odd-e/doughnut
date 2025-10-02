@@ -38,11 +38,10 @@ Feature: MCP (Model Context Protocol) Services
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
     When AI agent searches for relevant notes using MCP tool with the term "Lord"
     Then the response should contain "No MCP notebook is set for this user."
-
-  @skip
+   
   Scenario: User selects a notebook as MCP_Notebook
     Given I have a notebook with the head note "Cats" and details "nice cat"
-    When I select the notebook as MCP_Notebook
+    When I select the notebook "Cats" as MCP_Notebook
     And AI agent searches for relevant notes using MCP tool with the term "Cats"
     Then the response should contain "Cats"
 
