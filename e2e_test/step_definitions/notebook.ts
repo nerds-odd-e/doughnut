@@ -191,5 +191,9 @@ Then('I should see popup {string}', (message: string) => {
 })
 
 When('I select the notebook {string} as MCP_Notebook', (noteTitle: string) => {
-  start.routerToNotebooksPage().notebookCard(noteTitle).editNotebookSettings().selectMCPNotebook()
+  start
+    .routerToNotebooksPage()
+    .notebookCard(noteTitle)
+    .editNotebookSettings()
+    .selectMCPNotebook()
 })
