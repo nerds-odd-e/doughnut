@@ -160,7 +160,12 @@ Given('I have a valid MCP token with label {string}', (label: string) => {
 })
 
 When('I delete the MCP token with label {string}', (label: string) => {
-  start.mainMenu().userOptions().manageMCPTokens().deleteToken(label)
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .deleteToken(label)
+    .checkTokenWithLabelNotExists(label)
 })
 
 Given('I have no MCP token with label {string}', (label: string) => {

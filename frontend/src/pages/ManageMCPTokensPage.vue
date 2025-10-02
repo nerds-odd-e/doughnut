@@ -47,7 +47,7 @@
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">
-              <button class="daisy-btn daisy-btn-error daisy-btn-xs">Delete</button>
+              <button class="daisy-btn daisy-btn-error daisy-btn-xs" @click="deleteToken(item.id)">Delete</button>
             </div>
           </td>
         </tr>
@@ -71,7 +71,7 @@ const popbutton = ref<InstanceType<typeof PopButton> | null>(null)
 
 const tokenFormData = ref({ label: "" })
 
-const tokens = ref<Array<{ label: string }>>([])
+const tokens = ref<Array<{ id: number; label: string }>>([])
 const token = ref<string | null>(null)
 const loading = ref(false)
 const copied = ref(false)
@@ -79,7 +79,7 @@ const copied = ref(false)
 const loadTokens = async () => {
   try {
     const res = await managedApi.restUserController.getTokens()
-    tokens.value = res.map((t) => ({ label: t.label }))
+    tokens.value = res.map((t) => ({ id: t.id, label: t.label }))
   } catch (error) {
     console.error("Error loading tokens:", error)
   }
@@ -95,7 +95,7 @@ const generateToken = async () => {
       label: tokenFormData.value.label,
     })
     token.value = res.token
-    tokens.value.push({ label: res.label })
+    tokens.value.push({ id: res.id, label: res.label })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {
@@ -110,6 +110,15 @@ const copyToken = async () => {
     await navigator.clipboard.writeText(token.value)
     copied.value = true
     setTimeout(() => (copied.value = false), 1500)
+  }
+}
+
+const deleteToken = async (id: number) => {
+  try {
+    // await managedApi.restUserController.deleteToken(id)
+    tokens.value = tokens.value.filter((token) => token.id !== id)
+  } catch (error) {
+    console.error("Error deleting token:", error)
   }
 }
 </script>

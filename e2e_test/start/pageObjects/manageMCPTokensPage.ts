@@ -13,6 +13,7 @@ export const manageMCPTokensPage = () => {
       cy.contains('tr', label).within(() => {
         cy.findByRole('button', { name: 'Delete' }).click()
       })
+      return this
     },
     checkTokenWithLabelNotExists(label: string) {
       cy.findByText(label).should('not.exist')
