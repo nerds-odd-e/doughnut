@@ -6,6 +6,13 @@
       v-model="formData.skipMemoryTrackingEntirely"
       :error-message="errors.skipMemoryTrackingEntirely"
     />
+    <CheckInput
+      scope-name="notebook"
+      field="selectMCPNotebook"
+      label="Select Mcp Notebook"
+      hint="If selected, this notebook will be used by the MCP tool for AI agents to search for relevant notes."
+      :error-message="errors.selectMCPNotebook"
+    />
     <TextInput
       scope-name="notebook"
       field="numberOfQuestionsInAssessment"
@@ -113,11 +120,13 @@ const props = defineProps({
 const {
   skipMemoryTrackingEntirely,
   numberOfQuestionsInAssessment,
+  selectMCPNotebook,
   certificateExpiry = "1y",
 } = props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
+  selectMCPNotebook,
   numberOfQuestionsInAssessment,
   certificateExpiry,
 })
@@ -125,6 +134,7 @@ const formData = ref({
 const errors = ref({
   skipMemoryTrackingEntirely: undefined as string | undefined,
   numberOfQuestionsInAssessment: undefined as string | undefined,
+  selectMCPNotebook: undefined as string | undefined,
   certificateExpiry: undefined as string | undefined,
 })
 
