@@ -46,7 +46,7 @@
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
-          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">Not Used</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.lastUsedAt || 'N/A' }}</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">Expired</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">
@@ -74,7 +74,9 @@ const popbutton = ref<InstanceType<typeof PopButton> | null>(null)
 
 const tokenFormData = ref({ label: "" })
 
-const tokens = ref<Array<{ id: number; label: string }>>([])
+const tokens = ref<
+  Array<{ id: number; label: string; lastUsedAt: string | null }>
+>([])
 const token = ref<string | null>(null)
 const loading = ref(false)
 const copied = ref(false)
@@ -82,7 +84,11 @@ const copied = ref(false)
 const loadTokens = async () => {
   try {
     const res = await managedApi.restUserController.getTokens()
-    tokens.value = res.map((t) => ({ id: t.id, label: t.label }))
+    tokens.value = res.map((t) => ({
+      id: t.id,
+      label: t.label,
+      lastUsedAt: null,
+    }))
   } catch (error) {
     console.error("Error loading tokens:", error)
   }
@@ -98,7 +104,7 @@ const generateToken = async () => {
       label: tokenFormData.value.label,
     })
     token.value = res.token
-    tokens.value.push({ id: res.id, label: res.label })
+    tokens.value.push({ id: res.id, label: res.label, lastUsedAt: null })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {
