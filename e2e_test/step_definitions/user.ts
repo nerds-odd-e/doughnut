@@ -187,6 +187,15 @@ Then('I cannot create a note as a child of {string}', (parentNote: string) => {
     })
 })
 
+When('I create a note as a child of {string} using the MCP', (parentNote: string) => {
+  start
+    .mcpApi()
+    .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214666' })
+    .then((response) => {
+      expect(response.status).to.eq(200)
+    })
+})
+
 Given('I have no MCP token with label {string}', (label: string) => {
   start
     .mainMenu()
