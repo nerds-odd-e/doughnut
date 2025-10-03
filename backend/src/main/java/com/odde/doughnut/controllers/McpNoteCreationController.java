@@ -21,12 +21,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @SessionScope
@@ -63,9 +61,7 @@ public class McpNoteCreationController {
   @Transactional
   public NoteCreationResult createNote(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    if (currentUser.getEntity() == null) {
-      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized");
-    }
+    currentUser.assertLoggedIn();
 
     var parentNoteObj = FindParentNote(currentUser.getEntity(), noteCreation);
 
