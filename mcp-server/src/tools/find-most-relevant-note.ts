@@ -42,19 +42,16 @@ For broader search results, consider breaking down complex queries into specific
   }
 
   try {
+    const notebooksData = await ctx.api.restNotebookController.myNotebooks()
+    const mcpNotebook = notebooksData.notebooks.find(
+      (notebook) => notebook.notebookSettings.selectMCPNotebook === true
+    )
+    const mcpNotebookId = mcpNotebook?.id ?? null
 
-    if (false) {
-      const notebooksData = await ctx.api.restNotebookController.myNotebooks()
-      const mcpNotebook = notebooksData.notebooks.find(
-        (notebook) => notebook.notebookSettings.selectMCPNotebook === true
+    if (!mcpNotebookId) {
+      return textResponse(
+        'Inform the user that -no MCP notebook is set.-. Make sure nothing else is outputted. You as LLM agent stop iterating on other tools.'
       )
-      const mcpNotebookId = mcpNotebook?.id ?? null
-
-      if (!mcpNotebookId) {
-        return textResponse(
-          'Inform the user that -no MCP notebook is set.-. Make sure nothing else is outputted. You as LLM agent stop iterating on other tools.'
-        )
-      }
     }
 
     const results =
