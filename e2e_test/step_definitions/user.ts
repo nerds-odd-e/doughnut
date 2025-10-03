@@ -234,12 +234,13 @@ Then(
 )
 
 When('it is 90 days later', () => {
-  start.testability().backendTimeTravelTo(90, 1)
+  start.testability().backendTimeTravelRelativeToNow(21610) // 90 days in seconds
 })
 
 Then(
   'the MCP token {string} should be marked as expired',
   (tokenLabel: string) => {
+    cy.reload()
     cy.get('table').within(() => {
       cy.contains('tr', tokenLabel).within(() => {
         cy.contains('Expired')
