@@ -10,6 +10,7 @@ import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
 import { notebookCard } from './pageObjects/notebookCard'
 import downloadChecker from './downloadChecker'
+import mcpApi from './mcpApi'
 const start = {
   ...basicActions,
   questionGenerationService,
@@ -19,6 +20,7 @@ const start = {
   recall,
   assumeCirclePage,
   notebookCard,
+  mcpApi,
   ...downloadChecker(),
 }
 export default start

@@ -156,7 +156,9 @@ Given('I have a valid MCP token with label {string}', (label: string) => {
     .userOptions()
     .manageMCPTokens()
     .generateToken(label)
-    .as('savedMcpToken')
+    .then((token) => {
+      cy.wrap(token).as('savedMcpToken')
+    })
 })
 
 When('I delete the MCP token with label {string}', (label: string) => {
@@ -166,6 +168,15 @@ When('I delete the MCP token with label {string}', (label: string) => {
     .manageMCPTokens()
     .deleteToken(label)
     .checkTokenWithLabelNotExists(label)
+})
+
+Then('I cannot create a note as a child of {string}', (parentNote: string) => {
+  start
+    .mcpApi()
+    .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214665' })
+    .then((response) => {
+      expect(response.status).to.eq(401)
+    })
 })
 
 Given('I have no MCP token with label {string}', (label: string) => {

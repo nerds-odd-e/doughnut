@@ -21,9 +21,11 @@ Feature: User MCP token
 
   Scenario: Delete an MCP token
     Given I have a valid MCP token with label "To be deleted"
+    And I have a notebook with the head note "Parent Note"
     When I delete the MCP token with label "To be deleted"
-    # Then I cannot use the token to access MCP services
-  
+    Then I cannot create a note as a child of "Parent Note"
+
+ @skip
   Scenario: User MCP token expiration
     Given I have a valid MCP token with label "my token"
     #When it is 90 days later

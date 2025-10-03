@@ -116,7 +116,7 @@ const copyToken = async () => {
 
 const deleteToken = async (id: number) => {
   try {
-    // await managedApi.restUserController.deleteToken(id)
+    await managedApi.restUserController.deleteToken(id)
     tokens.value = tokens.value.filter((token) => token.id !== id)
   } catch (error) {
     console.error("Error deleting token:", error)
