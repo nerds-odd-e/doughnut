@@ -190,3 +190,14 @@ Then(
       .checkTokenWithLabelExists(label)
   }
 )
+
+Then(
+  'the MCP token {string} should be marked as expired',
+  (tokenLabel: string) => {
+    cy.get('table').within(() => {
+      cy.contains('tr', tokenLabel).within(() => {
+        cy.contains('Expired')
+      })
+    })
+  }
+)
