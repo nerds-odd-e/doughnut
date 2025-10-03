@@ -1,7 +1,7 @@
 <template>
   <div class="daisy-container daisy-mx-auto daisy-p-4">
     <h1 class="daisy-text-2xl daisy-font-bold daisy-mb-4">Generate Token</h1>
-    
+
     <PopButton ref="popbutton" btn-class="daisy-btn daisy-btn-primary daisy-btn-md">
       <template #button_face>
         Generate Token
@@ -45,6 +45,7 @@
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">Expired</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">
               <button class="daisy-btn daisy-btn-error daisy-btn-xs" @click="deleteToken(item.id)">Delete</button>

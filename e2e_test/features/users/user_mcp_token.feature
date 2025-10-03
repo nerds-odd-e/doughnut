@@ -23,8 +23,7 @@ Feature: User MCP token
     Given I have a valid MCP token with label "To be deleted"
     When I delete the MCP token with label "To be deleted"
     # Then I cannot use the token to access MCP services
-
-  @skip
+  
   Scenario: User MCP token expiration
     Given I have a valid MCP token with label "my token"
     #When it is 90 days later
