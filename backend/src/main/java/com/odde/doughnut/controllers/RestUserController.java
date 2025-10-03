@@ -8,9 +8,14 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,10 +27,12 @@ import org.springframework.web.bind.annotation.*;
 class RestUserController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
+  private final TestabilitySettings testabilitySettings;
 
-  public RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser) {
+  public RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser, TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @PostMapping("")
@@ -61,7 +68,9 @@ class RestUserController {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
-    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
+    Timestamp expirationDate =
+        Timestamp.from(testabilitySettings.getCurrentUTCTimestamp().toInstant().plus(90, ChronoUnit.DAYS));
+    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel(), expirationDate);
     return modelFactoryService.save(userToken);
   }
 
@@ -70,7 +79,12 @@ class RestUserController {
   public List<UserToken> getTokens() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
-    return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
+    List<UserToken> userTokens = modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
+    return userTokens.stream().peek(userToken -> {
+        if (userToken.getExpirationDate().before(testabilitySettings.getCurrentUTCTimestamp())) {
+            userToken.setIsExpired(true);
+        }
+    }).toList();
   }
 
   @DeleteMapping("/token/{tokenId}")
