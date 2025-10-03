@@ -1,5 +1,7 @@
 import { describe, test, expect, vi } from 'vitest'
 import { createMockApi, createMockContext, findTool } from '../helpers/index.js'
+import type { RestSearchControllerService } from '@generated/backend/services/RestSearchControllerService.js'
+import type { RestNotebookControllerService } from '@generated/backend/services/RestNotebookControllerService.js'
 
 describe('find_most_relevant_note tool', () => {
   // Helper function to create mock API for find_most_relevant_note tests
@@ -7,7 +9,18 @@ describe('find_most_relevant_note tool', () => {
     createMockApi({
       restSearchController: {
         searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
-      },
+      } as unknown as RestSearchControllerService,
+      restNotebookController: {
+        myNotebooks: vi.fn().mockResolvedValue({
+          notebooks: [
+            {
+              id: 1,
+              notebookSettings: { selectMCPNotebook: true },
+            },
+          ],
+          subscriptions: [],
+        }),
+      } as unknown as RestNotebookControllerService,
     })
 
   // Helper function to run the test

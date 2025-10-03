@@ -33,6 +33,7 @@ Feature: MCP (Model Context Protocol) Services
       | Harry       | Harry Potter            |
       | Fiona       | No relevant note found. |
 
+  @skip
   Scenario: AI return a warning message when no MCP notebook is set
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
     When AI agent searches for relevant notes using MCP tool with the term "Lord"

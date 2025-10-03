@@ -99,22 +99,31 @@ onMounted(() => {
 
 const onSelectMcp = async (value: string) => {
   const selectedId = value ? Number(value) : null
-  const currentId = selectedMcpNotebookId.value == null ? null : Number(selectedMcpNotebookId.value)
+  const currentId =
+    selectedMcpNotebookId.value == null
+      ? null
+      : Number(selectedMcpNotebookId.value)
   if (selectedId == null) {
     if (currentId != null) {
-      await managedApi.restNotebookController.update1(currentId, { selectMCPNotebook: false })
+      await managedApi.restNotebookController.update1(currentId, {
+        selectMCPNotebook: false,
+      })
       await fetchData()
     }
     return
   }
   if (currentId != null) {
-    await managedApi.restNotebookController.update1(currentId, { selectMCPNotebook: false })
+    await managedApi.restNotebookController.update1(currentId, {
+      selectMCPNotebook: false,
+    })
   }
-  await managedApi.restNotebookController.update1(selectedId, { selectMCPNotebook: true })
+  await managedApi.restNotebookController.update1(selectedId, {
+    selectMCPNotebook: true,
+  })
   await fetchData()
 }
 
 const clearMcpSelection = async () => {
-  await onSelectMcp('')
+  await onSelectMcp("")
 }
 </script>
