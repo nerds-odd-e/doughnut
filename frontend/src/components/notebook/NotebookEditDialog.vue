@@ -6,13 +6,6 @@
       v-model="formData.skipMemoryTrackingEntirely"
       :error-message="errors.skipMemoryTrackingEntirely"
     />
-    <CheckInput
-      scope-name="notebook"
-      field="selectMCPNotebook"
-      title="Select MCP Notebook"
-      v-model="formData.selectMCPNotebook"
-      :error-message="errors.selectMCPNotebook"
-    />
     <TextInput
       scope-name="notebook"
       field="numberOfQuestionsInAssessment"

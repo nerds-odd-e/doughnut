@@ -74,10 +74,6 @@ const notebookSettingsPopup = () => {
       cy.findByRole('button', { name: 'OK' }).click()
       return this
     },
-    selectMCPNotebook() {
-      cy.formField('Select MCP Notebook').check()
-      clickButton('Update')
-    },
   }
 }
 

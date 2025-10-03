@@ -23,6 +23,11 @@ const myNotebooksPage = () => {
     notebookCard(notebook: string) {
       return notebookCard(notebook)
     },
+    selectMCPNotebook(notebook: string) {
+      cy.findByRole('combobox', { name: 'Select MCP Notebook' }).select(
+        notebook
+      )
+    },
   }
 }
 
