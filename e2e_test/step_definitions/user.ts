@@ -233,6 +233,10 @@ Then(
   }
 )
 
+When('it is 90 days later', () => {
+  start.testability().backendTimeTravelTo(90, 1)
+})
+
 Then(
   'the MCP token {string} should be marked as expired',
   (tokenLabel: string) => {
