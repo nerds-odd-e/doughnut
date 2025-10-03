@@ -9,7 +9,7 @@
     <CheckInput
       scope-name="notebook"
       field="selectMCPNotebook"
-      label="Select Mcp Notebook"
+      title="Select MCP Notebook"
       v-model="formData.selectMCPNotebook"
       :error-message="errors.selectMCPNotebook"
     />

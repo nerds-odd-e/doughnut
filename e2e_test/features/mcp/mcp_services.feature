@@ -38,12 +38,11 @@ Feature: MCP (Model Context Protocol) Services
     Given I have a notebook with the head note "Lord of the Rings" and details "Test"
     When AI agent searches for relevant notes using MCP tool with the term "Lord"
     Then the response should contain "No MCP notebook is set for this user."
-   
+  
   Scenario: User selects a notebook as MCP_Notebook
     Given I have a notebook with the head note "Cats" and details "nice cat"
     When I select the notebook "Cats" as MCP_Notebook
-    And AI agent searches for relevant notes using MCP tool with the term "Cats"
-    Then the response should contain "Cats"
+    Then I see the "MCP" banner for notebook "Cats"
 
   Scenario: AI agent gets relevant note and then fetches its graph using the token limit
     Given I have a notebook with head note "Programming Concepts" and notes:

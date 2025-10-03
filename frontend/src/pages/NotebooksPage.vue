@@ -6,6 +6,14 @@
     <main>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
         <template #default="{ notebook }">
+            <span
+              v-if="notebook.notebookSettings?.selectMCPNotebook" 
+              class="daisy-badge daisy-badge-primary daisy-badge-lg"
+              title="This notebook is selected as MCP Notebook"
+              data-testid="mcp-badge"
+            >
+              MCP
+            </span>
           <NotebookButtons v-bind="{ notebook, user }" />
         </template>
       </NotebookCardsWithButtons>

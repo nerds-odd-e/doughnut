@@ -75,7 +75,7 @@ const notebookSettingsPopup = () => {
       return this
     },
     selectMCPNotebook() {
-      cy.formField('Select Mcp Notebook').check()
+      cy.formField('Select MCP Notebook').check()
       clickButton('Update')
     },
   }

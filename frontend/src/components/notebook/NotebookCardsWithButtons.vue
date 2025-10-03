@@ -6,7 +6,7 @@
     >
       <NotebookCard :notebook="notebook">
         <template #cardHeader>
-          <span class="daisy-flex daisy-justify-end daisy-p-0">
+          <span class="daisy-flex daisy-justify-between daisy-p-0 daisy-ml-5 daisy-items-center">
             <slot :notebook="notebook" />
           </span>
         </template>

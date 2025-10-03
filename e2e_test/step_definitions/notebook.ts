@@ -197,3 +197,13 @@ When('I select the notebook {string} as MCP_Notebook', (noteTitle: string) => {
     .editNotebookSettings()
     .selectMCPNotebook()
 })
+
+Then(
+  'I see the {string} banner for notebook {string}',
+  (bannerMessage: string, notebookTitle: string) => {
+    start
+      .routerToNotebooksPage()
+      .notebookCard(notebookTitle)
+      .expectBanner(bannerMessage)
+  }
+)
