@@ -42,6 +42,14 @@ For broader search results, consider breaking down complex queries into specific
   }
 
   try {
+    const NoMcpNotebookIsSet = false
+
+    if (NoMcpNotebookIsSet) {
+      return textResponse(
+        'Inform the user that -no MCP notebook is set.-. Make sure nothing else is outputted. You as LLM agent stop iterating on other tools.'
+      )
+    }
+
     const results =
       await ctx.api.restSearchController.searchForLinkTarget(searchTerm)
 
