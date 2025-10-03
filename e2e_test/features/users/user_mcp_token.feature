@@ -32,8 +32,8 @@ Feature: User MCP token
     When I create a note as a child of "Parent Note" using the MCP
     # Then the MCP token "Usage Token" should show a last used time
 
- @skip
+
   Scenario: User MCP token expiration
     Given I have a valid MCP token with label "my token"
-    #When it is 90 days later
+    When it is 90 days later
     Then the MCP token "my token" should be marked as expired
