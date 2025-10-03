@@ -40,11 +40,13 @@
       <thead>
         <tr>
           <th class="daisy-text-left daisy-px-4 daisy-py-2">Label</th>
+          <th class="daisy-text-left daisy-px-4 daisy-py-2">Last Used</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">Not Used</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">Expired</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">

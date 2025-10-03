@@ -161,6 +161,14 @@ Given('I have a valid MCP token with label {string}', (label: string) => {
     })
 })
 
+Given('the MCP token {string} has not been used', (label: string) => {
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .checkTokenWithLabelNotUsed(label)
+})
+
 When('I delete the MCP token with label {string}', (label: string) => {
   start
     .mainMenu()
