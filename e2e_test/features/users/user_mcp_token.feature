@@ -25,6 +25,14 @@ Feature: User MCP token
     When I delete the MCP token with label "To be deleted"
     Then I cannot create a note as a child of "Parent Note"
 
+  @skip
+  Scenario: Diplay last used time for MCP token
+    Given I have a valid MCP token with label "Usage Token"
+    And the MCP token "Usage Token" has not been used
+    #And I have a notebook with the head note "Parent Note"
+    #When I create a note as a child of "Parent Note" using the MCP
+    #Then the MCP token "Usage Token" should show a last used time
+
  @skip
   Scenario: User MCP token expiration
     Given I have a valid MCP token with label "my token"
