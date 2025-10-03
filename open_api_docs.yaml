@@ -3470,12 +3470,11 @@ paths:
       - rest-user-controller
       operationId: deleteToken
       parameters:
-      - name: id
-        in: query
+      - name: tokenId
+        in: path
         required: true
         schema:
           type: integer
-          format: int32
       responses:
         "500":
           description: Internal Server Error

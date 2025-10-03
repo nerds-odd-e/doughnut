@@ -74,11 +74,11 @@ class RestUserController {
   }
 
   @DeleteMapping("/token/{tokenId}")
-  public void deleteToken(Integer id) {
+  public void deleteToken(@PathVariable @Schema(type = "integer") Integer tokenId) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
 
-    Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(id);
+    Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(tokenId);
     if (userToken.isEmpty()) {
       throw new org.springframework.web.server.ResponseStatusException(
           org.springframework.http.HttpStatus.NOT_FOUND, "Token not found");
@@ -90,6 +90,6 @@ class RestUserController {
           "Token does not belong to the current user");
     }
 
-    modelFactoryService.deleteToken(id);
+    modelFactoryService.deleteToken(tokenId);
   }
 }
