@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -76,6 +77,18 @@ class RestUserController {
   public void deleteToken(Integer id) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
+
+    Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(id);
+    if (userToken.isEmpty()) {
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.NOT_FOUND, "Token not found");
+    }
+
+    if (!userToken.get().getUserId().equals(user.getId())) {
+      throw new org.springframework.web.server.ResponseStatusException(
+          org.springframework.http.HttpStatus.FORBIDDEN,
+          "Token does not belong to the current user");
+    }
 
     modelFactoryService.deleteToken(id);
   }

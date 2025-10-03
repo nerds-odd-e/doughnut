@@ -97,4 +97,17 @@ class RestUserControllerTest {
     assertFalse(getTokens.stream().anyMatch(el -> el.getId().equals(userToken.getId())));
     assertThat(getTokens.size(), equalTo(0));
   }
+
+  @Test
+  void deleteTokenTestForAnotherUser() {
+    UserModel userModel2 = makeMe.aUser().toModelPlease();
+    UserToken userToken2 =
+        makeMe.aUserToken().forUser(userModel2).withLabel("OTHER_USER_TOKEN").please();
+    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
+    modelFactoryService.save(userToken2);
+
+    controller = new RestUserController(makeMe.modelFactoryService, userModel);
+
+    assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
+  }
 }
