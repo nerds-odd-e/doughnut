@@ -12,6 +12,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Timestamp;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,11 +31,12 @@ class RestUserControllerTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
   RestUserController controller;
+  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestUserController(makeMe.modelFactoryService, userModel);
+    controller = new RestUserController(makeMe.modelFactoryService, userModel, testabilitySettings);
   }
 
   @Test
@@ -75,7 +79,18 @@ class RestUserControllerTest {
 
   @Test
   void getTokensTest() {
-    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("TEST_LABEL").please();
+    UserToken userToken =
+        makeMe
+            .aUserToken()
+            .forUser(userModel)
+            .withLabel("TEST_LABEL")
+            .withExpirationDate(
+                Timestamp.from(
+                    testabilitySettings
+                        .getCurrentUTCTimestamp()
+                        .toInstant()
+                        .plus(90, ChronoUnit.DAYS)))
+            .please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 

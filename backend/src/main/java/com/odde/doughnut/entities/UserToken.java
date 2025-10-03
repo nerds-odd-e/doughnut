@@ -30,15 +30,12 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Column(name = "expires_at")
   @Getter
   @Setter
-  @NotNull
   private Timestamp expirationDate;
 
-  @Getter
-  @Setter
-  @Transient
-  private Boolean isExpired;
+  @Getter @Setter @Transient private Boolean isExpired;
 
-  public UserToken(Integer userId, @NotNull String token, @NotNull String label, Timestamp expirationDate) {
+  public UserToken(
+      Integer userId, @NotNull String token, @NotNull String label, Timestamp expirationDate) {
     this.userId = userId;
     this.token = token;
     this.label = label;

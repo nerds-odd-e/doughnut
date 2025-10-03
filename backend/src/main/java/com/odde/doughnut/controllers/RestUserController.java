@@ -13,9 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +27,10 @@ class RestUserController {
   private final UserModel currentUser;
   private final TestabilitySettings testabilitySettings;
 
-  public RestUserController(ModelFactoryService modelFactoryService, UserModel currentUser, TestabilitySettings testabilitySettings) {
+  public RestUserController(
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
@@ -69,8 +70,11 @@ class RestUserController {
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
     Timestamp expirationDate =
-        Timestamp.from(testabilitySettings.getCurrentUTCTimestamp().toInstant().plus(90, ChronoUnit.DAYS));
+        Timestamp.from(
+            testabilitySettings.getCurrentUTCTimestamp().toInstant().plus(90, ChronoUnit.DAYS));
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel(), expirationDate);
+    userToken.setIsExpired(
+        userToken.getExpirationDate().before(testabilitySettings.getCurrentUTCTimestamp()));
     return modelFactoryService.save(userToken);
   }
 
@@ -79,12 +83,17 @@ class RestUserController {
   public List<UserToken> getTokens() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
-    List<UserToken> userTokens = modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
-    return userTokens.stream().peek(userToken -> {
-        if (userToken.getExpirationDate().before(testabilitySettings.getCurrentUTCTimestamp())) {
-            userToken.setIsExpired(true);
-        }
-    }).toList();
+    List<UserToken> userTokens =
+        modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
+    return userTokens.stream()
+        .peek(
+            userToken -> {
+              userToken.setIsExpired(
+                  userToken
+                      .getExpirationDate()
+                      .before(testabilitySettings.getCurrentUTCTimestamp()));
+            })
+        .toList();
   }
 
   @DeleteMapping("/token/{tokenId}")
