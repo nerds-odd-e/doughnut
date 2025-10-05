@@ -40,7 +40,7 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 
 ```bash
 # from doughnut source root dir
-pnpm sut
+pnpm backend:sut
 ```
 Navigate to README.md
 

@@ -27,7 +27,7 @@ git config user.email "your_email@your_domain.com"
 
 ### Get your doughnut DB tables setup
 
-- From root of `doughnut` run `pnpm sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
+- From root of `doughnut` run `pnpm backend:sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 

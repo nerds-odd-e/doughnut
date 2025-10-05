@@ -51,7 +51,7 @@ runs:
         run_install: |
           - recursive: true
             args: [--frozen-lockfile, --strict-peer-dependencies]
-    - run: pnpm sut &
+    - run: pnpm backend:sut &
       env:
         INPUT_DB_URL: ${{ inputs.db_url }}
       shell: bash
