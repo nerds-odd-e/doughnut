@@ -121,7 +121,7 @@ class RestUserControllerTest {
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken2);
 
-    controller = new RestUserController(makeMe.modelFactoryService, userModel);
+    controller = new RestUserController(makeMe.modelFactoryService, userModel, testabilitySettings);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }
