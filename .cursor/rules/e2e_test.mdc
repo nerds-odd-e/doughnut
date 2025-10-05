@@ -4,20 +4,29 @@ alwaysApply: false
 ---
 # E2E Testing Practices for Doughnut
 
+## Development Environment Assumption
+
+**IMPORTANT**: Always assume that the developer has already started all services using `pnpm sut`, which includes:
+- Backend (with auto-reload on Java code changes)
+- Frontend (with hot module replacement)
+- Mountebank (mock services)
+- Cypress IDE
+
+All services automatically restart when code changes are made. The developer does NOT need to manually restart services when making changes.
+
+**If services are not running**, suggest the user to run `pnpm sut` in a separate terminal first.
+
 ## Run E2E Test in Terminal
 
-We usually don't run all the e2e test locally, since it will take too much time, to run one feature file:
+We usually don't run all the e2e tests locally, since it will take too much time. To run one feature file:
 
 ```
 nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
-Note: don't use `cypress run -- --sepc`. The empty `--` will ignore the `--spec` parameter after it.
+Note: don't use `cypress run -- --spec`. The empty `--` will ignore the `--spec` parameter after it.
 
-Typically, the developer will start the backend, frontend, mountebank mock services manually.
-If any backend code is changed, the backend server will need to be restarted manually. In case it is running in the agent mode, please pause or stop and remind the programmer to restart the backend service before continue.
-
-If a scenario has the "@focus" tag, the other sceanrios in the same feature file are ignored.
+If a scenario has the "@focus" tag, the other scenarios in the same feature file are ignored.
 
 ## Technology Stack
 - Cypress for E2E testing

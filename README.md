@@ -86,7 +86,23 @@ If you have `direnv` installed & configured right, just `cd` to the path where y
 nix develop
 ```
 
-Start the backend service/application with auto-reload
+Start the complete development environment (RECOMMENDED)
+
+```bash
+pnpm sut
+```
+
+This single command starts everything you need for local development:
+- **Backend** (with auto-reload on Java code changes)
+- **Frontend** (with hot module replacement on Vue code changes)  
+- **Mountebank** (mock external services)
+- **Cypress IDE** (for running/debugging e2e tests)
+
+All services will automatically restart when you make code changes, so you can focus on development without manual restarts.
+
+##### Alternative: Start only the backend
+
+If you only need the backend for testing or development:
 
 ```bash
 pnpm backend:sut
@@ -132,13 +148,13 @@ For MS Windows WSL2 users:
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------  |
+| **🌟 Start full dev environment (RECOMMENDED)** | **`pnpm sut`** (starts backend, frontend, mountebank & Cypress IDE - all with auto-reload)                                                |
 | Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                      |                               |                                       |                                                                                                                                                 |
-| Start SUT (backend system under test) | `pnpm backend:sut` (starts backend SUT with auto-reload)                                                                                                            |
+| Start backend only                    | `pnpm backend:sut` (starts backend SUT with auto-reload)                                                                                        |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
 | Start ONLY the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
-| Run one feature headlessly            | `pnpm cypress run --spec **/name.feature` (expect services are already running, run the matched feature files only in headless mode)                 |
+| Run one feature headlessly            | `pnpm cypress run --spec **/name.feature` (expect services are already running, run the matched feature files only in headless mode)           |
 | Run all e2e test                      | `pnpm verify` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                  |
-| Run cypress with Backend & Frontend   | `pnpm test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
 | Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes)    |
 
 #### Structure

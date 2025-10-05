@@ -27,7 +27,17 @@ git config user.email "your_email@your_domain.com"
 
 ### Get your doughnut DB tables setup
 
-- From root of `doughnut` run `pnpm backend:sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion). Note: `backend:sut` includes auto-reload, so the backend will restart automatically when you change Java code.
+- From root of `doughnut` run `pnpm backend:sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion). 
+
+### Start development environment
+
+For ongoing development work, use:
+
+```bash
+pnpm sut
+```
+
+This starts backend, frontend, mountebank, and Cypress IDE - all with auto-reload on code changes. You can now develop and test without manually restarting services.
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 

@@ -4,29 +4,47 @@ globs:
 alwaysApply: true
 ---
 
-# Running command in terminal
+# Development Environment Setup
 
-This project use nix to manage the development envioroment. So we need to run `nix develop` once first in every new terminal window to start the nix enviroment. But right now there is a bug in the Cursor IDE that when in the Cursor agent mode, Cursor won't be able to detect the nix command finished running. So, for now, instead of `nix develop`, please always at the root folder run
+## Starting the Development Environment
+
+**IMPORTANT**: Always assume that the developer has already started all necessary services using:
+
+```bash
+pnpm sut
+```
+
+This command starts:
+- Backend (with auto-reload on Java code changes)
+- Frontend (with hot module replacement on Vue code changes)
+- Mountebank (mock external services)
+- Cypress IDE (for running/debugging e2e tests)
+
+All services automatically restart when code changes are made. Developers should NOT need to manually restart services.
+
+**If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first.
+
+## Running Commands in Terminal
+
+This project uses nix to manage the development environment. There is currently a bug in Cursor IDE that prevents detection of `nix develop` completion in agent mode. Therefore, always use:
 
 ```
 CURSOR_DEV=true nix develop -c <command>
 ```
 
-To run backend unit test:
+### Running Tests
 
+**Backend unit test:**
 ```
 CURSOR_DEV=true nix develop -c pnpm backend:verify
 ```
 
-
-To run frontend unit test:
-
+**Frontend unit test:**
 ```
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
-To run e2e test (we usually assume the frontend, backend and mountebank services are already running):
-
+**E2E test** (assumes services are already running via `pnpm sut`):
 ```
 nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```

@@ -45,7 +45,7 @@
     "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
     "cy:run-on-sut": "wait-on tcp:9081 && pnpm cy:run",
     "test": "pnpm --frozen-lockfile --silent recursive install && pnpm frontend:build && run-p -clnr backend:sut start:mb cy:run-on-sut",
-    "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm run-p -clnr backend:sut start:mb frontend:sut cy:open",
+    "sut": "pnpm --frozen-lockfile --silent recursive install && pnpm run-p -clnr backend:sut start:mb frontend:sut cy:open",
     "verify": "pnpm format:all && pnpm test",
     "sound": "github_action_sound https://github.com/nerds-odd-e/doughnut/actions",
     "lint:all": "pnpm --frozen-lockfile --silent recursive install && pnpm backend:lint && pnpm frontend:lint && pnpm cy:lint",

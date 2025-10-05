@@ -36,10 +36,19 @@ cd doughnut
 ```
 
 All development tool commands henceforth should work when in the `nix` development environment that will be bootstrapped by `direnv` (if installed and configured correctly), else run `nix develop` to get the necessary tooling installed correctly.
-Run E2E profile springboot backend server with gradle (backend app started on port 9081 with auto-reload)
+
+**Start the complete development environment (recommended):**
 
 ```bash
 # from doughnut source root dir
+pnpm sut
+```
+
+This starts backend, frontend, mountebank, and Cypress IDE - all with auto-reload on code changes.
+
+**Alternative - Start only the backend:**
+
+```bash
 pnpm backend:sut
 ```
 
