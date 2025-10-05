@@ -44,7 +44,6 @@
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
     "cy:run-on-sut": "wait-on tcp:9081 && pnpm cy:run",
-    "open": "pnpm --frozen-lockfile --silent recursive install && pnpm format:all && pnpm frontend:build && run-p -clnr backend:sut cy:open",
     "test": "pnpm --frozen-lockfile --silent recursive install && pnpm frontend:build && run-p -clnr backend:sut start:mb cy:run-on-sut",
     "test:open": "pnpm --frozen-lockfile --silent recursive install && pnpm run-p -clnr backend:sut start:mb frontend:sut cy:open",
     "verify": "pnpm format:all && pnpm test",
