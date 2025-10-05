@@ -21,9 +21,9 @@ Feature: MCP (Model Context Protocol) Services
       | Harry Potter      |
       | Art of War        |
 
-  Scenario Outline: AI developer learns from Doughnut via MCP (happy case)
-    Given I have a notebook with the head note "Lord of the Rings" and details "Test"
-    And I have a notebook with the head note "Harry Potter" and details "Harry Potter is handsome"
+  Scenario Outline: AI developer learns from Doughnut via MCP client
+    Given I have a notebook with the head note "Lord of the Rings"
+    And I have a notebook with the head note "Harry Potter"
     When AI agent searches for relevant notes using MCP tool with the term "<search_term>"
     Then the response should contain "<note_title>"
 
