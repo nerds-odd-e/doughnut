@@ -76,7 +76,12 @@ const popbutton = ref<InstanceType<typeof PopButton> | null>(null)
 const tokenFormData = ref({ label: "" })
 
 const tokens = ref<
-  Array<{ id: number; label: string; lastUsedAt: string | null; isExpired: boolean }>
+  Array<{
+    id: number
+    label: string
+    lastUsedAt: string | null
+    isExpired: boolean
+  }>
 >([])
 const token = ref<string | null>(null)
 const loading = ref(false)
@@ -106,7 +111,12 @@ const generateToken = async () => {
       label: tokenFormData.value.label,
     })
     token.value = res.token
-    tokens.value.push({ id: res.id, label: res.label, lastUsedAt: null, isExpired: res.isExpired })
+    tokens.value.push({
+      id: res.id,
+      label: res.label,
+      lastUsedAt: null,
+      isExpired: res.isExpired,
+    })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
   } catch (error) {
