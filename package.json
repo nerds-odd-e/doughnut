@@ -11,7 +11,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "syncpack fix-mismatches",
+    "postinstall": "syncpack fix-mismatches && npx cypress install",
     "start:mb": "mb",
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
     "mcp-server:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server test",
