@@ -86,13 +86,14 @@ If you have `direnv` installed & configured right, just `cd` to the path where y
 nix develop
 ```
 
-Start the backend service/application
+Start the backend service/application with auto-reload
 
 ```bash
 pnpm backend:sut
 ```
 
-- Rerun it each time you reset the database or change backend java code (java is still a compiled language).
+- The backend will automatically restart when you change backend Java code (powered by Spring Boot DevTools + Gradle continuous build).
+- You only need to rerun it manually if you reset the database.
 
 #### 2.1 Run full backend unit tests suite from terminal/CLI
 
@@ -132,7 +133,7 @@ For MS Windows WSL2 users:
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------  |
 | Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                      |                               |                                       |                                                                                                                                                 |
-| Start SUT (backend system under test) | `pnpm backend:sut` (starts backend SUT ONLY)                                                                                                            |
+| Start SUT (backend system under test) | `pnpm backend:sut` (starts backend SUT with auto-reload)                                                                                                            |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
 | Start ONLY the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
 | Run one feature headlessly            | `pnpm cypress run --spec **/name.feature` (expect services are already running, run the matched feature files only in headless mode)                 |

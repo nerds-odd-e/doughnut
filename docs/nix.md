@@ -36,12 +36,14 @@ cd doughnut
 ```
 
 All development tool commands henceforth should work when in the `nix` development environment that will be bootstrapped by `direnv` (if installed and configured correctly), else run `nix develop` to get the necessary tooling installed correctly.
-Run E2E profile springboot backend server with gradle (backend app started on port 9081)
+Run E2E profile springboot backend server with gradle (backend app started on port 9081 with auto-reload)
 
 ```bash
 # from doughnut source root dir
 pnpm backend:sut
 ```
+
+The backend will automatically restart when you change Java code.
 Navigate to README.md
 
 ### 3. Uninstalling

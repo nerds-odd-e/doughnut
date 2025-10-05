@@ -163,7 +163,7 @@ jobs:
           browser: chrome
           config-file: e2e_test/config/ci.ts
           build: pnpm bundle:all
-          start: pnpm run-p -clnr backend:sut start:mb
+          start: pnpm run-p -clnr backend:sut:ci start:mb
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}

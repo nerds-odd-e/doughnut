@@ -7,7 +7,7 @@
 5. Open a terminal window (press ⌘ (CMD) or ⊞ (Win) to see installed applications) or launch IntelliJ or VScode and open embedded terminal from there. (see fig. below)
 6. Run `cd ~/doughnut`
 7. Run `nix develop` to setup the required tooling and boot up biome server and MySQL 8.4 DB server locally
-8. Run `pnpm backend:sut` to bootup backend Java Springboot server and get all needed DB migrations to run (`Ctrl-C` twice to exit)
+8. Run `pnpm backend:sut` to bootup backend Java Springboot server with auto-reload and get all needed DB migrations to run (`Ctrl-C` twice to exit)
 9. Run `pnpm verify`. This will run all end-to-end tests in headless mode
 10. If you wish to continue to use git over HTTPS authentication, proceed to setup your GitHub Personal Access Token (since the local doughnut repository is initially cloned via HTTPS)
 - Go to your GitHub settings
