@@ -94,7 +94,7 @@ const loadTokens = async () => {
       id: t.id,
       label: t.label,
       lastUsedAt: null,
-      isExpired: t.isExpired,
+      isExpired: t.isExpired ?? false,
     }))
   } catch (error) {
     console.error("Error loading tokens:", error)
@@ -115,7 +115,7 @@ const generateToken = async () => {
       id: res.id,
       label: res.label,
       lastUsedAt: null,
-      isExpired: res.isExpired,
+      isExpired: res.isExpired ?? false,
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
