@@ -11,7 +11,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "syncpack fix-mismatches && npx cypress install",
+    "postinstall": "syncpack fix-mismatches",
     "start:mb": "mb",
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
     "mcp-server:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server test",
@@ -54,7 +54,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.8.0",
-    "@badeball/cypress-cucumber-preprocessor": "^23.2.0",
+    "@badeball/cypress-cucumber-preprocessor": "^23.2.1",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.5",
     "@biomejs/biome": "2.2.5",
     "@mbtest/mountebank": "2.9.2",
@@ -64,7 +64,7 @@
     "@types/jquery": "^3.5.33",
     "@types/node": "^22.15.30",
     "adm-zip": "^0.5.16",
-    "cypress": "15.3.0",
+    "cypress": "15.4.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.4.9",
