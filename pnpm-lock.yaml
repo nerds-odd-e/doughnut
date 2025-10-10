@@ -11,7 +11,7 @@ overrides:
   express@<4.19.2: '>=4.19.2'
   express@4.19.2>path-to-regexp: 0.1.10
   nodemailer: 6.9.9
-  mailparser>nodemailer: 6.9.9
+  mailparser>nodemailer: 7.0.7
   smtp-server>nodemailer: 6.9.9
   superagent@<10.0.0: '>=10.0.0'
   '*>superagent': '>=10.0.0'
@@ -3440,6 +3440,10 @@ packages:
 
   nodemailer@6.9.9:
     resolution: {integrity: sha512-dexTll8zqQoVJEZPwQAKzxxtFn0qTnjdQTchoU6Re9BUUGBJiOy3YMn/0ShTW6J5M0dfQ1NeDeRTTl4oIWgQMA==}
+    engines: {node: '>=6.0.0'}
+
+  nodemailer@7.0.7:
+    resolution: {integrity: sha512-jGOaRznodf62TVzdyhKt/f1Q/c3kYynk8629sgJHpRzGZj01ezbgMMWJSAjHADcwTKxco3B68/R+KHJY2T5BaA==}
     engines: {node: '>=6.0.0'}
 
   nopt@7.2.1:
@@ -8285,7 +8289,7 @@ snapshots:
       libmime: 5.3.7
       linkify-it: 5.0.0
       mailsplit: 5.4.5
-      nodemailer: 6.9.9
+      nodemailer: 7.0.7
       punycode.js: 2.3.1
       tlds: 1.259.0
 
@@ -8449,6 +8453,8 @@ snapshots:
       '@babel/parser': 7.28.4
 
   nodemailer@6.9.9: {}
+
+  nodemailer@7.0.7: {}
 
   nopt@7.2.1:
     dependencies:

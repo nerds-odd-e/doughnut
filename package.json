@@ -91,7 +91,7 @@
       "express@<4.19.2": ">=4.19.2",
       "express@4.19.2>path-to-regexp": "0.1.10",
       "nodemailer": "6.9.9",
-      "mailparser>nodemailer": "6.9.9",
+      "mailparser>nodemailer": "7.0.7",
       "smtp-server>nodemailer": "6.9.9",
       "superagent@<10.0.0": ">=10.0.0",
       "*>superagent": ">=10.0.0",
