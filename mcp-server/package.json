@@ -6,7 +6,7 @@
   "type": "module",
   "engines": {
     "node": ">=22",
-    "pnpm": ">=10.17.1"
+    "pnpm": ">=10.18.2"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -17,7 +17,7 @@
     "format": "biome check --write src/"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
+    "@biomejs/biome": "2.2.5",
     "@modelcontextprotocol/sdk": "^1.17.5",
     "@types/node": "^22.15.30",
     "esbuild": "^0.25.10",
