@@ -17,7 +17,7 @@
     "format": "biome check --write src/"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.5",
+    "@biomejs/biome": "2.2.6",
     "@modelcontextprotocol/sdk": "^1.20.0",
     "@types/node": "^22.15.30",
     "esbuild": "^0.25.10",
