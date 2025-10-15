@@ -13,6 +13,7 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 import Inspector from 'unplugin-vue-inspector/vite'
+import checker from 'vite-plugin-checker'
 
 const config = defineConfig({
   resolve: {
@@ -76,6 +77,11 @@ const config = defineConfig({
       dts: true,
     }),
     Components({}),
+    checker({
+      typescript: true,
+      vueTsc: true, // This will check Vue templates
+      biome: true,  // This will use Biome for linting
+    }),
   ],
   server: {
     proxy: {

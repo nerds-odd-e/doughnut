@@ -130,26 +130,26 @@ describe("repeat page", () => {
 
     it("should move current memory tracker to end when requested", async () => {
       const wrapper = await mountPage()
+      type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
+      const vm = wrapper.vm as unknown as ExposedVM
 
       // Initial order should be [123, 456, 3]
-      expect(wrapper.vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
-        123, 456, 3,
-      ])
+      expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([123, 456, 3])
 
       // Click the "Move to end" button
       await wrapper.find('button[title="Move to end of list"]').trigger("click")
 
       // New order should be [456, 3, 123]
-      expect(wrapper.vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
-        456, 3, 123,
-      ])
+      expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([456, 3, 123])
     })
 
     it("should not show move to end button for last item", async () => {
       const wrapper = await mountPage()
+      type ExposedVM = { toRepeat?: MemoryTrackerLite[]; currentIndex: number }
+      const vm = wrapper.vm as unknown as ExposedVM
 
       // Move to last item
-      wrapper.vm.currentIndex = 2
+      vm.currentIndex = 2
       await wrapper.vm.$nextTick()
 
       const quiz = wrapper.findComponent({ name: "Quiz" })

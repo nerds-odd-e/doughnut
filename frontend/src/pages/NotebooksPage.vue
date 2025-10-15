@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined, title: 'Notebooks' }">
-    <p class="daisy-mb-6 daisy-flex daisy-items-center daisy-gap-10">
+    <div class="daisy-mb-6 daisy-flex daisy-items-center daisy-gap-10">
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
       <p class="daisy-flex daisy-items-center daisy-gap-3">
       <span>MCP Notebook:</span>
@@ -38,7 +38,7 @@
         Clear MCP Tag
       </button>
       </p>
-    </p>
+    </div>
     <main>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
         <template #default="{ notebook }">

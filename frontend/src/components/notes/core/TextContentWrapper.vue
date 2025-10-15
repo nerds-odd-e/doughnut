@@ -43,11 +43,15 @@ const changerInner = async (
     .catch(errorHander)
   savedVersion.value = version
 }
+// Debounced executor used only when explicitly triggered (on blur/unmount)
 const changer = debounce(changerInner, 1000)
 
 const localValue = ref(value)
 const version = ref(0)
 const errors = ref({} as Record<string, string>)
+// Track the latest edited value and note id without auto-saving
+const latestNoteId = ref<number | null>(null)
+const latestValue = ref<string | null>(null)
 
 const wrapperClass = computed(() => {
   if (version.value !== savedVersion.value) {
@@ -58,16 +62,23 @@ const wrapperClass = computed(() => {
 
 const onUpdate = (noteId: number, newValue: string) => {
   if (field === "edit title" && !newValue.trim()) {
+    // Do not update or schedule save for blank titles
     return
   }
   version.value += 1
   errors.value = {}
   localValue.value = newValue
-  changer(noteId, newValue, version.value, setError)
+  // Record latest edit, but do not auto-save yet
+  latestNoteId.value = noteId
+  latestValue.value = newValue
 }
 
 const onBlur = () => {
-  changer.flush()
+  // Trigger a save for the latest edit and flush immediately
+  if (latestNoteId.value != null && latestValue.value != null) {
+    changer(latestNoteId.value, latestValue.value, version.value, setError)
+    changer.flush()
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,7 +111,11 @@ watch(
 )
 
 onUnmounted(() => {
-  changer.flush()
+  // If there is a pending edit, schedule and flush to persist it
+  if (latestNoteId.value != null && latestValue.value != null) {
+    changer(latestNoteId.value, latestValue.value, version.value, setError)
+    changer.flush()
+  }
   changer.cancel()
 })
 </script>

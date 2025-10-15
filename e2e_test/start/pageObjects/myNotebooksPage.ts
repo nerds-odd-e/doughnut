@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+/// <reference path="../../support/index.d.ts" />
 import type NotePath from '../../support/NotePath'
 import type { assumeNotePage } from './notePage'
 import { notebookCard } from './notebookCard'
@@ -22,11 +24,6 @@ const myNotebooksPage = () => {
     },
     notebookCard(notebook: string) {
       return notebookCard(notebook)
-    },
-    selectMCPNotebook(notebook: string) {
-      cy.findByRole('combobox', { name: 'Select MCP Notebook' }).select(
-        notebook
-      )
     },
   }
 }

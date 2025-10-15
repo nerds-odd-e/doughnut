@@ -24,7 +24,6 @@
       "!**/backend",
       "!**/docs",
       "!**/doughnut_mobile",
-      "!**/frontend",
       "!**/infra",
       "!**/mysql",
       "!**/secrets_public_keys",

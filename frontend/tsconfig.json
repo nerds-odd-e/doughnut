@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@tests/*": ["tests/*"],
-      "@generated/*": ["../generated/*"]
+      "@generated/*": ["../generated/*"],
+      "@/generated/*": ["../generated/*"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true,
