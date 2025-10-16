@@ -32,6 +32,10 @@ export const notebookList = () => {
       cy.findByText(notebook, { selector: '.notebook-card *' }).click()
       return assumeNotePage()
     },
+    selectMCPNotebook(notebook: string) {
+      cy.get('[data-testid="mcp-select"]').select(notebook)
+      cy.pageIsNotLoading()
+    },
   }
 }
 
