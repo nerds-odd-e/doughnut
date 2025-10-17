@@ -115,8 +115,8 @@ importers:
         specifier: ^0.12.2
         version: 0.12.2
       marked:
-        specifier: ^16.4.0
-        version: 16.4.0
+        specifier: ^16.4.1
+        version: 16.4.1
       mini-debounce:
         specifier: ^1.0.8
         version: 1.0.8
@@ -3426,8 +3426,8 @@ packages:
   mailsplit@5.4.5:
     resolution: {integrity: sha512-oMfhmvclR689IIaQmIcR5nODnZRRVwAKtqFT407TIvmhX2OLUBnshUTcxzQBt3+96sZVDud9NfSe1NxAkUNXEQ==}
 
-  marked@16.4.0:
-    resolution: {integrity: sha512-CTPAcRBq57cn3R8n3hwc2REddc28hjR7RzDXQ+lXLmMJYqn20BaI2cGw6QjgZGIgVfp2Wdfw4aMzgNteQ6qJgQ==}
+  marked@16.4.1:
+    resolution: {integrity: sha512-ntROs7RaN3EvWfy3EZi14H4YxmT6A5YvywfhO+0pm+cH/dnSQRmdAmoFIc3B9aiwTehyk7pESH4ofyBY+V5hZg==}
     engines: {node: '>= 20'}
     hasBin: true
 
@@ -8619,7 +8619,7 @@ snapshots:
       libmime: 5.3.7
       libqp: 2.1.1
 
-  marked@16.4.0: {}
+  marked@16.4.1: {}
 
   math-intrinsics@1.1.0: {}
 

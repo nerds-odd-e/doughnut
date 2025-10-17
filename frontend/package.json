@@ -21,7 +21,7 @@
   "dependencies": {
     "file-saver": "^2.0.5",
     "intersection-observer": "^0.12.2",
-    "marked": "^16.4.0",
+    "marked": "^16.4.1",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.3",
     "turndown": "^7.2.1",
