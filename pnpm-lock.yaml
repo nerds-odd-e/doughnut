@@ -203,8 +203,8 @@ importers:
         specifier: ^20.2.0
         version: 20.2.0
       unplugin-vue-components:
-        specifier: ^29.1.0
-        version: 29.1.0(@babel/parser@7.28.4)(vue@3.5.22(typescript@5.9.3))
+        specifier: ^30.0.0
+        version: 30.0.0(@babel/parser@7.28.4)(vue@3.5.22(typescript@5.9.3))
       unplugin-vue-inspector:
         specifier: ^2.3.2
         version: 2.3.2(vite@7.1.11(@types/node@22.18.6)(jiti@1.21.7)(sass@1.93.2)(terser@5.44.0)(tsx@4.20.6)(yaml@2.8.1))
@@ -4770,8 +4770,12 @@ packages:
     resolution: {integrity: sha512-JLoggz+PvLVMJo+jZt97hdIIIZ2yTzGgft9e9q8iMrC4ewufl62ekeW7mixBghonn2gVb/ICjyvlmOCUBnJLQg==}
     engines: {node: '>=20.19.0'}
 
-  unplugin-vue-components@29.1.0:
-    resolution: {integrity: sha512-z/9ACPXth199s9aCTCdKZAhe5QGOpvzJYP+Hkd0GN1/PpAmsu+W3UlRY3BJAewPqQxh5xi56+Og6mfiCV1Jzpg==}
+  unplugin-utils@0.3.1:
+    resolution: {integrity: sha512-5lWVjgi6vuHhJ526bI4nlCOmkCIF3nnfXkCMDeMJrtdvxTs6ZFCM8oNufGTsDbKv/tJ/xj8RpvXjRuPBZJuJog==}
+    engines: {node: '>=20.19.0'}
+
+  unplugin-vue-components@30.0.0:
+    resolution: {integrity: sha512-4qVE/lwCgmdPTp6h0qsRN2u642tt4boBQtcpn4wQcWZAsr8TQwq+SPT3NDu/6kBFxzo/sSEK4ioXhOOBrXc3iw==}
     engines: {node: '>=14'}
     peerDependencies:
       '@babel/parser': ^7.15.8
@@ -10017,16 +10021,21 @@ snapshots:
       pathe: 2.0.3
       picomatch: 4.0.3
 
-  unplugin-vue-components@29.1.0(@babel/parser@7.28.4)(vue@3.5.22(typescript@5.9.3)):
+  unplugin-utils@0.3.1:
     dependencies:
-      chokidar: 3.6.0
+      pathe: 2.0.3
+      picomatch: 4.0.3
+
+  unplugin-vue-components@30.0.0(@babel/parser@7.28.4)(vue@3.5.22(typescript@5.9.3)):
+    dependencies:
+      chokidar: 4.0.3
       debug: 4.4.3(supports-color@8.1.1)
       local-pkg: 1.1.2
       magic-string: 0.30.19
       mlly: 1.8.0
       tinyglobby: 0.2.15
       unplugin: 2.3.10
-      unplugin-utils: 0.3.0
+      unplugin-utils: 0.3.1
       vue: 3.5.22(typescript@5.9.3)
     optionalDependencies:
       '@babel/parser': 7.28.4
