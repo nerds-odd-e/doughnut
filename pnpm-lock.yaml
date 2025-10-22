@@ -10,9 +10,9 @@ overrides:
   body-parser@<1.20.3: '>=1.20.3'
   express@<4.19.2: '>=4.19.2'
   express@4.19.2>path-to-regexp: 0.1.10
-  nodemailer: 6.9.9
+  nodemailer: 7.0.7
   mailparser>nodemailer: 7.0.7
-  smtp-server>nodemailer: 6.9.9
+  smtp-server>nodemailer: 7.0.7
   superagent@<10.0.0: '>=10.0.0'
   '*>superagent': '>=10.0.0'
   formidable: '>=3.5.3'
@@ -2987,6 +2987,7 @@ packages:
 
   intersection-observer@0.12.2:
     resolution: {integrity: sha512-7m1vEcPCxXYI8HqnL8CKI6siDyD+eIWSwgB3DZA+ZTogxk9I4CDnj4wilt9x/+/QbHI4YG5YZNmC6458/e9Ktg==}
+    deprecated: The Intersection Observer polyfill is no longer needed and can safely be removed. Intersection Observer has been Baseline since 2019.
 
   ipaddr.js@1.9.1:
     resolution: {integrity: sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==}
@@ -3603,10 +3604,6 @@ packages:
   node-source-walk@7.0.1:
     resolution: {integrity: sha512-3VW/8JpPqPvnJvseXowjZcirPisssnBuDikk6JIZ8jQzF7KJQX52iPFX4RYYxLycYH7IbMRSPUOga/esVjy5Yg==}
     engines: {node: '>=18'}
-
-  nodemailer@6.9.9:
-    resolution: {integrity: sha512-dexTll8zqQoVJEZPwQAKzxxtFn0qTnjdQTchoU6Re9BUUGBJiOy3YMn/0ShTW6J5M0dfQ1NeDeRTTl4oIWgQMA==}
-    engines: {node: '>=6.0.0'}
 
   nodemailer@7.0.7:
     resolution: {integrity: sha512-jGOaRznodf62TVzdyhKt/f1Q/c3kYynk8629sgJHpRzGZj01ezbgMMWJSAjHADcwTKxco3B68/R+KHJY2T5BaA==}
@@ -6050,7 +6047,7 @@ snapshots:
       https-proxy-agent: 7.0.2
       jsonpath-plus: 10.3.0
       mailparser: 3.7.4
-      nodemailer: 6.9.9
+      nodemailer: 7.0.7
       prom-client: 15.1.0
       proper-lockfile: 4.1.2
       safe-regex: 2.1.1
@@ -8819,8 +8816,6 @@ snapshots:
     dependencies:
       '@babel/parser': 7.28.4
 
-  nodemailer@6.9.9: {}
-
   nodemailer@7.0.7: {}
 
   nopt@7.2.1:
@@ -9590,7 +9585,7 @@ snapshots:
     dependencies:
       base32.js: 0.1.0
       ipv6-normalize: 1.0.1
-      nodemailer: 6.9.9
+      nodemailer: 7.0.7
       punycode.js: 2.3.1
 
   source-map-js@1.2.1: {}
