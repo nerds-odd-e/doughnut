@@ -3,7 +3,6 @@
 </template>
 
 <script setup lang="ts">
-import "intersection-observer"
 import type { Ref } from "vue"
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 

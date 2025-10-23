@@ -1,5 +1,4 @@
 import { screen } from "@testing-library/vue"
-import "intersection-observer"
 import Sidebar from "@/components/notes/Sidebar.vue"
 import type { NoteRealm } from "@/generated/backend"
 import { flushPromises } from "@vue/test-utils"

@@ -54,3 +54,14 @@ HTMLCanvasElement.prototype.getContext = function() {
     translate: vi.fn(),
   }
 }
+
+// Mock IntersectionObserver for tests
+global.IntersectionObserver = class IntersectionObserver {
+  constructor() {}
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+  takeRecords() {
+    return []
+  }
+}
