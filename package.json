@@ -80,7 +80,6 @@
   },
   "dependencies": {
     "@cucumber/cucumber": "^12.2.0",
-    "vitest": "3.2.4",
     "vue-toastification": "2.0.0-rc.5"
   },
   "pnpm": {
