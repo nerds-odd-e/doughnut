@@ -86,4 +86,20 @@ public class PredefinedQuestionService {
     }
     return modelFactoryService.save(result);
   }
+
+  public void deleteQuestion(PredefinedQuestion question) {
+    Note note = question.getNote();
+    Notebook parentNotebook = note.getNotebook();
+    parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
+    modelFactoryService.save(parentNotebook);
+    modelFactoryService.remove(question);
+  }
+
+  public PredefinedQuestion updateQuestion(
+      PredefinedQuestion question, PredefinedQuestion updatedData) {
+    question.setMultipleChoicesQuestion(updatedData.getMultipleChoicesQuestion());
+    question.setCorrectAnswerIndex(updatedData.getCorrectAnswerIndex());
+    modelFactoryService.save(question);
+    return question;
+  }
 }

@@ -111,6 +111,26 @@ Given(
   }
 )
 
+When(
+  'I delete the question {string} from the note {string}',
+  (questionStem: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).deleteQuestion(questionStem)
+  }
+)
+
+When(
+  'I edit the question {string} for the note {string} to become:',
+  (questionStem: string, noteTopology: string, data: DataTable) => {
+    expect(
+      data.hashes().length,
+      'please edit one question at a time.'
+    ).to.equal(1)
+    start
+      .jumpToNotePage(noteTopology)
+      .editQuestion(questionStem, data.hashes()[0]!)
+  }
+)
+
 Given(
   'I refine the following question for the note {string}:',
   (noteTopology: string, data: DataTable) => {
@@ -459,6 +479,13 @@ When(
   'I should see the questions in the question list of the note {string}:',
   (noteTopology: string, data: DataTable) => {
     start.jumpToNotePage(noteTopology).expectQuestionsInList(data.hashes())
+  }
+)
+
+Then(
+  'I should not see the question {string} in the question list of the note {string}',
+  (questionStem: string, noteTopology: string) => {
+    start.jumpToNotePage(noteTopology).expectQuestionNotInList(questionStem)
   }
 )
 

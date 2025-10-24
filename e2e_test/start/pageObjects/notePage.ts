@@ -238,6 +238,38 @@ export const assumeNotePage = (noteTopology?: string) => {
     expectQuestionsInList(expectedQuestions: Record<string, string>[]) {
       this.openQuestionList().expectQuestion(expectedQuestions)
     },
+    deleteQuestion(questionStem: string) {
+      this.openQuestionList()
+      cy.findByText(questionStem)
+        .parents('tr')
+        .within(() => {
+          cy.findByRole('button', { name: 'Delete' }).click()
+        })
+      cy.pageIsNotLoading()
+    },
+    editQuestion(questionStem: string, updatedData: Record<string, string>) {
+      this.openQuestionList()
+      cy.findByText(questionStem)
+        .parents('tr')
+        .within(() => {
+          cy.findByRole('button', { name: 'Edit' }).click()
+        })
+      // Fill in the edit form
+      cy.findByLabelText('Question Text').clear().type(updatedData.Stem!)
+      cy.findByLabelText('Choice A').clear().type(updatedData['Choice 0']!)
+      cy.findByLabelText('Choice B').clear().type(updatedData['Choice 1']!)
+      cy.findByLabelText('Choice C').clear().type(updatedData['Choice 2']!)
+      cy.findByLabelText('Choice D').clear().type(updatedData['Choice 3']!)
+      cy.findByLabelText('Correct Answer').select(
+        updatedData['Correct Choice Index']!
+      )
+      cy.findByRole('button', { name: 'Save' }).click()
+      cy.pageIsNotLoading()
+    },
+    expectQuestionNotInList(questionStem: string) {
+      this.openQuestionList()
+      cy.findByText(questionStem).should('not.exist')
+    },
     sendMessageToNoteOwner(message: string) {
       this.toolbarButton('Star a conversation about this note').click()
       cy.findByRole('textbox').type(message)

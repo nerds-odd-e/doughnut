@@ -39,3 +39,15 @@ Feature: Quiz Question Management
     Then the question in the form becomes:
       | Stem                            | Choice 0                 | Choice 1           | Choice 2      | Correct Choice Index |
       | Why did the cow cross the road? | To get to the udder side | To see the chicken | To find grass | 0                    |
+
+  Scenario: Delete a question from the note
+    When I delete the question "What does a cow say?" from the note "The cow joke"
+    Then I should not see the question "What does a cow say?" in the question list of the note "The cow joke"
+
+  Scenario: Edit a question in the note
+    When I edit the question "What does a cow say?" for the note "The cow joke" to become:
+      | Stem                     | Choice 0 | Choice 1 | Choice 2 | Choice 3 | Correct Choice Index |
+      | What sound does a cow make? | moo      | boo      | woo      | zoo      | 0                    |
+    Then I should see the questions in the question list of the note "The cow joke":
+      | Question                     | Correct Choice |
+      | What sound does a cow make? | moo            |
