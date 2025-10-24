@@ -1,10 +1,10 @@
-import { expect, vi } from "vitest"
-import NoteConversation from "@/components/conversations/NoteConversation.vue"
-import helper from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
-import { flushPromises } from "@vue/test-utils"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
+import NoteConversation from "@/components/conversations/NoteConversation.vue"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import { expect, vi } from "vitest"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -12,16 +12,6 @@ vitest.mock("vue-router", () => ({
     push: mockedPush,
   }),
 }))
-
-// At the top of the file, add these mocks
-const mockIntersectionObserver = vi.fn()
-mockIntersectionObserver.mockReturnValue({
-  observe: () => null,
-  unobserve: () => null,
-  disconnect: () => null,
-})
-
-vi.stubGlobal("IntersectionObserver", mockIntersectionObserver)
 
 // Add window.performance mock
 const mockPerformance = {

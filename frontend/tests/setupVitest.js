@@ -1,6 +1,6 @@
+import { expect, vi } from "vitest";
 import * as matchers from "vitest-dom/matchers";
 import createFetchMock from "vitest-fetch-mock";
-import { vi, expect } from "vitest";
 expect.extend(matchers);
 
 const fetchMock = createFetchMock(vi, {
@@ -9,7 +9,7 @@ const fetchMock = createFetchMock(vi, {
 
 fetchMock.enableMocks();
 
-if(process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
+if (process.env.FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE) {
   const CONSOLE_FAIL_TYPES = ["error", "warn", "log"];
 
   CONSOLE_FAIL_TYPES.forEach((type) => {
@@ -37,7 +37,7 @@ global.FormData = function () {
 }
 
 // Mock canvas context for tests
-HTMLCanvasElement.prototype.getContext = function() {
+HTMLCanvasElement.prototype.getContext = function () {
   return {
     drawImage: vi.fn(),
     fillRect: vi.fn(),
@@ -55,13 +55,14 @@ HTMLCanvasElement.prototype.getContext = function() {
   }
 }
 
-// Mock IntersectionObserver for tests
-global.IntersectionObserver = class IntersectionObserver {
-  constructor() {}
-  disconnect() {}
-  observe() {}
-  unobserve() {}
-  takeRecords() {
-    return []
-  }
+// Mock IntersectionObserver for tests - Vitest 4.0 compatible constructor
+function MockIntersectionObserver(callback, options) {
+  this.callback = callback
+  this.options = options
+  this.disconnect = vi.fn()
+  this.observe = vi.fn()
+  this.unobserve = vi.fn()
+  this.takeRecords = vi.fn(() => [])
 }
+
+global.IntersectionObserver = MockIntersectionObserver

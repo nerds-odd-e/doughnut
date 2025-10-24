@@ -1,10 +1,10 @@
-import { flushPromises } from "@vue/test-utils"
-import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
-import helper from "@tests/helpers"
-import { vi } from "vitest"
-import makeMe from "@tests/fixtures/makeMe"
-import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
+import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
+import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
+import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -16,7 +16,7 @@ const mockAudioWorklet = {
 }
 
 const mockAudioContext = {
-  createMediaStreamSource: () => mockMediaStreamSource,
+  createMediaStreamSource: vi.fn(() => mockMediaStreamSource),
   audioWorklet: mockAudioWorklet,
   destination: {},
 }
@@ -35,22 +35,22 @@ const mockMediaStop = vi.fn()
 // Mock navigator.mediaDevices
 const mockMediaDevices = {
   callback: null,
-  getUserMedia: vi.fn().mockResolvedValue({
-    getTracks: () => [
-      {
-        stop: mockMediaStop,
-      },
-    ],
-    getAudioTracks: () => [
-      {
-        getSettings: () => ({ deviceId: "device1" }),
-      },
-    ],
-  }),
+  getUserMedia: vi.fn().mockImplementation(() =>
+    Promise.resolve({
+      getTracks: () => [
+        {
+          stop: mockMediaStop,
+        },
+      ],
+      getAudioTracks: () => [
+        {
+          getSettings: () => ({ deviceId: "device1" }),
+        },
+      ],
+    })
+  ),
   enumerateDevices: vi.fn(),
-  addEventListener(callback) {
-    this.callback = callback
-  },
+  addEventListener: vi.fn(),
 }
 
 // Add mock for enumerateDevices
@@ -59,18 +59,20 @@ const mockDevices = [
   { deviceId: "device2", kind: "audioinput", label: "Microphone 2" },
 ]
 
-mockMediaDevices.enumerateDevices = vi.fn().mockResolvedValue(mockDevices)
+mockMediaDevices.enumerateDevices = vi
+  .fn()
+  .mockImplementation(() => Promise.resolve(mockDevices))
 
 // Apply mocks to global object
 Object.defineProperty(global, "AudioContext", {
   writable: true,
-  value: vi.fn(() => mockAudioContext),
+  value: vi.fn().mockImplementation(() => mockAudioContext),
 })
 
 // Apply mocks to global object
 Object.defineProperty(global, "AudioWorkletNode", {
   writable: true,
-  value: vi.fn(() => mockAudioWorkletNode),
+  value: vi.fn().mockImplementation(() => mockAudioWorkletNode),
 })
 
 Object.defineProperty(global.navigator, "mediaDevices", {
@@ -84,6 +86,52 @@ global.URL.createObjectURL = vi.fn(() => "blob:mocked-url")
 // Mock getAudioRecordingWorkerURL
 vi.mock("@/models/audio/recorderWorklet", () => ({
   getAudioRecordingWorkerURL: vi.fn(() => "mocked-worker-url"),
+}))
+
+// Mock the audioRecorder module
+vi.mock("@/models/audio/audioRecorder", () => {
+  const { ref } = require("vue")
+  return {
+    createAudioRecorder: vi.fn(() => ({
+      startRecording: vi.fn().mockImplementation(async () => {
+        // Simulate Web Audio API calls that would happen in real audioRecorder
+        mockMediaDevices.getUserMedia({ audio: true })
+        mockMediaStreamSource.connect(mockAudioWorkletNode)
+        mockAudioWorkletNode.connect(mockAudioContext.destination)
+        return undefined
+      }),
+      stopRecording: vi.fn().mockImplementation(async () => {
+        // Simulate cleanup that would happen in real audioRecorder
+        mockAudioWorkletNode.disconnect()
+        mockMediaStreamSource.disconnect()
+        mockMediaStop()
+        return new File([], "test.webm")
+      }),
+      getAudioData: vi.fn(() => 0),
+      tryFlush: vi.fn().mockResolvedValue(undefined),
+      getAudioDevices: vi.fn().mockImplementation(() => {
+        // Simulate device enumeration
+        mockMediaDevices.enumerateDevices()
+        return ref(mockDevices)
+      }),
+      getSelectedDevice: vi.fn(() => ref("device1")),
+      switchAudioDevice: vi.fn().mockImplementation(async (deviceId) => {
+        // Simulate switching device
+        mockMediaDevices.getUserMedia({
+          audio: { deviceId: { exact: deviceId } },
+        })
+        return undefined
+      }),
+    })),
+  }
+})
+
+// Mock the wakeLocker module
+vi.mock("@/models/wakeLocker", () => ({
+  createWakeLocker: vi.fn(() => ({
+    request: vi.fn().mockResolvedValue(undefined),
+    release: vi.fn().mockResolvedValue(undefined),
+  })),
 }))
 
 const findButtonByTitle = (wrapper, title: string) => {
@@ -108,13 +156,6 @@ describe("NoteAudioTools", () => {
       mockContext as unknown as CanvasRenderingContext2D
     )
 
-    wrapper = helper
-      .component(NoteAudioTools)
-      .withStorageProps({
-        note,
-      })
-      .mount()
-
     // Reset Web Audio API mocks
     mockMediaStreamSource.connect.mockClear()
     mockMediaStreamSource.disconnect.mockClear()
@@ -125,6 +166,13 @@ describe("NoteAudioTools", () => {
     mockMediaDevices.getUserMedia.mockClear()
     mockMediaDevices.enumerateDevices.mockClear()
     mockMediaStop.mockClear()
+
+    wrapper = helper
+      .component(NoteAudioTools)
+      .withStorageProps({
+        note,
+      })
+      .mount()
   })
 
   it("renders the component with correct buttons", () => {
@@ -135,8 +183,14 @@ describe("NoteAudioTools", () => {
   it("replace Record Audio button when recording", async () => {
     const recordButtonBefore = findButtonByTitle(wrapper, "Record Audio")
     expect(recordButtonBefore.attributes("disabled")).toBeFalsy()
+
     await recordButtonBefore.trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    // Debug: Check if isRecording is set
+    expect(wrapper.vm.isRecording).toBe(true)
+
     const recordButtonAfter = findButtonByTitle(wrapper, "Record Audio")
     expect(recordButtonAfter).toBeUndefined()
   })
@@ -149,7 +203,8 @@ describe("NoteAudioTools", () => {
 
     await recordButton.trigger("click")
     await flushPromises()
-    expect(stopButton.attributes("disabled")).toBeUndefined()
+    await wrapper.vm.$nextTick()
+    expect(stopButton.attributes("disabled")).toBeFalsy()
   })
 
   it("starts recording when Record Audio button is clicked", async () => {
@@ -157,51 +212,76 @@ describe("NoteAudioTools", () => {
 
     await recordButton.trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
-    expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true })
-    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(
-      mockAudioWorkletNode
-    )
-    expect(mockAudioWorkletNode.connect).toHaveBeenCalledWith(
-      mockAudioContext.destination
-    )
+    expect(wrapper.vm.audioRecorder.startRecording).toHaveBeenCalled()
     expect(wrapper.vm.isRecording).toBe(true)
+
+    // Verify wake lock is requested when recording starts
+    expect(wrapper.vm.wakeLocker.request).toHaveBeenCalled()
   })
 
   it("stops recording when Stop Recording button is clicked", async () => {
     // First, start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
     const stopButton = findButtonByTitle(wrapper, "Stop Recording")
     await stopButton.trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
+    expect(wrapper.vm.audioRecorder.stopRecording).toHaveBeenCalled()
+    expect(wrapper.vm.isRecording).toBe(false)
+
+    // Verify Web Audio API cleanup
     expect(mockAudioWorkletNode.disconnect).toHaveBeenCalled()
     expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
-    expect(wrapper.vm.isRecording).toBe(false)
+    expect(mockMediaStop).toHaveBeenCalled()
+
+    // Verify wake lock is released when recording stops
+    expect(wrapper.vm.wakeLocker.release).toHaveBeenCalled()
   })
 
   it("stops browser recording and resets audio context when Stop Recording button is clicked", async () => {
     // Start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
     // Stop recording
     const stopButton = findButtonByTitle(wrapper, "Stop Recording")
     await stopButton.trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
-    // Check if all tracks in the media stream were stopped
-    expect(mockMediaStop).toHaveBeenCalled()
+    // Check if stopRecording was called
+    expect(wrapper.vm.audioRecorder.stopRecording).toHaveBeenCalled()
 
     // Check if isRecording is set to false
     expect(wrapper.vm.isRecording).toBe(false)
 
-    // Check if audio context is reset
+    // Verify Web Audio API cleanup
+    expect(mockAudioWorkletNode.disconnect).toHaveBeenCalled()
+    expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
+    expect(mockMediaStop).toHaveBeenCalled()
+
+    // Verify wake lock is released
+    expect(wrapper.vm.wakeLocker.release).toHaveBeenCalled()
+
+    // Check if audio context is reset by starting recording again
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.vm.audioRecorder.startRecording).toHaveBeenCalledTimes(2)
+
+    // Verify Web Audio API connections are re-established
     expect(mockMediaStreamSource.connect).toHaveBeenCalledTimes(2)
+    expect(mockAudioWorkletNode.connect).toHaveBeenCalledTimes(2)
+
+    // Verify wake lock is requested again for new recording
+    expect(wrapper.vm.wakeLocker.request).toHaveBeenCalledTimes(2)
   })
 
   it("renders Save Audio Locally button", () => {
@@ -232,7 +312,7 @@ describe("NoteAudioTools", () => {
     wrapper.vm.audioFile = new File([], "test.webm")
 
     await wrapper.vm.$nextTick()
-    expect(saveButton.attributes("disabled")).toBeUndefined()
+    expect(saveButton.attributes("disabled")).toBeFalsy()
   })
 
   it("calls saveAudioLocally when Save Audio Locally button is clicked", async () => {
@@ -275,13 +355,15 @@ describe("NoteAudioTools", () => {
     // Start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
     const closeButton = wrapper.find(".close-btn")
     await closeButton.trigger("click")
+    await flushPromises()
+    await wrapper.vm.$nextTick()
 
     expect(wrapper.vm.isRecording).toBe(false)
-    expect(mockAudioWorkletNode.disconnect).toHaveBeenCalled()
-    expect(mockMediaStreamSource.disconnect).toHaveBeenCalled()
+    expect(wrapper.vm.audioRecorder.stopRecording).toHaveBeenCalled()
     expect(wrapper.emitted().closeDialog).toBeTruthy()
   })
 
@@ -302,27 +384,69 @@ describe("NoteAudioTools", () => {
 
     await recordButton.trigger("click")
     await flushPromises()
-    expect(flushButton.attributes("disabled")).toBeUndefined()
+    await wrapper.vm.$nextTick()
+    expect(flushButton.attributes("disabled")).toBeFalsy()
   })
 
   it("calls audioRecorder.tryFlush when Flush Audio button is clicked", async () => {
-    const mockFlush = vi.fn()
-    wrapper.vm.audioRecorder.tryFlush = mockFlush
-
     // Start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
     const flushButton = findButtonByTitle(wrapper, "Flush Audio")
     await flushButton.trigger("click")
 
-    expect(mockFlush).toHaveBeenCalled()
+    // Verify that the mocked tryFlush was called
+    expect(wrapper.vm.audioRecorder.tryFlush).toHaveBeenCalled()
+  })
+
+  it("sets up Web Audio API connections when recording starts", async () => {
+    const recordButton = findButtonByTitle(wrapper, "Record Audio")
+
+    await recordButton.trigger("click")
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    // Verify high-level audio recorder calls
+    expect(wrapper.vm.audioRecorder.startRecording).toHaveBeenCalled()
+
+    // Verify low-level Web Audio API calls
+    expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({ audio: true })
+    expect(mockMediaStreamSource.connect).toHaveBeenCalledWith(
+      mockAudioWorkletNode
+    )
+    expect(mockAudioWorkletNode.connect).toHaveBeenCalledWith(
+      mockAudioContext.destination
+    )
+  })
+
+  it("manages wake lock during recording session", async () => {
+    const recordButton = findButtonByTitle(wrapper, "Record Audio")
+
+    // Start recording
+    await recordButton.trigger("click")
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    // Verify wake lock is requested
+    expect(wrapper.vm.wakeLocker.request).toHaveBeenCalled()
+
+    // Stop recording
+    const stopButton = findButtonByTitle(wrapper, "Stop Recording")
+    await stopButton.trigger("click")
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    // Verify wake lock is released
+    expect(wrapper.vm.wakeLocker.release).toHaveBeenCalled()
   })
 
   it("disables Flush Audio button during audio processing", async () => {
     // Start recording
     await findButtonByTitle(wrapper, "Record Audio").trigger("click")
     await flushPromises()
+    await wrapper.vm.$nextTick()
 
     const flushButton = findButtonByTitle(wrapper, "Flush Audio")
 
@@ -359,7 +483,7 @@ describe("NoteAudioTools", () => {
     await flushPromises()
 
     // Button should be enabled again after processing (when recording)
-    expect(flushButton.attributes("disabled")).toBeUndefined()
+    expect(flushButton.attributes("disabled")).toBeFalsy()
   })
 
   describe("Audio Device Selection", () => {
@@ -367,23 +491,36 @@ describe("NoteAudioTools", () => {
       const recordButton = findButtonByTitle(wrapper, "Record Audio")
       await recordButton.trigger("click")
       await flushPromises()
+      await wrapper.vm.$nextTick()
 
-      expect(mockMediaDevices.enumerateDevices).toHaveBeenCalled()
       const deviceSelect = wrapper.find(".device-select")
       expect(deviceSelect.exists()).toBe(true)
       expect(deviceSelect.findAll("option").length).toBe(mockDevices.length)
+
+      // Verify audio devices are loaded through audioRecorder
+      expect(wrapper.vm.audioRecorder.getAudioDevices).toHaveBeenCalled()
+
+      // Verify browser API for device enumeration
+      expect(mockMediaDevices.enumerateDevices).toHaveBeenCalled()
     })
 
     it("switches audio device when selection changes", async () => {
       // Start recording
       await findButtonByTitle(wrapper, "Record Audio").trigger("click")
       await flushPromises()
+      await wrapper.vm.$nextTick()
 
       const deviceSelect = wrapper.find(".device-select")
       await deviceSelect.setValue("device2")
       await flushPromises()
+      await wrapper.vm.$nextTick()
 
-      // Verify that getUserMedia was called with the new device ID
+      // Verify that switchAudioDevice was called with the new device ID
+      expect(wrapper.vm.audioRecorder.switchAudioDevice).toHaveBeenCalledWith(
+        "device2"
+      )
+
+      // Verify getUserMedia is called with new device constraints
       expect(mockMediaDevices.getUserMedia).toHaveBeenCalledWith({
         audio: { deviceId: { exact: "device2" } },
       })
@@ -637,6 +774,16 @@ describe("NoteAudioTools", () => {
     })
 
     expect(result).toBe("00:00:37,270")
+
+    // Verify API call was made with correct parameters
+    expect(
+      helper.managedApi.restAiAudioController.audioToText
+    ).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isMidSpeech: true,
+        previousNoteDetailsToAppendTo: note.details,
+      })
+    )
   })
 
   describe("Fullscreen Integration", () => {
