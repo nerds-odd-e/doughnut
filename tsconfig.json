@@ -2,6 +2,7 @@
   "compilerOptions": {
     "sourceMap": true,
     "target": "ES2022",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "useDefineForClassFields": true,
     "strict": true,
