@@ -40,7 +40,7 @@
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.23",
-    "es-toolkit": "^1.40.0",
+    "es-toolkit": "^1.41.0",
     "gsap": "^3.13.0",
     "jsdom": "^27.0.1",
     "optionator": "^0.9.4",
