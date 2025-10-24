@@ -6,6 +6,7 @@ export type AudioUploadDTO = {
     uploadAudioFile?: Blob;
     additionalProcessingInstructions?: string;
     previousNoteDetailsToAppendTo?: string;
+    midSpeech?: boolean;
     isMidSpeech?: boolean;
 };
 

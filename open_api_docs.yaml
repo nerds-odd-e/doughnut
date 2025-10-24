@@ -4281,6 +4281,8 @@ components:
           type: string
         previousNoteDetailsToAppendTo:
           type: string
+        midSpeech:
+          type: boolean
         isMidSpeech:
           type: boolean
     NoteDetailsCompletion:
