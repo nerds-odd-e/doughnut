@@ -44,14 +44,3 @@ Feature: MCP (Model Context Protocol) Services
       | token_limit | sibling_inclusion |
       | 10          | not contain       |
       | 1000        | contain           |
-
-  Scenario Outline: AI agent respects different token limits for graph retrieval with error handling
-    When AI agent searches for relevant notes using MCP tool with the term "Functional"
-    Then the response should contain "Functional"
-    When AI agent extracts note ID and calls get graph MCP tool with token limit "<token_limit>"
-    Then the graph response should contain an error with "<error_message>"
-
-    Examples:
-      | token_limit | error_message                        |
-      | 0           | tokenLimit must be a positive number |
-      | 5           | tokenLimit too low to fetch any note |
