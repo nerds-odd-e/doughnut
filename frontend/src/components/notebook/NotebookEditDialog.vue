@@ -52,21 +52,21 @@
     <hr/>
     <NotebookAssistantManagementDialog :notebook="notebook" />
   </template>
-  
+
   <!-- Notebook Indexing Section -->
   <div class="daisy-mt-4">
     <h4 class="daisy-text-lg daisy-mb-2">Notebook Indexing</h4>
     <div class="daisy-flex daisy-gap-2">
-      <button 
-        class="daisy-btn daisy-btn-secondary" 
+      <button
+        class="daisy-btn daisy-btn-secondary"
         @click="reindexNotebook"
         :disabled="isIndexing"
       >
         <span v-if="isIndexing">Working...</span>
         <span v-else>Reset notebook index</span>
       </button>
-      <button 
-        class="daisy-btn daisy-btn-secondary" 
+      <button
+        class="daisy-btn daisy-btn-secondary"
         @click="updateIndexNotebook"
         :disabled="isIndexing"
       >
@@ -112,14 +112,12 @@ const props = defineProps({
 // Form data
 const {
   skipMemoryTrackingEntirely,
-  selectMCPNotebook,
   numberOfQuestionsInAssessment,
   certificateExpiry = "1y",
 } = props.notebook.notebookSettings
 
 const formData = ref({
   skipMemoryTrackingEntirely,
-  selectMCPNotebook,
   numberOfQuestionsInAssessment,
   certificateExpiry,
 })
@@ -127,7 +125,6 @@ const formData = ref({
 const errors = ref({
   skipMemoryTrackingEntirely: undefined as string | undefined,
   numberOfQuestionsInAssessment: undefined as string | undefined,
-  selectMCPNotebook: undefined as string | undefined,
   certificateExpiry: undefined as string | undefined,
 })
 
