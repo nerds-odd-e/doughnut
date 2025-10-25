@@ -9,6 +9,7 @@ import {
 import { recall } from './pageObjects/recallPage'
 import { assumeCirclePage } from './pageObjects/circlePage'
 import { notebookCard } from './pageObjects/notebookCard'
+import { mcpAgentActions } from './pageObjects/mcpAgentActions'
 import downloadChecker from './downloadChecker'
 import mcpApi from './mcpApi'
 const start = {
@@ -20,6 +21,7 @@ const start = {
   recall,
   assumeCirclePage,
   notebookCard,
+  mcpAgentActions,
   mcpApi,
   ...downloadChecker(),
 }
