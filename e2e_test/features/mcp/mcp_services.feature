@@ -23,7 +23,7 @@ Feature: MCP (Model Context Protocol) Services
       | Functional      |
       | Procedural      |
 
-  Scenario Outline: AI developer learns from Doughnut via MCP client
+  Scenario Outline: AI agent learns from Doughnut via MCP client
     When AI agent searches for relevant notes using MCP tool with the term "<search_term>"
     Then the response should contain "<note_title>"
 
@@ -33,18 +33,12 @@ Feature: MCP (Model Context Protocol) Services
       | Functional      | Functional              |
       | Fiona           | No relevant note found. |
 
-  Scenario: AI agent gets relevant note and then fetches its graph using the token limit
-    When AI agent searches for relevant notes using MCP tool with the term "Object Oriented"
-    Then the response should contain "Object Oriented"
-    When AI agent extracts note ID from the search result and calls get graph MCP tool
-    Then the graph response should contain the focus note "Object Oriented"
-    And the graph response should contain related notes
-
   Scenario Outline: AI agent respects different token limits for graph retrieval
     When AI agent searches for relevant notes using MCP tool with the term "Functional"
     Then the response should contain "Functional"
     When AI agent extracts note ID and calls get graph MCP tool with token limit "<token_limit>"
-    Then the graph response should show "<expected_behavior>"
+    Then the graph response should contain the focus note "Functional"
+    And the graph response should show "<expected_behavior>"
 
     Examples:
       | token_limit | expected_behavior                    |
