@@ -129,3 +129,27 @@ Then(
     })
   }
 )
+
+Then(
+  'the graph response should contain {string}',
+  (expectedText: string) => {
+    cy.get('@MCPGraphResponse').then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      const responseText = actualResponse.content[0]?.text || ''
+
+      expect(responseText).to.contain(expectedText)
+    })
+  }
+)
+
+Then(
+  'the graph response should not contain {string}',
+  (unexpectedText: string) => {
+    cy.get('@MCPGraphResponse').then((response) => {
+      const actualResponse = response as unknown as ApiResponse
+      const responseText = actualResponse.content[0]?.text || ''
+
+      expect(responseText).to.not.contain(unexpectedText)
+    })
+  }
+)

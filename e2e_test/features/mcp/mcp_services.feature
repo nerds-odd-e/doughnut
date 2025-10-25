@@ -38,12 +38,12 @@ Feature: MCP (Model Context Protocol) Services
     Then the response should contain "Functional"
     When AI agent extracts note ID and calls get graph MCP tool with token limit "<token_limit>"
     Then the graph response should contain the focus note "Functional"
-    And the graph response should show "<expected_behavior>"
+    And the graph response should <sibling_inclusion> "Object Oriented"
 
     Examples:
-      | token_limit | expected_behavior                    |
-      | 10          | Functional                           |
-      | 1000        | Programming Concepts                 |
+      | token_limit | sibling_inclusion |
+      | 10          | not contain       |
+      | 1000        | contain           |
 
   Scenario Outline: AI agent respects different token limits for graph retrieval with error handling
     When AI agent searches for relevant notes using MCP tool with the term "Functional"
