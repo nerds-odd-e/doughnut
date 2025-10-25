@@ -28,12 +28,4 @@ export const notebookCard = (notebook: string) => ({
   importObsidianData(filename: string) {
     return this.editNotebookSettings().importObsidianData(filename)
   },
-  expectBanner(bannerMessage: string) {
-    return cy
-      .findByText(notebook, { selector: '.notebook-card *' })
-      .parents('.daisy-card')
-      .find('.daisy-badge')
-      .contains(bannerMessage)
-      .should('be.visible')
-  },
 })
