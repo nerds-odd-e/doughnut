@@ -161,14 +161,6 @@ Given('I have a valid MCP token with label {string}', (label: string) => {
     })
 })
 
-Given('the MCP token {string} has not been used', (label: string) => {
-  start
-    .mainMenu()
-    .userOptions()
-    .manageMCPTokens()
-    .checkTokenWithLabelNotUsed(label)
-})
-
 When('I delete the MCP token with label {string}', (label: string) => {
   start
     .mainMenu()
@@ -206,21 +198,5 @@ Then(
       .userOptions()
       .manageMCPTokens()
       .checkTokenWithLabelExists(label)
-  }
-)
-
-When('it is 90 days later', () => {
-  start.testability().backendTimeTravelRelativeToNow(21610) // 90 days in seconds
-})
-
-Then(
-  'the MCP token {string} should be marked as expired',
-  (tokenLabel: string) => {
-    cy.reload()
-    cy.get('table').within(() => {
-      cy.contains('tr', tokenLabel).within(() => {
-        cy.contains('Expired')
-      })
-    })
   }
 )

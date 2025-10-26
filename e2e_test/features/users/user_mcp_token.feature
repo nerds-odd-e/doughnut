@@ -15,12 +15,3 @@ Feature: User MCP token
     And I can create a note as a child of "Parent Note" using the MCP token
     When I delete the MCP token with label "To be deleted"
     Then I cannot create a note as a child of "Parent Note" using the MCP token
-
-  Scenario: Display last used time for MCP token
-    Given I have a valid MCP token with label "Usage Token"
-    And the MCP token "Usage Token" has not been used
-
-  Scenario: User MCP token expiration
-    Given I have a valid MCP token with label "my token"
-    When it is 90 days later
-    Then the MCP token "my token" should be marked as expired

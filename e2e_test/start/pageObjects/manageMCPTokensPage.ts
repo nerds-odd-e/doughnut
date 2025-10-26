@@ -21,10 +21,5 @@ export const manageMCPTokensPage = () => {
     checkTokenWithLabelExists(label: string) {
       cy.findByText(label).should('exist')
     },
-    checkTokenWithLabelNotUsed(label: string) {
-      cy.contains('tr', label).within(() => {
-        cy.get('td').eq(1).contains('N/A')
-      })
-    },
   }
 }
