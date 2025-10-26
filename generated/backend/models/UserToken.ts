@@ -7,7 +7,5 @@ export type UserToken = {
     userId?: number;
     token: string;
     label: string;
-    expirationDate?: string;
-    isExpired?: boolean;
 };
 

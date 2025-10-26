@@ -13,8 +13,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,18 +77,7 @@ class RestUserControllerTest {
 
   @Test
   void getTokensTest() {
-    UserToken userToken =
-        makeMe
-            .aUserToken()
-            .forUser(userModel)
-            .withLabel("TEST_LABEL")
-            .withExpirationDate(
-                Timestamp.from(
-                    testabilitySettings
-                        .getCurrentUTCTimestamp()
-                        .toInstant()
-                        .plus(90, ChronoUnit.DAYS)))
-            .please();
+    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("TEST_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -101,8 +88,8 @@ class RestUserControllerTest {
   }
 
   @Test
-  void getTokensWithNullExpirationDate() {
-    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL", null);
+  void getTokensWithMultipleTokens() {
+    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL");
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -110,7 +97,6 @@ class RestUserControllerTest {
 
     assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("LABEL")));
     assertThat(getTokens.size(), equalTo(1));
-    assertThat(getTokens.getFirst().getIsExpired(), equalTo(false));
   }
 
   @Test

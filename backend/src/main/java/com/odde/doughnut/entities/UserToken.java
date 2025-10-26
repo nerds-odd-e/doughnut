@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,19 +26,10 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @NotNull
   private String label;
 
-  @Column(name = "expires_at")
-  @Getter
-  @Setter
-  private Timestamp expirationDate;
-
-  @Getter @Setter @Transient private Boolean isExpired;
-
-  public UserToken(
-      Integer userId, @NotNull String token, @NotNull String label, Timestamp expirationDate) {
+  public UserToken(Integer userId, @NotNull String token, @NotNull String label) {
     this.userId = userId;
     this.token = token;
     this.label = label;
-    this.expirationDate = expirationDate;
   }
 
   public UserToken() {}

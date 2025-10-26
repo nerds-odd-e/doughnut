@@ -12,8 +12,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.sql.Timestamp;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,12 +67,7 @@ class RestUserController {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
-    Timestamp expirationDate =
-        Timestamp.from(
-            testabilitySettings.getCurrentUTCTimestamp().toInstant().plus(90, ChronoUnit.DAYS));
-    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel(), expirationDate);
-    userToken.setIsExpired(
-        userToken.getExpirationDate().before(testabilitySettings.getCurrentUTCTimestamp()));
+    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
     return modelFactoryService.save(userToken);
   }
 
@@ -83,17 +76,7 @@ class RestUserController {
   public List<UserToken> getTokens() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
-    List<UserToken> userTokens =
-        modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
-    return userTokens.stream()
-        .peek(
-            userToken -> {
-              Timestamp expirationDate = userToken.getExpirationDate();
-              userToken.setIsExpired(
-                  expirationDate != null
-                      && expirationDate.before(testabilitySettings.getCurrentUTCTimestamp()));
-            })
-        .toList();
+    return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
 
   @DeleteMapping("/token/{tokenId}")

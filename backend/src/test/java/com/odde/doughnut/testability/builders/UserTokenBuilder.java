@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 public class UserTokenBuilder extends EntityBuilder<UserToken> {
@@ -21,11 +20,6 @@ public class UserTokenBuilder extends EntityBuilder<UserToken> {
 
   public UserTokenBuilder withLabel(String label) {
     this.entity.setLabel(label);
-    return this;
-  }
-
-  public UserTokenBuilder withExpirationDate(Timestamp timestamp) {
-    this.entity.setExpirationDate(timestamp);
     return this;
   }
 

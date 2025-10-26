@@ -3577,11 +3577,6 @@ components:
           type: string
         label:
           type: string
-        expirationDate:
-          type: string
-          format: date-time
-        isExpired:
-          type: boolean
       required:
       - id
       - label
