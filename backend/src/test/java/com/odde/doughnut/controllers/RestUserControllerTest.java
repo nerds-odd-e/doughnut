@@ -101,6 +101,19 @@ class RestUserControllerTest {
   }
 
   @Test
+  void getTokensWithNullExpirationDate() {
+    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL", null);
+    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
+    modelFactoryService.save(userToken);
+
+    List<UserToken> getTokens = controller.getTokens();
+
+    assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("LABEL")));
+    assertThat(getTokens.size(), equalTo(1));
+    assertThat(getTokens.getFirst().getIsExpired(), equalTo(false));
+  }
+
+  @Test
   void deleteTokenTest() {
     UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("DELETE_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;

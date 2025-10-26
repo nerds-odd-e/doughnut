@@ -88,10 +88,10 @@ class RestUserController {
     return userTokens.stream()
         .peek(
             userToken -> {
+              Timestamp expirationDate = userToken.getExpirationDate();
               userToken.setIsExpired(
-                  userToken
-                      .getExpirationDate()
-                      .before(testabilitySettings.getCurrentUTCTimestamp()));
+                  expirationDate != null
+                      && expirationDate.before(testabilitySettings.getCurrentUTCTimestamp()));
             })
         .toList();
   }
