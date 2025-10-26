@@ -178,17 +178,20 @@ When('I delete the MCP token with label {string}', (label: string) => {
     .checkTokenWithLabelNotExists(label)
 })
 
-Then('I cannot create a note as a child of {string}', (parentNote: string) => {
-  start
-    .mcpApi()
-    .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214665' })
-    .then((response) => {
-      expect(response.status).to.eq(401)
-    })
-})
+Then(
+  'I cannot create a note as a child of {string} using the MCP token',
+  (parentNote: string) => {
+    start
+      .mcpApi()
+      .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214665' })
+      .then((response) => {
+        expect(response.status).to.eq(401)
+      })
+  }
+)
 
 When(
-  'I create a note as a child of {string} using the MCP',
+  'I can create a note as a child of {string} using the MCP token',
   (parentNote: string) => {
     start
       .mcpApi()

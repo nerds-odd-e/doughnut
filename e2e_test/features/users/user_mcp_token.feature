@@ -3,6 +3,7 @@ Feature: User MCP token
 
   Background:
     Given I am logged in as "old_learner"
+    And I have a notebook with the head note "Parent Note"
 
   Scenario: Generate MCP token
     When I generate a new MCP token with label "Initial Token"
@@ -11,16 +12,13 @@ Feature: User MCP token
 
   Scenario: Delete an MCP token
     Given I have a valid MCP token with label "To be deleted"
-    And I have a notebook with the head note "Parent Note"
+    And I can create a note as a child of "Parent Note" using the MCP token
     When I delete the MCP token with label "To be deleted"
-    Then I cannot create a note as a child of "Parent Note"
+    Then I cannot create a note as a child of "Parent Note" using the MCP token
 
   Scenario: Display last used time for MCP token
     Given I have a valid MCP token with label "Usage Token"
     And the MCP token "Usage Token" has not been used
-    And I have a notebook with the head note "Parent Note"
-    When I create a note as a child of "Parent Note" using the MCP
-
 
   Scenario: User MCP token expiration
     Given I have a valid MCP token with label "my token"
