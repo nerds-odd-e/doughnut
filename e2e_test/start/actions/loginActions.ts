@@ -1,5 +1,7 @@
 import { mainMenu } from '../pageObjects/mainMenu'
 import start from '../index'
+import { RestHealthCheckControllerService } from '@generated/backend/services/RestHealthCheckControllerService'
+import { extractRequestConfig } from '../utils/apiConfigExtractor'
 
 export const loginActions = {
   logout() {
@@ -22,9 +24,16 @@ export const loginActions = {
 
     const password = 'password'
     const token = btoa(`${username}:${password}`)
+
+    // Extract healthcheck endpoint config from generated service
+    const config = extractRequestConfig((httpRequest) => {
+      const service = new RestHealthCheckControllerService(httpRequest)
+      return service.ping()
+    })
+
     cy.request({
-      method: 'GET',
-      url: '/api/healthcheck',
+      method: config.method,
+      url: config.url,
       headers: {
         Authorization: `Basic ${token}`,
       },

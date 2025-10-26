@@ -5,33 +5,26 @@ import type { QuestionSuggestionParams } from '@generated/backend/models/Questio
 import type ServiceMocker from '../support/ServiceMocker'
 import type { NoteTestData } from '@generated/backend/models/NoteTestData'
 import type { PredefinedQuestionsTestData } from '@generated/backend/models/PredefinedQuestionsTestData'
+import type { TimeTravel } from '@generated/backend/models/TimeTravel'
+import type { TimeTravelRelativeToNow } from '@generated/backend/models/TimeTravelRelativeToNow'
+import type { SuggestedQuestionsData } from '@generated/backend/models/SuggestedQuestionsData'
+import type { NotesTestData } from '@generated/backend/models/NotesTestData'
+import { TestabilityRestControllerService } from '@generated/backend/services/TestabilityRestControllerService'
+import { extractRequestConfig } from './utils/apiConfigExtractor'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
 }
 
-const postToTestabilityApi = (
-  cy: Cypress.cy & CyEventEmitter,
-  path: string,
-  options: { body?: Record<string, unknown>; failOnStatusCode?: boolean }
-) => {
-  return cy.request({
-    method: 'POST',
-    url: `/api/testability/${path}`,
-    ...options,
-  })
-}
-
-const postToTestabilityApiSuccessfully = (
-  cy: Cypress.cy & CyEventEmitter,
-  path: string,
-  options: { body?: Record<string, unknown> }
-) => {
-  return postToTestabilityApi(cy, path, { failOnStatusCode: true, ...options })
-}
-
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
-  postToTestabilityApi(cy, 'clean_db_and_reset_testability_settings', {
+  const config = extractRequestConfig((httpRequest) => {
+    const service = new TestabilityRestControllerService(httpRequest)
+    return service.resetDbAndTestabilitySettings()
+  })
+
+  cy.request({
+    method: config.method,
+    url: config.url,
     failOnStatusCode: countdown === 1,
   }).then((response) => {
     if (countdown > 0 && response.status !== 200) {
@@ -50,8 +43,16 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      postToTestabilityApiSuccessfully(cy, 'feature_toggle', {
-        body: { enabled },
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.enableFeatureToggle({ enabled: enabled.toString() })
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        body: { enabled: enabled.toString() },
+        failOnStatusCode: true,
       })
     },
 
@@ -60,19 +61,32 @@ const testability = () => {
       externalIdentifier = '',
       circleName: string | null = null
     ) {
-      return postToTestabilityApi(cy, 'inject_notes', {
-        body: {
-          externalIdentifier,
-          circleName,
-          noteTestData,
-        },
-      }).then((response) => {
-        expect(Object.keys(response.body).length).to.equal(noteTestData.length)
-        cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-          const mergedMap = { ...existingMap, ...response.body }
-          cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
-        })
+      const requestBody: NotesTestData = {
+        externalIdentifier,
+        circleName,
+        noteTestData,
+      }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.injectNotes(requestBody)
       })
+
+      return cy
+        .request({
+          method: config.method,
+          url: config.url,
+          body: requestBody,
+        })
+        .then((response) => {
+          expect(Object.keys(response.body).length).to.equal(
+            noteTestData.length
+          )
+          cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+            const mergedMap = { ...existingMap, ...response.body }
+            cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
+          })
+        })
     },
     injectNumberNotes(
       notebook: string,
@@ -91,7 +105,14 @@ const testability = () => {
     injectPredefinedQuestionsToNotebook(
       predefinedQuestionsTestData: PredefinedQuestionsTestData
     ) {
-      postToTestabilityApi(cy, 'inject-predefined-questions', {
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.injectPredefinedQuestion(predefinedQuestionsTestData)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
         body: predefinedQuestionsTestData,
       }).then((response) => {
         expect(Object.keys(response.body).length).to.equal(
@@ -141,21 +162,40 @@ const testability = () => {
         expect(injectedNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
         const fromNoteId = injectedNoteIdMap[fromNoteTopic]
         const toNoteId = injectedNoteIdMap[toNoteTopic]
-        postToTestabilityApiSuccessfully(cy, 'link_notes', {
-          body: {
-            type,
-            source_id: fromNoteId,
-            target_id: toNoteId,
-          },
+
+        const requestBody = {
+          type,
+          source_id: fromNoteId.toString(),
+          target_id: toNoteId.toString(),
+        }
+
+        const config = extractRequestConfig((httpRequest) => {
+          const service = new TestabilityRestControllerService(httpRequest)
+          return service.linkNotes(requestBody)
+        })
+
+        cy.request({
+          method: config.method,
+          url: config.url,
+          body: requestBody,
+          failOnStatusCode: true,
         })
       })
     },
 
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
-      postToTestabilityApiSuccessfully(cy, 'inject_suggested_questions', {
-        body: {
-          examples,
-        },
+      const requestBody: SuggestedQuestionsData = { examples }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.injectSuggestedQuestion(requestBody)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        body: requestBody,
+        failOnStatusCode: true,
       })
     },
 
@@ -197,61 +237,147 @@ const testability = () => {
     },
 
     backendTimeTravelToDate(date: Date) {
-      postToTestabilityApiSuccessfully(cy, 'time_travel', {
-        body: { travel_to: JSON.stringify(date) },
+      const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.timeTravel(requestBody)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        body: requestBody,
+        failOnStatusCode: true,
       })
     },
 
     backendTimeTravelTo(day: number, hour: number) {
-      postToTestabilityApiSuccessfully(cy, 'time_travel', {
-        body: { travel_to: JSON.stringify(hourOfDay(day, hour)) },
+      const requestBody: TimeTravel = {
+        travel_to: JSON.stringify(hourOfDay(day, hour)),
+      }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.timeTravel(requestBody)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        body: requestBody,
+        failOnStatusCode: true,
       })
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
-      return postToTestabilityApiSuccessfully(
-        cy,
-        'time_travel_relative_to_now',
-        {
-          body: { hours: JSON.stringify(hours) },
-        }
-      )
+      const requestBody: TimeTravelRelativeToNow = {
+        hours: JSON.stringify(hours),
+      }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.timeTravelRelativeToNow(requestBody)
+      })
+
+      return cy.request({
+        method: config.method,
+        url: config.url,
+        body: requestBody,
+        failOnStatusCode: true,
+      })
     },
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
-      postToTestabilityApiSuccessfully(cy, 'randomizer', {
-        body: <Randomization>{ choose: strategy, seed },
+      const requestBody: Randomization = { choose: strategy, seed }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.randomizer(requestBody)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        body: requestBody,
+        failOnStatusCode: true,
       })
     },
 
     triggerException() {
-      postToTestabilityApi(cy, 'trigger_exception', { failOnStatusCode: false })
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.triggerException()
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        failOnStatusCode: false,
+      })
     },
 
     shareToBazaar(noteTopology: string) {
-      postToTestabilityApiSuccessfully(cy, 'share_to_bazaar', {
-        body: { noteTopology },
+      const requestBody = { noteTopology }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.shareToBazaar(requestBody)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
+        body: requestBody,
+        failOnStatusCode: true,
       })
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, 'inject_circle', {
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.injectCircle(circleInfo)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
         body: circleInfo,
+        failOnStatusCode: true,
       })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      postToTestabilityApiSuccessfully(cy, 'update_current_user', {
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.updateCurrentUser(hash)
+      })
+
+      cy.request({
+        method: config.method,
+        url: config.url,
         body: hash,
+        failOnStatusCode: true,
       })
     },
 
     setServiceUrl(serviceName: string, serviceUrl: string) {
-      return postToTestabilityApi(cy, `replace_service_url`, {
-        body: { [serviceName]: serviceUrl },
-      }).then((response) => {
-        expect(response.status).to.equal(200)
+      const requestBody = { [serviceName]: serviceUrl }
+
+      const config = extractRequestConfig((httpRequest) => {
+        const service = new TestabilityRestControllerService(httpRequest)
+        return service.replaceServiceUrl(requestBody)
       })
+
+      return cy
+        .request({
+          method: config.method,
+          url: config.url,
+          body: requestBody,
+        })
+        .then((response) => {
+          expect(response.status).to.equal(200)
+        })
     },
     mockBrowserTime() {
       //
