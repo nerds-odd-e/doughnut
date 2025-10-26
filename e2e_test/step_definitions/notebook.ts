@@ -189,3 +189,17 @@ Then('I should see popup {string}', (message: string) => {
     expect(text).to.equal(message)
   })
 })
+
+Then(
+  'I delete the following questions for the notes in the notebook {string}:',
+  (notebook: string, titles: DataTable) => {
+    const notebookQuestionsPage = start
+      .routerToNotebooksPage()
+      .notebookCard(notebook)
+      .openNotebookQuestions()
+    titles.rows().forEach((title: string[]) => {
+      const titleName = title[0]!
+      notebookQuestionsPage.deleteQuestionPage(titleName)
+    })
+  }
+)
