@@ -184,9 +184,7 @@ Then(
     start
       .mcpApi()
       .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214665' })
-      .then((response) => {
-        expect(response.status).to.eq(401)
-      })
+      .shouldBeDenied()
   }
 )
 
@@ -196,9 +194,7 @@ When(
     start
       .mcpApi()
       .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214666' })
-      .then((response) => {
-        expect(response.status).to.eq(200)
-      })
+      .shouldBeAccepted()
   }
 )
 
