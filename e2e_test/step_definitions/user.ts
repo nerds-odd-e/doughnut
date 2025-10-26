@@ -169,17 +169,6 @@ Given('the MCP token {string} has not been used', (label: string) => {
     .checkTokenWithLabelNotUsed(label)
 })
 
-Given(
-  'the MCP token {string} should show a last used time',
-  (label: string) => {
-    start
-      .mainMenu()
-      .userOptions()
-      .manageMCPTokens()
-      .checkTokenWithLabelHasLastUsedTimestamp(label)
-  }
-)
-
 When('I delete the MCP token with label {string}', (label: string) => {
   start
     .mainMenu()

@@ -26,12 +26,5 @@ export const manageMCPTokensPage = () => {
         cy.get('td').eq(1).contains('N/A')
       })
     },
-    checkTokenWithLabelHasLastUsedTimestamp(label: string) {
-      cy.contains('tr', label).within(() => {
-        cy.get('td')
-          .eq(1)
-          .should('match', /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)
-      })
-    },
   }
 }

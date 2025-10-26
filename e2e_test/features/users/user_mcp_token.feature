@@ -20,7 +20,6 @@ Feature: User MCP token
     And the MCP token "Usage Token" has not been used
     And I have a notebook with the head note "Parent Note"
     When I create a note as a child of "Parent Note" using the MCP
-    # Then the MCP token "Usage Token" should show a last used time
 
 
   Scenario: User MCP token expiration
