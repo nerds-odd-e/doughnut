@@ -37,8 +37,8 @@ importers:
         specifier: ^23.2.1
         version: 23.2.1(@babel/core@7.28.4)(cypress@15.5.0)(typescript@5.9.3)
       '@bahmutov/cypress-esbuild-preprocessor':
-        specifier: ^2.2.5
-        version: 2.2.6(esbuild@0.25.11)
+        specifier: ^2.2.7
+        version: 2.2.7(esbuild@0.25.11)
       '@biomejs/biome':
         specifier: 2.3.0
         version: 2.3.0
@@ -439,8 +439,8 @@ packages:
     peerDependencies:
       cypress: ^12.0.0 || ^13.0.0 || ^14.0.0 || ^15.0.0
 
-  '@bahmutov/cypress-esbuild-preprocessor@2.2.6':
-    resolution: {integrity: sha512-njJI3neexUcRh3iK/hXRZLwGa7tsjzO87MsoXkmqx0lmNaasJzewTau8hW6K9Tt74smA57e/uuskBUqU9SYrGw==}
+  '@bahmutov/cypress-esbuild-preprocessor@2.2.7':
+    resolution: {integrity: sha512-n5kYNQ830Tics+04/pRR/IdJsCoc2xf4iO7emI2ofGIWGuDkE4ewIJt1jYJ+FfN41I2B7jTWQRvU274T4NloTQ==}
     peerDependencies:
       esbuild: '>=0.17.0'
 
@@ -5454,7 +5454,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@bahmutov/cypress-esbuild-preprocessor@2.2.6(esbuild@0.25.11)':
+  '@bahmutov/cypress-esbuild-preprocessor@2.2.7(esbuild@0.25.11)':
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       esbuild: 0.25.11
