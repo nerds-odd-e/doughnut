@@ -61,6 +61,6 @@
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
     "vue": "3.5.22",
-    "vue-tsc": "3.1.1"
+    "vue-tsc": "3.1.2"
   }
 }
