@@ -110,7 +110,7 @@ const generateToken = async () => {
     tokens.value.push({
       id: res.id,
       label: res.label,
-      status: "Valid",
+      status: res.status,
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
