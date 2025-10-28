@@ -201,4 +201,6 @@ Then(
   }
 )
 
-Then('the token is marked as valid', () => {})
+Then('the token is marked as valid', () => {
+  return
+})
