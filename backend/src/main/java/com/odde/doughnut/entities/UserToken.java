@@ -33,4 +33,9 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   }
 
   public UserToken() {}
+
+  @NotNull
+  public String getStatus() {
+    return "Valid";
+  }
 }

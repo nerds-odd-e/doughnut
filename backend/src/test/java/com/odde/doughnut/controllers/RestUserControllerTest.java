@@ -72,6 +72,7 @@ class RestUserControllerTest {
 
     assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
     assertThat(userToken.getLabel(), equalTo("TEST_LABEL"));
+    assertThat(userToken.getStatus(), equalTo("Valid"));
     assertThat(userToken.getToken().length(), equalTo(36));
   }
 

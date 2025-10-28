@@ -3577,9 +3577,12 @@ components:
           type: string
         label:
           type: string
+        status:
+          type: string
       required:
       - id
       - label
+      - status
       - token
     TimeTravelRelativeToNow:
       type: object
