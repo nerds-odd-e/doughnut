@@ -90,7 +90,7 @@ const loadTokens = async () => {
     tokens.value = res.map((t) => ({
       id: t.id,
       label: t.label,
-      status: "Valid",
+      status: t.status,
     }))
   } catch (error) {
     console.error("Error loading tokens:", error)
