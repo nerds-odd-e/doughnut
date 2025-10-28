@@ -40,11 +40,13 @@
       <thead>
         <tr>
           <th class="daisy-text-left daisy-px-4 daisy-py-2">Label</th>
+          <th class="daisy-text-left daisy-px-4 daisy-py-2">Status</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">Valid</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">
               <button class="daisy-btn daisy-btn-error daisy-btn-xs" @click="deleteToken(item.id)">Delete</button>

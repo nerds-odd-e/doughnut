@@ -202,5 +202,9 @@ Then(
 )
 
 Then('the token is marked as valid', () => {
-  return
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .checkTokenWithLabelExists('Valid')
 })
