@@ -23,7 +23,7 @@ export const manageMCPTokensPage = () => {
     },
     checkLastUsedTokenTimestamp(timestamp: string) {
       // TODO: implement actual check
-      return this
+      cy.findByText(timestamp).should('exist')
     },
   }
 }

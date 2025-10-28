@@ -41,12 +41,15 @@
         <tr>
           <th class="daisy-text-left daisy-px-4 daisy-py-2">Label</th>
           <th class="daisy-text-left daisy-px-4 daisy-py-2">Status</th>
+          <th class="daisy-text-left daisy-px-4 daisy-py-2">Last used</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.status }}</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.lastUsedAt || 'N/A' }}</td>
+
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">
               <button class="daisy-btn daisy-btn-error daisy-btn-xs" @click="deleteToken(item.id)">Delete</button>
@@ -78,6 +81,7 @@ const tokens = ref<
     id: number
     label: string
     status: string
+    lastUsedAt?: string
   }>
 >([])
 const token = ref<string | null>(null)
@@ -91,6 +95,7 @@ const loadTokens = async () => {
       id: t.id,
       label: t.label,
       status: t.status,
+      lastUsedAt: t.lastUsedAt,
     }))
   } catch (error) {
     console.error("Error loading tokens:", error)
@@ -111,6 +116,7 @@ const generateToken = async () => {
       id: res.id,
       label: res.label,
       status: res.status,
+      lastUsedAt: res.lastUsedAt,
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()

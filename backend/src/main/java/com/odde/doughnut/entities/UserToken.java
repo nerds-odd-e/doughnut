@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +26,11 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Setter
   @NotNull
   private String label;
+
+  @Column(name = "last_used_at")
+  @Getter
+  @Setter
+  private Timestamp lastUsedAt;
 
   public UserToken(Integer userId, @NotNull String token, @NotNull String label) {
     this.userId = userId;

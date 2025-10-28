@@ -8,5 +8,6 @@ export type UserToken = {
     token: string;
     label: string;
     status: string;
+    lastUsedAt?: string;
 };
 
