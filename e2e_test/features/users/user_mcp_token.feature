@@ -10,7 +10,8 @@ Feature: User MCP token
     Then the new MCP Token should be a valid UUID
     And I can see the token with label "Initial Token" in the list of tokens
     And the token is marked as valid
-
+    And The last used token timestamp should show "N/A"
+    
   Scenario: Delete an MCP token
     Given I have a valid MCP token with label "To be deleted"
     And I can create a note as a child of "Parent Note" using the MCP token

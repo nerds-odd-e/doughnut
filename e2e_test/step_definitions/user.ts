@@ -208,3 +208,14 @@ Then('the token is marked as valid', () => {
     .manageMCPTokens()
     .checkTokenWithLabelExists('Valid')
 })
+
+Then(
+  'The last used token timestamp should show {string}',
+  (timestamp: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageMCPTokens()
+      .checkLastUsedTokenTimestamp(timestamp)
+  }
+)
