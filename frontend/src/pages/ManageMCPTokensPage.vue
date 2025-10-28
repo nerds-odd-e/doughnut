@@ -90,7 +90,7 @@ const loadTokens = async () => {
     tokens.value = res.map((t) => ({
       id: t.id,
       label: t.label,
-      status: 'Valid',
+      status: "Valid",
     }))
   } catch (error) {
     console.error("Error loading tokens:", error)
@@ -110,7 +110,7 @@ const generateToken = async () => {
     tokens.value.push({
       id: res.id,
       label: res.label,
-      status: 'Valid',
+      status: "Valid",
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
