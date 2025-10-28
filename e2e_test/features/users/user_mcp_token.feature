@@ -9,6 +9,7 @@ Feature: User MCP token
     When I generate a new MCP token with label "Initial Token"
     Then the new MCP Token should be a valid UUID
     And I can see the token with label "Initial Token" in the list of tokens
+    And the token is marked as valid
 
   Scenario: Delete an MCP token
     Given I have a valid MCP token with label "To be deleted"

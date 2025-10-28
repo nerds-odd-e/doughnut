@@ -200,3 +200,10 @@ Then(
       .checkTokenWithLabelExists(label)
   }
 )
+
+Then(
+  'the token is marked as valid',
+  () => {
+    
+  }
+)
