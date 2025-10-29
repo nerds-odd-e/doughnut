@@ -17,3 +17,9 @@ Feature: User MCP token
     And I can create a note as a child of "Parent Note" using the MCP token
     When I delete the MCP token with label "To be deleted"
     Then I cannot create a note as a child of "Parent Note" using the MCP token
+
+  @ignore
+  Scenario: MCP token last used timestamp updates after use
+    Given I have a valid MCP token with label "Tracking Test Token"
+    When I create a note as a child of "Parent Note" using the MCP token
+    Then I can see the token with label "Tracking Test Token" has a last used timestamp that is not "N/A"
