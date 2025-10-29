@@ -102,11 +102,17 @@ const setError = (errs: unknown) => {
 
 watch(
   () => value,
-  () => {
+  (newValue) => {
     if (version.value !== savedVersion.value) {
-      return
+      // Cancel any pending saves when navigating away with unsaved changes
+      changer.cancel()
+      // Reset the tracking state
+      latestNoteId.value = null
+      latestValue.value = null
+      // Reset version tracking
+      version.value = savedVersion.value
     }
-    localValue.value = value
+    localValue.value = newValue
   }
 )
 
