@@ -33,5 +33,5 @@ Feature: User MCP token
   @ignore
   Scenario: MCP token last used timestamp updates after use
     Given I have a valid MCP token with label "Tracking Test Token"
-    When I create a note as a child of "Parent Note" using the MCP token
-    Then I can see the token with label "Tracking Test Token" has a last used timestamp that is not "N/A"
+    When I can create a note as a child of "Parent Note" using the MCP token
+    Then the last used token timestamp should show "YYYY-MM-DD HH:MM:SS"
