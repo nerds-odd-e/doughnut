@@ -229,3 +229,16 @@ When(
       .shouldBeAccepted()
   }
 )
+
+Given(
+  'I have an MCP token with expiration date {string}',
+  (dateString: string) => {
+    // unimplemented
+    return
+  }
+)
+
+Then('the token is marked as {string}', (status: string) => {
+  // unimplemented
+  return
+})
