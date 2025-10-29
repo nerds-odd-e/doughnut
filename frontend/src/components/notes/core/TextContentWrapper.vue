@@ -104,13 +104,20 @@ watch(
   () => value,
   (newValue) => {
     if (version.value !== savedVersion.value) {
-      // Cancel any pending saves when navigating away with unsaved changes
-      changer.cancel()
-      // Reset the tracking state
-      latestNoteId.value = null
-      latestValue.value = null
-      // Reset version tracking
-      version.value = savedVersion.value
+      // Only reset if the incoming value is different from what we're currently showing
+      // This indicates navigation to a different note
+      if (newValue !== localValue.value) {
+        // Cancel any pending saves when navigating away with unsaved changes
+        changer.cancel()
+        // Reset the tracking state
+        latestNoteId.value = null
+        latestValue.value = null
+        // Reset version tracking
+        version.value = savedVersion.value
+        localValue.value = newValue
+      }
+      // Otherwise, keep the unsaved changes (same note, just prop update)
+      return
     }
     localValue.value = newValue
   }
