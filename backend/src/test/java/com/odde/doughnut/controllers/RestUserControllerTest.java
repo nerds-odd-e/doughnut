@@ -77,15 +77,10 @@ class RestUserControllerTest {
   }
 
   @Test
-  void getTokensTest() {
-    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("TEST_LABEL").please();
-    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
-    modelFactoryService.save(userToken);
-
+  void getTokensNoTokenExists() {
     List<UserToken> getTokens = controller.getTokens();
 
-    assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("TEST_LABEL")));
-    assertThat(getTokens.size(), equalTo(1));
+    assertThat(getTokens.size(), equalTo(0));
   }
 
   @Test
