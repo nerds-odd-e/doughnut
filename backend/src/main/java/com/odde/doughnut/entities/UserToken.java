@@ -2,8 +2,8 @@ package com.odde.doughnut.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.sql.Timestamp;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
