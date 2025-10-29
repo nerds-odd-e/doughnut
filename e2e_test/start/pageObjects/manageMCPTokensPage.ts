@@ -25,5 +25,14 @@ export const manageMCPTokensPage = () => {
       // TODO: implement actual check
       cy.findByText(timestamp).should('exist')
     },
+    checkTokenWithLabelHasLastUsedTimestamp(label: string, notValue: string) {
+      cy.contains('tr', label).within(() => {
+        cy.get('td')
+          .eq(2)
+          .should('exist')
+          .invoke('text')
+          .should('not.equal', notValue)
+      })
+    },
   }
 }

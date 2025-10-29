@@ -219,3 +219,13 @@ Then(
       .checkLastUsedTokenTimestamp(timestamp)
   }
 )
+
+When(
+  'I create a note as a child of {string} using the MCP token',
+  (parentNote: string) => {
+    start
+      .mcpApi()
+      .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214667' })
+      .shouldBeAccepted()
+  }
+)
