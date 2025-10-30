@@ -12,9 +12,9 @@ Feature: User MCP token
     And The last used token timestamp should show "N/A"
 
   Scenario Outline: Token expiration
-    Given I have an MCP token with expiration date "<expires_at>"
+    Given I have an MCP token with label "Tracking Test Token" and expiration date "<expires_at>"
     And the current date is "<current_date>"
-    Then the token is marked as "<status>"
+    Then the token with label "Tracking Test Token" is marked as "<status>"
 
   Examples:
     | expires_at | current_date | status  |

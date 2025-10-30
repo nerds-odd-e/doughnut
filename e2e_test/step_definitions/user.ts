@@ -242,8 +242,8 @@ When(
 )
 
 Given(
-  'I have an MCP token with expiration date {string}',
-  (dateString: string) => {
+  'I have an MCP token with label {string} and expiration date {string}',
+  (label: string, dateString: string) => {
     const now = new Date(Date.now()) // Let us return to now afterwards
 
     // travel back to set token with desired expiration date
@@ -255,17 +255,20 @@ Given(
       .mainMenu()
       .userOptions()
       .manageMCPTokens()
-      .generateToken('Test-token-with-expiration')
+      .generateToken(label)
       .as('generatedMcpToken')
     // travel back to now
     start.testability().backendTimeTravelToDate(now)
   }
 )
 
-Then('the token is marked as {string}', (status: string) => {
-  start
-    .mainMenu()
-    .userOptions()
-    .manageMCPTokens()
-    .checkTokenWithStatusExists(status)
-})
+Then(
+  'the token with label {string} is marked as {string}',
+  (label: string, status: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageMCPTokens()
+      .checkTokenWithStatusExists(label, status)
+  }
+)
