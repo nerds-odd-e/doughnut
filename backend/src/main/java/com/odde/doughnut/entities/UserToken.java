@@ -35,6 +35,7 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   private Timestamp lastUsedAt;
 
   @Column(name = "expires_at")
+  @Getter
   private Date expiresAt;
 
   public UserToken(Integer userId, @NotNull String token, @NotNull String label) {
@@ -47,16 +48,4 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   }
 
   public UserToken() {}
-
-  @NotNull
-  public String getStatus() {
-    if (this.expiresAt == null) {
-      return "Valid";
-    }
-    LocalDate today = LocalDate.now();
-    if (this.expiresAt.before(Date.valueOf(today))) {
-      return "Invalid";
-    }
-    return "Valid";
-  }
 }

@@ -5,5 +5,6 @@
 import type { UserToken } from './UserToken';
 export type UserTokenInfo = {
     userToken: UserToken;
+    status: string;
 };
 

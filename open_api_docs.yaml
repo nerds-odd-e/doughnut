@@ -3580,12 +3580,12 @@ components:
         lastUsedAt:
           type: string
           format: date-time
-        status:
+        expiresAt:
           type: string
+          format: date-time
       required:
       - id
       - label
-      - status
       - token
     TimeTravelRelativeToNow:
       type: object
@@ -4497,7 +4497,10 @@ components:
       properties:
         userToken:
           $ref: "#/components/schemas/UserToken"
+        status:
+          type: string
       required:
+      - status
       - userToken
     CurrentUserInfo:
       type: object

@@ -13,6 +13,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,9 +81,10 @@ class RestUserController {
   public List<UserTokenInfo> getTokens() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     List<UserToken> userTokens =
         modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
-    return userTokens.stream().map(userToken -> new UserTokenInfo(userToken)).toList();
+    return userTokens.stream().map(userToken -> new UserTokenInfo(userToken, now)).toList();
   }
 
   @DeleteMapping("/token/{tokenId}")

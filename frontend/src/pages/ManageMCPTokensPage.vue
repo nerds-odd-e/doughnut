@@ -94,7 +94,7 @@ const loadTokens = async () => {
     tokens.value = res.map((t) => ({
       id: t.userToken.id,
       label: t.userToken.label,
-      status: t.userToken.status,
+      status: t.status,
       lastUsedAt: t.userToken.lastUsedAt,
     }))
   } catch (error) {
@@ -115,7 +115,7 @@ const generateToken = async () => {
     tokens.value.push({
       id: res.id,
       label: res.label,
-      status: res.status,
+      status: "Valid",
       lastUsedAt: res.lastUsedAt,
     })
     tokenFormData.value.label = ""
