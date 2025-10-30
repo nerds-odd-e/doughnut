@@ -267,5 +267,5 @@ Then('the token is marked as {string}', (status: string) => {
     .mainMenu()
     .userOptions()
     .manageMCPTokens()
-    .checkTokenWithLabelExists(status)
+    .checkTokenWithStatusExists(status)
 })

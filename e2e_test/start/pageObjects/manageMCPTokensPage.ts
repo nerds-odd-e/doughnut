@@ -21,6 +21,9 @@ export const manageMCPTokensPage = () => {
     checkTokenWithLabelExists(label: string) {
       cy.findByText(label).should('exist')
     },
+    checkTokenWithStatusExists(label: string) {
+      cy.findByText(label).should('exist')
+    },
     checkLastUsedTokenTimestamp(timestamp: string) {
       // TODO: implement actual check
       cy.findByText(timestamp).should('exist')
