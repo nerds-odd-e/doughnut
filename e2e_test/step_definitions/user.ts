@@ -220,6 +220,17 @@ Then(
   }
 )
 
+Then(
+  'the last used token timestamp should show {string}',
+  (timestamp: string) => {
+    start
+      .mainMenu()
+      .userOptions()
+      .manageMCPTokens()
+      .checkLastUsedTokenTimestamp(timestamp)
+  }
+)
+
 When(
   'I create a note as a child of {string} using the MCP token',
   (parentNote: string) => {
