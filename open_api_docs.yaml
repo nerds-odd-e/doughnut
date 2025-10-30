@@ -2630,7 +2630,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserToken"
+                  $ref: "#/components/schemas/UserTokenInfo"
   /api/user/current-user-info:
     get:
       tags:
@@ -4492,6 +4492,13 @@ components:
       required:
       - WikidataTitleInEnglish
       - WikipediaEnglishUrl
+    UserTokenInfo:
+      type: object
+      properties:
+        userToken:
+          $ref: "#/components/schemas/UserToken"
+      required:
+      - userToken
     CurrentUserInfo:
       type: object
       properties:

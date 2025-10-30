@@ -92,10 +92,10 @@ const loadTokens = async () => {
   try {
     const res = await managedApi.restUserController.getTokens()
     tokens.value = res.map((t) => ({
-      id: t.id,
-      label: t.label,
-      status: t.status,
-      lastUsedAt: t.lastUsedAt,
+      id: t.userToken.id,
+      label: t.userToken.label,
+      status: t.userToken.status,
+      lastUsedAt: t.userToken.lastUsedAt,
     }))
   } catch (error) {
     console.error("Error loading tokens:", error)

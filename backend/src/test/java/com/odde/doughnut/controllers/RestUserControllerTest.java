@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
+import com.odde.doughnut.controllers.dto.UserTokenInfo;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -78,7 +79,7 @@ class RestUserControllerTest {
 
   @Test
   void getTokensNoTokenExists() {
-    List<UserToken> getTokens = controller.getTokens();
+    List<UserTokenInfo> getTokens = controller.getTokens();
 
     assertThat(getTokens.size(), equalTo(0));
   }
@@ -89,9 +90,9 @@ class RestUserControllerTest {
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
-    List<UserToken> getTokens = controller.getTokens();
+    List<UserTokenInfo> getTokens = controller.getTokens();
 
-    assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("LABEL")));
+    assertTrue(getTokens.stream().anyMatch(el -> el.userToken.getLabel().equals("LABEL")));
     assertThat(getTokens.size(), equalTo(1));
   }
 
@@ -103,8 +104,8 @@ class RestUserControllerTest {
 
     controller.deleteToken(userToken.getId());
 
-    List<UserToken> getTokens = controller.getTokens();
-    assertFalse(getTokens.stream().anyMatch(el -> el.getId().equals(userToken.getId())));
+    List<UserTokenInfo> getTokens = controller.getTokens();
+    assertFalse(getTokens.stream().anyMatch(el -> el.userToken.getId().equals(userToken.getId())));
     assertThat(getTokens.size(), equalTo(0));
   }
 

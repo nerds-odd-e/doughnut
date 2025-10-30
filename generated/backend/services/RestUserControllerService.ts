@@ -6,6 +6,7 @@ import type { TokenConfigDTO } from '../models/TokenConfigDTO';
 import type { User } from '../models/User';
 import type { UserDTO } from '../models/UserDTO';
 import type { UserToken } from '../models/UserToken';
+import type { UserTokenInfo } from '../models/UserTokenInfo';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
 export class RestUserControllerService {
@@ -83,10 +84,10 @@ export class RestUserControllerService {
         });
     }
     /**
-     * @returns UserToken OK
+     * @returns UserTokenInfo OK
      * @throws ApiError
      */
-    public getTokens(): CancelablePromise<Array<UserToken>> {
+    public getTokens(): CancelablePromise<Array<UserTokenInfo>> {
         return this.httpRequest.request({
             method: 'GET',
             url: '/api/user/get-tokens',

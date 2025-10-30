@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
+import com.odde.doughnut.controllers.dto.UserTokenInfo;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -76,10 +77,12 @@ class RestUserController {
 
   @GetMapping("/get-tokens")
   @Transactional
-  public List<UserToken> getTokens() {
+  public List<UserTokenInfo> getTokens() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
-    return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
+    List<UserToken> userTokens =
+        modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
+    return userTokens.stream().map(userToken -> new UserTokenInfo(userToken)).toList();
   }
 
   @DeleteMapping("/token/{tokenId}")
