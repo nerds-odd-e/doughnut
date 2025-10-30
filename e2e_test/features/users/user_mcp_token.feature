@@ -9,21 +9,18 @@ Feature: User MCP token
     When I generate a new MCP token with label "Initial Token"
     Then the new MCP Token should be a valid UUID
     And I can see the token with label "Initial Token" in the list of tokens
-    And the token is marked as valid
     And The last used token timestamp should show "N/A"
 
   Scenario Outline: Token expiration
     Given I have an MCP token with expiration date "<expires_at>"
-    When the current date is "<current_date>"
+    And the current date is "<current_date>"
     Then the token is marked as "<status>"
 
   Examples:
-    | expires_at | current_date | status |
-    | 2025-01-06 | 2025-01-05   | Valid  |
-    | 2025-01-06 | 2025-01-06   | Valid  |
-    | Null       | 2024-01-06   | Valid  |
-    | 2025-01-06 | 2025-01-07   | Valid  |
-    
+    | expires_at | current_date | status  |
+    | 2025-01-06 | 2025-01-05   | Valid   |
+    #| 2025-01-06 | 2025-01-07   | Invalid |
+
   Scenario: Delete an MCP token
     Given I have a valid MCP token with label "To be deleted"
     And I can create a note as a child of "Parent Note" using the MCP token

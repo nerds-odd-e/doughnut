@@ -233,12 +233,28 @@ When(
 Given(
   'I have an MCP token with expiration date {string}',
   (dateString: string) => {
-    // unimplemented
-    return
+    const now = new Date(Date.now()) // Let us return to now afterwards
+
+    // travel back to set token with desired expiration date
+    const oneMonthBeforeExpDate = new Date(dateString)
+    oneMonthBeforeExpDate.setMonth(oneMonthBeforeExpDate.getMonth() - 1) // Move 1 month back
+    start.testability().backendTimeTravelToDate(oneMonthBeforeExpDate)
+
+    start
+      .mainMenu()
+      .userOptions()
+      .manageMCPTokens()
+      .generateToken('Test-token-with-expiration')
+      .as('generatedMcpToken')
+    // travel back to now
+    start.testability().backendTimeTravelToDate(now)
   }
 )
 
 Then('the token is marked as {string}', (status: string) => {
-  // unimplemented
-  return
+  start
+    .mainMenu()
+    .userOptions()
+    .manageMCPTokens()
+    .checkTokenWithLabelExists(status)
 })
