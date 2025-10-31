@@ -111,12 +111,12 @@ const generateToken = async () => {
     const res = await managedApi.restUserController.generateToken({
       label: tokenFormData.value.label,
     })
-    token.value = res.token
+    token.value = res.userToken.token
     tokens.value.push({
-      id: res.id,
-      label: res.label,
-      status: "Valid",
-      lastUsedAt: res.lastUsedAt,
+      id: res.userToken.id,
+      label: res.userToken.label,
+      status: res.status,
+      lastUsedAt: res.userToken.lastUsedAt,
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()

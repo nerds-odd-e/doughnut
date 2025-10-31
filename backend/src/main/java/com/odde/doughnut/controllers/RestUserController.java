@@ -65,7 +65,7 @@ class RestUserController {
 
   @PostMapping("/generate-token")
   @Transactional
-  public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
+  public UserTokenInfo generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
@@ -73,7 +73,8 @@ class RestUserController {
     if ("Tracking Test Token".equals(tokenConfig.getLabel())) {
       userToken.setLastUsedAt(java.sql.Timestamp.valueOf("2025-10-29 10:00:00"));
     }
-    return modelFactoryService.save(userToken);
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    return new UserTokenInfo(modelFactoryService.save(userToken), now);
   }
 
   @GetMapping("/get-tokens")

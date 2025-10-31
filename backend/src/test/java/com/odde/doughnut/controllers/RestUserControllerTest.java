@@ -69,11 +69,11 @@ class RestUserControllerTest {
   void generateTokenShouldReturnValidUserToken() {
     TokenConfigDTO tokenConfig = new TokenConfigDTO();
     tokenConfig.setLabel("TEST_LABEL");
-    UserToken userToken = controller.generateToken(tokenConfig);
+    UserTokenInfo userTokenInfo = controller.generateToken(tokenConfig);
 
-    assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
-    assertThat(userToken.getLabel(), equalTo("TEST_LABEL"));
-    assertThat(userToken.getToken().length(), equalTo(36));
+    assertThat(userTokenInfo.userToken.getUserId(), equalTo(userModel.getEntity().getId()));
+    assertThat(userTokenInfo.userToken.getLabel(), equalTo("TEST_LABEL"));
+    assertThat(userTokenInfo.userToken.getToken().length(), equalTo(36));
   }
 
   @Test

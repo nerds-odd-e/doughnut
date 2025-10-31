@@ -5,7 +5,6 @@
 import type { TokenConfigDTO } from '../models/TokenConfigDTO';
 import type { User } from '../models/User';
 import type { UserDTO } from '../models/UserDTO';
-import type { UserToken } from '../models/UserToken';
 import type { UserTokenInfo } from '../models/UserTokenInfo';
 import type { CancelablePromise } from '../core/CancelablePromise';
 import type { BaseHttpRequest } from '../core/BaseHttpRequest';
@@ -44,12 +43,12 @@ export class RestUserControllerService {
     }
     /**
      * @param requestBody
-     * @returns UserToken OK
+     * @returns UserTokenInfo OK
      * @throws ApiError
      */
     public generateToken(
         requestBody: TokenConfigDTO,
-    ): CancelablePromise<UserToken> {
+    ): CancelablePromise<UserTokenInfo> {
         return this.httpRequest.request({
             method: 'POST',
             url: '/api/user/generate-token',

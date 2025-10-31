@@ -69,7 +69,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/UserToken"
+                $ref: "#/components/schemas/UserTokenInfo"
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
@@ -3587,6 +3587,16 @@ components:
       - id
       - label
       - token
+    UserTokenInfo:
+      type: object
+      properties:
+        userToken:
+          $ref: "#/components/schemas/UserToken"
+        status:
+          type: string
+      required:
+      - status
+      - userToken
     TimeTravelRelativeToNow:
       type: object
       properties:
@@ -4492,16 +4502,6 @@ components:
       required:
       - WikidataTitleInEnglish
       - WikipediaEnglishUrl
-    UserTokenInfo:
-      type: object
-      properties:
-        userToken:
-          $ref: "#/components/schemas/UserToken"
-        status:
-          type: string
-      required:
-      - status
-      - userToken
     CurrentUserInfo:
       type: object
       properties:

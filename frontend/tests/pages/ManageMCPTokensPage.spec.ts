@@ -19,8 +19,10 @@ describe("ManageMCPTokensPage", () => {
     helper.managedApi.restUserController.generateToken = vi
       .fn()
       .mockResolvedValue({
-        token: "mocked-token",
-        label: "",
+        userToken: {
+          token: "mocked-token",
+          label: "",
+        },
       })
 
     helper.managedApi.restUserController.getTokens = vi
