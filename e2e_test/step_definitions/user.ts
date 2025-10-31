@@ -175,7 +175,7 @@ Then(
   (parentNote: string) => {
     start
       .mcpApi()
-      .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214665' })
+      .createNote(parentNote, { newTitle: 'Child Note' })
       .shouldBeDenied()
   }
 )
@@ -185,7 +185,7 @@ When(
   (parentNote: string) => {
     start
       .mcpApi()
-      .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214666' })
+      .createNote(parentNote, { newTitle: 'Child Note' })
       .shouldBeAccepted()
   }
 )
@@ -236,7 +236,7 @@ When(
   (parentNote: string) => {
     start
       .mcpApi()
-      .createNote(parentNote, { newTitle: 'Child Note', wikidataId: 'Q214667' })
+      .createNote(parentNote, { newTitle: 'Child Note' })
       .shouldBeAccepted()
   }
 )
