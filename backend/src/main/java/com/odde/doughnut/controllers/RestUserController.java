@@ -70,9 +70,7 @@ class RestUserController {
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
-    if ("Tracking Test Token".equals(tokenConfig.getLabel())) {
-      userToken.setLastUsedAt(java.sql.Timestamp.valueOf("2025-10-29 10:00:00"));
-    }
+
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
     return new UserTokenInfo(modelFactoryService.save(userToken), now);
   }

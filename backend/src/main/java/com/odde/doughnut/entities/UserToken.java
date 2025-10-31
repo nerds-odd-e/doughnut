@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
@@ -32,6 +33,7 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Column(name = "last_used_at")
   @Getter
   @Setter
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "JST")
   private Timestamp lastUsedAt;
 
   @Column(name = "expires_at")

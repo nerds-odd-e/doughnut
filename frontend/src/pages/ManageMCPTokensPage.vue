@@ -48,7 +48,7 @@
         <tr v-for="(item, idx) in tokens" :key="idx">
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label || 'No Label' }}</td>
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.status }}</td>
-          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.label === 'Tracking Test Token' ? '2025-10-29 10:00:00' : (item.lastUsedAt || 'N/A') }}</td>
+          <td class="daisy-px-4 daisy-py-2 daisy-font-mono">{{ item.lastUsedAt ?? 'N/A' }}</td>
 
           <td class="daisy-px-4 daisy-py-2 daisy-font-mono">
             <div class="daisy-flex daisy-justify-end">

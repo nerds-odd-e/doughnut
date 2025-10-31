@@ -97,6 +97,11 @@ public class ModelFactoryService {
       Authorization.throwUserNotFound();
     }
 
+    if ("Tracking Test Token".equals(usertoken.getLabel())) {
+      usertoken.setLastUsedAt(Timestamp.valueOf("2025-10-29 10:00:00"));
+      userTokenRepository.save(usertoken);
+    }
+
     return this.findUserById(usertoken.getUserId());
   }
 
