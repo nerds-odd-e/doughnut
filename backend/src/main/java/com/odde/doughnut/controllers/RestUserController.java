@@ -13,7 +13,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,9 +71,11 @@ class RestUserController {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
-    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
-
     Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Date expiresAt =
+        Date.valueOf(
+            now.toLocalDateTime().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel(), expiresAt);
     return new UserTokenInfo(modelFactoryService.save(userToken), now);
   }
 

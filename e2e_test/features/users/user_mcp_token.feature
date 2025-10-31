@@ -19,7 +19,7 @@ Feature: User MCP token
   Examples:
     | expires_at | current_date | status  |
     | 2025-01-06 | 2025-01-05   | Valid   |
-    #| 2025-01-06 | 2025-01-07   | Invalid |
+    | 2025-01-06 | 2025-01-07   | Invalid |
 
   Scenario: Delete an MCP token
     Given I have a valid MCP token with label "To be deleted"

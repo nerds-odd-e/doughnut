@@ -14,6 +14,9 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -85,7 +88,11 @@ class RestUserControllerTest {
 
   @Test
   void getTokensWithMultipleTokens() {
-    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL");
+    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
+    Date expiresAt =
+        Date.valueOf(
+            now.toLocalDateTime().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL", expiresAt);
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 

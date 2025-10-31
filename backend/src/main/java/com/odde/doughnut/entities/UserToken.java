@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -40,13 +39,11 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Getter
   private Date expiresAt;
 
-  public UserToken(Integer userId, @NotNull String token, @NotNull String label) {
+  public UserToken(Integer userId, @NotNull String token, @NotNull String label, Date expiresAt) {
     this.userId = userId;
     this.token = token;
     this.label = label;
-
-    LocalDate today = LocalDate.now();
-    this.expiresAt = Date.valueOf(today.plusMonths(1));
+    this.expiresAt = expiresAt;
   }
 
   public UserToken() {}
