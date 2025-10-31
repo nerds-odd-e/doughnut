@@ -3,16 +3,18 @@ package com.odde.doughnut.configs;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.RealGithubService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -36,16 +38,19 @@ import org.springframework.web.server.ResponseStatusException;
 public class ControllerSetupTest {
   @Autowired MakeMe makeMe;
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired UserRepository userRepository;
   @Mock RealGithubService githubService;
-  @Mock CurrentUserFetcher currentUserFetcher;
   MockHttpServletRequest request = new MockHttpServletRequest();
   @Mock TestabilitySettings testabilitySettings;
 
   ControllerSetup controllerSetup;
+  CurrentUserFetcherFromRequest currentUserFetcher;
 
   @BeforeEach
   void setup() {
     when(testabilitySettings.getGithubService()).thenReturn(githubService);
+    currentUserFetcher =
+        new CurrentUserFetcherFromRequest(request, userRepository, modelFactoryService);
     controllerSetup =
         new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
   }
@@ -80,13 +85,15 @@ public class ControllerSetupTest {
   @Test
   @Disabled
   void shouldRecordUserInfo() {
-    UserModel userModel = makeMe.aUser().toModelPlease();
-    String externalId = userModel.getEntity().getExternalIdentifier();
-    when(currentUserFetcher.getExternalIdentifier()).thenReturn(externalId);
-    when(currentUserFetcher.getUser()).thenReturn(userModel);
+    User user = makeMe.aUser().please();
+    request.setUserPrincipal(() -> user.getExternalIdentifier());
+    currentUserFetcher =
+        new CurrentUserFetcherFromRequest(request, userRepository, modelFactoryService);
+    controllerSetup =
+        new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
     FailureReport failureReport = catchExceptionAndGetFailureReport();
-    assertThat(failureReport.getErrorDetail(), containsString(externalId));
-    assertThat(failureReport.getErrorDetail(), containsString(userModel.getName()));
+    assertThat(failureReport.getErrorDetail(), containsString(user.getExternalIdentifier()));
+    assertThat(failureReport.getErrorDetail(), containsString(user.getName()));
   }
 
   @Test
@@ -103,8 +110,10 @@ public class ControllerSetupTest {
     ResponseEntity<ApiError> response =
         controllerSetup.handleOpenAIUnauthorizedException(exception);
     assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    assertThat(response.getBody().getErrors().keySet(), contains("_originalMessage"));
-    assertThat(response.getBody().getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
+    ApiError body = response.getBody();
+    assertNotNull(body);
+    assertThat(body.getErrors().keySet(), contains("_originalMessage"));
+    assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
   }
 
   private FailureReport catchExceptionAndGetFailureReport() {
