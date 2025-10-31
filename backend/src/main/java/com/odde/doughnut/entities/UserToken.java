@@ -32,7 +32,7 @@ public class UserToken extends EntityIdentifiedByIdOnly {
   @Column(name = "last_used_at")
   @Getter
   @Setter
-  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "JST")
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "UTC")
   private Timestamp lastUsedAt;
 
   @Column(name = "expires_at")
