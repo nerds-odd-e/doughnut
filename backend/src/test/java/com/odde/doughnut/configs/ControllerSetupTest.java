@@ -20,7 +20,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,6 @@ public class ControllerSetupTest {
   }
 
   @Test
-  @Disabled
   void shouldRecordExceptionDetails() {
     FailureReport failureReport = catchExceptionAndGetFailureReport();
     assertEquals("java.lang.RuntimeException", failureReport.getErrorName());
@@ -75,7 +73,6 @@ public class ControllerSetupTest {
   }
 
   @Test
-  @Disabled
   void shouldCreateGithubIssue() throws IOException, InterruptedException {
     when(githubService.createGithubIssue(any())).thenReturn(123);
     FailureReport failureReport = catchExceptionAndGetFailureReport();
@@ -83,7 +80,6 @@ public class ControllerSetupTest {
   }
 
   @Test
-  @Disabled
   void shouldRecordUserInfo() {
     User user = makeMe.aUser().please();
     request.setUserPrincipal(() -> user.getExternalIdentifier());
@@ -97,7 +93,6 @@ public class ControllerSetupTest {
   }
 
   @Test
-  @Disabled
   void shouldRecordRequestInfo() {
     request.setRequestURI("/path");
     FailureReport failureReport = catchExceptionAndGetFailureReport();
