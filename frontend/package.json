@@ -29,7 +29,7 @@
     "vue-toastification": "2.0.0-rc.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.2",
+    "@biomejs/biome": "2.3.3",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^22.15.30",
@@ -41,26 +41,27 @@
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.23",
     "es-toolkit": "^1.41.0",
+    "esbuild": "0.25.12",
     "gsap": "^3.13.0",
-    "jsdom": "^27.0.1",
+    "jsdom": "^27.1.0",
     "optionator": "^0.9.4",
     "postcss": "^8.5.4",
     "postcss-load-config": "^6.0.1",
-    "sass": "1.93.2",
+    "sass": "1.93.3",
     "tailwindcss": "^3.4.17",
     "terser": "^5.44.0",
     "typescript": "5.9.3",
     "unplugin-auto-import": "^20.2.0",
     "unplugin-vue-components": "^30.0.0",
     "unplugin-vue-inspector": "^2.3.2",
-    "unplugin-vue-router": "^0.16.0",
+    "unplugin-vue-router": "^0.16.1",
     "vite": "7.1.12",
     "vite-plugin-checker": "^0.11.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "4.0.4",
+    "vitest": "4.0.6",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
     "vue": "3.5.22",
-    "vue-tsc": "3.1.2"
+    "vue-tsc": "3.1.3"
   }
 }
