@@ -460,9 +460,13 @@ describe("NoteAudioTools", () => {
     const processPromise = new Promise<AudioResponse>((resolve) => {
       resolveProcess = resolve
     })
-    const audioToTextMock = vi.fn()
-    helper.managedApi.restAiAudioController.audioToText = audioToTextMock
-    audioToTextMock.mockReturnValue(processPromise)
+    vi.spyOn(
+      helper.managedApi.restAiAudioController,
+      "audioToText"
+    ).mockImplementation(
+      // biome-ignore lint/suspicious/noExplicitAny: Mock function type compatibility for Promise
+      () => processPromise as any
+    )
 
     // Trigger audio processing
     const processPromise2 = wrapper.vm.processAudio({
@@ -532,9 +536,13 @@ describe("NoteAudioTools", () => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
       helper.managedApi.restTextContentController.updateNoteTitle = vi.fn()
-      helper.managedApi.restAiAudioController.audioToText = vi
-        .fn()
-        .mockResolvedValue({ completionFromAudio: "text" })
+      vi.spyOn(
+        helper.managedApi.restAiAudioController,
+        "audioToText"
+      ).mockResolvedValue({
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:00,000",
+      })
     })
 
     it("suggests title for power-of-2 audio processes", async () => {
@@ -583,14 +591,20 @@ describe("NoteAudioTools", () => {
   })
 
   describe("Audio processing with thread context", () => {
-    let audioToTextMock: ReturnType<typeof vi.fn>
+    let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.fn().mockResolvedValue({
+      audioToTextMock = vi.spyOn(
+        helper.managedApi.restAiAudioController,
+        "audioToText"
+      ).mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
         endTimestamp: "00:00:37,270",
       })
-      helper.managedApi.restAiAudioController.audioToText = audioToTextMock
+    })
+
+    afterEach(() => {
+      audioToTextMock.mockRestore()
     })
 
     it("stores and reuses thread context between calls", async () => {
@@ -660,14 +674,20 @@ describe("NoteAudioTools", () => {
   })
 
   describe("Advanced Options", () => {
-    let audioToTextMock: ReturnType<typeof vi.fn>
+    let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.fn().mockResolvedValue({
+      audioToTextMock = vi.spyOn(
+        helper.managedApi.restAiAudioController,
+        "audioToText"
+      ).mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
         endTimestamp: "00:00:37,270",
       })
-      helper.managedApi.restAiAudioController.audioToText = audioToTextMock
+    })
+
+    afterEach(() => {
+      audioToTextMock.mockRestore()
     })
 
     it("shows advanced options when toggle button is clicked", async () => {
@@ -730,14 +750,20 @@ describe("NoteAudioTools", () => {
   })
 
   describe("Audio processing with isMidSpeech flag", () => {
-    let audioToTextMock: ReturnType<typeof vi.fn>
+    let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.fn().mockResolvedValue({
+      audioToTextMock = vi.spyOn(
+        helper.managedApi.restAiAudioController,
+        "audioToText"
+      ).mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
         endTimestamp: "00:00:37,270",
       })
-      helper.managedApi.restAiAudioController.audioToText = audioToTextMock
+    })
+
+    afterEach(() => {
+      audioToTextMock.mockRestore()
     })
 
     it("should pass isMidSpeech=true when processing timer-triggered chunk", async () => {
@@ -763,9 +789,10 @@ describe("NoteAudioTools", () => {
       endTimestamp: "00:00:37,270",
     }
 
-    helper.managedApi.restAiAudioController.audioToText = vi
-      .fn()
-      .mockResolvedValue(mockResponse)
+    vi.spyOn(
+      helper.managedApi.restAiAudioController,
+      "audioToText"
+    ).mockResolvedValue(mockResponse)
 
     const testBlob = new Blob(["test"])
     const result = await wrapper.vm.processAudio({
@@ -840,14 +867,20 @@ describe("NoteAudioTools", () => {
   })
 
   describe("Previous content handling", () => {
-    let audioToTextMock: ReturnType<typeof vi.fn>
+    let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.fn().mockResolvedValue({
+      audioToTextMock = vi.spyOn(
+        helper.managedApi.restAiAudioController,
+        "audioToText"
+      ).mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
         endTimestamp: "00:00:37,270",
       })
-      helper.managedApi.restAiAudioController.audioToText = audioToTextMock
+    })
+
+    afterEach(() => {
+      audioToTextMock.mockRestore()
     })
 
     it("sends full content when under 500 characters", async () => {
