@@ -594,13 +594,12 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(
-        helper.managedApi.restAiAudioController,
-        "audioToText"
-      ).mockResolvedValue({
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270",
-      })
+      audioToTextMock = vi
+        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .mockResolvedValue({
+          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+          endTimestamp: "00:00:37,270",
+        })
     })
 
     afterEach(() => {
@@ -677,13 +676,12 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(
-        helper.managedApi.restAiAudioController,
-        "audioToText"
-      ).mockResolvedValue({
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270",
-      })
+      audioToTextMock = vi
+        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .mockResolvedValue({
+          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+          endTimestamp: "00:00:37,270",
+        })
     })
 
     afterEach(() => {
@@ -753,13 +751,12 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(
-        helper.managedApi.restAiAudioController,
-        "audioToText"
-      ).mockResolvedValue({
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270",
-      })
+      audioToTextMock = vi
+        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .mockResolvedValue({
+          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+          endTimestamp: "00:00:37,270",
+        })
     })
 
     afterEach(() => {
@@ -870,13 +867,12 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(
-        helper.managedApi.restAiAudioController,
-        "audioToText"
-      ).mockResolvedValue({
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:37,270",
-      })
+      audioToTextMock = vi
+        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .mockResolvedValue({
+          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+          endTimestamp: "00:00:37,270",
+        })
     })
 
     afterEach(() => {
