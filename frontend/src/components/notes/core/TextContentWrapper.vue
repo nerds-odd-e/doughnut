@@ -43,15 +43,12 @@ const changerInner = async (
     .catch(errorHander)
   savedVersion.value = version
 }
-// Debounced executor used only when explicitly triggered (on blur/unmount)
+// Debounced executor for auto-save
 const changer = debounce(changerInner, 1000)
 
 const localValue = ref(value)
 const version = ref(0)
 const errors = ref({} as Record<string, string>)
-// Track the latest edited value and note id without auto-saving
-const latestNoteId = ref<number | null>(null)
-const latestValue = ref<string | null>(null)
 
 const wrapperClass = computed(() => {
   if (version.value !== savedVersion.value) {
@@ -68,17 +65,13 @@ const onUpdate = (noteId: number, newValue: string) => {
   version.value += 1
   errors.value = {}
   localValue.value = newValue
-  // Record latest edit, but do not auto-save yet
-  latestNoteId.value = noteId
-  latestValue.value = newValue
+  // Schedule auto-save with debouncing
+  changer(noteId, newValue, version.value, setError)
 }
 
 const onBlur = () => {
-  // Trigger a save for the latest edit and flush immediately
-  if (latestNoteId.value != null && latestValue.value != null) {
-    changer(latestNoteId.value, latestValue.value, version.value, setError)
-    changer.flush()
-  }
+  // Flush any pending debounced save immediately
+  changer.flush()
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -109,9 +102,6 @@ watch(
       if (newValue !== localValue.value) {
         // Cancel any pending saves when navigating away with unsaved changes
         changer.cancel()
-        // Reset the tracking state
-        latestNoteId.value = null
-        latestValue.value = null
         // Reset version tracking
         version.value = savedVersion.value
         localValue.value = newValue
@@ -124,12 +114,8 @@ watch(
 )
 
 onUnmounted(() => {
-  // If there is a pending edit, schedule and flush to persist it
-  if (latestNoteId.value != null && latestValue.value != null) {
-    changer(latestNoteId.value, latestValue.value, version.value, setError)
-    changer.flush()
-  }
-  changer.cancel()
+  // Flush any pending debounced save before unmounting
+  changer.flush()
 })
 </script>
 

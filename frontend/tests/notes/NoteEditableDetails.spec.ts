@@ -193,4 +193,48 @@ describe("NoteEditableDetails", () => {
       details: "Edited details",
     })
   })
+
+  it("should auto-save edited details after debounce timeout without blur", async () => {
+    // This test reproduces the bug: content should be saved by debounced timer
+    // even without blur event
+    vi.useFakeTimers()
+
+    const noteId = 1
+    const noteDetails = "Original details"
+
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withStorageProps({
+        noteId: noteId,
+        noteDetails: noteDetails,
+        readonly: false,
+        asMarkdown: true,
+      })
+      .mount()
+
+    await flushPromises()
+
+    // Edit the details
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+    detailsEl.value = "Edited details"
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    // Should show dirty indicator
+    expect(wrapper.find(".dirty").exists()).toBe(true)
+
+    // Wait for debounce timeout (1000ms)
+    vi.advanceTimersByTime(1000)
+    await flushPromises()
+
+    // Should have auto-saved
+    expect(mockedUpdateDetailsCall).toHaveBeenCalledWith(noteId, {
+      details: "Edited details",
+    })
+
+    // Dirty indicator should be gone after save completes
+    expect(wrapper.find(".dirty").exists()).toBe(false)
+
+    vi.useRealTimers()
+  })
 })
