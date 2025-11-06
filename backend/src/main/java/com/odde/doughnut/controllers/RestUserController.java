@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
-import com.odde.doughnut.controllers.dto.UserTokenInfo;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -13,9 +12,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -67,27 +63,20 @@ class RestUserController {
 
   @PostMapping("/generate-token")
   @Transactional
-  public UserTokenInfo generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
+  public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    Date expiresAt =
-        Date.valueOf(
-            now.toLocalDateTime().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel(), expiresAt);
-    return new UserTokenInfo(modelFactoryService.save(userToken), now);
+    UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
+    return modelFactoryService.save(userToken);
   }
 
   @GetMapping("/get-tokens")
   @Transactional
-  public List<UserTokenInfo> getTokens() {
+  public List<UserToken> getTokens() {
     currentUser.assertLoggedIn();
     User user = currentUser.getEntity();
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    List<UserToken> userTokens =
-        modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
-    return userTokens.stream().map(userToken -> new UserTokenInfo(userToken, now)).toList();
+    return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
 
   @DeleteMapping("/token/{tokenId}")

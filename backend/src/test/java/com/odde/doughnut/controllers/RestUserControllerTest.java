@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
-import com.odde.doughnut.controllers.dto.UserTokenInfo;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -14,9 +13,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,33 +68,34 @@ class RestUserControllerTest {
   void generateTokenShouldReturnValidUserToken() {
     TokenConfigDTO tokenConfig = new TokenConfigDTO();
     tokenConfig.setLabel("TEST_LABEL");
-    UserTokenInfo userTokenInfo = controller.generateToken(tokenConfig);
+    UserToken userToken = controller.generateToken(tokenConfig);
 
-    assertThat(userTokenInfo.userToken.getUserId(), equalTo(userModel.getEntity().getId()));
-    assertThat(userTokenInfo.userToken.getLabel(), equalTo("TEST_LABEL"));
-    assertThat(userTokenInfo.userToken.getToken().length(), equalTo(36));
+    assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
+    assertThat(userToken.getLabel(), equalTo("TEST_LABEL"));
+    assertThat(userToken.getToken().length(), equalTo(36));
   }
 
   @Test
-  void getTokensNoTokenExists() {
-    List<UserTokenInfo> getTokens = controller.getTokens();
+  void getTokensTest() {
+    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("TEST_LABEL").please();
+    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
+    modelFactoryService.save(userToken);
 
-    assertThat(getTokens.size(), equalTo(0));
+    List<UserToken> getTokens = controller.getTokens();
+
+    assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("TEST_LABEL")));
+    assertThat(getTokens.size(), equalTo(1));
   }
 
   @Test
   void getTokensWithMultipleTokens() {
-    Timestamp now = testabilitySettings.getCurrentUTCTimestamp();
-    Date expiresAt =
-        Date.valueOf(
-            now.toLocalDateTime().plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL", expiresAt);
+    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL");
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
-    List<UserTokenInfo> getTokens = controller.getTokens();
+    List<UserToken> getTokens = controller.getTokens();
 
-    assertTrue(getTokens.stream().anyMatch(el -> el.userToken.getLabel().equals("LABEL")));
+    assertTrue(getTokens.stream().anyMatch(el -> el.getLabel().equals("LABEL")));
     assertThat(getTokens.size(), equalTo(1));
   }
 
@@ -110,8 +107,8 @@ class RestUserControllerTest {
 
     controller.deleteToken(userToken.getId());
 
-    List<UserTokenInfo> getTokens = controller.getTokens();
-    assertFalse(getTokens.stream().anyMatch(el -> el.userToken.getId().equals(userToken.getId())));
+    List<UserToken> getTokens = controller.getTokens();
+    assertFalse(getTokens.stream().anyMatch(el -> el.getId().equals(userToken.getId())));
     assertThat(getTokens.size(), equalTo(0));
   }
 

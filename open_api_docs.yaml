@@ -69,7 +69,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/UserTokenInfo"
+                $ref: "#/components/schemas/UserToken"
   /api/testability/use_real_sandbox_github_and_close_all_github_issues:
     post:
       tags:
@@ -2630,7 +2630,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserTokenInfo"
+                  $ref: "#/components/schemas/UserToken"
   /api/user/current-user-info:
     get:
       tags:
@@ -3577,26 +3577,10 @@ components:
           type: string
         label:
           type: string
-        lastUsedAt:
-          type: string
-          format: date-time
-        expiresAt:
-          type: string
-          format: date-time
       required:
       - id
       - label
       - token
-    UserTokenInfo:
-      type: object
-      properties:
-        userToken:
-          $ref: "#/components/schemas/UserToken"
-        status:
-          type: string
-      required:
-      - status
-      - userToken
     TimeTravelRelativeToNow:
       type: object
       properties:

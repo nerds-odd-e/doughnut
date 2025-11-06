@@ -7,10 +7,6 @@ import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.NotebookService;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,15 +95,6 @@ public class ModelFactoryService {
 
     if (usertoken == null) {
       Authorization.throwUserNotFound();
-    }
-
-    if ("Tracking Test Token".equals(usertoken.getLabel())) {
-      LocalDateTime localDateTime =
-          LocalDateTime.parse(
-              "2025-10-29 10:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-      ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.of("UTC"));
-      usertoken.setLastUsedAt(Timestamp.from(zonedDateTime.toInstant()));
-      userTokenRepository.save(usertoken);
     }
 
     return this.findUserById(usertoken.getUserId());
