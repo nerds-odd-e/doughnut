@@ -4,7 +4,7 @@
     <div>
       <AssessmentQuestion
         v-if="currentQuestion < assessmentQuestionInstance.length"
-        :assessment-question-instance="assessmentQuestionInstance[currentQuestion]!"
+        :assessment-question-instance="currentQuestionInstance"
         @advance="advance"
         :key="currentQuestion"
       />
@@ -50,6 +50,10 @@ const localAssessmentAttempt = ref<AssessmentAttempt | undefined>(
 const assessmentQuestionInstance = computed(
   () => props.assessmentAttempt.assessmentQuestionInstances!
 )
+
+const currentQuestionInstance = computed(() => {
+  return assessmentQuestionInstance.value[currentQuestion.value]!
+})
 
 const passCriteriaPercentage = 80
 
