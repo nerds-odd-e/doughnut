@@ -21,36 +21,5 @@ export const manageMCPTokensPage = () => {
     checkTokenWithLabelExists(label: string) {
       cy.findByText(label).should('exist')
     },
-    getRowByLabel(label: string) {
-      const row = cy.contains('tr', label)
-      return rowOfUserTokenTable(row)
-    },
-    checkTokenWithStatusExists(label: string, status: string) {
-      this.getRowByLabel(label).statusShouldBe(status)
-    },
-    checkLastUsedTokenTimestamp(timestamp: string) {
-      // TODO: implement actual check
-      cy.findByText(timestamp).should('exist')
-    },
-    checkTokenWithLabelHasLastUsedTimestamp(label: string, notValue: string) {
-      this.getRowByLabel(label).lastUsedTimestampShouldBe(notValue)
-    },
-  }
-}
-
-function rowOfUserTokenTable(
-  row: Cypress.Chainable<JQuery<HTMLTableRowElement>>
-) {
-  return {
-    statusShouldBe(status: string) {
-      row.within(() => {
-        cy.get('td').eq(1).should('have.text', status)
-      })
-    },
-    lastUsedTimestampShouldBe(timestamp: string) {
-      row.within(() => {
-        cy.get('td').eq(2).should('have.text', timestamp)
-      })
-    },
   }
 }
