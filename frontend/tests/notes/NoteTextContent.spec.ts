@@ -24,8 +24,13 @@ describe("in place edit on title", () => {
 
   beforeEach(() => {
     vi.resetAllMocks()
+    vi.useFakeTimers()
     helper.managedApi.restTextContentController.updateNoteTitle =
       mockedUpdateTitleCall
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   it("should display text field when one single click on title", async () => {
@@ -128,6 +133,49 @@ describe("in place edit on title", () => {
     expect(titleEl.innerText).toBe("updated")
 
     expect(mockedUpdateTitleCall).not.toBeCalled()
+  })
+
+  it("should keep unsaved changes when API returns with older value during typing", async () => {
+    const wrapper = mountComponent(note)
+    await flushPromises()
+
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+
+    // User types "ABC"
+    titleEl.innerText = "ABC"
+    titleEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    // Wait for debounced save to trigger (1 second)
+    await vi.advanceTimersByTimeAsync(1000)
+    await flushPromises()
+
+    // API call should have been made
+    expect(mockedUpdateTitleCall).toHaveBeenCalledWith(note.id, {
+      newTitle: "ABC",
+    })
+
+    // User continues typing to "ABCDEF" while API is in flight
+    titleEl.innerText = "ABCDEF"
+    titleEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    // Now simulate the API response coming back with "ABC"
+    // This would update the note prop
+    await wrapper.setProps({
+      note: {
+        ...note,
+        noteTopology: {
+          ...note.noteTopology,
+          titleOrPredicate: "ABC",
+        },
+      },
+    })
+    await flushPromises()
+
+    // The editor should keep "ABCDEF", not reset to "ABC"
+    // because there are unsaved changes
+    expect(titleEl.innerText).toBe("ABCDEF")
   })
 
   it("should change content if there's no unsaved changed but change from prop", async () => {

@@ -31,6 +31,7 @@ const { storageAccessor, field, value } = defineProps({
 })
 
 const savedVersion = ref(0)
+const lastSavedValue = ref(value)
 const changerInner = async (
   noteId: number,
   newValue: string,
@@ -42,6 +43,7 @@ const changerInner = async (
     .updateTextField(noteId, field, newValue)
     .catch(errorHander)
   savedVersion.value = version
+  lastSavedValue.value = newValue
 }
 // Debounced executor for auto-save
 const changer = debounce(changerInner, 1000)
@@ -97,19 +99,21 @@ watch(
   () => value,
   (newValue) => {
     if (version.value !== savedVersion.value) {
-      // Only reset if the incoming value is different from what we're currently showing
-      // This indicates navigation to a different note
-      if (newValue !== localValue.value) {
-        // Cancel any pending saves when navigating away with unsaved changes
+      // There are unsaved changes
+      // Check if this is navigation to a different note or just API returning with saved value
+      if (newValue !== localValue.value && newValue !== lastSavedValue.value) {
+        // The incoming value is different from both current and last saved value
+        // This indicates navigation to a different note
         changer.cancel()
-        // Reset version tracking
         version.value = savedVersion.value
         localValue.value = newValue
+        lastSavedValue.value = newValue
       }
-      // Otherwise, keep the unsaved changes (same note, just prop update)
+      // Otherwise, keep the unsaved changes (API returning with old value during typing)
       return
     }
     localValue.value = newValue
+    lastSavedValue.value = newValue
   }
 )
 
