@@ -89,4 +89,30 @@ class ClozeDescriptionTest {
         new ClozedString(clozeReplacement, "abc").hide(new NoteTitle("abc")).clozeDetails(),
         containsString("/.../"));
   }
+
+  @Test
+  void clozeShouldWorkWithSlashInTitleAndUrlsInDetails() {
+    String title = "archenemy / arch-enemy";
+    String details = "In literature, an **archenemy** (sometimes spelled as **arch-enemy**) or **nemesis** is the main [enemy](https://en.wikipedia.org/wiki/Enemy) of the [protagonist](https://en.wikipedia.org/wiki/Protagonist)—or sometimes, one of the other main characters—appearing as the most prominent and most-known enemy of the [hero](https://en.wikipedia.org/wiki/Hero)";
+    String result = new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails();
+    
+    // The word "archenemy" and "arch-enemy" should be clozed
+    assertThat(result, containsString("[...]"));
+    
+    // URLs should not be affected
+    assertThat(result, containsString("https://en.wikipedia.org/wiki/Enemy"));
+    assertThat(result, containsString("https://en.wikipedia.org/wiki/Protagonist"));
+    assertThat(result, containsString("https://en.wikipedia.org/wiki/Hero"));
+  }
+
+  @ParameterizedTest
+  @CsvSource({
+    "archenemy / arch-enemy, an archenemy here, an [...] here",
+    "archenemy / arch-enemy, an arch-enemy here, an [...] here",
+    "archenemy / arch-enemy, the archenemy and arch-enemy are, the [...] and [...] are",
+  })
+  void clozeShouldHandleTitleWithSlash(String title, String details, String expected) {
+    String result = new ClozedString(clozeReplacement, details).hide(new NoteTitle(title)).clozeDetails();
+    assertThat(result, containsString(expected));
+  }
 }
