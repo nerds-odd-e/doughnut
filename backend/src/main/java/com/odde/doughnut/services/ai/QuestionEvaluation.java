@@ -39,16 +39,18 @@ public class QuestionEvaluation {
     QuestionContestResult result = new QuestionContestResult();
     result.advice = "";
     if (!indisputableAnswer(correctChoiceIndex)) {
+      var choices = mcqWithAnswer.getMultipleChoicesQuestion().getChoices();
       String correctChoicesStr =
           correctChoices == null
               ? "none"
               : Arrays.stream(correctChoices)
                   .mapToObj(
-                      i ->
-                          i
-                              + " (\""
-                              + mcqWithAnswer.getMultipleChoicesQuestion().getChoices().get(i)
-                              + "\")")
+                      i -> {
+                        if (i < 0 || i >= choices.size()) {
+                          return i + " (invalid index)";
+                        }
+                        return i + " (\"" + choices.get(i) + "\")";
+                      })
                   .collect(Collectors.joining(", "));
 
       result.advice =
