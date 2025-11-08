@@ -20,7 +20,7 @@
       <span class="label">{{ label }}</span>
     </router-link>
 
-    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown daisy-dropdown-end lg:daisy-dropdown-right">
+    <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right">
       <summary
         tabindex="0"
         role="button"
