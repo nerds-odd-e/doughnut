@@ -62,4 +62,19 @@ class QuestionEvaluationTest {
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
     assertEquals("This seems to be a legitimate question. Please answer it.", result.advice);
   }
+
+  @Test
+  void shouldHandleOutOfBoundsIndicesInCorrectChoices() {
+    questionEvaluation.feasibleQuestion = true;
+    // AI returns index 3, but question only has 3 choices (indices 0-2)
+    questionEvaluation.correctChoices = new int[] {3};
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
+    assertThat(result.advice, containsString("Unclear answer detected"));
+    assertThat(
+        result.advice,
+        containsString(
+            "original question assume one correct choice index (0-based) of 0 (\"Paris\")"));
+    // Should handle the out of bounds index gracefully
+    assertThat(result.advice, containsString("3 (invalid index)"));
+  }
 }
