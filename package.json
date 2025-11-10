@@ -68,7 +68,7 @@
     "cypress": "15.6.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
-    "got": "^14.6.2",
+    "got": "^14.6.3",
     "jsdom": "^27.1.0",
     "npm-run-all2": "^8.0.4",
     "openapi-typescript-codegen": "^0.29.0",
@@ -77,7 +77,7 @@
     "syncpack": "^13.0.4",
     "typescript": "5.9.3",
     "util": "^0.12.5",
-    "wait-on": "^9.0.1"
+    "wait-on": "^9.0.3"
   },
   "dependencies": {
     "@cucumber/cucumber": "^12.2.0",
