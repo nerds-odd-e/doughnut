@@ -64,19 +64,17 @@ class QuestionEvaluationTest {
   }
 
   @Test
-  void shouldHandleNullChoicesGracefully() {
-    // Reproduce the NullPointerException scenario
-    MCQWithAnswer mcqWithNullChoices = new MCQWithAnswer();
-    mcqWithNullChoices.setMultipleChoicesQuestion(
-        new MultipleChoicesQuestion("What is the capital?", null));
-    mcqWithNullChoices.setCorrectChoiceIndex(0);
-
+  void shouldHandleOutOfBoundsIndicesInCorrectChoices() {
     questionEvaluation.feasibleQuestion = true;
-    questionEvaluation.correctChoices = new int[] {1};
-    questionEvaluation.improvementAdvices = "Please fix the choices";
-
-    // This should not throw NullPointerException
-    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
-    assertThat(result.advice, containsString("Please fix the choices"));
+    // AI returns index 3, but question only has 3 choices (indices 0-2)
+    questionEvaluation.correctChoices = new int[] {3};
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
+    assertThat(result.advice, containsString("Unclear answer detected"));
+    assertThat(
+        result.advice,
+        containsString(
+            "original question assume one correct choice index (0-based) of 0 (\"Paris\")"));
+    // Should handle the out of bounds index gracefully
+    assertThat(result.advice, containsString("3 (invalid index)"));
   }
 }

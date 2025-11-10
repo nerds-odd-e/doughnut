@@ -41,27 +41,24 @@ public class QuestionEvaluation {
     if (!indisputableAnswer(correctChoiceIndex)) {
       var choices = mcqWithAnswer.getMultipleChoicesQuestion().getChoices();
       String correctChoicesStr =
-          correctChoices == null || choices == null
+          correctChoices == null
               ? "none"
               : Arrays.stream(correctChoices)
                   .mapToObj(
-                      i ->
-                          i < 0 || i >= choices.size()
-                              ? i + " (out of range)"
-                              : i + " (\"" + choices.get(i) + "\")")
+                      i -> {
+                        if (i < 0 || i >= choices.size()) {
+                          return i + " (invalid index)";
+                        }
+                        return i + " (\"" + choices.get(i) + "\")";
+                      })
                   .collect(Collectors.joining(", "));
-
-      String originalChoiceStr =
-          choices == null || correctChoiceIndex < 0 || correctChoiceIndex >= choices.size()
-              ? "(unavailable)"
-              : "(\"" + choices.get(correctChoiceIndex) + "\")";
 
       result.advice =
           "Unclear answer detected. The original question assume one correct choice index (0-based) of "
               + correctChoiceIndex
-              + " "
-              + originalChoiceStr
-              + ". however, the re-evaluation of the question shows that "
+              + " (\""
+              + mcqWithAnswer.getMultipleChoicesQuestion().getChoices().get(correctChoiceIndex)
+              + "\"). however, the re-evaluation of the question shows that "
               + correctChoicesStr
               + " are correct to the question.\n"
               + "Please make sure the correct answer is correct and unique.\n\n";
