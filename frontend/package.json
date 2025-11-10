@@ -41,7 +41,7 @@
     "autoprefixer": "^10.4.21",
     "daisyui": "^4.12.23",
     "es-toolkit": "^1.41.0",
-    "esbuild": "0.25.12",
+    "esbuild": "0.27.0",
     "gsap": "^3.13.0",
     "jsdom": "^27.1.0",
     "optionator": "^0.9.4",
