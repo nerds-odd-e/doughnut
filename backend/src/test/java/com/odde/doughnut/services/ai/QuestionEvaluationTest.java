@@ -62,4 +62,21 @@ class QuestionEvaluationTest {
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithAnswer);
     assertEquals("This seems to be a legitimate question. Please answer it.", result.advice);
   }
+
+  @Test
+  void shouldHandleNullChoicesGracefully() {
+    // Reproduce the NullPointerException scenario
+    MCQWithAnswer mcqWithNullChoices = new MCQWithAnswer();
+    mcqWithNullChoices.setMultipleChoicesQuestion(
+        new MultipleChoicesQuestion("What is the capital?", null));
+    mcqWithNullChoices.setCorrectChoiceIndex(0);
+
+    questionEvaluation.feasibleQuestion = true;
+    questionEvaluation.correctChoices = new int[] {1};
+    questionEvaluation.improvementAdvices = "Please fix the choices";
+
+    // This should not throw NullPointerException
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
+    assertThat(result.advice, containsString("Please fix the choices"));
+  }
 }
