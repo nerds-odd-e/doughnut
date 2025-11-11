@@ -4,10 +4,7 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import org.springframework.http.HttpStatus;
 
 public class OpenAIServiceErrorException extends ApiException {
-  public OpenAIServiceErrorException(String originalMessage, HttpStatus status) {
-    super(
-        originalMessage,
-        ApiError.ErrorType.OPENAI_SERVICE_ERROR,
-        "Open AI service error, with status: " + status.name());
+  public OpenAIServiceErrorException(String message, HttpStatus status) {
+    super(message, ApiError.ErrorType.OPENAI_SERVICE_ERROR, message);
   }
 }
