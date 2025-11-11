@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.RealGithubService;
 import com.odde.doughnut.testability.MakeMe;
@@ -62,6 +63,16 @@ public class ControllerSetupTest {
         () ->
             controllerSetup.handleSystemException(
                 request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
+    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
+  }
+
+  @Test
+  void shouldNotRecordUnexpectedNoAccessRightException() {
+    long count = makeMe.modelFactoryService.failureReportRepository.count();
+    assertThrows(
+        UnexpectedNoAccessRightException.class,
+        () ->
+            controllerSetup.handleSystemException(request, new UnexpectedNoAccessRightException()));
     assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
   }
 

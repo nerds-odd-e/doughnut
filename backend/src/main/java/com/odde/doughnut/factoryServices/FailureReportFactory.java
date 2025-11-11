@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GithubService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -18,6 +19,7 @@ public record FailureReportFactory(
 
   public void createUnlessAllowed() throws IOException, InterruptedException {
     if (exception instanceof ResponseStatusException) return;
+    if (exception instanceof UnexpectedNoAccessRightException) return;
 
     FailureReport failureReport = createFailureReport();
     Integer issueNumber = githubService.createGithubIssue(failureReport);
