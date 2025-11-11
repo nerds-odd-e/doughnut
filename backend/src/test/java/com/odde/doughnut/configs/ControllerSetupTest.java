@@ -13,6 +13,7 @@ import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -126,6 +127,17 @@ public class ControllerSetupTest {
     assertNotNull(body);
     assertThat(body.getErrors().keySet(), contains("_originalMessage"));
     assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.OPENAI_UNAUTHORIZED));
+  }
+
+  @Test
+  void shouldHandleOpenAITimeoutException() {
+    OpenAITimeoutException exception = new OpenAITimeoutException("timeout");
+    ResponseEntity<ApiError> response = controllerSetup.handleApiException(exception);
+    assertEquals(HttpStatus.GATEWAY_TIMEOUT, response.getStatusCode());
+    ApiError body = response.getBody();
+    assertNotNull(body);
+    assertThat(body.getErrors().keySet(), contains("_originalMessage"));
+    assertThat(body.getErrorType(), equalTo(ApiError.ErrorType.OPENAI_TIMEOUT));
   }
 
   private FailureReport catchExceptionAndGetFailureReport() {

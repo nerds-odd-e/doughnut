@@ -51,4 +51,20 @@ public class ControllerSetup {
       OpenAiUnauthorizedException exception) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getErrorBody());
   }
+
+  @ExceptionHandler(com.odde.doughnut.exceptions.ApiException.class)
+  public ResponseEntity<ApiError> handleApiException(
+      com.odde.doughnut.exceptions.ApiException exception) {
+    HttpStatus status = getHttpStatusForErrorType(exception.getErrorBody().getErrorType());
+    return ResponseEntity.status(status).body(exception.getErrorBody());
+  }
+
+  private HttpStatus getHttpStatusForErrorType(ApiError.ErrorType errorType) {
+    return switch (errorType) {
+      case OPENAI_TIMEOUT -> HttpStatus.GATEWAY_TIMEOUT;
+      case OPENAI_SERVICE_ERROR, WIKIDATA_SERVICE_ERROR, ASSESSMENT_SERVICE_ERROR ->
+          HttpStatus.BAD_GATEWAY;
+      case OPENAI_UNAUTHORIZED, QUESTION_ANSWER_ERROR, BINDING_ERROR -> HttpStatus.BAD_REQUEST;
+    };
+  }
 }
