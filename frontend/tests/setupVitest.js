@@ -1,7 +1,6 @@
 import { expect, vi } from "vitest";
-import * as matchers from "vitest-dom/matchers";
+import "vitest-dom/extend-expect";
 import createFetchMock from "vitest-fetch-mock";
-expect.extend(matchers);
 
 const fetchMock = createFetchMock(vi, {
   fallbackToNetwork: false
