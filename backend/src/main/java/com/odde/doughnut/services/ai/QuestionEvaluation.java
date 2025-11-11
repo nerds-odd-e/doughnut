@@ -40,6 +40,10 @@ public class QuestionEvaluation {
     result.advice = "";
     if (!indisputableAnswer(correctChoiceIndex)) {
       var choices = mcqWithAnswer.getMultipleChoicesQuestion().getChoices();
+      if (choices == null) {
+        result.advice = "The question has no choices defined.";
+        return result;
+      }
       String correctChoicesStr =
           correctChoices == null
               ? "none"
@@ -53,11 +57,16 @@ public class QuestionEvaluation {
                       })
                   .collect(Collectors.joining(", "));
 
+      String originalChoice =
+          (correctChoiceIndex >= 0 && correctChoiceIndex < choices.size())
+              ? choices.get(correctChoiceIndex)
+              : "invalid index";
+
       result.advice =
           "Unclear answer detected. The original question assume one correct choice index (0-based) of "
               + correctChoiceIndex
               + " (\""
-              + mcqWithAnswer.getMultipleChoicesQuestion().getChoices().get(correctChoiceIndex)
+              + originalChoice
               + "\"). however, the re-evaluation of the question shows that "
               + correctChoicesStr
               + " are correct to the question.\n"

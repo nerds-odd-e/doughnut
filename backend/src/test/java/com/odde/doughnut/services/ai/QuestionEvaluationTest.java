@@ -77,4 +77,21 @@ class QuestionEvaluationTest {
     // Should handle the out of bounds index gracefully
     assertThat(result.advice, containsString("3 (invalid index)"));
   }
+
+  @Test
+  void shouldHandleNullChoices() {
+    questionEvaluation.feasibleQuestion = true;
+    questionEvaluation.correctChoices = new int[] {1};
+    // Create MCQWithAnswer with null choices
+    MCQWithAnswer mcqWithNullChoices =
+        makeMe
+            .aMCQWithAnswer()
+            .stem("What is the capital of France?")
+            .correctChoiceIndex(0)
+            .please();
+    mcqWithNullChoices.getMultipleChoicesQuestion().setChoices(null);
+
+    QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
+    assertEquals("The question has no choices defined.", result.advice);
+  }
 }
