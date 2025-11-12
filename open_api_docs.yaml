@@ -3272,6 +3272,30 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConversationMessage"
+  /api/conversation/{conversationId}/export:
+    get:
+      tags:
+      - rest-conversation-message-controller
+      operationId: exportConversation
+      parameters:
+      - name: conversationId
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/conversation/unread:
     get:
       tags:

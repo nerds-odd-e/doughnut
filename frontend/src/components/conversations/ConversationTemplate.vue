@@ -27,6 +27,27 @@
     <div class="daisy-spacer"></div>
     <div class="daisy-flex daisy-align-items-center daisy-gap-2">
       <button
+        class="export-button"
+        @click="showExportDialog = true"
+        aria-label="Export conversation"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="7 10 12 15 17 10"></polyline>
+          <line x1="12" y1="15" x2="12" y2="3"></line>
+        </svg>
+      </button>
+      <button
         class="maximize-button"
         @click="$emit('toggle-maximize')"
         aria-label="Toggle maximize"
@@ -142,11 +163,18 @@
       </form>
     </div>
   </div>
+
+  <ConversationExportDialog
+    v-if="showExportDialog && selectedConversation"
+    :conversation-id="selectedConversation.id"
+    @close="showExportDialog = false"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue"
 import type { Conversation } from "@generated/backend"
+import ConversationExportDialog from "./ConversationExportDialog.vue"
 
 const { isMaximized, defaultMessages } = defineProps<{
   conversations?: Conversation[]
@@ -166,6 +194,7 @@ const emit = defineEmits<{
 }>()
 
 const message = ref("")
+const showExportDialog = ref(false)
 
 const trimmedMessage = computed(() => message.value.trim())
 
@@ -273,7 +302,8 @@ const handleDefaultMessageClick = (message: string) => {
 }
 
 .minimize-button,
-.maximize-button {
+.maximize-button,
+.export-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,7 +315,8 @@ const handleDefaultMessageClick = (message: string) => {
 }
 
 .minimize-button:hover,
-.maximize-button:hover {
+.maximize-button:hover,
+.export-button:hover {
   background-color: hsl(var(--b3));
 }
 

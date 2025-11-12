@@ -193,6 +193,25 @@ export class RestConversationMessageControllerService {
         });
     }
     /**
+     * @param conversationId
+     * @returns string OK
+     * @throws ApiError
+     */
+    public exportConversation(
+        conversationId: number,
+    ): CancelablePromise<string> {
+        return this.httpRequest.request({
+            method: 'GET',
+            url: '/api/conversation/{conversationId}/export',
+            path: {
+                'conversationId': conversationId,
+            },
+            errors: {
+                500: `Internal Server Error`,
+            },
+        });
+    }
+    /**
      * @returns ConversationMessage OK
      * @throws ApiError
      */

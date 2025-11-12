@@ -128,6 +128,15 @@ public class RestConversationMessageController {
     return conversation.getConversationMessages();
   }
 
+  @GetMapping("/{conversationId}/export")
+  public String exportConversation(
+      @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(conversation);
+    // TODO: Implement conversation export logic
+    return "";
+  }
+
   @GetMapping("/note/{note}")
   public List<Conversation> getConversationsAboutNote(
       @PathVariable("note") @Schema(type = "integer") Note note) {
