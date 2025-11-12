@@ -5,9 +5,6 @@ import org.springframework.http.HttpStatus;
 
 public class WikidataServiceErrorException extends ApiException {
   public WikidataServiceErrorException(String message, HttpStatus status) {
-    super(
-        message,
-        ApiError.ErrorType.WIKIDATA_SERVICE_ERROR,
-        "Wikidata service error, with status: " + status.name());
+    super(message, ApiError.ErrorType.WIKIDATA_SERVICE_ERROR, message);
   }
 }

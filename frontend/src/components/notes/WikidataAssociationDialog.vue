@@ -120,6 +120,7 @@ const validateAndSave = async () => {
     } else {
       wikidataIdError.value = "An unknown error occurred"
     }
+    return
   }
   await save()
 }
