@@ -26,3 +26,26 @@ Feature: Chat about a note with AI
       | assistant | No. It is not.               |
       | user      | Is this note correct?        |
       | assistant | No, there are 47 prefectures |
+
+
+  @ignore
+  Scenario: User can export conversation to continue in ChatGPT
+    Given OpenAI assistant will reply below for user messages in a stream run:
+      | user message         | assistant reply | run id |
+      | Is Naba one of them? | No. It is not.  | run1   |
+    When I start a conversation about the note "There are 42 prefectures in Japan" with a message "Is Naba one of them?" to AI
+    When I open the conversation export dialog
+    Then I should see the export content containing:
+      """
+      # Conversation: There are 42 prefectures in Japan
+      """
+    And I should see the export content containing:
+      """
+      **User**: Is Naba one of them?
+      """
+    And I should see the export content containing:
+      """
+      **Assistant**: No. It is not.
+      """
+    When I click the copy export button
+    Then the copy button should show success feedback
