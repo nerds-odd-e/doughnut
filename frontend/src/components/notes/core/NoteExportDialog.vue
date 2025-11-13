@@ -12,33 +12,13 @@
           Export Descendants (JSON)
         </summary>
         <div v-if="expandedDescendants" class="daisy-mt-4">
-          <textarea
-            class="daisy-textarea daisy-textarea-bordered daisy-w-full daisy-h-48 daisy-bg-base-100 daisy-font-mono daisy-text-xs"
-            readonly
-            :value="jsonDescendants"
-            data-testid="descendants-json-textarea"
+          <JsonExportSection
+            :json-data="jsonDescendants"
+            :filename="`note-${note.id}-descendants`"
+            textarea-test-id="descendants-json-textarea"
+            copy-button-test-id="copy-json-btn-descendants"
+            download-button-test-id="download-json-btn-descendants"
           />
-          <div class="daisy-flex daisy-gap-2 daisy-justify-end daisy-mt-2">
-            <button
-              class="daisy-btn daisy-btn-secondary daisy-btn-circle"
-              @click="copyJson('descendants')"
-              :disabled="!jsonDescendants"
-              data-testid="copy-json-btn-descendants"
-              aria-label="Copy JSON"
-            >
-              <SvgClipboard v-if="!copiedDescendants" />
-              <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            </button>
-            <button
-              class="daisy-btn daisy-btn-secondary daisy-btn-circle"
-              @click="downloadJson('descendants')"
-              :disabled="!jsonDescendants"
-              data-testid="download-json-btn-descendants"
-              aria-label="Download JSON"
-            >
-              <SvgDownload />
-            </button>
-          </div>
         </div>
       </details>
       <!-- Graph Export -->
@@ -74,33 +54,14 @@
             </button>
             <span v-if="loadingGraph" class="daisy-loading daisy-loading-spinner daisy-loading-xs"></span>
           </div>
-          <textarea
-            class="daisy-textarea daisy-textarea-bordered daisy-w-full daisy-h-48 daisy-bg-base-100 daisy-font-mono daisy-text-xs"
-            readonly
-            :value="jsonGraph"
-            data-testid="graph-json-textarea"
+          <JsonExportSection
+            :json-data="jsonGraph"
+            :filename="`note-${note.id}-graph`"
+            :loading="loadingGraph"
+            textarea-test-id="graph-json-textarea"
+            copy-button-test-id="copy-json-btn-graph"
+            download-button-test-id="download-json-btn-graph"
           />
-          <div class="daisy-flex daisy-gap-2 daisy-justify-end daisy-mt-2">
-            <button
-              class="daisy-btn daisy-btn-secondary daisy-btn-circle"
-              @click="copyJson('graph')"
-              :disabled="!jsonGraph"
-              data-testid="copy-json-btn-graph"
-              aria-label="Copy JSON"
-            >
-              <SvgClipboard v-if="!copiedGraph" />
-              <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            </button>
-            <button
-              class="daisy-btn daisy-btn-secondary daisy-btn-circle"
-              @click="downloadJson('graph')"
-              :disabled="!jsonGraph"
-              data-testid="download-json-btn-graph"
-              aria-label="Download JSON"
-            >
-              <SvgDownload />
-            </button>
-          </div>
         </div>
       </details>
     </div>
@@ -110,10 +71,8 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import type { Note } from "@generated/backend"
-import { saveAs } from "file-saver"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import SvgDownload from "../../svgs/SvgDownload.vue"
-import SvgClipboard from "../../svgs/SvgClipboard.vue"
+import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
 const { managedApi } = useLoadingApi()
@@ -122,8 +81,6 @@ const expandedDescendants = ref(false)
 const expandedGraph = ref(false)
 const jsonDescendants = ref("")
 const jsonGraph = ref("")
-const copiedDescendants = ref(false)
-const copiedGraph = ref(false)
 const tokenLimit = ref(5000)
 const loadingGraph = ref(false)
 
@@ -170,29 +127,5 @@ function toggleExpanded(which: "descendants" | "graph", event: Event) {
   if (which === "descendants")
     expandedDescendants.value = !expandedDescendants.value
   if (which === "graph") expandedGraph.value = !expandedGraph.value
-}
-
-function downloadJson(which: "descendants" | "graph") {
-  const data = which === "descendants" ? jsonDescendants.value : jsonGraph.value
-  if (!data) return
-  const blob = new Blob([data], { type: "application/json" })
-  saveAs(blob, `note-${props.note.id}-${which}.json`)
-}
-
-async function copyJson(which: "descendants" | "graph") {
-  const data = which === "descendants" ? jsonDescendants.value : jsonGraph.value
-  if (!data) return
-  await navigator.clipboard.writeText(data)
-  if (which === "descendants") {
-    copiedDescendants.value = true
-    setTimeout(() => {
-      copiedDescendants.value = false
-    }, 1200)
-  } else {
-    copiedGraph.value = true
-    setTimeout(() => {
-      copiedGraph.value = false
-    }, 1200)
-  }
 }
 </script>

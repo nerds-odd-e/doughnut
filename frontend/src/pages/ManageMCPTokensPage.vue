@@ -21,18 +21,12 @@
       <span class="daisy-mr-2 daisy-px-2 daisy-py-1 daisy-bg-base-200 daisy-rounded daisy-font-mono" data-testid="token-result">
         {{ token }}
       </span>
-      <button
-        class="daisy-btn daisy-btn-ghost daisy-btn-xs"
-        @click="copyToken"
-        :disabled="copied"
+      <CopyButton
+        :text="token"
+        btn-class="daisy-btn daisy-btn-ghost daisy-btn-xs"
         aria-label="Copy token"
-        data-testid="copy-token-btn"
-      >
-        <svg v-if="!copied" xmlns="http://www.w3.org/2000/svg" class="daisy-h-4 daisy-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8M8 12h8m-7 8h6a2 2 0 002-2V6a2 2 0 00-2-2H8a2 2 0 00-2 2v12a2 2 0 002 2z" />
-        </svg>
-        <span v-else class="daisy-text-success">Copied!</span>
-      </button>
+        test-id="copy-token-btn"
+      />
     </div>
 
     <h2 class="daisy-text-xl daisy-font-bold daisy-mt-8">Existing Tokens</h2>
@@ -64,6 +58,7 @@ import { ref } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"
+import CopyButton from "@/components/commons/CopyButton.vue"
 
 const { managedApi } = useLoadingApi()
 
@@ -79,7 +74,6 @@ const tokens = ref<
 >([])
 const token = ref<string | null>(null)
 const loading = ref(false)
-const copied = ref(false)
 
 const loadTokens = async () => {
   try {
@@ -97,7 +91,6 @@ loadTokens()
 
 const generateToken = async () => {
   loading.value = true
-  copied.value = false
   try {
     const res = await managedApi.restUserController.generateToken({
       label: tokenFormData.value.label,
@@ -113,14 +106,6 @@ const generateToken = async () => {
     console.error("Error generating token:", error)
   } finally {
     loading.value = false
-  }
-}
-
-const copyToken = async () => {
-  if (token.value) {
-    await navigator.clipboard.writeText(token.value)
-    copied.value = true
-    setTimeout(() => (copied.value = false), 1500)
   }
 }
 
