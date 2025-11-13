@@ -8,7 +8,7 @@ Start the complete development environment (recommended):
 pnpm sut
 ```
 
-This starts backend, frontend, mountebank, and Cypress IDE - all with auto-reload.
+This starts backend, frontend, and mountebank - all with auto-reload.
 
 To use the AI services, you will need to set the environment variable `OPENAI_API_TOKEN` before running the command.
 

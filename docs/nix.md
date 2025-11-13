@@ -44,7 +44,7 @@ All development tool commands henceforth should work when in the `nix` developme
 pnpm sut
 ```
 
-This starts backend, frontend, mountebank, and Cypress IDE - all with auto-reload on code changes.
+This starts backend, frontend, and mountebank - all with auto-reload on code changes.
 
 **Alternative - Start only the backend:**
 

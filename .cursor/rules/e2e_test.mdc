@@ -10,7 +10,6 @@ alwaysApply: false
 - Backend (with auto-reload on Java code changes)
 - Frontend (with hot module replacement)
 - Mountebank (mock services)
-- Cypress IDE
 
 All services automatically restart when code changes are made. The developer does NOT need to manually restart services when making changes.
 

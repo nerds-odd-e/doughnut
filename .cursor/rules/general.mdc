@@ -18,7 +18,6 @@ This command starts:
 - Backend (with auto-reload on Java code changes)
 - Frontend (with hot module replacement on Vue code changes)
 - Mountebank (mock external services)
-- Cypress IDE (for running/debugging e2e tests)
 
 All services automatically restart when code changes are made. Developers should NOT need to manually restart services.
 

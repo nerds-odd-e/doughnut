@@ -13,7 +13,7 @@
 
 - Visit [doughnut Github](https://github.com/nerds-odd-e/doughnut) repo from your chrome/chromium-derivative broswer; Click on the `Ona` green button (near the top right corner of `doughnut`'s Github page if you have installed the chrome extension from above prerequisite step) to launch your development workspace. Or enter in your chomre browser's URL input [https://app.gitpod.io/#https://github.com/nerds-odd-e/doughnut/](https://app.gitpod.io/#https://github.com/nerds-odd-e/doughnut/).
 - From your Ona VSCode workspace browser tab launched from above step, at the bottom left hand corner of the VSCode IDE, locate the `Login to Github` icon/button and perform your Github login by entering your relevant Github credentials in the new browser tab spawned.
-- Once your Ona workspace with VSCode has launched successfully in a new chrome/chromium-derivative browser from above step, open a VSCode 'terminal'. (after VSCode browser tab is launched, another tab will launch which is a VNC connection to your ona for Cypress IDE launch for local development E2E testing use).
+- Once your Ona workspace with VSCode has launched successfully in a new chrome/chromium-derivative browser from above step, open a VSCode 'terminal'.
 
 ### zsh & git config to setup development workspace
 
@@ -37,7 +37,7 @@ For ongoing development work, use:
 pnpm sut
 ```
 
-This starts backend, frontend, mountebank, and Cypress IDE - all with auto-reload on code changes. You can now develop and test without manually restarting services.
+This starts backend, frontend, and mountebank - all with auto-reload on code changes. You can now develop and test without manually restarting services.
 
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 

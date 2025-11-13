@@ -96,7 +96,6 @@ This single command starts everything you need for local development:
 - **Backend** (with auto-reload on Java code changes)
 - **Frontend** (with hot module replacement on Vue code changes)  
 - **Mountebank** (mock external services)
-- **Cypress IDE** (for running/debugging e2e tests)
 
 All services will automatically restart when you make code changes, so you can focus on development without manual restarts.
 
@@ -139,6 +138,17 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
  
 #### Commands
 
+**Typical E2E Testing Workflow:**
+1. Start all services: `pnpm sut` (backend, frontend, mountebank)
+2. For **interactive test development/debugging**: Open Cypress IDE with `pnpm cy:open` in a separate terminal
+3. For **headless execution**: Use `pnpm cypress run --spec <feature-path>`
+
+**Note:** The Cypress IDE is useful for:
+- Developing new test scenarios
+- Debugging failing tests with visual feedback
+- Step-by-step test execution
+- Seeing real-time DOM changes
+
 For MS Windows WSL2 users:
 
 1. you need to ensure your WSL2 Linux has `xvfb` installed manually before you can run cypress. This
@@ -148,11 +158,11 @@ For MS Windows WSL2 users:
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------  |
-| **🌟 Start full dev environment (RECOMMENDED)** | **`pnpm sut`** (starts backend, frontend, mountebank & Cypress IDE - all with auto-reload)                                                |
+| **🌟 Start full dev environment (RECOMMENDED)** | **`pnpm sut`** (starts backend, frontend, and mountebank - all with auto-reload)                                                          |
 | Install needed e2e tooling            | `pnpm --frozen-lockfile recursive install`                                                                                                      |                               |                                       |                                                                                                                                                 |
 | Start backend only                    | `pnpm backend:sut` (starts backend SUT with auto-reload)                                                                                        |
 | Start Mock for external backend       | `pnpm start:mb` (starts mocked external backend ONLY)                                                                                           |
-| Start ONLY the Cypress IDE            | `pnpm cy:open` (starts Cypress IDE ONLY)                                                                                                        |
+| Open Cypress IDE for interactive testing | `pnpm cy:open` (for test development/debugging - requires services running via `pnpm sut`)                                                   |
 | Run one feature headlessly            | `pnpm cypress run --spec **/name.feature` (expect services are already running, run the matched feature files only in headless mode)           |
 | Run all e2e test                      | `pnpm verify` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                  |
 | Generate TypeScript Interfaces        | `pnpm generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend service changes)    |
