@@ -196,7 +196,7 @@ class TestabilityRestController {
     if (predefinedQuestions.isEmpty()) {
       return;
     }
-    Notebook notebook = predefinedQuestions.getFirst().getNote().getNotebook();
+    Notebook notebook = predefinedQuestions.get(0).getNote().getNotebook();
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(predefinedQuestions.size());
     modelFactoryService.save(notebook);
     if (notebookCertifiable != null && notebookCertifiable) {

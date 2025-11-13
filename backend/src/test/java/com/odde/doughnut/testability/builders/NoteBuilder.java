@@ -139,7 +139,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder withNChildren(int numNotes) {
-    return withNChildrenThat(numNotes, _ -> {});
+    return withNChildrenThat(numNotes, ignored -> {});
   }
 
   public NoteBuilder withNChildrenThat(int numNotes, Consumer<NoteBuilder> childNoteThat) {
