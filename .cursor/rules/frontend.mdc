@@ -12,6 +12,24 @@ To run frontend tests in terminal:
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
+## Linting and Type Checking
+
+**IMPORTANT**: The Vite dev server runs linting and type checking in the background using `vite-plugin-checker`. The overlay is disabled (`overlay: false`) to prevent blocking e2e tests, but errors still appear in the terminal.
+
+- **Always check the terminal output** where `pnpm sut` is running for linting/type errors
+- **Before completing any task**, run `pnpm format:all` to fix formatting and check for any remaining linting errors
+- **Fix all linting errors** - they won't block the browser UI but must be resolved
+
+To check for linting errors:
+```bash
+CURSOR_DEV=true nix develop -c pnpm lint:all
+```
+
+To fix formatting issues:
+```bash
+CURSOR_DEV=true nix develop -c pnpm format:all
+```
+
 ## File Organization
 
 - Frontend code lives in `frontend/src/`

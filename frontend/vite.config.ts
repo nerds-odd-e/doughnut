@@ -81,6 +81,7 @@ const config = defineConfig({
       typescript: true,
       vueTsc: true, // This will check Vue templates
       biome: true,  // This will use Biome for linting
+      overlay: false, // Disable overlay to prevent blocking e2e tests - errors still show in terminal
     }),
   ],
   server: {

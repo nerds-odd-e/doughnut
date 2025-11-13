@@ -135,6 +135,24 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
    - Use meaningful descriptions in feature files
    - Document complex test scenarios
 
+## Linting Errors and E2E Tests
+
+**IMPORTANT**: The frontend Vite configuration has `overlay: false` set in the checker plugin to prevent linting/type errors from blocking e2e tests with overlay warnings.
+
+- **For AI Agents**: If you see linting or type errors in the terminal output during e2e tests, they won't block the tests but MUST be fixed before completing your task.
+- **For Developers**: Linting and type errors still appear in the terminal where `pnpm sut` is running, but won't show as overlays in the browser.
+- **Clean up requirement**: Always run `pnpm format:all` and fix any remaining linting errors before considering a task complete.
+
+To check for linting errors:
+```bash
+CURSOR_DEV=true nix develop -c pnpm lint:all
+```
+
+To fix formatting issues:
+```bash
+CURSOR_DEV=true nix develop -c pnpm format:all
+```
+
 ## Common Pitfalls to Avoid
 
 1. Don't put complex logic in step definitions
@@ -143,3 +161,4 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
 4. Don't use hardcoded waits
 5. Don't skip error handling
 6. Don't mix different levels of abstraction in scenarios
+7. Don't ignore linting errors that appear in the terminal - fix them before completing your work
