@@ -30,28 +30,36 @@ This command starts:
 
 ## Running Commands in Terminal
 
-This project uses nix to manage the development environment. There is currently a bug in Cursor IDE that prevents detection of `nix develop` completion in agent mode. Therefore, always use:
+**CRITICAL: This project uses nix to manage the development environment.**
 
-```
+There is a bug in Cursor IDE that prevents detection of `nix develop` completion in agent mode. 
+
+**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true` when running them through `nix develop -c`:**
+
+```bash
 CURSOR_DEV=true nix develop -c <command>
 ```
+
+**DO NOT run commands without the `CURSOR_DEV=true` prefix!** Without it, the terminal will hang and not return control to the agent.
 
 ### Running Tests
 
 **Backend unit test:**
-```
+```bash
 CURSOR_DEV=true nix develop -c pnpm backend:verify
 ```
 
 **Frontend unit test:**
-```
+```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
 **E2E test** (assumes services are already running via `pnpm sut`):
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
-nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
-```
+
+**Note:** ALL commands that need to run in the nix development environment MUST use `CURSOR_DEV=true nix develop -c` prefix.
 
 # Development preferences
 
