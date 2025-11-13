@@ -76,4 +76,58 @@ public class Conversation extends EntityIdentifiedByIdOnly {
         .filter(msg -> msg.getSender() != null)
         .toList();
   }
+
+  @JsonIgnore
+  public Note getSubjectNote() {
+    Note note = subject.getNote();
+    if (note != null) {
+      return note;
+    }
+
+    RecallPrompt recallPrompt = subject.getRecallPrompt();
+    if (recallPrompt != null) {
+      return recallPrompt.getPredefinedQuestion().getNote();
+    }
+
+    AssessmentQuestionInstance assessmentQuestionInstance = subject.getAssessmentQuestionInstance();
+    if (assessmentQuestionInstance != null) {
+      return assessmentQuestionInstance.getPredefinedQuestion().getNote();
+    }
+
+    return null;
+  }
+
+  @JsonIgnore
+  public String getAdditionalContextForSubject() {
+    RecallPrompt recallPrompt = subject.getRecallPrompt();
+    if (recallPrompt != null) {
+      return """
+          User attempted to answer the following question about the note of focus.
+          Please note that user is not prompted with the specific note of focus,
+          but only with the broader notebook name. A question that is not possible to answer
+          is regarded as a wrong question.
+          Here's the question definition and user's answer:
+
+          """
+          + recallPrompt.getQuestionDetails();
+    }
+
+    return null;
+  }
+
+  @JsonIgnore
+  public String getContextDescription() {
+    Note note = getSubjectNote();
+    if (note == null) {
+      return "Unknown conversation subject";
+    }
+
+    String context = note.getNoteDescription();
+    String additionalContext = getAdditionalContextForSubject();
+    if (additionalContext != null) {
+      context += "\n\n" + additionalContext;
+    }
+
+    return context;
+  }
 }

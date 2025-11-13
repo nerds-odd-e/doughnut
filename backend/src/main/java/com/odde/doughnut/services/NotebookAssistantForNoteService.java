@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
@@ -18,6 +19,22 @@ public class NotebookAssistantForNoteService {
     this.assistantService = openAiAssistant;
     this.note = note;
     this.objectMapper = objectMapper;
+  }
+
+  public AssistantThread createThreadWithConversationContext(Conversation conversation) {
+    List<MessageRequest> messages = new ArrayList<>();
+
+    // Add note description first
+    messages.add(
+        MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build());
+
+    // Add additional context if present (e.g., recall prompt details)
+    String additionalContext = conversation.getAdditionalContextForSubject();
+    if (additionalContext != null) {
+      messages.add(MessageRequest.builder().role("assistant").content(additionalContext).build());
+    }
+
+    return assistantService.createThread(messages, note.getNotebookAssistantInstructions());
   }
 
   protected AssistantThread createThreadWithNoteInfo(List<MessageRequest> additionalMessages) {

@@ -498,7 +498,8 @@ class RestConversationMessageControllerTest {
     void shouldExportConversationWithContext() throws UnexpectedNoAccessRightException {
       String export = controller.exportConversation(conversation);
       assertThat(export).contains("## Context");
-      assertThat(export).contains("### Note: There are 42 prefectures in Japan");
+      assertThat(export).contains("note of current focus");
+      assertThat(export).contains("There are 42 prefectures in Japan");
     }
 
     @Test

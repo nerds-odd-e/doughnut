@@ -117,9 +117,9 @@ public class ConversationService {
     String subject = getConversationSubject(conversation);
     export.append("# Conversation: ").append(subject).append("\n\n");
 
-    // Context
+    // Context (reuse the same context sent to OpenAI)
     export.append("## Context\n\n");
-    export.append("### Note: ").append(subject).append("\n\n");
+    export.append(conversation.getContextDescription()).append("\n\n");
 
     // Conversation History
     export.append("## Conversation History\n\n");

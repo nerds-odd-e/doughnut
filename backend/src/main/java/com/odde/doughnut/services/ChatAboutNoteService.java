@@ -5,9 +5,7 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.AssistantThread;
 import com.odde.doughnut.services.commands.GetAiStreamHelper;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -54,26 +52,9 @@ public class ChatAboutNoteService {
     public MessageStage createOrResumeThread() {
       AssistantThread newThread;
       if (conversation.getAiAssistantThreadId() == null) {
-        List<MessageRequest> initialMessages = new ArrayList<>();
-        if (conversation.getSubject().getRecallPrompt() != null) {
-          MessageRequest msg =
-              MessageRequest.builder()
-                  .role("assistant")
-                  .content(
-                      """
-                    User attempted to answer the following question about the note of focus.
-                    Please note that user is not prompted with the specific note of focus,
-                    but only with the broader notebook name. A question that is not possible to answer
-                    is regarded as a wrong question.
-                    Here's the question definition and user's answer:
-
-                    """
-                          + conversation.getSubject().getRecallPrompt().getQuestionDetails())
-                  .build();
-          initialMessages.add(msg);
-        }
         newThread =
-            service.notebookAssistantForNoteService.createThreadWithNoteInfo(initialMessages);
+            service.notebookAssistantForNoteService.createThreadWithConversationContext(
+                conversation);
         conversationService.setConversationAiAssistantThreadId(
             conversation, newThread.getThreadId());
       } else {
