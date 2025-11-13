@@ -11,7 +11,7 @@ import java.util.List;
 
 public class NotebookAssistantForNoteService {
   private final OpenAiAssistant assistantService;
-  private final ObjectMapper objectMapper;
+  protected final ObjectMapper objectMapper;
   final Note note;
 
   public NotebookAssistantForNoteService(
@@ -24,9 +24,12 @@ public class NotebookAssistantForNoteService {
   public AssistantThread createThreadWithConversationContext(Conversation conversation) {
     List<MessageRequest> messages = new ArrayList<>();
 
-    // Add note description first
+    // Add note graph context first
     messages.add(
-        MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build());
+        MessageRequest.builder()
+            .role("assistant")
+            .content(note.getGraphRAGDescription(objectMapper))
+            .build());
 
     // Add additional context if present (e.g., recall prompt details)
     String additionalContext = conversation.getAdditionalContextForSubject();
@@ -40,7 +43,10 @@ public class NotebookAssistantForNoteService {
   protected AssistantThread createThreadWithNoteInfo(List<MessageRequest> additionalMessages) {
     List<MessageRequest> messages = new ArrayList<>();
     messages.add(
-        MessageRequest.builder().role("assistant").content(note.getNoteDescription()).build());
+        MessageRequest.builder()
+            .role("assistant")
+            .content(note.getGraphRAGDescription(objectMapper))
+            .build());
     if (!additionalMessages.isEmpty()) {
       messages.addAll(additionalMessages);
     }

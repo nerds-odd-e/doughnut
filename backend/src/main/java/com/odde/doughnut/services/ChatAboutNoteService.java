@@ -83,7 +83,10 @@ public class ChatAboutNoteService {
       if (lastAiAssistantThreadSync != null
           && service.note.getUpdatedAt().after(lastAiAssistantThreadSync)) {
         thread.createAssistantMessage(
-            "The note content has been update:\n\n%s".formatted(service.note.getNoteDescription()));
+            "The note content has been update:\n\n%s"
+                .formatted(
+                    service.note.getGraphRAGDescription(
+                        service.notebookAssistantForNoteService.objectMapper)));
       }
       List<ConversationMessage> unseen = conversation.getUnseenMessagesByAssistant();
       if (!unseen.isEmpty()) {

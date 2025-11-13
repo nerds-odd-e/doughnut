@@ -315,7 +315,9 @@ public class RestConversationMessageControllerAiReplyTests {
 
       List<MessageRequest> messages = captor.getAllValues();
       String expectedUpdateMessage =
-          String.format("The note content has been update:%n%n%s", note.getNoteDescription());
+          String.format(
+              "The note content has been update:%n%n%s",
+              note.getGraphRAGDescription(getTestObjectMapper()));
       assertThat(messages.get(0).getContent()).isEqualTo(expectedUpdateMessage);
       assertThat(messages.get(0).getRole()).isEqualTo("assistant");
     }
