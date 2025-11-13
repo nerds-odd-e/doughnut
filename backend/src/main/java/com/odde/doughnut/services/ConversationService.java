@@ -109,4 +109,51 @@ public class ConversationService {
     conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.save(conversation);
   }
+
+  public String exportConversationForChatGPT(Conversation conversation) {
+    StringBuilder export = new StringBuilder();
+
+    // Title
+    String subject = getConversationSubject(conversation);
+    export.append("# Conversation: ").append(subject).append("\n\n");
+
+    // Context
+    export.append("## Context\n\n");
+    export.append("### Note: ").append(subject).append("\n\n");
+
+    // Conversation History
+    export.append("## Conversation History\n\n");
+    for (ConversationMessage message : conversation.getConversationMessages()) {
+      String role = message.getSender() == null ? "Assistant" : "User";
+      String formattedMessage = formatMessage(message.getMessage());
+      export.append("**").append(role).append("**: ").append(formattedMessage).append("\n");
+    }
+
+    return export.toString();
+  }
+
+  private String formatMessage(String message) {
+    // Remove leading and trailing quotes and trim
+    return message.replaceAll("^\"|\"$", "").trim();
+  }
+
+  private String getConversationSubject(Conversation conversation) {
+    Note note = conversation.getSubject().getNote();
+    if (note != null) {
+      return note.getTopicConstructor();
+    }
+
+    AssessmentQuestionInstance assessmentQuestionInstance =
+        conversation.getSubject().getAssessmentQuestionInstance();
+    if (assessmentQuestionInstance != null) {
+      return assessmentQuestionInstance.getMultipleChoicesQuestion().getStem();
+    }
+
+    RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();
+    if (recallPrompt != null) {
+      return recallPrompt.getPredefinedQuestion().getNote().getTopicConstructor();
+    }
+
+    return "Unknown Subject";
+  }
 }

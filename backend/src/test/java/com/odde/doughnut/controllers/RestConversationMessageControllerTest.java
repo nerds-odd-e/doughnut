@@ -447,4 +447,70 @@ class RestConversationMessageControllerTest {
       assertEquals(recallPrompt.getNotebook().getOwnership(), conversation.getSubjectOwnership());
     }
   }
+
+  @Nested
+  class ExportConversationTests {
+    Note note;
+    Conversation conversation;
+
+    @BeforeEach
+    void setup() {
+      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(noteOwner)
+              .titleConstructor("There are 42 prefectures in Japan")
+              .please();
+      conversation = makeMe.aConversation().forANote(note).from(currentUser).please();
+    }
+
+    @Test
+    void shouldNotBeAbleToExportAConversationIAmNotIn() {
+      Conversation otherConversation = makeMe.aConversation().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.exportConversation(otherConversation));
+    }
+
+    @Test
+    void shouldExportConversationWithNoteTitle() throws UnexpectedNoAccessRightException {
+      String export = controller.exportConversation(conversation);
+      assertThat(export).contains("# Conversation: There are 42 prefectures in Japan");
+    }
+
+    @Test
+    void shouldExportConversationWithMessages() throws UnexpectedNoAccessRightException {
+      makeMe
+          .aConversationMessage(conversation)
+          .sender(currentUser.getEntity())
+          .message("Is Naba one of them?")
+          .please();
+      makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
+
+      String export = controller.exportConversation(conversation);
+
+      assertThat(export).contains("**User**: Is Naba one of them?");
+      assertThat(export).contains("**Assistant**: No. It is not.");
+    }
+
+    @Test
+    void shouldExportConversationWithContext() throws UnexpectedNoAccessRightException {
+      String export = controller.exportConversation(conversation);
+      assertThat(export).contains("## Context");
+      assertThat(export).contains("### Note: There are 42 prefectures in Japan");
+    }
+
+    @Test
+    void shouldExportConversationWithHistory() throws UnexpectedNoAccessRightException {
+      makeMe
+          .aConversationMessage(conversation)
+          .sender(currentUser.getEntity())
+          .message("Is Naba one of them?")
+          .please();
+
+      String export = controller.exportConversation(conversation);
+      assertThat(export).contains("## Conversation History");
+    }
+  }
 }

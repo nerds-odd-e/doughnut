@@ -39,4 +39,9 @@ public class ConversationMessageBuilder extends EntityBuilder<ConversationMessag
     entity.setCreatedAt(time);
     return this;
   }
+
+  public ConversationMessageBuilder message(String message) {
+    entity.setMessage(message);
+    return this;
+  }
 }

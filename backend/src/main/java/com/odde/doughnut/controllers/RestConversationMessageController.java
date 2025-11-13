@@ -133,17 +133,7 @@ public class RestConversationMessageController {
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
-
-    // Hardcoded for now to match e2e test
-    StringBuilder export = new StringBuilder();
-    export.append("# Conversation: There are 42 prefectures in Japan\n\n");
-    export.append("## Context\n\n");
-    export.append("### Note: There are 42 prefectures in Japan\n\n");
-    export.append("## Conversation History\n\n");
-    export.append("**User**: Is Naba one of them?\n");
-    export.append("**Assistant**: No. It is not.\n");
-
-    return export.toString();
+    return conversationService.exportConversationForChatGPT(conversation);
   }
 
   @GetMapping("/note/{note}")
