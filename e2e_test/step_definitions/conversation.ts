@@ -106,19 +106,42 @@ Then('I should receive the following chat messages:', (data: DataTable) => {
   start.assumeConversationAboutNotePage().expectMessages(data.hashes())
 })
 
-When('I open the conversation export dialog', () => {
+When('I export the conversation', () => {
   cy.findByRole('button', { name: 'Export conversation' }).click()
 })
 
-Then('I should see the export content containing:', (content: string) => {
-  cy.get('[data-testid="export-textarea"]').should('contain.value', content)
-})
+Then(
+  'the export should contain the conversation title {string}',
+  (title: string) => {
+    cy.get('[data-testid="export-textarea"]').should(
+      'contain.value',
+      `# Conversation: ${title}`
+    )
+  }
+)
 
-When('I click the copy export button', () => {
+Then(
+  'the export should contain the user message {string}',
+  (message: string) => {
+    cy.get('[data-testid="export-textarea"]').should(
+      'contain.value',
+      `**User**: ${message}`
+    )
+  }
+)
+
+Then(
+  'the export should contain the assistant reply {string}',
+  (reply: string) => {
+    cy.get('[data-testid="export-textarea"]').should(
+      'contain.value',
+      `**Assistant**: ${reply}`
+    )
+  }
+)
+
+Then('I should be able to copy the export', () => {
   cy.get('[data-testid="copy-export-btn"]').click()
-})
-
-Then('the copy button should show success feedback', () => {
   cy.get('[data-testid="copy-export-btn"]').within(() => {
     cy.get('svg').should('exist')
   })
