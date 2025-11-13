@@ -15,13 +15,18 @@ pnpm sut
 ```
 
 This command starts:
-- Backend (with auto-reload on Java code changes)
+- Backend (with auto-reload on Java code changes via Gradle continuous build)
 - Frontend (with hot module replacement on Vue code changes)
 - Mountebank (mock external services)
 
-All services automatically restart when code changes are made. Developers should NOT need to manually restart services.
+**CRITICAL: All services automatically restart/reload when code changes are made.**
 
-**If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first.
+**DO NOT tell developers to restart `pnpm sut` after making code changes!** 
+- Backend: Uses Gradle continuous build (`-t` flag) which automatically detects changes, recompiles Java classes, and hot-reloads them into the running Spring Boot application
+- Frontend: Uses Vite with Hot Module Replacement (HMR) for instant Vue component updates
+- Developers should NEVER need to manually restart services during development
+
+**If services are not running or if you need to suggest starting them**, recommend running `pnpm sut` in a separate terminal first. But once running, DO NOT suggest restarting after code changes.
 
 ## Running Commands in Terminal
 
