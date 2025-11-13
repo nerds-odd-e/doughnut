@@ -28,7 +28,6 @@ Feature: Chat about a note with AI
       | assistant | No, there are 47 prefectures |
 
 
-  @ignore
   Scenario: User can export conversation to continue in ChatGPT
     Given OpenAI assistant will reply below for user messages in a stream run:
       | user message         | assistant reply | run id |

@@ -34,7 +34,6 @@
 import { ref, onMounted } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import SvgClipboard from "@/components/svgs/SvgClipboard.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const props = defineProps<{
   conversationId: number
@@ -44,16 +43,18 @@ const emit = defineEmits<{
   (e: "close"): void
 }>()
 
-const { managedApi } = useLoadingApi()
 const exportContent = ref("")
 const copied = ref(false)
 
 onMounted(async () => {
   try {
-    exportContent.value =
-      await managedApi.restConversationMessageController.exportConversation(
-        props.conversationId
-      )
+    const response = await fetch(
+      `/api/conversation/${props.conversationId}/export`
+    )
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    exportContent.value = await response.text()
   } catch (error) {
     console.error("Failed to fetch export content:", error)
     exportContent.value = "Failed to load export content"

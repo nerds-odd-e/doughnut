@@ -3293,7 +3293,7 @@ paths:
         "200":
           description: OK
           content:
-            '*/*':
+            text/plain:
               schema:
                 type: string
   /api/conversation/unread:
