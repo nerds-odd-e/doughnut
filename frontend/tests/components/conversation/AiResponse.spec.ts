@@ -4,8 +4,6 @@ import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import {
   DummyForGeneratingTypes,
-  type Message,
-  type MessageDelta,
   type TitleReplacement,
 } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
