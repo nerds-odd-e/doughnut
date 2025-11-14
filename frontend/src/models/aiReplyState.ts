@@ -138,8 +138,6 @@ export const createAiReplyStates = (
                 await context.handleSuggestion({
                   suggestionType: "completion",
                   content: JSON.parse(functionArgs),
-                  threadId: "synthetic",
-                  runId: "synthetic",
                   toolCallId: toolCall.id || "synthetic",
                 })
               } else if (
@@ -150,8 +148,6 @@ export const createAiReplyStates = (
                 await context.handleSuggestion({
                   suggestionType: "title",
                   content: newTitle,
-                  threadId: "synthetic",
-                  runId: "synthetic",
                   toolCallId: toolCall.id || "synthetic",
                 })
               } else {
@@ -161,8 +157,6 @@ export const createAiReplyStates = (
                     rawJson: functionArgs,
                     functionName: functionName!,
                   },
-                  threadId: "synthetic",
-                  runId: "synthetic",
                   toolCallId: toolCall.id || "synthetic",
                 })
               }

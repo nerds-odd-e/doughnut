@@ -105,8 +105,6 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
         content: { completion: "test content" },
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-1",
       })
       // Tool calls are executed inline with Chat Completion API
@@ -160,8 +158,6 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "title",
         content: "New Title",
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-1",
       })
     })
@@ -264,8 +260,6 @@ describe("aiReplyState", () => {
           rawJson: '{"test":"data"}',
           functionName: "unknown_tool",
         },
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-1",
       })
     })
@@ -364,8 +358,6 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
         content: { completion: "test content" },
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-123",
       })
     })
@@ -442,15 +434,11 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
         content: { completion: "first" },
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-1",
       })
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "title",
         content: "Second Title",
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-2",
       })
     })
@@ -558,8 +546,6 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
         content: { completion: "This is a long completion" },
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-frag",
       })
     })
@@ -625,8 +611,6 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenNthCalledWith(2, {
         suggestionType: "completion",
         content: { completion: "second" },
-        threadId: "synthetic",
-        runId: "synthetic",
         toolCallId: "call-2",
       })
     })
