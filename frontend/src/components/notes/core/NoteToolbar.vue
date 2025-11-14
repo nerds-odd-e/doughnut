@@ -163,7 +163,7 @@
           <li>
             <PopButton btn-class="daisy-w-full" title="Export...">
               <template #button_face>
-                <SvgDownload />
+                <SvgExport />
                 <span class="ms-2">Export...</span>
               </template>
               <template #default="{ closer }">
@@ -227,7 +227,7 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
-import SvgDownload from "../../svgs/SvgDownload.vue"
+import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "./NoteExportDialog.vue"
 
 const { storageAccessor, note } = defineProps<{
