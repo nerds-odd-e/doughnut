@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
@@ -33,7 +32,6 @@ class NoteQuestionGenerationServiceTests {
   NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
-  private OpenAiAssistant assistant;
   private NoteQuestionGenerationService service;
 
   @BeforeEach

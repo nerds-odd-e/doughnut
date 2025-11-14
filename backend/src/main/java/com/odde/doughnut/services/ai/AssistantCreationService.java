@@ -16,6 +16,11 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service for creating and managing OpenAI Assistants using the Assistants API.
+ *
+ * <p>Creates assistant objects for notebook-specific AI features with file search capabilities.
+ */
 @Service
 public class AssistantCreationService {
   protected final OpenAiApiHandler openAiApiHandler;

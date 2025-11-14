@@ -18,8 +18,6 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -48,8 +46,6 @@ class RestRecallPromptControllerTests {
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
-  OpenAIAssistantMocker openAIAssistantMocker;
-  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
 
   RestRecallPromptController controller;
 
@@ -58,8 +54,6 @@ class RestRecallPromptControllerTests {
     currentUser = makeMe.aUser().toModelPlease();
     testabilitySettings.setRandomization(new Randomization(first, 1));
 
-    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
 
     // Mock chat completion for question evaluation

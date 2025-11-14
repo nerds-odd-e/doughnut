@@ -118,8 +118,4 @@ public final class OtherAiServices {
     RequestBody requestBody = builder.build();
     return openAiApiHandler.getTranscription(requestBody);
   }
-
-  public OpenAiOngoingRun resumeRun(String threadId, String runId) {
-    return new OpenAiRunResumed(openAiApiHandler, threadId, runId, null);
-  }
 }

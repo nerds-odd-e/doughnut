@@ -3,7 +3,9 @@ import type { ToolCallResult } from "./aiReplyState"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 
 interface BaseSuggestion {
+  /** @deprecated Not used, always set to "synthetic" */
   threadId: string
+  /** @deprecated Not used, always set to "synthetic" */
   runId: string
   toolCallId: string
 }

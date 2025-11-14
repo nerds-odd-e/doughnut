@@ -15,6 +15,11 @@ import io.reactivex.Flowable;
 import java.util.List;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+/**
+ * Service for handling AI conversations using OpenAI's Chat Completion API.
+ *
+ * <p>Provides streaming conversation responses with inline tool call handling.
+ */
 public class ChatCompletionConversationService {
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
