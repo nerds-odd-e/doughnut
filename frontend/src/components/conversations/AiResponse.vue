@@ -144,6 +144,10 @@ const getAiReply = async () => {
       if (state) {
         aiStatus.value = state.status
         await state.handleEvent(data)
+      } else if (event === "error") {
+        // Handle error event from SSE stream
+        aiStatus.value = undefined
+        lastErrorMessage.value = data || "Bad Request"
       } else {
         aiStatus.value = event
       }
@@ -151,7 +155,10 @@ const getAiReply = async () => {
     .onError((e) => {
       aiStatus.value = undefined
       const error = e as Error
-      if (error.message.indexOf("400") !== -1) {
+      if (
+        error.message.indexOf("400") !== -1 ||
+        error.message.indexOf("401") !== -1
+      ) {
         lastErrorMessage.value = "Bad Request"
       }
     })

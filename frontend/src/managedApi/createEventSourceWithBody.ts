@@ -15,7 +15,13 @@ async function createEventSourceWithBody(
     })
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
+      // Handle HTTP errors before SSE stream starts
+      // This catches errors that happen before the SSE connection is established
+      const error = new Error(`HTTP error! status: ${response.status}`)
+      if (onError) {
+        onError(error)
+      }
+      return
     }
 
     const reader = response.body?.getReader()

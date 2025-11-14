@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.tools.AiTool;
@@ -29,7 +30,8 @@ public class ChatCompletionConversationService {
   }
 
   public SseEmitter getReplyStream(
-      Conversation conversation, ConversationService conversationService) {
+      Conversation conversation, ConversationService conversationService)
+      throws OpenAiUnauthorizedException {
     // Build conversation history from database
     ConversationHistoryBuilder historyBuilder = new ConversationHistoryBuilder(objectMapper);
     List<ChatMessage> history = historyBuilder.buildHistory(conversation);
@@ -48,12 +50,18 @@ public class ChatCompletionConversationService {
 
     // Convert to SSE and save AI response when complete
     ChatCompletionStream chatStream = new ChatCompletionStream(stream);
-    return chatStream.getSseEmitter(
-        content -> {
-          // Save AI response to database when streaming completes (only for text responses)
-          if (content != null && !content.isEmpty()) {
-            conversationService.addMessageToConversation(conversation, null, content);
-          }
-        });
+    SseEmitter emitter =
+        chatStream.getSseEmitter(
+            content -> {
+              // Save AI response to database when streaming completes (only for text responses)
+              if (content != null && !content.isEmpty()) {
+                conversationService.addMessageToConversation(conversation, null, content);
+              }
+            });
+
+    // Note: Errors from the stream will be handled by the error callback in ChatCompletionStream
+    // which calls emitter.completeWithError(). If it's an OpenAiUnauthorizedException,
+    // it will be caught by the controller's exception handler.
+    return emitter;
   }
 }

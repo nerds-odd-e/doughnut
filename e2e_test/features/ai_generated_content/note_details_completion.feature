@@ -9,11 +9,10 @@ Feature: Note details completion
       | Taipei  | It is a    | Taiwan       |
       | Weather | It rains a | Taipei       |
 
-  # TODO: Re-enable after error handling is properly migrated
-  # Scenario: OpenAI Service Unavailability
-  #   Given the OpenAI service is unavailable due to invalid system token
-  #   When I request to complete the details for the note "Taipei"
-  #   Then I should see a notification of a bad request
+  Scenario: OpenAI Service Unavailability
+    Given the OpenAI service is unavailable due to invalid system token
+    When I request to complete the details for the note "Taipei"
+    Then I should see a notification of a bad request
 
   Scenario: Completing Note Details Using OpenAI and accepting
     Given OpenAI will reply below for user messages:

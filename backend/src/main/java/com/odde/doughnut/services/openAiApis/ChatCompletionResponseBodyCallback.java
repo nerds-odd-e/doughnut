@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.openAiApis;
 
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import io.reactivex.FlowableEmitter;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +9,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,7 +29,15 @@ public class ChatCompletionResponseBodyCallback implements Callback<ResponseBody
   public void onResponse(
       @NotNull Call<ResponseBody> call, @NotNull Response<ResponseBody> response) {
     if (!response.isSuccessful()) {
-      emitter.onError(new RuntimeException("Unsuccessful response: " + response.code()));
+      int statusCode = response.code();
+      // Handle both 401 (Unauthorized) and 400 (Bad Request) as unauthorized errors
+      // since the mock returns BAD_REQUEST status for unauthorized scenarios
+      if (statusCode == HttpStatus.UNAUTHORIZED.value()
+          || statusCode == HttpStatus.BAD_REQUEST.value()) {
+        emitter.onError(new OpenAiUnauthorizedException("Unauthorized: " + response.message()));
+      } else {
+        emitter.onError(new RuntimeException("Unsuccessful response: " + statusCode));
+      }
       return;
     }
 

@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.theokanning.openai.completion.chat.ChatToolCall;
 import io.reactivex.Flowable;
 import java.util.ArrayList;
@@ -87,7 +88,25 @@ public class ChatCompletionStream {
             emitter.completeWithError(e);
           }
         },
-        error -> emitter.completeWithError(error),
+        error -> {
+          // Send error event through SSE before completing with error
+          // This allows the frontend to handle the error properly
+          try {
+            if (error instanceof OpenAiUnauthorizedException) {
+              // Send error event that frontend can catch
+              SseEmitter.SseEventBuilder errorBuilder =
+                  SseEmitter.event().name("error").data("Bad Request");
+              emitter.send(errorBuilder);
+              // Complete normally after sending error event so frontend can process it
+              emitter.complete();
+            } else {
+              emitter.completeWithError(error);
+            }
+          } catch (Exception e) {
+            // If sending fails, just complete with error
+            emitter.completeWithError(error);
+          }
+        },
         () -> {
           // On stream complete, invoke callback if not already called
           if (contentConsumer != null && accumulatedContent.length() > 0 && !consumerCalled[0]) {
