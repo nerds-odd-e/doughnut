@@ -7,10 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
-import com.theokanning.openai.assistants.assistant.Assistant;
-import com.theokanning.openai.assistants.assistant.AssistantRequest;
-import com.theokanning.openai.assistants.assistant.VectorStoreFileRequest;
-import com.theokanning.openai.assistants.vector_store.VectorStoreRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -32,12 +28,9 @@ import okhttp3.RequestBody;
 import org.springframework.http.HttpStatus;
 
 /**
- * Handler for OpenAI API calls, supporting both Chat Completion API and Assistants API.
+ * Handler for OpenAI API calls, supporting Chat Completion API.
  *
  * <p>Chat Completion API methods: {@link #chatCompletion}, {@link #streamChatCompletion}
- *
- * <p>Assistants API methods: {@link #createAssistant}, {@link #createVectorFile}, {@link
- * #uploadTextFile}
  */
 public class OpenAiApiHandler {
   private final OpenAiApi openAiApi;
@@ -119,32 +112,8 @@ public class OpenAiApiHandler {
     return fineTuningJob;
   }
 
-  /**
-   * Creates an OpenAI Assistant using the Assistants API.
-   *
-   * <p>Used by {@link com.odde.doughnut.services.ai.AssistantCreationService} for creating
-   * assistant objects.
-   */
-  public Assistant createAssistant(AssistantRequest assistantRequest) {
-    return blockGet(openAiApi.createAssistant(assistantRequest));
-  }
-
   public String getTranscription(RequestBody requestBody) throws IOException {
     return blockGet(((OpenAiApiExtended) openAiApi).createTranscriptionSrt(requestBody)).string();
-  }
-
-  /**
-   * Creates a vector store file for use with Assistants API.
-   *
-   * <p>Used by {@link com.odde.doughnut.services.ai.AssistantCreationService} for creating notebook
-   * assistants with file search capabilities.
-   */
-  public String createVectorFile(String assistantName, String fileId) {
-    VectorStoreRequest store = VectorStoreRequest.builder().name(assistantName).build();
-    String storeId = blockGet(openAiApi.createVectorStore(store)).getId();
-    VectorStoreFileRequest request = VectorStoreFileRequest.builder().fileId(fileId).build();
-    blockGet(openAiApi.createVectorStoreFile(storeId, request)).getId();
-    return storeId;
   }
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(

@@ -84,11 +84,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @OneToOne(mappedBy = "notebook", fetch = FetchType.LAZY)
   @JsonIgnore
   @Getter
-  private NotebookAssistant notebookAssistant;
-
-  @OneToOne(mappedBy = "notebook", fetch = FetchType.LAZY)
-  @JsonIgnore
-  @Getter
   private NotebookAiAssistant notebookAiAssistant;
 
   public boolean isCertifiable() {
@@ -178,19 +173,5 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   public Circle getCircle() {
     return getOwnership().getCircle();
-  }
-
-  @JsonIgnore
-  public NotebookAssistant buildOrEditNotebookAssistant(
-      Timestamp currentUTCTimestamp, User creator, String id) {
-    NotebookAssistant notebookAssistant = getNotebookAssistant();
-    if (notebookAssistant == null) {
-      notebookAssistant = new NotebookAssistant();
-      notebookAssistant.setNotebook(this);
-    }
-    notebookAssistant.setCreator(creator);
-    notebookAssistant.setCreatedAt(currentUTCTimestamp);
-    notebookAssistant.setAssistantId(id);
-    return notebookAssistant;
   }
 }

@@ -21,7 +21,6 @@ public class ModelFactoryService {
   @Autowired public MemoryTrackerRepository memoryTrackerRepository;
   @Autowired public CircleRepository circleRepository;
   @Autowired public FailureReportRepository failureReportRepository;
-  @Autowired public NotebookAssistantRepository notebookAssistantRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
   @Autowired public AssessmentAttemptRepository assessmentAttemptRepository;
   @Autowired public EntityManager entityManager;

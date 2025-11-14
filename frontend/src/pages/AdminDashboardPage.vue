@@ -20,12 +20,6 @@
       @click="activePage = 'manageModel'"
     >Manage Models</a>
     <a
-      :class="`daisy-tab daisy-tab-lg ${activePage === 'manageAssistant' ? 'daisy-tab-active' : ''}`"
-      role="button"
-      href="#"
-      @click="activePage = 'manageAssistant'"
-    >Manage Assistant</a>
-    <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'manageBazaar' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
@@ -42,7 +36,6 @@
     <FineTuningData v-if="activePage === 'fineTuningData'" />
     <FailureReportList v-if="activePage === 'failureReport'" />
     <ManageModel v-if="activePage === 'manageModel'" />
-    <ManageAssistant v-if="activePage === 'manageAssistant'" />
     <ManageBazaar v-if="activePage === 'manageBazaar'" />
     <CertificateRequests v-if="activePage === 'certificateRequests'" />
   </div>
@@ -53,7 +46,6 @@ import { ref } from "vue"
 import FineTuningData from "../components/admin/FineTuningData.vue"
 import FailureReportList from "../components/admin/FailureReportList.vue"
 import ManageModel from "../components/admin/ManageModel.vue"
-import ManageAssistant from "../components/admin/ManageAssistant.vue"
 import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import CertificateRequests from "../components/admin/CertificateRequests.vue"
@@ -63,7 +55,6 @@ const activePage = ref(
     | "fineTuningData"
     | "failureReport"
     | "manageModel"
-    | "manageAssistant"
     | "manageBazaar"
     | "certificateRequests"
     | undefined

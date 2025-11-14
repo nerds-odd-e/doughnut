@@ -14,9 +14,6 @@
   </form>
 
   <div class="daisy-mt-4">
-    <button @click.prevent="createAssistantForNotebook" class="daisy-btn daisy-btn-error">
-      Create Assistant For Notebook
-    </button>
     <button @click.prevent="downloadNotebookDump" class="daisy-btn daisy-btn-success">
       Download Notebook Dump
     </button>
@@ -44,13 +41,6 @@ const updateAiInstructions = async () => {
   await managedApi.restNotebookController.updateAiAssistant(props.notebook.id, {
     additionalInstructions: additionalInstruction.value,
   })
-}
-
-const createAssistantForNotebook = async () => {
-  await managedApi.restAiAssistantCreationController.recreateNotebookAssistant(
-    props.notebook.id
-  )
-  emit("close")
 }
 
 const downloadNotebookDump = async () => {
