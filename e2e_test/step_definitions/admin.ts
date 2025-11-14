@@ -119,29 +119,9 @@ Given(
   }
 )
 
-Then('I choose model {string} for {string}', (model: string, task: string) => {
+When('I choose model {string} for {string}', (model: string, task: string) => {
   start.goToAdminDashboard().goToModelManagement().chooseModel(model, task)
 })
-
-Given(
-  'OpenAI creates an assistant of ID {string} for name {string} with model {string}',
-  (newId: string, nameOfAssistant: string, modelName: string) => {
-    mock_services
-      .openAi()
-      .stubCreateAssistant(newId, nameOfAssistant, modelName)
-  }
-)
-
-When(
-  'I recreate all the assitants and the new assistant ID should be {string} for {string}',
-  (newId: string, nameOfAssistant: string) => {
-    start
-      .goToAdminDashboard()
-      .goToAssistantManagement()
-      .recreate()
-      .expectNewAssistant(newId, nameOfAssistant)
-  }
-)
 
 When('I remove the notebook {string} from the bazaar', (notebook: string) => {
   start.goToAdminDashboard().goToBazaarManagement().removeFromBazaar(notebook)

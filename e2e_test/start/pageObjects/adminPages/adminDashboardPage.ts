@@ -60,22 +60,6 @@ export function assumeAdminDashboardPage() {
         },
       }
     },
-
-    goToAssistantManagement() {
-      this.goToTabInAdminDashboard('Manage Assistant')
-      return {
-        recreate() {
-          cy.findByRole('button', {
-            name: 'Recreate Default Assistant',
-          }).click()
-          return {
-            expectNewAssistant(newId: string, nameOfAssistant: string) {
-              cy.findByLabelText(nameOfAssistant).should('have.value', newId)
-            },
-          }
-        },
-      }
-    },
     goToCertificationRequestPage() {
       this.goToTabInAdminDashboard('Certification Requests')
       return {

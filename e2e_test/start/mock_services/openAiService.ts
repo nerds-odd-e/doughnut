@@ -122,37 +122,6 @@ const openAiService = () => {
       }
     },
 
-    stubOpenAiVectorFileUpload() {
-      const vectorStoreId = 'vector-store-abc123'
-      serviceMocker.stubPoster(`/vector_stores`, {
-        id: vectorStoreId,
-      })
-      serviceMocker.stubPoster(`/vector_stores/${vectorStoreId}/files`, {
-        id: 'vector-file-1',
-      })
-    },
-
-    async stubCreateAssistant(
-      newId: string,
-      nameOfAssistant: string,
-      modelName?: string
-    ) {
-      return await serviceMocker.mockPostMatchsAndNotMatches(
-        `/assistants`,
-        {
-          name: nameOfAssistant,
-          model: modelName,
-        },
-        undefined,
-        [
-          {
-            id: newId,
-            name: nameOfAssistant,
-          },
-        ]
-      )
-    },
-
     stubChatCompletionStream(messages: Record<string, string>[]) {
       // Create separate responses for each message
       const responses = messages.map((row) =>

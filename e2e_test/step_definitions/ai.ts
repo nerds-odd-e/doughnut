@@ -158,22 +158,6 @@ Given(
 )
 
 Given(
-  'I create a customized assistant for my notebook {string}',
-  (notebook: string) => {
-    start
-      .routerToNotebooksPage()
-      .notebookCard(notebook)
-      .editNotebookSettings()
-      .createCustomizedAssistant()
-  }
-)
-
-Given('OpenAI accepts the vector file upload requests', () => {
-  mock_services.openAi().stubOpenAiUploadResponse(true)
-  mock_services.openAi().stubOpenAiVectorFileUpload()
-})
-
-Given(
   'the OpenAI transcription service will return the following srt transcript:',
   (transcript: string) => {
     mock_services.openAi().stubTranscription(transcript)
