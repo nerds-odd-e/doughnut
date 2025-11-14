@@ -213,7 +213,10 @@ const openAiService = () => {
     stubChatCompletionStream(messages: Record<string, string>[]) {
       // Create separate responses for each message
       const responses = messages.map((row) =>
-        buildChatCompletionStreamEvent(row['assistant reply']!)
+        buildChatCompletionStreamEvent(
+          row['assistant reply']!,
+          row['response type'] as 'requires action' | 'message delta & complete'
+        )
       )
 
       // Use stubPosterWithMultipleResponses to send each response in sequence

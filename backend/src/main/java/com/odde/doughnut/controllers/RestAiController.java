@@ -59,6 +59,12 @@ public class RestAiController {
       @RequestBody Map<String, ToolCallResult> results)
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
+    // Chat completion handles tool execution inline, no need to submit results
+    // If threadId/runId are synthetic (from chat completion), do nothing
+    if (threadId.equals("thread-synthetic") || runId.equals("run-synthetic")) {
+      return; // Chat completion - tool already executed, nothing to submit
+    }
+    // Legacy assistant API path (will be removed in Step 5)
     otherAiServices.resumeRun(threadId, runId).submitToolOutputs(results);
   }
 
@@ -66,6 +72,12 @@ public class RestAiController {
   @Transactional
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
+    // Chat completion handles cancellation inline, no separate endpoint needed
+    // If threadId/runId are synthetic (from chat completion), do nothing
+    if (threadId.equals("thread-synthetic") || runId.equals("run-synthetic")) {
+      return; // Chat completion - nothing to cancel
+    }
+    // Legacy assistant API path (will be removed in Step 5)
     otherAiServices.resumeRun(threadId, runId).cancelRun();
   }
 

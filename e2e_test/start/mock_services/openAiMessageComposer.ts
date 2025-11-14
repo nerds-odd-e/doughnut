@@ -77,13 +77,48 @@ data: [DONE]
 }
 
 // Chat completion streaming event builder
-export function buildChatCompletionStreamEvent(message: string): string {
-  // Send message as single chunk
+export function buildChatCompletionStreamEvent(
+  message: string,
+  responseType?: 'requires action' | 'message delta & complete'
+): string {
+  if (responseType === 'requires action') {
+    // Tool call response
+    const toolCallData = JSON.parse(message)
+    const chunk = {
+      choices: [
+        {
+          index: 0,
+          message: {
+            role: 'assistant',
+            content: null,
+            tool_calls: [
+              {
+                id: 'tool-call-1',
+                type: 'function',
+                function: {
+                  name: 'complete_note_details',
+                  arguments: JSON.stringify(toolCallData),
+                },
+              },
+            ],
+          },
+          finish_reason: 'tool_calls',
+        },
+      ],
+    }
+    return `data: ${JSON.stringify(chunk)}
+
+data: [DONE]
+
+`
+  }
+
+  // Regular message response
   const chunk = {
     choices: [
       {
         index: 0,
-        delta: {
+        message: {
           role: 'assistant',
           content: message,
         },

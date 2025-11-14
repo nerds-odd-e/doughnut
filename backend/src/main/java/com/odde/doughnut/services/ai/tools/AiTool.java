@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai.tools;
 
 import com.theokanning.openai.assistants.assistant.FunctionTool;
 import com.theokanning.openai.assistants.assistant.Tool;
+import com.theokanning.openai.completion.chat.ChatTool;
 
 public record AiTool(String name, String description, Class<?> parameterClass) {
   public Tool getTool() {
@@ -14,6 +15,11 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
             .strict(Boolean.TRUE)
             .parametersDefinitionByClass(castParameterClass)
             .build());
+  }
+
+  /** Get tool definition for Chat Completion API */
+  public ChatTool getChatTool() {
+    return new ChatTool(getFunctionDefinition());
   }
 
   /**
