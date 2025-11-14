@@ -42,7 +42,26 @@ public class ConversationHistoryBuilder {
     Note note = conversation.getSubjectNote();
     if (note != null) {
       String noteDescription = note.getGraphRAGDescription(objectMapper);
-      messages.add(new SystemMessage(noteDescription));
+      String notebookInstructions = note.getNotebookAssistantInstructions();
+
+      // Combine note description with notebook instructions
+      String systemMessageContent = noteDescription;
+      if (notebookInstructions != null && !notebookInstructions.trim().isEmpty()) {
+        systemMessageContent += "\n\n" + notebookInstructions;
+      }
+
+      messages.add(new SystemMessage(systemMessageContent));
+
+      // Add additional context for recall prompts
+      String additionalContext = conversation.getAdditionalContextForSubject();
+      if (additionalContext != null) {
+        messages.add(new SystemMessage(additionalContext));
+      }
+
+      // Add conversation instructions
+      messages.add(
+          new SystemMessage(
+              "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly."));
     }
   }
 }

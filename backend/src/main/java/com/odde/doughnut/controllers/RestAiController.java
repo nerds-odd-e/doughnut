@@ -60,15 +60,16 @@ public class RestAiController {
       throws JsonProcessingException {
     currentUser.assertLoggedIn();
     // Chat completion handles tool execution inline, no need to submit results
-    // If threadId/runId are synthetic (from chat completion), do nothing
+    // This endpoint only handles synthetic IDs from chat completion (no-op)
     if (threadId.equals("thread-synthetic")
         || runId.equals("run-synthetic")
         || threadId.equals("synthetic")
         || runId.equals("synthetic")) {
       return; // Chat completion - tool already executed, nothing to submit
     }
-    // Legacy assistant API path (will be removed in Step 5)
-    otherAiServices.resumeRun(threadId, runId).submitToolOutputs(results);
+    // Non-synthetic IDs should not occur with Chat Completion API
+    throw new IllegalArgumentException(
+        "Invalid thread/run ID: Chat Completion API uses synthetic IDs only");
   }
 
   @PostMapping("/cancel-run/{threadId}/{runId}")
@@ -76,15 +77,16 @@ public class RestAiController {
   public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
     currentUser.assertLoggedIn();
     // Chat completion handles cancellation inline, no separate endpoint needed
-    // If threadId/runId are synthetic (from chat completion), do nothing
+    // This endpoint only handles synthetic IDs from chat completion (no-op)
     if (threadId.equals("thread-synthetic")
         || runId.equals("run-synthetic")
         || threadId.equals("synthetic")
         || runId.equals("synthetic")) {
       return; // Chat completion - nothing to cancel
     }
-    // Legacy assistant API path (will be removed in Step 5)
-    otherAiServices.resumeRun(threadId, runId).cancelRun();
+    // Non-synthetic IDs should not occur with Chat Completion API
+    throw new IllegalArgumentException(
+        "Invalid thread/run ID: Chat Completion API uses synthetic IDs only");
   }
 
   @PostMapping("/suggest-title/{note}")

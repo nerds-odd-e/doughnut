@@ -109,6 +109,11 @@ const submitMessageAndSimulateToolCallChunk = async (
   await flushPromises()
 }
 
+const submitMessageAndSimulateRunResponse = async (wrapper, toolCallChunk) => {
+  // Alias for submitMessageAndSimulateToolCallChunk for backward compatibility
+  await submitMessageAndSimulateToolCallChunk(wrapper, toolCallChunk)
+}
+
 describe("ConversationInner", () => {
   let wrapper
   let note

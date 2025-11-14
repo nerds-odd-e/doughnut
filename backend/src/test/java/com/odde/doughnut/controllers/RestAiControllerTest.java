@@ -21,7 +21,6 @@ import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
-import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -145,72 +144,58 @@ class RestAiControllerTest {
   @Nested
   class SubmitToolCallsResult {
     @Test
-    void shouldSubmitToolOutputSuccessfully() throws JsonProcessingException {
-      String threadId = "thread-123";
-      String runId = "run-123";
+    void shouldHandleSyntheticIdsAsNoOp() throws JsonProcessingException {
+      // Chat completion uses synthetic IDs - tool execution is handled inline
+      String threadId = "synthetic";
+      String runId = "synthetic";
       String toolCallId = "call-456";
-
-      when(openAiApi.submitToolOutputs(
-              eq(threadId),
-              eq(runId),
-              argThat(
-                  request -> {
-                    assertEquals(1, request.getToolOutputs().size());
-                    assertEquals(toolCallId, request.getToolOutputs().get(0).getToolCallId());
-                    return true;
-                  })))
-          .thenReturn(Single.just(new Run()));
 
       Map<String, ToolCallResult> results = new HashMap<>();
       results.put(toolCallId, new ToolCallResult("accepted"));
 
+      // Should not throw and should not call OpenAI API
       controller.submitToolCallsResult(threadId, runId, results);
 
-      verify(openAiApi).submitToolOutputs(eq(threadId), eq(runId), any());
+      verify(openAiApi, never()).submitToolOutputs(any(), any(), any());
     }
 
     @Test
-    void shouldSubmitMultipleToolOutputsSuccessfully() throws JsonProcessingException {
+    void shouldRejectNonSyntheticIds() {
       String threadId = "thread-123";
       String runId = "run-123";
-      String toolCallId1 = "call-456";
-      String toolCallId2 = "call-789";
-
-      when(openAiApi.submitToolOutputs(
-              eq(threadId),
-              eq(runId),
-              argThat(
-                  request -> {
-                    assertEquals(2, request.getToolOutputs().size());
-                    var toolOutputs = request.getToolOutputs();
-                    assertEquals(toolCallId1, toolOutputs.get(0).getToolCallId());
-                    assertEquals(toolCallId2, toolOutputs.get(1).getToolCallId());
-                    return true;
-                  })))
-          .thenReturn(Single.just(new Run()));
+      String toolCallId = "call-456";
 
       Map<String, ToolCallResult> results = new HashMap<>();
-      results.put(toolCallId1, new ToolCallResult("accepted"));
-      results.put(toolCallId2, new ToolCallResult("accepted"));
+      results.put(toolCallId, new ToolCallResult("accepted"));
 
-      controller.submitToolCallsResult(threadId, runId, results);
-
-      verify(openAiApi).submitToolOutputs(eq(threadId), eq(runId), any());
+      // Should throw exception for non-synthetic IDs
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.submitToolCallsResult(threadId, runId, results));
     }
   }
 
   @Nested
   class CancelRun {
     @Test
-    void shouldCancelRunSuccessfully() {
+    void shouldHandleSyntheticIdsAsNoOp() {
+      // Chat completion uses synthetic IDs - cancellation is handled inline
+      String threadId = "synthetic";
+      String runId = "synthetic";
+
+      // Should not throw and should not call OpenAI API
+      controller.cancelRun(threadId, runId);
+
+      verify(openAiApi, never()).cancelRun(any(), any());
+    }
+
+    @Test
+    void shouldRejectNonSyntheticIds() {
       String threadId = "thread-123";
       String runId = "run-123";
 
-      when(openAiApi.cancelRun(threadId, runId)).thenReturn(Single.just(new Run()));
-
-      controller.cancelRun(threadId, runId);
-
-      verify(openAiApi).cancelRun(threadId, runId);
+      // Should throw exception for non-synthetic IDs
+      assertThrows(IllegalArgumentException.class, () -> controller.cancelRun(threadId, runId));
     }
 
     @Test

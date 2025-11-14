@@ -77,12 +77,14 @@ class ConversationHistoryBuilderTest {
       ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
       List<ChatMessage> history = builder.buildHistory(conversation);
 
-      // Then should have system message + 3 conversation messages
-      assertEquals(4, history.size());
-      assertInstanceOf(SystemMessage.class, history.get(0));
-      assertInstanceOf(UserMessage.class, history.get(1));
+      // Then should have system messages (note context + conversation instructions) + 3
+      // conversation messages
+      assertEquals(5, history.size());
+      assertInstanceOf(SystemMessage.class, history.get(0)); // Note context
+      assertInstanceOf(SystemMessage.class, history.get(1)); // Conversation instructions
+      assertInstanceOf(UserMessage.class, history.get(2));
       // AI messages will be AssistantMessage
-      assertInstanceOf(UserMessage.class, history.get(3));
+      assertInstanceOf(UserMessage.class, history.get(4));
     }
 
     @Test
@@ -95,9 +97,10 @@ class ConversationHistoryBuilderTest {
       ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
       List<ChatMessage> history = builder.buildHistory(conversation);
 
-      // Then should only have system message
-      assertEquals(1, history.size());
-      assertInstanceOf(SystemMessage.class, history.get(0));
+      // Then should have system messages (note context + conversation instructions)
+      assertEquals(2, history.size());
+      assertInstanceOf(SystemMessage.class, history.get(0)); // Note context
+      assertInstanceOf(SystemMessage.class, history.get(1)); // Conversation instructions
     }
   }
 }
