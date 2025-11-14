@@ -6,11 +6,11 @@ import static org.hamcrest.Matchers.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.OpenAiAssistant;
+import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
+import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,38 +26,60 @@ import org.springframework.transaction.annotation.Transactional;
 class NoteAutomationServiceTests {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
-  OpenAIAssistantMocker openAIAssistantMocker;
-  OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+  OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
-  private OpenAiAssistant assistant;
   private NoteAutomationService service;
 
   @BeforeEach
   void setup() {
-    openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-    openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation("thread-id");
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
 
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    assistant = new OpenAiAssistant(new OpenAiApiHandler(openAiApi), "ass-id");
-    service =
-        new NoteAutomationService(
-            new NotebookAssistantForNoteService(assistant, testNote, getTestObjectMapper()));
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
+        new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
+    com.fasterxml.jackson.databind.ObjectMapper objectMapper = getTestObjectMapper();
+    ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
+        new ChatCompletionNoteAutomationService(
+            openAiApiHandler, globalSettingsService, objectMapper, testNote);
+    service = new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 
   @Test
-  void shouldHandleCompletedRunWhenSuggestingTitle() throws JsonProcessingException {
-    openAIAssistantThreadMocker
-        .mockCreateRunInProcess("my-run-id")
-        .aCompletedRun()
-        .mockRetrieveRun();
+  void shouldHandleNoToolCallWhenSuggestingTitle() throws JsonProcessingException {
+    // Mock chat completion with no tool calls (empty response with tools)
+    // Note: mockNullChatCompletion only works for requests without tools
+    // For requests with tools, we need to return an empty result
+    com.theokanning.openai.completion.chat.ChatCompletionResult emptyResult =
+        new com.theokanning.openai.completion.chat.ChatCompletionResult();
+    emptyResult.setChoices(new java.util.ArrayList<>());
+    org.mockito.Mockito.doReturn(io.reactivex.Single.just(emptyResult))
+        .when(openAiApi)
+        .createChatCompletion(
+            org.mockito.ArgumentMatchers.argThat(
+                request -> request.getTools() != null && !request.getTools().isEmpty()));
 
     String result = service.suggestTitle();
 
     assertThat(result, is(nullValue()));
+  }
+
+  @Test
+  void shouldReturnSuggestedTitle() throws JsonProcessingException {
+    // Mock chat completion with tool call
+    com.odde.doughnut.services.ai.TitleReplacement titleReplacement =
+        new com.odde.doughnut.services.ai.TitleReplacement();
+    titleReplacement.setNewTitle("Suggested Title");
+    openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
+        titleReplacement, AiToolName.SUGGEST_NOTE_TITLE.getValue());
+
+    String result = service.suggestTitle();
+
+    assertThat(result, is("Suggested Title"));
   }
 
   private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {

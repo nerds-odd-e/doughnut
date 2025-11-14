@@ -19,8 +19,7 @@ import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.OpenAIAssistantMocker;
-import com.odde.doughnut.testability.OpenAIAssistantThreadMocker;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.assistants.run.Run;
 import com.theokanning.openai.client.OpenAiApi;
@@ -230,21 +229,16 @@ class RestAiControllerTest {
   @Nested
   class SuggestNoteTitle {
     Note testNote;
-    OpenAIAssistantMocker openAIAssistantMocker;
-    OpenAIAssistantThreadMocker openAIAssistantThreadMocker;
+    OpenAIChatCompletionMock openAIChatCompletionMock;
 
     @BeforeEach
     void setup() {
       testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
-      openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
-      openAIAssistantThreadMocker = openAIAssistantMocker.mockThreadCreation(null);
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
-      openAIAssistantThreadMocker
-          .mockCreateRunInProcess("my-run-id")
-          .aRunThatRequireAction(suggestedTopic, AiToolName.SUGGEST_NOTE_TITLE.getValue())
-          .mockRetrieveRun()
-          .mockCancelRun("my-run-id");
+      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
+          suggestedTopic, AiToolName.SUGGEST_NOTE_TITLE.getValue());
     }
 
     @Test
@@ -255,16 +249,20 @@ class RestAiControllerTest {
     }
 
     @Test
-    void shouldCallCreateThreadWithRightMessage()
+    void shouldCallChatCompletionWithRightMessage()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       controller.suggestTitle(testNote);
       verify(openAiApi)
-          .createRun(
-              any(),
+          .createChatCompletion(
               argThat(
                   request -> {
-                    assertThat(request.getAdditionalInstructions())
-                        .contains("Please suggest a better title for the note");
+                    String userMessage =
+                        request.getMessages().stream()
+                            .filter(m -> "user".equals(m.getRole()))
+                            .findFirst()
+                            .map(m -> m.getTextContent())
+                            .orElse("");
+                    assertThat(userMessage).contains("Please suggest a better title for the note");
                     return true;
                   }));
     }

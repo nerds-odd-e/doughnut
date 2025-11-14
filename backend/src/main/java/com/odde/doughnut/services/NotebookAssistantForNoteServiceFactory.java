@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookAssistant;
+import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
 import com.odde.doughnut.services.ai.OpenAiAssistant;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
@@ -52,9 +53,10 @@ public final class NotebookAssistantForNoteServiceFactory {
   }
 
   public NoteAutomationService createNoteAutomationService(Note note) {
-    NotebookAssistantForNoteService notebookAssistantForNoteService =
-        getDefaultAssistantForNoteService(note);
-    return new NoteAutomationService(notebookAssistantForNoteService);
+    ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
+        new ChatCompletionNoteAutomationService(
+            openAiApiHandler, globalSettingsService, objectMapper, note);
+    return new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
