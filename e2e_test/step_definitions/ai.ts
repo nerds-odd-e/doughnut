@@ -127,18 +127,6 @@ Given(
 )
 
 Given(
-  'OpenAI assistant will reply below for user messages in a non-stream run {string}:',
-  (runId: string, data: DataTable) => {
-    mock_services
-      .openAi()
-      .stubCreateThread('thread-123')
-      .stubCreateRuns('thread-123', [runId])
-      .aRun(runId)
-      .stubRetrieveRunsThatRequireAction(data.hashes())
-  }
-)
-
-Given(
   'the OpenAI completion service will return the following response for the transcription to text request:',
   (data: DataTable) => {
     mock_services
@@ -155,24 +143,20 @@ Given(
 Given(
   'OpenAI assistant can accept tool call results submission and run cancellation for run {string}',
   (runId: string) => {
+    // Chat Completion uses synthetic IDs - stub endpoints that handle synthetic IDs
     mock_services
       .openAi()
-      .stubToolCallSubmission('thread-123', runId)
-      .stubRunCancellation('thread-123', runId)
+      .stubToolCallSubmission('synthetic', 'synthetic')
+      .stubRunCancellation('synthetic', 'synthetic')
   }
 )
 
 Given(
   'OpenAI assistant {string} will reply below for user messages:',
   (assistantId: string, data: DataTable) => {
-    mock_services
-      .openAi()
-      .stubCreateThread('thread-123')
-      .createThreadWithRunStreamAndStubMessages(
-        'thread-123',
-        data.hashes(),
-        assistantId
-      )
+    // Conversations now use Chat Completion API, not Assistant API
+    // Notebook-specific instructions are included in system messages
+    mock_services.openAi().stubChatCompletionStream(data.hashes())
   }
 )
 

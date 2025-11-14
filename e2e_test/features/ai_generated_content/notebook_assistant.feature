@@ -18,8 +18,8 @@ Feature: Notebook assistant
     And I set my notebook "Vertical farming" to use additional AI instruction "Please use simple English."
     And I create a customized assistant for my notebook "Vertical farming"
     And OpenAI assistant "assistant-id-1" will reply below for user messages:
-      | user message          | assistant reply                   | run id |
-      | Tell me more about it | It is a kind of vertical farming. | run1   |
+      | user message          | assistant reply                   |
+      | Tell me more about it | It is a kind of vertical farming. |
     When I start to chat about the note "Acquaponics"
     And I send the message "Tell me more about it" to AI
     Then I should receive the following chat messages:
