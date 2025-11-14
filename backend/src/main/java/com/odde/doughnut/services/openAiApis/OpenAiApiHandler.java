@@ -68,6 +68,24 @@ public class OpenAiApiHandler {
     return result.getChoices().stream().findFirst();
   }
 
+  public Flowable<ChatCompletionChunk> streamChatCompletion(ChatCompletionRequest request) {
+    // Rebuild the request with streaming enabled
+    ChatCompletionRequest streamingRequest =
+        ChatCompletionRequest.builder()
+            .model(request.getModel())
+            .messages(request.getMessages())
+            .stream(true)
+            .tools(request.getTools())
+            .build();
+
+    return Flowable.create(
+        emitter ->
+            openAiApi
+                .createChatCompletionStream(streamingRequest)
+                .enqueue(new ChatCompletionResponseBodyCallback(emitter)),
+        BackpressureStrategy.BUFFER);
+  }
+
   public List<Model> getModels() {
     return blockGet(openAiApi.listModels()).data;
   }
