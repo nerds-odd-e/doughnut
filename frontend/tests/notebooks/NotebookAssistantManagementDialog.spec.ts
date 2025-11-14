@@ -53,19 +53,18 @@ describe("NotebookAssistantManagementDialog.vue", () => {
     })
   })
 
-  describe("Assistant Creation and Download", () => {
-    it("renders the buttons", () => {
+  describe("Download", () => {
+    it("renders the download button", () => {
       const buttons = wrapper.findAll("button")
-      expect(buttons).toHaveLength(3) // Update, Create, and Download buttons
-      expect(buttons[1].text()).toContain("Create Assistant For Notebook")
-      expect(buttons[2].text()).toContain("Download Notebook Dump")
+      expect(buttons).toHaveLength(2) // Update and Download buttons
+      expect(buttons[1].text()).toContain("Download Notebook Dump")
     })
 
     it("downloads notebook dump when button is clicked", async () => {
       const noteBriefs = [{ id: 1, title: "Note 1", details: "Test content" }]
       mockedDump.mockResolvedValue(noteBriefs)
 
-      await wrapper.findAll("button")[2].trigger("click")
+      await wrapper.findAll("button")[1].trigger("click")
       await flushPromises()
 
       expect(saveAs).toHaveBeenCalledWith(

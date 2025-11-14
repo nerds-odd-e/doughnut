@@ -78,7 +78,6 @@ export type { NoteAccessoriesDTO } from './models/NoteAccessoriesDTO';
 export type { NoteAccessory } from './models/NoteAccessory';
 export type { Notebook } from './models/Notebook';
 export type { NotebookAiAssistant } from './models/NotebookAiAssistant';
-export type { NotebookAssistant } from './models/NotebookAssistant';
 export type { NotebookCertificateApproval } from './models/NotebookCertificateApproval';
 export type { NotebookSettings } from './models/NotebookSettings';
 export type { NotebooksViewedByUser } from './models/NotebooksViewedByUser';
@@ -155,7 +154,6 @@ export type { WikidataSearchEntity } from './models/WikidataSearchEntity';
 
 export { AssimilationControllerService } from './services/AssimilationControllerService';
 export { McpNoteCreationControllerService } from './services/McpNoteCreationControllerService';
-export { RestAiAssistantCreationControllerService } from './services/RestAiAssistantCreationControllerService';
 export { RestAiAudioControllerService } from './services/RestAiAudioControllerService';
 export { RestAiControllerService } from './services/RestAiControllerService';
 export { RestAssessmentControllerService } from './services/RestAssessmentControllerService';
