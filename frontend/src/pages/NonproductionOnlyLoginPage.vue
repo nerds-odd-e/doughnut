@@ -32,7 +32,7 @@
           required
         />
       </div>
-      <button type="submit" class="daisy-btn daisy-btn-primary">Login</button>
+      <button type="submit" id="login-button" class="daisy-btn daisy-btn-primary">Login</button>
     </form>
   </div>
 </template>

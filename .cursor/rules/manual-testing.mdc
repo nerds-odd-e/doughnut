@@ -45,6 +45,18 @@ When performing manual testing, use the browser extension tools to:
 - Take another snapshot to verify the result
 - Check console/network if issues occur
 
+**Finding UI Elements**:
+- Use semantic attributes like `id` (e.g., `id="login-button"`) or `aria-label` when available
+- Use element text/role as fallback (e.g., button with text "Login")
+- Use `browser_snapshot` to see all available elements and their refs
+
+**Login Flow**:
+1. Navigate to http://localhost:5173/
+2. Click "Login via Github" button (this redirects to the username/password form)
+3. Fill in username field (use `id="username"` or find by label "Username")
+4. Fill in password field (use `id="password"` or find by label "Password")
+5. Click login button (use `id="login-button"` or find button with text "Login")
+
 ## Linting Errors
 
 The frontend dev server runs linting and type checking in the background. Error overlays are disabled to avoid blocking the UI, but errors appear in the terminal output. Always check the terminal and fix any errors before committing code.
