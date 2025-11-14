@@ -39,14 +39,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   @OrderBy("updatedAt DESC")
   private Timestamp updatedAt = new Timestamp(new Date().getTime());
 
-  @Column(name = "ai_assistant_thread_id")
-  @Setter
-  private String aiAssistantThreadId;
-
-  @Column(name = "last_ai_assistant_thread_sync")
-  @Setter
-  private Timestamp lastAiAssistantThreadSync;
-
   @JsonIgnore
   public void setAssessmentQuestionInstance(AssessmentQuestionInstance assessmentQuestionInstance) {
     this.subject.setAssessmentQuestionInstance(assessmentQuestionInstance);
@@ -64,17 +56,6 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   public void setRecallPrompt(RecallPrompt recallPrompt) {
     this.subject.setRecallPrompt(recallPrompt);
     this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
-  }
-
-  @JsonIgnore
-  public List<ConversationMessage> getUnseenMessagesByAssistant() {
-    return getConversationMessages().stream()
-        .filter(
-            msg ->
-                getLastAiAssistantThreadSync() == null
-                    || msg.getCreatedAt().after(getLastAiAssistantThreadSync()))
-        .filter(msg -> msg.getSender() != null)
-        .toList();
   }
 
   @JsonIgnore

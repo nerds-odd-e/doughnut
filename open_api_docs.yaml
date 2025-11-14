@@ -4228,11 +4228,6 @@ components:
         updatedAt:
           type: string
           format: date-time
-        aiAssistantThreadId:
-          type: string
-        lastAiAssistantThreadSync:
-          type: string
-          format: date-time
       required:
       - createdAt
       - id

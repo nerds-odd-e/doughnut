@@ -68,12 +68,6 @@ public class ConversationService {
     conversationMessage.setMessage(message);
     conversationMessage.setCreatedAt(currentUTCTimestamp);
 
-    // Update sync timestamp when AI sends a message
-    if (user == null) { // AI message
-      conversation.setLastAiAssistantThreadSync(currentUTCTimestamp);
-      modelFactoryService.conversationRepository.save(conversation);
-    }
-
     return modelFactoryService.conversationMessageRepository.save(conversationMessage);
   }
 
@@ -98,16 +92,6 @@ public class ConversationService {
     return conversationRelatedToUser(entity).stream()
         .filter(conversation -> note.equals(conversation.getSubject().getNote()))
         .toList();
-  }
-
-  public void setConversationAiAssistantThreadId(Conversation conversation, String threadId) {
-    conversation.setAiAssistantThreadId(threadId);
-    modelFactoryService.save(conversation);
-  }
-
-  public void updateLastAiAssistantThreadSync(Conversation conversation) {
-    conversation.setLastAiAssistantThreadSync(testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.save(conversation);
   }
 
   public String exportConversationForChatGPT(Conversation conversation) {
