@@ -185,6 +185,367 @@ describe("aiReplyState", () => {
         toolCallId: "call-1",
       })
     })
+
+    it("accumulates tool calls from delta.tool_calls across multiple chunks", async () => {
+      mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
+
+      const states = createAiReplyStates(mockContext)
+
+      // First chunk: tool call starts with id and name
+      const chunk1 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: "call-123",
+                  type: "function",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName
+                      .COMPLETE_NOTE_DETAILS,
+                    arguments: '{"completion":',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+
+      // Second chunk: arguments continue (fragmented JSON)
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: null, // id can be null in subsequent chunks
+                  function: {
+                    arguments: '"test content"',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
+
+      // Third chunk: arguments complete
+      const chunk3 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: null,
+                  function: {
+                    arguments: "}",
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk3))
+
+      // Final chunk: finish_reason triggers processing
+      const chunk4 = {
+        choices: [
+          {
+            index: 0,
+            delta: {},
+            finish_reason: "tool_calls",
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk4))
+
+      // Verify the accumulated arguments were parsed correctly
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "completion",
+        content: { completion: "test content" },
+        threadId: "synthetic",
+        runId: "synthetic",
+        toolCallId: "call-123",
+      })
+    })
+
+    it("handles multiple tool calls with different indices", async () => {
+      mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
+
+      const states = createAiReplyStates(mockContext)
+
+      // First tool call (index 0)
+      const chunk1 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: "call-1",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName
+                      .COMPLETE_NOTE_DETAILS,
+                    arguments: '{"completion":"first"}',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+
+      // Second tool call (index 1)
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 1,
+                  id: "call-2",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
+                    arguments: '{"newTitle":"Second Title"}',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
+
+      // Final chunk triggers processing
+      const chunk3 = {
+        choices: [
+          {
+            index: 0,
+            delta: {},
+            finish_reason: "tool_calls",
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk3))
+
+      // Both tool calls should be processed
+      expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(2)
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "completion",
+        content: { completion: "first" },
+        threadId: "synthetic",
+        runId: "synthetic",
+        toolCallId: "call-1",
+      })
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "title",
+        content: "Second Title",
+        threadId: "synthetic",
+        runId: "synthetic",
+        toolCallId: "call-2",
+      })
+    })
+
+    it("handles fragmented arguments that need concatenation", async () => {
+      mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
+
+      const states = createAiReplyStates(mockContext)
+
+      // Simulate fragmented JSON arguments across multiple chunks
+      const chunks = [
+        {
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    id: "call-frag",
+                    function: {
+                      name: DummyForGeneratingTypes.aiToolName
+                        .COMPLETE_NOTE_DETAILS,
+                      arguments: '{"completion":',
+                    },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        },
+        {
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    function: {
+                      arguments: '"This is a',
+                    },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        },
+        {
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    function: {
+                      arguments: " long",
+                    },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        },
+        {
+          choices: [
+            {
+              index: 0,
+              delta: {
+                tool_calls: [
+                  {
+                    index: 0,
+                    function: {
+                      arguments: ' completion"}',
+                    },
+                  },
+                ],
+              },
+              finish_reason: null,
+            },
+          ],
+        },
+        {
+          choices: [
+            {
+              index: 0,
+              delta: {},
+              finish_reason: "tool_calls",
+            },
+          ],
+        },
+      ]
+
+      for (const chunk of chunks) {
+        await states["chat.completion.chunk"]?.handleEvent(
+          JSON.stringify(chunk)
+        )
+      }
+
+      // Verify the complete arguments were parsed correctly
+      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
+        suggestionType: "completion",
+        content: { completion: "This is a long completion" },
+        threadId: "synthetic",
+        runId: "synthetic",
+        toolCallId: "call-frag",
+      })
+    })
+
+    it("clears accumulated tool calls after processing", async () => {
+      mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
+
+      const states = createAiReplyStates(mockContext)
+
+      // First tool call
+      const chunk1 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: "call-1",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName
+                      .COMPLETE_NOTE_DETAILS,
+                    arguments: '{"completion":"first"}',
+                  },
+                },
+              ],
+            },
+            finish_reason: "tool_calls",
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+      expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(1)
+
+      // Second tool call in a new stream should not include the first one
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  id: "call-2",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName
+                      .COMPLETE_NOTE_DETAILS,
+                    arguments: '{"completion":"second"}',
+                  },
+                },
+              ],
+            },
+            finish_reason: "tool_calls",
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
+
+      // Should have been called twice (once for each tool call)
+      expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(2)
+      expect(mockContext.handleSuggestion).toHaveBeenNthCalledWith(2, {
+        suggestionType: "completion",
+        content: { completion: "second" },
+        threadId: "synthetic",
+        runId: "synthetic",
+        toolCallId: "call-2",
+      })
+    })
   })
 
   describe("done", () => {

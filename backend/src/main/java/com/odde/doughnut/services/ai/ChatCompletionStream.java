@@ -3,10 +3,7 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
-import com.theokanning.openai.completion.chat.ChatToolCall;
 import io.reactivex.Flowable;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -21,7 +18,6 @@ public class ChatCompletionStream {
     SseEmitter emitter = new SseEmitter();
     ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
     StringBuilder accumulatedContent = new StringBuilder();
-    List<ChatToolCall> accumulatedToolCalls = new ArrayList<>();
     final boolean[] consumerCalled = {false};
 
     this.chatStream.subscribe(
@@ -48,14 +44,8 @@ public class ChatCompletionStream {
                   accumulatedContent.append(deltaContent);
                 }
 
-                // Handle tool calls in delta
-                JsonNode toolCallsNode = deltaNode.get("tool_calls");
-                if (toolCallsNode != null && toolCallsNode.isArray()) {
-                  for (JsonNode toolCallNode : toolCallsNode) {
-                    ChatToolCall toolCall = mapper.treeToValue(toolCallNode, ChatToolCall.class);
-                    accumulatedToolCalls.add(toolCall);
-                  }
-                }
+                // Tool calls in delta are forwarded as raw JSON to frontend
+                // Frontend handles accumulation of fragmented tool call arguments
               }
 
               // Also check message field (for final chunks)

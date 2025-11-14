@@ -25,6 +25,7 @@ interface ChatCompletionChunk {
       role?: string
       content?: string | null
       tool_calls?: Array<{
+        index?: number
         id?: string
         type?: string
         function?: {
@@ -37,6 +38,7 @@ interface ChatCompletionChunk {
       role?: string
       content?: string | null
       tool_calls?: Array<{
+        index?: number
         id?: string
         type?: string
         function?: {
@@ -52,6 +54,21 @@ interface ChatCompletionChunk {
 export const createAiReplyStates = (
   context: AiActionContext
 ): Record<string, AiReplyState> => {
+  // Accumulate tool calls across streaming chunks
+  // Tool calls come incrementally in delta.tool_calls with fragmented arguments
+  const accumulatedToolCalls: Record<
+    number,
+    {
+      id?: string
+      type?: string
+      index: number
+      function: {
+        name?: string
+        arguments: string
+      }
+    }
+  > = {}
+
   const states: Record<string, AiReplyState> = {
     "chat.completion.chunk": {
       status: "Streaming response...",
@@ -66,22 +83,76 @@ export const createAiReplyStates = (
           context.append(content)
         }
 
-        // Handle tool calls (check both delta and message)
-        const toolCalls = choice.delta?.tool_calls || choice.message?.tool_calls
-        if (choice.finish_reason === "tool_calls" && toolCalls) {
+        // Accumulate tool calls from delta.tool_calls (streaming mode)
+        // Tool calls come incrementally with fragmented arguments that need to be concatenated
+        const deltaToolCalls = choice.delta?.tool_calls
+        if (deltaToolCalls) {
+          for (const toolCall of deltaToolCalls) {
+            const index = toolCall.index ?? 0
+
+            // Initialize tool call if this is the first chunk for this index
+            if (!accumulatedToolCalls[index]) {
+              accumulatedToolCalls[index] = {
+                id: toolCall.id,
+                type: toolCall.type,
+                index,
+                function: {
+                  name: toolCall.function?.name,
+                  arguments: toolCall.function?.arguments || "",
+                },
+              }
+            } else {
+              // Accumulate: concatenate arguments (they come as fragmented JSON strings)
+              if (toolCall.function?.arguments) {
+                accumulatedToolCalls[index].function.arguments +=
+                  toolCall.function.arguments
+              }
+              // Update id/type/name if provided in this chunk
+              if (toolCall.id) {
+                accumulatedToolCalls[index].id = toolCall.id
+              }
+              if (toolCall.type) {
+                accumulatedToolCalls[index].type = toolCall.type
+              }
+              if (toolCall.function?.name) {
+                accumulatedToolCalls[index].function.name =
+                  toolCall.function.name
+              }
+            }
+          }
+        }
+
+        // Also check message.tool_calls (for non-streaming or final chunks)
+        const messageToolCalls = choice.message?.tool_calls
+        if (messageToolCalls) {
+          for (const toolCall of messageToolCalls) {
+            const index = toolCall.index ?? 0
+            accumulatedToolCalls[index] = {
+              id: toolCall.id,
+              type: toolCall.type,
+              index,
+              function: {
+                name: toolCall.function?.name,
+                arguments: toolCall.function?.arguments || "{}",
+              },
+            }
+          }
+        }
+
+        // Process accumulated tool calls when finish_reason is "tool_calls"
+        if (choice.finish_reason === "tool_calls") {
           try {
-            const results: Record<string, ToolCallResult> = {}
+            const toolCallsArray = Object.values(accumulatedToolCalls)
 
-            for (const toolCall of toolCalls) {
-              const functionArgs = toolCall.function?.arguments || "{}"
-              const functionName = toolCall.function?.name
+            for (const toolCall of toolCallsArray) {
+              const functionArgs = toolCall.function.arguments || "{}"
+              const functionName = toolCall.function.name
 
-              let result: ToolCallResult
               if (
                 functionName ===
                 DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
               ) {
-                result = await context.handleSuggestion({
+                await context.handleSuggestion({
                   suggestionType: "completion",
                   content: JSON.parse(functionArgs),
                   threadId: "synthetic",
@@ -93,7 +164,7 @@ export const createAiReplyStates = (
                 DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE
               ) {
                 const { newTitle } = JSON.parse(functionArgs)
-                result = await context.handleSuggestion({
+                await context.handleSuggestion({
                   suggestionType: "title",
                   content: newTitle,
                   threadId: "synthetic",
@@ -101,7 +172,7 @@ export const createAiReplyStates = (
                   toolCallId: toolCall.id || "synthetic",
                 })
               } else {
-                result = await context.handleSuggestion({
+                await context.handleSuggestion({
                   suggestionType: "unknown",
                   content: {
                     rawJson: functionArgs,
@@ -112,15 +183,22 @@ export const createAiReplyStates = (
                   toolCallId: toolCall.id || "synthetic",
                 })
               }
-
-              results[toolCall.id || "synthetic"] = result
             }
+
+            // Clear accumulated tool calls after processing
+            Object.keys(accumulatedToolCalls).forEach(
+              (key) => delete accumulatedToolCalls[Number(key)]
+            )
 
             // Tool calls are executed inline with Chat Completion API
             // No need to submit results or cancel runs
           } catch (_e) {
             // When user rejects a tool call, do nothing
             // Tool execution is already handled inline
+            // Clear accumulated tool calls on error
+            Object.keys(accumulatedToolCalls).forEach(
+              (key) => delete accumulatedToolCalls[Number(key)]
+            )
           }
         }
       },
