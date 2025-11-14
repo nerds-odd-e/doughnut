@@ -135,6 +135,60 @@ Given('OpenAI assistant will reply below for user messages in a stream run:', (d
    - Use meaningful descriptions in feature files
    - Document complex test scenarios
 
+### 7. Assertions and Error Messages
+
+**CRITICAL**: When tests fail, error messages must be immediately actionable for debugging. Follow these principles:
+
+1. **Assert with clear domain meaning**
+   - Error messages should describe what went wrong in business/domain terms, not just technical selectors
+   - Example: Instead of "Expected to find text '80%'", use "Expected assessment score to be 80%, but found 75%"
+
+2. **Highlight actual values in failure messages**
+   - Always show both expected and actual values when they differ
+   - Include relevant context (e.g., page content, API response) when helpful
+   - Example: `expect(actualScore, \`Expected assessment score to be ${expectedScore}, but found ${actualScore}\`).to.equal(expectedScore)`
+
+3. **All steps (Given/When/Then) must be assertive and fail early**
+   - Given steps should verify that setup actually succeeded (e.g., verify notes were created, API calls succeeded)
+   - When steps should verify actions completed (e.g., verify button click registered, form submitted)
+   - Then steps should use domain-specific assertions, not just generic visibility checks
+   - Fail immediately when something is wrong - don't let errors cascade
+
+Example of good assertion:
+```typescript
+expectEndOfAssessment(expectedScore?: string) {
+  if (expectedScore) {
+    cy.get('[data-test="assessment-score"]').should($score => {
+      const actualScore = $score.text().trim()
+      expect(actualScore, 
+        `Expected assessment score to be ${expectedScore}, but found ${actualScore}`
+      ).to.equal(expectedScore)
+    })
+  }
+  return endOfAssessment()
+}
+```
+
+Example of assertive Given step (assertion inside page object, not step definition):
+```typescript
+// Step definition - clean and simple
+Given('there are some notes:', (data: DataTable) => {
+  start.testability().injectNotes(data.hashes())
+})
+
+// Page object implementation - contains the assertion
+injectNotes(noteTestData: NoteTestData[]) {
+  return cy.request({...}).then((response) => {
+    const expectedCount = noteTestData.length
+    const actualCount = Object.keys(response.body).length
+    expect(actualCount, 
+      `Expected ${expectedCount} notes to be created, but backend only created ${actualCount}`
+    ).to.equal(expectedCount)
+    // ... rest of implementation
+  })
+}
+```
+
 ## Linting Errors and E2E Tests
 
 **IMPORTANT**: The frontend Vite configuration has `overlay: false` set in the checker plugin to prevent linting/type errors from blocking e2e tests with overlay warnings.
