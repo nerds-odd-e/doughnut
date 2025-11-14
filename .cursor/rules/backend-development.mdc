@@ -179,3 +179,23 @@ Always run all unit tests instead of just sepected file or test case, unlike for
    - Each test should create its own data
    - Avoid sharing mutable state between tests
    - Use fresh instances through @BeforeEach
+
+## Code Style
+
+1. **Import Statements**
+   - Always use proper import statements at the top of files
+   - Never use inline fully qualified class names in code
+   - Bad example:
+   ```java
+   ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+   List<com.theokanning.openai.completion.chat.ChatMessage> messages = ...;
+   ```
+   - Good example:
+   ```java
+   import com.odde.doughnut.configs.ObjectMapperConfig;
+   import com.theokanning.openai.completion.chat.ChatMessage;
+   
+   ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
+   List<ChatMessage> messages = ...;
+   ```
+   - Exception: Only use fully qualified names when there's a naming conflict between two classes with the same simple name from different packages
