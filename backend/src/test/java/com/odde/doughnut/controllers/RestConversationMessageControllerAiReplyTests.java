@@ -24,6 +24,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.SystemMessage;
 import java.sql.Timestamp;
 import java.util.List;
@@ -138,8 +139,7 @@ public class RestConversationMessageControllerAiReplyTests {
       verify(openAiApi).createChatCompletionStream(captor.capture());
 
       // Verify conversation instructions are included in system messages
-      List<com.theokanning.openai.completion.chat.ChatMessage> messages =
-          captor.getValue().getMessages();
+      List<ChatMessage> messages = captor.getValue().getMessages();
       boolean foundConversationInstructions =
           messages.stream()
               .filter(m -> m instanceof SystemMessage)
@@ -172,8 +172,7 @@ public class RestConversationMessageControllerAiReplyTests {
       verify(openAiApi).createChatCompletionStream(captor.capture());
 
       // Verify notebook instructions are included in system messages
-      List<com.theokanning.openai.completion.chat.ChatMessage> messages =
-          captor.getValue().getMessages();
+      List<ChatMessage> messages = captor.getValue().getMessages();
       boolean foundNotebookInstructions =
           messages.stream()
               .filter(m -> m instanceof SystemMessage)
@@ -221,8 +220,7 @@ public class RestConversationMessageControllerAiReplyTests {
       verify(openAiApi).createChatCompletionStream(captor.capture());
 
       // Verify the question details were included in the system messages
-      List<com.theokanning.openai.completion.chat.ChatMessage> messages =
-          captor.getValue().getMessages();
+      List<ChatMessage> messages = captor.getValue().getMessages();
       String expectedQuestionDetails = recallPrompt.getQuestionDetails();
       boolean foundQuestionDetails =
           messages.stream()

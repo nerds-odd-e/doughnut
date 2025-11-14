@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -21,8 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class GraphRAGResultTest {
   @Autowired private MakeMe makeMe;
-  private final ObjectMapper objectMapper =
-      new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
   private static final String PARENT_URI_AND_TITLE = "parentUriAndTitle";
 
   @Test

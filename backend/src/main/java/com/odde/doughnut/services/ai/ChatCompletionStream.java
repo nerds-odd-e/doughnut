@@ -2,6 +2,7 @@ package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import io.reactivex.Flowable;
 import java.util.function.Consumer;
@@ -16,7 +17,7 @@ public class ChatCompletionStream {
 
   public SseEmitter getSseEmitter(Consumer<String> contentConsumer) {
     SseEmitter emitter = new SseEmitter();
-    ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+    ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
     StringBuilder accumulatedContent = new StringBuilder();
     final boolean[] consumerCalled = {false};
 

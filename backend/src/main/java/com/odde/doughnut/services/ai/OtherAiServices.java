@@ -3,6 +3,7 @@ package com.odde.doughnut.services.ai;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -72,9 +73,7 @@ public final class OtherAiServices {
         String jsonContent =
             String.format(
                 "{\"previousNoteDetailsToAppendTo\": %s}",
-                new com.odde.doughnut.configs.ObjectMapperConfig()
-                    .objectMapper()
-                    .writeValueAsString(previousContent));
+                new ObjectMapperConfig().objectMapper().writeValueAsString(previousContent));
         chatAboutNoteRequestBuilder.addUserMessage(
             "Previous note details (in JSON format):\n" + jsonContent);
       } catch (JsonProcessingException e) {
@@ -89,8 +88,7 @@ public final class OtherAiServices {
         .flatMap(
             jsonNode -> {
               try {
-                ObjectMapper mapper =
-                    new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+                ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
                 mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
                 return Optional.of(mapper.treeToValue(jsonNode, NoteDetailsCompletion.class));
               } catch (JsonProcessingException e) {

@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -21,9 +22,11 @@ import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
 import java.io.IOException;
 import java.time.Period;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -47,24 +50,23 @@ class RestNotebookControllerTest {
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Autowired NotebookIndexingService notebookIndexingService;
   @Autowired WebApplicationContext webApplicationContext;
-  @MockitoBean com.odde.doughnut.services.EmbeddingService embeddingService;
+  @MockitoBean EmbeddingService embeddingService;
 
   @BeforeEach
   void setup() {
     // Setup MockMvc
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 
-    when(embeddingService.streamEmbeddingsForNoteList(org.mockito.ArgumentMatchers.any()))
+    when(embeddingService.streamEmbeddingsForNoteList(ArgumentMatchers.any()))
         .thenAnswer(
             invocation -> {
               @SuppressWarnings("unchecked")
-              java.util.List<com.odde.doughnut.entities.Note> notes =
-                  (java.util.List<com.odde.doughnut.entities.Note>) invocation.getArgument(0);
+              List<Note> notes = (List<Note>) invocation.getArgument(0);
               return notes.stream()
                   .map(
                       n ->
-                          new com.odde.doughnut.services.EmbeddingService.EmbeddingForNote(
-                              n, java.util.Optional.of(java.util.List.of(1.0f, 2.0f, 3.0f))));
+                          new EmbeddingService.EmbeddingForNote(
+                              n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
             });
 
     userModel = makeMe.aUser().toModelPlease();

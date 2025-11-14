@@ -9,7 +9,7 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
     @SuppressWarnings("unchecked")
     Class<Object> castParameterClass = (Class<Object>) parameterClass;
     return new FunctionTool(
-        FunctionDefinition.builder()
+        com.theokanning.openai.function.FunctionDefinition.builder()
             .name(name)
             .description(description)
             .strict(Boolean.TRUE)
@@ -28,11 +28,12 @@ public record AiTool(String name, String description, Class<?> parameterClass) {
    * https://github.com/Lambdua/openai4j/pull/74
    */
   @SuppressWarnings("unchecked")
-  public com.theokanning.openai.function.FunctionDefinition getFunctionDefinition() {
+  public FunctionDefinition getFunctionDefinition() {
     Class<Object> castParameterClass = (Class<Object>) parameterClass;
-    return com.theokanning.openai.function.FunctionDefinition.builder()
+    return FunctionDefinition.builder()
         .name(name)
         .description(description)
+        .strict(Boolean.TRUE)
         .parametersDefinitionByClass(castParameterClass)
         .build();
   }

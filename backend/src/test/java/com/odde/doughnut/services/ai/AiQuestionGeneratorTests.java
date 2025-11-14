@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
@@ -107,8 +108,7 @@ class AiQuestionGeneratorTests {
   @Test
   void shouldShuffleChoicesInSpecificOrder() {
     // Setup a mocked randomizer
-    com.odde.doughnut.models.Randomizer mockedRandomizer =
-        mock(com.odde.doughnut.models.Randomizer.class);
+    Randomizer mockedRandomizer = mock(Randomizer.class);
     var objectMapper = new ObjectMapperConfig().objectMapper();
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
         new AiQuestionGenerator(

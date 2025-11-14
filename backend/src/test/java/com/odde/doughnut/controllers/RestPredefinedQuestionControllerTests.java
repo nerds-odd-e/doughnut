@@ -237,7 +237,7 @@ class RestPredefinedQuestionControllerTests {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-          new com.odde.doughnut.configs.ObjectMapperConfig()
+          new ObjectMapperConfig()
               .objectMapper()
               .readTree(
                   "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),

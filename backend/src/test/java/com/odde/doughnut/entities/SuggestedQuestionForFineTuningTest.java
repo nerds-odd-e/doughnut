@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -65,12 +66,10 @@ class SuggestedQuestionForFineTuningTest {
     ChatMessageForFineTuning message = getThirdMessage();
     try {
       // First parse the JSON string to JsonNode, then convert to QuestionEvaluation
-      return new com.odde.doughnut.configs.ObjectMapperConfig()
+      return new ObjectMapperConfig()
           .objectMapper()
           .treeToValue(
-              new com.odde.doughnut.configs.ObjectMapperConfig()
-                  .objectMapper()
-                  .readTree(message.getContent()),
+              new ObjectMapperConfig().objectMapper().readTree(message.getContent()),
               QuestionEvaluation.class);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);

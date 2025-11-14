@@ -1,9 +1,9 @@
 package com.odde.doughnut.services.ai.builder;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.theokanning.openai.completion.chat.*;
-import com.theokanning.openai.function.FunctionDefinition;
 import java.util.ArrayList;
 import java.util.List;
 

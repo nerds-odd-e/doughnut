@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
@@ -98,7 +99,7 @@ public class EmbeddingService {
   /** Generate an embedding vector for a free-form search query. */
   public List<Float> generateQueryEmbedding(String query) {
     String input =
-        new com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy()
+        new CharacterBasedTokenCountingStrategy()
             .truncateByApproxTokens(query == null ? "" : query.trim(), MAX_TOKENS_PER_INPUT);
     EmbeddingRequest request =
         EmbeddingRequest.builder().model(EMBEDDING_MODEL).input(List.of(input)).build();
@@ -133,7 +134,7 @@ public class EmbeddingService {
     }
 
     String structured = sb.toString();
-    return new com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy()
+    return new CharacterBasedTokenCountingStrategy()
         .truncateByApproxTokens(structured, MAX_TOKENS_PER_INPUT);
   }
 

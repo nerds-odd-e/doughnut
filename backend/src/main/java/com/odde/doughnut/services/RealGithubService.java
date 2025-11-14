@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.FailureReport;
 import java.io.IOException;
 import java.net.URI;
@@ -33,10 +34,7 @@ public class RealGithubService implements GithubService {
   public Integer createGithubIssue(FailureReport failureReport)
       throws IOException, InterruptedException {
     FailureReport.GithubIssue githubIssue = failureReport.getGithubIssue();
-    final String body =
-        new com.odde.doughnut.configs.ObjectMapperConfig()
-            .objectMapper()
-            .writeValueAsString(githubIssue);
+    final String body = new ObjectMapperConfig().objectMapper().writeValueAsString(githubIssue);
     Map<String, Object> map =
         apiRequestWithMapAsResult(
             "issues", (builder) -> builder.POST(BodyPublishers.ofString(body)));
@@ -65,7 +63,7 @@ public class RealGithubService implements GithubService {
       String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback)
       throws IOException, InterruptedException {
     HttpResponse<String> response = apiRequest(action, callback);
-    return new com.odde.doughnut.configs.ObjectMapperConfig()
+    return new ObjectMapperConfig()
         .objectMapper()
         .readValue(response.body(), new TypeReference<>() {});
   }
@@ -74,7 +72,7 @@ public class RealGithubService implements GithubService {
       String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback)
       throws IOException, InterruptedException {
     HttpResponse<String> response = apiRequest(action, callback);
-    return new com.odde.doughnut.configs.ObjectMapperConfig()
+    return new ObjectMapperConfig()
         .objectMapper()
         .readValue(response.body(), new TypeReference<>() {});
   }

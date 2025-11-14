@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -60,7 +61,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
 
   public MCQWithAnswer getPreservedQuestion() {
     try {
-      return new com.odde.doughnut.configs.ObjectMapperConfig()
+      return new ObjectMapperConfig()
           .objectMapper()
           .readValue(preservedQuestion, MCQWithAnswer.class);
     } catch (JsonProcessingException e) {
@@ -70,10 +71,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
 
   public void preserveQuestion(MCQWithAnswer mcqWithAnswer) {
     this.preservedQuestion =
-        new com.odde.doughnut.configs.ObjectMapperConfig()
-            .objectMapper()
-            .valueToTree(mcqWithAnswer)
-            .toString();
+        new ObjectMapperConfig().objectMapper().valueToTree(mcqWithAnswer).toString();
   }
 
   public void preserveNoteContent(Note note) {
@@ -104,10 +102,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
     // Add the expected response as an assistant message
     AssistantMessage assistantMessage =
         new AssistantMessage(
-            new com.odde.doughnut.configs.ObjectMapperConfig()
-                .objectMapper()
-                .valueToTree(argument)
-                .toString());
+            new ObjectMapperConfig().objectMapper().valueToTree(argument).toString());
     messages.add(assistantMessage);
 
     return OpenAIChatGPTFineTuningExample.from(messages);

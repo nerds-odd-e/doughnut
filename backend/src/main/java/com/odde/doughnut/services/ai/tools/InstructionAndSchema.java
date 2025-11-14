@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import com.theokanning.openai.function.FunctionDefinition;
 import lombok.Getter;
 
 public class InstructionAndSchema {

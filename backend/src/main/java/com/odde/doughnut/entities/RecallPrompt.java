@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -36,7 +37,7 @@ public class RecallPrompt extends AnswerableQuestionInstance {
 
   @JsonIgnore
   public String getQuestionDetails() {
-    ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+    ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
     MCQWithAnswer mcqWithAnswer = getPredefinedQuestion().getMcqWithAnswer();
     questionDetails.set(

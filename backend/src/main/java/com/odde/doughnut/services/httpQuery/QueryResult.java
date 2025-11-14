@@ -3,6 +3,7 @@ package com.odde.doughnut.services.httpQuery;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import java.util.Optional;
 
 public record QueryResult(String response) {
@@ -13,7 +14,7 @@ public record QueryResult(String response) {
 
   public <T> T mapToObject(Class<T> tClass) throws JsonProcessingException {
     if (response == null) return null;
-    ObjectMapper mapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+    ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     return mapper.readValue(response, tClass);
   }

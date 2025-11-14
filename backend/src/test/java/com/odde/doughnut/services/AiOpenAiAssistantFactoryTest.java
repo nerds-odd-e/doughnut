@@ -8,7 +8,6 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
-import com.theokanning.openai.assistants.assistant.FunctionTool;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -70,8 +69,7 @@ class AiOpenAiAssistantFactoryTest {
               .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TITLE.getValue()))
               .findFirst();
 
-      FunctionTool tool = (FunctionTool) topicTitleTool.get().getTool();
-      FunctionDefinition fun = (FunctionDefinition) tool.getFunction();
+      FunctionDefinition fun = topicTitleTool.get().getFunctionDefinition();
       assertTrue(fun.getStrict());
     }
 

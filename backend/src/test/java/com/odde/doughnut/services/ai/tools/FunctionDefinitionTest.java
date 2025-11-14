@@ -4,12 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import org.junit.jupiter.api.Test;
 
 class FunctionDefinitionTest {
 
-  private final ObjectMapper objectMapper =
-      new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
 
   @Test
   void shouldSerializeWithStrictTrue() throws Exception {

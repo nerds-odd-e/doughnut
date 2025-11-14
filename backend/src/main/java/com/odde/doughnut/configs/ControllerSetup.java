@@ -2,6 +2,7 @@ package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.controllers.dto.ApiError;
+import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.FailureReportFactory;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -52,9 +53,8 @@ public class ControllerSetup {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getErrorBody());
   }
 
-  @ExceptionHandler(com.odde.doughnut.exceptions.ApiException.class)
-  public ResponseEntity<ApiError> handleApiException(
-      com.odde.doughnut.exceptions.ApiException exception) {
+  @ExceptionHandler(ApiException.class)
+  public ResponseEntity<ApiError> handleApiException(ApiException exception) {
     HttpStatus status = getHttpStatusForErrorType(exception.getErrorBody().getErrorType());
     return ResponseEntity.status(status).body(exception.getErrorBody());
   }

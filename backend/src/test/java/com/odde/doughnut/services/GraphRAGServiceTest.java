@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
@@ -775,7 +776,7 @@ public class GraphRAGServiceTest {
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      ObjectMapper objectMapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
       JsonNode jsonNode = objectMapper.valueToTree(result);
 
       assertThat(jsonNode.has("relatedNotes"), is(true));

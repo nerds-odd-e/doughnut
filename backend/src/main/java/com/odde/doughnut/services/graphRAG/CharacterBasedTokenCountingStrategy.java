@@ -1,13 +1,13 @@
 package com.odde.doughnut.services.graphRAG;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import java.nio.charset.StandardCharsets;
 import lombok.SneakyThrows;
 
 public class CharacterBasedTokenCountingStrategy implements TokenCountingStrategy {
   private static final double BYTES_PER_TOKEN = 3.75d;
-  private final ObjectMapper objectMapper =
-      new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
 
   @SneakyThrows
   @Override

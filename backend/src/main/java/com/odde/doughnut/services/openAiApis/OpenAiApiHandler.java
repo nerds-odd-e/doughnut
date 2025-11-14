@@ -4,6 +4,8 @@ import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
@@ -130,15 +132,13 @@ public class OpenAiApiHandler {
           .map(
               content -> {
                 try {
-                  return new com.odde.doughnut.configs.ObjectMapperConfig()
-                      .objectMapper()
-                      .readTree(content);
+                  return new ObjectMapperConfig().objectMapper().readTree(content);
                 } catch (JsonProcessingException e) {
                   return null;
                 }
               });
     } catch (RuntimeException e) {
-      if (e.getCause() instanceof com.fasterxml.jackson.databind.exc.MismatchedInputException) {
+      if (e.getCause() instanceof MismatchedInputException) {
         return Optional.empty();
       }
       throw e;
