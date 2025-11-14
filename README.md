@@ -248,17 +248,7 @@ directory:
 
 ### 7. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 
-### 8. [Manual testing locally](./docs/manual_testing_locally.md)
-
-When you have the backend and frontend running, you can manually test the application.
-
-Visit http://localhost:5173/ to see the frontend web-app. The backend API is available at http://localhost:9081, and you will see the built frontend web-app there as well, but it wil not auto-reload on changes. So stay with the 5173 port.
-
-Local test accounts:
-
-- User: 'old_learner', Password: 'password'
-- User: 'another_old_learner', Password: 'password'
-- User: 'admin', Password: 'password'
+### 8. [Manual testing locally](./.cursor/rules/manual-testing.mdc)
 
 ### 9. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 

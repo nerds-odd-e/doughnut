@@ -1,0 +1,50 @@
+---
+description: Manual testing guidelines for both human developers and AI agents
+alwaysApply: false
+---
+# Manual Testing
+
+## Starting the Development Environment
+
+**IMPORTANT**: Always assume that the developer has already started all necessary services using `pnpm sut`, which includes:
+- Backend (with auto-reload on Java code changes)
+- Frontend (with hot module replacement)
+- Mountebank (mock services)
+
+All services automatically restart/reload when code changes are made. Do NOT restart after making code changes.
+
+**If services are not running**, suggest the user to run `pnpm sut` in a separate terminal first.
+
+To use AI services, set `OPENAI_API_TOKEN` environment variable before running `pnpm sut`.
+
+## Access Points
+
+- Frontend web-app: http://localhost:5173/ (with hot-reload)
+- Backend API: http://localhost:9081
+
+## Test Accounts
+
+- User: 'old_learner', Password: 'password'
+- User: 'another_old_learner', Password: 'password'
+- User: 'admin', Password: 'password'
+
+## For AI Agents: Using Browser Tools
+
+When performing manual testing, use the browser extension tools to:
+
+1. **Navigate to the application**: Use `browser_navigate` to go to http://localhost:5173/
+2. **Take snapshots**: Use `browser_snapshot` to capture the current page state
+3. **Interact with elements**: Use `browser_click`, `browser_type`, `browser_select_option` to interact with the UI
+4. **Verify content**: Use `browser_snapshot` to check page content and verify expected behavior
+5. **Check console/network**: Use `browser_console_messages` and `browser_network_requests` for debugging
+
+**Workflow**:
+- Navigate to the page
+- Take a snapshot to understand the current state
+- Perform actions (click, type, etc.)
+- Take another snapshot to verify the result
+- Check console/network if issues occur
+
+## Linting Errors
+
+The frontend dev server runs linting and type checking in the background. Error overlays are disabled to avoid blocking the UI, but errors appear in the terminal output. Always check the terminal and fix any errors before committing code.
