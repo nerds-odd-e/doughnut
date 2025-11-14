@@ -75,3 +75,9 @@ It is the top priority to keep high cohesion all the time.
 
 * DO NOT follow the defensive programming style
 * Use the simplest solution and minimum code to achieve what the prompt asked to do.
+
+## Documentation
+
+* DO NOT add historical documentation, comments about past implementations, or completed task lists
+* Code readers only care about the current state, not development history
+* Exception: Temporary requirement documents in the `ongoing/` folder are allowed for active development
