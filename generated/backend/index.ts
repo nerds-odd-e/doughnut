@@ -139,7 +139,6 @@ export type { ToolCallFileSearch } from './models/ToolCallFileSearch';
 export type { ToolCallFileSearchResult } from './models/ToolCallFileSearchResult';
 export type { ToolCallFileSearchResultContent } from './models/ToolCallFileSearchResultContent';
 export type { ToolCallFunction } from './models/ToolCallFunction';
-export type { ToolCallResult } from './models/ToolCallResult';
 export type { ToolChoice } from './models/ToolChoice';
 export type { ToolResources } from './models/ToolResources';
 export type { TruncationStrategy } from './models/TruncationStrategy';

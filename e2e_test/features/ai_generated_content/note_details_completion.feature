@@ -19,18 +19,16 @@ Feature: Note details completion
     Given OpenAI will reply below for user messages:
       | user message                      | response type   | assistant reply                   |
       | Please complete the note details. | requires action | {"completion": " vigorous city."} |
-    And OpenAI can accept tool call results submission and cancellation
     When I request to complete the details for the note "Taipei"
     Then I should see the suggested completion "... vigorous city." in the chat dialog
     When I accept the suggested completion
     Then the note details on the current page should be "It is a vigorous city."
 
-  # TODO: Rejecting tool calls will work after removing old Assistant API endpoints in Step 5
-  # Scenario: Completing Note Details Using OpenAI and rejecting
-  #   Given OpenAI will reply below for user messages:
-  #     | user message                      | response type   | assistant reply                   |
-  #     | Please complete the note details. | requires action | {"completion": " vigorous city."} |
-  #   When I request to complete the details for the note "Taipei"
-  #   Then I should see the suggested completion "... vigorous city." in the chat dialog
-  #   When I reject the suggested completion
-  #   Then the note details on the current page should be "It is a"
+  Scenario: Completing Note Details Using OpenAI and rejecting
+    Given OpenAI will reply below for user messages:
+      | user message                      | response type   | assistant reply                   |
+      | Please complete the note details. | requires action | {"completion": " vigorous city."} |
+    When I request to complete the details for the note "Taipei"
+    Then I should see the suggested completion "... vigorous city." in the chat dialog
+    When I reject the suggested completion
+    Then the note details on the current page should be "It is a"

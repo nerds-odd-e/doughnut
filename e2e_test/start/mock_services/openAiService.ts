@@ -96,19 +96,6 @@ const openAiService = () => {
       return serviceMocker.stubGetterWithError500Response(`/*`, {})
     },
 
-    stubToolCallSubmission(threadId: string, runId: string) {
-      serviceMocker.stubPoster(
-        `/threads/${threadId}/runs/${runId}/submit_tool_outputs`,
-        {}
-      )
-      return this
-    },
-
-    stubRunCancellation(threadId: string, runId: string) {
-      serviceMocker.stubPoster(`/threads/${threadId}/runs/${runId}/cancel`, {})
-      return this
-    },
-
     async alwaysResponseAsUnauthorized() {
       await serviceMocker.install()
       await serviceMocker.stubPosterUnauthorized(`/*`, {

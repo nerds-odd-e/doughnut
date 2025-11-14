@@ -1,7 +1,9 @@
-import type { ToolCallResult } from "@generated/backend"
 import { DummyForGeneratingTypes } from "@generated/backend"
-import type { RestAiControllerService } from "@generated/backend/services/RestAiControllerService"
 import { type Suggestion } from "./suggestions"
+
+export type ToolCallResult = {
+  status: string
+}
 
 export type AiReplyState = {
   handleEvent: (data: string) => Promise<void>
@@ -48,8 +50,7 @@ interface ChatCompletionChunk {
 }
 
 export const createAiReplyStates = (
-  context: AiActionContext,
-  aiController: RestAiControllerService
+  context: AiActionContext
 ): Record<string, AiReplyState> => {
   const states: Record<string, AiReplyState> = {
     "chat.completion.chunk": {
@@ -115,17 +116,11 @@ export const createAiReplyStates = (
               results[toolCall.id || "synthetic"] = result
             }
 
-            await aiController.submitToolCallsResult(
-              "synthetic",
-              "synthetic",
-              results
-            )
-          } catch (e) {
-            if (e instanceof Error && e.message === "Tool call was rejected") {
-              await aiController.cancelRun("synthetic", "synthetic")
-            } else {
-              throw e
-            }
+            // Tool calls are executed inline with Chat Completion API
+            // No need to submit results or cancel runs
+          } catch (_e) {
+            // When user rejects a tool call, do nothing
+            // Tool execution is already handled inline
           }
         }
       },

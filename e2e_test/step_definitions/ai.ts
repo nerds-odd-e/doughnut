@@ -137,14 +137,6 @@ Given(
   }
 )
 
-Given('OpenAI can accept tool call results submission and cancellation', () => {
-  // Chat Completion uses synthetic IDs - stub endpoints that handle synthetic IDs
-  mock_services
-    .openAi()
-    .stubToolCallSubmission('synthetic', 'synthetic')
-    .stubRunCancellation('synthetic', 'synthetic')
-})
-
 Given(
   'OpenAI will reply below for user messages with notebook-specific instructions:',
   (data: DataTable) => {

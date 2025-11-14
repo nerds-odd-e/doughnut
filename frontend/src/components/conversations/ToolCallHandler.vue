@@ -17,11 +17,8 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type {
-  NoteDetailsCompletion,
-  Note,
-  ToolCallResult,
-} from "@generated/backend"
+import type { NoteDetailsCompletion, Note } from "@generated/backend"
+import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
 import type { StorageAccessor } from "@/store/createNoteStorage"

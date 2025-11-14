@@ -9,7 +9,6 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
@@ -49,44 +48,6 @@ public class RestAiController {
   @GetMapping("/available-gpt-models")
   public List<String> getAvailableGptModels() {
     return otherAiServices.getAvailableGptModels();
-  }
-
-  @PostMapping("/submit-tool-results/{threadId}/{runId}")
-  @Transactional
-  public void submitToolCallsResult(
-      @PathVariable String threadId,
-      @PathVariable String runId,
-      @RequestBody Map<String, ToolCallResult> results)
-      throws JsonProcessingException {
-    currentUser.assertLoggedIn();
-    // Chat completion handles tool execution inline, no need to submit results
-    // This endpoint only handles synthetic IDs from chat completion (no-op)
-    if (threadId.equals("thread-synthetic")
-        || runId.equals("run-synthetic")
-        || threadId.equals("synthetic")
-        || runId.equals("synthetic")) {
-      return; // Chat completion - tool already executed, nothing to submit
-    }
-    // Non-synthetic IDs should not occur with Chat Completion API
-    throw new IllegalArgumentException(
-        "Invalid thread/run ID: Chat Completion API uses synthetic IDs only");
-  }
-
-  @PostMapping("/cancel-run/{threadId}/{runId}")
-  @Transactional
-  public void cancelRun(@PathVariable String threadId, @PathVariable String runId) {
-    currentUser.assertLoggedIn();
-    // Chat completion handles cancellation inline, no separate endpoint needed
-    // This endpoint only handles synthetic IDs from chat completion (no-op)
-    if (threadId.equals("thread-synthetic")
-        || runId.equals("run-synthetic")
-        || threadId.equals("synthetic")
-        || runId.equals("synthetic")) {
-      return; // Chat completion - nothing to cancel
-    }
-    // Non-synthetic IDs should not occur with Chat Completion API
-    throw new IllegalArgumentException(
-        "Invalid thread/run ID: Chat Completion API uses synthetic IDs only");
   }
 
   @PostMapping("/suggest-title/{note}")

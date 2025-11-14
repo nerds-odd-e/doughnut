@@ -37,7 +37,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
-import type { Conversation, ToolCallResult } from "@generated/backend"
+import type { Conversation } from "@generated/backend"
+import type { ToolCallResult } from "@/models/aiReplyState"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import markdownizer from "../form/markdownizer"
@@ -134,10 +135,7 @@ const currentNote = computed(
 )
 
 const getAiReply = async () => {
-  const states = createAiReplyStates(
-    createAiActionContext(),
-    managedApi.restAiController
-  )
+  const states = createAiReplyStates(createAiActionContext())
 
   aiStatus.value = "Starting AI reply..."
   await managedApi.eventSource

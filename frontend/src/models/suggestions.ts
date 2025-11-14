@@ -1,4 +1,5 @@
-import type { NoteDetailsCompletion, ToolCallResult } from "@generated/backend"
+import type { NoteDetailsCompletion } from "@generated/backend"
+import type { ToolCallResult } from "./aiReplyState"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 
 interface BaseSuggestion {

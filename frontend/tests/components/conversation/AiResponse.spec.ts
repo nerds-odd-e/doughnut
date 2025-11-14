@@ -192,13 +192,8 @@ describe("ConversationInner", () => {
   describe("Tool Call Handling", () => {
     const testCompletion = "**bold completion**"
     const renderedCompletion = "bold completion"
-    const threadId = "synthetic"
-    const runId = "synthetic"
-    const toolCallId = "call-456"
 
     beforeEach(async () => {
-      helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
-      helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
       await submitMessageAndSimulateRunResponse(
@@ -284,11 +279,8 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteDetails
       ).toHaveBeenCalledWith(note.id, { details: testCompletion })
 
-      expect(
-        helper.managedApi.restAiController.submitToolCallsResult
-      ).toHaveBeenCalledWith(threadId, runId, {
-        [toolCallId]: { status: "accepted" },
-      })
+      // Tool calls are executed inline with Chat Completion API
+      // No need to submit results
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
@@ -302,10 +294,7 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteDetails
       ).not.toHaveBeenCalled()
 
-      expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
-        threadId,
-        runId
-      )
+      // Rejection is handled silently - no API calls needed
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
@@ -321,11 +310,8 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteDetails
       ).not.toHaveBeenCalled()
 
-      expect(
-        helper.managedApi.restAiController.submitToolCallsResult
-      ).toHaveBeenCalledWith(threadId, runId, {
-        [toolCallId]: { status: "skipped" },
-      })
+      // Tool calls are executed inline with Chat Completion API
+      // No need to submit results
 
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
@@ -386,7 +372,6 @@ describe("ConversationInner", () => {
 
     describe("Note Access", () => {
       beforeEach(async () => {
-        helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
         helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
       })
 
@@ -425,13 +410,8 @@ describe("ConversationInner", () => {
 
   describe("Title Title Generation", () => {
     const testTitle = "Generated Title"
-    const threadId = "synthetic"
-    const runId = "synthetic"
-    const toolCallId = "call-456"
 
     beforeEach(async () => {
-      helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
-      helper.managedApi.restAiController.cancelRun = vi.fn()
       helper.managedApi.restTextContentController.updateNoteTitle = vi.fn()
 
       await submitMessageAndSimulateRunResponse(
@@ -453,11 +433,8 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteTitle
       ).toHaveBeenCalledWith(note.id, { newTitle: testTitle })
 
-      expect(
-        helper.managedApi.restAiController.submitToolCallsResult
-      ).toHaveBeenCalledWith(threadId, runId, {
-        [toolCallId]: { status: "accepted" },
-      })
+      // Tool calls are executed inline with Chat Completion API
+      // No need to submit results
 
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)
     })
@@ -470,10 +447,7 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
 
-      expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
-        threadId,
-        runId
-      )
+      // Rejection is handled silently - no API calls needed
 
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)
     })
@@ -488,11 +462,8 @@ describe("ConversationInner", () => {
         helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
 
-      expect(
-        helper.managedApi.restAiController.submitToolCallsResult
-      ).toHaveBeenCalledWith(threadId, runId, {
-        [toolCallId]: { status: "skipped" },
-      })
+      // Tool calls are executed inline with Chat Completion API
+      // No need to submit results
 
       expect(wrapper.find(".title-suggestion").exists()).toBe(false)
     })
@@ -500,14 +471,8 @@ describe("ConversationInner", () => {
 
   describe("Unknown Tool Call Handling", () => {
     const testJson = { unknown: "data" }
-    const threadId = "synthetic"
-    const runId = "synthetic"
-    const toolCallId = "call-456"
 
     beforeEach(async () => {
-      helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
-      helper.managedApi.restAiController.cancelRun = vi.fn()
-
       const run = createToolCallChunk("unknown_tool", testJson)
 
       await submitMessageAndSimulateToolCallChunk(wrapper, run)
@@ -533,11 +498,8 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(
-        helper.managedApi.restAiController.submitToolCallsResult
-      ).toHaveBeenCalledWith(threadId, runId, {
-        [toolCallId]: { status: "skipped" },
-      })
+      // Tool calls are executed inline with Chat Completion API
+      // No need to submit results
 
       expect(wrapper.find(".unknown-request").exists()).toBe(false)
     })
@@ -546,10 +508,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
-        "synthetic",
-        "synthetic"
-      )
+      // Rejection is handled silently - no API calls needed
 
       expect(wrapper.find(".unknown-request").exists()).toBe(false)
     })

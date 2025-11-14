@@ -2,14 +2,12 @@ package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
-import com.odde.doughnut.controllers.dto.ToolCallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -27,9 +25,7 @@ import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -138,76 +134,6 @@ class RestAiControllerTest {
 
       when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
-    }
-  }
-
-  @Nested
-  class SubmitToolCallsResult {
-    @Test
-    void shouldHandleSyntheticIdsAsNoOp() throws JsonProcessingException {
-      // Chat completion uses synthetic IDs - tool execution is handled inline
-      String threadId = "synthetic";
-      String runId = "synthetic";
-      String toolCallId = "call-456";
-
-      Map<String, ToolCallResult> results = new HashMap<>();
-      results.put(toolCallId, new ToolCallResult("accepted"));
-
-      // Should not throw and should not call OpenAI API
-      controller.submitToolCallsResult(threadId, runId, results);
-
-      verify(openAiApi, never()).submitToolOutputs(any(), any(), any());
-    }
-
-    @Test
-    void shouldRejectNonSyntheticIds() {
-      String threadId = "thread-123";
-      String runId = "run-123";
-      String toolCallId = "call-456";
-
-      Map<String, ToolCallResult> results = new HashMap<>();
-      results.put(toolCallId, new ToolCallResult("accepted"));
-
-      // Should throw exception for non-synthetic IDs
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> controller.submitToolCallsResult(threadId, runId, results));
-    }
-  }
-
-  @Nested
-  class CancelRun {
-    @Test
-    void shouldHandleSyntheticIdsAsNoOp() {
-      // Chat completion uses synthetic IDs - cancellation is handled inline
-      String threadId = "synthetic";
-      String runId = "synthetic";
-
-      // Should not throw and should not call OpenAI API
-      controller.cancelRun(threadId, runId);
-
-      verify(openAiApi, never()).cancelRun(any(), any());
-    }
-
-    @Test
-    void shouldRejectNonSyntheticIds() {
-      String threadId = "thread-123";
-      String runId = "run-123";
-
-      // Should throw exception for non-synthetic IDs
-      assertThrows(IllegalArgumentException.class, () -> controller.cancelRun(threadId, runId));
-    }
-
-    @Test
-    void shouldRequireUserToBeLoggedIn() {
-      controller =
-          new RestAiController(
-              notebookAssistantForNoteServiceFactory,
-              new OtherAiServices(openAiApi),
-              makeMe.aNullUserModelPlease());
-
-      assertThrows(
-          ResponseStatusException.class, () -> controller.cancelRun("thread-123", "run-123"));
     }
   }
 

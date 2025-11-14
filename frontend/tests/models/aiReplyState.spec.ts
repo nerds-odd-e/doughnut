@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
 import { createAiReplyStates } from "@/models/aiReplyState"
-import type { RestAiControllerService } from "@generated/backend/services/RestAiControllerService"
 import { DummyForGeneratingTypes } from "@generated/backend"
 
 describe("aiReplyState", () => {
@@ -11,18 +10,13 @@ describe("aiReplyState", () => {
     handleSuggestion: vi.fn(),
   }
 
-  const mockAiController = {
-    submitToolCallsResult: vi.fn().mockResolvedValue({}),
-    cancelRun: vi.fn(),
-  } as unknown as RestAiControllerService
-
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   describe("chat.completion.chunk", () => {
     it("appends content from message", async () => {
-      const states = createAiReplyStates(mockContext, mockAiController)
+      const states = createAiReplyStates(mockContext)
       const chunk = {
         choices: [
           {
@@ -68,7 +62,7 @@ describe("aiReplyState", () => {
         ],
       }
 
-      const states = createAiReplyStates(mockContext, mockAiController)
+      const states = createAiReplyStates(mockContext)
       await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
@@ -78,11 +72,8 @@ describe("aiReplyState", () => {
         runId: "synthetic",
         toolCallId: "call-1",
       })
-      expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
-        "synthetic",
-        "synthetic",
-        { "call-1": { status: "accepted" } }
-      )
+      // Tool calls are executed inline with Chat Completion API
+      // No need to submit results
     })
 
     it("handles title suggestion tool call", async () => {
@@ -111,7 +102,7 @@ describe("aiReplyState", () => {
         ],
       }
 
-      const states = createAiReplyStates(mockContext, mockAiController)
+      const states = createAiReplyStates(mockContext)
       await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
@@ -123,7 +114,7 @@ describe("aiReplyState", () => {
       })
     })
 
-    it("cancels when tool call is rejected", async () => {
+    it("handles tool call rejection silently", async () => {
       mockContext.handleSuggestion.mockRejectedValue(
         new Error("Tool call was rejected")
       )
@@ -149,14 +140,12 @@ describe("aiReplyState", () => {
         ],
       }
 
-      const states = createAiReplyStates(mockContext, mockAiController)
+      const states = createAiReplyStates(mockContext)
+      // Should not throw - rejection is handled silently
       await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
-      expect(mockAiController.cancelRun).toHaveBeenCalledWith(
-        "synthetic",
-        "synthetic"
-      )
-      expect(mockAiController.submitToolCallsResult).not.toHaveBeenCalled()
+      expect(mockContext.handleSuggestion).toHaveBeenCalled()
+      // No API calls needed - rejection is handled inline
     })
 
     it("handles unknown tool call", async () => {
@@ -182,7 +171,7 @@ describe("aiReplyState", () => {
         ],
       }
 
-      const states = createAiReplyStates(mockContext, mockAiController)
+      const states = createAiReplyStates(mockContext)
       await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
@@ -200,7 +189,7 @@ describe("aiReplyState", () => {
 
   describe("done", () => {
     it("resets context", async () => {
-      const states = createAiReplyStates(mockContext, mockAiController)
+      const states = createAiReplyStates(mockContext)
       await states.done?.handleEvent("")
 
       expect(mockContext.reset).toHaveBeenCalled()
