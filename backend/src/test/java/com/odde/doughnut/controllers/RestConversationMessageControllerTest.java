@@ -41,7 +41,13 @@ class RestConversationMessageControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestConversationMessageController(currentUser, conversationService, null);
+    com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
+        new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
+    com.fasterxml.jackson.databind.ObjectMapper objectMapper =
+        new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+    controller =
+        new RestConversationMessageController(
+            currentUser, conversationService, null, objectMapper, null, globalSettingsService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -119,9 +125,18 @@ class RestConversationMessageControllerTest {
 
     @Test
     void forLoginUserOnly() {
+      com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
+          new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
+      com.fasterxml.jackson.databind.ObjectMapper objectMapper =
+          new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
       controller =
           new RestConversationMessageController(
-              makeMe.aNullUserModelPlease(), conversationService, null);
+              makeMe.aNullUserModelPlease(),
+              conversationService,
+              null,
+              objectMapper,
+              null,
+              globalSettingsService);
       ResponseStatusException exception =
           assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
@@ -409,9 +424,18 @@ class RestConversationMessageControllerTest {
 
     @Test
     void shouldRequireLogin() {
+      com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
+          new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
+      com.fasterxml.jackson.databind.ObjectMapper objectMapper =
+          new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
       controller =
           new RestConversationMessageController(
-              makeMe.aNullUserModelPlease(), conversationService, null);
+              makeMe.aNullUserModelPlease(),
+              conversationService,
+              null,
+              objectMapper,
+              null,
+              globalSettingsService);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));

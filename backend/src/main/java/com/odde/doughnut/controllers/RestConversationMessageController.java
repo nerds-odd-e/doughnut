@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -9,10 +10,15 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
+import com.odde.doughnut.services.ai.ChatCompletionConversationService;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.apache.coyote.BadRequestException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -23,14 +29,22 @@ public class RestConversationMessageController {
   private final ConversationService conversationService;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final UserModel currentUser;
+  private final ChatCompletionConversationService chatCompletionConversationService;
 
   public RestConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
-      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory) {
+      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
+      ObjectMapper objectMapper,
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      GlobalSettingsService globalSettingsService) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    this.chatCompletionConversationService =
+        new ChatCompletionConversationService(
+            openAiApiHandler, globalSettingsService, objectMapper);
   }
 
   @PostMapping("/assessment-question/{assessmentQuestion}")
@@ -99,20 +113,14 @@ public class RestConversationMessageController {
       throws UnexpectedNoAccessRightException, BadRequestException {
     currentUser.assertAuthorization(conversation);
     try {
-      Note note = conversation.getSubject().getNote();
-      if (note == null && conversation.getSubject().getRecallPrompt() != null) {
-        note = conversation.getSubject().getRecallPrompt().getPredefinedQuestion().getNote();
-      }
+      Note note = conversation.getSubjectNote();
       if (note == null) {
         throw new RuntimeException(
             "Only note or recall prompt related conversation can have AI reply");
       }
-      return notebookAssistantForNoteServiceFactory
-          .createChatAboutNoteService(note)
-          .startChat(conversation, conversationService)
-          .createOrResumeThread()
-          .provideUnseenMessages()
-          .getReplyStream();
+
+      // Use new chat completion service
+      return chatCompletionConversationService.getReplyStream(conversation, conversationService);
     } catch (OpenAiUnauthorizedException e) {
       // Since this method is asynchronous, the exception body is not returned to the client.
       // Instead, the client will receive a 400 Bad Request status code, with no body.

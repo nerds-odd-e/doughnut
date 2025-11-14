@@ -6,6 +6,7 @@ import createOpenAiChatCompletionMock from './createOpenAiChatCompletionMock'
 import openAiAssistantThreadMocker from './openAiAssistantThreadMocker'
 import {
   buildRunStreamEvent,
+  buildChatCompletionStreamEvent,
   type RunStreamData,
 } from './openAiMessageComposer'
 
@@ -206,6 +207,21 @@ const openAiService = () => {
       serviceMocker.stubPoster(`/threads`, {
         id: threadId,
       })
+      return this
+    },
+
+    stubChatCompletionStream(messages: Record<string, string>[]) {
+      // Create separate responses for each message
+      const responses = messages.map((row) =>
+        buildChatCompletionStreamEvent(row['assistant reply']!)
+      )
+
+      // Use stubPosterWithMultipleResponses to send each response in sequence
+      serviceMocker.stubPosterWithMultipleResponses(
+        `/chat/completions`,
+        responses,
+        { 'Content-Type': 'text/event-stream' }
+      )
       return this
     },
 

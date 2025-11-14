@@ -121,10 +121,8 @@ Then('I contest the question', () => {
 Given(
   'OpenAI assistant will reply below for user messages in a stream run:',
   (data: DataTable) => {
-    mock_services
-      .openAi()
-      .stubCreateThread('thread-123')
-      .createThreadWithRunStreamAndStubMessages('thread-123', data.hashes())
+    // Use chat completion streaming instead of assistant API
+    mock_services.openAi().stubChatCompletionStream(data.hashes())
   }
 )
 

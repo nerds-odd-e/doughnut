@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -10,7 +11,6 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
-import com.odde.doughnut.entities.NotebookAssistant;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.TimestampOperations;
@@ -20,6 +20,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIAssistantMocker;
+import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -85,7 +86,12 @@ public class RestConversationMessageControllerAiReplyTests {
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
         new RestConversationMessageController(
-            currentUser, conversationService, notebookAssistantForNoteServiceFactory);
+            currentUser,
+            conversationService,
+            notebookAssistantForNoteServiceFactory,
+            getTestObjectMapper(),
+            openAiApi,
+            globalSettingsService);
     openAIAssistantMocker = new OpenAIAssistantMocker(openAiApi);
   }
 
@@ -95,15 +101,12 @@ public class RestConversationMessageControllerAiReplyTests {
 
   @Nested
   class NewChatTests {
+    OpenAIChatCompletionStreamMocker chatMocker;
+
     @BeforeEach
     void setUp() {
-      openAIAssistantMocker
-          .mockThreadCreation("my-thread")
-          .mockCreateMessage()
-          .andARunStream("my-run-id")
-          .withMessageDeltas("I", " am", " a", " Chatbot")
-          .withMessageCompleted("I am a Chatbot")
-          .mockTheRunStream();
+      chatMocker = new OpenAIChatCompletionStreamMocker(openAiApi);
+      chatMocker.withMessage("I am a Chatbot").mockStreamResponse();
     }
 
     @SuppressWarnings("unchecked")
@@ -121,44 +124,38 @@ public class RestConversationMessageControllerAiReplyTests {
 
     @Test
     void chatWithAIAndGetResponse() throws UnexpectedNoAccessRightException, BadRequestException {
+      // Add a user message first
+      makeMe
+          .aConversationMessage(conversation)
+          .sender(currentUser.getEntity())
+          .message("Hello!")
+          .please();
+
       SseEmitter res = controller.getAiReply(conversation);
       assertThat(res.getTimeout()).isNull();
-      List<ResponseBodyEmitter.DataWithMediaType> events =
-          peekIntoEmitterWithExtremelyInappropriateIntimacy(res);
-      assertThat(events.size()).isEqualTo(21);
+
+      // Verify AI message was saved to database
+      makeMe.refresh(conversation);
+      assertEquals(2, conversation.getConversationMessages().size());
+      ConversationMessage aiMessage = conversation.getConversationMessages().get(1);
+      assertEquals("I am a Chatbot", aiMessage.getMessage());
+      assertNull(aiMessage.getSender()); // AI has no sender
     }
 
-    @Test
-    void chatWithUseTheChatAssistant()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      GlobalSettingsService globalSettingsService =
-          new GlobalSettingsService(makeMe.modelFactoryService);
-      globalSettingsService
-          .defaultAssistantId()
-          .setKeyValue(makeMe.aTimestamp().please(), "chat-assistant");
-      controller.getAiReply(conversation);
-      ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
-      verify(openAiApi).createRunStream(any(), captor.capture());
-      assertThat(captor.getValue().getAssistantId()).isEqualTo("chat-assistant");
-    }
+    // TODO: This test was checking Assistant API specific behavior - needs rewriting for chat
+    // completion
+    // @Test
+    // void chatWithUseTheChatAssistant()
+    //     throws UnexpectedNoAccessRightException, BadRequestException {
+    //   // No longer relevant - chat completion doesn't use assistant IDs
+    // }
 
-    @Test
-    void shouldUseNotebookSpecificAssistantWhenAvailable()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      NotebookAssistant notebookAssistant = new NotebookAssistant();
-      notebookAssistant.setAssistantId("notebook-assistant");
-      notebookAssistant.setNotebook(note.getNotebook());
-      notebookAssistant.setCreator(currentUser.getEntity());
-      notebookAssistant.setCreatedAt(currentUTCTimestamp);
-      makeMe.modelFactoryService.save(notebookAssistant);
-      makeMe.refresh(note.getNotebook());
-
-      controller.getAiReply(conversation);
-
-      ArgumentCaptor<RunCreateRequest> captor = ArgumentCaptor.forClass(RunCreateRequest.class);
-      verify(openAiApi).createRunStream(any(), captor.capture());
-      assertThat(captor.getValue().getAssistantId()).isEqualTo("notebook-assistant");
-    }
+    // TODO: This test was checking Assistant API specific behavior - will be replaced in Step 4
+    // @Test
+    // void shouldUseNotebookSpecificAssistantWhenAvailable()
+    //     throws UnexpectedNoAccessRightException, BadRequestException {
+    //   // Will test that notebook-specific instructions are included in chat completion
+    // }
 
     @Test
     void shouldAddMessageToConversationWhenMessageCompleted()
@@ -175,18 +172,12 @@ public class RestConversationMessageControllerAiReplyTests {
       assertThat(lastMessage.getSender()).isNull(); // AI message should have no user
     }
 
-    @Test
-    void itShouldPersistThreadIdInConversation()
-        throws UnexpectedNoAccessRightException, BadRequestException {
-      assertThat(conversation.getAiAssistantThreadId()).isNull();
-      assertThat(conversation.getLastAiAssistantThreadSync()).isNull();
-
-      controller.getAiReply(conversation);
-
-      assertThat(conversation.getAiAssistantThreadId()).isEqualTo("my-thread");
-      assertThat(conversation.getLastAiAssistantThreadSync())
-          .isEqualTo(testabilitySettings.getCurrentUTCTimestamp());
-    }
+    // TODO: Thread IDs no longer relevant with chat completion - will be removed in Step 7
+    // @Test
+    // void itShouldPersistThreadIdInConversation()
+    //     throws UnexpectedNoAccessRightException, BadRequestException {
+    //   // Chat completion doesn't use threads
+    // }
 
     @Test
     void shouldUpdateSyncTimestampWhenAIMessageIsAdded()

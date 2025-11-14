@@ -75,3 +75,38 @@ data: [DONE]
 
 `
 }
+
+// Chat completion streaming event builder
+export function buildChatCompletionStreamEvent(message: string): string {
+  // Send message as single chunk
+  const chunk = {
+    choices: [
+      {
+        index: 0,
+        delta: {
+          role: 'assistant',
+          content: message,
+        },
+        finish_reason: null,
+      },
+    ],
+  }
+
+  const doneChunk = {
+    choices: [
+      {
+        index: 0,
+        delta: {},
+        finish_reason: 'stop',
+      },
+    ],
+  }
+
+  return `data: ${JSON.stringify(chunk)}
+
+data: ${JSON.stringify(doneChunk)}
+
+data: [DONE]
+
+`
+}
