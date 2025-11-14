@@ -53,28 +53,72 @@ export const simulateAiResponse = (content = "## I'm ChatGPT") => {
   )
 }
 
-const createToolCallChunk = (functionName: string, args: object) => ({
-  choices: [
+// Create realistic streaming tool call chunks (delta.tool_calls format)
+const createToolCallChunk = (functionName: string, args: object) => {
+  const argumentsString = JSON.stringify(args)
+  // Return array of chunks to simulate realistic streaming
+  return [
+    // First chunk: tool call with id, name, and start of arguments
     {
-      index: 0,
-      message: {
-        role: "assistant",
-        content: null,
-        tool_calls: [
-          {
-            id: "call-456",
-            type: "function",
-            function: {
-              name: functionName,
-              arguments: JSON.stringify(args),
-            },
+      choices: [
+        {
+          index: 0,
+          delta: {
+            role: "assistant",
+            tool_calls: [
+              {
+                index: 0,
+                id: "call-456",
+                type: "function",
+                function: {
+                  name: functionName,
+                  arguments: argumentsString.substring(
+                    0,
+                    Math.min(20, argumentsString.length)
+                  ),
+                },
+              },
+            ],
           },
-        ],
-      },
-      finish_reason: "tool_calls",
+          finish_reason: null,
+        },
+      ],
     },
-  ],
-})
+    // Subsequent chunks: continue with fragmented arguments (if needed)
+    ...(argumentsString.length > 20
+      ? [
+          {
+            choices: [
+              {
+                index: 0,
+                delta: {
+                  tool_calls: [
+                    {
+                      index: 0,
+                      function: {
+                        arguments: argumentsString.substring(20),
+                      },
+                    },
+                  ],
+                },
+                finish_reason: null,
+              },
+            ],
+          },
+        ]
+      : []),
+    // Final chunk: finish_reason triggers processing
+    {
+      choices: [
+        {
+          index: 0,
+          delta: {},
+          finish_reason: "tool_calls",
+        },
+      ],
+    },
+  ]
+}
 
 const setupTestData = () => {
   const noteRealm = makeMe.aNoteRealm.please()
@@ -97,14 +141,20 @@ const submitMessage = async (wrapper) => {
 
 const submitMessageAndSimulateToolCallChunk = async (
   wrapper,
-  toolCallChunk
+  toolCallChunks
 ) => {
   await submitMessage(wrapper)
-  helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "chat.completion.chunk",
-    JSON.stringify(toolCallChunk)
-  )
-  await flushPromises()
+  // toolCallChunks can be a single chunk (old format) or array of chunks (new format)
+  const chunks = Array.isArray(toolCallChunks)
+    ? toolCallChunks
+    : [toolCallChunks]
+  for (const chunk of chunks) {
+    helper.managedApi.eventSource.eventSourceRequest.onMessage(
+      "chat.completion.chunk",
+      JSON.stringify(chunk)
+    )
+    await flushPromises()
+  }
 }
 
 const submitMessageAndSimulateRunResponse = async (wrapper, toolCallChunk) => {

@@ -122,23 +122,6 @@ export const createAiReplyStates = (
           }
         }
 
-        // Also check message.tool_calls (for non-streaming or final chunks)
-        const messageToolCalls = choice.message?.tool_calls
-        if (messageToolCalls) {
-          for (const toolCall of messageToolCalls) {
-            const index = toolCall.index ?? 0
-            accumulatedToolCalls[index] = {
-              id: toolCall.id,
-              type: toolCall.type,
-              index,
-              function: {
-                name: toolCall.function?.name,
-                arguments: toolCall.function?.arguments || "{}",
-              },
-            }
-          }
-        }
-
         // Process accumulated tool calls when finish_reason is "tool_calls"
         if (choice.finish_reason === "tool_calls") {
           try {

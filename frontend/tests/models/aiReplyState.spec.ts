@@ -38,32 +38,69 @@ describe("aiReplyState", () => {
     it("handles tool call successfully", async () => {
       mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
 
-      const chunk = {
+      const states = createAiReplyStates(mockContext)
+
+      // First chunk: tool call with id, name, and start of arguments
+      const chunk1 = {
         choices: [
           {
             index: 0,
-            message: {
+            delta: {
               role: "assistant",
-              content: null,
               tool_calls: [
                 {
+                  index: 0,
                   id: "call-1",
                   type: "function",
                   function: {
                     name: DummyForGeneratingTypes.aiToolName
                       .COMPLETE_NOTE_DETAILS,
-                    arguments: JSON.stringify({ completion: "test content" }),
+                    arguments: '{"completion":',
                   },
                 },
               ],
             },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+
+      // Second chunk: continue arguments
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {
+              tool_calls: [
+                {
+                  index: 0,
+                  function: {
+                    arguments: '"test content"}',
+                  },
+                },
+              ],
+            },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
+
+      // Final chunk: finish_reason triggers processing
+      const chunk3 = {
+        choices: [
+          {
+            index: 0,
+            delta: {},
             finish_reason: "tool_calls",
           },
         ],
       }
 
-      const states = createAiReplyStates(mockContext)
-      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk3))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
@@ -79,31 +116,46 @@ describe("aiReplyState", () => {
     it("handles title suggestion tool call", async () => {
       mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
 
-      const chunk = {
+      const states = createAiReplyStates(mockContext)
+
+      // First chunk: tool call with id, name, and arguments
+      const chunk1 = {
         choices: [
           {
             index: 0,
-            message: {
+            delta: {
               role: "assistant",
-              content: null,
               tool_calls: [
                 {
+                  index: 0,
                   id: "call-1",
                   type: "function",
                   function: {
                     name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
-                    arguments: JSON.stringify({ newTitle: "New Title" }),
+                    arguments: '{"newTitle":"New Title"}',
                   },
                 },
               ],
             },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+
+      // Final chunk: finish_reason triggers processing
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {},
             finish_reason: "tool_calls",
           },
         ],
       }
 
-      const states = createAiReplyStates(mockContext)
-      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "title",
@@ -119,30 +171,46 @@ describe("aiReplyState", () => {
         new Error("Tool call was rejected")
       )
 
-      const chunk = {
+      const states = createAiReplyStates(mockContext)
+
+      // First chunk: tool call
+      const chunk1 = {
         choices: [
           {
             index: 0,
-            message: {
+            delta: {
               tool_calls: [
                 {
+                  index: 0,
                   id: "call-1",
                   function: {
                     name: DummyForGeneratingTypes.aiToolName
                       .COMPLETE_NOTE_DETAILS,
-                    arguments: JSON.stringify({ completion: "test" }),
+                    arguments: '{"completion":"test"}',
                   },
                 },
               ],
             },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+
+      // Final chunk: finish_reason triggers processing
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {},
             finish_reason: "tool_calls",
           },
         ],
       }
 
-      const states = createAiReplyStates(mockContext)
       // Should not throw - rejection is handled silently
-      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalled()
       // No API calls needed - rejection is handled inline
@@ -151,33 +219,49 @@ describe("aiReplyState", () => {
     it("handles unknown tool call", async () => {
       mockContext.handleSuggestion.mockResolvedValue({ status: "skipped" })
 
-      const chunk = {
+      const states = createAiReplyStates(mockContext)
+
+      // First chunk: tool call
+      const chunk1 = {
         choices: [
           {
             index: 0,
-            message: {
+            delta: {
               tool_calls: [
                 {
+                  index: 0,
                   id: "call-1",
                   function: {
                     name: "unknown_tool",
-                    arguments: JSON.stringify({ test: "data" }),
+                    arguments: '{"test":"data"}',
                   },
                 },
               ],
             },
+            finish_reason: null,
+          },
+        ],
+      }
+
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk1))
+
+      // Final chunk: finish_reason triggers processing
+      const chunk2 = {
+        choices: [
+          {
+            index: 0,
+            delta: {},
             finish_reason: "tool_calls",
           },
         ],
       }
 
-      const states = createAiReplyStates(mockContext)
-      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "unknown",
         content: {
-          rawJson: JSON.stringify({ test: "data" }),
+          rawJson: '{"test":"data"}',
           functionName: "unknown_tool",
         },
         threadId: "synthetic",
