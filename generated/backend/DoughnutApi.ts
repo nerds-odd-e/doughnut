@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { BaseHttpRequest } from './core/BaseHttpRequest';
 import type { OpenAPIConfig } from './core/OpenAPI';
+import { Interceptors } from './core/OpenAPI';
 import { FetchHttpRequest } from './core/FetchHttpRequest';
 import { AssimilationControllerService } from './services/AssimilationControllerService';
 import { McpNoteCreationControllerService } from './services/McpNoteCreationControllerService';
@@ -77,6 +78,10 @@ export class DoughnutApi {
             PASSWORD: config?.PASSWORD,
             HEADERS: config?.HEADERS,
             ENCODE_PATH: config?.ENCODE_PATH,
+            interceptors: config?.interceptors ?? {
+                request: new Interceptors(),
+                response: new Interceptors(),
+            },
         });
         this.assimilationController = new AssimilationControllerService(this.request);
         this.mcpNoteCreationController = new McpNoteCreationControllerService(this.request);
