@@ -17,7 +17,7 @@ Feature: Notebook assistant
     And OpenAI accepts the vector file upload requests
     And I set my notebook "Vertical farming" to use additional AI instruction "Please use simple English."
     And I create a customized assistant for my notebook "Vertical farming"
-    And OpenAI assistant "assistant-id-1" will reply below for user messages:
+    And OpenAI will reply below for user messages with notebook-specific instructions:
       | user message          | assistant reply                   |
       | Tell me more about it | It is a kind of vertical farming. |
     When I start to chat about the note "Acquaponics"

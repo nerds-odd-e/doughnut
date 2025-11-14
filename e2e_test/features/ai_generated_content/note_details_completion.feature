@@ -16,10 +16,10 @@ Feature: Note details completion
   #   Then I should see a notification of a bad request
 
   Scenario: Completing Note Details Using OpenAI and accepting
-    Given OpenAI assistant will reply below for user messages in a stream run:
-      | user message                      | response type   | assistant reply                   | run id |
-      | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
-    And OpenAI assistant can accept tool call results submission and run cancellation for run "run1"
+    Given OpenAI will reply below for user messages:
+      | user message                      | response type   | assistant reply                   |
+      | Please complete the note details. | requires action | {"completion": " vigorous city."} |
+    And OpenAI can accept tool call results submission and cancellation
     When I request to complete the details for the note "Taipei"
     Then I should see the suggested completion "... vigorous city." in the chat dialog
     When I accept the suggested completion
@@ -27,9 +27,9 @@ Feature: Note details completion
 
   # TODO: Rejecting tool calls will work after removing old Assistant API endpoints in Step 5
   # Scenario: Completing Note Details Using OpenAI and rejecting
-  #   Given OpenAI assistant will reply below for user messages in a stream run:
-  #     | user message                      | response type   | assistant reply                   | run id |
-  #     | Please complete the note details. | requires action | {"completion": " vigorous city."} | run1   |
+  #   Given OpenAI will reply below for user messages:
+  #     | user message                      | response type   | assistant reply                   |
+  #     | Please complete the note details. | requires action | {"completion": " vigorous city."} |
   #   When I request to complete the details for the note "Taipei"
   #   Then I should see the suggested completion "... vigorous city." in the chat dialog
   #   When I reject the suggested completion

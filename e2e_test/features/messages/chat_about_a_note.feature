@@ -10,10 +10,10 @@ Feature: Chat about a note with AI
 
 
   Scenario: The users can chat with AI about the current note
-    Given OpenAI assistant will reply below for user messages in a stream run:
-      | user message          | assistant reply              | run id |
-      | Is Naba one of them?  | No. It is not.               | run1   |
-      | Is this note correct? | No, there are 47 prefectures | run2   |
+    Given OpenAI will reply below for user messages:
+      | user message          | assistant reply              |
+      | Is Naba one of them?  | No. It is not.               |
+      | Is this note correct? | No, there are 47 prefectures |
     When I start a conversation about the note "There are 42 prefectures in Japan" with a message "Is Naba one of them?" to AI
     Then I should receive the following chat messages:
       | role      | message              |
@@ -29,9 +29,9 @@ Feature: Chat about a note with AI
 
 
   Scenario: User can export conversation to continue in external AI tools
-    Given OpenAI assistant will reply below for user messages in a stream run:
-      | user message         | assistant reply | run id |
-      | Is Naba one of them? | No. It is not.  | run1   |
+    Given OpenAI will reply below for user messages:
+      | user message         | assistant reply |
+      | Is Naba one of them? | No. It is not.  |
     When I start a conversation about the note "There are 42 prefectures in Japan" with a message "Is Naba one of them?" to AI
     Then I should receive the following chat messages:
       | role      | message              |

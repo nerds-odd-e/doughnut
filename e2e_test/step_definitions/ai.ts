@@ -118,13 +118,10 @@ Then('I contest the question', () => {
   cy.findByRole('button', { name: "Doesn't make sense?" }).click()
 })
 
-Given(
-  'OpenAI assistant will reply below for user messages in a stream run:',
-  (data: DataTable) => {
-    // Use chat completion streaming instead of assistant API
-    mock_services.openAi().stubChatCompletionStream(data.hashes())
-  }
-)
+Given('OpenAI will reply below for user messages:', (data: DataTable) => {
+  // Use chat completion streaming
+  mock_services.openAi().stubChatCompletionStream(data.hashes())
+})
 
 Given(
   'the OpenAI completion service will return the following response for the transcription to text request:',
@@ -140,21 +137,18 @@ Given(
   }
 )
 
-Given(
-  'OpenAI assistant can accept tool call results submission and run cancellation for run {string}',
-  (runId: string) => {
-    // Chat Completion uses synthetic IDs - stub endpoints that handle synthetic IDs
-    mock_services
-      .openAi()
-      .stubToolCallSubmission('synthetic', 'synthetic')
-      .stubRunCancellation('synthetic', 'synthetic')
-  }
-)
+Given('OpenAI can accept tool call results submission and cancellation', () => {
+  // Chat Completion uses synthetic IDs - stub endpoints that handle synthetic IDs
+  mock_services
+    .openAi()
+    .stubToolCallSubmission('synthetic', 'synthetic')
+    .stubRunCancellation('synthetic', 'synthetic')
+})
 
 Given(
-  'OpenAI assistant {string} will reply below for user messages:',
-  (assistantId: string, data: DataTable) => {
-    // Conversations now use Chat Completion API, not Assistant API
+  'OpenAI will reply below for user messages with notebook-specific instructions:',
+  (data: DataTable) => {
+    // Conversations use Chat Completion API
     // Notebook-specific instructions are included in system messages
     mock_services.openAi().stubChatCompletionStream(data.hashes())
   }
