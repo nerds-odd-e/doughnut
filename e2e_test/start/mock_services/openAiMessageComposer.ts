@@ -113,23 +113,36 @@ data: [DONE]
 `
   }
 
-  // Regular message response - just one chunk with content
-  const chunk = {
+  // Regular message response - use delta for streaming (matches real API)
+  // Send content as delta chunks
+  const chunks: string[] = []
+  // For simplicity, send as one delta chunk (in real streaming, this would be character by character)
+  const deltaChunk = {
     choices: [
       {
         index: 0,
-        message: {
+        delta: {
           role: 'assistant',
           content: message,
         },
+        finish_reason: null,
+      },
+    ],
+  }
+  chunks.push(`data: ${JSON.stringify(deltaChunk)}`)
+
+  // Final chunk with finish reason
+  const finalChunk = {
+    choices: [
+      {
+        index: 0,
+        delta: {},
         finish_reason: 'stop',
       },
     ],
   }
+  chunks.push(`data: ${JSON.stringify(finalChunk)}`)
+  chunks.push('data: [DONE]')
 
-  return `data: ${JSON.stringify(chunk)}
-
-data: [DONE]
-
-`
+  return `${chunks.join('\n\n')}\n\n`
 }

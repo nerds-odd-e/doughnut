@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.openAiApis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import io.reactivex.FlowableEmitter;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,12 +17,10 @@ import retrofit2.Response;
  * objects.
  */
 public class ChatCompletionResponseBodyCallback implements Callback<ResponseBody> {
-  private final FlowableEmitter<ChatCompletionChunk> emitter;
-  private final ObjectMapper objectMapper;
+  private final FlowableEmitter<String> emitter; // Emit raw JSON strings instead of chunks
 
-  public ChatCompletionResponseBodyCallback(FlowableEmitter<ChatCompletionChunk> emitter) {
+  public ChatCompletionResponseBodyCallback(FlowableEmitter<String> emitter) {
     this.emitter = emitter;
-    this.objectMapper = new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
   }
 
   @Override
@@ -65,8 +61,9 @@ public class ChatCompletionResponseBodyCallback implements Callback<ResponseBody
           }
           if (!data.isEmpty()) {
             try {
-              ChatCompletionChunk chunk = objectMapper.readValue(data, ChatCompletionChunk.class);
-              emitter.onNext(chunk);
+              // Emit raw JSON string directly to preserve delta field
+              // The SDK's ChatCompletionChunk might not preserve delta when deserializing
+              emitter.onNext(data);
             } catch (Exception e) {
               // Skip malformed chunks
             }

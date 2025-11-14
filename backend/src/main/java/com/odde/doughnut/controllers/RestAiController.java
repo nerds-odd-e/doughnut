@@ -61,7 +61,10 @@ public class RestAiController {
     currentUser.assertLoggedIn();
     // Chat completion handles tool execution inline, no need to submit results
     // If threadId/runId are synthetic (from chat completion), do nothing
-    if (threadId.equals("thread-synthetic") || runId.equals("run-synthetic")) {
+    if (threadId.equals("thread-synthetic")
+        || runId.equals("run-synthetic")
+        || threadId.equals("synthetic")
+        || runId.equals("synthetic")) {
       return; // Chat completion - tool already executed, nothing to submit
     }
     // Legacy assistant API path (will be removed in Step 5)
@@ -74,7 +77,10 @@ public class RestAiController {
     currentUser.assertLoggedIn();
     // Chat completion handles cancellation inline, no separate endpoint needed
     // If threadId/runId are synthetic (from chat completion), do nothing
-    if (threadId.equals("thread-synthetic") || runId.equals("run-synthetic")) {
+    if (threadId.equals("thread-synthetic")
+        || runId.equals("run-synthetic")
+        || threadId.equals("synthetic")
+        || runId.equals("synthetic")) {
       return; // Chat completion - nothing to cancel
     }
     // Legacy assistant API path (will be removed in Step 5)

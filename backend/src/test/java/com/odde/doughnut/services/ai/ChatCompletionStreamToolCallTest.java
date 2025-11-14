@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import io.reactivex.Flowable;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,7 @@ class ChatCompletionStreamToolCallTest {
   @Test
   void shouldDetectToolCallsInStream() {
     // Given a stream with empty content (indicating tool calls will be present)
-    Flowable<ChatCompletionChunk> flowable = Flowable.empty();
+    Flowable<String> flowable = Flowable.empty();
     ChatCompletionStream stream = new ChatCompletionStream(flowable);
 
     // When getting SSE emitter
@@ -26,7 +25,7 @@ class ChatCompletionStreamToolCallTest {
   @Test
   void shouldInvokeCallbackOnlyOnceForToolCalls() {
     // Given a stream that completes
-    Flowable<ChatCompletionChunk> flowable = Flowable.empty();
+    Flowable<String> flowable = Flowable.empty();
     ChatCompletionStream stream = new ChatCompletionStream(flowable);
 
     // When providing a consumer

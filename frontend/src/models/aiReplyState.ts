@@ -19,6 +19,18 @@ export interface AiActionContext {
 interface ChatCompletionChunk {
   choices?: Array<{
     index: number
+    delta?: {
+      role?: string
+      content?: string | null
+      tool_calls?: Array<{
+        id?: string
+        type?: string
+        function?: {
+          name?: string
+          arguments?: string
+        }
+      }>
+    }
     message?: {
       role?: string
       content?: string | null
@@ -47,20 +59,19 @@ export const createAiReplyStates = (
         const choice = chunk.choices?.[0]
         if (!choice) return
 
-        // Handle content delta
-        if (choice.message?.content) {
-          context.append(choice.message.content)
+        // Handle content delta (streaming chunks use delta, final chunks use message)
+        const content = choice.delta?.content || choice.message?.content
+        if (content) {
+          context.append(content)
         }
 
-        // Handle tool calls
-        if (
-          choice.finish_reason === "tool_calls" &&
-          choice.message?.tool_calls
-        ) {
+        // Handle tool calls (check both delta and message)
+        const toolCalls = choice.delta?.tool_calls || choice.message?.tool_calls
+        if (choice.finish_reason === "tool_calls" && toolCalls) {
           try {
             const results: Record<string, ToolCallResult> = {}
 
-            for (const toolCall of choice.message.tool_calls) {
+            for (const toolCall of toolCalls) {
               const functionArgs = toolCall.function?.arguments || "{}"
               const functionName = toolCall.function?.name
 

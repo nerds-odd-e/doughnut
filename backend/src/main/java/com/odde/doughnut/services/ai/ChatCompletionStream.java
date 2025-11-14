@@ -1,8 +1,7 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.theokanning.openai.completion.chat.AssistantMessage;
-import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import com.theokanning.openai.completion.chat.ChatToolCall;
 import io.reactivex.Flowable;
 import java.util.ArrayList;
@@ -11,9 +10,9 @@ import java.util.function.Consumer;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class ChatCompletionStream {
-  private final Flowable<ChatCompletionChunk> chatStream;
+  private final Flowable<String> chatStream; // Raw JSON strings instead of chunks
 
-  public ChatCompletionStream(Flowable<ChatCompletionChunk> chatStream) {
+  public ChatCompletionStream(Flowable<String> chatStream) {
     this.chatStream = chatStream;
   }
 
@@ -25,34 +24,54 @@ public class ChatCompletionStream {
     final boolean[] consumerCalled = {false};
 
     this.chatStream.subscribe(
-        chunk -> {
+        rawJson -> {
           try {
-            // Emit native chat completion chunk
-            String chunkJson = mapper.writeValueAsString(chunk);
+            // Emit raw JSON directly to preserve delta field
             SseEmitter.SseEventBuilder builder =
-                SseEmitter.event().name("chat.completion.chunk").data(chunkJson);
+                SseEmitter.event().name("chat.completion.chunk").data(rawJson);
             emitter.send(builder);
 
-            // Accumulate for callback
-            if (chunk.getChoices() != null && !chunk.getChoices().isEmpty()) {
-              var choice = chunk.getChoices().get(0);
-              if (choice.getMessage() instanceof AssistantMessage assistantMessage) {
-                String content = assistantMessage.getContent();
-                if (content != null) {
-                  accumulatedContent.append(content);
+            // Parse raw JSON to extract delta content for callback
+            JsonNode chunkNode = mapper.readTree(rawJson);
+            JsonNode choicesNode = chunkNode.get("choices");
+
+            if (choicesNode != null && choicesNode.isArray() && choicesNode.size() > 0) {
+              JsonNode choiceNode = choicesNode.get(0);
+
+              // Parse delta from raw JSON (streaming chunks use delta)
+              JsonNode deltaNode = choiceNode.get("delta");
+              if (deltaNode != null && !deltaNode.isNull()) {
+                JsonNode contentNode = deltaNode.get("content");
+                if (contentNode != null && contentNode.isTextual()) {
+                  String deltaContent = contentNode.asText();
+                  accumulatedContent.append(deltaContent);
                 }
-                if (assistantMessage.getToolCalls() != null) {
-                  accumulatedToolCalls.addAll(assistantMessage.getToolCalls());
+
+                // Handle tool calls in delta
+                JsonNode toolCallsNode = deltaNode.get("tool_calls");
+                if (toolCallsNode != null && toolCallsNode.isArray()) {
+                  for (JsonNode toolCallNode : toolCallsNode) {
+                    ChatToolCall toolCall = mapper.treeToValue(toolCallNode, ChatToolCall.class);
+                    accumulatedToolCalls.add(toolCall);
+                  }
                 }
               }
 
-              // On completion, invoke callback
-              if (choice.getFinishReason() != null
-                  && !choice.getFinishReason().isEmpty()
-                  && !consumerCalled[0]) {
+              // Also check message field (for final chunks)
+              JsonNode messageNode = choiceNode.get("message");
+              if (messageNode != null) {
+                JsonNode messageContentNode = messageNode.get("content");
+                if (messageContentNode != null && messageContentNode.isTextual()) {
+                  accumulatedContent.append(messageContentNode.asText());
+                }
+              }
+
+              // Check finish_reason for completion
+              JsonNode finishReasonNode = choiceNode.get("finish_reason");
+              if (finishReasonNode != null && finishReasonNode.isTextual() && !consumerCalled[0]) {
+                String finishReason = finishReasonNode.asText();
                 // Only call consumer for text responses, not tool calls
-                if (!"tool_calls".equals(choice.getFinishReason())
-                    && accumulatedContent.length() > 0) {
+                if (!"tool_calls".equals(finishReason) && accumulatedContent.length() > 0) {
                   contentConsumer.accept(accumulatedContent.toString());
                 }
                 consumerCalled[0] = true;

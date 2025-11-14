@@ -68,7 +68,7 @@ public class OpenAiApiHandler {
     return result.getChoices().stream().findFirst();
   }
 
-  public Flowable<ChatCompletionChunk> streamChatCompletion(ChatCompletionRequest request) {
+  public Flowable<String> streamChatCompletion(ChatCompletionRequest request) {
     // Rebuild the request with streaming enabled
     ChatCompletionRequest streamingRequest =
         ChatCompletionRequest.builder()

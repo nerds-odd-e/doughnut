@@ -2,7 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.theokanning.openai.completion.chat.ChatCompletionChunk;
 import io.reactivex.Flowable;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,7 @@ class ChatCompletionStreamTest {
   @Test
   void shouldCreateSseEmitterFromFlowable() {
     // Given an empty flowable (just testing construction)
-    Flowable<ChatCompletionChunk> flowable = Flowable.empty();
+    Flowable<String> flowable = Flowable.empty();
     ChatCompletionStream stream = new ChatCompletionStream(flowable);
 
     // When getting SSE emitter
@@ -27,7 +26,7 @@ class ChatCompletionStreamTest {
   @Test
   void shouldHandleEmptyStream() {
     // Given an empty stream
-    Flowable<ChatCompletionChunk> flowable = Flowable.empty();
+    Flowable<String> flowable = Flowable.empty();
     ChatCompletionStream stream = new ChatCompletionStream(flowable);
 
     // When getting SSE emitter
@@ -40,7 +39,7 @@ class ChatCompletionStreamTest {
   @Test
   void shouldAcceptContentConsumer() {
     // Given a stream
-    Flowable<ChatCompletionChunk> flowable = Flowable.empty();
+    Flowable<String> flowable = Flowable.empty();
     ChatCompletionStream stream = new ChatCompletionStream(flowable);
 
     // When providing a content consumer

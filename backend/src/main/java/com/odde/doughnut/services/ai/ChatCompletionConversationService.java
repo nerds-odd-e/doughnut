@@ -44,8 +44,7 @@ public class ChatCompletionConversationService {
         ChatCompletionRequest.builder().model(modelName).messages(history).tools(chatTools).build();
 
     // Stream the response
-    Flowable<com.theokanning.openai.completion.chat.ChatCompletionChunk> stream =
-        openAiApiHandler.streamChatCompletion(request);
+    Flowable<String> stream = openAiApiHandler.streamChatCompletion(request);
 
     // Convert to SSE and save AI response when complete
     ChatCompletionStream chatStream = new ChatCompletionStream(stream);
