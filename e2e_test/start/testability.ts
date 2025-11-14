@@ -79,9 +79,12 @@ const testability = () => {
           body: requestBody,
         })
         .then((response) => {
-          expect(Object.keys(response.body).length).to.equal(
-            noteTestData.length
-          )
+          const expectedCount = noteTestData.length
+          const actualCount = Object.keys(response.body).length
+          expect(
+            actualCount,
+            `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
+          ).to.equal(expectedCount)
           cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
             const mergedMap = { ...existingMap, ...response.body }
             cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)

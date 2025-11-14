@@ -113,7 +113,13 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectEndOfAssessment(expectedScore?: string) {
       if (expectedScore) {
-        cy.contains(expectedScore)
+        cy.contains('Your score:').then(($scoreElement) => {
+          const actualScore = $scoreElement.text().trim()
+          expect(
+            actualScore,
+            `Expected assessment score to be "${expectedScore}", but found "${actualScore}"`
+          ).to.equal(expectedScore)
+        })
       }
       return endOfAssessment()
     },
