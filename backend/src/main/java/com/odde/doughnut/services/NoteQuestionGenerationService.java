@@ -10,6 +10,7 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.assistants.message.MessageRequest;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.util.Optional;
 
 public class NoteQuestionGenerationService {
@@ -34,7 +35,18 @@ public class NoteQuestionGenerationService {
     return generateQuestionWithChatCompletion(additionalMessage);
   }
 
-  private MCQWithAnswer generateQuestionWithChatCompletion(MessageRequest additionalMessage) {
+  public ChatCompletionRequest buildQuestionGenerationRequest(MessageRequest additionalMessage) {
+    OpenAIChatRequestBuilder chatRequestBuilder = buildQuestionGenerationRequestBuilder();
+    // Add the question generation instruction (this also sets up JSON schema response format)
+    chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool());
+    // Add any additional message if provided (after the question generation instruction)
+    if (additionalMessage != null) {
+      chatRequestBuilder.addUserMessage(additionalMessage.getContent().toString());
+    }
+    return chatRequestBuilder.build();
+  }
+
+  private OpenAIChatRequestBuilder buildQuestionGenerationRequestBuilder() {
     var chatRequestBuilder = getChatRequestBuilder();
 
     String instructions = note.getNotebookAssistantInstructions();
@@ -42,10 +54,13 @@ public class NoteQuestionGenerationService {
       chatRequestBuilder.addSystemMessage(instructions);
     }
 
-    // Add the question generation instruction
-    chatRequestBuilder.addUserMessage(AiToolFactory.mcqWithAnswerAiTool().getMessageBody());
+    return chatRequestBuilder;
+  }
 
-    // Add any additional message if provided
+  private MCQWithAnswer generateQuestionWithChatCompletion(MessageRequest additionalMessage) {
+    OpenAIChatRequestBuilder chatRequestBuilder = buildQuestionGenerationRequestBuilder();
+    // Add any additional message if provided (before the question generation instruction)
+    // Note: responseJsonSchema will add the question generation instruction
     if (additionalMessage != null) {
       chatRequestBuilder.addUserMessage(additionalMessage.getContent().toString());
     }
