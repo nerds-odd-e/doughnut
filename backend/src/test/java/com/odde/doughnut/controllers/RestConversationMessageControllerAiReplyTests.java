@@ -15,7 +15,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -49,7 +48,6 @@ public class RestConversationMessageControllerAiReplyTests {
   UserModel currentUser;
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
-  NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private ConversationService conversationService;
   Conversation conversation;
 
@@ -65,15 +63,11 @@ public class RestConversationMessageControllerAiReplyTests {
   private void setupServices() {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(
-            openAiApi, globalSettingsService, getTestObjectMapper());
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
         new RestConversationMessageController(
             currentUser,
             conversationService,
-            notebookAssistantForNoteServiceFactory,
             getTestObjectMapper(),
             openAiApi,
             globalSettingsService);

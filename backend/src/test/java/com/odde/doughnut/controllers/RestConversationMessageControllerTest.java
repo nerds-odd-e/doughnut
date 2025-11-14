@@ -47,7 +47,7 @@ class RestConversationMessageControllerTest {
         new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
     controller =
         new RestConversationMessageController(
-            currentUser, conversationService, null, objectMapper, null, globalSettingsService);
+            currentUser, conversationService, objectMapper, null, globalSettingsService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -133,7 +133,6 @@ class RestConversationMessageControllerTest {
           new RestConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
-              null,
               objectMapper,
               null,
               globalSettingsService);
@@ -432,7 +431,6 @@ class RestConversationMessageControllerTest {
           new RestConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
-              null,
               objectMapper,
               null,
               globalSettingsService);

@@ -11,7 +11,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
@@ -27,20 +26,17 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/conversation")
 public class RestConversationMessageController {
   private final ConversationService conversationService;
-  private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final UserModel currentUser;
   private final ChatCompletionConversationService chatCompletionConversationService;
 
   public RestConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
-      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       ObjectMapper objectMapper,
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       GlobalSettingsService globalSettingsService) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
-    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
     this.chatCompletionConversationService =
         new ChatCompletionConversationService(
