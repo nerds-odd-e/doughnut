@@ -1,12 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import { createAiReplyStates } from "@/models/aiReplyState"
-import type {
-  RunStep,
-  DeltaOfRunStep,
-  JsonNode,
-  RestAiControllerService,
-  Run,
-} from "@generated/backend"
+import type { RestAiControllerService } from "@generated/backend/services/RestAiControllerService"
 import { DummyForGeneratingTypes } from "@generated/backend"
 
 describe("aiReplyState", () => {
@@ -26,269 +20,190 @@ describe("aiReplyState", () => {
     vi.clearAllMocks()
   })
 
-  describe("thread.run.step.created", () => {
-    it("resets content when receiving a tool_calls step", async () => {
+  describe("chat.completion.chunk", () => {
+    it("appends content from message", async () => {
       const states = createAiReplyStates(mockContext, mockAiController)
-      const runStep: RunStep = {
-        type: "tool_calls",
-        step_details: {
-          type: "tool_calls",
-          tool_calls: [],
-        },
-      }
-
-      await states["thread.run.step.created"]?.handleEvent(
-        JSON.stringify(runStep)
-      )
-
-      expect(mockContext.set).toHaveBeenCalledWith("")
-    })
-
-    it("does not reset content for non-tool_calls steps", async () => {
-      const states = createAiReplyStates(mockContext, mockAiController)
-      const runStep: RunStep = {
-        type: "message_creation",
-        step_details: {
-          type: "message_creation",
-          message_creation: {},
-        },
-      }
-
-      await states["thread.run.step.created"]?.handleEvent(
-        JSON.stringify(runStep)
-      )
-
-      expect(mockContext.set).not.toHaveBeenCalled()
-    })
-  })
-
-  describe("thread.run.step.delta", () => {
-    it("appends tool call arguments from delta", async () => {
-      const states = createAiReplyStates(mockContext, mockAiController)
-      const stepDelta: DeltaOfRunStep = {
-        delta: {
-          step_details: {
-            tool_calls: [
-              {
-                function: {
-                  arguments: '{"partial": "argument"}' as unknown as JsonNode,
-                },
-              },
-            ],
+      const chunk = {
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: "Hello world",
+            },
+            finish_reason: null,
           },
-        },
+        ],
       }
 
-      await states["thread.run.step.delta"]?.handleEvent(
-        JSON.stringify(stepDelta)
-      )
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
-      expect(mockContext.append).toHaveBeenCalledWith('{"partial": "argument"}')
+      expect(mockContext.append).toHaveBeenCalledWith("Hello world")
     })
 
-    it("handles empty or malformed delta gracefully", async () => {
-      const states = createAiReplyStates(mockContext, mockAiController)
-      const emptyDelta: DeltaOfRunStep = {
-        delta: {
-          step_details: {
-            tool_calls: [],
-          },
-        },
-      }
-
-      await states["thread.run.step.delta"]?.handleEvent(
-        JSON.stringify(emptyDelta)
-      )
-
-      expect(mockContext.append).toHaveBeenCalledWith(undefined)
-    })
-  })
-
-  describe("thread.run.requires_action", () => {
-    const mockRun: Run = {
-      id: "run-123",
-      thread_id: "thread-123",
-      required_action: {
-        submit_tool_outputs: {
-          tool_calls: [],
-        },
-      },
-    }
-
-    beforeEach(() => {
+    it("handles tool call successfully", async () => {
       mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
-    })
 
-    it("handles single tool call successfully", async () => {
-      const run = {
-        ...mockRun,
-        required_action: {
-          submit_tool_outputs: {
-            tool_calls: [
-              {
-                id: "call-1",
-                function: {
-                  name: DummyForGeneratingTypes.aiToolName
-                    .COMPLETE_NOTE_DETAILS,
-                  arguments: JSON.stringify({ completion: "test content" }),
+      const chunk = {
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: null,
+              tool_calls: [
+                {
+                  id: "call-1",
+                  type: "function",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName
+                      .COMPLETE_NOTE_DETAILS,
+                    arguments: JSON.stringify({ completion: "test content" }),
+                  },
                 },
-              },
-            ],
+              ],
+            },
+            finish_reason: "tool_calls",
           },
-        },
+        ],
       }
 
       const states = createAiReplyStates(mockContext, mockAiController)
-      await states["thread.run.requires_action"]?.handleEvent(
-        JSON.stringify(run)
-      )
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
         content: { completion: "test content" },
-        threadId: "thread-123",
-        runId: "run-123",
+        threadId: "synthetic",
+        runId: "synthetic",
         toolCallId: "call-1",
       })
       expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
-        "thread-123",
-        "run-123",
+        "synthetic",
+        "synthetic",
         { "call-1": { status: "accepted" } }
       )
     })
 
-    it("handles multiple tool calls successfully", async () => {
-      const run = {
-        ...mockRun,
-        required_action: {
-          submit_tool_outputs: {
-            tool_calls: [
-              {
-                id: "call-1",
-                function: {
-                  name: DummyForGeneratingTypes.aiToolName
-                    .COMPLETE_NOTE_DETAILS,
-                  arguments: JSON.stringify({ completion: "test content" }),
+    it("handles title suggestion tool call", async () => {
+      mockContext.handleSuggestion.mockResolvedValue({ status: "accepted" })
+
+      const chunk = {
+        choices: [
+          {
+            index: 0,
+            message: {
+              role: "assistant",
+              content: null,
+              tool_calls: [
+                {
+                  id: "call-1",
+                  type: "function",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
+                    arguments: JSON.stringify({ newTitle: "New Title" }),
+                  },
                 },
-              },
-              {
-                id: "call-2",
-                function: {
-                  name: DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
-                  arguments: JSON.stringify({ newTitle: "test title" }),
-                },
-              },
-            ],
+              ],
+            },
+            finish_reason: "tool_calls",
           },
-        },
+        ],
       }
 
       const states = createAiReplyStates(mockContext, mockAiController)
-      await states["thread.run.requires_action"]?.handleEvent(
-        JSON.stringify(run)
-      )
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
-      expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
-        suggestionType: "completion",
-        content: { completion: "test content" },
-        threadId: "thread-123",
-        runId: "run-123",
-        toolCallId: "call-1",
-      })
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "title",
-        content: "test title",
-        threadId: "thread-123",
-        runId: "run-123",
-        toolCallId: "call-2",
+        content: "New Title",
+        threadId: "synthetic",
+        runId: "synthetic",
+        toolCallId: "call-1",
       })
-      expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
-        "thread-123",
-        "run-123",
-        {
-          "call-1": { status: "accepted" },
-          "call-2": { status: "accepted" },
-        }
-      )
     })
 
-    it("cancels run when any tool call is rejected", async () => {
-      const run = {
-        ...mockRun,
-        required_action: {
-          submit_tool_outputs: {
-            tool_calls: [
-              {
-                id: "call-1",
-                function: {
-                  name: DummyForGeneratingTypes.aiToolName
-                    .COMPLETE_NOTE_DETAILS,
-                  arguments: JSON.stringify({ completion: "test content" }),
-                },
-              },
-            ],
-          },
-        },
-      }
-
+    it("cancels when tool call is rejected", async () => {
       mockContext.handleSuggestion.mockRejectedValue(
         new Error("Tool call was rejected")
       )
 
+      const chunk = {
+        choices: [
+          {
+            index: 0,
+            message: {
+              tool_calls: [
+                {
+                  id: "call-1",
+                  function: {
+                    name: DummyForGeneratingTypes.aiToolName
+                      .COMPLETE_NOTE_DETAILS,
+                    arguments: JSON.stringify({ completion: "test" }),
+                  },
+                },
+              ],
+            },
+            finish_reason: "tool_calls",
+          },
+        ],
+      }
+
       const states = createAiReplyStates(mockContext, mockAiController)
-      await states["thread.run.requires_action"]?.handleEvent(
-        JSON.stringify(run)
-      )
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
       expect(mockAiController.cancelRun).toHaveBeenCalledWith(
-        "thread-123",
-        "run-123"
+        "synthetic",
+        "synthetic"
       )
       expect(mockAiController.submitToolCallsResult).not.toHaveBeenCalled()
     })
 
-    it("handles unknown tool call through handleSuggestion", async () => {
-      const unknownToolName = "unknown_tool"
-      const unknownToolArgs = { test: "data" }
-      const run = {
-        ...mockRun,
-        required_action: {
-          submit_tool_outputs: {
-            tool_calls: [
-              {
-                id: "call-1",
-                function: {
-                  name: unknownToolName,
-                  arguments: JSON.stringify(unknownToolArgs),
-                },
-              },
-            ],
-          },
-        },
-      }
-
+    it("handles unknown tool call", async () => {
       mockContext.handleSuggestion.mockResolvedValue({ status: "skipped" })
 
+      const chunk = {
+        choices: [
+          {
+            index: 0,
+            message: {
+              tool_calls: [
+                {
+                  id: "call-1",
+                  function: {
+                    name: "unknown_tool",
+                    arguments: JSON.stringify({ test: "data" }),
+                  },
+                },
+              ],
+            },
+            finish_reason: "tool_calls",
+          },
+        ],
+      }
+
       const states = createAiReplyStates(mockContext, mockAiController)
-      await states["thread.run.requires_action"]?.handleEvent(
-        JSON.stringify(run)
-      )
+      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk))
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "unknown",
         content: {
-          rawJson: JSON.stringify(unknownToolArgs),
-          functionName: unknownToolName,
+          rawJson: JSON.stringify({ test: "data" }),
+          functionName: "unknown_tool",
         },
-        threadId: "thread-123",
-        runId: "run-123",
+        threadId: "synthetic",
+        runId: "synthetic",
         toolCallId: "call-1",
       })
-      expect(mockAiController.submitToolCallsResult).toHaveBeenCalledWith(
-        "thread-123",
-        "run-123",
-        { "call-1": { status: "skipped" } }
-      )
+    })
+  })
+
+  describe("done", () => {
+    it("resets context", async () => {
+      const states = createAiReplyStates(mockContext, mockAiController)
+      await states.done?.handleEvent("")
+
+      expect(mockContext.reset).toHaveBeenCalled()
     })
   })
 })

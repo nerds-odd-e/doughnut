@@ -36,49 +36,46 @@ beforeAll(() => {
 })
 
 export const simulateAiResponse = (content = "## I'm ChatGPT") => {
-  const newMessage: Message = {
-    role: "assistant",
-    thread_id: "test-thread-id",
-    content: [],
-  }
-  const messageDelta: MessageDelta = {
-    delta: {
-      content: [
-        {
-          text: {
-            value: content,
-          },
+  const chunk = {
+    choices: [
+      {
+        index: 0,
+        message: {
+          role: "assistant",
+          content,
         },
-      ],
-    },
+        finish_reason: null,
+      },
+    ],
   }
 
   helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "thread.message.created",
-    JSON.stringify(newMessage)
-  )
-  helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "thread.message.delta",
-    JSON.stringify(messageDelta)
+    "chat.completion.chunk",
+    JSON.stringify(chunk)
   )
 }
 
-const createRunResponse = (functionName: string, args: object) => ({
-  id: "run-123",
-  thread_id: "thread-123",
-  required_action: {
-    submit_tool_outputs: {
-      tool_calls: [
-        {
-          id: "call-456",
-          function: {
-            name: functionName,
-            arguments: JSON.stringify(args),
+const createToolCallChunk = (functionName: string, args: object) => ({
+  choices: [
+    {
+      index: 0,
+      message: {
+        role: "assistant",
+        content: null,
+        tool_calls: [
+          {
+            id: "call-456",
+            type: "function",
+            function: {
+              name: functionName,
+              arguments: JSON.stringify(args),
+            },
           },
-        },
-      ],
+        ],
+      },
+      finish_reason: "tool_calls",
     },
-  },
+  ],
 })
 
 const setupTestData = () => {
@@ -100,11 +97,14 @@ const submitMessage = async (wrapper) => {
   await flushPromises()
 }
 
-const submitMessageAndSimulateRunResponse = async (wrapper, runResponse) => {
+const submitMessageAndSimulateToolCallChunk = async (
+  wrapper,
+  toolCallChunk
+) => {
   await submitMessage(wrapper)
   helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "thread.run.requires_action",
-    JSON.stringify(runResponse)
+    "chat.completion.chunk",
+    JSON.stringify(toolCallChunk)
   )
   await flushPromises()
 }
@@ -150,29 +150,21 @@ describe("ConversationInner", () => {
         expect(statusBar.exists()).toBe(true)
         expect(statusText()).toBe("Starting AI reply...")
 
-        // After message created
-        helper.managedApi.eventSource.eventSourceRequest.onMessage(
-          "thread.message.created",
-          JSON.stringify({
-            role: "assistant",
-            thread_id: "test-thread-id",
-            content: [],
-          })
-        )
-        await wrapper.vm.$nextTick()
-        expect(statusText()).toBe("Generating response...")
-
         // During writing
         helper.managedApi.eventSource.eventSourceRequest.onMessage(
-          "thread.message.delta",
+          "chat.completion.chunk",
           JSON.stringify({
-            delta: {
-              content: [{ text: { value: "Test" } }],
-            },
+            choices: [
+              {
+                index: 0,
+                message: { role: "assistant", content: "Test" },
+                finish_reason: null,
+              },
+            ],
           })
         )
         await wrapper.vm.$nextTick()
-        expect(statusText()).toBe("Writing response...")
+        expect(statusText()).toBe("Streaming response...")
 
         // After completion
         helper.managedApi.eventSource.eventSourceRequest.onMessage("done", "")
@@ -197,8 +189,8 @@ describe("ConversationInner", () => {
   describe("Tool Call Handling", () => {
     const testCompletion = "**bold completion**"
     const renderedCompletion = "bold completion"
-    const threadId = "thread-123"
-    const runId = "run-123"
+    const threadId = "synthetic"
+    const runId = "synthetic"
     const toolCallId = "call-456"
 
     beforeEach(async () => {
@@ -208,7 +200,7 @@ describe("ConversationInner", () => {
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           {
             completion: testCompletion,
@@ -223,7 +215,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: testCompletion, deleteFromEnd: 0 }
         )
@@ -235,7 +227,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: testCompletion, deleteFromEnd: 0 }
         )
@@ -250,7 +242,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: " friends!", deleteFromEnd: 5 }
         )
@@ -268,7 +260,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: "New content", deleteFromEnd: 20 }
         )
@@ -340,7 +332,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           {
             completion: " friends!",
@@ -370,7 +362,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
           {
             completion: "Completely new text",
@@ -409,7 +401,7 @@ describe("ConversationInner", () => {
         // Simulate completion suggestion
         await submitMessageAndSimulateRunResponse(
           wrapper,
-          createRunResponse(
+          createToolCallChunk(
             DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
             {
               completion: "test completion",
@@ -430,8 +422,8 @@ describe("ConversationInner", () => {
 
   describe("Title Title Generation", () => {
     const testTitle = "Generated Title"
-    const threadId = "thread-123"
-    const runId = "run-123"
+    const threadId = "synthetic"
+    const runId = "synthetic"
     const toolCallId = "call-456"
 
     beforeEach(async () => {
@@ -441,7 +433,7 @@ describe("ConversationInner", () => {
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createRunResponse(
+        createToolCallChunk(
           DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
           <TitleReplacement>{
             newTitle: testTitle,
@@ -505,17 +497,17 @@ describe("ConversationInner", () => {
 
   describe("Unknown Tool Call Handling", () => {
     const testJson = { unknown: "data" }
-    const threadId = "thread-123"
-    const runId = "run-123"
+    const threadId = "synthetic"
+    const runId = "synthetic"
     const toolCallId = "call-456"
 
     beforeEach(async () => {
       helper.managedApi.restAiController.submitToolCallsResult = vi.fn()
       helper.managedApi.restAiController.cancelRun = vi.fn()
 
-      const run = createRunResponse("unknown_tool", testJson)
+      const run = createToolCallChunk("unknown_tool", testJson)
 
-      await submitMessageAndSimulateRunResponse(wrapper, run)
+      await submitMessageAndSimulateToolCallChunk(wrapper, run)
     })
 
     it("displays unknown tool call with raw JSON", () => {
@@ -552,8 +544,8 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(helper.managedApi.restAiController.cancelRun).toHaveBeenCalledWith(
-        threadId,
-        runId
+        "synthetic",
+        "synthetic"
       )
 
       expect(wrapper.find(".unknown-request").exists()).toBe(false)

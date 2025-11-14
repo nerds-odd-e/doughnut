@@ -76,7 +76,7 @@ data: [DONE]
 `
 }
 
-// Chat completion streaming event builder
+// Chat completion streaming event builder (native format)
 export function buildChatCompletionStreamEvent(
   message: string,
   responseType?: 'requires action' | 'message delta & complete'
@@ -113,7 +113,7 @@ data: [DONE]
 `
   }
 
-  // Regular message response
+  // Regular message response - just one chunk with content
   const chunk = {
     choices: [
       {
@@ -122,24 +122,12 @@ data: [DONE]
           role: 'assistant',
           content: message,
         },
-        finish_reason: null,
-      },
-    ],
-  }
-
-  const doneChunk = {
-    choices: [
-      {
-        index: 0,
-        delta: {},
         finish_reason: 'stop',
       },
     ],
   }
 
   return `data: ${JSON.stringify(chunk)}
-
-data: ${JSON.stringify(doneChunk)}
 
 data: [DONE]
 
