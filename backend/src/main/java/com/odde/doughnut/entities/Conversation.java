@@ -95,20 +95,4 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
     return null;
   }
-
-  @JsonIgnore
-  public String getContextDescription() {
-    Note note = getSubjectNote();
-    if (note == null) {
-      return "Unknown conversation subject";
-    }
-
-    String context = note.getNoteDescription();
-    String additionalContext = getAdditionalContextForSubject();
-    if (additionalContext != null) {
-      context += "\n\n" + additionalContext;
-    }
-
-    return context;
-  }
 }

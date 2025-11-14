@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -15,6 +16,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.ChatCompletionConversationService;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -63,17 +66,20 @@ public class RestConversationMessageControllerAiReplyTests {
   private void setupServices() {
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
-    conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
+    ObjectMapper objectMapper = getTestObjectMapper();
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    ChatCompletionConversationService chatCompletionConversationService =
+        new ChatCompletionConversationService(
+            openAiApiHandler, globalSettingsService, objectMapper);
+    conversationService =
+        new ConversationService(
+            testabilitySettings, makeMe.modelFactoryService, chatCompletionConversationService);
     controller =
         new RestConversationMessageController(
-            currentUser,
-            conversationService,
-            getTestObjectMapper(),
-            openAiApi,
-            globalSettingsService);
+            currentUser, conversationService, chatCompletionConversationService);
   }
 
-  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
+  private ObjectMapper getTestObjectMapper() {
     return new ObjectMapperConfig().objectMapper();
   }
 

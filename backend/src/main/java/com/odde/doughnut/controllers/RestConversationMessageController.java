@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -10,14 +9,10 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.apache.coyote.BadRequestException;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -32,15 +27,10 @@ public class RestConversationMessageController {
   public RestConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
-      ObjectMapper objectMapper,
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      GlobalSettingsService globalSettingsService) {
+      ChatCompletionConversationService chatCompletionConversationService) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    this.chatCompletionConversationService =
-        new ChatCompletionConversationService(
-            openAiApiHandler, globalSettingsService, objectMapper);
+    this.chatCompletionConversationService = chatCompletionConversationService;
   }
 
   @PostMapping("/assessment-question/{assessmentQuestion}")

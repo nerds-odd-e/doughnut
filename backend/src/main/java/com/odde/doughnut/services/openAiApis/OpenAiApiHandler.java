@@ -25,17 +25,20 @@ import java.util.*;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 /**
  * Handler for OpenAI API calls, supporting Chat Completion API.
  *
  * <p>Chat Completion API methods: {@link #chatCompletion}, {@link #streamChatCompletion}
  */
+@Service
 public class OpenAiApiHandler {
   private final OpenAiApi openAiApi;
 
-  public OpenAiApiHandler(OpenAiApi openAiApi) {
+  public OpenAiApiHandler(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }
 

@@ -7,7 +7,13 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.theokanning.openai.completion.chat.AssistantMessage;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.SystemMessage;
+import com.theokanning.openai.completion.chat.UserMessage;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.List;
@@ -23,6 +29,7 @@ public class ConversationService {
   private final TestabilitySettings testabilitySettings;
 
   private final ModelFactoryService modelFactoryService;
+  private final ChatCompletionConversationService chatCompletionConversationService;
 
   private Conversation initializeConversation(User initiator) {
     Conversation conversation = new Conversation();
@@ -94,29 +101,49 @@ public class ConversationService {
         .toList();
   }
 
-  public String exportConversationForChatGPT(Conversation conversation) {
+  public static String exportChatCompletionRequestForChatGPT(
+      ChatCompletionRequest request, String title) {
     StringBuilder export = new StringBuilder();
 
     // Title
-    String subject = getConversationSubject(conversation);
-    export.append("# Conversation: ").append(subject).append("\n\n");
+    export.append("# Conversation: ").append(title).append("\n\n");
 
-    // Context (reuse the same context sent to OpenAI)
+    // Context section: Extract all system messages
     export.append("## Context\n\n");
-    export.append(conversation.getContextDescription()).append("\n\n");
+    List<ChatMessage> messages = request.getMessages();
+    for (ChatMessage message : messages) {
+      if (message instanceof SystemMessage systemMessage) {
+        export.append(systemMessage.getTextContent()).append("\n\n");
+      }
+    }
 
-    // Conversation History
+    // Conversation History: Extract user and assistant messages
     export.append("## Conversation History\n\n");
-    for (ConversationMessage message : conversation.getConversationMessages()) {
-      String role = message.getSender() == null ? "Assistant" : "User";
-      String formattedMessage = formatMessage(message.getMessage());
-      export.append("**").append(role).append("**: ").append(formattedMessage).append("\n");
+    for (ChatMessage message : messages) {
+      if (message instanceof UserMessage userMessage) {
+        export
+            .append("**User**: ")
+            .append(formatMessage(userMessage.getTextContent()))
+            .append("\n");
+      } else if (message instanceof AssistantMessage assistantMessage) {
+        export
+            .append("**Assistant**: ")
+            .append(formatMessage(assistantMessage.getTextContent()))
+            .append("\n");
+      }
     }
 
     return export.toString();
   }
 
-  private String formatMessage(String message) {
+  public String exportConversationForChatGPT(Conversation conversation) {
+    ChatCompletionRequest request =
+        chatCompletionConversationService.buildChatCompletionRequest(conversation);
+    String title = getConversationSubject(conversation);
+    return exportChatCompletionRequestForChatGPT(request, title);
+  }
+
+  private static String formatMessage(String message) {
     // Remove leading and trailing quotes and trim
     return message.replaceAll("^\"|\"$", "").trim();
   }

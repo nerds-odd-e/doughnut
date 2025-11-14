@@ -7,11 +7,16 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.ai.ChatCompletionConversationService;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import java.util.List;
@@ -41,13 +46,16 @@ class RestConversationMessageControllerTest {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
-        new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
-    com.fasterxml.jackson.databind.ObjectMapper objectMapper =
-        new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(makeMe.modelFactoryService);
+    ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
+    ChatCompletionConversationService chatCompletionConversationService =
+        new ChatCompletionConversationService(
+            openAiApiHandler, globalSettingsService, objectMapper);
     controller =
         new RestConversationMessageController(
-            currentUser, conversationService, objectMapper, null, globalSettingsService);
+            currentUser, conversationService, chatCompletionConversationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -125,17 +133,18 @@ class RestConversationMessageControllerTest {
 
     @Test
     void forLoginUserOnly() {
-      com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
-          new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
-      com.fasterxml.jackson.databind.ObjectMapper objectMapper =
-          new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+      GlobalSettingsService globalSettingsService =
+          new GlobalSettingsService(makeMe.modelFactoryService);
+      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
+      ChatCompletionConversationService chatCompletionConversationService =
+          new ChatCompletionConversationService(
+              openAiApiHandler, globalSettingsService, objectMapper);
       controller =
           new RestConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
-              objectMapper,
-              null,
-              globalSettingsService);
+              chatCompletionConversationService);
       ResponseStatusException exception =
           assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
@@ -423,17 +432,18 @@ class RestConversationMessageControllerTest {
 
     @Test
     void shouldRequireLogin() {
-      com.odde.doughnut.services.GlobalSettingsService globalSettingsService =
-          new com.odde.doughnut.services.GlobalSettingsService(makeMe.modelFactoryService);
-      com.fasterxml.jackson.databind.ObjectMapper objectMapper =
-          new com.odde.doughnut.configs.ObjectMapperConfig().objectMapper();
+      GlobalSettingsService globalSettingsService =
+          new GlobalSettingsService(makeMe.modelFactoryService);
+      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
+      ChatCompletionConversationService chatCompletionConversationService =
+          new ChatCompletionConversationService(
+              openAiApiHandler, globalSettingsService, objectMapper);
       controller =
           new RestConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
-              objectMapper,
-              null,
-              globalSettingsService);
+              chatCompletionConversationService);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));
@@ -520,8 +530,11 @@ class RestConversationMessageControllerTest {
     void shouldExportConversationWithContext() throws UnexpectedNoAccessRightException {
       String export = controller.exportConversation(conversation);
       assertThat(export).contains("## Context");
-      assertThat(export).contains("note of current focus");
+      assertThat(export).contains("Focus Note and the notes related to it:");
       assertThat(export).contains("There are 42 prefectures in Japan");
+      assertThat(export)
+          .contains(
+              "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.");
     }
 
     @Test

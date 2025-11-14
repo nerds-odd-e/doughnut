@@ -13,6 +13,8 @@ import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatTool;
 import io.reactivex.Flowable;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 /**
@@ -20,23 +22,14 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  *
  * <p>Provides streaming conversation responses with inline tool call handling.
  */
+@RequiredArgsConstructor
+@Service
 public class ChatCompletionConversationService {
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
   private final ObjectMapper objectMapper;
 
-  public ChatCompletionConversationService(
-      OpenAiApiHandler openAiApiHandler,
-      GlobalSettingsService globalSettingsService,
-      ObjectMapper objectMapper) {
-    this.openAiApiHandler = openAiApiHandler;
-    this.globalSettingsService = globalSettingsService;
-    this.objectMapper = objectMapper;
-  }
-
-  public SseEmitter getReplyStream(
-      Conversation conversation, ConversationService conversationService)
-      throws OpenAiUnauthorizedException {
+  public ChatCompletionRequest buildChatCompletionRequest(Conversation conversation) {
     // Build conversation history from database
     ConversationHistoryBuilder historyBuilder = new ConversationHistoryBuilder(objectMapper);
     List<ChatMessage> history = historyBuilder.buildHistory(conversation);
@@ -47,8 +40,17 @@ public class ChatCompletionConversationService {
 
     // Create chat completion request with tools
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    ChatCompletionRequest request =
-        ChatCompletionRequest.builder().model(modelName).messages(history).tools(chatTools).build();
+    return ChatCompletionRequest.builder()
+        .model(modelName)
+        .messages(history)
+        .tools(chatTools)
+        .build();
+  }
+
+  public SseEmitter getReplyStream(
+      Conversation conversation, ConversationService conversationService)
+      throws OpenAiUnauthorizedException {
+    ChatCompletionRequest request = buildChatCompletionRequest(conversation);
 
     // Stream the response
     Flowable<String> stream = openAiApiHandler.streamChatCompletion(request);

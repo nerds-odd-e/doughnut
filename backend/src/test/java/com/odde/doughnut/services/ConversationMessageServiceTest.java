@@ -2,10 +2,14 @@ package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ai.ChatCompletionConversationService;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -31,7 +35,16 @@ class ConversationMessageServiceTest {
 
   @BeforeEach
   void setup() {
-    conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
+    GlobalSettingsService globalSettingsService =
+        new GlobalSettingsService(this.modelFactoryService);
+    ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
+    ChatCompletionConversationService chatCompletionConversationService =
+        new ChatCompletionConversationService(
+            openAiApiHandler, globalSettingsService, objectMapper);
+    conversationService =
+        new ConversationService(
+            testabilitySettings, this.modelFactoryService, chatCompletionConversationService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
