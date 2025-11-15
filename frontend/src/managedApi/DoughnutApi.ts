@@ -243,7 +243,7 @@ class RestLinkControllerServiceInstance extends ServiceInstance {
     data: Types.LinkCreation
   ): CancelablePromise<Types.UpdateLinkResponse> {
     return this.httpRequest.request<Types.UpdateLinkResponse>({
-      method: "PATCH",
+      method: "POST",
       url: "/api/links/{linkId}",
       path: { linkId },
       body: data,
@@ -1334,10 +1334,9 @@ class RestNotebookControllerServiceInstance extends ServiceInstance {
     circle: number
   ): CancelablePromise<Types.MoveToCircleResponse> {
     return this.httpRequest.request<Types.MoveToCircleResponse>({
-      method: "POST",
-      url: "/api/notebooks/{notebook}/move-to-circle",
-      path: { notebook },
-      query: { circle },
+      method: "PATCH",
+      url: "/api/notebooks/{notebook}/move-to-circle/{circle}",
+      path: { notebook, circle },
       errors: { 500: "Internal Server Error" },
     })
   }
@@ -1412,6 +1411,18 @@ class RestCircleControllerServiceInstance extends ServiceInstance {
       method: "GET",
       url: "/api/circles/{circle}",
       path: { circle },
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  joinCircle(
+    requestBody: Types.JoinCircleData["requestBody"]
+  ): CancelablePromise<Types.JoinCircleResponse> {
+    return this.httpRequest.request<Types.JoinCircleResponse>({
+      method: "POST",
+      url: "/api/circles/join",
+      body: requestBody,
+      mediaType: "application/json",
       errors: { 500: "Internal Server Error" },
     })
   }
