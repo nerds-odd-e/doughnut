@@ -31,8 +31,7 @@ class ManagedApi {
     this.services = this.wrapServices()
   }
 
-  // Helper to wrap Services object for error handling
-  // We create a new object instead of using Proxy to avoid read-only property issues
+  // Helper to wrap Services object for error handling and loading states
   protected wrapServices(): typeof Services {
     const self = this
     const wrapped: Record<string, unknown> = {}
@@ -42,17 +41,11 @@ class ManagedApi {
       if (Object.hasOwn(Services, key)) {
         const value = (Services as Record<string, unknown>)[key]
         if (typeof value === "function") {
-          // Check if the function is a Vitest mock/spy - don't wrap it
-          if ("mock" in value && typeof value.mock === "object") {
-            wrapped[key] = value
-          } else {
-            // Wrap the function
-            const originalFn = value as (
-              ...args: unknown[]
-            ) => CancelablePromise<unknown>
-            wrapped[key] = (...args: unknown[]) => {
-              return self.wrapServiceCall(() => originalFn(...args))
-            }
+          const originalFn = value as (
+            ...args: unknown[]
+          ) => CancelablePromise<unknown>
+          wrapped[key] = (...args: unknown[]) => {
+            return self.wrapServiceCall(() => originalFn(...args))
           }
         } else {
           wrapped[key] = value

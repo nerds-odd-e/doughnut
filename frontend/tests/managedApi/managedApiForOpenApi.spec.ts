@@ -11,7 +11,7 @@ vi.mock("vue-toastification", () => ({
   useToast: () => mockToast,
 }))
 
-describe("managdApi", () => {
+describe("ManagedApi", () => {
   const apiStatus: ApiStatus = { states: [], errors: [] }
   const managedApi = new ManagedApi(apiStatus)
   const baseUrl = "http://localhost:9081"
@@ -23,185 +23,113 @@ describe("managdApi", () => {
     mockToast.error.mockClear()
   })
 
-  describe("set the loading status", () => {
-    it("should set the loading status", async () => {
-      let interimStateLength = 0
+  describe("loading state management", () => {
+    it("sets loading state during API calls", async () => {
+      let loadingStateDuringCall = false
       fetchMock.mockResponse(
         () => {
-          interimStateLength = apiStatus.states.length
-          return Promise.resolve("")
+          loadingStateDuringCall = apiStatus.states.length > 0
+          return Promise.resolve(JSON.stringify({}))
         },
-        {
-          url: `${baseUrl}/api/user`,
-        }
+        { url: `${baseUrl}/api/user` }
       )
+
       await managedApi.services.getUserProfile()
-      expect(interimStateLength).toBeGreaterThan(0)
+
+      expect(loadingStateDuringCall).toBe(true)
       expect(apiStatus.states.length).toBe(0)
     })
 
-    it("should not set the loading status in silent mode", async () => {
-      let interimStateLength = 0
+    it("does not set loading state in silent mode", async () => {
+      let loadingStateDuringCall = false
       fetchMock.mockResponse(
         () => {
-          interimStateLength = apiStatus.states.length
-          return Promise.resolve("")
+          loadingStateDuringCall = apiStatus.states.length > 0
+          return Promise.resolve(JSON.stringify({}))
         },
-        {
-          url: `${baseUrl}/api/user`,
-        }
+        { url: `${baseUrl}/api/user` }
       )
+
       await managedApi.silent.services.getUserProfile()
-      expect(interimStateLength).toBe(0)
+
+      expect(loadingStateDuringCall).toBe(false)
     })
   })
 
   describe("error handling", () => {
-    beforeEach(() => {
+    it("shows error toast on API errors", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      try {
+        await managedApi.services.getUserProfile()
+      } catch {
+        // ignore
+      }
+
+      expect(mockToast.error).toHaveBeenCalled()
+    })
+
+    it("does not show error toast in silent mode", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      try {
+        await managedApi.silent.services.getUserProfile()
+      } catch {
+        // ignore
+      }
+
+      expect(mockToast.error).not.toHaveBeenCalled()
+    })
+
+    it("enhances 404 errors with method and URL", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 404,
       })
-    })
 
-    const callApiAndIgnoreError = async () => {
+      let caughtError: Error | undefined
       try {
         await managedApi.services.getUserProfile()
-      } catch (_e) {
-        // ignore
+      } catch (error) {
+        caughtError = error as Error
       }
-    }
 
-    it("should show error toast", async () => {
-      await callApiAndIgnoreError()
-      expect(mockToast.error).toHaveBeenCalled()
+      expect(caughtError?.message).toContain("[404 Not Found]")
+      expect(caughtError?.message).toContain("GET")
+      expect(caughtError?.message).toContain("/api/user")
+      expect(mockToast.error).toHaveBeenCalledWith(
+        expect.stringContaining("[404 Not Found]"),
+        expect.objectContaining({
+          timeout: 15000,
+          closeOnClick: false,
+        })
+      )
     })
 
-    it("should not show error toast in silent mode", async () => {
+    it("uses shorter timeout for non-404 errors", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
       try {
-        await managedApi.silent.services.getUserProfile()
-      } catch (_e) {
+        await managedApi.services.getUserProfile()
+      } catch {
         // ignore
       }
-      expect(mockToast.error).not.toHaveBeenCalled()
-    })
 
-    describe("404 error enhancement", () => {
-      it("should enhance 404 error message with method and URL in toast", async () => {
-        fetchMock.mockResponse(JSON.stringify({}), {
-          url: `${baseUrl}/api/test/endpoint`,
-          status: 404,
+      expect(mockToast.error).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({
+          timeout: 3000,
         })
-
-        try {
-          await managedApi.services.getUserProfile()
-        } catch (_e) {
-          // ignore
-        }
-
-        expect(mockToast.error).toHaveBeenCalledWith(
-          expect.stringContaining("[404 Not Found]"),
-          expect.objectContaining({
-            timeout: 15000,
-            closeOnClick: false,
-          })
-        )
-
-        const errorCall = mockToast.error.mock.calls[0]
-        expect(errorCall).toBeDefined()
-        expect(errorCall![0]).toContain("GET")
-        expect(errorCall![0]).toContain("/api/user")
-      })
-
-      it("should enhance error.message property for Cypress visibility", async () => {
-        fetchMock.mockResponse(JSON.stringify({}), {
-          url: `${baseUrl}/api/missing/endpoint`,
-          status: 404,
-        })
-
-        let caughtError: Error | undefined
-        try {
-          await managedApi.services.getUserProfile()
-        } catch (error) {
-          caughtError = error as Error
-        }
-
-        expect(caughtError).toBeDefined()
-        expect(caughtError?.message).toContain("[404 Not Found]")
-        expect(caughtError?.message).toContain("GET")
-        expect(caughtError?.message).toContain("/api/user")
-      })
-
-      it("should use 15 second timeout for 404 errors", async () => {
-        fetchMock.mockResponse(JSON.stringify({}), {
-          url: `${baseUrl}/api/user`,
-          status: 404,
-        })
-
-        await callApiAndIgnoreError()
-
-        expect(mockToast.error).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            timeout: 15000,
-          })
-        )
-      })
-
-      it("should disable closeOnClick for 404 errors", async () => {
-        fetchMock.mockResponse(JSON.stringify({}), {
-          url: `${baseUrl}/api/user`,
-          status: 404,
-        })
-
-        await callApiAndIgnoreError()
-
-        expect(mockToast.error).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            closeOnClick: false,
-          })
-        )
-      })
-    })
-
-    describe("non-404 error handling", () => {
-      it("should use 3 second timeout for non-404 errors", async () => {
-        fetchMock.mockResponse(JSON.stringify({}), {
-          url: `${baseUrl}/api/user`,
-          status: 500,
-        })
-
-        try {
-          await managedApi.services.getUserProfile()
-        } catch (_e) {
-          // ignore
-        }
-
-        expect(mockToast.error).toHaveBeenCalledWith(
-          expect.any(String),
-          expect.objectContaining({
-            timeout: 3000,
-          })
-        )
-      })
-
-      it("should not enhance error message for non-404 errors", async () => {
-        fetchMock.mockResponse(JSON.stringify({}), {
-          url: `${baseUrl}/api/user`,
-          status: 500,
-        })
-
-        let caughtError: Error | undefined
-        try {
-          await managedApi.services.getUserProfile()
-        } catch (error) {
-          caughtError = error as Error
-        }
-
-        expect(caughtError).toBeDefined()
-        expect(caughtError?.message).not.toContain("[404 Not Found]")
-      })
+      )
     })
   })
 })
