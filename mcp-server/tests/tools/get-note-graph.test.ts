@@ -1,11 +1,11 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { findTool, createMockContext } from '../helpers/index.js'
-import * as Services from '@generated/backend/services.gen'
+import * as Services from '@generated/backend/sdk.gen'
 import { OpenAPI } from '@generated/backend'
 import type { GetGraphResponse } from '@generated/backend'
 
 // Mock the generated services
-vi.mock('@generated/backend/services.gen', () => ({
+vi.mock('@generated/backend/sdk.gen', () => ({
   getGraph: vi.fn(),
 }))
 

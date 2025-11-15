@@ -7,7 +7,7 @@ import {
   jsonResponse,
 } from '../helpers.js'
 import type { ToolResponse } from '../types.js'
-import * as Services from '@generated/backend/services.gen'
+import * as Services from '@generated/backend/sdk.gen'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({

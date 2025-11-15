@@ -4,7 +4,7 @@ import type {
   McpNoteAddDTO,
   CreateNote1Response,
 } from '@generated/backend'
-import * as Services from '@generated/backend/services.gen'
+import * as Services from '@generated/backend/sdk.gen'
 import { createTool } from './tool-builder.js'
 import { jsonResponse } from '../helpers.js'
 
