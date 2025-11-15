@@ -29,8 +29,17 @@ export default class ApiStatusHandler {
     }
   }
 
-  addError(message: string): void {
+  addError(message: string, statusCode?: number): void {
     if (this.silentMode) return
-    this.toast.error(message)
+
+    // For 404 errors, show longer timeout and make it more visible
+    const timeout = statusCode === 404 ? 15000 : 3000 // 15 seconds for 404, 3 seconds for others
+
+    this.toast.error(message, {
+      timeout,
+      closeOnClick: false, // Prevent accidental dismissal for 404 errors
+      pauseOnFocusLoss: true,
+      pauseOnHover: true,
+    })
   }
 }

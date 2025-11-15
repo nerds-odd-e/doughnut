@@ -37,14 +37,29 @@ export default function BindingHttpRequest(
                 }
               }
 
-              const msg =
+              let msg =
                 error.body &&
                 typeof error.body === "object" &&
                 "message" in error.body &&
                 typeof error.body.message === "string"
                   ? error.body.message
                   : error.message
-              apiStatusHandler.addError(msg)
+
+              // For 404 errors, include endpoint details for better debugging
+              if (error.status === 404) {
+                const method = error.request.method || "UNKNOWN"
+                const url = error.url || error.request.url || "UNKNOWN"
+                const enhancedMsg = `[404 Not Found] ${method} ${url}\n\n${msg}`
+                // Enhance the error message itself so Cypress can see it
+                Object.defineProperty(error, "message", {
+                  value: enhancedMsg,
+                  writable: true,
+                  configurable: true,
+                })
+                msg = enhancedMsg
+              }
+
+              apiStatusHandler.addError(msg, error.status)
 
               if (error.status === 400) {
                 const jsonResponse =

@@ -85,5 +85,123 @@ describe("managdApi", () => {
       }
       expect(mockToast.error).not.toHaveBeenCalled()
     })
+
+    describe("404 error enhancement", () => {
+      it("should enhance 404 error message with method and URL in toast", async () => {
+        fetchMock.mockResponse(JSON.stringify({}), {
+          url: `${baseUrl}/api/test/endpoint`,
+          status: 404,
+        })
+
+        try {
+          await managedApi.restUserController.getUserProfile()
+        } catch (_e) {
+          // ignore
+        }
+
+        expect(mockToast.error).toHaveBeenCalledWith(
+          expect.stringContaining("[404 Not Found]"),
+          expect.objectContaining({
+            timeout: 15000,
+            closeOnClick: false,
+          })
+        )
+
+        const errorCall = mockToast.error.mock.calls[0]
+        expect(errorCall).toBeDefined()
+        expect(errorCall![0]).toContain("GET")
+        expect(errorCall![0]).toContain("/api/user")
+      })
+
+      it("should enhance error.message property for Cypress visibility", async () => {
+        fetchMock.mockResponse(JSON.stringify({}), {
+          url: `${baseUrl}/api/missing/endpoint`,
+          status: 404,
+        })
+
+        let caughtError: Error | undefined
+        try {
+          await managedApi.restUserController.getUserProfile()
+        } catch (error) {
+          caughtError = error as Error
+        }
+
+        expect(caughtError).toBeDefined()
+        expect(caughtError?.message).toContain("[404 Not Found]")
+        expect(caughtError?.message).toContain("GET")
+        expect(caughtError?.message).toContain("/api/user")
+      })
+
+      it("should use 15 second timeout for 404 errors", async () => {
+        fetchMock.mockResponse(JSON.stringify({}), {
+          url: `${baseUrl}/api/user`,
+          status: 404,
+        })
+
+        await callApiAndIgnoreError()
+
+        expect(mockToast.error).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            timeout: 15000,
+          })
+        )
+      })
+
+      it("should disable closeOnClick for 404 errors", async () => {
+        fetchMock.mockResponse(JSON.stringify({}), {
+          url: `${baseUrl}/api/user`,
+          status: 404,
+        })
+
+        await callApiAndIgnoreError()
+
+        expect(mockToast.error).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            closeOnClick: false,
+          })
+        )
+      })
+    })
+
+    describe("non-404 error handling", () => {
+      it("should use 3 second timeout for non-404 errors", async () => {
+        fetchMock.mockResponse(JSON.stringify({}), {
+          url: `${baseUrl}/api/user`,
+          status: 500,
+        })
+
+        try {
+          await managedApi.restUserController.getUserProfile()
+        } catch (_e) {
+          // ignore
+        }
+
+        expect(mockToast.error).toHaveBeenCalledWith(
+          expect.any(String),
+          expect.objectContaining({
+            timeout: 3000,
+          })
+        )
+      })
+
+      it("should not enhance error message for non-404 errors", async () => {
+        fetchMock.mockResponse(JSON.stringify({}), {
+          url: `${baseUrl}/api/user`,
+          status: 500,
+        })
+
+        let caughtError: Error | undefined
+        try {
+          await managedApi.restUserController.getUserProfile()
+        } catch (error) {
+          caughtError = error as Error
+        }
+
+        expect(caughtError).toBeDefined()
+        expect(caughtError?.message).not.toContain("[404 Not Found]")
+      })
+    })
   })
 })
