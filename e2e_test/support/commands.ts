@@ -248,6 +248,16 @@ Cypress.Commands.add('findCardTitle', (title) =>
 )
 
 Cypress.Commands.add('yesIRemember', () => {
+  // Handle uncaught exceptions that may occur when session times out
+  // The frontend shows a confirmation dialog for 401 errors, which can cause uncaught exceptions
+  cy.on('uncaught:exception', (err) => {
+    // If it's an ApiError with 401 status, it's expected when session times out
+    if (err.message.includes('Unauthorized') || err.message.includes('401')) {
+      return false // Prevent Cypress from failing the test
+    }
+    // Otherwise, let Cypress handle the exception
+    return true
+  })
   cy.findByRole('button', { name: 'Yes, I remember' })
   cy.tick(11 * 1000).then(() => {
     cy.findByRole('button', { name: 'Yes, I remember' }).click({})
