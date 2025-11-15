@@ -16,7 +16,7 @@
   </svg>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue"
 import { bgcolors } from "../../../colors"
 
@@ -26,5 +26,5 @@ const props = defineProps({
   y: Number,
   oheight: Number,
 })
-const fill = computed(() => bgcolors(props.linkRole))
+const fill = computed(() => bgcolors(props.linkRole ?? ""))
 </script>

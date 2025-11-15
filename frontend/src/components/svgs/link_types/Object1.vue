@@ -17,7 +17,7 @@
   </svg>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed } from "vue"
 import { bgcolors } from "../../../colors"
 
@@ -29,6 +29,6 @@ const props = defineProps({
   abstract: Boolean,
   size: Number,
 })
-const fill = computed(() => bgcolors(props.linkRole))
-const strokeDashArray = computed(() => (props.abstract ? "20, 12" : null))
+const fill = computed(() => bgcolors(props.linkRole ?? ""))
+const strokeDashArray = computed(() => (props.abstract ? "20, 12" : undefined))
 </script>

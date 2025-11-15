@@ -13,6 +13,6 @@
   </svg>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({ ifInverse: { type: Number, default: 1 } })
 </script>

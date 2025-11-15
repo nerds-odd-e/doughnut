@@ -9,6 +9,6 @@
   </svg>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps({ x: String })
 </script>

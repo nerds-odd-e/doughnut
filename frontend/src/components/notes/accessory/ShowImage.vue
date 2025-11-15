@@ -28,14 +28,14 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 const props = defineProps({
   noteImage: String,
   imageMask: String,
   opacity: Number,
 })
 
-const createGroups = (arr, perGroup) => {
+const createGroups = (arr: string[], perGroup: number): string[][] => {
   const numGroups = Math.ceil(arr.length / perGroup)
   return new Array(numGroups)
     .fill("")
@@ -43,6 +43,7 @@ const createGroups = (arr, perGroup) => {
 }
 
 const getMasks = () => {
+  if (!props.imageMask) return []
   return createGroups(props.imageMask.split(/\s+/), 4).map((arr, index) => {
     const [x, y, width, height] = arr
     return { index, x, y, width, height }
