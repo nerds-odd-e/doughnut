@@ -266,6 +266,23 @@ class EventSourceApi extends ManagedApi {
         response: OpenAPI.interceptors.response,
       },
     })
+
+    // Override restConversationMessageController.getAiReply to use eventSourceRequest
+    // instead of the default request function
+    this.restConversationMessageController.getAiReply = (
+      conversationId: number
+    ) => {
+      return this.eventSourceRequest.request({
+        method: "POST",
+        url: "/api/conversation/{conversationId}/ai-reply",
+        path: {
+          conversationId,
+        },
+        errors: {
+          500: "Internal Server Error",
+        },
+      })
+    }
   }
 
   onMessage(callback: (event: string, data: string) => void) {
