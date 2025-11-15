@@ -8,7 +8,7 @@ import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThi
 // Set up OpenAPI config
 OpenAPI.BASE = ""
 OpenAPI.VERSION = "0"
-OpenAPI.WITH_CREDENTIALS = false
+OpenAPI.WITH_CREDENTIALS = true
 OpenAPI.CREDENTIALS = "include"
 
 class ManagedApi {
@@ -31,46 +31,36 @@ class ManagedApi {
     this.services = this.wrapServices()
   }
 
-  // Helper to wrap Services object with Proxy for error handling
+  // Helper to wrap Services object for error handling
+  // We create a new object instead of using Proxy to avoid read-only property issues
   protected wrapServices(): typeof Services {
-    // Capture `this` for use in the Proxy handler
     const self = this
-    // Cache wrapped functions to maintain reference equality for test mocking
-    // biome-ignore lint/complexity/noBannedTypes: Need to cache arbitrary functions
-    const wrappedFunctions = new WeakMap<Function, Function>()
+    const wrapped: Record<string, unknown> = {}
 
-    return new Proxy(Services, {
-      get(target, prop) {
-        const value = Reflect.get(target, prop)
+    // Wrap all service functions
+    for (const key in Services) {
+      if (Object.hasOwn(Services, key)) {
+        const value = (Services as Record<string, unknown>)[key]
         if (typeof value === "function") {
           // Check if the function is a Vitest mock/spy - don't wrap it
-          // Vitest mocks have a 'mock' property
           if ("mock" in value && typeof value.mock === "object") {
-            return value
-          }
-
-          // Check if we've already wrapped this function
-          let wrappedFn = wrappedFunctions.get(value)
-          if (!wrappedFn) {
-            // Create and cache the wrapped function
-            wrappedFn = (...args: unknown[]) => {
-              return self.wrapServiceCall(() => value.apply(target, args))
+            wrapped[key] = value
+          } else {
+            // Wrap the function
+            const originalFn = value as (
+              ...args: unknown[]
+            ) => CancelablePromise<unknown>
+            wrapped[key] = (...args: unknown[]) => {
+              return self.wrapServiceCall(() => originalFn(...args))
             }
-            wrappedFunctions.set(value, wrappedFn)
           }
-          return wrappedFn
+        } else {
+          wrapped[key] = value
         }
-        return value
-      },
-      set(target, prop, value) {
-        // When a property is set (e.g., a test spy), clear the cached wrapped function
-        const oldValue = Reflect.get(target, prop)
-        if (oldValue && typeof oldValue === "function") {
-          wrappedFunctions.delete(oldValue)
-        }
-        return Reflect.set(target, prop, value)
-      },
-    }) as typeof Services
+      }
+    }
+
+    return wrapped as typeof Services
   }
 
   // Helper to wrap generated function calls with error handling and loading states
