@@ -1141,7 +1141,7 @@ class RestConversationMessageControllerServiceInstance extends ServiceInstance {
     return this.httpRequest.request<Types.GetConversationsOfCurrentUserResponse>(
       {
         method: "GET",
-        url: "/api/conversation",
+        url: "/api/conversation/all",
         errors: { 500: "Internal Server Error" },
       }
     )
