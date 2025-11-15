@@ -15,8 +15,8 @@
     "serve": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "biome check .",
-    "format": "biome check --write ."
+    "lint": "biome check . && vue-tsc --noEmit",
+    "format": "biome check --write . && vue-tsc --noEmit"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
