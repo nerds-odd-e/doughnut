@@ -32,8 +32,8 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.managedApi.restCircleController
-        .createCircle(this.formData)
+      this.managedApi.services
+        .createCircle({ requestBody: this.formData })
         .then((res) => {
           this.$emit("closeDialog")
           this.$router.push({

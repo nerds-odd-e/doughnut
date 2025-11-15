@@ -6,7 +6,10 @@ import makeMe from "@tests/fixtures/makeMe"
 describe("RecallPromptComponent", () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    helper.managedApi.restRecallPromptController.answerQuiz = vi.fn()
+    vi.spyOn(
+      helper.managedApi.services,
+      "answerQuiz"
+    ).mockResolvedValue({} as never)
   })
 
   afterEach(() => {
@@ -28,11 +31,12 @@ describe("RecallPromptComponent", () => {
   describe("answer submission", () => {
     it("shows loading state while submitting answer", async () => {
       // Setup API to delay response
-      helper.managedApi.restRecallPromptController.answerQuiz = vi
-        .fn()
-        .mockImplementation(
-          () => new Promise((resolve) => setTimeout(resolve, 100))
-        )
+      vi.spyOn(
+        helper.managedApi.services,
+        "answerQuiz"
+      ).mockImplementation(
+        () => new Promise((resolve) => setTimeout(resolve, 100)) as never
+      )
 
       const wrapper = mountComponent()
 
@@ -56,10 +60,12 @@ describe("RecallPromptComponent", () => {
 
     it("allows retrying on API error", async () => {
       // Setup API to fail first time
-      helper.managedApi.restRecallPromptController.answerQuiz = vi
-        .fn()
+      vi.spyOn(
+        helper.managedApi.services,
+        "answerQuiz"
+      )
         .mockRejectedValueOnce(new Error("API Error"))
-        .mockResolvedValueOnce({ correct: true })
+        .mockResolvedValueOnce({ correct: true } as never)
 
       const wrapper = mountComponent()
 
@@ -87,9 +93,10 @@ describe("RecallPromptComponent", () => {
 
     it("emits answered event on successful submission", async () => {
       const answerResult = { correct: true }
-      helper.managedApi.restRecallPromptController.answerQuiz = vi
-        .fn()
-        .mockResolvedValue(answerResult)
+      vi.spyOn(
+        helper.managedApi.services,
+        "answerQuiz"
+      ).mockResolvedValue(answerResult as never)
 
       const wrapper = mountComponent()
 

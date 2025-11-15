@@ -24,12 +24,18 @@ describe("answered question page", () => {
 
     beforeEach(async () => {
       vitest.resetAllMocks()
-      helper.managedApi.restRecallPromptController.showQuestion =
-        mockedShowAnswerCall.mockResolvedValue(answeredQuestion)
-      helper.managedApi.restNoteController.show =
-        mockedNotePositionCall.mockResolvedValue(makeMe.aNoteRealm.please())
-      helper.managedApi.restConversationMessageController.startConversationAboutRecallPrompt =
-        mockedStartConversationCall.mockResolvedValue({ id: 123 })
+      vi.spyOn(
+        helper.managedApi.services,
+        "showQuestion"
+      ).mockResolvedValue(answeredQuestion as never)
+      vi.spyOn(
+        helper.managedApi.services,
+        "show"
+      ).mockResolvedValue(makeMe.aNoteRealm.please() as never)
+      vi.spyOn(
+        helper.managedApi.services,
+        "startConversationAboutRecallPrompt"
+      ).mockResolvedValue({ id: 123 } as never)
     })
 
     it("click on note when doing review", async () => {
@@ -41,7 +47,9 @@ describe("answered question page", () => {
       await flushPromises()
       wrapper.find(".note-under-question").trigger("click")
       await flushPromises()
-      expect(mockedShowAnswerCall).toHaveBeenCalledWith(REVIEW_QUESTION_ID)
+      expect(
+        helper.managedApi.services.showQuestion
+      ).toHaveBeenCalledWith({ recallPrompt: REVIEW_QUESTION_ID })
     })
 
     describe("conversation button", () => {
@@ -61,9 +69,9 @@ describe("answered question page", () => {
         await button.trigger("click")
         await flushPromises()
 
-        expect(mockedStartConversationCall).toHaveBeenCalledWith(
-          REVIEW_QUESTION_ID
-        )
+        expect(
+          helper.managedApi.services.startConversationAboutRecallPrompt
+        ).toHaveBeenCalledWith({ recallPrompt: REVIEW_QUESTION_ID })
         expect(mockedPush).toHaveBeenCalledWith({
           name: "messageCenter",
           params: { conversationId: 123 },

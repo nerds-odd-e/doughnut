@@ -38,8 +38,8 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.managedApi.restSubscriptionController
-        .update(this.subscription.id, this.formData)
+      this.managedApi.services
+        .update({ subscription: this.subscription.id, requestBody: this.formData })
         .then(() => {
           this.$router.push({ name: "notebooks" })
         })

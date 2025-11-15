@@ -134,10 +134,10 @@ const viewLastResult = (cursor: number | undefined) => {
 }
 
 const loadMore = async (dueInDays?: number) => {
-  const response = await managedApi.restRecallsController.recalling(
-    timezoneParam(),
-    dueInDays
-  )
+  const response = await managedApi.services.recalling({
+    timezone: timezoneParam(),
+    dueindays: dueInDays,
+  })
   toRepeat.value = response.toRepeat
   currentIndex.value = 0
   if (toRepeat.value?.length === 0) {

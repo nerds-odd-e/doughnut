@@ -28,7 +28,7 @@ const { managedApi } = useLoadingApi()
 const bazaarNotebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
 const fetchData = () => {
-  managedApi.restBazaarController.bazaar().then((res) => {
+  managedApi.services.bazaar().then((res) => {
     bazaarNotebooks.value = res
   })
 }

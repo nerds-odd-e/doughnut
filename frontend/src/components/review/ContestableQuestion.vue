@@ -81,9 +81,9 @@ const contest = async () => {
   currentQuestionLegitMessage.value = ""
   contesting.value = true
   try {
-    const contestResult = await managedApi.restRecallPromptController.contest(
-      currentQuestion.value.id
-    )
+    const contestResult =     await managedApi.services.contest({
+      recallPrompt: currentQuestion.value.id,
+    })
 
     if (!contestResult.rejected) {
       regenerating.value = true
@@ -93,10 +93,10 @@ const contest = async () => {
       })
       try {
         currentQuestion.value =
-          await managedApi.restRecallPromptController.regenerate(
-            currentQuestion.value.id,
-            contestResult
-          )
+          await managedApi.services.regenerate({
+            recallPrompt: currentQuestion.value.id,
+            requestBody: contestResult,
+          })
       } finally {
         regenerating.value = false
       }

@@ -50,20 +50,22 @@ describe("Save wikidata id", () => {
         .wikidataTitle(wikidataTitle)
         .please()
 
-      helper.managedApi.restWikidataController.fetchWikidataEntityDataById = vi
-        .fn()
-        .mockResolvedValue(wikidata)
-      helper.managedApi.restNoteController.updateWikidataId = vi
-        .fn()
-        .mockResolvedValue({})
+      vi.spyOn(
+        helper.managedApi.services,
+        "fetchWikidataEntityDataById"
+      ).mockResolvedValue(wikidata as never)
+      vi.spyOn(
+        helper.managedApi.services,
+        "updateWikidataId"
+      ).mockResolvedValue({} as never)
 
       const wrapper = await putWikidataIdAndSubmit(note)
       await userAction(wrapper)
       expect(
-        helper.managedApi.restWikidataController.fetchWikidataEntityDataById
-      ).toBeCalledWith(wikidataId)
+        helper.managedApi.services.fetchWikidataEntityDataById
+      ).toBeCalledWith({ wikidataId })
       expect(
-        helper.managedApi.restNoteController.updateWikidataId
+        helper.managedApi.services.updateWikidataId
       ).toBeCalledTimes(shouldSave ? 1 : 0)
     }
   )

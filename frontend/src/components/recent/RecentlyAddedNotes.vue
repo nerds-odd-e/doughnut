@@ -38,7 +38,7 @@ const { managedApi } = useLoadingApi()
 const notes = ref<NoteRealm[] | undefined>(undefined)
 
 const fetchData = async () => {
-  notes.value = await managedApi.restNoteController.getRecentNotes()
+  notes.value = await managedApi.services.getRecentNotes()
 }
 
 onMounted(() => {

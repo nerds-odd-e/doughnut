@@ -40,7 +40,7 @@ const { managedApi } = useLoadingApi()
 const circles = ref<Circle[] | undefined>(undefined)
 
 const fetchData = () => {
-  managedApi.restCircleController.index().then((res) => {
+  managedApi.services.index().then((res) => {
     circles.value = res
   })
 }

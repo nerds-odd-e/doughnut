@@ -76,9 +76,9 @@ const isMaximized = ref(false)
 onMounted(async () => {
   if (props.conversation.subject?.note?.id) {
     conversations.value =
-      await managedApi.restConversationMessageController.getConversationsAboutNote(
-        props.conversation.subject.note.id
-      )
+      await managedApi.services.getConversationsAboutNote({
+        note: props.conversation.subject.note.id,
+      })
   }
 })
 

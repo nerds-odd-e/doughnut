@@ -14,17 +14,24 @@ vitest.mock("vue-router", () => ({
 
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()
-const mockedCreateNote = vitest.fn()
+let mockedCreateNote: ReturnType<typeof vi.fn>
 
 describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    helper.managedApi.restSearchController.searchForLinkTarget = mockedSearch
-    helper.managedApi.restSearchController.searchForLinkTargetWithin =
-      mockedSearchWithin
-    helper.managedApi.restNoteCreationController.createNote =
-      mockedCreateNote.mockResolvedValue({})
+    vi.spyOn(
+      helper.managedApi.services,
+      "searchForLinkTarget"
+    ).mockImplementation(mockedSearch)
+    vi.spyOn(
+      helper.managedApi.services,
+      "searchForLinkTargetWithin"
+    ).mockImplementation(mockedSearchWithin)
+    mockedCreateNote = vi.spyOn(
+      helper.managedApi.services,
+      "createNote"
+    ).mockResolvedValue({} as never)
   })
 
   afterEach(() => {
@@ -48,10 +55,10 @@ describe("adding new note", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("mythical")
-    expect(mockedSearchWithin).toHaveBeenCalledWith(
-      note.id,
-      expect.objectContaining({ searchKey: "myth" })
-    )
+    expect(mockedSearchWithin).toHaveBeenCalledWith({
+      note: note.id,
+      requestBody: expect.objectContaining({ searchKey: "myth" }),
+    })
   })
 
   describe("submit form", () => {
@@ -68,7 +75,10 @@ describe("adding new note", () => {
 
     it("call the api", async () => {
       await wrapper.find("form").trigger("submit")
-      expect(mockedCreateNote).toHaveBeenCalledWith(note.id, expect.anything())
+      expect(mockedCreateNote).toHaveBeenCalledWith({
+        parentNote: note.id,
+        requestBody: expect.anything(),
+      })
     })
 
     it("call the api once only", async () => {
@@ -85,8 +95,10 @@ describe("adding new note", () => {
 
     beforeEach(() => {
       mockedSearchWithin.mockResolvedValue([])
-      helper.managedApi.restWikidataController.searchWikidata =
-        mockedWikidataSearch
+      vi.spyOn(
+        helper.managedApi.services,
+        "searchWikidata"
+      ).mockImplementation(mockedWikidataSearch)
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -132,7 +144,7 @@ describe("adding new note", () => {
 
       it("focus on the select", async () => {
         expect(select.element).toHaveFocus()
-        expect(mockedWikidataSearch).toHaveBeenCalledWith("dog")
+        expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: "dog" })
       })
 
       it("remove the select when lose focus", async () => {
@@ -161,7 +173,7 @@ describe("adding new note", () => {
         action()
         await flushPromises()
 
-        expect(mockedWikidataSearch).toHaveBeenCalledWith(searchTitle)
+        expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: searchTitle })
         expect((<HTMLInputElement>titleInput().element).value).toBe(
           expectedTitle
         )
