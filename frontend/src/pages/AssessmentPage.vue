@@ -24,9 +24,9 @@ const errors = ref("")
 const generateAssessmentQuestions = async () => {
   try {
     assessmentAttempt.value =
-      await managedApi.restAssessmentController.generateAssessmentQuestions(
-        props.notebookId
-      )
+      await managedApi.services.generateAssessmentQuestions({
+        notebook: props.notebookId,
+      })
   } catch (err) {
     if (err instanceof Error) {
       errors.value = err.message

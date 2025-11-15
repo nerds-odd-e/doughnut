@@ -461,7 +461,7 @@ describe("NoteAudioTools", () => {
       resolveProcess = resolve
     })
     vi.spyOn(
-      helper.managedApi.restAiAudioController,
+      helper.managedApi.services,
       "audioToText"
     ).mockImplementation(
       // biome-ignore lint/suspicious/noExplicitAny: Mock function type compatibility for Promise
@@ -535,9 +535,12 @@ describe("NoteAudioTools", () => {
     beforeEach(() => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
-      helper.managedApi.restTextContentController.updateNoteTitle = vi.fn()
       vi.spyOn(
-        helper.managedApi.restAiAudioController,
+        helper.managedApi.services,
+        "updateNoteTitle"
+      ).mockResolvedValue({} as never)
+      vi.spyOn(
+        helper.managedApi.services,
         "audioToText"
       ).mockResolvedValue({
         completionFromAudio: { completion: "text", deleteFromEnd: 0 },
@@ -552,9 +555,10 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      helper.managedApi.restAiController.suggestTitle = vi
-        .fn()
-        .mockResolvedValue({ title: "Suggested Title" })
+      vi.spyOn(
+        helper.managedApi.services,
+        "suggestTitle"
+      ).mockResolvedValue({ title: "Suggested Title" } as never)
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -563,10 +567,10 @@ describe("NoteAudioTools", () => {
 
       // Should call suggestTitle 4 times (on calls 1, 2, 4, and 8)
       expect(
-        helper.managedApi.restAiController.suggestTitle
+        helper.managedApi.services.suggestTitle
       ).toHaveBeenCalledTimes(4)
       expect(
-        helper.managedApi.restTextContentController.updateNoteTitle
+        helper.managedApi.services.updateNoteTitle
       ).toHaveBeenCalledTimes(4)
     })
 
@@ -577,15 +581,16 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      helper.managedApi.restAiController.suggestTitle = vi
-        .fn()
-        .mockResolvedValue({ title: "" })
+      vi.spyOn(
+        helper.managedApi.services,
+        "suggestTitle"
+      ).mockResolvedValue({ title: "" } as never)
 
       await wrapper.vm.processAudio(new Blob())
 
-      expect(helper.managedApi.restAiController.suggestTitle).toHaveBeenCalled()
+      expect(helper.managedApi.services.suggestTitle).toHaveBeenCalled()
       expect(
-        helper.managedApi.restTextContentController.updateNoteTitle
+        helper.managedApi.services.updateNoteTitle
       ).not.toHaveBeenCalled()
     })
   })
@@ -595,7 +600,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = vi
-        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .spyOn(helper.managedApi.services, "audioToText")
         .mockResolvedValue({
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
@@ -625,23 +630,23 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(new Blob())
 
       expect(
-        helper.managedApi.restAiAudioController.audioToText
-      ).toHaveBeenLastCalledWith(
-        expect.objectContaining({
+        helper.managedApi.services.audioToText
+      ).toHaveBeenLastCalledWith({
+        formData: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
-        })
-      )
+        }),
+      })
 
       // Second call should include previous thread context
       await wrapper.vm.processAudio(new Blob())
 
       expect(
-        helper.managedApi.restAiAudioController.audioToText
-      ).toHaveBeenLastCalledWith(
-        expect.objectContaining({
+        helper.managedApi.services.audioToText
+      ).toHaveBeenLastCalledWith({
+        formData: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
-        })
-      )
+        }),
+      })
     })
 
     it("maintains thread context even after errors", async () => {
@@ -667,7 +672,9 @@ describe("NoteAudioTools", () => {
       const lastCall = audioToTextMock.mock.calls.pop()
       expect(lastCall).toBeDefined()
       expect(lastCall![0]).toMatchObject({
-        previousNoteDetailsToAppendTo: note.details,
+        formData: {
+          previousNoteDetailsToAppendTo: note.details,
+        },
       })
     })
   })
@@ -677,7 +684,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = vi
-        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .spyOn(helper.managedApi.services, "audioToText")
         .mockResolvedValue({
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
@@ -710,13 +717,13 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(testBlob)
 
       expect(
-        helper.managedApi.restAiAudioController.audioToText
-      ).toHaveBeenCalledWith(
-        expect.objectContaining({
+        helper.managedApi.services.audioToText
+      ).toHaveBeenCalledWith({
+        formData: expect.objectContaining({
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
-        })
-      )
+        }),
+      })
     })
 
     it("maintains processing instructions between recordings", async () => {
@@ -737,12 +744,16 @@ describe("NoteAudioTools", () => {
       const calls = audioToTextMock.mock.calls
       expect(calls.length).toBeGreaterThanOrEqual(2)
       expect(calls[0]?.[0]).toMatchObject({
-        additionalProcessingInstructions: "Test instructions",
-        previousNoteDetailsToAppendTo: note.details,
+        formData: {
+          additionalProcessingInstructions: "Test instructions",
+          previousNoteDetailsToAppendTo: note.details,
+        },
       })
       expect(calls[1]?.[0]).toMatchObject({
-        additionalProcessingInstructions: "Test instructions",
-        previousNoteDetailsToAppendTo: note.details,
+        formData: {
+          additionalProcessingInstructions: "Test instructions",
+          previousNoteDetailsToAppendTo: note.details,
+        },
       })
     })
   })
@@ -752,7 +763,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = vi
-        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .spyOn(helper.managedApi.services, "audioToText")
         .mockResolvedValue({
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
@@ -771,12 +782,12 @@ describe("NoteAudioTools", () => {
       })
       await flushPromises()
 
-      expect(audioToTextMock).toHaveBeenCalledWith(
-        expect.objectContaining({
+      expect(audioToTextMock).toHaveBeenCalledWith({
+        formData: expect.objectContaining({
           isMidSpeech: true,
           previousNoteDetailsToAppendTo: note.details,
-        })
-      )
+        }),
+      })
     })
   })
 
@@ -787,7 +798,7 @@ describe("NoteAudioTools", () => {
     }
 
     vi.spyOn(
-      helper.managedApi.restAiAudioController,
+      helper.managedApi.services,
       "audioToText"
     ).mockResolvedValue(mockResponse)
 
@@ -801,13 +812,13 @@ describe("NoteAudioTools", () => {
 
     // Verify API call was made with correct parameters
     expect(
-      helper.managedApi.restAiAudioController.audioToText
-    ).toHaveBeenCalledWith(
-      expect.objectContaining({
+      helper.managedApi.services.audioToText
+    ).toHaveBeenCalledWith({
+      formData: expect.objectContaining({
         isMidSpeech: true,
         previousNoteDetailsToAppendTo: note.details,
-      })
-    )
+      }),
+    })
   })
 
   describe("Fullscreen Integration", () => {
@@ -868,7 +879,7 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = vi
-        .spyOn(helper.managedApi.restAiAudioController, "audioToText")
+        .spyOn(helper.managedApi.services, "audioToText")
         .mockResolvedValue({
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
@@ -892,11 +903,11 @@ describe("NoteAudioTools", () => {
         isMidSpeech: true,
       })
 
-      expect(audioToTextMock).toHaveBeenCalledWith(
-        expect.objectContaining({
+      expect(audioToTextMock).toHaveBeenCalledWith({
+        formData: expect.objectContaining({
           previousNoteDetailsToAppendTo: shortContent,
-        })
-      )
+        }),
+      })
     })
 
     it("truncates content over 500 characters and adds ellipsis", async () => {
@@ -913,11 +924,11 @@ describe("NoteAudioTools", () => {
       })
 
       const expectedContent = `...${"a".repeat(500)}`
-      expect(audioToTextMock).toHaveBeenCalledWith(
-        expect.objectContaining({
+      expect(audioToTextMock).toHaveBeenCalledWith({
+        formData: expect.objectContaining({
           previousNoteDetailsToAppendTo: expectedContent,
-        })
-      )
+        }),
+      })
     })
 
     it("handles null content", async () => {
@@ -932,11 +943,11 @@ describe("NoteAudioTools", () => {
         isMidSpeech: true,
       })
 
-      expect(audioToTextMock).toHaveBeenCalledWith(
-        expect.objectContaining({
+      expect(audioToTextMock).toHaveBeenCalledWith({
+        formData: expect.objectContaining({
           previousNoteDetailsToAppendTo: "",
-        })
-      )
+        }),
+      })
     })
   })
 })

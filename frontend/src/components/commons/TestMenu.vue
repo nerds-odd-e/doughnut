@@ -63,14 +63,18 @@ export default defineComponent({
   },
   methods: {
     updateRandomSelector() {
-      this.managedApi.testabilityRestController.randomizer({
-        choose: this.randomSelector,
-        seed: this.seed,
+      this.managedApi.services.randomizer({
+        requestBody: {
+          choose: this.randomSelector,
+          seed: this.seed,
+        },
       })
     },
     updateFeatureToggle(value) {
-      this.managedApi.testabilityRestController.enableFeatureToggle({
-        enabled: value,
+      this.managedApi.services.enableFeatureToggle({
+        requestBody: {
+          enabled: value,
+        },
       })
       this.$emit("featureToggle", value)
     },

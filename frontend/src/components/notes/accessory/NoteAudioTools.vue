@@ -115,7 +115,9 @@ const shouldSuggestTitle = (callCount: number): boolean => {
 }
 
 const updateTopicIfSuggested = async (noteId: number) => {
-  const suggestedTopic = await managedApi.restAiController.suggestTitle(noteId)
+  const suggestedTopic = await managedApi.services.suggestTitle({
+    note: noteId,
+  })
   if (suggestedTopic?.title) {
     await storageAccessor
       .storedApi()
@@ -145,11 +147,13 @@ const getLastContentChunk = (
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
-    const response = await managedApi.restAiAudioController.audioToText({
-      uploadAudioFile: chunk.data,
-      additionalProcessingInstructions: processingInstructions.value,
-      isMidSpeech: chunk.isMidSpeech,
-      previousNoteDetailsToAppendTo: getLastContentChunk(note.details),
+    const response = await managedApi.services.audioToText({
+      formData: {
+        uploadAudioFile: chunk.data,
+        additionalProcessingInstructions: processingInstructions.value,
+        isMidSpeech: chunk.isMidSpeech,
+        previousNoteDetailsToAppendTo: getLastContentChunk(note.details),
+      },
     })
 
     if (!response) {

@@ -56,7 +56,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.managedApi.restFailureReportController
+      this.managedApi.services
         .failureReports()
         .then((res) => {
           this.failureReports = res as unknown as FailureReport[]
@@ -73,8 +73,8 @@ export default defineComponent({
         return
       }
 
-      this.managedApi.restFailureReportController
-        .deleteFailureReports(this.selectedFailureReports)
+      this.managedApi.services
+        .deleteFailureReports({ requestBody: this.selectedFailureReports })
         .then(() => {
           this.fetchData()
           this.selectedFailureReports = []

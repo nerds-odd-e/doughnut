@@ -29,7 +29,7 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
   answeredQuestion.value =
-    await managedApi.restRecallPromptController.showQuestion(recallPromptId)
+    await managedApi.services.showQuestion({ recallPrompt: recallPromptId })
 }
 
 watch(() => recallPromptId, fetchData, { immediate: true })

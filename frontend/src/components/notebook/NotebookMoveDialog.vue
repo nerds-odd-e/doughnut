@@ -34,15 +34,15 @@ const props = defineProps({
 const circles = ref<Circle[]>([])
 
 onMounted(async () => {
-  circles.value = await managedApi.restCircleController.index()
+  circles.value = await managedApi.services.index()
 })
 
 const move = async (circle: Circle) => {
   if (await popups.confirm(`Move notebook to ${circle.name}?`)) {
-    await managedApi.restNotebookController.moveToCircle(
-      props.notebook.id,
-      circle.id
-    )
+    await managedApi.services.moveToCircle({
+      notebook: props.notebook.id,
+      circle: circle.id,
+    })
   }
 }
 </script>

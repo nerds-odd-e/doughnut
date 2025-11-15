@@ -90,9 +90,7 @@ watch(
   async (newId) => {
     if (newId) {
       currentConversation.value =
-        await managedApi.restConversationMessageController.getConversation(
-          newId
-        )
+        await managedApi.services.getConversation({ conversationId: newId })
       return
     }
     currentConversation.value = null
@@ -101,7 +99,7 @@ watch(
 
 const fetchData = async () => {
   conversations.value =
-    await managedApi.restConversationMessageController.getConversationsOfCurrentUser()
+    await managedApi.services.getConversationsOfCurrentUser()
 
   if (props.conversationId && conversations.value) {
     currentConversation.value =
@@ -112,9 +110,7 @@ const fetchData = async () => {
 
 const handleConversationFetched = async (conversationId: number) => {
   messageCenterConversations.unreadConversations =
-    await managedApi.restConversationMessageController.markConversationAsRead(
-      conversationId
-    )
+    await managedApi.services.markConversationAsRead({ conversationId })
 }
 
 onMounted(() => {

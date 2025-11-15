@@ -33,7 +33,7 @@ const { popups } = usePopups()
 const notebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  notebooks.value = await managedApi.restBazaarController.bazaar()
+  notebooks.value = await managedApi.services.bazaar()
 }
 
 const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
@@ -42,9 +42,9 @@ const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
       `Are you sure you want to remove "${bazaarNotebook.notebook.title}" from the bazaar?`
     )
   ) {
-    notebooks.value = await managedApi.restBazaarController.removeFromBazaar(
-      bazaarNotebook.id!
-    )
+    notebooks.value = await managedApi.services.removeFromBazaar({
+      bazaarNotebook: bazaarNotebook.id!,
+    })
   }
 }
 

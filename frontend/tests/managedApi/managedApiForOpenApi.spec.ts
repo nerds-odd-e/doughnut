@@ -35,7 +35,7 @@ describe("managdApi", () => {
           url: `${baseUrl}/api/user`,
         }
       )
-      await managedApi.restUserController.getUserProfile()
+      await managedApi.services.getUserProfile()
       expect(interimStateLength).toBeGreaterThan(0)
       expect(apiStatus.states.length).toBe(0)
     })
@@ -51,7 +51,7 @@ describe("managdApi", () => {
           url: `${baseUrl}/api/user`,
         }
       )
-      await managedApi.silent.restUserController.getUserProfile()
+      await managedApi.silent.services.getUserProfile()
       expect(interimStateLength).toBe(0)
     })
   })
@@ -66,7 +66,7 @@ describe("managdApi", () => {
 
     const callApiAndIgnoreError = async () => {
       try {
-        await managedApi.restUserController.getUserProfile()
+        await managedApi.services.getUserProfile()
       } catch (_e) {
         // ignore
       }
@@ -79,7 +79,7 @@ describe("managdApi", () => {
 
     it("should not show error toast in silent mode", async () => {
       try {
-        await managedApi.silent.restUserController.getUserProfile()
+        await managedApi.silent.services.getUserProfile()
       } catch (_e) {
         // ignore
       }
@@ -94,7 +94,7 @@ describe("managdApi", () => {
         })
 
         try {
-          await managedApi.restUserController.getUserProfile()
+          await managedApi.services.getUserProfile()
         } catch (_e) {
           // ignore
         }
@@ -121,7 +121,7 @@ describe("managdApi", () => {
 
         let caughtError: Error | undefined
         try {
-          await managedApi.restUserController.getUserProfile()
+          await managedApi.services.getUserProfile()
         } catch (error) {
           caughtError = error as Error
         }
@@ -173,7 +173,7 @@ describe("managdApi", () => {
         })
 
         try {
-          await managedApi.restUserController.getUserProfile()
+          await managedApi.services.getUserProfile()
         } catch (_e) {
           // ignore
         }
@@ -194,7 +194,7 @@ describe("managdApi", () => {
 
         let caughtError: Error | undefined
         try {
-          await managedApi.restUserController.getUserProfile()
+          await managedApi.services.getUserProfile()
         } catch (error) {
           caughtError = error as Error
         }

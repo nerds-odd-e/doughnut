@@ -11,9 +11,10 @@ describe("NoteExportDialog", () => {
   it("fetches and displays descendants JSON when expanded", async () => {
     const note = makeMe.aNote.please()
     const descendantsData = { focusNote: { id: note.id }, relatedNotes: [] }
-    helper.managedApi.restNoteController.getDescendants = vi
-      .fn()
-      .mockResolvedValue(descendantsData)
+    vi.spyOn(
+      helper.managedApi.services,
+      "getDescendants"
+    ).mockResolvedValue(descendantsData)
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -31,16 +32,17 @@ describe("NoteExportDialog", () => {
     })
     // Should call API once
     expect(
-      helper.managedApi.restNoteController.getDescendants
-    ).toHaveBeenCalledWith(note.id)
+      helper.managedApi.services.getDescendants
+    ).toHaveBeenCalledWith({ note: note.id })
   })
 
   it("downloads JSON when download button is clicked", async () => {
     const note = makeMe.aNote.please()
     const descendantsData = { focusNote: { id: note.id }, relatedNotes: [] }
-    helper.managedApi.restNoteController.getDescendants = vi
-      .fn()
-      .mockResolvedValue(descendantsData)
+    vi.spyOn(
+      helper.managedApi.services,
+      "getDescendants"
+    ).mockResolvedValue(descendantsData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -54,8 +56,9 @@ describe("NoteExportDialog", () => {
   it("does not refetch JSON if already loaded when toggling open/close", async () => {
     const note = makeMe.aNote.please()
     const descendantsData = { focusNote: { id: note.id }, relatedNotes: [] }
-    const getDescendantsMock = vi.fn().mockResolvedValue(descendantsData)
-    helper.managedApi.restNoteController.getDescendants = getDescendantsMock
+    const getDescendantsMock = vi
+      .spyOn(helper.managedApi.services, "getDescendants")
+      .mockResolvedValue(descendantsData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -73,9 +76,10 @@ describe("NoteExportDialog", () => {
   it("fetches and displays graph JSON when expanded", async () => {
     const note = makeMe.aNote.please()
     const graphData = { focusNote: { id: note.id }, relatedNotes: [] }
-    helper.managedApi.restNoteController.getGraph = vi
-      .fn()
-      .mockResolvedValue(graphData)
+    vi.spyOn(
+      helper.managedApi.services,
+      "getGraph"
+    ).mockResolvedValue(graphData)
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -90,18 +94,19 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(helper.managedApi.restNoteController.getGraph).toHaveBeenCalledWith(
-      note.id,
-      5000
-    )
+    expect(helper.managedApi.services.getGraph).toHaveBeenCalledWith({
+      note: note.id,
+      tokenLimit: 5000,
+    })
   })
 
   it("downloads graph JSON when download button is clicked", async () => {
     const note = makeMe.aNote.please()
     const graphData = { focusNote: { id: note.id }, relatedNotes: [] }
-    helper.managedApi.restNoteController.getGraph = vi
-      .fn()
-      .mockResolvedValue(graphData)
+    vi.spyOn(
+      helper.managedApi.services,
+      "getGraph"
+    ).mockResolvedValue(graphData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -115,8 +120,9 @@ describe("NoteExportDialog", () => {
   it("does not refetch graph JSON if already loaded when toggling open/close", async () => {
     const note = makeMe.aNote.please()
     const graphData = { focusNote: { id: note.id }, relatedNotes: [] }
-    const getGraphMock = vi.fn().mockResolvedValue(graphData)
-    helper.managedApi.restNoteController.getGraph = getGraphMock
+    const getGraphMock = vi
+      .spyOn(helper.managedApi.services, "getGraph")
+      .mockResolvedValue(graphData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -139,10 +145,9 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     }
     const getGraphMock = vi
-      .fn()
+      .spyOn(helper.managedApi.services, "getGraph")
       .mockResolvedValueOnce(graphData1)
       .mockResolvedValueOnce(graphData2)
-    helper.managedApi.restNoteController.getGraph = getGraphMock
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -155,7 +160,10 @@ describe("NoteExportDialog", () => {
     await fireEvent.input(input)
     await fireEvent.click(getByTestId("refresh-graph-btn"))
     await waitFor(() => {
-      expect(getGraphMock).toHaveBeenLastCalledWith(note.id, 1234)
+      expect(getGraphMock).toHaveBeenLastCalledWith({
+        note: note.id,
+        tokenLimit: 1234,
+      })
       const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
       expect(textarea.value).toContain('"token": 1234')
     })

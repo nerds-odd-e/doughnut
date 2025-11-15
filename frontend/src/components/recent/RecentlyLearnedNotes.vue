@@ -36,7 +36,7 @@ const memoryTrackers = ref<MemoryTracker[] | undefined>(undefined)
 
 const fetchData = async () => {
   memoryTrackers.value =
-    await managedApi.restMemoryTrackerController.getRecentMemoryTrackers()
+    await managedApi.services.getRecentMemoryTrackers()
 }
 
 onMounted(() => {

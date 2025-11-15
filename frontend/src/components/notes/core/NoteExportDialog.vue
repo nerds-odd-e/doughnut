@@ -88,9 +88,9 @@ watch(
   () => expandedDescendants.value,
   async (val) => {
     if (val && !jsonDescendants.value) {
-      const result = await managedApi.restNoteController.getDescendants(
-        props.note.id
-      )
+      const result = await managedApi.services.getDescendants({
+        note: props.note.id,
+      })
       jsonDescendants.value = JSON.stringify(result, null, 2)
     }
   }
@@ -108,10 +108,10 @@ watch(
 async function fetchGraph() {
   loadingGraph.value = true
   try {
-    const result = await managedApi.restNoteController.getGraph(
-      props.note.id,
-      tokenLimit.value
-    )
+    const result = await managedApi.services.getGraph({
+      note: props.note.id,
+      tokenLimit: tokenLimit.value,
+    })
     jsonGraph.value = JSON.stringify(result, null, 2)
   } finally {
     loadingGraph.value = false

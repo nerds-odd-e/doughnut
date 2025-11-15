@@ -45,14 +45,14 @@ const approvals = ref<NotebookCertificateApproval[] | undefined>(undefined)
 
 const fetchNotebooks = async () => {
   approvals.value =
-    await managedApi.restNotebookCertificateApprovalController.getAllPendingRequest()
+    await managedApi.services.getAllPendingRequest()
 }
 
 const approveNoteBook = async (approvalId: number) => {
   if (await popups.confirm(`Are you sure you want to approve this notebook?`)) {
-    await managedApi.restNotebookCertificateApprovalController.approve(
-      approvalId
-    )
+    await managedApi.services.approve({
+      notebookCertificateApproval: approvalId,
+    })
     fetchNotebooks()
   }
 }

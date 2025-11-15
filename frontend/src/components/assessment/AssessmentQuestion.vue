@@ -58,10 +58,10 @@ const emits = defineEmits(["advance"])
 const submitAnswer = async (answerData: AnswerDTO) => {
   try {
     localAssessmentQuestionInstance.value =
-      await managedApi.restAssessmentController.answerQuestion(
-        props.assessmentQuestionInstance.id,
-        answerData
-      )
+      await managedApi.services.answerQuestion({
+        assessmentQuestionInstance: props.assessmentQuestionInstance.id,
+        requestBody: answerData,
+      })
 
     if (localAssessmentQuestionInstance.value.answer?.correct) {
       emits("advance")

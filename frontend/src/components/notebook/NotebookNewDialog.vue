@@ -31,14 +31,14 @@ export default {
   methods: {
     createNotebook() {
       if (this.circle) {
-        return this.managedApi.restCircleController.createNotebookInCircle(
-          this.circle.id,
-          this.noteFormData
-        )
+        return this.managedApi.services.createNotebookInCircle({
+          circle: this.circle.id,
+          requestBody: this.noteFormData,
+        })
       }
-      return this.managedApi.restNotebookController.createNotebook(
-        this.noteFormData
-      )
+      return this.managedApi.services.createNotebook({
+        requestBody: this.noteFormData,
+      })
     },
     processForm() {
       this.createNotebook()

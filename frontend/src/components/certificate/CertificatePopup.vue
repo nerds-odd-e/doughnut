@@ -66,9 +66,9 @@ const formatDate = (date: Date): string => {
 }
 
 const fetchData = async () => {
-  certificate.value = await managedApi.restCertificateController.getCertificate(
-    props.notebookId
-  )
+  certificate.value = await managedApi.services.getCertificate({
+    notebook: props.notebookId,
+  })
 }
 
 onMounted(() => {

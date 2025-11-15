@@ -4,15 +4,16 @@ import helper from "@tests/helpers"
 
 describe("global bar", () => {
   beforeEach(() => {
-    helper.managedApi.restCircleController.index = vitest
-      .fn()
-      .mockResolvedValue([])
+    vi.spyOn(
+      helper.managedApi.services,
+      "index"
+    ).mockResolvedValue([])
   })
 
   it("opens the circles selection", async () => {
     const wrapper = helper.component(CirclesPage).withRouter().mount()
     wrapper.find("[role='button']").trigger("click")
     await flushPromises()
-    expect(helper.managedApi.restCircleController.index).toBeCalled()
+    expect(helper.managedApi.services.index).toBeCalled()
   })
 })

@@ -12,14 +12,16 @@ describe("repeat page", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    helper.managedApi.restNoteController.show = vi
-      .fn()
-      .mockResolvedValue(makeMe.aNote.please())
-    helper.managedApi.restMemoryTrackerController.show1 = vi
-      .fn()
-      .mockResolvedValue(makeMe.aMemoryTracker.please())
-    helper.managedApi.silent.restRecallPromptController.askAQuestion =
-      mockedRandomQuestionCall
+    vi.spyOn(helper.managedApi.services, "show").mockResolvedValue(
+      makeMe.aNote.please() as never
+    )
+    vi.spyOn(helper.managedApi.services, "show1").mockResolvedValue(
+      makeMe.aMemoryTracker.please() as never
+    )
+    vi.spyOn(
+      helper.managedApi.silent.services,
+      "askAquestion"
+    ).mockImplementation(mockedRandomQuestionCall)
   })
 
   const createMemoryTrackerLite = (
@@ -54,21 +56,25 @@ describe("repeat page", () => {
   describe('repeat page with "just review" quiz', () => {
     it("fetch the first 1 question when mount", async () => {
       await mountPage([1, 2, 3], 1)
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(1)
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
+        memoryTracker: 1,
+      })
     })
 
     it("fetch the first 3 question when mount", async () => {
       await mountPage([111, 222, 333, 444], 3)
-      expect(mockedRandomQuestionCall).nthCalledWith(1, 111)
-      expect(mockedRandomQuestionCall).nthCalledWith(2, 222)
-      expect(mockedRandomQuestionCall).nthCalledWith(3, 333)
+      expect(mockedRandomQuestionCall).nthCalledWith(1, { memoryTracker: 111 })
+      expect(mockedRandomQuestionCall).nthCalledWith(2, { memoryTracker: 222 })
+      expect(mockedRandomQuestionCall).nthCalledWith(3, { memoryTracker: 333 })
     })
 
     it("does not fetch question 2 again after prefetched", async () => {
       const wrapper = await mountPage([1, 2, 3, 4], 2)
       expect(mockedRandomQuestionCall).toBeCalledTimes(2)
       await wrapper.setProps({ currentIndex: 1 })
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(3)
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
+        memoryTracker: 3,
+      })
     })
   })
 
@@ -98,9 +104,10 @@ describe("repeat page", () => {
       const answerResult = makeMe.anAnsweredQuestion
         .answerCorrect(true)
         .please()
-      helper.managedApi.restMemoryTrackerController.answerSpelling = vi
-        .fn()
-        .mockResolvedValue(answerResult)
+      vi.spyOn(
+        helper.managedApi.services,
+        "answerSpelling"
+      ).mockResolvedValue(answerResult as never)
 
       const wrapper = await mountPage([1], 1, true)
 
@@ -110,9 +117,12 @@ describe("repeat page", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.restMemoryTrackerController.answerSpelling
-      ).toHaveBeenCalledWith(1, {
-        spellingAnswer: "cat",
+        helper.managedApi.services.answerSpelling
+      ).toHaveBeenCalledWith({
+        memoryTracker: 1,
+        requestBody: {
+          spellingAnswer: "cat",
+        },
       })
 
       const emitted = wrapper.emitted()
