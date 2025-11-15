@@ -20,10 +20,9 @@ describe("all in note show page", () => {
     const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
 
     beforeEach(() => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "show"
-      ).mockResolvedValue(noteRealm as never)
+      helper.managedApi.restNoteController.show = vi
+        .fn()
+        .mockResolvedValue(noteRealm)
     })
 
     it(" should fetch API", async () => {
@@ -33,23 +32,20 @@ describe("all in note show page", () => {
         .withRouter(router)
         .render()
       await screen.findByText(noteRealm.note.noteTopology.titleOrPredicate)
-      expect(helper.managedApi.services.show).toBeCalledWith({
-        note: noteRealm.id,
-      })
+      expect(helper.managedApi.restNoteController.show).toBeCalledWith(
+        noteRealm.id
+      )
     })
   })
 
   describe("conversation maximize/minimize", () => {
     it("should maximize conversation when maximize button is clicked", async () => {
       const note = makeMe.aNoteRealm.please()
-      vi.spyOn(
-        helper.managedApi.services,
-        "show"
-      ).mockResolvedValue(note as never)
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsAboutNote"
-      ).mockResolvedValue([])
+      helper.managedApi.restNoteController.show = vitest
+        .fn()
+        .mockResolvedValue(note)
+      helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+        vitest.fn().mockResolvedValue([])
 
       const wrapper = helper
         .component(NoteShowPage)
@@ -79,14 +75,11 @@ describe("all in note show page", () => {
 
     it("should restore maximized state before closing conversation", async () => {
       const note = makeMe.aNoteRealm.please()
-      vi.spyOn(
-        helper.managedApi.services,
-        "show"
-      ).mockResolvedValue(note as never)
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsAboutNote"
-      ).mockResolvedValue([])
+      helper.managedApi.restNoteController.show = vitest
+        .fn()
+        .mockResolvedValue(note)
+      helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+        vitest.fn().mockResolvedValue([])
 
       const wrapper = helper
         .component(NoteShowPage)
@@ -124,14 +117,11 @@ describe("all in note show page", () => {
 
     it("should open conversation when URL has conversation=true", async () => {
       const note = makeMe.aNoteRealm.please()
-      vi.spyOn(
-        helper.managedApi.services,
-        "show"
-      ).mockResolvedValue(note as never)
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsAboutNote"
-      ).mockResolvedValue([])
+      helper.managedApi.restNoteController.show = vitest
+        .fn()
+        .mockResolvedValue(note)
+      helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+        vitest.fn().mockResolvedValue([])
 
       // Start with conversation in URL
       router.push({

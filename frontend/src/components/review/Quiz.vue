@@ -114,9 +114,10 @@ const useQuestionFetching = (props: QuizProps) => {
       if (memoryTrackerId in recallPromptCache.value) continue
 
       try {
-        const question = await managedApi.silent.services.askAquestion({
-          memoryTracker: memoryTrackerId,
-        })
+        const question =
+          await managedApi.silent.restRecallPromptController.askAQuestion(
+            memoryTrackerId
+          )
         recallPromptCache.value[memoryTrackerId] = question
       } catch (e) {
         recallPromptCache.value[memoryTrackerId] = undefined
@@ -172,10 +173,11 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
     return
 
   try {
-    const answerResult = await managedApi.services.answerSpelling({
-      memoryTracker: currentMemoryTrackerId.value,
-      requestBody: { spellingAnswer: answerData.spellingAnswer },
-    })
+    const answerResult =
+      await managedApi.restMemoryTrackerController.answerSpelling(
+        currentMemoryTrackerId.value,
+        { spellingAnswer: answerData.spellingAnswer }
+      )
     emit("answered-spelling", answerResult)
   } catch (e) {
     // Error handling is already done in the component

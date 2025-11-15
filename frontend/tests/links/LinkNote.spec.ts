@@ -23,14 +23,9 @@ describe("LinkNoteFinalize", () => {
       linkNoteFinalize: vi.fn().mockResolvedValue(undefined),
       moveNote: vi.fn().mockResolvedValue(undefined),
     }
-    vi.spyOn(
-      helper.managedApi.services,
-      "linkNoteFinalize"
-    ).mockImplementation(storedApi.linkNoteFinalize)
-    vi.spyOn(
-      helper.managedApi.services,
-      "moveNote"
-    ).mockImplementation(storedApi.moveNote)
+    helper.managedApi.restLinkController.linkNoteFinalize =
+      storedApi.linkNoteFinalize
+    helper.managedApi.restLinkController.moveNote = storedApi.moveNote
     const wrapper = helper
       .component(LinkNoteFinalize)
       .withStorageProps({

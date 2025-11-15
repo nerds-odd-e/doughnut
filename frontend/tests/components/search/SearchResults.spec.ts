@@ -11,14 +11,12 @@ describe("SearchResults.vue", () => {
       setTimeout(() => resolve([]), 1)
     )
 
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockReturnValue(delayed as never)
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearch"
-    ).mockReturnValue(delayed as never)
+    helper.managedApi.restSearchController.searchForLinkTarget = vi
+      .fn()
+      .mockReturnValue(delayed)
+    helper.managedApi.restSearchController.semanticSearch = vi
+      .fn()
+      .mockReturnValue(delayed)
 
     const wrapper = helper
       .component(SearchResults)
@@ -37,14 +35,12 @@ describe("SearchResults.vue", () => {
     vi.useFakeTimers()
 
     const empty: Array<unknown> = []
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockResolvedValue(empty)
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearch"
-    ).mockResolvedValue(empty)
+    helper.managedApi.restSearchController.searchForLinkTarget = vi
+      .fn()
+      .mockResolvedValue(empty)
+    helper.managedApi.restSearchController.semanticSearch = vi
+      .fn()
+      .mockResolvedValue(empty)
 
     const wrapper = helper
       .component(SearchResults)
@@ -70,22 +66,11 @@ describe("SearchResults.vue", () => {
     const withinSpy = vitest.fn().mockResolvedValue(result)
     const semanticSpy = vitest.fn().mockResolvedValue([])
     const semanticWithinSpy = vitest.fn().mockResolvedValue([])
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockImplementation(firstSpy)
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTargetWithin"
-    ).mockImplementation(withinSpy)
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearch"
-    ).mockImplementation(semanticSpy)
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearchWithin"
-    ).mockImplementation(semanticWithinSpy)
+    helper.managedApi.restSearchController.searchForLinkTarget = firstSpy
+    helper.managedApi.restSearchController.searchForLinkTargetWithin = withinSpy
+    helper.managedApi.restSearchController.semanticSearch = semanticSpy
+    helper.managedApi.restSearchController.semanticSearchWithin =
+      semanticWithinSpy
 
     const wrapper = helper
       .component(SearchResults)
@@ -131,22 +116,12 @@ describe("SearchResults.vue", () => {
     const mockSemanticTop = vitest.fn().mockResolvedValueOnce([])
     const mockSemanticWithin = vitest.fn().mockResolvedValueOnce([])
 
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockImplementation(mockTop)
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTargetWithin"
-    ).mockImplementation(mockWithin)
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearch"
-    ).mockImplementation(mockSemanticTop)
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearchWithin"
-    ).mockImplementation(mockSemanticWithin)
+    helper.managedApi.restSearchController.searchForLinkTarget = mockTop
+    helper.managedApi.restSearchController.searchForLinkTargetWithin =
+      mockWithin
+    helper.managedApi.restSearchController.semanticSearch = mockSemanticTop
+    helper.managedApi.restSearchController.semanticSearchWithin =
+      mockSemanticWithin
 
     const wrapper = helper
       .component(SearchResults)

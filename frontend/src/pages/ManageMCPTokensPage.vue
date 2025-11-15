@@ -77,7 +77,7 @@ const loading = ref(false)
 
 const loadTokens = async () => {
   try {
-    const res = await managedApi.services.getTokens()
+    const res = await managedApi.restUserController.getTokens()
     tokens.value = res.map((t) => ({
       id: t.id,
       label: t.label,
@@ -92,10 +92,8 @@ loadTokens()
 const generateToken = async () => {
   loading.value = true
   try {
-    const res = await managedApi.services.generateToken({
-      requestBody: {
-        label: tokenFormData.value.label,
-      },
+    const res = await managedApi.restUserController.generateToken({
+      label: tokenFormData.value.label,
     })
     token.value = res.token
     tokens.value.push({
@@ -113,7 +111,7 @@ const generateToken = async () => {
 
 const deleteToken = async (id: number) => {
   try {
-    await managedApi.services.deleteToken({ tokenId: id })
+    await managedApi.restUserController.deleteToken(id)
     tokens.value = tokens.value.filter((token) => token.id !== id)
   } catch (error) {
     console.error("Error deleting token:", error)

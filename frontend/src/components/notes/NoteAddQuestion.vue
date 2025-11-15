@@ -126,24 +126,26 @@ const removeChoice = () => {
 const submitQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
   const response =
-    await managedApi.services.addQuestionManually({
-      note: props.note.id,
-      requestBody: recallPrompt,
-    })
+    await managedApi.restPredefinedQuestionController.addQuestionManually(
+      props.note.id,
+      recallPrompt
+    )
   emit("close-dialog", response)
 }
 
 const refineQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
   predefinedQuestion.value =
-    await managedApi.services.refineQuestion({
-      note: props.note.id,
-      requestBody: recallPrompt,
-    })
+    await managedApi.restPredefinedQuestionController.refineQuestion(
+      props.note.id,
+      recallPrompt
+    )
 }
 
 const generateQuestionByAI = async () => {
   predefinedQuestion.value =
-    await managedApi.services.generateQuestionWithoutSave({ note: props.note.id })
+    await managedApi.restPredefinedQuestionController.generateQuestionWithoutSave(
+      props.note.id
+    )
 }
 </script>

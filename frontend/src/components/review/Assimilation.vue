@@ -63,12 +63,12 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
-  const memoryTrackers = await managedApi.services.assimilate({
-    requestBody: {
+  const memoryTrackers = await managedApi.restAssimilationController.assimilate(
+    {
       noteId: note.id,
       skipMemoryTracking,
-    },
-  })
+    }
+  )
 
   const newTrackerCount = memoryTrackers.filter(
     (t) => !t.removedFromTracking

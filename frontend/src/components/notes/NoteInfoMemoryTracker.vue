@@ -73,12 +73,13 @@ watch(
 )
 
 const selfEvaluate = async (adjustment: number) => {
-  const memoryTracker = await managedApi.services.selfEvaluate({
-    memoryTracker: localMemoryTracker.value.id,
-    requestBody: {
-      adjustment,
-    },
-  })
+  const memoryTracker =
+    await managedApi.restMemoryTrackerController.selfEvaluate(
+      localMemoryTracker.value.id,
+      {
+        adjustment,
+      }
+    )
   localMemoryTracker.value = memoryTracker
   emit("update:modelValue", memoryTracker)
 }
@@ -91,9 +92,10 @@ const removeFromReview = async () => {
   ) {
     return
   }
-  const memoryTracker = await managedApi.services.removeFromRepeating({
-    memoryTracker: localMemoryTracker.value.id,
-  })
+  const memoryTracker =
+    await managedApi.restMemoryTrackerController.removeFromRepeating(
+      localMemoryTracker.value.id
+    )
   localMemoryTracker.value = memoryTracker
   emit("update:modelValue", memoryTracker)
 }

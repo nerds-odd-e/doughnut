@@ -38,18 +38,15 @@ const additionalInstruction = ref("")
 const emit = defineEmits(["close"])
 
 const updateAiInstructions = async () => {
-  await managedApi.services.updateAiAssistant({
-    notebook: props.notebook.id,
-    requestBody: {
-      additionalInstructions: additionalInstruction.value,
-    },
+  await managedApi.restNotebookController.updateAiAssistant(props.notebook.id, {
+    additionalInstructions: additionalInstruction.value,
   })
 }
 
 const downloadNotebookDump = async () => {
-  const notes = await managedApi.services.downloadNotebookDump({
-    notebook: props.notebook.id,
-  })
+  const notes = await managedApi.restNotebookController.downloadNotebookDump(
+    props.notebook.id
+  )
   const blob = new Blob([JSON.stringify(notes, null, 2)], {
     type: "application/json",
   })
@@ -58,9 +55,9 @@ const downloadNotebookDump = async () => {
 
 const loadCurrentSettings = async () => {
   try {
-    const assistant = await managedApi.services.getAiAssistant({
-      notebook: props.notebook.id,
-    })
+    const assistant = await managedApi.restNotebookController.getAiAssistant(
+      props.notebook.id
+    )
     if (assistant) {
       additionalInstruction.value = assistant.additionalInstructionsToAi || ""
     }

@@ -25,10 +25,8 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    vi.spyOn(
-      helper.managedApi.services,
-      "updateNoteTitle"
-    ).mockImplementation(mockedUpdateTitleCall)
+    helper.managedApi.restTextContentController.updateNoteTitle =
+      mockedUpdateTitleCall
   })
 
   afterEach(() => {
@@ -90,9 +88,8 @@ describe("in place edit on title", () => {
     titleEl.innerText = "updated"
     titleEl.dispatchEvent(new Event("input"))
     wrapper.unmount()
-    expect(mockedUpdateTitleCall).toBeCalledWith({
-      note: note.id,
-      requestBody: { newTitle: "updated" },
+    expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
+      newTitle: "updated",
     })
   })
 
@@ -120,9 +117,8 @@ describe("in place edit on title", () => {
     await editTitle(wrapper, "updated")
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.dispatchEvent(new Event("blur"))
-    expect(mockedUpdateTitleCall).toBeCalledWith({
-      note: note.id,
-      requestBody: { newTitle: "updated" },
+    expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
+      newTitle: "updated",
     })
   })
 

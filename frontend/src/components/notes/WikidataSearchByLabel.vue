@@ -82,7 +82,9 @@ export default defineComponent({
     },
     async fetchSearchResult() {
       this.wikiSearchSuggestions =
-        await this.managedApi.services.searchWikidata({ search: this.searchKey })
+        await this.managedApi.restWikidataController.searchWikidata(
+          this.searchKey
+        )
       this.$nextTick(() => {
         const select = this.$refs.select as HTMLSelectElement | undefined
         select?.focus()

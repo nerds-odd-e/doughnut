@@ -139,12 +139,12 @@ const relativeSearch = async (
   searchTerm: SearchTerm
 ) => {
   if (noteId) {
-    return managedApi.services.searchForLinkTargetWithin({
-      note: noteId,
-      requestBody: searchTerm,
-    })
+    return managedApi.restSearchController.searchForLinkTargetWithin(
+      noteId,
+      searchTerm
+    )
   }
-  return managedApi.services.searchForLinkTarget({ requestBody: searchTerm })
+  return managedApi.restSearchController.searchForLinkTarget(searchTerm)
 }
 
 const semanticRelativeSearch = async (
@@ -152,12 +152,12 @@ const semanticRelativeSearch = async (
   searchTerm: SearchTerm
 ) => {
   if (noteId) {
-    return managedApi.services.semanticSearchWithin({
-      note: noteId,
-      requestBody: searchTerm,
-    })
+    return managedApi.restSearchController.semanticSearchWithin(
+      noteId,
+      searchTerm
+    )
   }
-  return managedApi.services.semanticSearch({ requestBody: searchTerm })
+  return managedApi.restSearchController.semanticSearch(searchTerm)
 }
 
 const debounced = debounce((callback) => callback(), 500)

@@ -48,26 +48,22 @@ describe("NoteConversation", () => {
   })
 
   beforeEach(() => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "startConversationAboutNote"
-    ).mockResolvedValue(conversation as never)
+    helper.managedApi.restConversationMessageController.startConversationAboutNote =
+      vi.fn().mockResolvedValue(conversation)
   })
 
   it("calls api to start conversation and shows ConversationInner when successful", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
     const wrapper = await mount()
     await wrapper.find("textarea").setValue("Hello")
     await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
 
     expect(
-      helper.managedApi.services
+      helper.managedApi.restConversationMessageController
         .startConversationAboutNote
-    ).toHaveBeenCalledWith({ note: note.id, requestBody: "Hello" })
+    ).toHaveBeenCalledWith(note.id, "Hello")
 
     // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -76,10 +72,8 @@ describe("NoteConversation", () => {
   })
 
   it("shows the first conversation if conversation exists", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([conversation])
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([conversation])
     const wrapper = await mount()
     const conversationInner = wrapper.findComponent(ConversationInner)
 
@@ -88,10 +82,8 @@ describe("NoteConversation", () => {
   })
 
   it("shows ConversationTemplate when no conversation exists", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
     const wrapper = await mount()
     const conversationTemplate = wrapper.findComponent(ConversationTemplate)
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -106,10 +98,8 @@ describe("NoteConversation", () => {
       { id: 2, title: "Second Conversation" },
     ]
 
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue(conversations)
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue(conversations)
 
     const wrapper = await mount()
 
@@ -129,10 +119,8 @@ describe("NoteConversation", () => {
   })
 
   it("shows conversation selector only when multiple conversations exist", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([conversation])
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([conversation])
 
     const wrapper = await mount()
 
@@ -143,10 +131,8 @@ describe("NoteConversation", () => {
   it("allows starting a new conversation when in conversation view", async () => {
     // Setup with existing conversation
     const existingConversation = { id: 1, title: "Test Conversation" }
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([existingConversation])
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([existingConversation])
 
     const wrapper = await mount()
 
@@ -167,23 +153,19 @@ describe("NoteConversation", () => {
 
     // Verify API was called
     expect(
-      helper.managedApi.services
+      helper.managedApi.restConversationMessageController
         .startConversationAboutNote
-    ).toHaveBeenCalledWith({ note: note.id, requestBody: "New conversation message" })
+    ).toHaveBeenCalledWith(note.id, "New conversation message")
 
     // Verify we're back to showing ConversationInner
     expect(wrapper.findComponent(ConversationInner).exists()).toBe(true)
   })
 
   it("handles AI reply when starting new conversation with AI invite", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
-    vi.spyOn(
-      helper.managedApi.eventSource.services,
-      "getAiReply"
-    ).mockResolvedValue({} as never)
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
 
     const wrapper = await mount()
 
@@ -194,14 +176,14 @@ describe("NoteConversation", () => {
 
     // Verify conversation was started
     expect(
-      helper.managedApi.services
+      helper.managedApi.restConversationMessageController
         .startConversationAboutNote
-    ).toHaveBeenCalledWith({ note: note.id, requestBody: "Hello AI" })
+    ).toHaveBeenCalledWith(note.id, "Hello AI")
 
     // Verify AI reply was requested
     expect(
-      helper.managedApi.eventSource.services.getAiReply
-    ).toHaveBeenCalledWith({ conversationId: conversation.id })
+      helper.managedApi.eventSource.restConversationMessageController.getAiReply
+    ).toHaveBeenCalledWith(conversation.id)
 
     // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -211,18 +193,12 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when sending message with AI invite in existing conversation", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([conversation])
-    vi.spyOn(
-      helper.managedApi.services,
-      "replyToConversation"
-    ).mockResolvedValue({} as never)
-    vi.spyOn(
-      helper.managedApi.eventSource.services,
-      "getAiReply"
-    ).mockResolvedValue({} as never)
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([conversation])
+    helper.managedApi.restConversationMessageController.replyToConversation =
+      vi.fn()
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
 
     const wrapper = await mount()
 
@@ -232,12 +208,12 @@ describe("NoteConversation", () => {
 
     // Verify message was sent
     expect(
-      helper.managedApi.services.replyToConversation
-    ).toHaveBeenCalledWith({ conversationId: conversation.id, requestBody: "Hello AI" })
+      helper.managedApi.restConversationMessageController.replyToConversation
+    ).toHaveBeenCalledWith(conversation.id, "Hello AI")
 
     // Verify AI reply was requested
     expect(
-      helper.managedApi.eventSource.services.getAiReply
-    ).toHaveBeenCalledWith({ conversationId: conversation.id })
+      helper.managedApi.eventSource.restConversationMessageController.getAiReply
+    ).toHaveBeenCalledWith(conversation.id)
   })
 })

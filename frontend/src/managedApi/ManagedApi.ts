@@ -1,6 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
 import { OpenAPI, ApiError, CancelablePromise } from "@generated/backend"
-import * as Services from "@generated/backend/services.gen"
+import { DoughnutApi } from "./DoughnutApi"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
@@ -13,7 +13,7 @@ OpenAPI.VERSION = "0"
 OpenAPI.WITH_CREDENTIALS = false
 OpenAPI.CREDENTIALS = "include"
 
-class ManagedApi {
+class ManagedApi extends DoughnutApi {
   apiStatus: ApiStatus
 
   apiStatusHandler: ApiStatusHandler
@@ -24,57 +24,124 @@ class ManagedApi {
 
   private isSilent: boolean
 
-  public readonly services: typeof Services
-
   constructor(apiStatus: ApiStatus, silent?: boolean) {
+    super()
     this.apiStatus = apiStatus
     this.isSilent = silent ?? false
     this.apiStatusHandler = new ApiStatusHandler(apiStatus, silent)
 
-    // Wrap Services object with Proxy for error handling and loading states
-    this.services = this.wrapServices()
+    // Wrap all service instances to use wrapServiceCall for error handling and loading states
+    this.wrapServiceInstances()
   }
 
-  // Helper to wrap Services object with Proxy for error handling
-  private wrapServices(): typeof Services {
+  // Helper to wrap all service instance methods with error handling
+  private wrapServiceInstances() {
     // Capture `this` for use in the Proxy handler
     const self = this
     // Cache wrapped functions to maintain reference equality for test mocking
     // biome-ignore lint/complexity/noBannedTypes: Need to cache arbitrary functions
     const wrappedFunctions = new WeakMap<Function, Function>()
 
-    return new Proxy(Services, {
-      get(target, prop) {
-        const value = Reflect.get(target, prop)
-        if (typeof value === "function") {
-          // Check if the function is a Vitest mock/spy - don't wrap it
-          // Vitest mocks have a 'mock' property
-          if ("mock" in value && typeof value.mock === "object") {
-            return value
-          }
-
-          // Check if we've already wrapped this function
-          let wrappedFn = wrappedFunctions.get(value)
-          if (!wrappedFn) {
-            // Create and cache the wrapped function
-            wrappedFn = (...args: unknown[]) => {
-              return self.wrapServiceCall(() => value.apply(target, args))
+    // Create a proxy wrapper for a service instance
+    const wrapInstance = <T extends object>(instance: T): T => {
+      return new Proxy(instance, {
+        get(target, prop) {
+          const value = Reflect.get(target, prop)
+          if (typeof value === "function") {
+            // Check if the function is a Vitest mock/spy - don't wrap it
+            // Vitest mocks have a 'mock' property
+            if ("mock" in value && typeof value.mock === "object") {
+              return value
             }
-            wrappedFunctions.set(value, wrappedFn)
+
+            // Check if we've already wrapped this function
+            let wrappedFn = wrappedFunctions.get(value)
+            if (!wrappedFn) {
+              // Create and cache the wrapped function
+              wrappedFn = (...args: unknown[]) => {
+                return self.wrapServiceCall(() => value.apply(target, args))
+              }
+              wrappedFunctions.set(value, wrappedFn)
+            }
+            return wrappedFn
           }
-          return wrappedFn
-        }
-        return value
-      },
-      set(target, prop, value) {
-        // When a property is set (e.g., a test spy), clear the cached wrapped function
-        const oldValue = Reflect.get(target, prop)
-        if (oldValue && typeof oldValue === "function") {
-          wrappedFunctions.delete(oldValue)
-        }
-        return Reflect.set(target, prop, value)
-      },
-    }) as typeof Services
+          return value
+        },
+        set(target, prop, value) {
+          // When a property is set (e.g., a test spy), clear the cached wrapped function
+          const oldValue = Reflect.get(target, prop)
+          if (oldValue && typeof oldValue === "function") {
+            wrappedFunctions.delete(oldValue)
+          }
+          return Reflect.set(target, prop, value)
+        },
+      })
+    }
+
+    // Wrap all service instances
+    this.restNoteController = wrapInstance(this.restNoteController)
+    this.restTextContentController = wrapInstance(
+      this.restTextContentController
+    )
+    this.restNoteCreationController = wrapInstance(
+      this.restNoteCreationController
+    )
+    this.restLinkController = wrapInstance(this.restLinkController)
+    this.restUserController = wrapInstance(this.restUserController)
+    this.restSearchController = wrapInstance(this.restSearchController)
+    this.restNotebookController = wrapInstance(this.restNotebookController)
+    this.restCircleController = wrapInstance(this.restCircleController)
+    this.restConversationMessageController = wrapInstance(
+      this.restConversationMessageController
+    )
+    this.restMemoryTrackerController = wrapInstance(
+      this.restMemoryTrackerController
+    )
+    this.restRecallPromptController = wrapInstance(
+      this.restRecallPromptController
+    )
+    this.restRecallsController = wrapInstance(this.restRecallsController)
+    this.restPredefinedQuestionController = wrapInstance(
+      this.restPredefinedQuestionController
+    )
+    this.restWikidataController = wrapInstance(this.restWikidataController)
+    this.restAiController = wrapInstance(this.restAiController)
+    this.restAiAudioController = wrapInstance(this.restAiAudioController)
+    this.restAssessmentController = wrapInstance(this.restAssessmentController)
+    this.restBazaarController = wrapInstance(this.restBazaarController)
+    this.restCertificateController = wrapInstance(
+      this.restCertificateController
+    )
+    this.restFailureReportController = wrapInstance(
+      this.restFailureReportController
+    )
+    this.restFineTuningDataController = wrapInstance(
+      this.restFineTuningDataController
+    )
+    this.restGlobalSettingsController = wrapInstance(
+      this.restGlobalSettingsController
+    )
+    this.restHealthCheckController = wrapInstance(
+      this.restHealthCheckController
+    )
+    this.restNotebookCertificateApprovalController = wrapInstance(
+      this.restNotebookCertificateApprovalController
+    )
+    this.restSubscriptionController = wrapInstance(
+      this.restSubscriptionController
+    )
+    this.restCurrentUserInfoController = wrapInstance(
+      this.restCurrentUserInfoController
+    )
+    this.testabilityRestController = wrapInstance(
+      this.testabilityRestController
+    )
+    this.restAssimilationController = wrapInstance(
+      this.restAssimilationController
+    )
+    this.mcpNoteCreationController = wrapInstance(
+      this.mcpNoteCreationController
+    )
   }
 
   // Helper to wrap generated function calls with error handling and loading states

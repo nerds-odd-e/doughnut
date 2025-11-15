@@ -7,11 +7,10 @@ describe("bazaar page", () => {
   it("fetch API to be called ONCE on mount", async () => {
     const notebook = makeMe.aNotebook.please()
     const bazaarNotebooks = makeMe.bazaarNotebooks.notebooks(notebook).please()
-    vi.spyOn(
-      helper.managedApi.services,
-      "bazaar"
-    ).mockResolvedValue(bazaarNotebooks)
+    helper.managedApi.restBazaarController.bazaar = vi
+      .fn()
+      .mockResolvedValue(bazaarNotebooks)
     helper.component(BazaarPage).withRouter().render()
-    expect(helper.managedApi.services.bazaar).toBeCalledTimes(1)
+    expect(helper.managedApi.restBazaarController.bazaar).toBeCalledTimes(1)
   })
 })

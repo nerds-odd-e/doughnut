@@ -34,9 +34,8 @@ watch(
 )
 
 const fetchData = async () => {
-  noteAccessory.value = await managedApi.services.showNoteAccessory({
-    note: noteId,
-  })
+  noteAccessory.value =
+    await managedApi.restNoteController.showNoteAccessory(noteId)
 }
 
 onMounted(fetchData)

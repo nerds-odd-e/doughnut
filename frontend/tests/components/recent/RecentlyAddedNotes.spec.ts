@@ -18,10 +18,9 @@ describe("RecentlyAddedNotes", () => {
   ]
 
   beforeEach(() => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getRecentNotes"
-    ).mockResolvedValue(mockNotes)
+    helper.managedApi.restNoteController.getRecentNotes = vitest
+      .fn()
+      .mockResolvedValue(mockNotes)
   })
 
   it("fetches and displays recent notes", async () => {
@@ -30,7 +29,7 @@ describe("RecentlyAddedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(helper.managedApi.services.getRecentNotes).toBeCalled()
+    expect(helper.managedApi.restNoteController.getRecentNotes).toBeCalled()
 
     // Verify notes are displayed
     const rows = wrapper.findAll("tbody tr")

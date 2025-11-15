@@ -41,10 +41,10 @@ export default defineComponent({
       if (this.memoryTrackerId === undefined) {
         return
       }
-      await this.managedApi.services.markAsRepeated({
-        memoryTracker: this.memoryTrackerId,
-        successful,
-      })
+      await this.managedApi.restMemoryTrackerController.markAsRepeated(
+        this.memoryTrackerId,
+        successful
+      )
       this.$emit("reviewed")
     },
   },

@@ -121,18 +121,12 @@ export default class StoredApiCollection implements StoredApi {
     content: string
   ) {
     if (field === "edit title") {
-      return this.managedApi.services.updateNoteTitle({
-        note: noteId,
-        requestBody: {
-          newTitle: content,
-        },
+      return this.managedApi.restTextContentController.updateNoteTitle(noteId, {
+        newTitle: content,
       })
     }
-    return this.managedApi.services.updateNoteDetails({
-      note: noteId,
-      requestBody: {
-        details: content,
-      },
+    return this.managedApi.restTextContentController.updateNoteDetails(noteId, {
+      details: content,
     })
   }
 
@@ -141,15 +135,12 @@ export default class StoredApiCollection implements StoredApi {
     data: WikidataAssociationCreation
   ): Promise<NoteRealm> {
     return this.storage.refreshNoteRealm(
-      await this.managedApi.services.updateWikidataId({
-        note: noteId,
-        requestBody: data,
-      })
+      await this.managedApi.restNoteController.updateWikidataId(noteId, data)
     )
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const noteRealm = await this.managedApi.services.show({ note: noteId })
+    const noteRealm = await this.managedApi.restNoteController.show(noteId)
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
@@ -175,10 +166,10 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDTO
   ) {
-    const nrwp = await this.managedApi.services.createNote({
-      parentNote: parentId,
-      requestBody: data,
-    })
+    const nrwp = await this.managedApi.restNoteCreationController.createNote(
+      parentId,
+      data
+    )
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
@@ -191,10 +182,10 @@ export default class StoredApiCollection implements StoredApi {
     data: NoteCreationDTO
   ) {
     const nrwp =
-      await this.managedApi.services.createNoteAfter({
-        referenceNote: referenceId,
-        requestBody: data,
-      })
+      await this.managedApi.restNoteCreationController.createNoteAfter(
+        referenceId,
+        data
+      )
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
@@ -207,20 +198,17 @@ export default class StoredApiCollection implements StoredApi {
     data: LinkCreation
   ) {
     this.refreshNoteRealms(
-      await this.managedApi.services.linkNoteFinalize({
-        sourceNote: sourceId,
-        targetNote: targetId,
-        requestBody: data,
-      })
+      await this.managedApi.restLinkController.linkNoteFinalize(
+        sourceId,
+        targetId,
+        data
+      )
     )
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
     this.refreshNoteRealms(
-      await this.managedApi.services.updateLink({
-        link: linkId,
-        requestBody: data,
-      })
+      await this.managedApi.restLinkController.updateLink(linkId, data)
     )
   }
 
@@ -233,11 +221,11 @@ export default class StoredApiCollection implements StoredApi {
     targetNoteId: number,
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]> {
-    const updatedNotes = await this.managedApi.services.moveAfter({
-      note: noteId,
-      targetNote: targetNoteId,
-      asFirstChild: dropMode === "asFirstChild" ? "true" : "false",
-    })
+    const updatedNotes = await this.managedApi.restNoteController.moveAfter(
+      noteId,
+      targetNoteId,
+      dropMode
+    )
     this.refreshNoteRealms(updatedNotes)
     return updatedNotes
   }
@@ -290,7 +278,7 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!
       )
     }
-    return this.managedApi.services.undoDeleteNote({ note: undone.noteId })
+    return this.managedApi.restNoteController.undoDeleteNote(undone.noteId)
   }
 
   async undo(router: Router) {
@@ -303,7 +291,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const res = await this.managedApi.services.deleteNote({ note: noteId })
+    const res = await this.managedApi.restNoteController.deleteNote(noteId)
     this.noteEditingHistory.deleteNote(noteId)
     if (res.length === 0) {
       this.routerReplaceFocus(router)
@@ -320,11 +308,11 @@ export default class StoredApiCollection implements StoredApi {
     data: NoteMoveDTO
   ) {
     this.refreshNoteRealms(
-      await this.managedApi.services.moveNote({
-        sourceNote: sourceId,
-        targetNote: targetId,
-        requestBody: data,
-      })
+      await this.managedApi.restLinkController.moveNote(
+        sourceId,
+        targetId,
+        data
+      )
     )
   }
 }

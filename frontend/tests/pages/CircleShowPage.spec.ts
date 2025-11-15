@@ -13,10 +13,9 @@ describe("circle show page", () => {
   const circleNote = makeMe.aCircleNote.notebooks(notebook).please()
 
   beforeEach(() => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "showCircle"
-    ).mockResolvedValue(circleNote as never)
+    helper.managedApi.restCircleController.showCircle = vi
+      .fn()
+      .mockResolvedValue(circleNote)
   })
 
   it("fetch API to be called ONCE on mount", async () => {
@@ -25,9 +24,9 @@ describe("circle show page", () => {
       .withRouter()
       .withStorageProps({ circleId: circleNote.id })
       .render()
-    expect(helper.managedApi.services.showCircle).toBeCalledWith({
-      circle: circleNote.id,
-    })
+    expect(helper.managedApi.restCircleController.showCircle).toBeCalledWith(
+      circleNote.id
+    )
   })
 
   const moveButtonTitle = "Move to ..."

@@ -29,7 +29,8 @@ export default defineComponent({
       const component = vm as unknown as {
         managedApi: ReturnType<typeof useLoadingApi>["managedApi"]
       }
-      const x = await component.managedApi.services.currentUserInfo()
+      const x =
+        await component.managedApi.restCurrentUserInfoController.currentUserInfo()
       if (!x?.user) {
         loginOrRegisterAndHaltThisThread()
         next(false)

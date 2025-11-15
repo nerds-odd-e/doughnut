@@ -15,22 +15,19 @@ vitest.mock("vue-router", () => ({
 
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsOfCurrentUser"
-    ).mockResolvedValue([])
+    helper.managedApi.restConversationMessageController.getConversationsOfCurrentUser =
+      vi.fn().mockResolvedValue([])
     helper.component(MessageCenterPage).withStorageProps({}).render()
     expect(
-      helper.managedApi.services.getConversationsOfCurrentUser
+      helper.managedApi.restConversationMessageController
+        .getConversationsOfCurrentUser
     ).toBeCalledTimes(1)
   })
 
   it("should render no conversation selected by default", async () => {
     const conversation = makeMe.aConversation.please()
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsOfCurrentUser"
-    ).mockResolvedValue([conversation])
+    helper.managedApi.restConversationMessageController.getConversationsOfCurrentUser =
+      vi.fn().mockResolvedValue([conversation])
     const { findByText } = helper
       .component(MessageCenterPage)
       .withStorageProps({})
@@ -44,10 +41,8 @@ describe("MessageCenterPage", () => {
       makeMe.aConversation.please(),
     ]
     beforeEach(() => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsOfCurrentUser"
-      ).mockResolvedValue(conversations)
+      helper.managedApi.restConversationMessageController.getConversationsOfCurrentUser =
+        vi.fn().mockResolvedValue(conversations)
     })
 
     it("should highlight the selected conversation", async () => {

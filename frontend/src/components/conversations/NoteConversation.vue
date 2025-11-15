@@ -64,7 +64,9 @@ const initialAiReply = ref(false)
 onMounted(async () => {
   try {
     const fetchedConversations =
-      await managedApi.services.getConversationsAboutNote({ note: props.noteId })
+      await managedApi.restConversationMessageController.getConversationsAboutNote(
+        props.noteId
+      )
     conversations.value = fetchedConversations
     conversation.value =
       fetchedConversations.length > 0 ? fetchedConversations[0] : undefined
@@ -80,20 +82,20 @@ const handleConversationChange = (conversationId: number) => {
 async function startConversationWithMessage(message: string) {
   initialAiReply.value = false
   conversation.value =
-    await managedApi.services.startConversationAboutNote({
-      note: props.noteId,
-      requestBody: message,
-    })
+    await managedApi.restConversationMessageController.startConversationAboutNote(
+      props.noteId,
+      message
+    )
   emit("submitted")
 }
 
 async function startConversationWithMessageAndAI(message: string) {
   initialAiReply.value = true
   conversation.value =
-    await managedApi.services.startConversationAboutNote({
-      note: props.noteId,
-      requestBody: message,
-    })
+    await managedApi.restConversationMessageController.startConversationAboutNote(
+      props.noteId,
+      message
+    )
   emit("submitted")
 }
 

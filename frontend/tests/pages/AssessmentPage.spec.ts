@@ -24,10 +24,8 @@ describe("assessment page", () => {
       .withQuestions([assessmentQuestionInstance])
       .please()
     beforeEach(() => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "generateAssessmentQuestions"
-      ).mockResolvedValue(assessmentAttempt as never)
+      helper.managedApi.restAssessmentController.generateAssessmentQuestions =
+        vi.fn().mockResolvedValue(assessmentAttempt)
     })
 
     it("calls API ONCE on mount", async () => {
@@ -36,7 +34,7 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       expect(
-        helper.managedApi.services.generateAssessmentQuestions
+        helper.managedApi.restAssessmentController.generateAssessmentQuestions
       ).toBeCalledTimes(1)
     })
 
@@ -81,20 +79,15 @@ describe("assessment page", () => {
       .withQuestions([quizQuestion_1, quizQuestion_2])
       .please()
     beforeEach(() => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "generateAssessmentQuestions"
-      ).mockResolvedValue(assessmentAttempt as never)
-      vi.spyOn(
-        helper.managedApi.services,
-        "answerQuestion"
-      )
-        .mockResolvedValueOnce(answerResult1 as never)
-        .mockResolvedValueOnce(answerResult2 as never)
-      vi.spyOn(
-        helper.managedApi.services,
-        "submitAssessmentResult"
-      ).mockResolvedValue(assessmentAttempt as never)
+      helper.managedApi.restAssessmentController.generateAssessmentQuestions =
+        vi.fn().mockResolvedValue(assessmentAttempt)
+      helper.managedApi.restAssessmentController.answerQuestion = vi
+        .fn()
+        .mockResolvedValueOnce(answerResult1)
+        .mockResolvedValueOnce(answerResult2)
+      helper.managedApi.restAssessmentController.submitAssessmentResult = vi
+        .fn()
+        .mockResolvedValue(assessmentAttempt)
     })
 
     it("should submit assessment result when answer all questions", async () => {
@@ -109,8 +102,8 @@ describe("assessment page", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.submitAssessmentResult
-      ).toBeCalledWith({ assessmentAttempt: assessmentAttempt.id })
+        helper.managedApi.restAssessmentController.submitAssessmentResult
+      ).toBeCalledWith(assessmentAttempt.id)
     })
 
     it("should explicitly blur the button after clicking an answer", async () => {

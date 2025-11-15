@@ -48,15 +48,13 @@ describe("Edit Suggested Question", () => {
           .component(SuggestedQuestionList)
           .withProps({ suggestedQuestions: [suggestedQuestion] })
           .mount()
-        const mockDelete = vi
-          .spyOn(helper.managedApi.services, "delete_")
-          .mockResolvedValue({} as never)
+        helper.managedApi.restFineTuningDataController.delete = vi.fn()
         matchByText(wrapper, /Del/, "button")!.trigger("click")
         usePopups().popups.done(true)
         await flushPromises()
-        expect(mockDelete).toHaveBeenCalledWith({
-          suggestedQuestion: suggestedQuestion.id,
-        })
+        expect(
+          helper.managedApi.restFineTuningDataController.delete
+        ).toHaveBeenCalledWith(suggestedQuestion.id)
       })
     })
   })

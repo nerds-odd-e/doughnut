@@ -62,10 +62,9 @@ describe("main menu", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockResolvedValue({ dueCount: 5 } as never)
+      helper.managedApi.restAssimilationController.getAssimilationCount = vitest
+        .fn()
+        .mockResolvedValue({ dueCount: 5 })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -76,10 +75,9 @@ describe("main menu", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockResolvedValue({ dueCount: 0 } as never)
+      helper.managedApi.restAssimilationController.getAssimilationCount = vitest
+        .fn()
+        .mockResolvedValue({ dueCount: 0 })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -90,10 +88,8 @@ describe("main menu", () => {
 
     it("fetches due count when user changes", async () => {
       const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockImplementation(mockGetCount)
+      helper.managedApi.restAssimilationController.getAssimilationCount =
+        mockGetCount
 
       const { rerender } = helper
         .component(MainMenu)
@@ -110,24 +106,21 @@ describe("main menu", () => {
 
     it("calls getAssimilationCount with the correct timezone", async () => {
       const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockImplementation(mockGetCount)
+      helper.managedApi.restAssimilationController.getAssimilationCount =
+        mockGetCount
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
-      expect(mockGetCount).toHaveBeenCalledWith({ timezone: timezoneParam() })
+      expect(mockGetCount).toHaveBeenCalledWith(timezoneParam())
     })
   })
 
   describe("recall count", () => {
     it("shows recall count when there are items to repeat", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "overview"
-      ).mockResolvedValue({ toRepeatCount: 789 } as never)
+      helper.managedApi.restRecallsController.overview = vitest
+        .fn()
+        .mockResolvedValue({ toRepeatCount: 789 })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -138,10 +131,9 @@ describe("main menu", () => {
     })
 
     it("does not show recall count when there are no items to repeat", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "overview"
-      ).mockResolvedValue({ toRepeatCount: 0 } as never)
+      helper.managedApi.restRecallsController.overview = vitest
+        .fn()
+        .mockResolvedValue({ toRepeatCount: 0 })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -154,10 +146,7 @@ describe("main menu", () => {
       const mockGetOverview = vitest
         .fn()
         .mockResolvedValue({ toRepeatCount: 3 })
-      vi.spyOn(
-        helper.managedApi.services,
-        "overview"
-      ).mockImplementation(mockGetOverview)
+      helper.managedApi.restRecallsController.overview = mockGetOverview
 
       const { rerender } = helper
         .component(MainMenu)
@@ -170,7 +159,7 @@ describe("main menu", () => {
       await flushPromises()
 
       expect(mockGetOverview).toHaveBeenCalledTimes(2)
-      expect(mockGetOverview).toHaveBeenCalledWith({ timezone: timezoneParam() })
+      expect(mockGetOverview).toHaveBeenCalledWith(timezoneParam())
     })
   })
 })

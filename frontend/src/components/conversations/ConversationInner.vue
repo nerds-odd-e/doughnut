@@ -120,9 +120,9 @@ const fetchConversationMessages = async () => {
   if (!conversation.id) return
 
   currentConversationMessages.value =
-    await managedApi.services.getConversationMessages({
-      conversationId: conversation.id,
-    })
+    await managedApi.restConversationMessageController.getConversationMessages(
+      conversation.id
+    )
   emit("conversation-fetched", conversation.id)
 }
 
@@ -130,10 +130,10 @@ const handleSendMessage = async (
   message: string,
   inviteAI: boolean = false
 ) => {
-  await managedApi.services.replyToConversation({
-    conversationId: conversation.id,
-    requestBody: message,
-  })
+  await managedApi.restConversationMessageController.replyToConversation(
+    conversation.id,
+    message
+  )
   await fetchConversationMessages()
 
   if (inviteAI) {

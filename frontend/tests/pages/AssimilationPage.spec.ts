@@ -26,18 +26,11 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  vi.spyOn(
-    helper.managedApi.services,
-    "assimilating"
-  ).mockImplementation(mockedInitialReviewCall)
-  vi.spyOn(
-    helper.managedApi.services,
-    "getNoteInfo"
-  ).mockResolvedValue({} as never)
-  vi.spyOn(
-    helper.managedApi.services,
-    "show"
-  ).mockImplementation(mockedGetNoteCall)
+  helper.managedApi.restAssimilationController.assimilating =
+    mockedInitialReviewCall
+  helper.managedApi.restNoteController.getNoteInfo =
+    mockedNoteInfoCall.mockResolvedValue({})
+  helper.managedApi.restNoteController.show = mockedGetNoteCall
   renderer = helper.component(AssimilationPage).withStorageProps({})
 })
 
@@ -49,7 +42,7 @@ describe("repeat page", () => {
     expect(wrapper.text()).toContain(
       "Congratulations! You've achieved your daily assimilation goal!"
     )
-    expect(mockedInitialReviewCall).toBeCalledWith({ timezone: "Europe/Amsterdam" })
+    expect(mockedInitialReviewCall).toBeCalledWith("Europe/Amsterdam")
   })
 
   describe("normal view", () => {

@@ -21,7 +21,9 @@ const props = defineProps({
 const managedApi = useLoadingApi().managedApi
 const notes = ref<Note[] | undefined>(undefined)
 const fetchData = async () => {
-  notes.value = await managedApi.services.getNotes({ notebook: props.notebook.id })
+  notes.value = await managedApi.restNotebookController.getNotes(
+    props.notebook.id
+  )
 }
 onMounted(() => {
   fetchData()

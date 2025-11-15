@@ -37,14 +37,14 @@ export default defineComponent({
   methods: {
     async fetchData() {
       this.noteAccessory =
-        (await this.managedApi.services.showNoteAccessory({
-          note: this.noteId,
-        })) || {}
+        (await this.managedApi.restNoteController.showNoteAccessory(
+          this.noteId
+        )) || {}
       this.formData = { ...this.noteAccessory }
     },
     processForm() {
-      this.managedApi.services
-        .updateNoteAccessories({ note: this.noteId, formData: this.formData })
+      this.managedApi.restNoteController
+        .updateNoteAccessories(this.noteId, this.formData)
         .then((na) => this.$emit("closeDialog", na))
         .catch((error) => {
           this.noteFormErrors = error

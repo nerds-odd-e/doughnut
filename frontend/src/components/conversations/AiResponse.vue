@@ -162,7 +162,7 @@ const getAiReply = async () => {
         lastErrorMessage.value = "Bad Request"
       }
     })
-    .services.getAiReply({ conversationId: conversation.id })
+    .restConversationMessageController.getAiReply(conversation.id)
 }
 
 watch(

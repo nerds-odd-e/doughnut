@@ -174,10 +174,9 @@ describe("Sidebar", () => {
 
   describe("drag and drop functionality", () => {
     it("should call moveAfter when dragging and dropping notes", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "moveAfter"
-      ).mockResolvedValue([])
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockResolvedValue([])
       render(firstGeneration)
 
       await flushPromises()
@@ -196,12 +195,12 @@ describe("Sidebar", () => {
       await fireEvent.drop(dropTarget)
 
       expect(
-        helper.managedApi.services.moveAfter
-      ).toHaveBeenCalledWith({
-        note: firstGeneration.id,
-        targetNote: firstGenerationSibling.id,
-        asFirstChild: "false",
-      })
+        helper.managedApi.restNoteController.moveAfter
+      ).toHaveBeenCalledWith(
+        firstGeneration.id,
+        firstGenerationSibling.id,
+        "after"
+      )
     })
 
     it("should add dragging class while dragging", async () => {
@@ -264,10 +263,7 @@ describe("Sidebar", () => {
     })
 
     it("should not call moveAfter when dragging to the same note", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "moveAfter"
-      ).mockResolvedValue({} as never)
+      helper.managedApi.restNoteController.moveAfter = vitest.fn()
       render(firstGeneration)
       await flushPromises()
 
@@ -280,15 +276,12 @@ describe("Sidebar", () => {
       await fireEvent.drop(note)
 
       expect(
-        helper.managedApi.services.moveAfter
+        helper.managedApi.restNoteController.moveAfter
       ).not.toHaveBeenCalled()
     })
 
     it("should not call moveAfter when dragging between different parents", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "moveAfter"
-      ).mockResolvedValue({} as never)
+      helper.managedApi.restNoteController.moveAfter = vitest.fn()
       render(firstGeneration)
       await flushPromises()
 
@@ -304,7 +297,7 @@ describe("Sidebar", () => {
       await fireEvent.drop(firstGenNote)
 
       expect(
-        helper.managedApi.services.moveAfter
+        helper.managedApi.restNoteController.moveAfter
       ).not.toHaveBeenCalled()
     })
 
@@ -442,10 +435,9 @@ describe("Sidebar", () => {
     })
 
     it("should call moveAfter with asFirstChild when dropping on right half", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "moveAfter"
-      ).mockResolvedValue([])
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockResolvedValue([])
       render(firstGeneration)
       await flushPromises()
 
@@ -469,19 +461,18 @@ describe("Sidebar", () => {
       await fireEvent.drop(dropTarget)
 
       expect(
-        helper.managedApi.services.moveAfter
-      ).toHaveBeenCalledWith({
-        note: firstGeneration.id,
-        targetNote: firstGenerationSibling.id,
-        asFirstChild: "true",
-      })
+        helper.managedApi.restNoteController.moveAfter
+      ).toHaveBeenCalledWith(
+        firstGeneration.id,
+        firstGenerationSibling.id,
+        "asFirstChild"
+      )
     })
 
     it("should allow dropping as child even with different parent", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "moveAfter"
-      ).mockResolvedValue([])
+      helper.managedApi.restNoteController.moveAfter = vitest
+        .fn()
+        .mockResolvedValue([])
       render(firstGeneration)
       await flushPromises()
 
@@ -505,12 +496,12 @@ describe("Sidebar", () => {
       await fireEvent.drop(firstGenNote)
 
       expect(
-        helper.managedApi.services.moveAfter
-      ).toHaveBeenCalledWith({
-        note: firstGeneration.id,
-        targetNote: firstGenerationSibling.id,
-        asFirstChild: "true",
-      })
+        helper.managedApi.restNoteController.moveAfter
+      ).toHaveBeenCalledWith(
+        firstGeneration.id,
+        firstGenerationSibling.id,
+        "asFirstChild"
+      )
     })
   })
 })

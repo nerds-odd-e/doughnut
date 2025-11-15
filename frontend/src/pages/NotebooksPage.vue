@@ -40,7 +40,7 @@ const subscriptions = ref<Subscription[] | undefined>(undefined)
 const notebooks = ref<Notebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const res = await managedApi.services.myNotebooks()
+  const res = await managedApi.restNotebookController.myNotebooks()
   notebooks.value = res.notebooks
   subscriptions.value = res.subscriptions
 }

@@ -59,14 +59,10 @@ describe("ConversationInner", () => {
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.spyOn(
-      helper.managedApi.services,
-      "replyToConversation"
-    ).mockResolvedValue({} as never)
-    vi.spyOn(
-      helper.managedApi.eventSource.services,
-      "getAiReply"
-    ).mockResolvedValue({} as never)
+    helper.managedApi.restConversationMessageController.replyToConversation =
+      vi.fn()
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
 
     const testData = setupTestData()
     conversation = testData.conversation
@@ -108,14 +104,14 @@ describe("ConversationInner", () => {
     it("prevents form submission for empty messages", async () => {
       await submitMessage(wrapper, "   ")
       expect(
-        helper.managedApi.services.replyToConversation
+        helper.managedApi.restConversationMessageController.replyToConversation
       ).not.toHaveBeenCalled()
     })
 
     it("allows form submission for non-empty messages", async () => {
       await submitMessage(wrapper, "Hello")
       expect(
-        helper.managedApi.services.replyToConversation
+        helper.managedApi.restConversationMessageController.replyToConversation
       ).toHaveBeenCalled()
     })
   })
@@ -212,11 +208,8 @@ describe("ConversationInner", () => {
       await firstButton.trigger("click")
 
       expect(
-        helper.managedApi.services.replyToConversation
-      ).toHaveBeenCalledWith({
-        conversationId: reviewConversation.id,
-        requestBody: "Why is my answer wrong?",
-      })
+        helper.managedApi.restConversationMessageController.replyToConversation
+      ).toHaveBeenCalledWith(reviewConversation.id, "Why is my answer wrong?")
     })
   })
 })

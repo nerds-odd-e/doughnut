@@ -168,10 +168,8 @@ describe("ConversationInner", () => {
 
   beforeEach(() => {
     storageAccessor = createNoteStorage(helper.managedApi)
-    vi.spyOn(
-      helper.managedApi.eventSource.services,
-      "getAiReply"
-    ).mockResolvedValue({} as never)
+    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
+      vi.fn()
 
     const testData = setupTestData()
     note = testData.note
@@ -243,10 +241,7 @@ describe("ConversationInner", () => {
     const renderedCompletion = "bold completion"
 
     beforeEach(async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "updateNoteDetails"
-      ).mockResolvedValue({} as never)
+      helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -325,8 +320,8 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.updateNoteDetails
-      ).toHaveBeenCalledWith({ note: note.id, requestBody: { details: testCompletion } })
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).toHaveBeenCalledWith(note.id, { details: testCompletion })
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -340,7 +335,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.updateNoteDetails
+        helper.managedApi.restTextContentController.updateNoteDetails
       ).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
@@ -356,7 +351,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.updateNoteDetails
+        helper.managedApi.restTextContentController.updateNoteDetails
       ).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
@@ -388,8 +383,8 @@ describe("ConversationInner", () => {
 
       // Should delete "world" and add "friends!"
       expect(
-        helper.managedApi.services.updateNoteDetails
-      ).toHaveBeenCalledWith({ note: note.id, requestBody: { details: "Hello friends!" } })
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).toHaveBeenCalledWith(note.id, { details: "Hello friends!" })
     })
 
     it("handles over-deletion by removing all content", async () => {
@@ -409,16 +404,13 @@ describe("ConversationInner", () => {
 
       // Should delete everything and add new text
       expect(
-        helper.managedApi.services.updateNoteDetails
-      ).toHaveBeenCalledWith({ note: note.id, requestBody: { details: "Completely new text" } })
+        helper.managedApi.restTextContentController.updateNoteDetails
+      ).toHaveBeenCalledWith(note.id, { details: "Completely new text" })
     })
 
     describe("Note Access", () => {
       beforeEach(async () => {
-        vi.spyOn(
-        helper.managedApi.services,
-        "updateNoteDetails"
-      ).mockResolvedValue({} as never)
+        helper.managedApi.restTextContentController.updateNoteDetails = vi.fn()
       })
 
       it("fails to handle completion when note is in answeredQuestion but not in subject", async () => {
@@ -445,7 +437,7 @@ describe("ConversationInner", () => {
         await flushPromises()
 
         expect(
-          helper.managedApi.services.updateNoteDetails
+          helper.managedApi.restTextContentController.updateNoteDetails
         ).toHaveBeenCalled()
       })
     })
@@ -455,10 +447,7 @@ describe("ConversationInner", () => {
     const testTitle = "Generated Title"
 
     beforeEach(async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "updateNoteTitle"
-      ).mockResolvedValue({} as never)
+      helper.managedApi.restTextContentController.updateNoteTitle = vi.fn()
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -473,8 +462,8 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.updateNoteTitle
-      ).toHaveBeenCalledWith({ note: note.id, requestBody: { newTitle: testTitle } })
+        helper.managedApi.restTextContentController.updateNoteTitle
+      ).toHaveBeenCalledWith(note.id, { newTitle: testTitle })
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -487,7 +476,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.updateNoteTitle
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
@@ -502,7 +491,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(
-        helper.managedApi.services.updateNoteTitle
+        helper.managedApi.restTextContentController.updateNoteTitle
       ).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API

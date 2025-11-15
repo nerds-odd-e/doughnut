@@ -23,9 +23,9 @@ const { managedApi } = useLoadingApi()
 
 const getWikidataItem = async () => {
   return (
-    await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId: props.wikidataId,
-    })
+    await managedApi.restWikidataController.fetchWikidataEntityDataById(
+      props.wikidataId
+    )
   ).WikipediaEnglishUrl
 }
 

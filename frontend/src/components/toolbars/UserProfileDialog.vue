@@ -46,13 +46,13 @@ const formData = ref<User | undefined>()
 const errors = ref<Record<string, string>>({})
 
 const fetchData = async () => {
-  formData.value = await managedApi.services.getUserProfile()
+  formData.value = await managedApi.restUserController.getUserProfile()
 }
 
 const processForm = async () => {
   if (!formData.value) return
-  const updated = await managedApi.services
-    .updateUser({ user: formData.value.id, requestBody: formData.value })
+  const updated = await managedApi.restUserController
+    .updateUser(formData.value.id, formData.value)
     .catch((err) => {
       errors.value = err as Record<string, string>
       return undefined

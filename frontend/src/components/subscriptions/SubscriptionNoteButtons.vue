@@ -42,8 +42,8 @@ export default defineComponent({
       if (
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        this.managedApi.services
-          .destroySubscription()
+        this.managedApi.restSubscriptionController
+          .delete(this.subscription.id)
           .then(() => {
             this.$emit("updated")
           })

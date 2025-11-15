@@ -20,21 +20,17 @@ describe("SuggestQuestion", () => {
     })
 
     it("should be able to suggest a question as good example", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "suggestQuestionForFineTuning"
-      ).mockResolvedValue({} as never)
+      helper.managedApi.restPredefinedQuestionController.suggestQuestionForFineTuning =
+        vi.fn().mockResolvedValue({})
       wrapper.get(".negative-feedback-btn").trigger("click")
       wrapper.get("button.daisy-btn-success").trigger("click")
       await flushPromises()
       expect(
-        helper.managedApi.services.suggestQuestionForFineTuning
-      ).toBeCalledWith({
-        predefinedQuestion: predefinedQuestion.id,
-        requestBody: {
-          comment: "",
-          isPositiveFeedback: false,
-        },
+        helper.managedApi.restPredefinedQuestionController
+          .suggestQuestionForFineTuning
+      ).toBeCalledWith(predefinedQuestion.id, {
+        comment: "",
+        isPositiveFeedback: false,
       })
     })
   })

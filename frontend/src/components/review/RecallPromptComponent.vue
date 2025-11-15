@@ -56,10 +56,10 @@ const submitQuizAnswer = async (answerData: AnswerDTO) => {
   error.value = ""
 
   try {
-    const answerResult =     await managedApi.services.answerQuiz({
-      recallPrompt: props.recallPrompt.id,
-      requestBody: answerData,
-    })
+    const answerResult = await managedApi.restRecallPromptController.answerQuiz(
+      props.recallPrompt.id,
+      answerData
+    )
     emits("answered", answerResult)
   } catch (e) {
     await handleError()

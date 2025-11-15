@@ -24,7 +24,7 @@ const { managedApi } = useLoadingApi()
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
 const fetchData = () => {
-  managedApi.services.getNoteInfo({ note: props.noteId }).then((articles) => {
+  managedApi.restNoteController.getNoteInfo(props.noteId).then((articles) => {
     noteInfo.value = articles
   })
 }

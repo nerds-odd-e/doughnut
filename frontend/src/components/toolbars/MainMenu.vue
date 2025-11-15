@@ -130,18 +130,19 @@ const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
 const fetchDueCount = async () => {
-  const count = await managedApi.services.getAssimilationCount({
-    timezone: timezoneParam(),
-  })
+  const count =
+    await managedApi.restAssimilationController.getAssimilationCount(
+      timezoneParam()
+    )
   setDueCount(count.dueCount)
   setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
   setTotalUnassimilatedCount(count.totalUnassimilatedCount)
 }
 
 const fetchRecallCount = async () => {
-  const overview = await managedApi.services.overview({
-    timezone: timezoneParam(),
-  })
+  const overview = await managedApi.restRecallsController.overview(
+    timezoneParam()
+  )
   setToRepeatCount(overview.toRepeatCount)
   setRecallWindowEndAt(overview.recallWindowEndAt)
   setTotalAssimilatedCount(overview.totalAssimilatedCount)
@@ -149,7 +150,7 @@ const fetchRecallCount = async () => {
 
 const fetchUnreadMessageCount = async () => {
   messageCenterConversations.unreadConversations =
-    await managedApi.services.getUnreadConversations()
+    await managedApi.restConversationMessageController.getUnreadConversations()
 }
 
 watch(

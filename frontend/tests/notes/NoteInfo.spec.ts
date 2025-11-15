@@ -12,10 +12,9 @@ const stubResponse: NoteInfo = {
 
 describe("note info", () => {
   it("should render values", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getNoteInfo"
-    ).mockResolvedValue(stubResponse)
+    helper.managedApi.restNoteController.getNoteInfo = vi
+      .fn()
+      .mockResolvedValue(stubResponse)
     const wrapper = helper
       .component(NoteInfoBar)
       .withProps({
@@ -24,8 +23,6 @@ describe("note info", () => {
       .mount()
     await flushPromises()
     expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
-    expect(helper.managedApi.services.getNoteInfo).toBeCalledWith({
-      note: 123,
-    })
+    expect(helper.managedApi.restNoteController.getNoteInfo).toBeCalledWith(123)
   })
 })

@@ -6,12 +6,9 @@ import helper from "@tests/helpers"
 
 const createWrapper = async () => {
   const note = makeMe.aNoteRealm.please()
-  vi.spyOn(
-    helper.managedApi.services,
-    "generateImage"
-  ).mockResolvedValue({
+  helper.managedApi.restAiController.generateImage = vi.fn().mockResolvedValue({
     b64encoded: "This is an encoded image",
-  } as never)
+  })
   const wrapper = helper
     .component(AIGenerateImageDialog)
     .withStorageProps({ note: note.note })
@@ -24,6 +21,6 @@ describe("AIGeneratedImageDialog", () => {
   it("fetches generated image", async () => {
     const wrapper = await createWrapper()
     expect(wrapper.find("img.ai-art").element).toBeDefined()
-    expect(helper.managedApi.services.generateImage).toBeCalled()
+    expect(helper.managedApi.restAiController.generateImage).toBeCalled()
   })
 })

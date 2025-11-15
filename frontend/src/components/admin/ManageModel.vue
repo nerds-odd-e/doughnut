@@ -19,8 +19,8 @@ const selectedModels = ref<GlobalAiModelSettings | undefined>(undefined)
 
 onMounted(() => {
   Promise.all([
-    managedApi.services.getAvailableGptModels(),
-    managedApi.services.getCurrentModelVersions(),
+    managedApi.restAiController.getAvailableGptModels(),
+    managedApi.restGlobalSettingsController.getCurrentModelVersions(),
   ]).then((results) => {
     const [modelListRes, selectedModelRes] = results
     modelList.value = modelListRes
@@ -30,6 +30,8 @@ onMounted(() => {
 
 const save = async (settings: GlobalAiModelSettings) => {
   selectedModels.value =
-    await managedApi.services.setCurrentModelVersions({ requestBody: settings })
+    await managedApi.restGlobalSettingsController.setCurrentModelVersions(
+      settings
+    )
 }
 </script>

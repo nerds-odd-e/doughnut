@@ -16,18 +16,16 @@ describe("ManageMCPTokensPage", () => {
   })
 
   it('displays "No Label" when token label is empty', async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "generateToken"
-    ).mockResolvedValue({
-      token: "mocked-token",
-      label: "",
-    } as never)
+    helper.managedApi.restUserController.generateToken = vi
+      .fn()
+      .mockResolvedValue({
+        token: "mocked-token",
+        label: "",
+      })
 
-    vi.spyOn(
-      helper.managedApi.services,
-      "getTokens"
-    ).mockResolvedValue([])
+    helper.managedApi.restUserController.getTokens = vi
+      .fn()
+      .mockResolvedValue([])
 
     const { findByText } = helper
       .component(ManageMCPTokensPage)

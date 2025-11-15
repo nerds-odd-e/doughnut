@@ -26,10 +26,8 @@ describe("ConversationComponent", () => {
 
   beforeEach(() => {
     mockedPush.mockClear()
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    helper.managedApi.restConversationMessageController.getConversationsAboutNote =
+      vi.fn().mockResolvedValue([])
     wrapper = helper
       .component(ConversationComponent)
       .withStorageProps({

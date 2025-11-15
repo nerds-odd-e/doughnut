@@ -24,18 +24,9 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  vi.spyOn(
-    helper.managedApi.services,
-    "assimilate"
-  ).mockImplementation(mockedAssimilateCall)
-  vi.spyOn(
-    helper.managedApi.services,
-    "show"
-  ).mockImplementation(mockedGetNoteCall)
-  vi.spyOn(
-    helper.managedApi.services,
-    "getNoteInfo"
-  ).mockImplementation(mockedGetNoteInfoCall)
+  helper.managedApi.restAssimilationController.assimilate = mockedAssimilateCall
+  helper.managedApi.restNoteController.show = mockedGetNoteCall
+  helper.managedApi.restNoteController.getNoteInfo = mockedGetNoteInfoCall
 
   vi.mocked(useRecallData).mockReturnValue({
     totalAssimilatedCount: mockedTotalAssimilatedCount,
@@ -89,10 +80,8 @@ describe("Assimilation component", () => {
       await flushPromises()
 
       expect(mockedAssimilateCall).toHaveBeenCalledWith({
-        requestBody: {
-          noteId: note.id,
-          skipMemoryTracking: false,
-        },
+        noteId: note.id,
+        skipMemoryTracking: false,
       })
       expect(wrapper.emitted()).toHaveProperty("initialReviewDone")
       expect(mockedTotalAssimilatedCount.value).toBe(2)
