@@ -424,7 +424,7 @@ class RestGlobalSettingsControllerServiceInstance extends ServiceInstance {
   getCurrentModelVersions(): CancelablePromise<Types.GetCurrentModelVersionsResponse> {
     return this.httpRequest.request<Types.GetCurrentModelVersionsResponse>({
       method: "GET",
-      url: "/api/global-settings/current-model-versions",
+      url: "/api/settings/current-model-version",
       errors: { 500: "Internal Server Error" },
     })
   }
@@ -434,7 +434,7 @@ class RestGlobalSettingsControllerServiceInstance extends ServiceInstance {
   ): CancelablePromise<Types.SetCurrentModelVersionsResponse> {
     return this.httpRequest.request<Types.SetCurrentModelVersionsResponse>({
       method: "POST",
-      url: "/api/global-settings/current-model-versions",
+      url: "/api/settings/current-model-version",
       body: requestBody,
       mediaType: "application/json",
       errors: { 500: "Internal Server Error" },
@@ -672,7 +672,7 @@ class RestUserControllerServiceInstance extends ServiceInstance {
   deleteToken(tokenId: number): CancelablePromise<Types.DeleteTokenResponse> {
     return this.httpRequest.request<Types.DeleteTokenResponse>({
       method: "DELETE",
-      url: "/api/user/tokens/{tokenId}",
+      url: "/api/user/token/{tokenId}",
       path: { tokenId },
       errors: { 500: "Internal Server Error" },
     })
@@ -1464,11 +1464,31 @@ class AssimilationControllerServiceInstance extends ServiceInstance {
 }
 
 class RestFailureReportControllerServiceInstance extends ServiceInstance {
+  failureReports(): CancelablePromise<Types.FailureReportsResponse> {
+    return this.httpRequest.request<Types.FailureReportsResponse>({
+      method: "GET",
+      url: "/api/failure-reports",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
   show2(failureReport: number): CancelablePromise<Types.Show2Response> {
     return this.httpRequest.request<Types.Show2Response>({
       method: "GET",
       url: "/api/failure-reports/{failureReport}",
       path: { failureReport },
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  deleteFailureReports(
+    requestBody: Types.DeleteFailureReportsData["requestBody"]
+  ): CancelablePromise<Types.DeleteFailureReportsResponse> {
+    return this.httpRequest.request<Types.DeleteFailureReportsResponse>({
+      method: "DELETE",
+      url: "/api/failure-reports/delete",
+      body: requestBody,
+      mediaType: "application/json",
       errors: { 500: "Internal Server Error" },
     })
   }
