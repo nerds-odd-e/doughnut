@@ -114,7 +114,7 @@ const useQuestionFetching = (props: QuizProps) => {
       if (memoryTrackerId in recallPromptCache.value) continue
 
       try {
-        const question = await managedApi.silent.services.askAquestion({
+        const question = await managedApi.silent.services.askAQuestion({
           memoryTracker: memoryTrackerId,
         })
         recallPromptCache.value[memoryTrackerId] = question

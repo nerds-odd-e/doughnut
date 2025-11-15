@@ -20,7 +20,7 @@ describe("repeat page", () => {
     )
     vi.spyOn(
       helper.managedApi.silent.services,
-      "askAquestion"
+      "askAQuestion"
     ).mockImplementation(mockedRandomQuestionCall)
   })
 

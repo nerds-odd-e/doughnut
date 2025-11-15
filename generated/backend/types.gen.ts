@@ -1562,11 +1562,11 @@ export type ShowQuestionData = {
 
 export type ShowQuestionResponse = (AnsweredQuestion);
 
-export type AskAquestionData = {
+export type AskAQuestionData = {
     memoryTracker: number;
 };
 
-export type AskAquestionResponse = (RecallPrompt);
+export type AskAQuestionResponse = (RecallPrompt);
 
 export type GetNoteInfoData = {
     note: number;

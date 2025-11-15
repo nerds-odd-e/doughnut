@@ -86,7 +86,7 @@ describe("repeat page", () => {
       )
       vi.spyOn(
         helper.managedApi.silent.services,
-        "askAquestion"
+        "askAQuestion"
       ).mockImplementation(mockedRandomQuestionCall)
       mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.anApiError.please())
       mockedRepeatCall.mockResolvedValue(
@@ -173,7 +173,7 @@ describe("repeat page", () => {
       )
       vi.spyOn(
         helper.managedApi.silent.services,
-        "askAquestion"
+        "askAQuestion"
       ).mockImplementation(mockedRandomQuestionCall)
 
       mockedRepeatCall.mockResolvedValue(

@@ -1,5 +1,5 @@
 import { OpenAPI, ApiError, CancelablePromise } from "@generated/backend"
-import * as Services from "@generated/backend/services.gen"
+import * as Services from "@generated/backend/sdk.gen"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
