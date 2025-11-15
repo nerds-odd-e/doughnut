@@ -31,7 +31,8 @@ public class NonProductConfiguration {
             auth ->
                 auth.requestMatchers(
                         "/users/identify", // in non-product env, we use frontend to identify user
-                        "/api/games")
+                        "/api/games",
+                        "/api/testability/**") // testability API for e2e tests
                     .permitAll())
         .rememberMe(rememberMe -> rememberMe.alwaysRemember(true));
 
