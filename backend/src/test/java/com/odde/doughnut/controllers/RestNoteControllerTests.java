@@ -48,8 +48,7 @@ class NoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
 
     controller =
-        new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Nested
@@ -286,8 +285,7 @@ class NoteControllerTests {
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
       SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController =
-          new SearchController(userModel, noteSearchService);
+      SearchController searchController = new SearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
     }
@@ -296,8 +294,7 @@ class NoteControllerTests {
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController =
-          new SearchController(userModel, noteSearchService);
+      SearchController searchController = new SearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class,
           () -> searchController.searchForLinkTargetWithin(note, searchTerm));

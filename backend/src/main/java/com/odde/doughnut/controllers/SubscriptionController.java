@@ -18,8 +18,7 @@ class SubscriptionController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
-  public SubscriptionController(
-      ModelFactoryService modelFactoryService, UserModel currentUser) {
+  public SubscriptionController(ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
   }

@@ -45,8 +45,7 @@ class BazaarControllerTest {
   class RemoveFromBazaar {
     @Test
     void otherPeopleCannot() {
-      controller =
-          new BazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
+      controller = new BazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));
