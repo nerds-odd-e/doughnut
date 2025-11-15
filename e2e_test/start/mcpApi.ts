@@ -1,6 +1,6 @@
 import type { McpNoteAddDTO } from '@generated/backend'
 import type { NoteCreationDTO } from '@generated/backend'
-import * as Services from '@generated/backend/services.gen'
+import * as Services from '@generated/backend/sdk.gen'
 import { OpenAPI } from '@generated/backend/core/OpenAPI'
 import { ApiError } from '@generated/backend/core/ApiError'
 

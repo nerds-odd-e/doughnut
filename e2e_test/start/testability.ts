@@ -9,7 +9,7 @@ import type { TimeTravel } from '@generated/backend'
 import type { TimeTravelRelativeToNow } from '@generated/backend'
 import type { SuggestedQuestionsData } from '@generated/backend'
 import type { NotesTestData } from '@generated/backend'
-import * as Services from '@generated/backend/services.gen'
+import * as Services from '@generated/backend/sdk.gen'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
