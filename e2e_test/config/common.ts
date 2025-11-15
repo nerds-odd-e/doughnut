@@ -32,7 +32,38 @@ const commonConfig = {
       on(
         'file:preprocessor',
         createBundler({
-          plugins: [createEsbuildPlugin(config)],
+          plugins: [
+            createEsbuildPlugin(config),
+            {
+              name: 'inject-request-extractor',
+              setup(build) {
+                build.onLoad(
+                  { filter: /generated\/backend\/core\/request\.ts$/ },
+                  async (args) => {
+                    const contents = await fs.promises.readFile(
+                      args.path,
+                      'utf8'
+                    )
+                    // Inject check for global extractor at the start of the request function
+                    const modified = contents.replace(
+                      /export const request = <T>\(config: OpenAPIConfig, options: ApiRequestOptions<T>\): CancelablePromise<T> => \{/,
+                      `export const request = <T>(config: OpenAPIConfig, options: ApiRequestOptions<T>): CancelablePromise<T> => {
+	// Check for global request config extractor (for e2e tests)
+	// @ts-ignore - Global variable for e2e test extraction
+	if (typeof globalThis !== 'undefined' && (globalThis as any).__extractRequestConfig) {
+		// @ts-ignore
+		(globalThis as any).__extractRequestConfig(options)
+		// Return a resolved promise to avoid actual network calls during extraction
+		return Promise.resolve() as any
+	}
+`
+                    )
+                    return { contents: modified, loader: 'ts' }
+                  }
+                )
+              },
+            },
+          ],
           alias: {
             '@frontend': path.resolve(__dirname, '../../frontend/src'),
           },
