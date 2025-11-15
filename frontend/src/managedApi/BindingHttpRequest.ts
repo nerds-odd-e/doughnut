@@ -13,7 +13,7 @@ export default function BindingHttpRequest(
   const apiStatusHandler = new ApiStatusHandler(apiStatus, silent)
   return class BindingHttpRequestWithStatus extends FetchHttpRequest {
     public override request<T>(
-      options: ApiRequestOptions
+      options: ApiRequestOptions<T>
     ): CancelablePromise<T> {
       return new CancelablePromise<T>((resolve, reject, onCancel) => {
         const originalPromise = super.request<T>(options)

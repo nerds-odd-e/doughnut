@@ -5,5 +5,7 @@ import type { OpenAPIConfig } from "@generated/backend/core/OpenAPI"
 export abstract class BaseHttpRequest {
   constructor(public readonly config: OpenAPIConfig) {}
 
-  public abstract request<T>(options: ApiRequestOptions): CancelablePromise<T>
+  public abstract request<T>(
+    options: ApiRequestOptions<T>
+  ): CancelablePromise<T>
 }

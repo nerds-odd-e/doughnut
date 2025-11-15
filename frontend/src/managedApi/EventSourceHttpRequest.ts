@@ -9,7 +9,10 @@ import createEventSourceWithBody from "./createEventSourceWithBody"
 // this function is copied from the generated code at
 // frontend/src/generated/backend/core/request.ts
 // It is not exported from the generated code, so it is copied here
-const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
+const getUrl = <T = unknown>(
+  config: OpenAPIConfig,
+  options: ApiRequestOptions<T>
+): string => {
   const encoder = config.ENCODE_PATH || encodeURI
 
   const path = options.url
@@ -34,7 +37,9 @@ export default class EventSourceHttpRequestImpl extends BaseHttpRequest {
 
   onError?: (error: unknown) => void = undefined
 
-  public override request<T>(options: ApiRequestOptions): CancelablePromise<T> {
+  public override request<T>(
+    options: ApiRequestOptions<T>
+  ): CancelablePromise<T> {
     return new CancelablePromise(async (resolve, reject, onCancel) => {
       try {
         const url = getUrl(this.config, options)

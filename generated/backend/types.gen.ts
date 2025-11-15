@@ -940,21 +940,6 @@ export type GenerateTokenData = {
 
 export type GenerateTokenResponse = UserToken;
 
-export type UpdateUserData = {
-    requestBody: UserDTO;
-    user: number;
-};
-
-export type UpdateUserResponse = User;
-
-export type GetTokensResponse = Array<UserToken>;
-
-export type DeleteTokenData = {
-    tokenId: number;
-};
-
-export type DeleteTokenResponse = unknown;
-
 export type CloseAllGithubIssuesResponse = string;
 
 export type UpdateCurrentUserData = {
@@ -1057,12 +1042,6 @@ export type EnableFeatureToggleResponse = Array<{
 
 export type ResetDbAndTestabilitySettingsResponse = string;
 
-export type GithubIssuesResponse = Array<{
-    [key: string]: {
-        [key: string]: unknown;
-    };
-}>;
-
 export type UpdateData = {
     requestBody: SubscriptionDTO;
     subscription: number;
@@ -1106,18 +1085,6 @@ export type AnswerQuizData = {
 };
 
 export type AnswerQuizResponse = AnsweredQuestion;
-
-export type ShowQuestionData = {
-    recallPrompt: number;
-};
-
-export type ShowQuestionResponse = AnsweredQuestion;
-
-export type AskAquestionData = {
-    memoryTracker: number;
-};
-
-export type AskAquestionResponse = RecallPrompt;
 
 export type ToggleApprovalData = {
     predefinedQuestion: number;
@@ -1179,73 +1146,6 @@ export type UpdateWikidataIdData = {
 
 export type UpdateWikidataIdResponse = NoteRealm;
 
-export type UpdateRecallSettingData = {
-    note: number;
-    requestBody: RecallSetting;
-};
-
-export type UpdateRecallSettingResponse = RedirectToNoteResponse;
-
-export type DeleteNoteData = {
-    note: number;
-};
-
-export type DeleteNoteResponse = Array<NoteRealm>;
-
-export type MoveAfterData = {
-    asFirstChild: string;
-    note: number;
-    targetNote: number;
-};
-
-export type MoveAfterResponse = Array<NoteRealm>;
-
-export type ShowData = {
-    note: number;
-};
-
-export type ShowResponse = NoteRealm;
-
-export type UpdateNoteAccessoriesData = {
-    formData?: NoteAccessoriesDTO;
-    note: number;
-};
-
-export type UpdateNoteAccessoriesResponse = NoteAccessory;
-
-export type UndoDeleteNoteData = {
-    note: number;
-};
-
-export type UndoDeleteNoteResponse = NoteRealm;
-
-export type GetNoteInfoData = {
-    note: number;
-};
-
-export type GetNoteInfoResponse = NoteInfo;
-
-export type GetGraphData = {
-    note: number;
-    tokenLimit: number;
-};
-
-export type GetGraphResponse = GraphRAGResult;
-
-export type GetDescendantsData = {
-    note: number;
-};
-
-export type GetDescendantsResponse = GraphRAGResult;
-
-export type ShowNoteAccessoryData = {
-    note: number;
-};
-
-export type ShowNoteAccessoryResponse = NoteAccessory;
-
-export type GetRecentNotesResponse = Array<NoteRealm>;
-
 export type SemanticSearchWithinData = {
     note: number;
     requestBody: SearchTerm;
@@ -1260,6 +1160,19 @@ export type SearchForLinkTargetWithinData = {
 
 export type SearchForLinkTargetWithinResponse = Array<NoteSearchResult>;
 
+export type UpdateRecallSettingData = {
+    note: number;
+    requestBody: RecallSetting;
+};
+
+export type UpdateRecallSettingResponse = RedirectToNoteResponse;
+
+export type DeleteNoteData = {
+    note: number;
+};
+
+export type DeleteNoteResponse = Array<NoteRealm>;
+
 export type SemanticSearchData = {
     requestBody: SearchTerm;
 };
@@ -1271,6 +1184,14 @@ export type SearchForLinkTargetData = {
 };
 
 export type SearchForLinkTargetResponse = Array<NoteSearchResult>;
+
+export type MoveAfterData = {
+    asFirstChild: string;
+    note: number;
+    targetNote: number;
+};
+
+export type MoveAfterResponse = Array<NoteRealm>;
 
 export type GetData = {
     notebook: number;
@@ -1324,46 +1245,6 @@ export type CreateNotebookData = {
 
 export type CreateNotebookResponse = RedirectToNoteResponse;
 
-export type MoveToCircleData = {
-    circle: number;
-    notebook: number;
-};
-
-export type MoveToCircleResponse = Notebook;
-
-export type GetAiAssistantData = {
-    notebook: number;
-};
-
-export type GetAiAssistantResponse = NotebookAiAssistant;
-
-export type UpdateAiAssistantData = {
-    notebook: number;
-    requestBody: UpdateAiAssistantRequest;
-};
-
-export type UpdateAiAssistantResponse = NotebookAiAssistant;
-
-export type MyNotebooksResponse = NotebooksViewedByUser;
-
-export type DownloadNotebookForObsidianData = {
-    notebook: number;
-};
-
-export type DownloadNotebookForObsidianResponse = string;
-
-export type GetNotesData = {
-    notebook: number;
-};
-
-export type GetNotesResponse = Array<Note>;
-
-export type DownloadNotebookDumpData = {
-    notebook: number;
-};
-
-export type DownloadNotebookDumpResponse = Array<BareNote>;
-
 export type ApproveData = {
     notebookCertificateApproval: number;
 };
@@ -1375,14 +1256,6 @@ export type RequestApprovalForNotebookData = {
 };
 
 export type RequestApprovalForNotebookResponse = NotebookCertificateApproval;
-
-export type GetAllPendingRequestResponse = Array<NotebookCertificateApproval>;
-
-export type GetApprovalForNotebookData = {
-    notebook: number;
-};
-
-export type GetApprovalForNotebookResponse = NotebookCertificateApproval;
 
 export type SelfEvaluateData = {
     memoryTracker: number;
@@ -1403,29 +1276,6 @@ export type AnswerSpellingData = {
 };
 
 export type AnswerSpellingResponse = SpellingResultDTO;
-
-export type MarkAsRepeatedData = {
-    memoryTracker: number;
-    successful: boolean;
-};
-
-export type MarkAsRepeatedResponse = MemoryTracker;
-
-export type Show1Data = {
-    memoryTracker: number;
-};
-
-export type Show1Response = MemoryTracker;
-
-export type GetSpellingQuestionData = {
-    memoryTracker: number;
-};
-
-export type GetSpellingQuestionResponse = SpellingQuestion;
-
-export type GetRecentlyReviewedResponse = Array<MemoryTracker>;
-
-export type GetRecentMemoryTrackersResponse = Array<MemoryTracker>;
 
 export type CreateNote1Data = {
     requestBody: McpNoteAddDTO;
@@ -1470,15 +1320,6 @@ export type DeleteResponse = SuggestedQuestionForFineTuning;
 
 export type UploadAndTriggerFineTuningResponse = unknown;
 
-export type UpdateSuggestedQuestionForFineTuningData = {
-    requestBody: QuestionSuggestionParams;
-    suggestedQuestion: number;
-};
-
-export type UpdateSuggestedQuestionForFineTuningResponse = SuggestedQuestionForFineTuning;
-
-export type GetAllSuggestedQuestionsResponse = Array<SuggestedQuestionForFineTuning>;
-
 export type ReplyToConversationData = {
     conversationId: number;
     requestBody: string;
@@ -1518,11 +1359,303 @@ export type StartConversationAboutAssessmentQuestionData = {
 
 export type StartConversationAboutAssessmentQuestionResponse = Conversation;
 
+export type IndexResponse = Array<Circle>;
+
+export type CreateCircleData = {
+    requestBody: Circle;
+};
+
+export type CreateCircleResponse = Circle;
+
+export type CreateNotebookInCircleData = {
+    circle: number;
+    requestBody: NoteCreationDTO;
+};
+
+export type CreateNotebookInCircleResponse = RedirectToNoteResponse;
+
+export type JoinCircleData = {
+    requestBody: CircleJoiningByInvitation;
+};
+
+export type JoinCircleResponse = Circle;
+
+export type GetCertificateData = {
+    notebook: number;
+};
+
+export type GetCertificateResponse = Certificate;
+
+export type ClaimCertificateData = {
+    notebook: number;
+};
+
+export type ClaimCertificateResponse = Certificate;
+
+export type RemoveFromBazaarData = {
+    bazaarNotebook: number;
+};
+
+export type RemoveFromBazaarResponse = Array<BazaarNotebook>;
+
+export type AudioToTextData = {
+    formData?: AudioUploadDTO;
+};
+
+export type AudioToTextResponse = TextFromAudioWithCallInfo;
+
+export type AssimilateData = {
+    requestBody: InitialInfo;
+};
+
+export type AssimilateResponse = Array<MemoryTracker>;
+
+export type AnswerQuestionData = {
+    assessmentQuestionInstance: number;
+    requestBody: AnswerDTO;
+};
+
+export type AnswerQuestionResponse = AssessmentQuestionInstance;
+
+export type SubmitAssessmentResultData = {
+    assessmentAttempt: number;
+};
+
+export type SubmitAssessmentResultResponse = AssessmentAttempt;
+
+export type GenerateAssessmentQuestionsData = {
+    notebook: number;
+};
+
+export type GenerateAssessmentQuestionsResponse = AssessmentAttempt;
+
+export type SuggestTitleData = {
+    note: number;
+};
+
+export type SuggestTitleResponse = SuggestedTitleDTO;
+
+export type GenerateImageData = {
+    requestBody: string;
+};
+
+export type GenerateImageResponse = AiGeneratedImage;
+
+export type UpdateUserData = {
+    requestBody: UserDTO;
+    user: number;
+};
+
+export type UpdateUserResponse = User;
+
+export type UpdateNoteTitleData = {
+    note: number;
+    requestBody: NoteUpdateTitleDTO;
+};
+
+export type UpdateNoteTitleResponse = NoteRealm;
+
+export type UpdateNoteDetailsData = {
+    note: number;
+    requestBody: NoteUpdateDetailsDTO;
+};
+
+export type UpdateNoteDetailsResponse = NoteRealm;
+
+export type ShowData = {
+    note: number;
+};
+
+export type ShowResponse = NoteRealm;
+
+export type UpdateNoteAccessoriesData = {
+    formData?: NoteAccessoriesDTO;
+    note: number;
+};
+
+export type UpdateNoteAccessoriesResponse = NoteAccessory;
+
+export type UndoDeleteNoteData = {
+    note: number;
+};
+
+export type UndoDeleteNoteResponse = NoteRealm;
+
+export type MoveToCircleData = {
+    circle: number;
+    notebook: number;
+};
+
+export type MoveToCircleResponse = Notebook;
+
+export type GetAiAssistantData = {
+    notebook: number;
+};
+
+export type GetAiAssistantResponse = NotebookAiAssistant;
+
+export type UpdateAiAssistantData = {
+    notebook: number;
+    requestBody: UpdateAiAssistantRequest;
+};
+
+export type UpdateAiAssistantResponse = NotebookAiAssistant;
+
+export type MarkAsRepeatedData = {
+    memoryTracker: number;
+    successful: boolean;
+};
+
+export type MarkAsRepeatedResponse = MemoryTracker;
+
+export type UpdateSuggestedQuestionForFineTuningData = {
+    requestBody: QuestionSuggestionParams;
+    suggestedQuestion: number;
+};
+
+export type UpdateSuggestedQuestionForFineTuningResponse = SuggestedQuestionForFineTuning;
+
 export type MarkConversationAsReadData = {
     conversationId: number;
 };
 
 export type MarkConversationAsReadResponse = Array<ConversationMessage>;
+
+export type SearchWikidataData = {
+    search: string;
+};
+
+export type SearchWikidataResponse = Array<WikidataSearchEntity>;
+
+export type FetchWikidataEntityDataByIdData = {
+    wikidataId: string;
+};
+
+export type FetchWikidataEntityDataByIdResponse = WikidataEntityData;
+
+export type GetTokensResponse = Array<UserToken>;
+
+export type CurrentUserInfoResponse = CurrentUserInfo;
+
+export type GithubIssuesResponse = Array<{
+    [key: string]: {
+        [key: string]: unknown;
+    };
+}>;
+
+export type RecallingData = {
+    dueindays?: number;
+    timezone: string;
+};
+
+export type RecallingResponse = DueMemoryTrackers;
+
+export type OverviewData = {
+    timezone: string;
+};
+
+export type OverviewResponse = RecallStatus;
+
+export type ShowQuestionData = {
+    recallPrompt: number;
+};
+
+export type ShowQuestionResponse = AnsweredQuestion;
+
+export type AskAquestionData = {
+    memoryTracker: number;
+};
+
+export type AskAquestionResponse = RecallPrompt;
+
+export type GetNoteInfoData = {
+    note: number;
+};
+
+export type GetNoteInfoResponse = NoteInfo;
+
+export type GetGraphData = {
+    note: number;
+    tokenLimit: number;
+};
+
+export type GetGraphResponse = GraphRAGResult;
+
+export type GetDescendantsData = {
+    note: number;
+};
+
+export type GetDescendantsResponse = GraphRAGResult;
+
+export type ShowNoteAccessoryData = {
+    note: number;
+};
+
+export type ShowNoteAccessoryResponse = NoteAccessory;
+
+export type GetRecentNotesResponse = Array<NoteRealm>;
+
+export type MyNotebooksResponse = NotebooksViewedByUser;
+
+export type DownloadNotebookForObsidianData = {
+    notebook: number;
+};
+
+export type DownloadNotebookForObsidianResponse = string;
+
+export type GetNotesData = {
+    notebook: number;
+};
+
+export type GetNotesResponse = Array<Note>;
+
+export type DownloadNotebookDumpData = {
+    notebook: number;
+};
+
+export type DownloadNotebookDumpResponse = Array<BareNote>;
+
+export type GetAllPendingRequestResponse = Array<NotebookCertificateApproval>;
+
+export type GetApprovalForNotebookData = {
+    notebook: number;
+};
+
+export type GetApprovalForNotebookResponse = NotebookCertificateApproval;
+
+export type Show1Data = {
+    memoryTracker: number;
+};
+
+export type Show1Response = MemoryTracker;
+
+export type GetSpellingQuestionData = {
+    memoryTracker: number;
+};
+
+export type GetSpellingQuestionResponse = SpellingQuestion;
+
+export type GetRecentlyReviewedResponse = Array<MemoryTracker>;
+
+export type GetRecentMemoryTrackersResponse = Array<MemoryTracker>;
+
+export type PingResponse = string;
+
+export type GetAllSuggestedQuestionsResponse = Array<SuggestedQuestionForFineTuning>;
+
+export type FailureReportsResponse = {
+    [key: string]: unknown;
+};
+
+export type Show2Data = {
+    failureReport: number;
+};
+
+export type Show2Response = FailureReportForView;
+
+export type DataUpgradeResponse = Array<{
+    [key: string]: unknown;
+}>;
 
 export type GetConversationData = {
     conversationId: number;
@@ -1546,64 +1679,13 @@ export type GetUnreadConversationsResponse = Array<ConversationMessage>;
 
 export type GetConversationsOfCurrentUserResponse = Array<Conversation>;
 
-export type IndexResponse = Array<Circle>;
-
-export type CreateCircleData = {
-    requestBody: Circle;
-};
-
-export type CreateCircleResponse = Circle;
-
-export type CreateNotebookInCircleData = {
-    circle: number;
-    requestBody: NoteCreationDTO;
-};
-
-export type CreateNotebookInCircleResponse = RedirectToNoteResponse;
-
-export type JoinCircleData = {
-    requestBody: CircleJoiningByInvitation;
-};
-
-export type JoinCircleResponse = Circle;
-
 export type ShowCircleData = {
     circle: number;
 };
 
 export type ShowCircleResponse = CircleForUserView;
 
-export type GetCertificateData = {
-    notebook: number;
-};
-
-export type GetCertificateResponse = Certificate;
-
-export type ClaimCertificateData = {
-    notebook: number;
-};
-
-export type ClaimCertificateResponse = Certificate;
-
-export type RemoveFromBazaarData = {
-    bazaarNotebook: number;
-};
-
-export type RemoveFromBazaarResponse = Array<BazaarNotebook>;
-
 export type BazaarResponse = Array<BazaarNotebook>;
-
-export type AudioToTextData = {
-    formData?: AudioUploadDTO;
-};
-
-export type AudioToTextResponse = TextFromAudioWithCallInfo;
-
-export type AssimilateData = {
-    requestBody: InitialInfo;
-};
-
-export type AssimilateResponse = Array<MemoryTracker>;
 
 export type GetAssimilationCountData = {
     timezone: string;
@@ -1617,99 +1699,17 @@ export type AssimilatingData = {
 
 export type AssimilatingResponse = Array<Note>;
 
-export type AnswerQuestionData = {
-    assessmentQuestionInstance: number;
-    requestBody: AnswerDTO;
-};
-
-export type AnswerQuestionResponse = AssessmentQuestionInstance;
-
-export type SubmitAssessmentResultData = {
-    assessmentAttempt: number;
-};
-
-export type SubmitAssessmentResultResponse = AssessmentAttempt;
-
-export type GenerateAssessmentQuestionsData = {
-    notebook: number;
-};
-
-export type GenerateAssessmentQuestionsResponse = AssessmentAttempt;
-
 export type GetMyAssessmentsResponse = Array<AssessmentAttempt>;
-
-export type SuggestTitleData = {
-    note: number;
-};
-
-export type SuggestTitleResponse = SuggestedTitleDTO;
-
-export type GenerateImageData = {
-    requestBody: string;
-};
-
-export type GenerateImageResponse = AiGeneratedImage;
 
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse = DummyForGeneratingTypes;
 
 export type GetAvailableGptModelsResponse = Array<(string)>;
 
-export type UpdateNoteTitleData = {
-    note: number;
-    requestBody: NoteUpdateTitleDTO;
+export type DeleteTokenData = {
+    tokenId: number;
 };
 
-export type UpdateNoteTitleResponse = NoteRealm;
-
-export type UpdateNoteDetailsData = {
-    note: number;
-    requestBody: NoteUpdateDetailsDTO;
-};
-
-export type UpdateNoteDetailsResponse = NoteRealm;
-
-export type SearchWikidataData = {
-    search: string;
-};
-
-export type SearchWikidataResponse = Array<WikidataSearchEntity>;
-
-export type FetchWikidataEntityDataByIdData = {
-    wikidataId: string;
-};
-
-export type FetchWikidataEntityDataByIdResponse = WikidataEntityData;
-
-export type CurrentUserInfoResponse = CurrentUserInfo;
-
-export type RecallingData = {
-    dueindays?: number;
-    timezone: string;
-};
-
-export type RecallingResponse = DueMemoryTrackers;
-
-export type OverviewData = {
-    timezone: string;
-};
-
-export type OverviewResponse = RecallStatus;
-
-export type PingResponse = string;
-
-export type DataUpgradeResponse = Array<{
-    [key: string]: unknown;
-}>;
-
-export type FailureReportsResponse = {
-    [key: string]: unknown;
-};
-
-export type Show2Data = {
-    failureReport: number;
-};
-
-export type Show2Response = FailureReportForView;
+export type DeleteTokenResponse = unknown;
 
 export type DeleteFailureReportsData = {
     requestBody: Array<(number)>;
@@ -1732,9 +1732,7 @@ export type $OpenApiTs = {
             };
         };
         post: {
-            req: {
-                requestBody: User;
-            };
+            req: CreateUserData;
             res: {
                 /**
                  * OK
@@ -1749,63 +1747,12 @@ export type $OpenApiTs = {
     };
     '/api/user/generate-token': {
         post: {
-            req: {
-                requestBody: TokenConfigDTO;
-            };
+            req: GenerateTokenData;
             res: {
                 /**
                  * OK
                  */
                 200: UserToken;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/user/{user}': {
-        patch: {
-            req: {
-                requestBody: UserDTO;
-                user: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: User;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/user/get-tokens': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<UserToken>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/user/token/{tokenId}': {
-        delete: {
-            req: {
-                tokenId: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: unknown;
                 /**
                  * Internal Server Error
                  */
@@ -1829,11 +1776,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/update_current_user': {
         post: {
-            req: {
-                requestBody: {
-                    [key: string]: (string);
-                };
-            };
+            req: UpdateCurrentUserData;
             res: {
                 /**
                  * OK
@@ -1862,9 +1805,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/time_travel_relative_to_now': {
         post: {
-            req: {
-                requestBody: TimeTravelRelativeToNow;
-            };
+            req: TimeTravelRelativeToNowData;
             res: {
                 /**
                  * OK
@@ -1881,9 +1822,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/time_travel': {
         post: {
-            req: {
-                requestBody: TimeTravel;
-            };
+            req: TimeTravelData;
             res: {
                 /**
                  * OK
@@ -1900,11 +1839,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/share_to_bazaar': {
         post: {
-            req: {
-                requestBody: {
-                    [key: string]: (string);
-                };
-            };
+            req: ShareToBazaarData;
             res: {
                 /**
                  * OK
@@ -1919,11 +1854,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/replace_service_url': {
         post: {
-            req: {
-                requestBody: {
-                    [key: string]: (string);
-                };
-            };
+            req: ReplaceServiceUrlData;
             res: {
                 /**
                  * OK
@@ -1938,9 +1869,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/randomizer': {
         post: {
-            req: {
-                requestBody: Randomization;
-            };
+            req: RandomizerData;
             res: {
                 /**
                  * OK
@@ -1957,11 +1886,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/link_notes': {
         post: {
-            req: {
-                requestBody: {
-                    [key: string]: (string);
-                };
-            };
+            req: LinkNotesData;
             res: {
                 /**
                  * OK
@@ -1976,9 +1901,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/inject_suggested_questions': {
         post: {
-            req: {
-                requestBody: SuggestedQuestionsData;
-            };
+            req: InjectSuggestedQuestionData;
             res: {
                 /**
                  * OK
@@ -1993,9 +1916,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/inject_notes': {
         post: {
-            req: {
-                requestBody: NotesTestData;
-            };
+            req: InjectNotesData;
             res: {
                 /**
                  * OK
@@ -2012,11 +1933,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/inject_circle': {
         post: {
-            req: {
-                requestBody: {
-                    [key: string]: (string);
-                };
-            };
+            req: InjectCircleData;
             res: {
                 /**
                  * OK
@@ -2031,9 +1948,7 @@ export type $OpenApiTs = {
     };
     '/api/testability/inject-predefined-questions': {
         post: {
-            req: {
-                requestBody: PredefinedQuestionsTestData;
-            };
+            req: InjectPredefinedQuestionData;
             res: {
                 /**
                  * OK
@@ -2060,11 +1975,7 @@ export type $OpenApiTs = {
             };
         };
         post: {
-            req: {
-                requestBody: {
-                    [key: string]: (string);
-                };
-            };
+            req: EnableFeatureToggleData;
             res: {
                 /**
                  * OK
@@ -2093,30 +2004,9 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/testability/github_issues': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<{
-                    [key: string]: {
-                        [key: string]: unknown;
-                    };
-                }>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
     '/api/subscriptions/{subscription}': {
         post: {
-            req: {
-                requestBody: SubscriptionDTO;
-                subscription: number;
-            };
+            req: UpdateData;
             res: {
                 /**
                  * OK
@@ -2145,10 +2035,7 @@ export type $OpenApiTs = {
     };
     '/api/subscriptions/notebooks/{notebook}/subscribe': {
         post: {
-            req: {
-                notebook: number;
-                requestBody: SubscriptionDTO;
-            };
+            req: CreateSubscriptionData;
             res: {
                 /**
                  * OK
@@ -2175,9 +2062,7 @@ export type $OpenApiTs = {
             };
         };
         post: {
-            req: {
-                requestBody: GlobalAiModelSettings;
-            };
+            req: SetCurrentModelVersionsData;
             res: {
                 /**
                  * OK
@@ -2192,10 +2077,7 @@ export type $OpenApiTs = {
     };
     '/api/recall-prompts/{recallPrompt}/regenerate': {
         post: {
-            req: {
-                recallPrompt: number;
-                requestBody: QuestionContestResult;
-            };
+            req: RegenerateData;
             res: {
                 /**
                  * OK
@@ -2210,9 +2092,7 @@ export type $OpenApiTs = {
     };
     '/api/recall-prompts/{recallPrompt}/contest': {
         post: {
-            req: {
-                recallPrompt: number;
-            };
+            req: ContestData;
             res: {
                 /**
                  * OK
@@ -2227,49 +2107,12 @@ export type $OpenApiTs = {
     };
     '/api/recall-prompts/{recallPrompt}/answer': {
         post: {
-            req: {
-                recallPrompt: number;
-                requestBody: AnswerDTO;
-            };
+            req: AnswerQuizData;
             res: {
                 /**
                  * OK
                  */
                 200: AnsweredQuestion;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/recall-prompts/{recallPrompt}': {
-        get: {
-            req: {
-                recallPrompt: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: AnsweredQuestion;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/recall-prompts/{memoryTracker}/question': {
-        get: {
-            req: {
-                memoryTracker: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: RecallPrompt;
                 /**
                  * Internal Server Error
                  */
@@ -2279,9 +2122,7 @@ export type $OpenApiTs = {
     };
     '/api/predefined-questions/{predefinedQuestion}/toggle-approval': {
         post: {
-            req: {
-                predefinedQuestion: number;
-            };
+            req: ToggleApprovalData;
             res: {
                 /**
                  * OK
@@ -2296,10 +2137,7 @@ export type $OpenApiTs = {
     };
     '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning': {
         post: {
-            req: {
-                predefinedQuestion: number;
-                requestBody: QuestionSuggestionCreationParams;
-            };
+            req: SuggestQuestionForFineTuningData;
             res: {
                 /**
                  * OK
@@ -2314,10 +2152,7 @@ export type $OpenApiTs = {
     };
     '/api/predefined-questions/{note}/refine-question': {
         post: {
-            req: {
-                note: number;
-                requestBody: PredefinedQuestion;
-            };
+            req: RefineQuestionData;
             res: {
                 /**
                  * OK
@@ -2332,9 +2167,7 @@ export type $OpenApiTs = {
     };
     '/api/predefined-questions/{note}/note-questions': {
         get: {
-            req: {
-                note: number;
-            };
+            req: GetAllQuestionByNoteData;
             res: {
                 /**
                  * OK
@@ -2347,10 +2180,7 @@ export type $OpenApiTs = {
             };
         };
         post: {
-            req: {
-                note: number;
-                requestBody: PredefinedQuestion;
-            };
+            req: AddQuestionManuallyData;
             res: {
                 /**
                  * OK
@@ -2365,9 +2195,7 @@ export type $OpenApiTs = {
     };
     '/api/predefined-questions/generate-question-without-save': {
         post: {
-            req: {
-                note: number;
-            };
+            req: GenerateQuestionWithoutSaveData;
             res: {
                 /**
                  * OK
@@ -2382,10 +2210,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{referenceNote}/create-after': {
         post: {
-            req: {
-                referenceNote: number;
-                requestBody: NoteCreationDTO;
-            };
+            req: CreateNoteAfterData;
             res: {
                 /**
                  * OK
@@ -2400,10 +2225,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{parentNote}/create': {
         post: {
-            req: {
-                parentNote: number;
-                requestBody: NoteCreationDTO;
-            };
+            req: CreateNoteData;
             res: {
                 /**
                  * OK
@@ -2418,10 +2240,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{note}/updateWikidataId': {
         post: {
-            req: {
-                note: number;
-                requestBody: WikidataAssociationCreation;
-            };
+            req: UpdateWikidataIdData;
             res: {
                 /**
                  * OK
@@ -2434,12 +2253,39 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/notes/{note}/semantic-search': {
+        post: {
+            req: SemanticSearchWithinData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteSearchResult>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notes/{note}/search': {
+        post: {
+            req: SearchForLinkTargetWithinData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteSearchResult>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
     '/api/notes/{note}/review-setting': {
         post: {
-            req: {
-                note: number;
-                requestBody: RecallSetting;
-            };
+            req: UpdateRecallSettingData;
             res: {
                 /**
                  * OK
@@ -2454,14 +2300,42 @@ export type $OpenApiTs = {
     };
     '/api/notes/{note}/delete': {
         post: {
-            req: {
-                note: number;
-            };
+            req: DeleteNoteData;
             res: {
                 /**
                  * OK
                  */
                 200: Array<NoteRealm>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notes/semantic-search': {
+        post: {
+            req: SemanticSearchData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteSearchResult>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notes/search': {
+        post: {
+            req: SearchForLinkTargetData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteSearchResult>;
                 /**
                  * Internal Server Error
                  */
@@ -2471,11 +2345,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}': {
         post: {
-            req: {
-                asFirstChild: string;
-                note: number;
-                targetNote: number;
-            };
+            req: MoveAfterData;
             res: {
                 /**
                  * OK
@@ -2488,11 +2358,629 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/notebooks/{notebook}': {
+        get: {
+            req: GetData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Notebook;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+        post: {
+            req: Update1Data;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Notebook;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebooks/{notebook}/update-index': {
+        post: {
+            req: UpdateNotebookIndexData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: unknown;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebooks/{notebook}/share': {
+        post: {
+            req: ShareNotebookData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Notebook;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebooks/{notebook}/reset-index': {
+        post: {
+            req: ResetNotebookIndexData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: unknown;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebooks/{notebookId}/obsidian': {
+        post: {
+            req: ImportObsidianData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: unknown;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebooks/create': {
+        post: {
+            req: CreateNotebookData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: RedirectToNoteResponse;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve': {
+        post: {
+            req: ApproveData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NotebookCertificateApproval;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebook_certificate_approvals/request-approval/{notebook}': {
+        post: {
+            req: RequestApprovalForNotebookData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NotebookCertificateApproval;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/memory-trackers/{memoryTracker}/self-evaluate': {
+        post: {
+            req: SelfEvaluateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemoryTracker;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/memory-trackers/{memoryTracker}/remove': {
+        post: {
+            req: RemoveFromRepeatingData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemoryTracker;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/memory-trackers/{memoryTracker}/answer-spelling': {
+        post: {
+            req: AnswerSpellingData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SpellingResultDTO;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/mcp/notes/create': {
+        post: {
+            req: CreateNote1Data;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NoteCreationResult;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/links/{link}': {
+        post: {
+            req: UpdateLinkData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteRealm>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/links/move/{sourceNote}/{targetNote}': {
+        post: {
+            req: MoveNoteData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteRealm>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/links/create/{sourceNote}/{targetNote}': {
+        post: {
+            req: LinkNoteFinalizeData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<NoteRealm>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/fine-tuning/{suggestedQuestion}/duplicate': {
+        post: {
+            req: DuplicateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SuggestedQuestionForFineTuning;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/fine-tuning/{suggestedQuestion}/delete': {
+        post: {
+            req: DeleteData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SuggestedQuestionForFineTuning;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/fine-tuning/upload-and-trigger-fine-tuning': {
+        post: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: unknown;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/conversation/{conversationId}/send': {
+        post: {
+            req: ReplyToConversationData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: ConversationMessage;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/conversation/{conversationId}/ai-reply': {
+        post: {
+            req: GetAiReplyData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SseEmitter;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/conversation/recall-prompt/{recallPrompt}': {
+        post: {
+            req: StartConversationAboutRecallPromptData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Conversation;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/conversation/note/{note}': {
+        get: {
+            req: GetConversationsAboutNoteData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<Conversation>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+        post: {
+            req: StartConversationAboutNoteData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Conversation;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/conversation/assessment-question/{assessmentQuestion}': {
+        post: {
+            req: StartConversationAboutAssessmentQuestionData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Conversation;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/circles': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<Circle>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+        post: {
+            req: CreateCircleData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Circle;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/circles/{circle}/notebooks': {
+        post: {
+            req: CreateNotebookInCircleData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: RedirectToNoteResponse;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/circles/join': {
+        post: {
+            req: JoinCircleData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Circle;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/certificate/{notebook}': {
+        get: {
+            req: GetCertificateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Certificate;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+        post: {
+            req: ClaimCertificateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Certificate;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/bazaar/{bazaarNotebook}/remove': {
+        post: {
+            req: RemoveFromBazaarData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<BazaarNotebook>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/audio/audio-to-text': {
+        post: {
+            req: AudioToTextData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: TextFromAudioWithCallInfo;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/assimilation': {
+        post: {
+            req: AssimilateData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<MemoryTracker>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/assessment/{assessmentQuestionInstance}/answer': {
+        post: {
+            req: AnswerQuestionData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: AssessmentQuestionInstance;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/assessment/{assessmentAttempt}': {
+        post: {
+            req: SubmitAssessmentResultData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: AssessmentAttempt;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/assessment/questions/{notebook}': {
+        post: {
+            req: GenerateAssessmentQuestionsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: AssessmentAttempt;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/ai/suggest-title/{note}': {
+        post: {
+            req: SuggestTitleData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SuggestedTitleDTO;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/ai/generate-image': {
+        post: {
+            req: GenerateImageData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: AiGeneratedImage;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/user/{user}': {
+        patch: {
+            req: UpdateUserData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: User;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/text_content/{note}/title': {
+        patch: {
+            req: UpdateNoteTitleData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NoteRealm;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/text_content/{note}/details': {
+        patch: {
+            req: UpdateNoteDetailsData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NoteRealm;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
     '/api/notes/{note}': {
         get: {
-            req: {
-                note: number;
-            };
+            req: ShowData;
             res: {
                 /**
                  * OK
@@ -2505,10 +2993,7 @@ export type $OpenApiTs = {
             };
         };
         patch: {
-            req: {
-                formData?: NoteAccessoriesDTO;
-                note: number;
-            };
+            req: UpdateNoteAccessoriesData;
             res: {
                 /**
                  * OK
@@ -2523,9 +3008,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{note}/undo-delete': {
         patch: {
-            req: {
-                note: number;
-            };
+            req: UndoDeleteNoteData;
             res: {
                 /**
                  * OK
@@ -2538,11 +3021,233 @@ export type $OpenApiTs = {
             };
         };
     };
+    '/api/notebooks/{notebook}/move-to-circle/{circle}': {
+        patch: {
+            req: MoveToCircleData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Notebook;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/notebooks/{notebook}/ai-assistant': {
+        get: {
+            req: GetAiAssistantData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NotebookAiAssistant;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+        patch: {
+            req: UpdateAiAssistantData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: NotebookAiAssistant;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/memory-trackers/{memoryTracker}/mark-as-repeated': {
+        patch: {
+            req: MarkAsRepeatedData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: MemoryTracker;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning': {
+        patch: {
+            req: UpdateSuggestedQuestionForFineTuningData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: SuggestedQuestionForFineTuning;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/conversation/{conversationId}/read': {
+        patch: {
+            req: MarkConversationAsReadData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<ConversationMessage>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/wikidata/search/{search}': {
+        get: {
+            req: SearchWikidataData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<WikidataSearchEntity>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/wikidata/entity-data/{wikidataId}': {
+        get: {
+            req: FetchWikidataEntityDataByIdData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: WikidataEntityData;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/user/get-tokens': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<UserToken>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/user/current-user-info': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: CurrentUserInfo;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/testability/github_issues': {
+        get: {
+            res: {
+                /**
+                 * OK
+                 */
+                200: Array<{
+                    [key: string]: {
+                        [key: string]: unknown;
+                    };
+                }>;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/recalls/recalling': {
+        get: {
+            req: RecallingData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: DueMemoryTrackers;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/recalls/overview': {
+        get: {
+            req: OverviewData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: RecallStatus;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/recall-prompts/{recallPrompt}': {
+        get: {
+            req: ShowQuestionData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: AnsweredQuestion;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
+    '/api/recall-prompts/{memoryTracker}/question': {
+        get: {
+            req: AskAquestionData;
+            res: {
+                /**
+                 * OK
+                 */
+                200: RecallPrompt;
+                /**
+                 * Internal Server Error
+                 */
+                500: string;
+            };
+        };
+    };
     '/api/notes/{note}/note-info': {
         get: {
-            req: {
-                note: number;
-            };
+            req: GetNoteInfoData;
             res: {
                 /**
                  * OK
@@ -2557,10 +3262,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{note}/graph': {
         get: {
-            req: {
-                note: number;
-                tokenLimit: number;
-            };
+            req: GetGraphData;
             res: {
                 /**
                  * OK
@@ -2575,9 +3277,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{note}/descendants': {
         get: {
-            req: {
-                note: number;
-            };
+            req: GetDescendantsData;
             res: {
                 /**
                  * OK
@@ -2592,9 +3292,7 @@ export type $OpenApiTs = {
     };
     '/api/notes/{note}/accessory': {
         get: {
-            req: {
-                note: number;
-            };
+            req: ShowNoteAccessoryData;
             res: {
                 /**
                  * OK
@@ -2621,254 +3319,6 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/notes/{note}/semantic-search': {
-        post: {
-            req: {
-                note: number;
-                requestBody: SearchTerm;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteSearchResult>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notes/{note}/search': {
-        post: {
-            req: {
-                note: number;
-                requestBody: SearchTerm;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteSearchResult>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notes/semantic-search': {
-        post: {
-            req: {
-                requestBody: SearchTerm;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteSearchResult>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notes/search': {
-        post: {
-            req: {
-                requestBody: SearchTerm;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteSearchResult>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebook}': {
-        get: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Notebook;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-        post: {
-            req: {
-                notebook: number;
-                requestBody: NotebookSettings;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Notebook;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebook}/update-index': {
-        post: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: unknown;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebook}/share': {
-        post: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Notebook;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebook}/reset-index': {
-        post: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: unknown;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebookId}/obsidian': {
-        post: {
-            req: {
-                formData?: {
-                    /**
-                     * Obsidian zip file to import
-                     */
-                    file: (Blob | File);
-                };
-                /**
-                 * Notebook ID
-                 */
-                notebookId: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: unknown;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/create': {
-        post: {
-            req: {
-                requestBody: NoteCreationDTO;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: RedirectToNoteResponse;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebook}/move-to-circle/{circle}': {
-        patch: {
-            req: {
-                circle: number;
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Notebook;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebooks/{notebook}/ai-assistant': {
-        get: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: NotebookAiAssistant;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-        patch: {
-            req: {
-                notebook: number;
-                requestBody: UpdateAiAssistantRequest;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: NotebookAiAssistant;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
     '/api/notebooks': {
         get: {
             res: {
@@ -2885,9 +3335,7 @@ export type $OpenApiTs = {
     };
     '/api/notebooks/{notebook}/obsidian': {
         get: {
-            req: {
-                notebook: number;
-            };
+            req: DownloadNotebookForObsidianData;
             res: {
                 /**
                  * OK
@@ -2902,9 +3350,7 @@ export type $OpenApiTs = {
     };
     '/api/notebooks/{notebook}/notes': {
         get: {
-            req: {
-                notebook: number;
-            };
+            req: GetNotesData;
             res: {
                 /**
                  * OK
@@ -2919,48 +3365,12 @@ export type $OpenApiTs = {
     };
     '/api/notebooks/{notebook}/dump': {
         get: {
-            req: {
-                notebook: number;
-            };
+            req: DownloadNotebookDumpData;
             res: {
                 /**
                  * OK
                  */
                 200: Array<BareNote>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve': {
-        post: {
-            req: {
-                notebookCertificateApproval: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: NotebookCertificateApproval;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/notebook_certificate_approvals/request-approval/{notebook}': {
-        post: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: NotebookCertificateApproval;
                 /**
                  * Internal Server Error
                  */
@@ -2984,9 +3394,7 @@ export type $OpenApiTs = {
     };
     '/api/notebook_certificate_approvals/for-notebook/{notebook}': {
         get: {
-            req: {
-                notebook: number;
-            };
+            req: GetApprovalForNotebookData;
             res: {
                 /**
                  * OK
@@ -2999,82 +3407,9 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/memory-trackers/{memoryTracker}/self-evaluate': {
-        post: {
-            req: {
-                memoryTracker: number;
-                requestBody: SelfEvaluation;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: MemoryTracker;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/memory-trackers/{memoryTracker}/remove': {
-        post: {
-            req: {
-                memoryTracker: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: MemoryTracker;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/memory-trackers/{memoryTracker}/answer-spelling': {
-        post: {
-            req: {
-                memoryTracker: number;
-                requestBody: AnswerSpellingDTO;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: SpellingResultDTO;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/memory-trackers/{memoryTracker}/mark-as-repeated': {
-        patch: {
-            req: {
-                memoryTracker: number;
-                successful: boolean;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: MemoryTracker;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
     '/api/memory-trackers/{memoryTracker}': {
         get: {
-            req: {
-                memoryTracker: number;
-            };
+            req: Show1Data;
             res: {
                 /**
                  * OK
@@ -3089,9 +3424,7 @@ export type $OpenApiTs = {
     };
     '/api/memory-trackers/{memoryTracker}/spelling-question': {
         get: {
-            req: {
-                memoryTracker: number;
-            };
+            req: GetSpellingQuestionData;
             res: {
                 /**
                  * OK
@@ -3132,138 +3465,13 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/mcp/notes/create': {
-        post: {
-            req: {
-                requestBody: McpNoteAddDTO;
-            };
+    '/api/healthcheck': {
+        get: {
             res: {
                 /**
                  * OK
                  */
-                200: NoteCreationResult;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/links/{link}': {
-        post: {
-            req: {
-                link: number;
-                requestBody: LinkCreation;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteRealm>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/links/move/{sourceNote}/{targetNote}': {
-        post: {
-            req: {
-                requestBody: NoteMoveDTO;
-                sourceNote: number;
-                targetNote: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteRealm>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/links/create/{sourceNote}/{targetNote}': {
-        post: {
-            req: {
-                requestBody: LinkCreation;
-                sourceNote: number;
-                targetNote: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<NoteRealm>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/fine-tuning/{suggestedQuestion}/duplicate': {
-        post: {
-            req: {
-                suggestedQuestion: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: SuggestedQuestionForFineTuning;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/fine-tuning/{suggestedQuestion}/delete': {
-        post: {
-            req: {
-                suggestedQuestion: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: SuggestedQuestionForFineTuning;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/fine-tuning/upload-and-trigger-fine-tuning': {
-        post: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: unknown;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning': {
-        patch: {
-            req: {
-                requestBody: QuestionSuggestionParams;
-                suggestedQuestion: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: SuggestedQuestionForFineTuning;
+                200: string;
                 /**
                  * Internal Server Error
                  */
@@ -3285,84 +3493,15 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/conversation/{conversationId}/send': {
-        post: {
-            req: {
-                conversationId: number;
-                requestBody: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: ConversationMessage;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/conversation/{conversationId}/ai-reply': {
-        post: {
-            req: {
-                conversationId: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: SseEmitter;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/conversation/recall-prompt/{recallPrompt}': {
-        post: {
-            req: {
-                recallPrompt: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Conversation;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/conversation/note/{note}': {
+    '/api/failure-reports': {
         get: {
-            req: {
-                note: number;
-            };
             res: {
                 /**
                  * OK
                  */
-                200: Array<Conversation>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-        post: {
-            req: {
-                note: number;
-                requestBody: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Conversation;
+                200: {
+                    [key: string]: unknown;
+                };
                 /**
                  * Internal Server Error
                  */
@@ -3370,17 +3509,14 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/conversation/assessment-question/{assessmentQuestion}': {
-        post: {
-            req: {
-                assessmentQuestion: number;
-                requestBody: string;
-            };
+    '/api/failure-reports/{failureReport}': {
+        get: {
+            req: Show2Data;
             res: {
                 /**
                  * OK
                  */
-                200: Conversation;
+                200: FailureReportForView;
                 /**
                  * Internal Server Error
                  */
@@ -3388,16 +3524,15 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/conversation/{conversationId}/read': {
-        patch: {
-            req: {
-                conversationId: number;
-            };
+    '/api/data_upgrade': {
+        get: {
             res: {
                 /**
                  * OK
                  */
-                200: Array<ConversationMessage>;
+                200: Array<{
+                    [key: string]: unknown;
+                }>;
                 /**
                  * Internal Server Error
                  */
@@ -3407,9 +3542,7 @@ export type $OpenApiTs = {
     };
     '/api/conversation/{conversationId}': {
         get: {
-            req: {
-                conversationId: number;
-            };
+            req: GetConversationData;
             res: {
                 /**
                  * OK
@@ -3424,9 +3557,7 @@ export type $OpenApiTs = {
     };
     '/api/conversation/{conversationId}/messages': {
         get: {
-            req: {
-                conversationId: number;
-            };
+            req: GetConversationMessagesData;
             res: {
                 /**
                  * OK
@@ -3441,9 +3572,7 @@ export type $OpenApiTs = {
     };
     '/api/conversation/{conversationId}/export': {
         get: {
-            req: {
-                conversationId: number;
-            };
+            req: ExportConversationData;
             res: {
                 /**
                  * OK
@@ -3484,129 +3613,14 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/circles': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<Circle>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-        post: {
-            req: {
-                requestBody: Circle;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Circle;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/circles/{circle}/notebooks': {
-        post: {
-            req: {
-                circle: number;
-                requestBody: NoteCreationDTO;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: RedirectToNoteResponse;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/circles/join': {
-        post: {
-            req: {
-                requestBody: CircleJoiningByInvitation;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Circle;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
     '/api/circles/{circle}': {
         get: {
-            req: {
-                circle: number;
-            };
+            req: ShowCircleData;
             res: {
                 /**
                  * OK
                  */
                 200: CircleForUserView;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/certificate/{notebook}': {
-        get: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Certificate;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-        post: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Certificate;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/bazaar/{bazaarNotebook}/remove': {
-        post: {
-            req: {
-                bazaarNotebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<BazaarNotebook>;
                 /**
                  * Internal Server Error
                  */
@@ -3628,45 +3642,9 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/audio/audio-to-text': {
-        post: {
-            req: {
-                formData?: AudioUploadDTO;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: TextFromAudioWithCallInfo;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/assimilation': {
-        post: {
-            req: {
-                requestBody: InitialInfo;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<MemoryTracker>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
     '/api/assimilation/count': {
         get: {
-            req: {
-                timezone: string;
-            };
+            req: GetAssimilationCountData;
             res: {
                 /**
                  * OK
@@ -3681,66 +3659,12 @@ export type $OpenApiTs = {
     };
     '/api/assimilation/assimilating': {
         get: {
-            req: {
-                timezone: string;
-            };
+            req: AssimilatingData;
             res: {
                 /**
                  * OK
                  */
                 200: Array<Note>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/assessment/{assessmentQuestionInstance}/answer': {
-        post: {
-            req: {
-                assessmentQuestionInstance: number;
-                requestBody: AnswerDTO;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: AssessmentQuestionInstance;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/assessment/{assessmentAttempt}': {
-        post: {
-            req: {
-                assessmentAttempt: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: AssessmentAttempt;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/assessment/questions/{notebook}': {
-        post: {
-            req: {
-                notebook: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: AssessmentAttempt;
                 /**
                  * Internal Server Error
                  */
@@ -3755,40 +3679,6 @@ export type $OpenApiTs = {
                  * OK
                  */
                 200: Array<AssessmentAttempt>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/ai/suggest-title/{note}': {
-        post: {
-            req: {
-                note: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: SuggestedTitleDTO;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/ai/generate-image': {
-        post: {
-            req: {
-                requestBody: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: AiGeneratedImage;
                 /**
                  * Internal Server Error
                  */
@@ -3824,181 +3714,14 @@ export type $OpenApiTs = {
             };
         };
     };
-    '/api/text_content/{note}/title': {
-        patch: {
-            req: {
-                note: number;
-                requestBody: NoteUpdateTitleDTO;
-            };
+    '/api/user/token/{tokenId}': {
+        delete: {
+            req: DeleteTokenData;
             res: {
                 /**
                  * OK
                  */
-                200: NoteRealm;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/text_content/{note}/details': {
-        patch: {
-            req: {
-                note: number;
-                requestBody: NoteUpdateDetailsDTO;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: NoteRealm;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/wikidata/search/{search}': {
-        get: {
-            req: {
-                search: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<WikidataSearchEntity>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/wikidata/entity-data/{wikidataId}': {
-        get: {
-            req: {
-                wikidataId: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: WikidataEntityData;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/user/current-user-info': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: CurrentUserInfo;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/recalls/recalling': {
-        get: {
-            req: {
-                dueindays?: number;
-                timezone: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: DueMemoryTrackers;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/recalls/overview': {
-        get: {
-            req: {
-                timezone: string;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: RecallStatus;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/healthcheck': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: string;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/data_upgrade': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: Array<{
-                    [key: string]: unknown;
-                }>;
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/failure-reports': {
-        get: {
-            res: {
-                /**
-                 * OK
-                 */
-                200: {
-                    [key: string]: unknown;
-                };
-                /**
-                 * Internal Server Error
-                 */
-                500: string;
-            };
-        };
-    };
-    '/api/failure-reports/{failureReport}': {
-        get: {
-            req: {
-                failureReport: number;
-            };
-            res: {
-                /**
-                 * OK
-                 */
-                200: FailureReportForView;
+                200: unknown;
                 /**
                  * Internal Server Error
                  */
@@ -4008,9 +3731,7 @@ export type $OpenApiTs = {
     };
     '/api/failure-reports/delete': {
         delete: {
-            req: {
-                requestBody: Array<(number)>;
-            };
+            req: DeleteFailureReportsData;
             res: {
                 /**
                  * OK
