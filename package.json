@@ -71,7 +71,7 @@
     "got": "^14.6.3",
     "jsdom": "^27.2.0",
     "npm-run-all2": "^8.0.4",
-    "@hey-api/openapi-ts": "0.50.0",
+    "@hey-api/openapi-ts": "0.51.0",
     "process": "^0.11.10",
     "superagent": "^10.2.3",
     "syncpack": "^13.0.4",

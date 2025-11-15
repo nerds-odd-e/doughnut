@@ -43,8 +43,8 @@ importers:
         specifier: 2.3.5
         version: 2.3.5
       '@hey-api/openapi-ts':
-        specifier: 0.50.0
-        version: 0.50.0(typescript@5.9.3)
+        specifier: 0.51.0
+        version: 0.51.0(typescript@5.9.3)
       '@mbtest/mountebank':
         specifier: 2.9.2
         version: 2.9.2
@@ -993,8 +993,8 @@ packages:
   '@hapi/topo@6.0.2':
     resolution: {integrity: sha512-KR3rD5inZbGMrHmgPxsJ9dbi6zEK+C3ZwUwTa+eMwWLz7oijWUTWD2pMSNNYJAU6Qq+65NkxXjqHr/7LM2Xkqg==}
 
-  '@hey-api/openapi-ts@0.50.0':
-    resolution: {integrity: sha512-Nt3Zcv+7evPQm1YZaeT0xbGOQ5PyOUU3jjIGYbUHm9eE7awpyM6BUByTJdZulldqUh829GDhfiU/md2ZQ1VHYw==}
+  '@hey-api/openapi-ts@0.51.0':
+    resolution: {integrity: sha512-ODZyPrUIVeufqPr6A2MEuLlk+UtaPQT40sgDD2OyfpK5gYFXS+/3A11guQoTX+wdgUgM6CR+cNh4MDXAScAlKg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -6100,7 +6100,7 @@ snapshots:
     dependencies:
       '@hapi/hoek': 11.0.7
 
-  '@hey-api/openapi-ts@0.50.0(typescript@5.9.3)':
+  '@hey-api/openapi-ts@0.51.0(typescript@5.9.3)':
     dependencies:
       '@apidevtools/json-schema-ref-parser': 11.6.4
       c12: 1.11.1
