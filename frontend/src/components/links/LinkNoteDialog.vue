@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { Note } from "@generated/backend"
-import { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
 import LinkNoteFinalize from "./LinkNoteFinalize.vue"
 import SearchNote from "../search/SearchNote.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"

@@ -1,4 +1,4 @@
-import { DummyForGeneratingTypes } from "@generated/backend"
+import { DummyForGeneratingTypes as DummyForGeneratingTypesConstants } from "@/managedApi/aiToolNameConstants"
 import { type Suggestion } from "./suggestions"
 
 export type ToolCallResult = {
@@ -133,7 +133,8 @@ export const createAiReplyStates = (
 
               if (
                 functionName ===
-                DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS
+                DummyForGeneratingTypesConstants.aiToolName
+                  .COMPLETE_NOTE_DETAILS
               ) {
                 await context.handleSuggestion({
                   suggestionType: "completion",
@@ -142,7 +143,7 @@ export const createAiReplyStates = (
                 })
               } else if (
                 functionName ===
-                DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE
+                DummyForGeneratingTypesConstants.aiToolName.SUGGEST_NOTE_TITLE
               ) {
                 const { newTitle } = JSON.parse(functionArgs)
                 await context.handleSuggestion({

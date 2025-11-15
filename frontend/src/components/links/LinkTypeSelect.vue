@@ -2,7 +2,10 @@
   <RadioButtons
     :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
-    v-bind="{ scopeName, field, options, errorMessage }"
+    :scope-name="scopeName"
+    :field="field"
+    :options="options"
+    :error-message="errorMessage"
   >
     <template #labelAddition="{ value }">
       <div class="daisy-text-center">
@@ -13,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import { linkTypeOptions } from "../../models/linkTypeOptions"
@@ -23,7 +26,7 @@ import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 const { allowEmpty } = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopology.linkType>,
+    type: String as PropType<NoteTopology["linkType"]>,
     required: true,
   },
   errorMessage: String,
@@ -40,8 +43,8 @@ const options = computed(() => {
     : linkTypeOptions.filter(({ label }) => label !== "no link")
 
   return filteredOptions.map(({ label }) => ({
-    value: label,
-    label,
+    value: label as string,
+    label: label as string,
   }))
 })
 </script>

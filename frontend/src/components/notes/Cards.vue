@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
 import Card from "./Card.vue"
 
 defineProps({

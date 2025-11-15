@@ -37,7 +37,13 @@ export default function BindingHttpRequest(
                 }
               }
 
-              const msg = error.body ? error.body.message : error.message
+              const msg =
+                error.body &&
+                typeof error.body === "object" &&
+                "message" in error.body &&
+                typeof error.body.message === "string"
+                  ? error.body.message
+                  : error.message
               apiStatusHandler.addError(msg)
 
               if (error.status === 400) {

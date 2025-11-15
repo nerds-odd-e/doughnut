@@ -1,7 +1,7 @@
-import { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
 
 interface LinkTypeOption {
-  label: NoteTopology.linkType
+  label: NoteTopology["linkType"]
   reversedLabel: string
 }
 

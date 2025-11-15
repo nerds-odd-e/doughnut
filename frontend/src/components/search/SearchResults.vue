@@ -51,7 +51,7 @@
 
 <script setup lang="ts">
 import type { SearchTerm } from "@generated/backend"
-import { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
 import type { NoteSearchResult } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"

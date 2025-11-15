@@ -42,7 +42,14 @@ export default {
         this.fineTuningDataResultMsg = "Training initiated."
       } catch (error) {
         const errorInstance = error as ApiError
-        this.fineTuningDataResultMsg = errorInstance.body.message
+        const msg =
+          errorInstance.body &&
+          typeof errorInstance.body === "object" &&
+          "message" in errorInstance.body &&
+          typeof errorInstance.body.message === "string"
+            ? errorInstance.body.message
+            : errorInstance.message
+        this.fineTuningDataResultMsg = msg
       }
       this.showAlert = true
     },

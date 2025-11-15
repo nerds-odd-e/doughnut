@@ -1,5 +1,5 @@
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { User } from "@generated/backend/models/User"
+import type { User } from "@generated/backend"
 import ManagedApi from "@/managedApi/ManagedApi"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import createNoteStorage from "@/store/createNoteStorage"

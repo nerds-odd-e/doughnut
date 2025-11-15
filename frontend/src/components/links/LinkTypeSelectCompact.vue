@@ -10,7 +10,7 @@
         <LinkTypeSelect
           v-bind="{
             scopeName,
-            modelValue: modelValue as string as NoteTopology.linkType,
+            modelValue,
             errorMessage,
             allowEmpty,
             field,
@@ -27,7 +27,7 @@
 </template>
 
 <script setup lang="ts">
-import { NoteTopology } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
@@ -39,8 +39,8 @@ import LinkTypeSelect from "./LinkTypeSelect.vue"
 const props = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopology.linkType>,
-    default: () => "no link" as NoteTopology.linkType,
+    type: String as PropType<NoteTopology["linkType"]>,
+    default: () => "no link" as NoteTopology["linkType"],
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },

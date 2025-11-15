@@ -2,10 +2,8 @@ import AiResponse from "@/components/conversations/AiResponse.vue"
 import { expect, vi } from "vitest"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import {
-  DummyForGeneratingTypes,
-  type TitleReplacement,
-} from "@generated/backend"
+import type { TitleReplacement } from "@generated/backend"
+import { DummyForGeneratingTypes as DummyForGeneratingTypesConstants } from "@/managedApi/aiToolNameConstants"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
 
@@ -249,7 +247,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           {
             completion: testCompletion,
           }
@@ -264,7 +262,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: testCompletion, deleteFromEnd: 0 }
         )
       )
@@ -276,7 +274,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: testCompletion, deleteFromEnd: 0 }
         )
       )
@@ -291,7 +289,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: " friends!", deleteFromEnd: 5 }
         )
       )
@@ -309,7 +307,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           { completion: "New content", deleteFromEnd: 20 }
         )
       )
@@ -372,7 +370,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           {
             completion: " friends!",
             deleteFromEnd: 6,
@@ -402,7 +400,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
           {
             completion: "Completely new text",
             deleteFromEnd: 20, // More than "Hello world" length
@@ -440,7 +438,7 @@ describe("ConversationInner", () => {
         await submitMessageAndSimulateRunResponse(
           wrapper,
           createToolCallChunk(
-            DummyForGeneratingTypes.aiToolName.COMPLETE_NOTE_DETAILS,
+            DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
             {
               completion: "test completion",
             }
@@ -467,7 +465,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk(
-          DummyForGeneratingTypes.aiToolName.SUGGEST_NOTE_TITLE,
+          DummyForGeneratingTypesConstants.aiToolName.SUGGEST_NOTE_TITLE,
           <TitleReplacement>{
             newTitle: testTitle,
           }

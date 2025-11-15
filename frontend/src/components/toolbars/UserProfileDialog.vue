@@ -54,7 +54,8 @@ const processForm = async () => {
   const updated = await managedApi.restUserController
     .updateUser(formData.value.id, formData.value)
     .catch((err) => {
-      errors.value = err
+      errors.value = err as Record<string, string>
+      return undefined
     })
   emits("user-updated", updated)
 }

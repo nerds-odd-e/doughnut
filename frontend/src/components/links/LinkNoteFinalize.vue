@@ -26,7 +26,9 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import type { Note } from "@generated/backend"
-import { LinkCreation, NoteTopology } from "@generated/backend"
+import type { LinkCreation } from "@generated/backend"
+import type { NoteTopology } from "@generated/backend"
+import { NoteTopology as NoteTopologyConstants } from "@/managedApi/linkTypeConstants"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"
@@ -50,7 +52,7 @@ const props = defineProps({
 const emit = defineEmits(["success", "goBack"])
 
 const formData = ref<LinkCreation>({
-  linkType: NoteTopology.linkType.NO_LINK,
+  linkType: NoteTopologyConstants.linkType.NO_LINK,
 })
 
 const linkFormErrors = ref({
@@ -69,7 +71,7 @@ const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
   }
 
   try {
-    if (linkType !== NoteTopology.linkType.NO_LINK) {
+    if (linkType !== NoteTopologyConstants.linkType.NO_LINK) {
       await props.storageAccessor
         .storedApi()
         .createLink(props.note.id, props.targetNoteTopology.id, {

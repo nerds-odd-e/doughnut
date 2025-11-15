@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { LinkCreation, NoteTopology } from "@generated/backend"
+import type { LinkCreation, NoteTopology } from "@generated/backend"
 import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"

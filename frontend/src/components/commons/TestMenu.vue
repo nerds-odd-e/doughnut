@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import type { User } from "@generated/backend"
-import { Randomization } from "@generated/backend"
+import type { Randomization } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -57,7 +57,7 @@ export default defineComponent({
   },
   data() {
     return {
-      randomSelector: "seed" as Randomization.choose,
+      randomSelector: "seed" as Randomization["choose"],
       seed: 0,
     }
   },

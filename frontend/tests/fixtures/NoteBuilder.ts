@@ -1,5 +1,8 @@
-import type { Note, NoteRealm } from "@generated/backend"
-import { NoteTopology } from "@generated/backend"
+import type {
+  Note,
+  NoteRealm,
+  NoteTopology as NoteTopologyType,
+} from "@generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
 
@@ -69,7 +72,7 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  linkType(value: NoteTopology.linkType): NoteBuilder {
+  linkType(value: NoteTopologyType["linkType"]): NoteBuilder {
     this.topicConstructor(`:${value}`)
     // default target
     this.data.noteTopology.objectNoteTopology = {
