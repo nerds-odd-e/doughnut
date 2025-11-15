@@ -130,20 +130,23 @@ const testability = () => {
       this.shareToBazaar(notebook)
     },
     injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
-      cy.get(`@${injectedNoteIdMapAliasName}`).then((injectedNoteIdMap) => {
-        expect(injectedNoteIdMap).haveOwnPropertyDescriptor(fromNoteTopic)
-        expect(injectedNoteIdMap).haveOwnPropertyDescriptor(toNoteTopic)
-        const fromNoteId = injectedNoteIdMap[fromNoteTopic]
-        const toNoteId = injectedNoteIdMap[toNoteTopic]
+      return cy
+        .get(`@${injectedNoteIdMapAliasName}`)
+        .then((injectedNoteIdMap) => {
+          expect(injectedNoteIdMap).to.have.property(fromNoteTopic)
+          expect(injectedNoteIdMap).to.have.property(toNoteTopic)
+          const fromNoteId = injectedNoteIdMap[fromNoteTopic]
+          const toNoteId = injectedNoteIdMap[toNoteTopic]
 
-        const requestBody = {
-          type,
-          source_id: fromNoteId.toString(),
-          target_id: toNoteId.toString(),
-        }
+          const requestBody = {
+            type,
+            source_id: fromNoteId.toString(),
+            target_id: toNoteId.toString(),
+          }
 
-        return Services.linkNotes({ requestBody })
-      })
+          const promise = Services.linkNotes({ requestBody })
+          return cy.wrap(promise)
+        })
     },
 
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
@@ -177,7 +180,7 @@ const testability = () => {
           expect(
             injectedNoteIdMap,
             `"${noteTopology}" is not in the injected note. Did you created during the test?`
-          ).haveOwnPropertyDescriptor(noteTopology)
+          ).to.have.property(noteTopology)
           return injectedNoteIdMap[noteTopology]
         })
     },
