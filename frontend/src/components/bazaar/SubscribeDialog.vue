@@ -46,8 +46,11 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.managedApi.restSubscriptionController
-        .createSubscription(this.notebook.id, this.formData)
+      this.managedApi.services
+        .createSubscription({
+          notebook: this.notebook.id,
+          requestBody: this.formData,
+        })
         .then(() => {
           this.$emit("closeDialog")
           this.$router.push({ name: "notebooks" })

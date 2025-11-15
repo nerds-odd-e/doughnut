@@ -16,8 +16,10 @@ describe("RecentlyLearnedNotes", () => {
   ]
 
   beforeEach(() => {
-    helper.managedApi.restMemoryTrackerController.getRecentMemoryTrackers =
-      vitest.fn().mockResolvedValue(mockMemoryTrackers)
+    vi.spyOn(
+      helper.managedApi.services,
+      "getRecentMemoryTrackers"
+    ).mockResolvedValue(mockMemoryTrackers)
   })
 
   it("fetches and displays recent memory trackers", async () => {
@@ -26,9 +28,7 @@ describe("RecentlyLearnedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(
-      helper.managedApi.restMemoryTrackerController.getRecentMemoryTrackers
-    ).toBeCalled()
+    expect(helper.managedApi.services.getRecentMemoryTrackers).toBeCalled()
 
     // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")

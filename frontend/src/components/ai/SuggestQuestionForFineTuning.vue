@@ -60,10 +60,10 @@ const emit = defineEmits(["closeDialog"])
 const { predefinedQuestion } = props
 
 async function suggestQuestionForFineTuning() {
-  await managedApi.restPredefinedQuestionController.suggestQuestionForFineTuning(
-    predefinedQuestion.id,
-    params.value
-  )
+  await managedApi.services.suggestQuestionForFineTuning({
+    predefinedQuestion: predefinedQuestion.id,
+    requestBody: params.value,
+  })
   emit("closeDialog")
 }
 </script>

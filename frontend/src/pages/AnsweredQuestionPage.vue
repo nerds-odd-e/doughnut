@@ -28,8 +28,9 @@ const { recallPromptId } = defineProps({
 const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
-  answeredQuestion.value =
-    await managedApi.restRecallPromptController.showQuestion(recallPromptId)
+  answeredQuestion.value = await managedApi.services.showQuestion({
+    recallPrompt: recallPromptId,
+  })
 }
 
 watch(() => recallPromptId, fetchData, { immediate: true })

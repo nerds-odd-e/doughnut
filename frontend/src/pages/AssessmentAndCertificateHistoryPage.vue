@@ -83,8 +83,7 @@ const filteredAssessmentHistories = computed(() => {
 })
 
 onMounted(async () => {
-  assessmentHistories.value =
-    await managedApi.restAssessmentController.getMyAssessments()
+  assessmentHistories.value = await managedApi.services.getMyAssessments()
 })
 </script>
 

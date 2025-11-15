@@ -107,8 +107,8 @@ const initialReviewDone = () => {
 }
 
 const loadInitialReview = () => {
-  managedApi.restAssimilationController
-    .assimilating(timezoneParam())
+  managedApi.services
+    .assimilating({ timezone: timezoneParam() })
     .then((resp) => {
       notes.value = resp
       setDueCount(resp.length)

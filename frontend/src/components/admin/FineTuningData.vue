@@ -38,7 +38,7 @@ export default {
     },
     async triggerFineTuning() {
       try {
-        await this.managedApi.restFineTuningDataController.uploadAndTriggerFineTuning()
+        await this.managedApi.services.uploadAndTriggerFineTuning()
         this.fineTuningDataResultMsg = "Training initiated."
       } catch (error) {
         const errorInstance = error as ApiError
@@ -58,7 +58,7 @@ export default {
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
     this.suggestedQuestions =
-      await this.managedApi.restFineTuningDataController.getAllSuggestedQuestions()
+      await this.managedApi.services.getAllSuggestedQuestions()
   },
 }
 </script>

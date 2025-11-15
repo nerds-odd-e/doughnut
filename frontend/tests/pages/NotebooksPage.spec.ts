@@ -7,15 +7,11 @@ describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please()
 
-    helper.managedApi.restNotebookController.myNotebooks = vi
-      .fn()
-      .mockResolvedValue({
-        notebooks: [notebook],
-        subscriptions: [],
-      })
+    vi.spyOn(helper.managedApi.services, "myNotebooks").mockResolvedValue({
+      notebooks: [notebook],
+      subscriptions: [],
+    } as never)
     helper.component(NotebooksPage).withRouter().render()
-    expect(
-      helper.managedApi.restNotebookController.myNotebooks
-    ).toBeCalledTimes(1)
+    expect(helper.managedApi.services.myNotebooks).toBeCalledTimes(1)
   })
 })

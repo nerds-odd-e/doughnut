@@ -24,10 +24,9 @@ const loaded = ref(false)
 const approval = ref<NotebookCertificateApproval | undefined>()
 
 onMounted(async () => {
-  approval.value =
-    await managedApi.restNotebookCertificateApprovalController.getApprovalForNotebook(
-      props.notebook.id
-    )
+  approval.value = await managedApi.services.getApprovalForNotebook({
+    notebook: props.notebook.id,
+  })
   loaded.value = true
 })
 
@@ -55,10 +54,9 @@ const isApprovalButtonDisabled = computed(() => {
   return approval.value !== undefined
 })
 const requestNotebookApproval = async () => {
-  approval.value =
-    await managedApi.restNotebookCertificateApprovalController.requestApprovalForNotebook(
-      props.notebook.id
-    )
+  approval.value = await managedApi.services.requestApprovalForNotebook({
+    notebook: props.notebook.id,
+  })
 }
 </script>
 

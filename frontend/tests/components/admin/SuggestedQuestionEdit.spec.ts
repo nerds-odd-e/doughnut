@@ -18,14 +18,18 @@ describe("Edit Suggested Question", () => {
     })
 
     it("call the api to make update", async () => {
-      helper.managedApi.restFineTuningDataController.updateSuggestedQuestionForFineTuning =
-        vi.fn().mockResolvedValue({})
+      const mockUpdate = vi
+        .spyOn(
+          helper.managedApi.services,
+          "updateSuggestedQuestionForFineTuning"
+        )
+        .mockResolvedValue({} as never)
       wrapper.get("button.daisy-btn-success").trigger("click")
       await flushPromises()
-      expect(
-        helper.managedApi.restFineTuningDataController
-          .updateSuggestedQuestionForFineTuning
-      ).toHaveBeenCalledWith(1357, expect.anything())
+      expect(mockUpdate).toHaveBeenCalledWith({
+        suggestedQuestion: 1357,
+        requestBody: expect.anything(),
+      })
     })
 
     it("requires more than 1 choice", async () => {

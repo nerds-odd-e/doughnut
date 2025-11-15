@@ -69,7 +69,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 const circle = ref<CircleForUserView | undefined>(undefined)
 
 const fetchData = async () => {
-  circle.value = await managedApi.restCircleController.showCircle(circleId)
+  circle.value = await managedApi.services.showCircle({ circle: circleId })
 }
 
 const invitationUrl = computed(() => {

@@ -15,9 +15,10 @@ describe("assessment and certificate history page", () => {
   let wrapper
 
   beforeEach(() => {
-    helper.managedApi.restAssessmentController.getMyAssessments = vi
-      .fn()
-      .mockResolvedValue([assessmentForArt, assessmentForTech])
+    vi.spyOn(helper.managedApi.services, "getMyAssessments").mockResolvedValue([
+      assessmentForArt,
+      assessmentForTech,
+    ])
     wrapper = helper
       .component(AssessmentAndCertificateHistoryPage)
       .withCurrentUser(user)
@@ -25,9 +26,7 @@ describe("assessment and certificate history page", () => {
   })
 
   it("calls API ONCE on mount", async () => {
-    expect(
-      helper.managedApi.restAssessmentController.getMyAssessments
-    ).toBeCalledTimes(1)
+    expect(helper.managedApi.services.getMyAssessments).toBeCalledTimes(1)
   })
 
   it("should have two items in the list", async () => {

@@ -25,8 +25,9 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    helper.managedApi.restTextContentController.updateNoteTitle =
+    vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockImplementation(
       mockedUpdateTitleCall
+    )
   })
 
   afterEach(() => {
@@ -88,8 +89,9 @@ describe("in place edit on title", () => {
     titleEl.innerText = "updated"
     titleEl.dispatchEvent(new Event("input"))
     wrapper.unmount()
-    expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
-      newTitle: "updated",
+    expect(mockedUpdateTitleCall).toBeCalledWith({
+      note: note.id,
+      requestBody: { newTitle: "updated" },
     })
   })
 
@@ -117,8 +119,9 @@ describe("in place edit on title", () => {
     await editTitle(wrapper, "updated")
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.dispatchEvent(new Event("blur"))
-    expect(mockedUpdateTitleCall).toBeCalledWith(note.id, {
-      newTitle: "updated",
+    expect(mockedUpdateTitleCall).toBeCalledWith({
+      note: note.id,
+      requestBody: { newTitle: "updated" },
     })
   })
 
@@ -151,8 +154,11 @@ describe("in place edit on title", () => {
     await flushPromises()
 
     // API call should have been made
-    expect(mockedUpdateTitleCall).toHaveBeenCalledWith(note.id, {
-      newTitle: "ABC",
+    expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
+      note: note.id,
+      requestBody: {
+        newTitle: "ABC",
+      },
     })
 
     // User continues typing to "ABCDEF" while API is in flight

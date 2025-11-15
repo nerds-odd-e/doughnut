@@ -22,9 +22,10 @@ describe("RecentlyReviewedNotes", () => {
   ]
 
   beforeEach(() => {
-    helper.managedApi.restMemoryTrackerController.getRecentlyReviewed = vitest
-      .fn()
-      .mockResolvedValue(mockMemoryTrackers)
+    vi.spyOn(
+      helper.managedApi.services,
+      "getRecentlyReviewed"
+    ).mockResolvedValue(mockMemoryTrackers)
   })
 
   it("fetches and displays recently reviewed points", async () => {
@@ -33,9 +34,7 @@ describe("RecentlyReviewedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(
-      helper.managedApi.restMemoryTrackerController.getRecentlyReviewed
-    ).toBeCalled()
+    expect(helper.managedApi.services.getRecentlyReviewed).toBeCalled()
 
     // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")

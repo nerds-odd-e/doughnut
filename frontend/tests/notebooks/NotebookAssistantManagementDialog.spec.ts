@@ -19,11 +19,17 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   beforeEach(() => {
     global.URL.createObjectURL = vitest.fn()
     global.URL.revokeObjectURL = vitest.fn()
-    helper.managedApi.restNotebookController.downloadNotebookDump = mockedDump
-    helper.managedApi.restNotebookController.updateAiAssistant =
-      mockedUpdateAiAssistant
-    helper.managedApi.restNotebookController.getAiAssistant =
+    vi.spyOn(
+      helper.managedApi.services,
+      "downloadNotebookDump"
+    ).mockImplementation(mockedDump)
+    vi.spyOn(
+      helper.managedApi.services,
+      "updateAiAssistant"
+    ).mockImplementation(mockedUpdateAiAssistant)
+    vi.spyOn(helper.managedApi.services, "getAiAssistant").mockImplementation(
       mockedGetAiAssistant
+    )
     mockedGetAiAssistant.mockResolvedValue(null) // default to no existing settings
     wrapper = helper
       .component(NotebookAssistantManagementDialog)
@@ -47,8 +53,11 @@ describe("NotebookAssistantManagementDialog.vue", () => {
         .setValue(instructions)
       await wrapper.find("form").trigger("submit")
 
-      expect(mockedUpdateAiAssistant).toHaveBeenCalledWith(notebook.id, {
-        additionalInstructions: instructions,
+      expect(mockedUpdateAiAssistant).toHaveBeenCalledWith({
+        notebook: notebook.id,
+        requestBody: {
+          additionalInstructions: instructions,
+        },
       })
     })
   })

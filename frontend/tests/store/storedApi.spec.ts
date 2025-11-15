@@ -16,13 +16,13 @@ describe("storedApiCollection", () => {
 
     beforeEach(() => {
       deleteNote = vi.fn().mockResolvedValue(note)
-      managedApi.restNoteController.deleteNote = deleteNote
+      vi.spyOn(managedApi.services, "deleteNote").mockImplementation(deleteNote)
     })
 
     it("should call the api", async () => {
       await sa.deleteNote(router, note.id)
       expect(deleteNote).toHaveBeenCalledTimes(1)
-      expect(deleteNote).toHaveBeenCalledWith(note.id)
+      expect(deleteNote).toHaveBeenCalledWith({ note: note.id })
       expect(routerReplace).toHaveBeenCalledTimes(1)
     })
   })
@@ -35,8 +35,10 @@ describe("storedApiCollection", () => {
     beforeEach(() => {
       updateNoteDetails = vi.fn().mockResolvedValue(note)
       showNote = vi.fn().mockResolvedValue(note)
-      managedApi.restTextContentController.updateNoteDetails = updateNoteDetails
-      managedApi.restNoteController.show = showNote
+      vi.spyOn(managedApi.services, "updateNoteDetails").mockImplementation(
+        updateNoteDetails
+      )
+      vi.spyOn(managedApi.services, "show").mockImplementation(showNote)
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 
@@ -53,8 +55,11 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 0,
       })
 
-      expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
-        details: "Hello world!",
+      expect(updateNoteDetails).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          details: "Hello world!",
+        },
       })
     })
 
@@ -66,8 +71,11 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 5,
       })
 
-      expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
-        details: "Hello !",
+      expect(updateNoteDetails).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          details: "Hello !",
+        },
       })
     })
 
@@ -79,9 +87,12 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 0,
       })
 
-      expect(showNote).toHaveBeenCalledWith(note.id)
-      expect(updateNoteDetails).toHaveBeenCalledWith(note.id, {
-        details: "<p>Desc</p>world!",
+      expect(showNote).toHaveBeenCalledWith({ note: note.id })
+      expect(updateNoteDetails).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          details: "<p>Desc</p>world!",
+        },
       })
     })
   })

@@ -39,8 +39,8 @@ export default defineComponent({
 
   methods: {
     processForm() {
-      this.managedApi.restCircleController
-        .joinCircle(this.formData)
+      this.managedApi.services
+        .joinCircle({ requestBody: this.formData })
         .then((res) => {
           this.$router.push({
             name: "circleShow",

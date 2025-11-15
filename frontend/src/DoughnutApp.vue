@@ -51,9 +51,8 @@ onMounted(async () => {
   environment.value = getEnvironment()
   featureToggle.value =
     environment.value === "testing" &&
-    (await managedApi.testabilityRestController.getFeatureToggle())
-  const userInfo =
-    await managedApi.restCurrentUserInfoController.currentUserInfo()
+    (await managedApi.services.getFeatureToggle())
+  const userInfo = await managedApi.services.currentUserInfo()
   user.value = userInfo.user
   externalIdentifier.value = userInfo.externalIdentifier
   userLoaded.value = true

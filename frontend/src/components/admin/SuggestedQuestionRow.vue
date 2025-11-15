@@ -65,10 +65,9 @@ export default {
   },
   methods: {
     async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
-      const duplicated =
-        await this.managedApi.restFineTuningDataController.duplicate(
-          suggested.id
-        )
+      const duplicated = await this.managedApi.services.duplicate({
+        suggestedQuestion: suggested.id,
+      })
       this.$emit("duplicated", duplicated)
     },
     chatStarter() {
@@ -80,7 +79,9 @@ export default {
           `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.stem})?`
         )
       ) {
-        await this.managedApi.restFineTuningDataController.delete(suggested.id)
+        await this.managedApi.services.delete_({
+          suggestedQuestion: suggested.id,
+        })
       }
     },
   },

@@ -63,8 +63,11 @@ export default defineComponent({
         ...formData.value,
         ...newValue,
       }
-      managedApi.restNoteController
-        .updateRecallSetting(props.noteId, formData.value)
+      managedApi.services
+        .updateRecallSetting({
+          note: props.noteId,
+          requestBody: formData.value,
+        })
         .then(() => {
           if (newValue.level !== undefined) {
             emit("levelChanged", newValue.level)

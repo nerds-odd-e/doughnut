@@ -11,14 +11,15 @@ describe("circle show page", () => {
   const circle2 = makeMe.aCircle.please()
 
   beforeEach(() => {
-    helper.managedApi.restCircleController.index = vi
-      .fn()
-      .mockResolvedValue([circle1, circle2])
+    vi.spyOn(helper.managedApi.services, "index").mockResolvedValue([
+      circle1,
+      circle2,
+    ])
   })
 
   it("fetch API to be called ONCE on mount", async () => {
     helper.component(NotebookMoveDialog).withProps({ notebook }).render()
-    expect(helper.managedApi.restCircleController.index).toBeCalled()
+    expect(helper.managedApi.services.index).toBeCalled()
   })
 
   it("filters the current circle", async () => {

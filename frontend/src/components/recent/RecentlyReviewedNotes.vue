@@ -41,8 +41,7 @@ const { managedApi } = useLoadingApi()
 const memoryTrackers = ref<MemoryTracker[] | undefined>(undefined)
 
 const fetchData = async () => {
-  memoryTrackers.value =
-    await managedApi.restMemoryTrackerController.getRecentlyReviewed()
+  memoryTrackers.value = await managedApi.services.getRecentlyReviewed()
 }
 
 onMounted(() => {

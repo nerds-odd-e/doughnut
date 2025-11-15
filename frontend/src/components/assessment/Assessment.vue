@@ -68,9 +68,9 @@ const checkIfQuizComplete = async () => {
     assessmentQuestionInstance.value.length > 0
   ) {
     localAssessmentAttempt.value =
-      await managedApi.restAssessmentController.submitAssessmentResult(
-        props.assessmentAttempt.id
-      )
+      await managedApi.services.submitAssessmentResult({
+        assessmentAttempt: props.assessmentAttempt.id,
+      })
   }
 }
 </script>
