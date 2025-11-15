@@ -36,20 +36,22 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
+import type { FailureReport } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi()
   },
   components: { ContainerPage },
   data() {
     return {
-      failureReports: null,
-      errorMessage: null,
-      selectedFailureReports: [],
+      failureReports: null as FailureReport[] | null,
+      errorMessage: null as string | null,
+      selectedFailureReports: [] as number[],
     }
   },
   methods: {
@@ -57,9 +59,9 @@ export default {
       this.managedApi.restFailureReportController
         .failureReports()
         .then((res) => {
-          this.failureReports = res
+          this.failureReports = res as unknown as FailureReport[]
         })
-        .catch((err) => {
+        .catch((err: { status?: number }) => {
           if (err.status === 401) {
             throw err
           }
@@ -77,7 +79,7 @@ export default {
           this.fetchData()
           this.selectedFailureReports = []
         })
-        .catch((err) => {
+        .catch((err: { status?: number }) => {
           if (err.status === 401) {
             throw err
           }
@@ -88,5 +90,5 @@ export default {
   mounted() {
     this.fetchData()
   },
-}
+})
 </script>

@@ -6,7 +6,7 @@
       </template>
       <SubscriptionEditDialog
         :subscription="subscription"
-        @done="doneHandler($event)"
+        @done="doneHandler()"
       />
     </PopButton>
     <button class="daisy-btn daisy-btn-sm" title="Unsubscribe" @click="processForm()">
@@ -15,7 +15,9 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, type PropType } from "vue"
+import type { Subscription } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
@@ -23,11 +25,16 @@ import SvgEdit from "../svgs/SvgEdit.vue"
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue"
 import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
 
-export default {
+export default defineComponent({
   setup() {
     return { ...useLoadingApi(), ...usePopups() }
   },
-  props: { subscription: Object },
+  props: {
+    subscription: {
+      type: Object as PropType<Subscription>,
+      required: true,
+    },
+  },
   emits: ["updated"],
   components: { SvgUnsubscribe, PopButton, SvgEdit, SubscriptionEditDialog },
   methods: {
@@ -42,6 +49,9 @@ export default {
           })
       }
     },
+    doneHandler() {
+      this.$emit("updated")
+    },
   },
-}
+})
 </script>

@@ -14,7 +14,8 @@
     <NotebookCardsWithButtons v-if="subscriptions" :notebooks="subscriptions?.map((s) => s.notebook!)">
       <template #default="{ notebook }">
         <SubscriptionNoteButtons
-          :subscription="subscriptions.find((s) => s.notebook === notebook)"
+          v-if="subscriptions?.find((s) => s.notebook === notebook)"
+          :subscription="subscriptions.find((s) => s.notebook === notebook)!"
           @updated="fetchData()"
         />
       </template>

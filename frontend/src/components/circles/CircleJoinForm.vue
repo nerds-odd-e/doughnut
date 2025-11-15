@@ -12,22 +12,28 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue"
+import type { Circle, CircleJoiningByInvitation } from "@generated/backend"
 import TextInput from "@/components/form/TextInput.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi()
   },
   components: { TextInput },
-  props: { invitationCode: Number },
+  props: {
+    invitationCode: Number,
+  },
 
   data() {
     return {
-      circle: null,
-      formData: { invitationCode: this.invitationCode },
-      errors: {},
+      circle: null as Circle | null,
+      formData: {
+        invitationCode: this.invitationCode?.toString() ?? "",
+      } as CircleJoiningByInvitation,
+      errors: {} as Record<string, string>,
     }
   },
 
@@ -41,8 +47,8 @@ export default {
             params: { circleId: res.id },
           })
         })
-        .catch((err) => (this.errors = err))
+        .catch((err) => (this.errors = err as Record<string, string>))
     },
   },
-}
+})
 </script>

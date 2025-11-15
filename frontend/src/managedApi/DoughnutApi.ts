@@ -1216,6 +1216,31 @@ class RestSubscriptionControllerServiceInstance extends ServiceInstance {
       errors: { 500: "Internal Server Error" },
     })
   }
+
+  update(
+    subscription: number,
+    requestBody: Types.UpdateData["requestBody"]
+  ): CancelablePromise<Types.UpdateResponse> {
+    return this.httpRequest.request<Types.UpdateResponse>({
+      method: "POST",
+      url: "/api/subscriptions/{subscription}",
+      path: { subscription },
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  delete(
+    subscription: number
+  ): CancelablePromise<Types.DestroySubscriptionResponse> {
+    return this.httpRequest.request<Types.DestroySubscriptionResponse>({
+      method: "POST",
+      url: "/api/subscriptions/{subscription}/delete",
+      path: { subscription },
+      errors: { 500: "Internal Server Error" },
+    })
+  }
 }
 
 class RestCertificateControllerServiceInstance extends ServiceInstance {

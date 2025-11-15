@@ -4,13 +4,15 @@
   </ContainerPage>
 </template>
 
-<script lang="js">
+<script lang="ts">
+import { defineComponent } from "vue"
+import type { RouteLocationNormalized, NavigationGuardNext } from "vue-router"
 import CircleJoinForm from "@/components/circles/CircleJoinForm.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi()
   },
@@ -18,10 +20,17 @@ export default {
   props: {
     invitationCode: Number,
   },
-  beforeRouteEnter(_to, _from, next) {
+  beforeRouteEnter(
+    _to: RouteLocationNormalized,
+    _from: RouteLocationNormalized,
+    next: NavigationGuardNext
+  ) {
     next(async (vm) => {
+      const component = vm as unknown as {
+        managedApi: ReturnType<typeof useLoadingApi>["managedApi"]
+      }
       const x =
-        await vm.managedApi.restCurrentUserInfoController.currentUserInfo()
+        await component.managedApi.restCurrentUserInfoController.currentUserInfo()
       if (!x?.user) {
         loginOrRegisterAndHaltThisThread()
         next(false)
@@ -29,5 +38,5 @@ export default {
       next()
     })
   },
-}
+})
 </script>
