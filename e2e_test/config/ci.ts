@@ -11,6 +11,6 @@ export default defineConfig({
   watchForFileChanges: false,
   e2e: {
     ...commonConfig.e2e,
-    baseUrl: 'http://localhost:9081',
+    baseUrl: 'http://localhost:5173',
   },
 })
