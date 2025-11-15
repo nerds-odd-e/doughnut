@@ -48,9 +48,9 @@ export const loginActions = {
   },
 
   reloginAndEnsureHomePage(username: string) {
-    const result = this.reloginAs(username)
+    const loginPromise = this.reloginAs(username)
     cy.visit('/')
-    return result
+    return loginPromise
   },
 
   loginAsAdmin() {

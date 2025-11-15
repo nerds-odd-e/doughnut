@@ -36,12 +36,14 @@ Then(
 Then(
   '{string} can see the conversation with {string} for the subject {string} in the message center:',
   (user: string, partner: string, subject: string, data: DataTable) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .navigateToMessageCenter()
-      .expectConversation(subject, partner)
-      .conversation(subject)
-      .expectMessage(data.hashes()[0]!.message!)
+    const loginResult = start.reloginAndEnsureHomePage(user)
+    cy.wrap(loginResult).then(() => {
+      start
+        .navigateToMessageCenter()
+        .expectConversation(subject, partner)
+        .conversation(subject)
+        .expectMessage(data.hashes()[0]!.message!)
+    })
   }
 )
 
@@ -58,10 +60,10 @@ Then(
 Then(
   'there should be no unread message for the user {string}',
   (user: string) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .messageCenterIndicator()
-      .expectNoCount()
+    const loginResult = start.reloginAndEnsureHomePage(user)
+    cy.wrap(loginResult).then(() => {
+      start.messageCenterIndicator().expectNoCount()
+    })
   }
 )
 
@@ -72,20 +74,20 @@ Then('I should have no unread messages', () => {
 Then(
   '{string} should have {int} unread messages',
   (user: string, unreadMessageCount: number) => {
-    start
-      .reloginAndEnsureHomePage(user)
-      .messageCenterIndicator()
-      .expectCount(unreadMessageCount)
+    const loginResult = start.reloginAndEnsureHomePage(user)
+    cy.wrap(loginResult).then(() => {
+      start.messageCenterIndicator().expectCount(unreadMessageCount)
+    })
   }
 )
 
 When(
   '{string} start a conversation about the note {string} with a message {string}',
   (externalIdentifier: string, note: string, conversation: string) => {
-    start
-      .reloginAndEnsureHomePage(externalIdentifier)
-      .jumpToNotePage(note)
-      .sendMessageToNoteOwner(conversation)
+    const loginResult = start.reloginAndEnsureHomePage(externalIdentifier)
+    cy.wrap(loginResult).then(() => {
+      start.jumpToNotePage(note).sendMessageToNoteOwner(conversation)
+    })
   }
 )
 
