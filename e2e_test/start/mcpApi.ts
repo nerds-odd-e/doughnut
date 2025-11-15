@@ -1,6 +1,8 @@
 import type { McpNoteAddDTO } from '@generated/backend'
 import type { NoteCreationDTO } from '@generated/backend'
-import { extractRequestConfig } from './utils/apiConfigExtractor'
+import * as Services from '@generated/backend/services.gen'
+import { OpenAPI } from '@generated/backend/core/OpenAPI'
+import { ApiError } from '@generated/backend/core/ApiError'
 
 const mcpApi = () => {
   return {
@@ -12,21 +14,27 @@ const mcpApi = () => {
             noteCreationDTO,
           }
 
-          // Extract the request configuration from DoughnutApi
-          const config = extractRequestConfig((api) => {
-            return api.mcpNoteCreationController.createNote1(requestBody)
-          })
+          // Set token in OpenAPI config for this request
+          const originalToken = OpenAPI.TOKEN
+          OpenAPI.TOKEN = typeof token === 'string' ? token : String(token)
 
-          const req = {
-            method: config.method,
-            url: config.url,
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            body: requestBody,
-            failOnStatusCode: false,
-          }
-          return cy.request(req)
+          // Call the service directly - it will use cy.request via our custom request function
+          return Services.createNote1({ requestBody })
+            .then(() => {
+              // Success - return 200 status
+              return { status: 200, body: {} }
+            })
+            .catch((error) => {
+              // Extract status from ApiError
+              if (error instanceof ApiError) {
+                return { status: error.status, body: error.body || {} }
+              }
+              throw error
+            })
+            .finally(() => {
+              // Restore original token
+              OpenAPI.TOKEN = originalToken
+            })
         })
       }
 

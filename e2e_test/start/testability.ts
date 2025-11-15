@@ -9,26 +9,24 @@ import type { TimeTravel } from '@generated/backend'
 import type { TimeTravelRelativeToNow } from '@generated/backend'
 import type { SuggestedQuestionsData } from '@generated/backend'
 import type { NotesTestData } from '@generated/backend'
-import { extractRequestConfig } from './utils/apiConfigExtractor'
+import * as Services from '@generated/backend/services.gen'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
 }
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
-  const config = extractRequestConfig((api) => {
-    return api.testabilityRestController.resetDbAndTestabilitySettings()
-  })
-
-  cy.request({
-    method: config.method,
-    url: config.url,
-    failOnStatusCode: countdown === 1,
-  }).then((response) => {
-    if (countdown > 0 && response.status !== 200) {
-      cleanAndReset(cy, countdown - 1)
-    }
-  })
+  Services.resetDbAndTestabilitySettings()
+    .then(() => {
+      // Success
+    })
+    .catch((error) => {
+      if (countdown > 0) {
+        cleanAndReset(cy, countdown - 1)
+      } else {
+        throw error
+      }
+    })
 }
 
 const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
@@ -41,17 +39,8 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.enableFeatureToggle({
-          enabled: enabled.toString(),
-        })
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: { enabled: enabled.toString() },
-        failOnStatusCode: true,
+      return Services.enableFeatureToggle({
+        requestBody: { enabled: enabled.toString() },
       })
     },
 
@@ -62,32 +51,22 @@ const testability = () => {
     ) {
       const requestBody: NotesTestData = {
         externalIdentifier,
-        circleName,
+        circleName: circleName ?? undefined,
         noteTestData,
       }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.injectNotes(requestBody)
+      return Services.injectNotes({ requestBody }).then((response) => {
+        const expectedCount = noteTestData.length
+        const actualCount = Object.keys(response).length
+        expect(
+          actualCount,
+          `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
+        ).to.equal(expectedCount)
+        cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+          const mergedMap = { ...existingMap, ...response }
+          cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
+        })
       })
-
-      return cy
-        .request({
-          method: config.method,
-          url: config.url,
-          body: requestBody,
-        })
-        .then((response) => {
-          const expectedCount = noteTestData.length
-          const actualCount = Object.keys(response.body).length
-          expect(
-            actualCount,
-            `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
-          ).to.equal(expectedCount)
-          cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-            const mergedMap = { ...existingMap, ...response.body }
-            cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
-          })
-        })
     },
     injectNumberNotes(
       notebook: string,
@@ -106,18 +85,10 @@ const testability = () => {
     injectPredefinedQuestionsToNotebook(
       predefinedQuestionsTestData: PredefinedQuestionsTestData
     ) {
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.injectPredefinedQuestion(
-          predefinedQuestionsTestData
-        )
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: predefinedQuestionsTestData,
+      return Services.injectPredefinedQuestion({
+        requestBody: predefinedQuestionsTestData,
       }).then((response) => {
-        expect(Object.keys(response.body).length).to.equal(
+        expect(Object.keys(response).length).to.equal(
           predefinedQuestionsTestData.predefinedQuestionTestData?.length
         )
       })
@@ -171,34 +142,14 @@ const testability = () => {
           target_id: toNoteId.toString(),
         }
 
-        const config = extractRequestConfig((api) => {
-          return api.testabilityRestController.linkNotes(requestBody)
-        })
-
-        cy.request({
-          method: config.method,
-          url: config.url,
-          body: requestBody,
-          failOnStatusCode: true,
-        })
+        return Services.linkNotes({ requestBody })
       })
     },
 
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
       const requestBody: SuggestedQuestionsData = { examples }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.injectSuggestedQuestion(
-          requestBody
-        )
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: requestBody,
-        failOnStatusCode: true,
-      })
+      return Services.injectSuggestedQuestion({ requestBody })
     },
 
     injectSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {
@@ -241,16 +192,7 @@ const testability = () => {
     backendTimeTravelToDate(date: Date) {
       const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.timeTravel(requestBody)
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: requestBody,
-        failOnStatusCode: true,
-      })
+      return Services.timeTravel({ requestBody })
     },
 
     backendTimeTravelTo(day: number, hour: number) {
@@ -258,121 +200,47 @@ const testability = () => {
         travel_to: JSON.stringify(hourOfDay(day, hour)),
       }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.timeTravel(requestBody)
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: requestBody,
-        failOnStatusCode: true,
-      })
+      return Services.timeTravel({ requestBody })
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
       const requestBody: TimeTravelRelativeToNow = {
-        hours: JSON.stringify(hours),
+        hours,
       }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.timeTravelRelativeToNow(
-          requestBody
-        )
-      })
-
-      return cy.request({
-        method: config.method,
-        url: config.url,
-        body: requestBody,
-        failOnStatusCode: true,
-      })
+      return Services.timeTravelRelativeToNow({ requestBody })
     },
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
       const requestBody: Randomization = { choose: strategy, seed }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.randomizer(requestBody)
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: requestBody,
-        failOnStatusCode: true,
-      })
+      return Services.randomizer({ requestBody })
     },
 
     triggerException() {
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.triggerException()
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        failOnStatusCode: false,
-      })
+      return Services.triggerException()
     },
 
     shareToBazaar(noteTopology: string) {
       const requestBody = { noteTopology }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.shareToBazaar(requestBody)
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: requestBody,
-        failOnStatusCode: true,
-      })
+      return Services.shareToBazaar({ requestBody })
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.injectCircle(circleInfo)
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: circleInfo,
-        failOnStatusCode: true,
-      })
+      return Services.injectCircle({ requestBody: circleInfo })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.updateCurrentUser(hash)
-      })
-
-      cy.request({
-        method: config.method,
-        url: config.url,
-        body: hash,
-        failOnStatusCode: true,
-      })
+      return Services.updateCurrentUser({ requestBody: hash })
     },
 
     setServiceUrl(serviceName: string, serviceUrl: string) {
       const requestBody = { [serviceName]: serviceUrl }
 
-      const config = extractRequestConfig((api) => {
-        return api.testabilityRestController.replaceServiceUrl(requestBody)
+      return Services.replaceServiceUrl({ requestBody }).then(() => {
+        // Service call succeeded
       })
-
-      return cy
-        .request({
-          method: config.method,
-          url: config.url,
-          body: requestBody,
-        })
-        .then((response) => {
-          expect(response.status).to.equal(200)
-        })
     },
     mockBrowserTime() {
       //
@@ -389,9 +257,8 @@ const testability = () => {
       ])
     },
     mockService(serviceMocker: ServiceMocker) {
-      this.setServiceUrl(
-        serviceMocker.serviceName,
-        serviceMocker.serviceUrl
+      cy.wrap(
+        this.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl)
       ).as(serviceMocker.savedServiceUrlName)
       serviceMocker.install()
     },

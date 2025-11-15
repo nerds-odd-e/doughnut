@@ -1,6 +1,7 @@
 import { mainMenu } from '../pageObjects/mainMenu'
 import start from '../index'
-import { extractRequestConfig } from '../utils/apiConfigExtractor'
+import * as Services from '@generated/backend/services.gen'
+import { OpenAPI } from '@generated/backend/core/OpenAPI'
 
 export const loginActions = {
   logout() {
@@ -22,24 +23,24 @@ export const loginActions = {
     }
 
     const password = 'password'
-    const token = btoa(`${username}:${password}`)
 
-    // Extract healthcheck endpoint config from DoughnutApi
-    const config = extractRequestConfig((api) => {
-      return api.restHealthCheckController.ping()
-    })
+    // Set Basic auth in OpenAPI config
+    const originalUsername = OpenAPI.USERNAME
+    const originalPassword = OpenAPI.PASSWORD
+    OpenAPI.USERNAME = username
+    OpenAPI.PASSWORD = password
 
-    cy.request({
-      method: config.method,
-      url: config.url,
-      headers: {
-        Authorization: `Basic ${token}`,
-      },
-    }).then((response) => {
-      expect(response.status).to.equal(200)
-    })
-
-    return start
+    // Call the service directly - it will use cy.request via our custom request function
+    return Services.ping()
+      .then(() => {
+        // Success
+      })
+      .finally(() => {
+        // Restore original credentials
+        OpenAPI.USERNAME = originalUsername
+        OpenAPI.PASSWORD = originalPassword
+      })
+      .then(() => start)
   },
 
   reloginAs(username: string) {
