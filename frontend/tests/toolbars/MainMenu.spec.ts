@@ -62,7 +62,7 @@ describe("main menu", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      helper.managedApi.assimilationController.getAssimilationCount = vitest
+      helper.managedApi.restAssimilationController.getAssimilationCount = vitest
         .fn()
         .mockResolvedValue({ dueCount: 5 })
 
@@ -75,7 +75,7 @@ describe("main menu", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      helper.managedApi.assimilationController.getAssimilationCount = vitest
+      helper.managedApi.restAssimilationController.getAssimilationCount = vitest
         .fn()
         .mockResolvedValue({ dueCount: 0 })
 
@@ -88,7 +88,7 @@ describe("main menu", () => {
 
     it("fetches due count when user changes", async () => {
       const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      helper.managedApi.assimilationController.getAssimilationCount =
+      helper.managedApi.restAssimilationController.getAssimilationCount =
         mockGetCount
 
       const { rerender } = helper
@@ -106,7 +106,7 @@ describe("main menu", () => {
 
     it("calls getAssimilationCount with the correct timezone", async () => {
       const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      helper.managedApi.assimilationController.getAssimilationCount =
+      helper.managedApi.restAssimilationController.getAssimilationCount =
         mockGetCount
 
       helper.component(MainMenu).withProps({ user }).render()

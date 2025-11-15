@@ -107,7 +107,7 @@ const initialReviewDone = () => {
 }
 
 const loadInitialReview = () => {
-  managedApi.assimilationController
+  managedApi.restAssimilationController
     .assimilating(timezoneParam())
     .then((resp) => {
       notes.value = resp

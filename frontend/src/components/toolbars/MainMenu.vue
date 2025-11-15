@@ -130,9 +130,10 @@ const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
 const fetchDueCount = async () => {
-  const count = await managedApi.assimilationController.getAssimilationCount(
-    timezoneParam()
-  )
+  const count =
+    await managedApi.restAssimilationController.getAssimilationCount(
+      timezoneParam()
+    )
   setDueCount(count.dueCount)
   setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
   setTotalUnassimilatedCount(count.totalUnassimilatedCount)

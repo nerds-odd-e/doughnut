@@ -24,7 +24,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  helper.managedApi.assimilationController.assimilate = mockedAssimilateCall
+  helper.managedApi.restAssimilationController.assimilate = mockedAssimilateCall
   helper.managedApi.restNoteController.show = mockedGetNoteCall
   helper.managedApi.restNoteController.getNoteInfo = mockedGetNoteInfoCall
 
