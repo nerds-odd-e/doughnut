@@ -168,8 +168,8 @@ class RestTextContentControllerServiceInstance extends ServiceInstance {
     data: { newTitle: string }
   ): CancelablePromise<Types.UpdateNoteTitleResponse> {
     return this.httpRequest.request<Types.UpdateNoteTitleResponse>({
-      method: "POST",
-      url: "/api/text-content/{note}/title",
+      method: "PATCH",
+      url: "/api/text_content/{note}/title",
       path: { note },
       body: data,
       mediaType: "application/json",
@@ -182,8 +182,8 @@ class RestTextContentControllerServiceInstance extends ServiceInstance {
     data: { details: string }
   ): CancelablePromise<Types.UpdateNoteDetailsResponse> {
     return this.httpRequest.request<Types.UpdateNoteDetailsResponse>({
-      method: "POST",
-      url: "/api/text-content/{note}/details",
+      method: "PATCH",
+      url: "/api/text_content/{note}/details",
       path: { note },
       body: data,
       mediaType: "application/json",
@@ -923,14 +923,14 @@ class RestRecallsControllerServiceInstance extends ServiceInstance {
 
 class RestPredefinedQuestionControllerServiceInstance extends ServiceInstance {
   suggestQuestionForFineTuning(
-    note: number,
+    predefinedQuestion: number,
     requestBody: Types.SuggestQuestionForFineTuningData["requestBody"]
   ): CancelablePromise<Types.SuggestQuestionForFineTuningResponse> {
     return this.httpRequest.request<Types.SuggestQuestionForFineTuningResponse>(
       {
         method: "POST",
-        url: "/api/predefined-questions/{note}/suggest-question-for-fine-tuning",
-        path: { note },
+        url: "/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning",
+        path: { predefinedQuestion },
         body: requestBody,
         mediaType: "application/json",
         errors: { 500: "Internal Server Error" },
@@ -944,7 +944,7 @@ class RestPredefinedQuestionControllerServiceInstance extends ServiceInstance {
   ): CancelablePromise<Types.AddQuestionManuallyResponse> {
     return this.httpRequest.request<Types.AddQuestionManuallyResponse>({
       method: "POST",
-      url: "/api/predefined-questions/{note}/add-question-manually",
+      url: "/api/predefined-questions/{note}/note-questions",
       path: { note },
       body: requestBody,
       mediaType: "application/json",
@@ -971,7 +971,7 @@ class RestPredefinedQuestionControllerServiceInstance extends ServiceInstance {
   ): CancelablePromise<Types.GetAllQuestionByNoteResponse> {
     return this.httpRequest.request<Types.GetAllQuestionByNoteResponse>({
       method: "GET",
-      url: "/api/predefined-questions/{note}",
+      url: "/api/predefined-questions/{note}/note-questions",
       path: { note },
       errors: { 500: "Internal Server Error" },
     })
@@ -1224,7 +1224,7 @@ class RestCertificateControllerServiceInstance extends ServiceInstance {
   ): CancelablePromise<Types.GetCertificateResponse> {
     return this.httpRequest.request<Types.GetCertificateResponse>({
       method: "GET",
-      url: "/api/certificates/{notebook}",
+      url: "/api/certificate/{notebook}",
       path: { notebook },
       errors: { 500: "Internal Server Error" },
     })
