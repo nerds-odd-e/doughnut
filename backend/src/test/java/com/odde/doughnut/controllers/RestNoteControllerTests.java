@@ -48,8 +48,7 @@ class NoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
 
     controller =
-        new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Nested
@@ -58,7 +57,7 @@ class NoteControllerTests {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
-      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(note));
+      assertThrows(UnexpectedNoAccessRightException.class, () -> controller.showNote(note));
     }
 
     @Test
@@ -66,7 +65,7 @@ class NoteControllerTests {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe.aBazaarNotebook(note.getNotebook()).please();
-      final NoteRealm noteRealm = controller.show(note);
+      final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getNote().getTopicConstructor(), equalTo(note.getTopicConstructor()));
       assertThat(noteRealm.getFromBazaar(), is(true));
     }
@@ -74,7 +73,7 @@ class NoteControllerTests {
     @Test
     void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      final NoteRealm noteRealm = controller.show(note);
+      final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getFromBazaar(), is(false));
     }
@@ -286,8 +285,7 @@ class NoteControllerTests {
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
       SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController =
-          new SearchController(userModel, noteSearchService);
+      SearchController searchController = new SearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
     }
@@ -296,8 +294,7 @@ class NoteControllerTests {
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController =
-          new SearchController(userModel, noteSearchService);
+      SearchController searchController = new SearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class,
           () -> searchController.searchForLinkTargetWithin(note, searchTerm));

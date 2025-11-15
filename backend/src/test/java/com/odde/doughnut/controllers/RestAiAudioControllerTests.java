@@ -47,8 +47,7 @@ class AiAudioControllerTests {
   }
 
   private void initializeController() {
-    controller =
-        new AiAudioController(new OtherAiServices(openAiApi), makeMe.modelFactoryService);
+    controller = new AiAudioController(new OtherAiServices(openAiApi), makeMe.modelFactoryService);
   }
 
   private void setupMocks() {

@@ -83,7 +83,7 @@ class NotebookController {
 
   @PostMapping(value = "/{notebook}")
   @Transactional
-  public Notebook update(
+  public Notebook updateNotebook(
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NotebookSettings notebookSettings)
       throws UnexpectedNoAccessRightException {

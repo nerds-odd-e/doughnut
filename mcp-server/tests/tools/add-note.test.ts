@@ -2,11 +2,11 @@ import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
 import * as Services from '@generated/backend/sdk.gen'
 import { OpenAPI } from '@generated/backend'
-import type { CreateNote1Response } from '@generated/backend'
+import type { CreateNoteViaMcpResponse } from '@generated/backend'
 
 // Mock the generated services
 vi.mock('@generated/backend/sdk.gen', () => ({
-  createNote1: vi.fn(),
+  createNoteViaMcp: vi.fn(),
 }))
 
 describe('add_note tool', () => {
@@ -22,8 +22,8 @@ describe('add_note tool', () => {
     expect(addNoteTool).toBeDefined()
 
     // Mock the service response
-    const mockCreateNote = vi.mocked(Services.createNote1)
-    const mockResponse: CreateNote1Response = {
+    const mockCreateNote = vi.mocked(Services.createNoteViaMcp)
+    const mockResponse: CreateNoteViaMcpResponse = {
       created: {
         note: {
           noteTopology: {

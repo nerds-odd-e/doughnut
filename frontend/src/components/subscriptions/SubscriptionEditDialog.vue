@@ -39,7 +39,7 @@ export default defineComponent({
   methods: {
     processForm() {
       this.managedApi.services
-        .update({
+        .updateSubscription({
           subscription: this.subscription.id,
           requestBody: this.formData,
         })

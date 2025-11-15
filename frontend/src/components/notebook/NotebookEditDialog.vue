@@ -134,7 +134,10 @@ const showIndexingComplete = ref(false)
 
 const processForm = () => {
   managedApi.services
-    .update1({ notebook: props.notebook.id, requestBody: formData.value })
+    .updateNotebook({
+      notebook: props.notebook.id,
+      requestBody: formData.value,
+    })
     .then(() => {
       router.go(0)
     })

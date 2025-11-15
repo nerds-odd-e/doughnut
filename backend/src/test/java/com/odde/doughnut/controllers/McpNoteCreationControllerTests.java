@@ -90,7 +90,7 @@ class McpNoteCreationControllerTests {
           assertThrows(
               ResponseStatusException.class,
               () -> {
-                controllerWithoutUser.createNote(GeneratorMcpNoteAddDTO("Harry Potter"));
+                controllerWithoutUser.createNoteViaMcp(GeneratorMcpNoteAddDTO("Harry Potter"));
               });
       assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
     }
@@ -105,7 +105,7 @@ class McpNoteCreationControllerTests {
 
       MockNoteSearchServiceReturn(Arrays.asList(searchResult));
 
-      var result = controller.createNote(GeneratorMcpNoteAddDTO("Lord of the Rings"));
+      var result = controller.createNoteViaMcp(GeneratorMcpNoteAddDTO("Lord of the Rings"));
       assertEquals("new note", result.getCreated().getNote().getTopicConstructor());
     }
 
@@ -116,7 +116,7 @@ class McpNoteCreationControllerTests {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> {
-            controller.createNote(GeneratorMcpNoteAddDTO("Harry Potter"));
+            controller.createNoteViaMcp(GeneratorMcpNoteAddDTO("Harry Potter"));
           });
     }
 

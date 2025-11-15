@@ -42,8 +42,7 @@ class NoteControllerMotionTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 

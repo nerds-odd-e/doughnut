@@ -31,7 +31,7 @@ beforeEach(() => {
   vi.spyOn(helper.managedApi.services, "getNoteInfo").mockResolvedValue(
     {} as never
   )
-  vi.spyOn(helper.managedApi.services, "show").mockImplementation(
+  vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
     mockedGetNoteCall
   )
   renderer = helper.component(AssimilationPage).withStorageProps({})

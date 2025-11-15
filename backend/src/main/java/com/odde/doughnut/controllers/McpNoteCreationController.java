@@ -59,7 +59,7 @@ public class McpNoteCreationController {
 
   @PostMapping(value = "/create")
   @Transactional
-  public NoteCreationResult createNote(@Valid @RequestBody McpNoteAddDTO noteCreation)
+  public NoteCreationResult createNoteViaMcp(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
     currentUser.assertLoggedIn();
 

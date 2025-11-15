@@ -38,7 +38,7 @@ describe("storedApiCollection", () => {
       vi.spyOn(managedApi.services, "updateNoteDetails").mockImplementation(
         updateNoteDetails
       )
-      vi.spyOn(managedApi.services, "show").mockImplementation(showNote)
+      vi.spyOn(managedApi.services, "showNote").mockImplementation(showNote)
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 

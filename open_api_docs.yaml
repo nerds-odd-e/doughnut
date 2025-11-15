@@ -454,7 +454,7 @@ paths:
     post:
       tags:
       - subscription-controller
-      operationId: update
+      operationId: updateSubscription
       parameters:
       - name: subscription
         in: path
@@ -854,7 +854,7 @@ paths:
     post:
       tags:
       - note-creation-controller
-      operationId: createNote
+      operationId: createNoteUnderParent
       parameters:
       - name: parentNote
         in: path
@@ -1145,7 +1145,7 @@ paths:
     post:
       tags:
       - notebook-controller
-      operationId: update_1
+      operationId: updateNotebook
       parameters:
       - name: notebook
         in: path
@@ -1430,7 +1430,7 @@ paths:
     post:
       tags:
       - mcp-note-creation-controller
-      operationId: createNote_1
+      operationId: createNoteViaMcp
       requestBody:
         content:
           application/json:
@@ -2220,7 +2220,7 @@ paths:
     get:
       tags:
       - note-controller
-      operationId: show
+      operationId: showNote
       parameters:
       - name: note
         in: path
@@ -2936,7 +2936,7 @@ paths:
     get:
       tags:
       - memory-tracker-controller
-      operationId: show_1
+      operationId: showMemoryTracker
       parameters:
       - name: memoryTracker
         in: path
@@ -3080,7 +3080,7 @@ paths:
     get:
       tags:
       - failure-report-controller
-      operationId: show_2
+      operationId: showFailureReport
       parameters:
       - name: failureReport
         in: path

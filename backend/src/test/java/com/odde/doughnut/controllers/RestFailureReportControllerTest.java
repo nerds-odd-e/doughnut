@@ -41,7 +41,8 @@ class FailureReportControllerTest {
     UserModel nonAdmin = makeMe.aUser().toModelPlease();
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
-        UnexpectedNoAccessRightException.class, () -> controller(nonAdmin).show(failureReport));
+        UnexpectedNoAccessRightException.class,
+        () -> controller(nonAdmin).showFailureReport(failureReport));
   }
 
   @Nested

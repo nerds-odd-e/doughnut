@@ -39,8 +39,7 @@ class GlobalSettingsControllerTest {
     currentUser = makeMe.anAdmin().toModelPlease();
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
-        new GlobalSettingsController(
-            makeMe.modelFactoryService, currentUser, testabilitySettings);
+        new GlobalSettingsController(makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
   @Nested

@@ -37,8 +37,7 @@ class NoteControllerRecentNotesTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
   @Test
@@ -71,8 +70,7 @@ class NoteControllerRecentNotesTests {
   void shouldNotAllowAccessWhenNotLoggedIn() {
     userModel = makeMe.aNullUserModelPlease();
     controller =
-        new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }

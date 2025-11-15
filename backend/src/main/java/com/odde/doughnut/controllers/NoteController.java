@@ -75,7 +75,7 @@ class NoteController {
   }
 
   @GetMapping("/{note}")
-  public NoteRealm show(@PathVariable("note") @Schema(type = "integer") Note note)
+  public NoteRealm showNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     User user = currentUser.getEntity();

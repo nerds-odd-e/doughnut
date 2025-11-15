@@ -146,7 +146,7 @@ class NotebookControllerTest {
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller.update(note.getNotebook(), new NotebookSettings()));
+          () -> controller.updateNotebook(note.getNotebook(), new NotebookSettings()));
     }
 
     @Test
@@ -154,7 +154,7 @@ class NotebookControllerTest {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       var notebookSettings = new NotebookSettings();
       notebookSettings.setCertificateExpiry(Period.parse("P2Y3M"));
-      controller.update(note.getNotebook(), notebookSettings);
+      controller.updateNotebook(note.getNotebook(), notebookSettings);
       assertThat(
           note.getNotebook().getNotebookSettings().getCertificateExpiry(),
           equalTo(Period.parse("P2Y3M")));

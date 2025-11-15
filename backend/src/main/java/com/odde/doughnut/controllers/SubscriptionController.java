@@ -18,8 +18,7 @@ class SubscriptionController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
-  public SubscriptionController(
-      ModelFactoryService modelFactoryService, UserModel currentUser) {
+  public SubscriptionController(ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
   }
@@ -41,7 +40,7 @@ class SubscriptionController {
 
   @PostMapping("/{subscription}")
   @Transactional
-  public @Valid Subscription update(
+  public @Valid Subscription updateSubscription(
       @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription,
       @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
