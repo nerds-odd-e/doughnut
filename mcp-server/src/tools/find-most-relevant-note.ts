@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { createTool } from './tool-builder.js'
 import { textResponse, jsonResponse } from '../helpers.js'
 import type { NoteSearchResult } from '@generated/backend'
+import * as Services from '@generated/backend/services.gen'
 
 // Schema definitions co-located with the tool
 const SearchNoteParamsSchema = z.object({
@@ -42,8 +43,9 @@ For broader search results, consider breaking down complex queries into specific
   }
 
   try {
-    const results =
-      await ctx.api.restSearchController.searchForLinkTarget(searchTerm)
+    const results = await Services.searchForLinkTarget({
+      requestBody: searchTerm,
+    })
 
     if (Array.isArray(results) && results.length > 0) {
       const firstResult = results[0] as NoteSearchResult

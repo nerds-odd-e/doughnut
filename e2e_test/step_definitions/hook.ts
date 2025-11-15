@@ -71,6 +71,7 @@ After({ tags: '@usingMockedOpenAiService' }, () => {
 // When a test fail, the After hook is not called.
 // So we need to call the task in the Before hook as well.
 Before({ tags: '@TerminateMCPServerWhenTeardown' }, () => {
+  cy.task('bundleMcpServer')
   cy.task('disconnectMcpServer')
 })
 

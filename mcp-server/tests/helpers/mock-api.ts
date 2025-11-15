@@ -1,20 +1,14 @@
-import { DoughnutApi } from '../../src/DoughnutApiExport.js'
-
-// Helper function to create a real API with selective method overrides
-export function createMockApi(
-  overrides: Partial<DoughnutApi> = {}
-): DoughnutApi {
-  // Create a real DoughnutApi instance
-  const mockApi = new DoughnutApi({
-    BASE: 'http://localhost:8080',
-    TOKEN: 'test-token',
-  })
-
-  // Apply overrides using spread operator
-  return { ...mockApi, ...overrides }
-}
+import type { ServerContext } from '../../src/types.js'
 
 // Helper function to create mock context
-export function createMockContext(api: DoughnutApi) {
-  return { api }
+// Since we now use generated services directly, we just need to provide the context
+// The services will use the OpenAPI configuration which can be set up in tests
+export function createMockContext(
+  overrides: Partial<ServerContext> = {}
+): ServerContext {
+  return {
+    apiBaseUrl: 'http://localhost:8080',
+    authToken: 'test-token',
+    ...overrides,
+  }
 }

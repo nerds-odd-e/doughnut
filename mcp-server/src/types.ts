@@ -1,5 +1,3 @@
-import type { DoughnutApi } from './DoughnutApiExport.js'
-
 export type ToolResponseContent = { type: 'text'; text: string }
 
 export type ToolResponse = {
@@ -7,7 +5,7 @@ export type ToolResponse = {
 }
 
 export type ServerContext = {
-  api: DoughnutApi
+  apiBaseUrl: string
   authToken?: string
 }
 

@@ -1,15 +1,21 @@
-import { describe, test, expect, vi } from 'vitest'
-import { createMockApi, createMockContext, findTool } from '../helpers/index.js'
-import type { RestSearchControllerService } from '@generated/backend'
+import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { createMockContext, findTool } from '../helpers/index.js'
+import * as Services from '@generated/backend/services.gen'
+import { OpenAPI } from '@generated/backend'
+import type { SearchForLinkTargetResponse } from '@generated/backend'
+
+// Mock the generated services
+vi.mock('@generated/backend/services.gen', () => ({
+  searchForLinkTarget: vi.fn(),
+}))
 
 describe('find_most_relevant_note tool', () => {
-  // Helper function to create mock API for find_most_relevant_note tests
-  const createRelevantNoteMockApi = (searchResult: unknown[]) =>
-    createMockApi({
-      restSearchController: {
-        searchForLinkTarget: vi.fn().mockResolvedValue(searchResult),
-      } as unknown as RestSearchControllerService,
-    })
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // Set up OpenAPI config for tests
+    OpenAPI.BASE = 'http://localhost:8080'
+    OpenAPI.TOKEN = 'test-token'
+  })
 
   // Helper function to run the test
   const runQueryExtractionTest = async (
@@ -22,8 +28,14 @@ describe('find_most_relevant_note tool', () => {
     const searchResult = shouldFindNote
       ? [{ noteTopology: { id: 123, titleOrPredicate: 'Test Note' } }]
       : []
-    const mockApi = createRelevantNoteMockApi(searchResult)
-    const ctx = createMockContext(mockApi)
+
+    // Mock the service response
+    const mockSearchForLinkTarget = vi.mocked(Services.searchForLinkTarget)
+    mockSearchForLinkTarget.mockResolvedValue(
+      searchResult as SearchForLinkTargetResponse
+    )
+
+    const ctx = createMockContext()
 
     // Call the tool's handle function
     const result = await findMostRelevantNoteTool.handle(
@@ -32,11 +44,11 @@ describe('find_most_relevant_note tool', () => {
     )
 
     // Assert search was called with correct arguments
-    expect(
-      mockApi.restSearchController.searchForLinkTarget
-    ).toHaveBeenCalledWith({
-      searchKey: expectedSearchKey,
-      allMyNotebooksAndSubscriptions: true,
+    expect(mockSearchForLinkTarget).toHaveBeenCalledWith({
+      requestBody: {
+        searchKey: expectedSearchKey,
+        allMyNotebooksAndSubscriptions: true,
+      },
     })
 
     // Assert the response

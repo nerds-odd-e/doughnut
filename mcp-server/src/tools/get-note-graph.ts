@@ -7,7 +7,7 @@ import {
   jsonResponse,
 } from '../helpers.js'
 import type { ToolResponse } from '../types.js'
-import type { DoughnutApi } from '../DoughnutApiExport.js'
+import * as Services from '@generated/backend/services.gen'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({
@@ -25,11 +25,10 @@ const NoteIdParamsSchema = z.object({
 
 // Note operations
 async function getNoteById(
-  api: DoughnutApi,
   noteId: number,
   tokenLimit: number
 ): Promise<ToolResponse> {
-  const graph = await api.restNoteController.getGraph(noteId, tokenLimit)
+  const graph = await Services.getGraph({ note: noteId, tokenLimit })
   return jsonResponse(graph)
 }
 
@@ -80,5 +79,5 @@ Navigation Pattern:
     return createErrorResponse('tokenLimit too low to fetch any note')
   }
   // You can use the tokenLimit variable as needed in your logic here
-  return await getNoteById(ctx.api, noteId, tokenLimit)
+  return await getNoteById(noteId, tokenLimit)
 })

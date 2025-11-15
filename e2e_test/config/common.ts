@@ -1,4 +1,5 @@
 import { existsSync, rmdir } from 'node:fs'
+import { execSync } from 'node:child_process'
 import mcpClient from '../support/mcp_client'
 const {
   addCucumberPreprocessorPlugin,
@@ -208,6 +209,20 @@ const commonConfig = {
         },
         async disconnectMcpServer() {
           return await mcpClient.disconnectMcpServer()
+        },
+        async bundleMcpServer() {
+          const repoRoot = path.resolve(__dirname, '..', '..')
+          const mcpServerDir = path.join(repoRoot, 'mcp-server')
+          try {
+            execSync('pnpm bundle', {
+              cwd: mcpServerDir,
+              stdio: 'inherit',
+            })
+            return true
+          } catch (error) {
+            console.error('Failed to bundle MCP server:', error)
+            throw error
+          }
         },
       })
 

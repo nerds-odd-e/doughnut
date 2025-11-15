@@ -1,8 +1,22 @@
-import { describe, test, expect, vi } from 'vitest'
-import { findTool, createMockApi, createMockContext } from '../helpers/index.js'
-import type { RestNoteControllerService } from '@generated/backend'
+import { describe, test, expect, vi, beforeEach } from 'vitest'
+import { findTool, createMockContext } from '../helpers/index.js'
+import * as Services from '@generated/backend/services.gen'
+import { OpenAPI } from '@generated/backend'
+import type { GetGraphResponse } from '@generated/backend'
+
+// Mock the generated services
+vi.mock('@generated/backend/services.gen', () => ({
+  getGraph: vi.fn(),
+}))
 
 describe('get_note_graph tool', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    // Set up OpenAPI config for tests
+    OpenAPI.BASE = 'http://localhost:8080'
+    OpenAPI.TOKEN = 'test-token'
+  })
+
   test('should be defined and have correct name', () => {
     const getNoteGraphTool = findTool('get_note_graph')
     expect(getNoteGraphTool).toBeDefined()
@@ -10,17 +24,9 @@ describe('get_note_graph tool', () => {
   })
 
   describe('token limit validation', () => {
-    const createNoteGraphMockApi = () =>
-      createMockApi({
-        restNoteController: {
-          getGraph: vi.fn().mockResolvedValue({ focusNote: { id: 1 } }),
-        } as unknown as RestNoteControllerService,
-      })
-
     test('should return error when tokenLimit is 0', async () => {
       const getNoteGraphTool = findTool('get_note_graph')
-      const mockApi = createNoteGraphMockApi()
-      const ctx = createMockContext(mockApi)
+      const ctx = createMockContext()
 
       const result = await getNoteGraphTool.handle(ctx, {
         noteId: 1,
@@ -34,8 +40,7 @@ describe('get_note_graph tool', () => {
 
     test('should return error when tokenLimit is too low (<=5)', async () => {
       const getNoteGraphTool = findTool('get_note_graph')
-      const mockApi = createNoteGraphMockApi()
-      const ctx = createMockContext(mockApi)
+      const ctx = createMockContext()
 
       const result = await getNoteGraphTool.handle(ctx, {
         noteId: 1,
@@ -49,15 +54,24 @@ describe('get_note_graph tool', () => {
 
     test('should successfully fetch graph with valid tokenLimit', async () => {
       const getNoteGraphTool = findTool('get_note_graph')
-      const mockApi = createNoteGraphMockApi()
-      const ctx = createMockContext(mockApi)
+      const ctx = createMockContext()
+
+      // Mock the service response
+      const mockGetGraph = vi.mocked(Services.getGraph)
+      const mockResponse: GetGraphResponse = {
+        focusNote: { id: 1 },
+      } as GetGraphResponse
+      mockGetGraph.mockResolvedValue(mockResponse)
 
       const result = await getNoteGraphTool.handle(ctx, {
         noteId: 1,
         tokenLimit: 100,
       })
 
-      expect(mockApi.restNoteController.getGraph).toHaveBeenCalledWith(1, 100)
+      expect(mockGetGraph).toHaveBeenCalledWith({
+        note: 1,
+        tokenLimit: 100,
+      })
       expect(result.content[0].text).toContain('"focusNote"')
     })
   })

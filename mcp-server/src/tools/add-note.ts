@@ -2,8 +2,9 @@ import { z } from 'zod'
 import type {
   NoteCreationDTO,
   McpNoteAddDTO,
-  NoteCreationResult,
+  CreateNote1Response,
 } from '@generated/backend'
+import * as Services from '@generated/backend/services.gen'
 import { createTool } from './tool-builder.js'
 import { jsonResponse } from '../helpers.js'
 
@@ -55,8 +56,9 @@ Response Format:
     parentNote: parentTitle,
     noteCreationDTO: noteCreationDTO,
   }
-  const result: NoteCreationResult =
-    await ctx.api.mcpNoteCreationController.createNote1(mcpCreationDto)
+  const result: CreateNote1Response = await Services.createNote1({
+    requestBody: mcpCreationDto,
+  })
 
   return jsonResponse({
     title: result.created.note.noteTopology.titleOrPredicate,
