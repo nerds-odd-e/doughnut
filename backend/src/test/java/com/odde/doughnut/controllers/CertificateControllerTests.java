@@ -20,11 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class RestCertificateControllerTests {
+public class CertificateControllerTests {
   public static final int oneYearInHours = 8760;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
-  private RestCertificateController controller;
+  private CertificateController controller;
   Timestamp currentTime;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -33,7 +33,7 @@ public class RestCertificateControllerTests {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestCertificateController(currentUser, makeMe.modelFactoryService);
+    controller = new CertificateController(currentUser, makeMe.modelFactoryService);
   }
 
   @Nested

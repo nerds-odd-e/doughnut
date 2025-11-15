@@ -41,12 +41,12 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestNotebookControllerTest {
+class NotebookControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private UserModel userModel;
   private Note topNote;
-  RestNotebookController controller;
+  NotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Autowired NotebookIndexingService notebookIndexingService;
   @Autowired WebApplicationContext webApplicationContext;
@@ -72,7 +72,7 @@ class RestNotebookControllerTest {
     userModel = makeMe.aUser().toModelPlease();
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     controller =
-        new RestNotebookController(
+        new NotebookController(
             modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
   }
 
@@ -101,7 +101,7 @@ class RestNotebookControllerTest {
     void whenNotLogin() {
       userModel = modelFactoryService.toUserModel(null);
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
@@ -112,7 +112,7 @@ class RestNotebookControllerTest {
       userModel = modelFactoryService.toUserModel(user);
       List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
@@ -175,7 +175,7 @@ class RestNotebookControllerTest {
     void whenNotAuthorized() {
       User anotherUser = makeMe.aUser().please();
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
@@ -219,7 +219,7 @@ class RestNotebookControllerTest {
     @Test
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
@@ -228,7 +228,7 @@ class RestNotebookControllerTest {
     @Test
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
@@ -349,7 +349,7 @@ class RestNotebookControllerTest {
     void whenNotAuthorized() {
       User anotherUser = makeMe.aUser().please();
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService,
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
@@ -446,7 +446,7 @@ class RestNotebookControllerTest {
       // Arrange
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestNotebookController(
+          new NotebookController(
               modelFactoryService, userModel, testabilitySettings, notebookIndexingService);
 
       // Act & Assert

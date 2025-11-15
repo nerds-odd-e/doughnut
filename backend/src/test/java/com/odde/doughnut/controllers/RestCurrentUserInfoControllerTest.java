@@ -19,13 +19,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestCurrentUserInfoControllerTest {
+class CurrentUserInfoControllerTest {
   @Autowired MakeMe makeMe;
 
   @Mock CurrentUserFetcher currentUserFetcher;
 
-  RestCurrentUserInfoController controller(CurrentUserFetcher currentUserFetcher) {
-    return new RestCurrentUserInfoController(currentUserFetcher);
+  CurrentUserInfoController controller(CurrentUserFetcher currentUserFetcher) {
+    return new CurrentUserInfoController(currentUserFetcher);
   }
 
   @Test

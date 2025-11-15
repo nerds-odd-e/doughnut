@@ -19,12 +19,12 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/notes")
-class RestNoteCreationController {
+class NoteCreationController {
   private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final NoteConstructionService noteConstructionService;
 
-  public RestNoteCreationController(
+  public NoteCreationController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,

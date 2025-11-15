@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestGlobalSettingsControllerTest {
-  RestGlobalSettingsController controller;
+class GlobalSettingsControllerTest {
+  GlobalSettingsController controller;
   UserModel currentUser;
 
   @Autowired MakeMe makeMe;
@@ -39,7 +39,7 @@ class RestGlobalSettingsControllerTest {
     currentUser = makeMe.anAdmin().toModelPlease();
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
-        new RestGlobalSettingsController(
+        new GlobalSettingsController(
             makeMe.modelFactoryService, currentUser, testabilitySettings);
   }
 
@@ -80,7 +80,7 @@ class RestGlobalSettingsControllerTest {
     @Test
     void authentication() {
       controller =
-          new RestGlobalSettingsController(
+          new GlobalSettingsController(
               makeMe.modelFactoryService, makeMe.aUser().toModelPlease(), testabilitySettings);
       assertThrows(
           UnexpectedNoAccessRightException.class,

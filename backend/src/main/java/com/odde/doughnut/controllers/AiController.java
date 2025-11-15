@@ -17,13 +17,13 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/ai")
-public class RestAiController {
+public class AiController {
 
   private final OtherAiServices otherAiServices;
   private final UserModel currentUser;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
-  public RestAiController(
+  public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
       UserModel currentUser) {

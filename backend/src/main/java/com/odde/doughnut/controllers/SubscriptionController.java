@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/subscriptions")
-class RestSubscriptionController {
+class SubscriptionController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
-  public RestSubscriptionController(
+  public SubscriptionController(
       ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/links")
-class RestLinkController {
+class LinkController {
   private final ModelFactoryService modelFactoryService;
 
   @Resource(name = "testabilitySettings")
@@ -34,7 +34,7 @@ class RestLinkController {
 
   private UserModel currentUser;
 
-  public RestLinkController(
+  public LinkController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
       UserModel currentUser) {

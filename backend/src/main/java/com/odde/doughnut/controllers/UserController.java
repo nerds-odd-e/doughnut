@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
-class RestUserController {
+class UserController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final TestabilitySettings testabilitySettings;
 
-  public RestUserController(
+  public UserController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

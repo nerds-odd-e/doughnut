@@ -23,8 +23,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindException;
 
-class RestWikidataControllerTests {
-  RestWikidataController controller;
+class WikidataControllerTests {
+  WikidataController controller;
   @Mock HttpClientAdapter httpClientAdapter;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -33,7 +33,7 @@ class RestWikidataControllerTests {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    controller = new RestWikidataController(testabilitySettings, httpClientAdapter);
+    controller = new WikidataController(testabilitySettings, httpClientAdapter);
   }
 
   @Nested

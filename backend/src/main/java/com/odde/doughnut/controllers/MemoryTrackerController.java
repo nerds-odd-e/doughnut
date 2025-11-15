@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/memory-trackers")
-class RestMemoryTrackerController {
+class MemoryTrackerController {
   private final ModelFactoryService modelFactoryService;
   private final MemoryTrackerService memoryTrackerService;
   private UserModel currentUser;
@@ -29,7 +29,7 @@ class RestMemoryTrackerController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestMemoryTrackerController(
+  public MemoryTrackerController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

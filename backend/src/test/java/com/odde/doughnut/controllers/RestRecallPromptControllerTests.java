@@ -39,7 +39,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestRecallPromptControllerTests {
+class RecallPromptControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
@@ -47,7 +47,7 @@ class RestRecallPromptControllerTests {
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
-  RestRecallPromptController controller;
+  RecallPromptController controller;
 
   @BeforeEach
   void setup() {
@@ -64,7 +64,7 @@ class RestRecallPromptControllerTests {
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
 
     controller =
-        new RestRecallPromptController(
+        new RecallPromptController(
             openAiApi,
             makeMe.modelFactoryService,
             currentUser,
@@ -72,8 +72,8 @@ class RestRecallPromptControllerTests {
             getTestObjectMapper());
   }
 
-  RestRecallPromptController nullUserController() {
-    return new RestRecallPromptController(
+  RecallPromptController nullUserController() {
+    return new RecallPromptController(
         openAiApi,
         modelFactoryService,
         makeMe.aNullUserModelPlease(),
@@ -190,8 +190,8 @@ class RestRecallPromptControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestRecallPromptController restAiController =
-                new RestRecallPromptController(
+            RecallPromptController restAiController =
+                new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
@@ -275,8 +275,8 @@ class RestRecallPromptControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
-            RestRecallPromptController restAiController =
-                new RestRecallPromptController(
+            RecallPromptController restAiController =
+                new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),

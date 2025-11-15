@@ -28,18 +28,18 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestCircleControllerTest {
+class CircleControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
   private UserModel userModel;
-  RestCircleController controller;
+  CircleController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestCircleController(modelFactoryService, testabilitySettings, userModel);
+    controller = new CircleController(modelFactoryService, testabilitySettings, userModel);
   }
 
   @Nested
@@ -47,7 +47,7 @@ class RestCircleControllerTest {
     @Test
     void itShouldNotAllowNonMemberToSeeACircle() {
       controller =
-          new RestCircleController(
+          new CircleController(
               modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class,
@@ -75,7 +75,7 @@ class RestCircleControllerTest {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
-      controller = new RestCircleController(modelFactoryService, testabilitySettings, user);
+      controller = new CircleController(modelFactoryService, testabilitySettings, user);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -99,7 +99,7 @@ class RestCircleControllerTest {
     void itShouldAskToLoginOfVisitorIsNotLogin() {
       Circle circle = makeMe.aCircle().please();
       controller =
-          new RestCircleController(
+          new CircleController(
               modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class,

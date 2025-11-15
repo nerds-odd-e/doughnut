@@ -34,14 +34,14 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/notes")
-class RestNoteController {
+class NoteController {
 
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
 
-  public RestNoteController(
+  public NoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,

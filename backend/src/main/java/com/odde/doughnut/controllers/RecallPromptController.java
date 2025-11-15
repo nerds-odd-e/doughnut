@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/recall-prompts")
-class RestRecallPromptController {
+class RecallPromptController {
   private final UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
@@ -28,7 +28,7 @@ class RestRecallPromptController {
 
   private final RecallQuestionService recallQuestionService;
 
-  public RestRecallPromptController(
+  public RecallPromptController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,

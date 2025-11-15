@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
-record RestCurrentUserInfoController(CurrentUserFetcher currentUserFetcher) {
+record CurrentUserInfoController(CurrentUserFetcher currentUserFetcher) {
   @GetMapping("/current-user-info")
   public CurrentUserInfo currentUserInfo() {
     CurrentUserInfo currentUserInfo = new CurrentUserInfo();

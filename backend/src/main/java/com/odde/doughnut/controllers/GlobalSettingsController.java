@@ -14,7 +14,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/settings")
-public class RestGlobalSettingsController {
+public class GlobalSettingsController {
 
   private final GlobalSettingsService globalSettingsService;
 
@@ -23,7 +23,7 @@ public class RestGlobalSettingsController {
 
   private UserModel currentUser;
 
-  public RestGlobalSettingsController(
+  public GlobalSettingsController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

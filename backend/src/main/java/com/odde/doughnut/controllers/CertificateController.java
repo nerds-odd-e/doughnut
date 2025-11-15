@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/certificate")
-public class RestCertificateController {
+public class CertificateController {
 
   private final UserModel currentUser;
 
   private final ModelFactoryService modelFactoryService;
 
-  public RestCertificateController(UserModel currentUser, ModelFactoryService modelFactoryService) {
+  public CertificateController(UserModel currentUser, ModelFactoryService modelFactoryService) {
     this.currentUser = currentUser;
     this.modelFactoryService = modelFactoryService;
   }

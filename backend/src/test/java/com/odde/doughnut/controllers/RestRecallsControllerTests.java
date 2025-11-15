@@ -26,22 +26,22 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestRecallsControllerTests {
+class RecallsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
-  RestRecallsController controller;
+  RecallsController controller;
 
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RestRecallsController(modelFactoryService, currentUser, testabilitySettings);
+    controller = new RecallsController(modelFactoryService, currentUser, testabilitySettings);
   }
 
-  RestRecallsController nullUserController() {
-    return new RestRecallsController(
+  RecallsController nullUserController() {
+    return new RecallsController(
         modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
   }
 

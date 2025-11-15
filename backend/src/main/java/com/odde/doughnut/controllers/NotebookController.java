@@ -33,7 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @SessionScope
 @RequestMapping("/api/notebooks")
-class RestNotebookController {
+class NotebookController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
 
@@ -43,7 +43,7 @@ class RestNotebookController {
   private final ObsidianFormatService obsidianFormatService;
   private final NotebookIndexingService notebookIndexingService;
 
-  public RestNotebookController(
+  public NotebookController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,

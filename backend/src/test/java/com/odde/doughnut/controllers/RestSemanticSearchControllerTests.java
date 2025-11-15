@@ -37,12 +37,12 @@ class RestSemanticSearchControllerTests {
   OpenAiApi openAiApi;
 
   private UserModel userModel;
-  private RestSearchController controller;
+  private SearchController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestSearchController(userModel, noteSearchService);
+    controller = new SearchController(userModel, noteSearchService);
     // Default: return empty embedding data so semantic search falls back to literal search
     EmbeddingResult empty = new EmbeddingResult();
     empty.setData(java.util.List.of());
@@ -68,7 +68,7 @@ class RestSemanticSearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new RestSearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -105,7 +105,7 @@ class RestSemanticSearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new RestSearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");

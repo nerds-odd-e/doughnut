@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
-class RestHealthCheckController {
+class HealthCheckController {
   @Autowired private Environment environment;
 
   @Autowired private UserModel currentUser;

@@ -43,12 +43,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class RestConversationMessageControllerAiReplyTests {
+public class ConversationMessageControllerAiReplyTests {
 
   @Mock private OpenAiApi openAiApi;
 
   @Autowired MakeMe makeMe;
-  RestConversationMessageController controller;
+  ConversationMessageController controller;
   UserModel currentUser;
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -76,7 +76,7 @@ public class RestConversationMessageControllerAiReplyTests {
         new ConversationService(
             testabilitySettings, makeMe.modelFactoryService, chatCompletionConversationService);
     controller =
-        new RestConversationMessageController(
+        new ConversationMessageController(
             currentUser, conversationService, chatCompletionConversationService);
   }
 
