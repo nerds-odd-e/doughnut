@@ -28,6 +28,7 @@
 
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/backend"
+import { LinkCreation } from "@generated/backend"
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
@@ -40,7 +41,7 @@ const props = defineProps({
   scopeName: String,
   modelValue: {
     type: String as PropType<NoteTopology["linkType"]>,
-    default: () => "no link" as NoteTopology["linkType"],
+    default: () => LinkCreation.linkType.NO_LINK as NoteTopology["linkType"],
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },

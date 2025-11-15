@@ -1,4 +1,5 @@
 import type { NoteTopology } from "@generated/backend"
+import { LinkCreation } from "@generated/backend"
 
 interface LinkTypeOption {
   label: NoteTopology["linkType"]
@@ -8,63 +9,63 @@ interface LinkTypeOption {
 const linkTypeOptions = [
   {
     reversedLabel: "no link",
-    label: "no link",
+    label: LinkCreation.linkType.NO_LINK,
   },
   {
     reversedLabel: "related to",
-    label: "related to",
+    label: LinkCreation.linkType.RELATED_TO,
   },
   {
     reversedLabel: "a generalization of",
-    label: "a specialization of",
+    label: LinkCreation.linkType.A_SPECIALIZATION_OF,
   },
   {
     reversedLabel: "applied to",
-    label: "an application of",
+    label: LinkCreation.linkType.AN_APPLICATION_OF,
   },
   {
     reversedLabel: "has instances",
-    label: "an instance of",
+    label: LinkCreation.linkType.AN_INSTANCE_OF,
   },
   {
     reversedLabel: "has parts",
-    label: "a part of",
+    label: LinkCreation.linkType.A_PART_OF,
   },
   {
     reversedLabel: "tagging",
-    label: "tagged by",
+    label: LinkCreation.linkType.TAGGED_BY,
   },
   {
     reversedLabel: "has attributes",
-    label: "an attribute of",
+    label: LinkCreation.linkType.AN_ATTRIBUTE_OF,
   },
   {
     reversedLabel: "the opposite of",
-    label: "the opposite of",
+    label: LinkCreation.linkType.THE_OPPOSITE_OF,
   },
   {
     reversedLabel: "brought by",
-    label: "author of",
+    label: LinkCreation.linkType.AUTHOR_OF,
   },
   {
     reversedLabel: "used by",
-    label: "using",
+    label: LinkCreation.linkType.USING,
   },
   {
     reversedLabel: "has examples",
-    label: "an example of",
+    label: LinkCreation.linkType.AN_EXAMPLE_OF,
   },
   {
     reversedLabel: "after",
-    label: "before",
+    label: LinkCreation.linkType.BEFORE,
   },
   {
     reversedLabel: "similar to",
-    label: "similar to",
+    label: LinkCreation.linkType.SIMILAR_TO,
   },
   {
     reversedLabel: "confused with",
-    label: "confused with",
+    label: LinkCreation.linkType.CONFUSED_WITH,
   },
 ] as LinkTypeOption[]
 

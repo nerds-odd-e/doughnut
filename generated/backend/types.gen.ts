@@ -84,7 +84,28 @@ export type BareNote = {
     details?: string;
 };
 
-export type relationToFocusNote = 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
+export namespace BareNote {
+    export enum relationToFocusNote {
+        SELF = 'Self',
+        PARENT = 'Parent',
+        OBJECT = 'Object',
+        CHILD = 'Child',
+        PRIOR_SIBLING = 'PriorSibling',
+        YOUNGER_SIBLING = 'YoungerSibling',
+        INBOUND_REFERENCE = 'InboundReference',
+        SUBJECT_OF_INBOUND_REFERENCE = 'SubjectOfInboundReference',
+        ANCESTOR_IN_CONTEXTUAL_PATH = 'AncestorInContextualPath',
+        ANCESTOR_IN_OBJECT_CONTEXTUAL_PATH = 'AncestorInObjectContextualPath',
+        OBJECT_OF_REIFIED_CHILD = 'ObjectOfReifiedChild',
+        SIBLING_OF_PARENT = 'SiblingOfParent',
+        SIBLING_OF_PARENT_OF_OBJECT = 'SiblingOfParentOfObject',
+        CHILD_OF_SIBLING_OF_PARENT = 'ChildOfSiblingOfParent',
+        CHILD_OF_SIBLING_OF_PARENT_OF_OBJECT = 'ChildOfSiblingOfParentOfObject',
+        INBOUND_REFERENCE_CONTEXTUAL_PATH = 'InboundReferenceContextualPath',
+        SIBLING_OF_SUBJECT_OF_INBOUND_REFERENCE = 'SiblingOfSubjectOfInboundReference',
+        INBOUND_REFERENCE_TO_OBJECT_OF_REIFIED_CHILD = 'InboundReferenceToObjectOfReifiedChild'
+    }
+}
 
 export type BazaarNotebook = {
     id: number;
@@ -199,7 +220,13 @@ export type DummyForGeneratingTypes = {
     aiToolName?: 'complete_note_details' | 'suggest_note_title' | 'ask_single_answer_multiple_choice_question';
 };
 
-export type aiToolName = 'complete_note_details' | 'suggest_note_title' | 'ask_single_answer_multiple_choice_question';
+export namespace DummyForGeneratingTypes {
+    export enum aiToolName {
+        COMPLETE_NOTE_DETAILS = 'complete_note_details',
+        SUGGEST_NOTE_TITLE = 'suggest_note_title',
+        ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION = 'ask_single_answer_multiple_choice_question'
+    }
+}
 
 export type ExpiresAfter = {
     anchor?: string;
@@ -272,6 +299,29 @@ export type FocusNote = {
     inboundReferences?: Array<(string)>;
 };
 
+export namespace FocusNote {
+    export enum relationToFocusNote {
+        SELF = 'Self',
+        PARENT = 'Parent',
+        OBJECT = 'Object',
+        CHILD = 'Child',
+        PRIOR_SIBLING = 'PriorSibling',
+        YOUNGER_SIBLING = 'YoungerSibling',
+        INBOUND_REFERENCE = 'InboundReference',
+        SUBJECT_OF_INBOUND_REFERENCE = 'SubjectOfInboundReference',
+        ANCESTOR_IN_CONTEXTUAL_PATH = 'AncestorInContextualPath',
+        ANCESTOR_IN_OBJECT_CONTEXTUAL_PATH = 'AncestorInObjectContextualPath',
+        OBJECT_OF_REIFIED_CHILD = 'ObjectOfReifiedChild',
+        SIBLING_OF_PARENT = 'SiblingOfParent',
+        SIBLING_OF_PARENT_OF_OBJECT = 'SiblingOfParentOfObject',
+        CHILD_OF_SIBLING_OF_PARENT = 'ChildOfSiblingOfParent',
+        CHILD_OF_SIBLING_OF_PARENT_OF_OBJECT = 'ChildOfSiblingOfParentOfObject',
+        INBOUND_REFERENCE_CONTEXTUAL_PATH = 'InboundReferenceContextualPath',
+        SIBLING_OF_SUBJECT_OF_INBOUND_REFERENCE = 'SiblingOfSubjectOfInboundReference',
+        INBOUND_REFERENCE_TO_OBJECT_OF_REIFIED_CHILD = 'InboundReferenceToObjectOfReifiedChild'
+    }
+}
+
 export type Function = {
     name?: string;
 };
@@ -335,7 +385,25 @@ export type LinkCreation = {
     linkType: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
 };
 
-export type linkType = 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
+export namespace LinkCreation {
+    export enum linkType {
+        NO_LINK = 'no link',
+        RELATED_TO = 'related to',
+        A_SPECIALIZATION_OF = 'a specialization of',
+        AN_APPLICATION_OF = 'an application of',
+        AN_INSTANCE_OF = 'an instance of',
+        A_PART_OF = 'a part of',
+        TAGGED_BY = 'tagged by',
+        AN_ATTRIBUTE_OF = 'an attribute of',
+        THE_OPPOSITE_OF = 'the opposite of',
+        AUTHOR_OF = 'author of',
+        USING = 'using',
+        AN_EXAMPLE_OF = 'an example of',
+        BEFORE = 'before',
+        SIMILAR_TO = 'similar to',
+        CONFUSED_WITH = 'confused with'
+    }
+}
 
 export type McpNoteAddDTO = {
     parentNote?: string;
@@ -537,6 +605,26 @@ export type NoteTopology = {
     title?: string;
 };
 
+export namespace NoteTopology {
+    export enum linkType {
+        NO_LINK = 'no link',
+        RELATED_TO = 'related to',
+        A_SPECIALIZATION_OF = 'a specialization of',
+        AN_APPLICATION_OF = 'an application of',
+        AN_INSTANCE_OF = 'an instance of',
+        A_PART_OF = 'a part of',
+        TAGGED_BY = 'tagged by',
+        AN_ATTRIBUTE_OF = 'an attribute of',
+        THE_OPPOSITE_OF = 'the opposite of',
+        AUTHOR_OF = 'author of',
+        USING = 'using',
+        AN_EXAMPLE_OF = 'an example of',
+        BEFORE = 'before',
+        SIMILAR_TO = 'similar to',
+        CONFUSED_WITH = 'confused with'
+    }
+}
+
 export type NoteUpdateDetailsDTO = {
     details?: string;
 };
@@ -600,7 +688,13 @@ export type Randomization = {
     seed?: number;
 };
 
-export type choose = 'first' | 'last' | 'seed';
+export namespace Randomization {
+    export enum choose {
+        FIRST = 'first',
+        LAST = 'last',
+        SEED = 'seed'
+    }
+}
 
 export type RecallPrompt = {
     id: number;

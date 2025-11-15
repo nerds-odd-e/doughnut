@@ -17,6 +17,7 @@
 
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/backend"
+import { LinkCreation } from "@generated/backend"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import { linkTypeOptions } from "../../models/linkTypeOptions"
@@ -40,7 +41,9 @@ defineEmits(["update:modelValue"])
 const options = computed(() => {
   const filteredOptions = allowEmpty
     ? linkTypeOptions
-    : linkTypeOptions.filter(({ label }) => label !== "no link")
+    : linkTypeOptions.filter(
+        ({ label }) => label !== LinkCreation.linkType.NO_LINK
+      )
 
   return filteredOptions.map(({ label }) => ({
     value: label as string,
