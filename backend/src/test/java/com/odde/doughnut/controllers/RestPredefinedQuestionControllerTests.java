@@ -33,7 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestPredefinedQuestionControllerTests {
+class PredefinedQuestionControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
@@ -41,14 +41,14 @@ class RestPredefinedQuestionControllerTests {
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
-  RestPredefinedQuestionController controller;
+  PredefinedQuestionController controller;
 
   @BeforeEach
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestPredefinedQuestionController(
+        new PredefinedQuestionController(
             openAiApi,
             modelFactoryService,
             currentUser,
@@ -56,8 +56,8 @@ class RestPredefinedQuestionControllerTests {
             getTestObjectMapper());
   }
 
-  RestPredefinedQuestionController nullUserController() {
-    return new RestPredefinedQuestionController(
+  PredefinedQuestionController nullUserController() {
+    return new PredefinedQuestionController(
         openAiApi,
         modelFactoryService,
         makeMe.aNullUserModelPlease(),

@@ -33,12 +33,12 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestConversationMessageControllerTest {
+class ConversationMessageControllerTest {
 
   @Autowired ConversationService conversationService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
-  RestConversationMessageController controller;
+  ConversationMessageController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
   AssessmentQuestionInstance assessmentQuestionInstance;
@@ -54,7 +54,7 @@ class RestConversationMessageControllerTest {
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
     controller =
-        new RestConversationMessageController(
+        new ConversationMessageController(
             currentUser, conversationService, chatCompletionConversationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
@@ -123,7 +123,7 @@ class RestConversationMessageControllerTest {
   }
 
   @Nested
-  class RestConversationMessageControllerUnreadCountTest {
+  class ConversationMessageControllerUnreadCountTest {
     Conversation conversation;
 
     @BeforeEach
@@ -141,7 +141,7 @@ class RestConversationMessageControllerTest {
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
       controller =
-          new RestConversationMessageController(
+          new ConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
               chatCompletionConversationService);
@@ -440,7 +440,7 @@ class RestConversationMessageControllerTest {
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
       controller =
-          new RestConversationMessageController(
+          new ConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
               chatCompletionConversationService);

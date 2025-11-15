@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/predefined-questions")
-class RestPredefinedQuestionController {
+class PredefinedQuestionController {
   private final ModelFactoryService modelFactoryService;
   private final PredefinedQuestionService predefinedQuestionService;
 
@@ -33,7 +33,7 @@ class RestPredefinedQuestionController {
 
   private final AiQuestionGenerator aiQuestionGenerator;
 
-  public RestPredefinedQuestionController(
+  public PredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,

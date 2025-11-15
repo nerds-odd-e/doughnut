@@ -28,7 +28,7 @@ import org.springframework.validation.BindException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestLinkControllerTests {
+class LinkControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
@@ -39,8 +39,8 @@ class RestLinkControllerTests {
     userModel = makeMe.aUser().toModelPlease();
   }
 
-  RestLinkController controller() {
-    return new RestLinkController(modelFactoryService, new TestabilitySettings(), userModel);
+  LinkController controller() {
+    return new LinkController(modelFactoryService, new TestabilitySettings(), userModel);
   }
 
   @Nested

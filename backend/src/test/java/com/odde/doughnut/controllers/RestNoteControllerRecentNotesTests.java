@@ -24,20 +24,20 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestNoteControllerRecentNotesTests {
+class NoteControllerRecentNotesTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   private UserModel userModel;
-  RestNoteController controller;
+  NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new RestNoteController(
+        new NoteController(
             modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
@@ -71,7 +71,7 @@ class RestNoteControllerRecentNotesTests {
   void shouldNotAllowAccessWhenNotLoggedIn() {
     userModel = makeMe.aNullUserModelPlease();
     controller =
-        new RestNoteController(
+        new NoteController(
             modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());

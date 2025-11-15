@@ -27,14 +27,14 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestNoteControllerMotionTests {
+class NoteControllerMotionTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   private UserModel userModel;
-  RestNoteController controller;
+  NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note subject;
 
@@ -42,7 +42,7 @@ class RestNoteControllerMotionTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new RestNoteController(
+        new NoteController(
             modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }

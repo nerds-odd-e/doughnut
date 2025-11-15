@@ -40,8 +40,8 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestAiControllerTest {
-  RestAiController controller;
+class AiControllerTest {
+  AiController controller;
   UserModel currentUser;
 
   Note note;
@@ -59,7 +59,7 @@ class RestAiControllerTest {
     currentUser = makeMe.aUser().toModelPlease();
     note = makeMe.aNote().please();
     controller =
-        new RestAiController(
+        new AiController(
             notebookAssistantForNoteServiceFactory, new OtherAiServices(openAiApi), currentUser);
   }
 
@@ -81,7 +81,7 @@ class RestAiControllerTest {
       assertThrows(
           ResponseStatusException.class,
           () ->
-              new RestAiController(
+              new AiController(
                       notebookAssistantForNoteServiceFactory,
                       new OtherAiServices(openAiApi),
                       makeMe.aNullUserModelPlease())
@@ -181,7 +181,7 @@ class RestAiControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       controller =
-          new RestAiController(
+          new AiController(
               notebookAssistantForNoteServiceFactory,
               new OtherAiServices(openAiApi),
               makeMe.aNullUserModelPlease());

@@ -22,17 +22,17 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestSearchControllerTests {
+class SearchControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired NoteSearchService noteSearchService;
 
   private UserModel userModel;
-  private RestSearchController controller;
+  private SearchController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestSearchController(userModel, noteSearchService);
+    controller = new SearchController(userModel, noteSearchService);
   }
 
   @Nested
@@ -111,7 +111,7 @@ class RestSearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new RestSearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -181,7 +181,7 @@ class RestSearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new RestSearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");

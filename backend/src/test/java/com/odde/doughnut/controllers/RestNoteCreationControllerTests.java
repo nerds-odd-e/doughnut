@@ -34,19 +34,19 @@ import org.springframework.validation.BindException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestNoteCreationControllerTests {
+class NoteCreationControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   private UserModel userModel;
-  RestNoteCreationController controller;
+  NoteCreationController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new RestNoteCreationController(
+        new NoteCreationController(
             modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 

@@ -8,7 +8,7 @@ paths:
   /api/user:
     get:
       tags:
-      - rest-user-controller
+      - user-controller
       operationId: getUserProfile
       responses:
         "500":
@@ -25,7 +25,7 @@ paths:
                 $ref: "#/components/schemas/User"
     post:
       tags:
-      - rest-user-controller
+      - user-controller
       operationId: createUser
       requestBody:
         content:
@@ -49,7 +49,7 @@ paths:
   /api/user/generate-token:
     post:
       tags:
-      - rest-user-controller
+      - user-controller
       operationId: generateToken
       requestBody:
         content:
@@ -453,7 +453,7 @@ paths:
   /api/subscriptions/{subscription}:
     post:
       tags:
-      - rest-subscription-controller
+      - subscription-controller
       operationId: update
       parameters:
       - name: subscription
@@ -483,7 +483,7 @@ paths:
   /api/subscriptions/{subscription}/delete:
     post:
       tags:
-      - rest-subscription-controller
+      - subscription-controller
       operationId: destroySubscription
       parameters: []
       responses:
@@ -505,7 +505,7 @@ paths:
   /api/subscriptions/notebooks/{notebook}/subscribe:
     post:
       tags:
-      - rest-subscription-controller
+      - subscription-controller
       operationId: createSubscription
       parameters:
       - name: notebook
@@ -535,7 +535,7 @@ paths:
   /api/settings/current-model-version:
     get:
       tags:
-      - rest-global-settings-controller
+      - global-settings-controller
       operationId: getCurrentModelVersions
       responses:
         "500":
@@ -552,7 +552,7 @@ paths:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
     post:
       tags:
-      - rest-global-settings-controller
+      - global-settings-controller
       operationId: setCurrentModelVersions
       requestBody:
         content:
@@ -576,7 +576,7 @@ paths:
   /api/recall-prompts/{recallPrompt}/regenerate:
     post:
       tags:
-      - rest-recall-prompt-controller
+      - recall-prompt-controller
       operationId: regenerate
       parameters:
       - name: recallPrompt
@@ -606,7 +606,7 @@ paths:
   /api/recall-prompts/{recallPrompt}/contest:
     post:
       tags:
-      - rest-recall-prompt-controller
+      - recall-prompt-controller
       operationId: contest
       parameters:
       - name: recallPrompt
@@ -630,7 +630,7 @@ paths:
   /api/recall-prompts/{recallPrompt}/answer:
     post:
       tags:
-      - rest-recall-prompt-controller
+      - recall-prompt-controller
       operationId: answerQuiz
       parameters:
       - name: recallPrompt
@@ -660,7 +660,7 @@ paths:
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
-      - rest-predefined-question-controller
+      - predefined-question-controller
       operationId: toggleApproval
       parameters:
       - name: predefinedQuestion
@@ -684,7 +684,7 @@ paths:
   /api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning:
     post:
       tags:
-      - rest-predefined-question-controller
+      - predefined-question-controller
       operationId: suggestQuestionForFineTuning
       parameters:
       - name: predefinedQuestion
@@ -714,7 +714,7 @@ paths:
   /api/predefined-questions/{note}/refine-question:
     post:
       tags:
-      - rest-predefined-question-controller
+      - predefined-question-controller
       operationId: refineQuestion
       parameters:
       - name: note
@@ -744,7 +744,7 @@ paths:
   /api/predefined-questions/{note}/note-questions:
     get:
       tags:
-      - rest-predefined-question-controller
+      - predefined-question-controller
       operationId: getAllQuestionByNote
       parameters:
       - name: note
@@ -769,7 +769,7 @@ paths:
                   $ref: "#/components/schemas/PredefinedQuestion"
     post:
       tags:
-      - rest-predefined-question-controller
+      - predefined-question-controller
       operationId: addQuestionManually
       parameters:
       - name: note
@@ -799,7 +799,7 @@ paths:
   /api/predefined-questions/generate-question-without-save:
     post:
       tags:
-      - rest-predefined-question-controller
+      - predefined-question-controller
       operationId: generateQuestionWithoutSave
       parameters:
       - name: note
@@ -823,7 +823,7 @@ paths:
   /api/notes/{referenceNote}/create-after:
     post:
       tags:
-      - rest-note-creation-controller
+      - note-creation-controller
       operationId: createNoteAfter
       parameters:
       - name: referenceNote
@@ -853,7 +853,7 @@ paths:
   /api/notes/{parentNote}/create:
     post:
       tags:
-      - rest-note-creation-controller
+      - note-creation-controller
       operationId: createNote
       parameters:
       - name: parentNote
@@ -883,7 +883,7 @@ paths:
   /api/notes/{note}/updateWikidataId:
     post:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: updateWikidataId
       parameters:
       - name: note
@@ -913,7 +913,7 @@ paths:
   /api/notes/{note}/semantic-search:
     post:
       tags:
-      - rest-search-controller
+      - search-controller
       operationId: semanticSearchWithin
       parameters:
       - name: note
@@ -945,7 +945,7 @@ paths:
   /api/notes/{note}/search:
     post:
       tags:
-      - rest-search-controller
+      - search-controller
       operationId: searchForLinkTargetWithin
       parameters:
       - name: note
@@ -977,7 +977,7 @@ paths:
   /api/notes/{note}/review-setting:
     post:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: updateRecallSetting
       parameters:
       - name: note
@@ -1007,7 +1007,7 @@ paths:
   /api/notes/{note}/delete:
     post:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: deleteNote
       parameters:
       - name: note
@@ -1033,7 +1033,7 @@ paths:
   /api/notes/semantic-search:
     post:
       tags:
-      - rest-search-controller
+      - search-controller
       operationId: semanticSearch
       requestBody:
         content:
@@ -1059,7 +1059,7 @@ paths:
   /api/notes/search:
     post:
       tags:
-      - rest-search-controller
+      - search-controller
       operationId: searchForLinkTarget
       requestBody:
         content:
@@ -1085,7 +1085,7 @@ paths:
   /api/notes/move_after/{note}/{targetNote}/{asFirstChild}:
     post:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: moveAfter
       parameters:
       - name: note
@@ -1121,7 +1121,7 @@ paths:
   /api/notebooks/{notebook}:
     get:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: get
       parameters:
       - name: notebook
@@ -1144,7 +1144,7 @@ paths:
                 $ref: "#/components/schemas/Notebook"
     post:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: update_1
       parameters:
       - name: notebook
@@ -1174,7 +1174,7 @@ paths:
   /api/notebooks/{notebook}/update-index:
     post:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: updateNotebookIndex
       parameters:
       - name: notebook
@@ -1194,7 +1194,7 @@ paths:
   /api/notebooks/{notebook}/share:
     post:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: shareNotebook
       parameters:
       - name: notebook
@@ -1218,7 +1218,7 @@ paths:
   /api/notebooks/{notebook}/reset-index:
     post:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: resetNotebookIndex
       parameters:
       - name: notebook
@@ -1238,7 +1238,7 @@ paths:
   /api/notebooks/{notebookId}/obsidian:
     post:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       summary: Import Obsidian file
       operationId: importObsidian
       parameters:
@@ -1273,7 +1273,7 @@ paths:
   /api/notebooks/create:
     post:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: createNotebook
       requestBody:
         content:
@@ -1297,7 +1297,7 @@ paths:
   /api/notebook_certificate_approvals/{notebookCertificateApproval}/approve:
     post:
       tags:
-      - rest-notebook-certificate-approval-controller
+      - notebook-certificate-approval-controller
       operationId: approve
       parameters:
       - name: notebookCertificateApproval
@@ -1321,7 +1321,7 @@ paths:
   /api/notebook_certificate_approvals/request-approval/{notebook}:
     post:
       tags:
-      - rest-notebook-certificate-approval-controller
+      - notebook-certificate-approval-controller
       operationId: requestApprovalForNotebook
       parameters:
       - name: notebook
@@ -1345,7 +1345,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/self-evaluate:
     post:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: selfEvaluate
       parameters:
       - name: memoryTracker
@@ -1375,7 +1375,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/remove:
     post:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: removeFromRepeating
       parameters:
       - name: memoryTracker
@@ -1399,7 +1399,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/answer-spelling:
     post:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: answerSpelling
       parameters:
       - name: memoryTracker
@@ -1453,7 +1453,7 @@ paths:
   /api/links/{link}:
     post:
       tags:
-      - rest-link-controller
+      - link-controller
       operationId: updateLink
       parameters:
       - name: link
@@ -1485,7 +1485,7 @@ paths:
   /api/links/move/{sourceNote}/{targetNote}:
     post:
       tags:
-      - rest-link-controller
+      - link-controller
       operationId: moveNote
       parameters:
       - name: sourceNote
@@ -1522,7 +1522,7 @@ paths:
   /api/links/create/{sourceNote}/{targetNote}:
     post:
       tags:
-      - rest-link-controller
+      - link-controller
       operationId: linkNoteFinalize
       parameters:
       - name: sourceNote
@@ -1559,7 +1559,7 @@ paths:
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
-      - rest-fine-tuning-data-controller
+      - fine-tuning-data-controller
       operationId: duplicate
       parameters:
       - name: suggestedQuestion
@@ -1583,7 +1583,7 @@ paths:
   /api/fine-tuning/{suggestedQuestion}/delete:
     post:
       tags:
-      - rest-fine-tuning-data-controller
+      - fine-tuning-data-controller
       operationId: delete
       parameters:
       - name: suggestedQuestion
@@ -1607,7 +1607,7 @@ paths:
   /api/fine-tuning/upload-and-trigger-fine-tuning:
     post:
       tags:
-      - rest-fine-tuning-data-controller
+      - fine-tuning-data-controller
       operationId: uploadAndTriggerFineTuning
       responses:
         "500":
@@ -1621,7 +1621,7 @@ paths:
   /api/conversation/{conversationId}/send:
     post:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: replyToConversation
       parameters:
       - name: conversationId
@@ -1651,7 +1651,7 @@ paths:
   /api/conversation/{conversationId}/ai-reply:
     post:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: getAiReply
       parameters:
       - name: conversationId
@@ -1675,7 +1675,7 @@ paths:
   /api/conversation/recall-prompt/{recallPrompt}:
     post:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: startConversationAboutRecallPrompt
       parameters:
       - name: recallPrompt
@@ -1699,7 +1699,7 @@ paths:
   /api/conversation/note/{note}:
     get:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: getConversationsAboutNote
       parameters:
       - name: note
@@ -1724,7 +1724,7 @@ paths:
                   $ref: "#/components/schemas/Conversation"
     post:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: startConversationAboutNote
       parameters:
       - name: note
@@ -1754,7 +1754,7 @@ paths:
   /api/conversation/assessment-question/{assessmentQuestion}:
     post:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: startConversationAboutAssessmentQuestion
       parameters:
       - name: assessmentQuestion
@@ -1784,7 +1784,7 @@ paths:
   /api/circles:
     get:
       tags:
-      - rest-circle-controller
+      - circle-controller
       operationId: index
       responses:
         "500":
@@ -1803,7 +1803,7 @@ paths:
                   $ref: "#/components/schemas/Circle"
     post:
       tags:
-      - rest-circle-controller
+      - circle-controller
       operationId: createCircle
       requestBody:
         content:
@@ -1827,7 +1827,7 @@ paths:
   /api/circles/{circle}/notebooks:
     post:
       tags:
-      - rest-circle-controller
+      - circle-controller
       operationId: createNotebookInCircle
       parameters:
       - name: circle
@@ -1857,7 +1857,7 @@ paths:
   /api/circles/join:
     post:
       tags:
-      - rest-circle-controller
+      - circle-controller
       operationId: joinCircle
       requestBody:
         content:
@@ -1881,7 +1881,7 @@ paths:
   /api/certificate/{notebook}:
     get:
       tags:
-      - rest-certificate-controller
+      - certificate-controller
       operationId: getCertificate
       parameters:
       - name: notebook
@@ -1904,7 +1904,7 @@ paths:
                 $ref: "#/components/schemas/Certificate"
     post:
       tags:
-      - rest-certificate-controller
+      - certificate-controller
       operationId: claimCertificate
       parameters:
       - name: notebook
@@ -1928,7 +1928,7 @@ paths:
   /api/bazaar/{bazaarNotebook}/remove:
     post:
       tags:
-      - rest-bazaar-controller
+      - bazaar-controller
       operationId: removeFromBazaar
       parameters:
       - name: bazaarNotebook
@@ -1954,7 +1954,7 @@ paths:
   /api/audio/audio-to-text:
     post:
       tags:
-      - rest-ai-audio-controller
+      - ai-audio-controller
       operationId: audioToText
       requestBody:
         content:
@@ -2003,7 +2003,7 @@ paths:
   /api/assessment/{assessmentQuestionInstance}/answer:
     post:
       tags:
-      - rest-assessment-controller
+      - assessment-controller
       operationId: answerQuestion
       parameters:
       - name: assessmentQuestionInstance
@@ -2033,7 +2033,7 @@ paths:
   /api/assessment/{assessmentAttempt}:
     post:
       tags:
-      - rest-assessment-controller
+      - assessment-controller
       operationId: submitAssessmentResult
       parameters:
       - name: assessmentAttempt
@@ -2057,7 +2057,7 @@ paths:
   /api/assessment/questions/{notebook}:
     post:
       tags:
-      - rest-assessment-controller
+      - assessment-controller
       operationId: generateAssessmentQuestions
       parameters:
       - name: notebook
@@ -2081,7 +2081,7 @@ paths:
   /api/ai/suggest-title/{note}:
     post:
       tags:
-      - rest-ai-controller
+      - ai-controller
       operationId: suggestTitle
       parameters:
       - name: note
@@ -2105,7 +2105,7 @@ paths:
   /api/ai/generate-image:
     post:
       tags:
-      - rest-ai-controller
+      - ai-controller
       operationId: generateImage
       requestBody:
         content:
@@ -2129,7 +2129,7 @@ paths:
   /api/user/{user}:
     patch:
       tags:
-      - rest-user-controller
+      - user-controller
       operationId: updateUser
       parameters:
       - name: user
@@ -2159,7 +2159,7 @@ paths:
   /api/text_content/{note}/title:
     patch:
       tags:
-      - rest-text-content-controller
+      - text-content-controller
       operationId: updateNoteTitle
       parameters:
       - name: note
@@ -2189,7 +2189,7 @@ paths:
   /api/text_content/{note}/details:
     patch:
       tags:
-      - rest-text-content-controller
+      - text-content-controller
       operationId: updateNoteDetails
       parameters:
       - name: note
@@ -2219,7 +2219,7 @@ paths:
   /api/notes/{note}:
     get:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: show
       parameters:
       - name: note
@@ -2242,7 +2242,7 @@ paths:
                 $ref: "#/components/schemas/NoteRealm"
     patch:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: updateNoteAccessories
       parameters:
       - name: note
@@ -2271,7 +2271,7 @@ paths:
   /api/notes/{note}/undo-delete:
     patch:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: undoDeleteNote
       parameters:
       - name: note
@@ -2295,7 +2295,7 @@ paths:
   /api/notebooks/{notebook}/move-to-circle/{circle}:
     patch:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: moveToCircle
       parameters:
       - name: notebook
@@ -2324,7 +2324,7 @@ paths:
   /api/notebooks/{notebook}/ai-assistant:
     get:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: getAiAssistant
       parameters:
       - name: notebook
@@ -2347,7 +2347,7 @@ paths:
                 $ref: "#/components/schemas/NotebookAiAssistant"
     patch:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: updateAiAssistant
       parameters:
       - name: notebook
@@ -2377,7 +2377,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/mark-as-repeated:
     patch:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: markAsRepeated
       parameters:
       - name: memoryTracker
@@ -2406,7 +2406,7 @@ paths:
   /api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning:
     patch:
       tags:
-      - rest-fine-tuning-data-controller
+      - fine-tuning-data-controller
       operationId: updateSuggestedQuestionForFineTuning
       parameters:
       - name: suggestedQuestion
@@ -2436,7 +2436,7 @@ paths:
   /api/conversation/{conversationId}/read:
     patch:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: markConversationAsRead
       parameters:
       - name: conversationId
@@ -2462,7 +2462,7 @@ paths:
   /api/wikidata/search/{search}:
     get:
       tags:
-      - rest-wikidata-controller
+      - wikidata-controller
       operationId: searchWikidata
       parameters:
       - name: search
@@ -2488,7 +2488,7 @@ paths:
   /api/wikidata/entity-data/{wikidataId}:
     get:
       tags:
-      - rest-wikidata-controller
+      - wikidata-controller
       operationId: fetchWikidataEntityDataByID
       parameters:
       - name: wikidataId
@@ -2512,7 +2512,7 @@ paths:
   /api/user/get-tokens:
     get:
       tags:
-      - rest-user-controller
+      - user-controller
       operationId: getTokens
       responses:
         "500":
@@ -2532,7 +2532,7 @@ paths:
   /api/user/current-user-info:
     get:
       tags:
-      - rest-current-user-info-controller
+      - current-user-info-controller
       operationId: currentUserInfo
       responses:
         "500":
@@ -2572,7 +2572,7 @@ paths:
   /api/recalls/recalling:
     get:
       tags:
-      - rest-recalls-controller
+      - recalls-controller
       operationId: recalling
       parameters:
       - name: timezone
@@ -2602,7 +2602,7 @@ paths:
   /api/recalls/overview:
     get:
       tags:
-      - rest-recalls-controller
+      - recalls-controller
       operationId: overview
       parameters:
       - name: timezone
@@ -2626,7 +2626,7 @@ paths:
   /api/recall-prompts/{recallPrompt}:
     get:
       tags:
-      - rest-recall-prompt-controller
+      - recall-prompt-controller
       operationId: showQuestion
       parameters:
       - name: recallPrompt
@@ -2650,7 +2650,7 @@ paths:
   /api/recall-prompts/{memoryTracker}/question:
     get:
       tags:
-      - rest-recall-prompt-controller
+      - recall-prompt-controller
       operationId: askAQuestion
       parameters:
       - name: memoryTracker
@@ -2674,7 +2674,7 @@ paths:
   /api/notes/{note}/note-info:
     get:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: getNoteInfo
       parameters:
       - name: note
@@ -2698,7 +2698,7 @@ paths:
   /api/notes/{note}/graph:
     get:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: getGraph
       parameters:
       - name: note
@@ -2728,7 +2728,7 @@ paths:
   /api/notes/{note}/descendants:
     get:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: getDescendants
       parameters:
       - name: note
@@ -2752,7 +2752,7 @@ paths:
   /api/notes/{note}/accessory:
     get:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: showNoteAccessory
       parameters:
       - name: note
@@ -2776,7 +2776,7 @@ paths:
   /api/notes/recent:
     get:
       tags:
-      - rest-note-controller
+      - note-controller
       operationId: getRecentNotes
       responses:
         "500":
@@ -2796,7 +2796,7 @@ paths:
   /api/notebooks:
     get:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: myNotebooks
       responses:
         "500":
@@ -2814,7 +2814,7 @@ paths:
   /api/notebooks/{notebook}/obsidian:
     get:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: downloadNotebookForObsidian
       parameters:
       - name: notebook
@@ -2839,7 +2839,7 @@ paths:
   /api/notebooks/{notebook}/notes:
     get:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: getNotes
       parameters:
       - name: notebook
@@ -2865,7 +2865,7 @@ paths:
   /api/notebooks/{notebook}/dump:
     get:
       tags:
-      - rest-notebook-controller
+      - notebook-controller
       operationId: downloadNotebookDump
       parameters:
       - name: notebook
@@ -2891,7 +2891,7 @@ paths:
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:
-      - rest-notebook-certificate-approval-controller
+      - notebook-certificate-approval-controller
       operationId: getAllPendingRequest
       responses:
         "500":
@@ -2911,7 +2911,7 @@ paths:
   /api/notebook_certificate_approvals/for-notebook/{notebook}:
     get:
       tags:
-      - rest-notebook-certificate-approval-controller
+      - notebook-certificate-approval-controller
       operationId: getApprovalForNotebook
       parameters:
       - name: notebook
@@ -2935,7 +2935,7 @@ paths:
   /api/memory-trackers/{memoryTracker}:
     get:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: show_1
       parameters:
       - name: memoryTracker
@@ -2959,7 +2959,7 @@ paths:
   /api/memory-trackers/{memoryTracker}/spelling-question:
     get:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: getSpellingQuestion
       parameters:
       - name: memoryTracker
@@ -2983,7 +2983,7 @@ paths:
   /api/memory-trackers/recently-reviewed:
     get:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: getRecentlyReviewed
       responses:
         "500":
@@ -3003,7 +3003,7 @@ paths:
   /api/memory-trackers/recent:
     get:
       tags:
-      - rest-memory-tracker-controller
+      - memory-tracker-controller
       operationId: getRecentMemoryTrackers
       responses:
         "500":
@@ -3023,7 +3023,7 @@ paths:
   /api/healthcheck:
     get:
       tags:
-      - rest-health-check-controller
+      - health-check-controller
       operationId: ping
       responses:
         "500":
@@ -3041,7 +3041,7 @@ paths:
   /api/fine-tuning/all-suggested-questions-for-fine-tuning:
     get:
       tags:
-      - rest-fine-tuning-data-controller
+      - fine-tuning-data-controller
       operationId: getAllSuggestedQuestions
       responses:
         "500":
@@ -3061,7 +3061,7 @@ paths:
   /api/failure-reports:
     get:
       tags:
-      - rest-failure-report-controller
+      - failure-report-controller
       operationId: failureReports
       responses:
         "500":
@@ -3079,7 +3079,7 @@ paths:
   /api/failure-reports/{failureReport}:
     get:
       tags:
-      - rest-failure-report-controller
+      - failure-report-controller
       operationId: show_2
       parameters:
       - name: failureReport
@@ -3103,7 +3103,7 @@ paths:
   /api/data_upgrade:
     get:
       tags:
-      - rest-health-check-controller
+      - health-check-controller
       operationId: dataUpgrade
       responses:
         "500":
@@ -3123,7 +3123,7 @@ paths:
   /api/conversation/{conversationId}:
     get:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: getConversation
       parameters:
       - name: conversationId
@@ -3147,7 +3147,7 @@ paths:
   /api/conversation/{conversationId}/messages:
     get:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: getConversationMessages
       parameters:
       - name: conversationId
@@ -3173,7 +3173,7 @@ paths:
   /api/conversation/{conversationId}/export:
     get:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: exportConversation
       parameters:
       - name: conversationId
@@ -3197,7 +3197,7 @@ paths:
   /api/conversation/unread:
     get:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: getUnreadConversations
       responses:
         "500":
@@ -3217,7 +3217,7 @@ paths:
   /api/conversation/all:
     get:
       tags:
-      - rest-conversation-message-controller
+      - conversation-message-controller
       operationId: getConversationsOfCurrentUser
       responses:
         "500":
@@ -3237,7 +3237,7 @@ paths:
   /api/circles/{circle}:
     get:
       tags:
-      - rest-circle-controller
+      - circle-controller
       operationId: showCircle
       parameters:
       - name: circle
@@ -3261,7 +3261,7 @@ paths:
   /api/bazaar:
     get:
       tags:
-      - rest-bazaar-controller
+      - bazaar-controller
       operationId: bazaar
       responses:
         "500":
@@ -3331,7 +3331,7 @@ paths:
   /api/assessment:
     get:
       tags:
-      - rest-assessment-controller
+      - assessment-controller
       operationId: getMyAssessments
       responses:
         "500":
@@ -3351,7 +3351,7 @@ paths:
   /api/ai/dummy:
     get:
       tags:
-      - rest-ai-controller
+      - ai-controller
       operationId: dummyEntryToGenerateDataTypesThatAreRequiredInEventStream
       responses:
         "500":
@@ -3369,7 +3369,7 @@ paths:
   /api/ai/available-gpt-models:
     get:
       tags:
-      - rest-ai-controller
+      - ai-controller
       operationId: getAvailableGptModels
       responses:
         "500":
@@ -3389,7 +3389,7 @@ paths:
   /api/user/token/{tokenId}:
     delete:
       tags:
-      - rest-user-controller
+      - user-controller
       operationId: deleteToken
       parameters:
       - name: tokenId
@@ -3409,7 +3409,7 @@ paths:
   /api/failure-reports/delete:
     delete:
       tags:
-      - rest-failure-report-controller
+      - failure-report-controller
       operationId: deleteFailureReports
       requestBody:
         content:

@@ -33,14 +33,14 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestNoteControllerTests {
+class NoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   private UserModel userModel;
-  RestNoteController controller;
+  NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
@@ -48,7 +48,7 @@ class RestNoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
 
     controller =
-        new RestNoteController(
+        new NoteController(
             modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
   }
 
@@ -286,8 +286,8 @@ class RestNoteControllerTests {
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
       SearchTerm searchTerm = new SearchTerm();
-      RestSearchController searchController =
-          new RestSearchController(userModel, noteSearchService);
+      SearchController searchController =
+          new SearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
     }
@@ -296,8 +296,8 @@ class RestNoteControllerTests {
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
-      RestSearchController searchController =
-          new RestSearchController(userModel, noteSearchService);
+      SearchController searchController =
+          new SearchController(userModel, noteSearchService);
       assertThrows(
           ResponseStatusException.class,
           () -> searchController.searchForLinkTargetWithin(note, searchTerm));

@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/notebook_certificate_approvals")
-class RestNotebookCertificateApprovalController {
+class NotebookCertificateApprovalController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestNotebookCertificateApprovalController(
+  public NotebookCertificateApprovalController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

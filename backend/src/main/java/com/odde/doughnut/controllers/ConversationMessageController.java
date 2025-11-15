@@ -19,12 +19,12 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 @RestController
 @RequestMapping("/api/conversation")
-public class RestConversationMessageController {
+public class ConversationMessageController {
   private final ConversationService conversationService;
   private final UserModel currentUser;
   private final ChatCompletionConversationService chatCompletionConversationService;
 
-  public RestConversationMessageController(
+  public ConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
       ChatCompletionConversationService chatCompletionConversationService) {

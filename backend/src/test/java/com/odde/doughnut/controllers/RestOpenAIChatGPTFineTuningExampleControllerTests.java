@@ -35,13 +35,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
-  RestFineTuningDataController controller;
+  FineTuningDataController controller;
   @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
     controller =
-        new RestFineTuningDataController(
+        new FineTuningDataController(
             modelFactoryService,
             makeMe.anAdmin().toModelPlease(),
             openAiApi,
@@ -53,7 +53,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void authentication() {
       controller =
-          new RestFineTuningDataController(
+          new FineTuningDataController(
               modelFactoryService,
               makeMe.aUser().toModelPlease(),
               openAiApi,
@@ -106,7 +106,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
       controller =
-          new RestFineTuningDataController(
+          new FineTuningDataController(
               modelFactoryService,
               makeMe.aNullUserModelPlease(),
               openAiApi,
@@ -147,7 +147,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void itShouldNotAllowNonAdmin() {
       controller =
-          new RestFineTuningDataController(
+          new FineTuningDataController(
               modelFactoryService,
               makeMe.aUser().toModelPlease(),
               openAiApi,
@@ -186,7 +186,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void itShouldNotAllowNonAdmin() {
       controller =
-          new RestFineTuningDataController(
+          new FineTuningDataController(
               modelFactoryService,
               makeMe.aUser().toModelPlease(),
               openAiApi,
@@ -214,7 +214,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
     @Test
     void itShouldNotAllowNonAdmin() {
       controller =
-          new RestFineTuningDataController(
+          new FineTuningDataController(
               modelFactoryService,
               makeMe.aUser().toModelPlease(),
               openAiApi,

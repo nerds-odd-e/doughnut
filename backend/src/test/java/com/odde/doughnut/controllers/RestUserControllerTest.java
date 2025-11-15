@@ -25,16 +25,16 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestUserControllerTest {
+class UserControllerTest {
   @Autowired MakeMe makeMe;
   UserModel userModel;
-  RestUserController controller;
+  UserController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestUserController(makeMe.modelFactoryService, userModel, testabilitySettings);
+    controller = new UserController(makeMe.modelFactoryService, userModel, testabilitySettings);
   }
 
   @Test
@@ -120,7 +120,7 @@ class RestUserControllerTest {
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken2);
 
-    controller = new RestUserController(makeMe.modelFactoryService, userModel, testabilitySettings);
+    controller = new UserController(makeMe.modelFactoryService, userModel, testabilitySettings);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }

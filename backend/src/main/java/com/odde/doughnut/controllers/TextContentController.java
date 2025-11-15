@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/text_content")
-class RestTextContentController {
+class TextContentController {
   private final ModelFactoryService modelFactoryService;
 
   private UserModel currentUser;
@@ -27,7 +27,7 @@ class RestTextContentController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  public RestTextContentController(
+  public TextContentController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings) {

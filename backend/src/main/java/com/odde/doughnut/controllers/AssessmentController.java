@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/assessment")
-class RestAssessmentController {
+class AssessmentController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final UserModel currentUser;
   private final AssessmentService assessmentService;
 
-  public RestAssessmentController(
+  public AssessmentController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
       UserModel currentUser) {

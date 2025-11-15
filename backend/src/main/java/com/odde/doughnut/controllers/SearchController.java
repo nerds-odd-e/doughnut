@@ -20,12 +20,12 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/notes")
-class RestSearchController {
+class SearchController {
 
   private final UserModel currentUser;
   private final NoteSearchService noteSearchService;
 
-  public RestSearchController(UserModel currentUser, NoteSearchService noteSearchService) {
+  public SearchController(UserModel currentUser, NoteSearchService noteSearchService) {
     this.currentUser = currentUser;
     this.noteSearchService = noteSearchService;
   }

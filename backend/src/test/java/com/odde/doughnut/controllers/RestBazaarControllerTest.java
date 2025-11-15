@@ -22,11 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestBazaarControllerTest {
+class BazaarControllerTest {
   @Autowired private MakeMe makeMe;
   private UserModel adminUser;
   private UserModel notebookOwner;
-  private RestBazaarController controller;
+  private BazaarController controller;
   private Note topNote;
   private Notebook notebook;
   private BazaarNotebook bazaarNotebook;
@@ -38,7 +38,7 @@ class RestBazaarControllerTest {
     topNote = makeMe.aNote().creatorAndOwner(notebookOwner).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
-    controller = new RestBazaarController(makeMe.modelFactoryService, adminUser);
+    controller = new BazaarController(makeMe.modelFactoryService, adminUser);
   }
 
   @Nested
@@ -46,7 +46,7 @@ class RestBazaarControllerTest {
     @Test
     void otherPeopleCannot() {
       controller =
-          new RestBazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
+          new BazaarController(makeMe.modelFactoryService, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));
@@ -55,7 +55,7 @@ class RestBazaarControllerTest {
 
     @Test
     void notebookOwnerCan() throws UnexpectedNoAccessRightException {
-      controller = new RestBazaarController(makeMe.modelFactoryService, notebookOwner);
+      controller = new BazaarController(makeMe.modelFactoryService, notebookOwner);
       controller.removeFromBazaar(bazaarNotebook);
     }
 

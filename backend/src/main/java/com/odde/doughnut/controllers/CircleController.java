@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/circles")
-class RestCircleController {
+class CircleController {
   private final ModelFactoryService modelFactoryService;
 
   @Resource(name = "testabilitySettings")
@@ -33,7 +33,7 @@ class RestCircleController {
 
   private UserModel currentUser;
 
-  public RestCircleController(
+  public CircleController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
       UserModel currentUser) {

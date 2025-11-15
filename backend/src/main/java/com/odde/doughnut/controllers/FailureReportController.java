@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/failure-reports")
-class RestFailureReportController {
+class FailureReportController {
   private final ModelFactoryService modelFactoryService;
   private final GithubService realGithubService;
   private UserModel currentUser;
 
-  public RestFailureReportController(
+  public FailureReportController(
       ModelFactoryService modelFactoryService,
       GithubService realGithubService,
       UserModel currentUser) {

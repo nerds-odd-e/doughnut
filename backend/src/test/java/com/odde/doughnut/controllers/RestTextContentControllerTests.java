@@ -25,12 +25,12 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestTextContentControllerTests {
+class TextContentControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
   private UserModel userModel;
-  RestTextContentController controller;
+  TextContentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note note;
 
@@ -38,7 +38,7 @@ class RestTextContentControllerTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-    controller = new RestTextContentController(modelFactoryService, userModel, testabilitySettings);
+    controller = new TextContentController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested

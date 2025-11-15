@@ -19,11 +19,11 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/wikidata")
-public class RestWikidataController {
+public class WikidataController {
 
   WikidataService wikidataService;
 
-  public RestWikidataController(
+  public WikidataController(
       TestabilitySettings testabilitySettings, HttpClientAdapter httpClientAdapter) {
     wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());

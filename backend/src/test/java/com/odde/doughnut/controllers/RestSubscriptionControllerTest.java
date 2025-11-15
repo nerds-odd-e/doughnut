@@ -25,13 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestSubscriptionControllerTest {
+class SubscriptionControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionRepository subscriptionRepository;
   private UserModel userModel;
   private Note topNote;
   private Notebook notebook;
-  private RestSubscriptionController controller;
+  private SubscriptionController controller;
 
   @BeforeEach
   void setup() {
@@ -39,7 +39,7 @@ class RestSubscriptionControllerTest {
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
-    controller = new RestSubscriptionController(makeMe.modelFactoryService, userModel);
+    controller = new SubscriptionController(makeMe.modelFactoryService, userModel);
   }
 
   @Test

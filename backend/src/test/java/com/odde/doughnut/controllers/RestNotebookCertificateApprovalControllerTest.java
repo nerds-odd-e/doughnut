@@ -22,19 +22,19 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestNotebookCertificateApprovalControllerTest {
+class NotebookCertificateApprovalControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
   private UserModel userModel;
-  RestNotebookCertificateApprovalController controller;
+  NotebookCertificateApprovalController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new RestNotebookCertificateApprovalController(
+        new NotebookCertificateApprovalController(
             modelFactoryService, userModel, testabilitySettings);
   }
 
@@ -99,7 +99,7 @@ class RestNotebookCertificateApprovalControllerTest {
       UserModel userModel = makeMe.anAdmin().toModelPlease();
       notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
       controller =
-          new RestNotebookCertificateApprovalController(
+          new NotebookCertificateApprovalController(
               modelFactoryService, userModel, testabilitySettings);
       approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
       makeMe.refresh(notebook);

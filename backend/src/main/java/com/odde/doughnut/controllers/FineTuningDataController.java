@@ -19,13 +19,13 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/fine-tuning")
-class RestFineTuningDataController {
+class FineTuningDataController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final FineTuningService fineTuningService;
   private final OtherAiServices otherAiServices;
 
-  public RestFineTuningDataController(
+  public FineTuningDataController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       OpenAiApi openAiApi,

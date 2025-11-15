@@ -28,12 +28,12 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestFailureReportControllerTest {
+class FailureReportControllerTest {
   @Autowired MakeMe makeMe;
   private GithubService githubService = new NullGithubService();
 
-  RestFailureReportController controller(UserModel userModel) {
-    return new RestFailureReportController(makeMe.modelFactoryService, githubService, userModel);
+  FailureReportController controller(UserModel userModel) {
+    return new FailureReportController(makeMe.modelFactoryService, githubService, userModel);
   }
 
   @Test

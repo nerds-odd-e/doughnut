@@ -17,12 +17,12 @@ import org.springframework.web.context.annotation.SessionScope;
 @RestController
 @SessionScope
 @RequestMapping("/api/audio")
-class RestAiAudioController {
+class AiAudioController {
 
   OtherAiServices otherAiServices;
   private final ModelFactoryService modelFactoryService;
 
-  public RestAiAudioController(
+  public AiAudioController(
       OtherAiServices otherAiServices, ModelFactoryService modelFactoryService) {
     this.otherAiServices = otherAiServices;
     this.modelFactoryService = modelFactoryService;

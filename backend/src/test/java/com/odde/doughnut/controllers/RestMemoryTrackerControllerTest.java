@@ -33,19 +33,19 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestMemoryTrackerControllerTest {
+class MemoryTrackerControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   private UserModel userModel;
-  RestMemoryTrackerController controller;
+  MemoryTrackerController controller;
 
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+        new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -73,7 +73,7 @@ class RestMemoryTrackerControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+          new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
       assertThrows(
@@ -219,7 +219,7 @@ class RestMemoryTrackerControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+          new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
   }
@@ -251,7 +251,7 @@ class RestMemoryTrackerControllerTest {
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+          new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
     }
   }
@@ -315,7 +315,7 @@ class RestMemoryTrackerControllerTest {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
       userModel = makeMe.aNullUserModelPlease();
       controller =
-          new RestMemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
+          new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(
           ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
     }

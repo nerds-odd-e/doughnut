@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/bazaar")
-class RestBazaarController {
+class BazaarController {
   private final ModelFactoryService modelFactoryService;
   private UserModel currentUser;
 
-  public RestBazaarController(ModelFactoryService modelFactoryService, UserModel currentUser) {
+  public BazaarController(ModelFactoryService modelFactoryService, UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
   }

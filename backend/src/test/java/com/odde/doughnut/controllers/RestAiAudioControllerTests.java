@@ -34,9 +34,9 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-class RestAiAudioControllerTests {
+class AiAudioControllerTests {
   @Autowired MakeMe makeMe;
-  RestAiAudioController controller;
+  AiAudioController controller;
   @Mock OpenAiApiExtended openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -48,7 +48,7 @@ class RestAiAudioControllerTests {
 
   private void initializeController() {
     controller =
-        new RestAiAudioController(new OtherAiServices(openAiApi), makeMe.modelFactoryService);
+        new AiAudioController(new OtherAiServices(openAiApi), makeMe.modelFactoryService);
   }
 
   private void setupMocks() {

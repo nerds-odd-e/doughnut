@@ -26,10 +26,10 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class RestAssessmentControllerTests {
+public class AssessmentControllerTests {
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
-  private RestAssessmentController controller;
+  private AssessmentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   private AssessmentService assessmentService;
@@ -39,7 +39,7 @@ public class RestAssessmentControllerTests {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new RestAssessmentController(makeMe.modelFactoryService, testabilitySettings, currentUser);
+        new AssessmentController(makeMe.modelFactoryService, testabilitySettings, currentUser);
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
@@ -55,7 +55,7 @@ public class RestAssessmentControllerTests {
     @Test
     void whenNotLogin() {
       controller =
-          new RestAssessmentController(
+          new AssessmentController(
               makeMe.modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
@@ -104,7 +104,7 @@ public class RestAssessmentControllerTests {
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
       controller =
-          new RestAssessmentController(
+          new AssessmentController(
               makeMe.modelFactoryService, testabilitySettings, makeMe.aUser().toModelPlease());
       assertThrows(
           UnexpectedNoAccessRightException.class,
