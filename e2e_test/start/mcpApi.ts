@@ -8,18 +8,19 @@ const mcpApi = () => {
   return {
     createNote: (parentNote: string, noteCreationDTO: NoteCreationDTO) => {
       const makeRequest = () => {
-        return cy.get('@savedMcpToken').then((token) => {
-          const requestBody: McpNoteAddDTO = {
-            parentNote,
-            noteCreationDTO,
-          }
+        const requestBody: McpNoteAddDTO = {
+          parentNote,
+          noteCreationDTO,
+        }
 
+        return cy.get('@savedMcpToken').then((token) => {
           // Set token in OpenAPI config for this request
           const originalToken = OpenAPI.TOKEN
           OpenAPI.TOKEN = typeof token === 'string' ? token : String(token)
 
-          // Call the service directly - it will use cy.request via our custom request function
-          return Services.createNote1({ requestBody })
+          // Call the service - it will use cy.request via our custom request function
+          // The CancelablePromise wraps cy.then() internally, so we need to wrap it
+          const promise = Services.createNote1({ requestBody })
             .then(() => {
               // Success - return 200 status
               return { status: 200, body: {} }
@@ -35,6 +36,9 @@ const mcpApi = () => {
               // Restore original token
               OpenAPI.TOKEN = originalToken
             })
+
+          // Wrap the promise to make it part of the Cypress chain
+          return cy.wrap(promise)
         })
       }
 
