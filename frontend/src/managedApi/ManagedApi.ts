@@ -243,10 +243,10 @@ class ManagedApi extends DoughnutApi {
     return this.eventSourceApi
   }
 
-  logout(): Promise<void> {
-    // TODO: Implement logout using generated function or direct request
-    // For now, return a resolved promise
-    return Promise.resolve()
+  async logout() {
+    await fetch("/logout", {
+      method: "POST",
+    })
   }
 }
 
