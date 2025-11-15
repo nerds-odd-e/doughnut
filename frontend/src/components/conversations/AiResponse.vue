@@ -36,7 +36,6 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { Conversation } from "@generated/backend"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
@@ -48,6 +47,7 @@ import {
 } from "@/models/aiReplyState"
 import ToolCallHandler from "./ToolCallHandler.vue"
 import { type Suggestion } from "@/models/suggestions"
+import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 
 const { conversation, storageAccessor, aiReplyTrigger } = defineProps<{
   conversation: Conversation
@@ -59,8 +59,6 @@ const emit = defineEmits<{
   (e: "ai-response-done"): void
   (e: "scroll-to", scrollIndex: number): void
 }>()
-
-const { managedApi } = useLoadingApi()
 
 const markdowntToHtml = (content?: string) =>
   markdownizer.markdownToHtml(content)
@@ -138,7 +136,7 @@ const getAiReply = async () => {
   const states = createAiReplyStates(createAiActionContext())
 
   aiStatus.value = "Starting AI reply..."
-  await managedApi.eventSource
+  new AiReplyEventSource(conversation.id)
     .onMessage(async (event, data) => {
       const state = states[event]
       if (state) {
@@ -162,7 +160,7 @@ const getAiReply = async () => {
         lastErrorMessage.value = "Bad Request"
       }
     })
-    .restConversationMessageController.getAiReply(conversation.id)
+    .start()
 }
 
 watch(

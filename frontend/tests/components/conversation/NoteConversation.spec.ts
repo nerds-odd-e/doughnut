@@ -5,6 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi } from "vitest"
+import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -164,8 +165,10 @@ describe("NoteConversation", () => {
   it("handles AI reply when starting new conversation with AI invite", async () => {
     helper.managedApi.restConversationMessageController.getConversationsAboutNote =
       vi.fn().mockResolvedValue([])
-    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
-      vi.fn()
+    const mockStart = vi.fn()
+    vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
+      mockStart
+    )
 
     const wrapper = await mount()
 
@@ -181,9 +184,7 @@ describe("NoteConversation", () => {
     ).toHaveBeenCalledWith(note.id, "Hello AI")
 
     // Verify AI reply was requested
-    expect(
-      helper.managedApi.eventSource.restConversationMessageController.getAiReply
-    ).toHaveBeenCalledWith(conversation.id)
+    expect(mockStart).toHaveBeenCalled()
 
     // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -197,8 +198,10 @@ describe("NoteConversation", () => {
       vi.fn().mockResolvedValue([conversation])
     helper.managedApi.restConversationMessageController.replyToConversation =
       vi.fn()
-    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
-      vi.fn()
+    const mockStart = vi.fn()
+    vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
+      mockStart
+    )
 
     const wrapper = await mount()
 
@@ -212,8 +215,6 @@ describe("NoteConversation", () => {
     ).toHaveBeenCalledWith(conversation.id, "Hello AI")
 
     // Verify AI reply was requested
-    expect(
-      helper.managedApi.eventSource.restConversationMessageController.getAiReply
-    ).toHaveBeenCalledWith(conversation.id)
+    expect(mockStart).toHaveBeenCalled()
   })
 })

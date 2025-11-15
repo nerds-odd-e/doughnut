@@ -5,6 +5,10 @@ import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
+import {
+  getLastInstance,
+  resetInstance,
+} from "@tests/helpers/aiReplyEventSourceTracker"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -30,7 +34,29 @@ beforeAll(() => {
   })
 })
 
+// Mock AiReplyEventSource to track instances
+vi.mock("@/managedApi/AiReplyEventSource", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/managedApi/AiReplyEventSource")
+  >("@/managedApi/AiReplyEventSource")
+  const { setLastInstance } = await import(
+    "@tests/helpers/aiReplyEventSourceTracker"
+  )
+  return {
+    default: class extends actual.default {
+      constructor(conversationId: number) {
+        super(conversationId)
+        setLastInstance(this)
+      }
+    },
+  }
+})
+
 export const simulateAiResponse = (content = "## I'm ChatGPT") => {
+  const instance = getLastInstance()
+  if (!instance) {
+    throw new Error("No AiReplyEventSource instance available")
+  }
   const chunk = {
     choices: [
       {
@@ -44,10 +70,7 @@ export const simulateAiResponse = (content = "## I'm ChatGPT") => {
     ],
   }
 
-  helper.managedApi.eventSource.eventSourceRequest.onMessage(
-    "chat.completion.chunk",
-    JSON.stringify(chunk)
-  )
+  instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
 }
 
 // Create realistic streaming tool call chunks (delta.tool_calls format)
@@ -141,15 +164,16 @@ const submitMessageAndSimulateToolCallChunk = async (
   toolCallChunks
 ) => {
   await submitMessage(wrapper)
+  const instance = getLastInstance()
+  if (!instance) {
+    throw new Error("No AiReplyEventSource instance available")
+  }
   // toolCallChunks can be a single chunk (old format) or array of chunks (new format)
   const chunks = Array.isArray(toolCallChunks)
     ? toolCallChunks
     : [toolCallChunks]
   for (const chunk of chunks) {
-    helper.managedApi.eventSource.eventSourceRequest.onMessage(
-      "chat.completion.chunk",
-      JSON.stringify(chunk)
-    )
+    instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
     await flushPromises()
   }
 }
@@ -168,8 +192,7 @@ describe("ConversationInner", () => {
 
   beforeEach(() => {
     storageAccessor = createNoteStorage(helper.managedApi)
-    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
-      vi.fn()
+    resetInstance()
 
     const testData = setupTestData()
     note = testData.note
@@ -177,6 +200,10 @@ describe("ConversationInner", () => {
     conversation = testData.conversation
 
     wrapper = mountComponent(conversation, storageAccessor)
+  })
+
+  afterEach(() => {
+    resetInstance()
   })
 
   describe("AI Reply", () => {
@@ -201,7 +228,11 @@ describe("ConversationInner", () => {
         expect(statusText()).toBe("Starting AI reply...")
 
         // During writing
-        helper.managedApi.eventSource.eventSourceRequest.onMessage(
+        const instance = getLastInstance()
+        if (!instance) {
+          throw new Error("No AiReplyEventSource instance available")
+        }
+        instance.onMessageCallback(
           "chat.completion.chunk",
           JSON.stringify({
             choices: [
@@ -217,14 +248,17 @@ describe("ConversationInner", () => {
         expect(statusText()).toBe("Streaming response...")
 
         // After completion
-        helper.managedApi.eventSource.eventSourceRequest.onMessage("done", "")
+        instance.onMessageCallback("done", "")
         await wrapper.vm.$nextTick()
         expect(wrapper.find(".status-bar").exists()).toBe(false)
       })
 
       it("hides status bar and shows error message on failure", async () => {
-        const onError =
-          helper.managedApi.eventSource.eventSourceRequest!.onError
+        const instance = getLastInstance()
+        if (!instance) {
+          throw new Error("No AiReplyEventSource instance available")
+        }
+        const onError = instance.onErrorCallback
         if (!onError) throw new Error("onError is not defined")
 
         onError(new Error("400 Bad Request"))

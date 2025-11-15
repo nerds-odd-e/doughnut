@@ -5,6 +5,8 @@ import makeMe from "@tests/fixtures/makeMe"
 import { type ConversationMessage } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import { simulateAiResponse } from "./AiResponse.spec"
+import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
+import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -28,6 +30,24 @@ beforeAll(() => {
     },
     configurable: true,
   })
+})
+
+// Mock AiReplyEventSource to track instances (shared with AiResponse.spec.ts)
+vi.mock("@/managedApi/AiReplyEventSource", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/managedApi/AiReplyEventSource")
+  >("@/managedApi/AiReplyEventSource")
+  const { setLastInstance } = await import(
+    "@tests/helpers/aiReplyEventSourceTracker"
+  )
+  return {
+    default: class extends actual.default {
+      constructor(conversationId: number) {
+        super(conversationId)
+        setLastInstance(this)
+      }
+    },
+  }
 })
 
 const setupTestData = () => {
@@ -61,14 +81,18 @@ describe("ConversationInner", () => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     helper.managedApi.restConversationMessageController.replyToConversation =
       vi.fn()
-    helper.managedApi.eventSource.restConversationMessageController.getAiReply =
-      vi.fn()
+    resetInstance()
+    vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
 
     const testData = setupTestData()
     conversation = testData.conversation
     user = testData.user
 
     wrapper = mountComponent(conversation, user)
+  })
+
+  afterEach(() => {
+    resetInstance()
   })
 
   describe("ScrollTo behavior", () => {
