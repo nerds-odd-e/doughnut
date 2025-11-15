@@ -3,7 +3,6 @@ import { expect, vi } from "vitest"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
-import { DummyForGeneratingTypes as DummyForGeneratingTypesConstants } from "@/managedApi/aiToolNameConstants"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
 
@@ -246,12 +245,9 @@ describe("ConversationInner", () => {
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          {
-            completion: testCompletion,
-          }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: testCompletion,
+        })
       )
     })
 
@@ -261,10 +257,10 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          { completion: testCompletion, deleteFromEnd: 0 }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: testCompletion,
+          deleteFromEnd: 0,
+        })
       )
       expect(wrapper.find(".completion-text").text()).toBe(renderedCompletion)
 
@@ -273,10 +269,10 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          { completion: testCompletion, deleteFromEnd: 0 }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: testCompletion,
+          deleteFromEnd: 0,
+        })
       )
       expect(wrapper.find(".completion-text").text()).toBe(
         `...${renderedCompletion}`
@@ -288,10 +284,10 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          { completion: " friends!", deleteFromEnd: 5 }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: " friends!",
+          deleteFromEnd: 5,
+        })
       )
 
       // The markdown ~~world~~ should render as strikethrough text
@@ -306,10 +302,10 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          { completion: "New content", deleteFromEnd: 20 }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: "New content",
+          deleteFromEnd: 20,
+        })
       )
 
       // The entire existing text should be struck through
@@ -369,13 +365,10 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          {
-            completion: " friends!",
-            deleteFromEnd: 6,
-          }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: " friends!",
+          deleteFromEnd: 6,
+        })
       )
 
       // Check the formatted suggestion shows with ellipsis
@@ -399,13 +392,10 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-          {
-            completion: "Completely new text",
-            deleteFromEnd: 20, // More than "Hello world" length
-          }
-        )
+        createToolCallChunk("complete_note_details", {
+          completion: "Completely new text",
+          deleteFromEnd: 20, // More than "Hello world" length
+        })
       )
 
       // Accept the suggestion
@@ -437,12 +427,9 @@ describe("ConversationInner", () => {
         // Simulate completion suggestion
         await submitMessageAndSimulateRunResponse(
           wrapper,
-          createToolCallChunk(
-            DummyForGeneratingTypesConstants.aiToolName.COMPLETE_NOTE_DETAILS,
-            {
-              completion: "test completion",
-            }
-          )
+          createToolCallChunk("complete_note_details", {
+            completion: "test completion",
+          })
         )
 
         // Try to accept the completion
@@ -464,12 +451,9 @@ describe("ConversationInner", () => {
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk(
-          DummyForGeneratingTypesConstants.aiToolName.SUGGEST_NOTE_TITLE,
-          <TitleReplacement>{
-            newTitle: testTitle,
-          }
-        )
+        createToolCallChunk("suggest_note_title", <TitleReplacement>{
+          newTitle: testTitle,
+        })
       )
     })
 

@@ -1,6 +1,5 @@
 import { describe, it, expect, vi } from "vitest"
 import { createAiReplyStates } from "@/models/aiReplyState"
-import { DummyForGeneratingTypes as DummyForGeneratingTypesConstants } from "@/managedApi/aiToolNameConstants"
 
 describe("aiReplyState", () => {
   const mockContext = {
@@ -53,8 +52,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   type: "function",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .COMPLETE_NOTE_DETAILS,
+                    name: "complete_note_details",
                     arguments: '{"completion":',
                   },
                 },
@@ -129,8 +127,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   type: "function",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .SUGGEST_NOTE_TITLE,
+                    name: "suggest_note_title",
                     arguments: '{"newTitle":"New Title"}',
                   },
                 },
@@ -181,8 +178,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-1",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .COMPLETE_NOTE_DETAILS,
+                    name: "complete_note_details",
                     arguments: '{"completion":"test"}',
                   },
                 },
@@ -282,8 +278,7 @@ describe("aiReplyState", () => {
                   id: "call-123",
                   type: "function",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .COMPLETE_NOTE_DETAILS,
+                    name: "complete_note_details",
                     arguments: '{"completion":',
                   },
                 },
@@ -379,8 +374,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-1",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .COMPLETE_NOTE_DETAILS,
+                    name: "complete_note_details",
                     arguments: '{"completion":"first"}',
                   },
                 },
@@ -404,8 +398,7 @@ describe("aiReplyState", () => {
                   index: 1,
                   id: "call-2",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .SUGGEST_NOTE_TITLE,
+                    name: "suggest_note_title",
                     arguments: '{"newTitle":"Second Title"}',
                   },
                 },
@@ -462,8 +455,7 @@ describe("aiReplyState", () => {
                     index: 0,
                     id: "call-frag",
                     function: {
-                      name: DummyForGeneratingTypesConstants.aiToolName
-                        .COMPLETE_NOTE_DETAILS,
+                      name: "complete_note_details",
                       arguments: '{"completion":',
                     },
                   },
@@ -568,8 +560,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-1",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .COMPLETE_NOTE_DETAILS,
+                    name: "complete_note_details",
                     arguments: '{"completion":"first"}',
                   },
                 },
@@ -594,8 +585,7 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: "call-2",
                   function: {
-                    name: DummyForGeneratingTypesConstants.aiToolName
-                      .COMPLETE_NOTE_DETAILS,
+                    name: "complete_note_details",
                     arguments: '{"completion":"second"}',
                   },
                 },
