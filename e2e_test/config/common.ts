@@ -56,9 +56,6 @@ const commonConfig = {
               },
             },
           ],
-          alias: {
-            '@frontend': path.resolve(__dirname, '../../frontend/src'),
-          },
         })
       )
 
