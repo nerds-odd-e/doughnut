@@ -1,6 +1,6 @@
 import { ApiError, CancelablePromise } from "@generated/backend"
 import type { ApiRequestOptions } from "@generated/backend/core/ApiRequestOptions"
-import { FetchHttpRequest } from "@generated/backend/core/FetchHttpRequest"
+import { FetchHttpRequest } from "./FetchHttpRequest"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"

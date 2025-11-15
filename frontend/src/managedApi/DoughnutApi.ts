@@ -2,10 +2,10 @@
 // This provides instance-based access to openapi-ts generated static services
 // This file should NOT be in the generated folder to avoid being overwritten
 
-import type { BaseHttpRequest } from "@generated/backend/core/BaseHttpRequest"
+import type { BaseHttpRequest } from "./BaseHttpRequest"
 import type { OpenAPIConfig } from "@generated/backend/core/OpenAPI"
 import { Interceptors } from "@generated/backend/core/OpenAPI"
-import { FetchHttpRequest } from "@generated/backend/core/FetchHttpRequest"
+import { FetchHttpRequest } from "./FetchHttpRequest"
 import type { CancelablePromise } from "@generated/backend/core/CancelablePromise"
 import type * as Types from "@generated/backend/types.gen"
 

@@ -1,5 +1,6 @@
 // eslint-disable-next-line max-classes-per-file
-import type { OpenAPIConfig, BaseHttpRequest } from "@generated/backend"
+import type { OpenAPIConfig } from "@generated/backend"
+import type { BaseHttpRequest } from "./BaseHttpRequest"
 import { DoughnutApi } from "./DoughnutApi"
 import type { ApiError, ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
