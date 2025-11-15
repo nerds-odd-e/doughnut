@@ -230,7 +230,7 @@ class RestLinkControllerServiceInstance extends ServiceInstance {
   ): CancelablePromise<Types.LinkNoteFinalizeResponse> {
     return this.httpRequest.request<Types.LinkNoteFinalizeResponse>({
       method: "POST",
-      url: "/api/links/{sourceId}/finalize/{targetId}",
+      url: "/api/links/create/{sourceId}/{targetId}",
       path: { sourceId, targetId },
       body: data,
       mediaType: "application/json",
