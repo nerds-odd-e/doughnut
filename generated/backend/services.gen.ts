@@ -9,13 +9,15 @@ import type { GetUserProfileResponse, CreateUserData, CreateUserResponse, Genera
  * @returns User OK
  * @throws ApiError
  */
-export const getUserProfile = (): CancelablePromise<GetUserProfileResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/user',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getUserProfile = (): CancelablePromise<GetUserProfileResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/user',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -23,15 +25,17 @@ export const getUserProfile = (): CancelablePromise<GetUserProfileResponse> => {
  * @returns User OK
  * @throws ApiError
  */
-export const createUser = (data: CreateUserData): CancelablePromise<CreateUserResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/user',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createUser = (data: CreateUserData): CancelablePromise<CreateUserResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/user',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -39,27 +43,31 @@ export const createUser = (data: CreateUserData): CancelablePromise<CreateUserRe
  * @returns UserToken OK
  * @throws ApiError
  */
-export const generateToken = (data: GenerateTokenData): CancelablePromise<GenerateTokenResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/user/generate-token',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const generateToken = (data: GenerateTokenData): CancelablePromise<GenerateTokenResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/user/generate-token',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns string OK
  * @throws ApiError
  */
-export const closeAllGithubIssues = (): CancelablePromise<CloseAllGithubIssuesResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const closeAllGithubIssues = (): CancelablePromise<CloseAllGithubIssuesResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -67,27 +75,31 @@ export const closeAllGithubIssues = (): CancelablePromise<CloseAllGithubIssuesRe
  * @returns string OK
  * @throws ApiError
  */
-export const updateCurrentUser = (data: UpdateCurrentUserData): CancelablePromise<UpdateCurrentUserResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/update_current_user',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateCurrentUser = (data: UpdateCurrentUserData): CancelablePromise<UpdateCurrentUserResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/update_current_user',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns string OK
  * @throws ApiError
  */
-export const triggerException = (): CancelablePromise<TriggerExceptionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/trigger_exception',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const triggerException = (): CancelablePromise<TriggerExceptionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/trigger_exception',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -95,15 +107,17 @@ export const triggerException = (): CancelablePromise<TriggerExceptionResponse> 
  * @returns unknown OK
  * @throws ApiError
  */
-export const timeTravelRelativeToNow = (data: TimeTravelRelativeToNowData): CancelablePromise<TimeTravelRelativeToNowResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/time_travel_relative_to_now',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const timeTravelRelativeToNow = (data: TimeTravelRelativeToNowData): CancelablePromise<TimeTravelRelativeToNowResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/time_travel_relative_to_now',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -111,15 +125,17 @@ export const timeTravelRelativeToNow = (data: TimeTravelRelativeToNowData): Canc
  * @returns unknown OK
  * @throws ApiError
  */
-export const timeTravel = (data: TimeTravelData): CancelablePromise<TimeTravelResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/time_travel',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const timeTravel = (data: TimeTravelData): CancelablePromise<TimeTravelResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/time_travel',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -127,15 +143,17 @@ export const timeTravel = (data: TimeTravelData): CancelablePromise<TimeTravelRe
  * @returns string OK
  * @throws ApiError
  */
-export const shareToBazaar = (data: ShareToBazaarData): CancelablePromise<ShareToBazaarResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/share_to_bazaar',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const shareToBazaar = (data: ShareToBazaarData): CancelablePromise<ShareToBazaarResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/share_to_bazaar',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -143,15 +161,17 @@ export const shareToBazaar = (data: ShareToBazaarData): CancelablePromise<ShareT
  * @returns unknown OK
  * @throws ApiError
  */
-export const replaceServiceUrl = (data: ReplaceServiceUrlData): CancelablePromise<ReplaceServiceUrlResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/replace_service_url',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const replaceServiceUrl = (data: ReplaceServiceUrlData): CancelablePromise<ReplaceServiceUrlResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/replace_service_url',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -159,15 +179,17 @@ export const replaceServiceUrl = (data: ReplaceServiceUrlData): CancelablePromis
  * @returns unknown OK
  * @throws ApiError
  */
-export const randomizer = (data: RandomizerData): CancelablePromise<RandomizerResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/randomizer',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const randomizer = (data: RandomizerData): CancelablePromise<RandomizerResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/randomizer',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -175,15 +197,17 @@ export const randomizer = (data: RandomizerData): CancelablePromise<RandomizerRe
  * @returns string OK
  * @throws ApiError
  */
-export const linkNotes = (data: LinkNotesData): CancelablePromise<LinkNotesResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/link_notes',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const linkNotes = (data: LinkNotesData): CancelablePromise<LinkNotesResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/link_notes',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -191,15 +215,17 @@ export const linkNotes = (data: LinkNotesData): CancelablePromise<LinkNotesRespo
  * @returns string OK
  * @throws ApiError
  */
-export const injectSuggestedQuestion = (data: InjectSuggestedQuestionData): CancelablePromise<InjectSuggestedQuestionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/inject_suggested_questions',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const injectSuggestedQuestion = (data: InjectSuggestedQuestionData): CancelablePromise<InjectSuggestedQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/inject_suggested_questions',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -207,15 +233,17 @@ export const injectSuggestedQuestion = (data: InjectSuggestedQuestionData): Canc
  * @returns number OK
  * @throws ApiError
  */
-export const injectNotes = (data: InjectNotesData): CancelablePromise<InjectNotesResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/inject_notes',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const injectNotes = (data: InjectNotesData): CancelablePromise<InjectNotesResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/inject_notes',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -223,15 +251,17 @@ export const injectNotes = (data: InjectNotesData): CancelablePromise<InjectNote
  * @returns string OK
  * @throws ApiError
  */
-export const injectCircle = (data: InjectCircleData): CancelablePromise<InjectCircleResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/inject_circle',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const injectCircle = (data: InjectCircleData): CancelablePromise<InjectCircleResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/inject_circle',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -239,27 +269,31 @@ export const injectCircle = (data: InjectCircleData): CancelablePromise<InjectCi
  * @returns PredefinedQuestion OK
  * @throws ApiError
  */
-export const injectPredefinedQuestion = (data: InjectPredefinedQuestionData): CancelablePromise<InjectPredefinedQuestionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/inject-predefined-questions',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const injectPredefinedQuestion = (data: InjectPredefinedQuestionData): CancelablePromise<InjectPredefinedQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/inject-predefined-questions',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns boolean OK
  * @throws ApiError
  */
-export const getFeatureToggle = (): CancelablePromise<GetFeatureToggleResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/testability/feature_toggle',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getFeatureToggle = (): CancelablePromise<GetFeatureToggleResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/testability/feature_toggle',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -267,27 +301,31 @@ export const getFeatureToggle = (): CancelablePromise<GetFeatureToggleResponse> 
  * @returns unknown OK
  * @throws ApiError
  */
-export const enableFeatureToggle = (data: EnableFeatureToggleData): CancelablePromise<EnableFeatureToggleResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/feature_toggle',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const enableFeatureToggle = (data: EnableFeatureToggleData): CancelablePromise<EnableFeatureToggleResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/feature_toggle',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns string OK
  * @throws ApiError
  */
-export const resetDbAndTestabilitySettings = (): CancelablePromise<ResetDbAndTestabilitySettingsResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/testability/clean_db_and_reset_testability_settings',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const resetDbAndTestabilitySettings = (): CancelablePromise<ResetDbAndTestabilitySettingsResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/testability/clean_db_and_reset_testability_settings',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -296,30 +334,34 @@ export const resetDbAndTestabilitySettings = (): CancelablePromise<ResetDbAndTes
  * @returns Subscription OK
  * @throws ApiError
  */
-export const update = (data: UpdateData): CancelablePromise<UpdateResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/subscriptions/{subscription}',
-    path: {
-        subscription: data.subscription
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const update = (data: UpdateData): CancelablePromise<UpdateResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/subscriptions/{subscription}',
+        path: {
+            subscription: data.subscription
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns number OK
  * @throws ApiError
  */
-export const destroySubscription = (): CancelablePromise<DestroySubscriptionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/subscriptions/{subscription}/delete',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const destroySubscription = (): CancelablePromise<DestroySubscriptionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/subscriptions/{subscription}/delete',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -328,30 +370,34 @@ export const destroySubscription = (): CancelablePromise<DestroySubscriptionResp
  * @returns Subscription OK
  * @throws ApiError
  */
-export const createSubscription = (data: CreateSubscriptionData): CancelablePromise<CreateSubscriptionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/subscriptions/notebooks/{notebook}/subscribe',
-    path: {
-        notebook: data.notebook
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createSubscription = (data: CreateSubscriptionData): CancelablePromise<CreateSubscriptionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/subscriptions/notebooks/{notebook}/subscribe',
+        path: {
+            notebook: data.notebook
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns GlobalAiModelSettings OK
  * @throws ApiError
  */
-export const getCurrentModelVersions = (): CancelablePromise<GetCurrentModelVersionsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/settings/current-model-version',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getCurrentModelVersions = (): CancelablePromise<GetCurrentModelVersionsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/settings/current-model-version',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -359,15 +405,17 @@ export const getCurrentModelVersions = (): CancelablePromise<GetCurrentModelVers
  * @returns GlobalAiModelSettings OK
  * @throws ApiError
  */
-export const setCurrentModelVersions = (data: SetCurrentModelVersionsData): CancelablePromise<SetCurrentModelVersionsResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/settings/current-model-version',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const setCurrentModelVersions = (data: SetCurrentModelVersionsData): CancelablePromise<SetCurrentModelVersionsResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/settings/current-model-version',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -376,18 +424,20 @@ export const setCurrentModelVersions = (data: SetCurrentModelVersionsData): Canc
  * @returns RecallPrompt OK
  * @throws ApiError
  */
-export const regenerate = (data: RegenerateData): CancelablePromise<RegenerateResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/recall-prompts/{recallPrompt}/regenerate',
-    path: {
-        recallPrompt: data.recallPrompt
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const regenerate = (data: RegenerateData): CancelablePromise<RegenerateResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/recall-prompts/{recallPrompt}/regenerate',
+        path: {
+            recallPrompt: data.recallPrompt
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -395,16 +445,18 @@ export const regenerate = (data: RegenerateData): CancelablePromise<RegenerateRe
  * @returns QuestionContestResult OK
  * @throws ApiError
  */
-export const contest = (data: ContestData): CancelablePromise<ContestResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/recall-prompts/{recallPrompt}/contest',
-    path: {
-        recallPrompt: data.recallPrompt
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const contest = (data: ContestData): CancelablePromise<ContestResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/recall-prompts/{recallPrompt}/contest',
+        path: {
+            recallPrompt: data.recallPrompt
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -413,18 +465,20 @@ export const contest = (data: ContestData): CancelablePromise<ContestResponse> =
  * @returns AnsweredQuestion OK
  * @throws ApiError
  */
-export const answerQuiz = (data: AnswerQuizData): CancelablePromise<AnswerQuizResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/recall-prompts/{recallPrompt}/answer',
-    path: {
-        recallPrompt: data.recallPrompt
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const answerQuiz = (data: AnswerQuizData): CancelablePromise<AnswerQuizResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/recall-prompts/{recallPrompt}/answer',
+        path: {
+            recallPrompt: data.recallPrompt
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -432,16 +486,18 @@ export const answerQuiz = (data: AnswerQuizData): CancelablePromise<AnswerQuizRe
  * @returns PredefinedQuestion OK
  * @throws ApiError
  */
-export const toggleApproval = (data: ToggleApprovalData): CancelablePromise<ToggleApprovalResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval',
-    path: {
-        predefinedQuestion: data.predefinedQuestion
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const toggleApproval = (data: ToggleApprovalData): CancelablePromise<ToggleApprovalResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval',
+        path: {
+            predefinedQuestion: data.predefinedQuestion
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -450,18 +506,20 @@ export const toggleApproval = (data: ToggleApprovalData): CancelablePromise<Togg
  * @returns SuggestedQuestionForFineTuning OK
  * @throws ApiError
  */
-export const suggestQuestionForFineTuning = (data: SuggestQuestionForFineTuningData): CancelablePromise<SuggestQuestionForFineTuningResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning',
-    path: {
-        predefinedQuestion: data.predefinedQuestion
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const suggestQuestionForFineTuning = (data: SuggestQuestionForFineTuningData): CancelablePromise<SuggestQuestionForFineTuningResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning',
+        path: {
+            predefinedQuestion: data.predefinedQuestion
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -470,18 +528,20 @@ export const suggestQuestionForFineTuning = (data: SuggestQuestionForFineTuningD
  * @returns PredefinedQuestion OK
  * @throws ApiError
  */
-export const refineQuestion = (data: RefineQuestionData): CancelablePromise<RefineQuestionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/predefined-questions/{note}/refine-question',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const refineQuestion = (data: RefineQuestionData): CancelablePromise<RefineQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/predefined-questions/{note}/refine-question',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -489,16 +549,18 @@ export const refineQuestion = (data: RefineQuestionData): CancelablePromise<Refi
  * @returns PredefinedQuestion OK
  * @throws ApiError
  */
-export const getAllQuestionByNote = (data: GetAllQuestionByNoteData): CancelablePromise<GetAllQuestionByNoteResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/predefined-questions/{note}/note-questions',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAllQuestionByNote = (data: GetAllQuestionByNoteData): CancelablePromise<GetAllQuestionByNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/predefined-questions/{note}/note-questions',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -507,18 +569,20 @@ export const getAllQuestionByNote = (data: GetAllQuestionByNoteData): Cancelable
  * @returns PredefinedQuestion OK
  * @throws ApiError
  */
-export const addQuestionManually = (data: AddQuestionManuallyData): CancelablePromise<AddQuestionManuallyResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/predefined-questions/{note}/note-questions',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const addQuestionManually = (data: AddQuestionManuallyData): CancelablePromise<AddQuestionManuallyResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/predefined-questions/{note}/note-questions',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -526,16 +590,18 @@ export const addQuestionManually = (data: AddQuestionManuallyData): CancelablePr
  * @returns PredefinedQuestion OK
  * @throws ApiError
  */
-export const generateQuestionWithoutSave = (data: GenerateQuestionWithoutSaveData): CancelablePromise<GenerateQuestionWithoutSaveResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/predefined-questions/generate-question-without-save',
-    query: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const generateQuestionWithoutSave = (data: GenerateQuestionWithoutSaveData): CancelablePromise<GenerateQuestionWithoutSaveResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/predefined-questions/generate-question-without-save',
+        query: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -544,18 +610,20 @@ export const generateQuestionWithoutSave = (data: GenerateQuestionWithoutSaveDat
  * @returns NoteCreationResult OK
  * @throws ApiError
  */
-export const createNoteAfter = (data: CreateNoteAfterData): CancelablePromise<CreateNoteAfterResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{referenceNote}/create-after',
-    path: {
-        referenceNote: data.referenceNote
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createNoteAfter = (data: CreateNoteAfterData): CancelablePromise<CreateNoteAfterResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{referenceNote}/create-after',
+        path: {
+            referenceNote: data.referenceNote
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -564,18 +632,20 @@ export const createNoteAfter = (data: CreateNoteAfterData): CancelablePromise<Cr
  * @returns NoteCreationResult OK
  * @throws ApiError
  */
-export const createNote = (data: CreateNoteData): CancelablePromise<CreateNoteResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{parentNote}/create',
-    path: {
-        parentNote: data.parentNote
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createNote = (data: CreateNoteData): CancelablePromise<CreateNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{parentNote}/create',
+        path: {
+            parentNote: data.parentNote
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -584,18 +654,20 @@ export const createNote = (data: CreateNoteData): CancelablePromise<CreateNoteRe
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const updateWikidataId = (data: UpdateWikidataIdData): CancelablePromise<UpdateWikidataIdResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{note}/updateWikidataId',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateWikidataId = (data: UpdateWikidataIdData): CancelablePromise<UpdateWikidataIdResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{note}/updateWikidataId',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -604,18 +676,20 @@ export const updateWikidataId = (data: UpdateWikidataIdData): CancelablePromise<
  * @returns NoteSearchResult OK
  * @throws ApiError
  */
-export const semanticSearchWithin = (data: SemanticSearchWithinData): CancelablePromise<SemanticSearchWithinResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{note}/semantic-search',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const semanticSearchWithin = (data: SemanticSearchWithinData): CancelablePromise<SemanticSearchWithinResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{note}/semantic-search',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -624,18 +698,20 @@ export const semanticSearchWithin = (data: SemanticSearchWithinData): Cancelable
  * @returns NoteSearchResult OK
  * @throws ApiError
  */
-export const searchForLinkTargetWithin = (data: SearchForLinkTargetWithinData): CancelablePromise<SearchForLinkTargetWithinResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{note}/search',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const searchForLinkTargetWithin = (data: SearchForLinkTargetWithinData): CancelablePromise<SearchForLinkTargetWithinResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{note}/search',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -644,18 +720,20 @@ export const searchForLinkTargetWithin = (data: SearchForLinkTargetWithinData): 
  * @returns RedirectToNoteResponse OK
  * @throws ApiError
  */
-export const updateRecallSetting = (data: UpdateRecallSettingData): CancelablePromise<UpdateRecallSettingResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{note}/review-setting',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateRecallSetting = (data: UpdateRecallSettingData): CancelablePromise<UpdateRecallSettingResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{note}/review-setting',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -663,16 +741,18 @@ export const updateRecallSetting = (data: UpdateRecallSettingData): CancelablePr
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const deleteNote = (data: DeleteNoteData): CancelablePromise<DeleteNoteResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/{note}/delete',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const deleteNote = (data: DeleteNoteData): CancelablePromise<DeleteNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/{note}/delete',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -680,15 +760,17 @@ export const deleteNote = (data: DeleteNoteData): CancelablePromise<DeleteNoteRe
  * @returns NoteSearchResult OK
  * @throws ApiError
  */
-export const semanticSearch = (data: SemanticSearchData): CancelablePromise<SemanticSearchResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/semantic-search',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const semanticSearch = (data: SemanticSearchData): CancelablePromise<SemanticSearchResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/semantic-search',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -696,15 +778,17 @@ export const semanticSearch = (data: SemanticSearchData): CancelablePromise<Sema
  * @returns NoteSearchResult OK
  * @throws ApiError
  */
-export const searchForLinkTarget = (data: SearchForLinkTargetData): CancelablePromise<SearchForLinkTargetResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/search',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const searchForLinkTarget = (data: SearchForLinkTargetData): CancelablePromise<SearchForLinkTargetResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/search',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -714,18 +798,20 @@ export const searchForLinkTarget = (data: SearchForLinkTargetData): CancelablePr
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const moveAfter = (data: MoveAfterData): CancelablePromise<MoveAfterResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}',
-    path: {
-        note: data.note,
-        targetNote: data.targetNote,
-        asFirstChild: data.asFirstChild
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const moveAfter = (data: MoveAfterData): CancelablePromise<MoveAfterResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}',
+        path: {
+            note: data.note,
+            targetNote: data.targetNote,
+            asFirstChild: data.asFirstChild
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -733,16 +819,18 @@ export const moveAfter = (data: MoveAfterData): CancelablePromise<MoveAfterRespo
  * @returns Notebook OK
  * @throws ApiError
  */
-export const get = (data: GetData): CancelablePromise<GetResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebooks/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const get = (data: GetData): CancelablePromise<GetResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebooks/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -751,18 +839,20 @@ export const get = (data: GetData): CancelablePromise<GetResponse> => { return _
  * @returns Notebook OK
  * @throws ApiError
  */
-export const update1 = (data: Update1Data): CancelablePromise<Update1Response> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebooks/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const update1 = (data: Update1Data): CancelablePromise<Update1Response> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebooks/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -770,16 +860,18 @@ export const update1 = (data: Update1Data): CancelablePromise<Update1Response> =
  * @returns unknown OK
  * @throws ApiError
  */
-export const updateNotebookIndex = (data: UpdateNotebookIndexData): CancelablePromise<UpdateNotebookIndexResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebooks/{notebook}/update-index',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateNotebookIndex = (data: UpdateNotebookIndexData): CancelablePromise<UpdateNotebookIndexResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebooks/{notebook}/update-index',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -787,16 +879,18 @@ export const updateNotebookIndex = (data: UpdateNotebookIndexData): CancelablePr
  * @returns Notebook OK
  * @throws ApiError
  */
-export const shareNotebook = (data: ShareNotebookData): CancelablePromise<ShareNotebookResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebooks/{notebook}/share',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const shareNotebook = (data: ShareNotebookData): CancelablePromise<ShareNotebookResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebooks/{notebook}/share',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -804,16 +898,18 @@ export const shareNotebook = (data: ShareNotebookData): CancelablePromise<ShareN
  * @returns unknown OK
  * @throws ApiError
  */
-export const resetNotebookIndex = (data: ResetNotebookIndexData): CancelablePromise<ResetNotebookIndexResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebooks/{notebook}/reset-index',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const resetNotebookIndex = (data: ResetNotebookIndexData): CancelablePromise<ResetNotebookIndexResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebooks/{notebook}/reset-index',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * Import Obsidian file
@@ -823,18 +919,20 @@ export const resetNotebookIndex = (data: ResetNotebookIndexData): CancelableProm
  * @returns unknown OK
  * @throws ApiError
  */
-export const importObsidian = (data: ImportObsidianData): CancelablePromise<ImportObsidianResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebooks/{notebookId}/obsidian',
-    path: {
-        notebookId: data.notebookId
-    },
-    formData: data.formData,
-    mediaType: 'multipart/form-data',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const importObsidian = (data: ImportObsidianData): CancelablePromise<ImportObsidianResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebooks/{notebookId}/obsidian',
+        path: {
+            notebookId: data.notebookId
+        },
+        formData: data.formData,
+        mediaType: 'multipart/form-data',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -842,15 +940,17 @@ export const importObsidian = (data: ImportObsidianData): CancelablePromise<Impo
  * @returns RedirectToNoteResponse OK
  * @throws ApiError
  */
-export const createNotebook = (data: CreateNotebookData): CancelablePromise<CreateNotebookResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebooks/create',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createNotebook = (data: CreateNotebookData): CancelablePromise<CreateNotebookResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebooks/create',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -858,16 +958,18 @@ export const createNotebook = (data: CreateNotebookData): CancelablePromise<Crea
  * @returns NotebookCertificateApproval OK
  * @throws ApiError
  */
-export const approve = (data: ApproveData): CancelablePromise<ApproveResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve',
-    path: {
-        notebookCertificateApproval: data.notebookCertificateApproval
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const approve = (data: ApproveData): CancelablePromise<ApproveResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve',
+        path: {
+            notebookCertificateApproval: data.notebookCertificateApproval
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -875,16 +977,18 @@ export const approve = (data: ApproveData): CancelablePromise<ApproveResponse> =
  * @returns NotebookCertificateApproval OK
  * @throws ApiError
  */
-export const requestApprovalForNotebook = (data: RequestApprovalForNotebookData): CancelablePromise<RequestApprovalForNotebookResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/notebook_certificate_approvals/request-approval/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const requestApprovalForNotebook = (data: RequestApprovalForNotebookData): CancelablePromise<RequestApprovalForNotebookResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/notebook_certificate_approvals/request-approval/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -893,18 +997,20 @@ export const requestApprovalForNotebook = (data: RequestApprovalForNotebookData)
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const selfEvaluate = (data: SelfEvaluateData): CancelablePromise<SelfEvaluateResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/memory-trackers/{memoryTracker}/self-evaluate',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const selfEvaluate = (data: SelfEvaluateData): CancelablePromise<SelfEvaluateResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/memory-trackers/{memoryTracker}/self-evaluate',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -912,16 +1018,18 @@ export const selfEvaluate = (data: SelfEvaluateData): CancelablePromise<SelfEval
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const removeFromRepeating = (data: RemoveFromRepeatingData): CancelablePromise<RemoveFromRepeatingResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/memory-trackers/{memoryTracker}/remove',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const removeFromRepeating = (data: RemoveFromRepeatingData): CancelablePromise<RemoveFromRepeatingResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/memory-trackers/{memoryTracker}/remove',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -930,18 +1038,20 @@ export const removeFromRepeating = (data: RemoveFromRepeatingData): CancelablePr
  * @returns SpellingResultDTO OK
  * @throws ApiError
  */
-export const answerSpelling = (data: AnswerSpellingData): CancelablePromise<AnswerSpellingResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/memory-trackers/{memoryTracker}/answer-spelling',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const answerSpelling = (data: AnswerSpellingData): CancelablePromise<AnswerSpellingResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/memory-trackers/{memoryTracker}/answer-spelling',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -949,15 +1059,17 @@ export const answerSpelling = (data: AnswerSpellingData): CancelablePromise<Answ
  * @returns NoteCreationResult OK
  * @throws ApiError
  */
-export const createNote1 = (data: CreateNote1Data): CancelablePromise<CreateNote1Response> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/mcp/notes/create',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createNote1 = (data: CreateNote1Data): CancelablePromise<CreateNote1Response> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/mcp/notes/create',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -966,18 +1078,20 @@ export const createNote1 = (data: CreateNote1Data): CancelablePromise<CreateNote
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const updateLink = (data: UpdateLinkData): CancelablePromise<UpdateLinkResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/links/{link}',
-    path: {
-        link: data.link
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateLink = (data: UpdateLinkData): CancelablePromise<UpdateLinkResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/links/{link}',
+        path: {
+            link: data.link
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -987,19 +1101,21 @@ export const updateLink = (data: UpdateLinkData): CancelablePromise<UpdateLinkRe
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const moveNote = (data: MoveNoteData): CancelablePromise<MoveNoteResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/links/move/{sourceNote}/{targetNote}',
-    path: {
-        sourceNote: data.sourceNote,
-        targetNote: data.targetNote
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const moveNote = (data: MoveNoteData): CancelablePromise<MoveNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/links/move/{sourceNote}/{targetNote}',
+        path: {
+            sourceNote: data.sourceNote,
+            targetNote: data.targetNote
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1009,19 +1125,21 @@ export const moveNote = (data: MoveNoteData): CancelablePromise<MoveNoteResponse
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const linkNoteFinalize = (data: LinkNoteFinalizeData): CancelablePromise<LinkNoteFinalizeResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/links/create/{sourceNote}/{targetNote}',
-    path: {
-        sourceNote: data.sourceNote,
-        targetNote: data.targetNote
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const linkNoteFinalize = (data: LinkNoteFinalizeData): CancelablePromise<LinkNoteFinalizeResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/links/create/{sourceNote}/{targetNote}',
+        path: {
+            sourceNote: data.sourceNote,
+            targetNote: data.targetNote
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1029,16 +1147,18 @@ export const linkNoteFinalize = (data: LinkNoteFinalizeData): CancelablePromise<
  * @returns SuggestedQuestionForFineTuning OK
  * @throws ApiError
  */
-export const duplicate = (data: DuplicateData): CancelablePromise<DuplicateResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/fine-tuning/{suggestedQuestion}/duplicate',
-    path: {
-        suggestedQuestion: data.suggestedQuestion
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const duplicate = (data: DuplicateData): CancelablePromise<DuplicateResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/fine-tuning/{suggestedQuestion}/duplicate',
+        path: {
+            suggestedQuestion: data.suggestedQuestion
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1046,28 +1166,32 @@ export const duplicate = (data: DuplicateData): CancelablePromise<DuplicateRespo
  * @returns SuggestedQuestionForFineTuning OK
  * @throws ApiError
  */
-export const delete_ = (data: DeleteData): CancelablePromise<DeleteResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/fine-tuning/{suggestedQuestion}/delete',
-    path: {
-        suggestedQuestion: data.suggestedQuestion
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const delete_ = (data: DeleteData): CancelablePromise<DeleteResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/fine-tuning/{suggestedQuestion}/delete',
+        path: {
+            suggestedQuestion: data.suggestedQuestion
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns unknown OK
  * @throws ApiError
  */
-export const uploadAndTriggerFineTuning = (): CancelablePromise<UploadAndTriggerFineTuningResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/fine-tuning/upload-and-trigger-fine-tuning',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const uploadAndTriggerFineTuning = (): CancelablePromise<UploadAndTriggerFineTuningResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/fine-tuning/upload-and-trigger-fine-tuning',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1076,18 +1200,20 @@ export const uploadAndTriggerFineTuning = (): CancelablePromise<UploadAndTrigger
  * @returns ConversationMessage OK
  * @throws ApiError
  */
-export const replyToConversation = (data: ReplyToConversationData): CancelablePromise<ReplyToConversationResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/conversation/{conversationId}/send',
-    path: {
-        conversationId: data.conversationId
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const replyToConversation = (data: ReplyToConversationData): CancelablePromise<ReplyToConversationResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/conversation/{conversationId}/send',
+        path: {
+            conversationId: data.conversationId
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1095,16 +1221,18 @@ export const replyToConversation = (data: ReplyToConversationData): CancelablePr
  * @returns SseEmitter OK
  * @throws ApiError
  */
-export const getAiReply = (data: GetAiReplyData): CancelablePromise<GetAiReplyResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/conversation/{conversationId}/ai-reply',
-    path: {
-        conversationId: data.conversationId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAiReply = (data: GetAiReplyData): CancelablePromise<GetAiReplyResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/conversation/{conversationId}/ai-reply',
+        path: {
+            conversationId: data.conversationId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1112,16 +1240,18 @@ export const getAiReply = (data: GetAiReplyData): CancelablePromise<GetAiReplyRe
  * @returns Conversation OK
  * @throws ApiError
  */
-export const startConversationAboutRecallPrompt = (data: StartConversationAboutRecallPromptData): CancelablePromise<StartConversationAboutRecallPromptResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/conversation/recall-prompt/{recallPrompt}',
-    path: {
-        recallPrompt: data.recallPrompt
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const startConversationAboutRecallPrompt = (data: StartConversationAboutRecallPromptData): CancelablePromise<StartConversationAboutRecallPromptResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/conversation/recall-prompt/{recallPrompt}',
+        path: {
+            recallPrompt: data.recallPrompt
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1129,16 +1259,18 @@ export const startConversationAboutRecallPrompt = (data: StartConversationAboutR
  * @returns Conversation OK
  * @throws ApiError
  */
-export const getConversationsAboutNote = (data: GetConversationsAboutNoteData): CancelablePromise<GetConversationsAboutNoteResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/conversation/note/{note}',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getConversationsAboutNote = (data: GetConversationsAboutNoteData): CancelablePromise<GetConversationsAboutNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/conversation/note/{note}',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1147,18 +1279,20 @@ export const getConversationsAboutNote = (data: GetConversationsAboutNoteData): 
  * @returns Conversation OK
  * @throws ApiError
  */
-export const startConversationAboutNote = (data: StartConversationAboutNoteData): CancelablePromise<StartConversationAboutNoteResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/conversation/note/{note}',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const startConversationAboutNote = (data: StartConversationAboutNoteData): CancelablePromise<StartConversationAboutNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/conversation/note/{note}',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1167,30 +1301,34 @@ export const startConversationAboutNote = (data: StartConversationAboutNoteData)
  * @returns Conversation OK
  * @throws ApiError
  */
-export const startConversationAboutAssessmentQuestion = (data: StartConversationAboutAssessmentQuestionData): CancelablePromise<StartConversationAboutAssessmentQuestionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/conversation/assessment-question/{assessmentQuestion}',
-    path: {
-        assessmentQuestion: data.assessmentQuestion
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const startConversationAboutAssessmentQuestion = (data: StartConversationAboutAssessmentQuestionData): CancelablePromise<StartConversationAboutAssessmentQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/conversation/assessment-question/{assessmentQuestion}',
+        path: {
+            assessmentQuestion: data.assessmentQuestion
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns Circle OK
  * @throws ApiError
  */
-export const index = (): CancelablePromise<IndexResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/circles',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const index = (): CancelablePromise<IndexResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/circles',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1198,15 +1336,17 @@ export const index = (): CancelablePromise<IndexResponse> => { return __request(
  * @returns Circle OK
  * @throws ApiError
  */
-export const createCircle = (data: CreateCircleData): CancelablePromise<CreateCircleResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/circles',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createCircle = (data: CreateCircleData): CancelablePromise<CreateCircleResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/circles',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1215,18 +1355,20 @@ export const createCircle = (data: CreateCircleData): CancelablePromise<CreateCi
  * @returns RedirectToNoteResponse OK
  * @throws ApiError
  */
-export const createNotebookInCircle = (data: CreateNotebookInCircleData): CancelablePromise<CreateNotebookInCircleResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/circles/{circle}/notebooks',
-    path: {
-        circle: data.circle
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const createNotebookInCircle = (data: CreateNotebookInCircleData): CancelablePromise<CreateNotebookInCircleResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/circles/{circle}/notebooks',
+        path: {
+            circle: data.circle
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1234,15 +1376,17 @@ export const createNotebookInCircle = (data: CreateNotebookInCircleData): Cancel
  * @returns Circle OK
  * @throws ApiError
  */
-export const joinCircle = (data: JoinCircleData): CancelablePromise<JoinCircleResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/circles/join',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const joinCircle = (data: JoinCircleData): CancelablePromise<JoinCircleResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/circles/join',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1250,16 +1394,18 @@ export const joinCircle = (data: JoinCircleData): CancelablePromise<JoinCircleRe
  * @returns Certificate OK
  * @throws ApiError
  */
-export const getCertificate = (data: GetCertificateData): CancelablePromise<GetCertificateResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/certificate/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getCertificate = (data: GetCertificateData): CancelablePromise<GetCertificateResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/certificate/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1267,16 +1413,18 @@ export const getCertificate = (data: GetCertificateData): CancelablePromise<GetC
  * @returns Certificate OK
  * @throws ApiError
  */
-export const claimCertificate = (data: ClaimCertificateData): CancelablePromise<ClaimCertificateResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/certificate/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const claimCertificate = (data: ClaimCertificateData): CancelablePromise<ClaimCertificateResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/certificate/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1284,16 +1432,18 @@ export const claimCertificate = (data: ClaimCertificateData): CancelablePromise<
  * @returns BazaarNotebook OK
  * @throws ApiError
  */
-export const removeFromBazaar = (data: RemoveFromBazaarData): CancelablePromise<RemoveFromBazaarResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/bazaar/{bazaarNotebook}/remove',
-    path: {
-        bazaarNotebook: data.bazaarNotebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const removeFromBazaar = (data: RemoveFromBazaarData): CancelablePromise<RemoveFromBazaarResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/bazaar/{bazaarNotebook}/remove',
+        path: {
+            bazaarNotebook: data.bazaarNotebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1301,15 +1451,17 @@ export const removeFromBazaar = (data: RemoveFromBazaarData): CancelablePromise<
  * @returns TextFromAudioWithCallInfo OK
  * @throws ApiError
  */
-export const audioToText = (data: AudioToTextData = {}): CancelablePromise<AudioToTextResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/audio/audio-to-text',
-    formData: data.formData,
-    mediaType: 'multipart/form-data',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const audioToText = (data: AudioToTextData = {}): CancelablePromise<AudioToTextResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/audio/audio-to-text',
+        formData: data.formData,
+        mediaType: 'multipart/form-data',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1317,15 +1469,17 @@ export const audioToText = (data: AudioToTextData = {}): CancelablePromise<Audio
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const assimilate = (data: AssimilateData): CancelablePromise<AssimilateResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/assimilation',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const assimilate = (data: AssimilateData): CancelablePromise<AssimilateResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/assimilation',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1334,18 +1488,20 @@ export const assimilate = (data: AssimilateData): CancelablePromise<AssimilateRe
  * @returns AssessmentQuestionInstance OK
  * @throws ApiError
  */
-export const answerQuestion = (data: AnswerQuestionData): CancelablePromise<AnswerQuestionResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/assessment/{assessmentQuestionInstance}/answer',
-    path: {
-        assessmentQuestionInstance: data.assessmentQuestionInstance
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const answerQuestion = (data: AnswerQuestionData): CancelablePromise<AnswerQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/assessment/{assessmentQuestionInstance}/answer',
+        path: {
+            assessmentQuestionInstance: data.assessmentQuestionInstance
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1353,16 +1509,18 @@ export const answerQuestion = (data: AnswerQuestionData): CancelablePromise<Answ
  * @returns AssessmentAttempt OK
  * @throws ApiError
  */
-export const submitAssessmentResult = (data: SubmitAssessmentResultData): CancelablePromise<SubmitAssessmentResultResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/assessment/{assessmentAttempt}',
-    path: {
-        assessmentAttempt: data.assessmentAttempt
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const submitAssessmentResult = (data: SubmitAssessmentResultData): CancelablePromise<SubmitAssessmentResultResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/assessment/{assessmentAttempt}',
+        path: {
+            assessmentAttempt: data.assessmentAttempt
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1370,16 +1528,18 @@ export const submitAssessmentResult = (data: SubmitAssessmentResultData): Cancel
  * @returns AssessmentAttempt OK
  * @throws ApiError
  */
-export const generateAssessmentQuestions = (data: GenerateAssessmentQuestionsData): CancelablePromise<GenerateAssessmentQuestionsResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/assessment/questions/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const generateAssessmentQuestions = (data: GenerateAssessmentQuestionsData): CancelablePromise<GenerateAssessmentQuestionsResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/assessment/questions/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1387,16 +1547,18 @@ export const generateAssessmentQuestions = (data: GenerateAssessmentQuestionsDat
  * @returns SuggestedTitleDTO OK
  * @throws ApiError
  */
-export const suggestTitle = (data: SuggestTitleData): CancelablePromise<SuggestTitleResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/ai/suggest-title/{note}',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const suggestTitle = (data: SuggestTitleData): CancelablePromise<SuggestTitleResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/ai/suggest-title/{note}',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1404,15 +1566,17 @@ export const suggestTitle = (data: SuggestTitleData): CancelablePromise<SuggestT
  * @returns AiGeneratedImage OK
  * @throws ApiError
  */
-export const generateImage = (data: GenerateImageData): CancelablePromise<GenerateImageResponse> => { return __request(OpenAPI, {
-    method: 'POST',
-    url: '/api/ai/generate-image',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const generateImage = (data: GenerateImageData): CancelablePromise<GenerateImageResponse> => {
+    return __request(OpenAPI, {
+        method: 'POST',
+        url: '/api/ai/generate-image',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1421,18 +1585,20 @@ export const generateImage = (data: GenerateImageData): CancelablePromise<Genera
  * @returns User OK
  * @throws ApiError
  */
-export const updateUser = (data: UpdateUserData): CancelablePromise<UpdateUserResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/user/{user}',
-    path: {
-        user: data.user
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateUser = (data: UpdateUserData): CancelablePromise<UpdateUserResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/user/{user}',
+        path: {
+            user: data.user
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1441,18 +1607,20 @@ export const updateUser = (data: UpdateUserData): CancelablePromise<UpdateUserRe
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const updateNoteTitle = (data: UpdateNoteTitleData): CancelablePromise<UpdateNoteTitleResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/text_content/{note}/title',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateNoteTitle = (data: UpdateNoteTitleData): CancelablePromise<UpdateNoteTitleResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/text_content/{note}/title',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1461,18 +1629,20 @@ export const updateNoteTitle = (data: UpdateNoteTitleData): CancelablePromise<Up
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const updateNoteDetails = (data: UpdateNoteDetailsData): CancelablePromise<UpdateNoteDetailsResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/text_content/{note}/details',
-    path: {
-        note: data.note
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateNoteDetails = (data: UpdateNoteDetailsData): CancelablePromise<UpdateNoteDetailsResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/text_content/{note}/details',
+        path: {
+            note: data.note
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1480,16 +1650,18 @@ export const updateNoteDetails = (data: UpdateNoteDetailsData): CancelablePromis
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const show = (data: ShowData): CancelablePromise<ShowResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notes/{note}',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const show = (data: ShowData): CancelablePromise<ShowResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notes/{note}',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1498,18 +1670,20 @@ export const show = (data: ShowData): CancelablePromise<ShowResponse> => { retur
  * @returns NoteAccessory OK
  * @throws ApiError
  */
-export const updateNoteAccessories = (data: UpdateNoteAccessoriesData): CancelablePromise<UpdateNoteAccessoriesResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/notes/{note}',
-    path: {
-        note: data.note
-    },
-    formData: data.formData,
-    mediaType: 'multipart/form-data',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateNoteAccessories = (data: UpdateNoteAccessoriesData): CancelablePromise<UpdateNoteAccessoriesResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/notes/{note}',
+        path: {
+            note: data.note
+        },
+        formData: data.formData,
+        mediaType: 'multipart/form-data',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1517,16 +1691,18 @@ export const updateNoteAccessories = (data: UpdateNoteAccessoriesData): Cancelab
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const undoDeleteNote = (data: UndoDeleteNoteData): CancelablePromise<UndoDeleteNoteResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/notes/{note}/undo-delete',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const undoDeleteNote = (data: UndoDeleteNoteData): CancelablePromise<UndoDeleteNoteResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/notes/{note}/undo-delete',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1535,17 +1711,19 @@ export const undoDeleteNote = (data: UndoDeleteNoteData): CancelablePromise<Undo
  * @returns Notebook OK
  * @throws ApiError
  */
-export const moveToCircle = (data: MoveToCircleData): CancelablePromise<MoveToCircleResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/notebooks/{notebook}/move-to-circle/{circle}',
-    path: {
-        notebook: data.notebook,
-        circle: data.circle
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const moveToCircle = (data: MoveToCircleData): CancelablePromise<MoveToCircleResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/notebooks/{notebook}/move-to-circle/{circle}',
+        path: {
+            notebook: data.notebook,
+            circle: data.circle
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1553,16 +1731,18 @@ export const moveToCircle = (data: MoveToCircleData): CancelablePromise<MoveToCi
  * @returns NotebookAiAssistant OK
  * @throws ApiError
  */
-export const getAiAssistant = (data: GetAiAssistantData): CancelablePromise<GetAiAssistantResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebooks/{notebook}/ai-assistant',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAiAssistant = (data: GetAiAssistantData): CancelablePromise<GetAiAssistantResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebooks/{notebook}/ai-assistant',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1571,18 +1751,20 @@ export const getAiAssistant = (data: GetAiAssistantData): CancelablePromise<GetA
  * @returns NotebookAiAssistant OK
  * @throws ApiError
  */
-export const updateAiAssistant = (data: UpdateAiAssistantData): CancelablePromise<UpdateAiAssistantResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/notebooks/{notebook}/ai-assistant',
-    path: {
-        notebook: data.notebook
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateAiAssistant = (data: UpdateAiAssistantData): CancelablePromise<UpdateAiAssistantResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/notebooks/{notebook}/ai-assistant',
+        path: {
+            notebook: data.notebook
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1591,19 +1773,21 @@ export const updateAiAssistant = (data: UpdateAiAssistantData): CancelablePromis
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const markAsRepeated = (data: MarkAsRepeatedData): CancelablePromise<MarkAsRepeatedResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/memory-trackers/{memoryTracker}/mark-as-repeated',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    query: {
-        successful: data.successful
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const markAsRepeated = (data: MarkAsRepeatedData): CancelablePromise<MarkAsRepeatedResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/memory-trackers/{memoryTracker}/mark-as-repeated',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        query: {
+            successful: data.successful
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1612,18 +1796,20 @@ export const markAsRepeated = (data: MarkAsRepeatedData): CancelablePromise<Mark
  * @returns SuggestedQuestionForFineTuning OK
  * @throws ApiError
  */
-export const updateSuggestedQuestionForFineTuning = (data: UpdateSuggestedQuestionForFineTuningData): CancelablePromise<UpdateSuggestedQuestionForFineTuningResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning',
-    path: {
-        suggestedQuestion: data.suggestedQuestion
-    },
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const updateSuggestedQuestionForFineTuning = (data: UpdateSuggestedQuestionForFineTuningData): CancelablePromise<UpdateSuggestedQuestionForFineTuningResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning',
+        path: {
+            suggestedQuestion: data.suggestedQuestion
+        },
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1631,16 +1817,18 @@ export const updateSuggestedQuestionForFineTuning = (data: UpdateSuggestedQuesti
  * @returns ConversationMessage OK
  * @throws ApiError
  */
-export const markConversationAsRead = (data: MarkConversationAsReadData): CancelablePromise<MarkConversationAsReadResponse> => { return __request(OpenAPI, {
-    method: 'PATCH',
-    url: '/api/conversation/{conversationId}/read',
-    path: {
-        conversationId: data.conversationId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const markConversationAsRead = (data: MarkConversationAsReadData): CancelablePromise<MarkConversationAsReadResponse> => {
+    return __request(OpenAPI, {
+        method: 'PATCH',
+        url: '/api/conversation/{conversationId}/read',
+        path: {
+            conversationId: data.conversationId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1648,16 +1836,18 @@ export const markConversationAsRead = (data: MarkConversationAsReadData): Cancel
  * @returns WikidataSearchEntity OK
  * @throws ApiError
  */
-export const searchWikidata = (data: SearchWikidataData): CancelablePromise<SearchWikidataResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/wikidata/search/{search}',
-    path: {
-        search: data.search
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const searchWikidata = (data: SearchWikidataData): CancelablePromise<SearchWikidataResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/wikidata/search/{search}',
+        path: {
+            search: data.search
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1665,52 +1855,60 @@ export const searchWikidata = (data: SearchWikidataData): CancelablePromise<Sear
  * @returns WikidataEntityData OK
  * @throws ApiError
  */
-export const fetchWikidataEntityDataById = (data: FetchWikidataEntityDataByIdData): CancelablePromise<FetchWikidataEntityDataByIdResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/wikidata/entity-data/{wikidataId}',
-    path: {
-        wikidataId: data.wikidataId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const fetchWikidataEntityDataById = (data: FetchWikidataEntityDataByIdData): CancelablePromise<FetchWikidataEntityDataByIdResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/wikidata/entity-data/{wikidataId}',
+        path: {
+            wikidataId: data.wikidataId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns UserToken OK
  * @throws ApiError
  */
-export const getTokens = (): CancelablePromise<GetTokensResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/user/get-tokens',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getTokens = (): CancelablePromise<GetTokensResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/user/get-tokens',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns CurrentUserInfo OK
  * @throws ApiError
  */
-export const currentUserInfo = (): CancelablePromise<CurrentUserInfoResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/user/current-user-info',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const currentUserInfo = (): CancelablePromise<CurrentUserInfoResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/user/current-user-info',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns unknown OK
  * @throws ApiError
  */
-export const githubIssues = (): CancelablePromise<GithubIssuesResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/testability/github_issues',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const githubIssues = (): CancelablePromise<GithubIssuesResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/testability/github_issues',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1719,17 +1917,19 @@ export const githubIssues = (): CancelablePromise<GithubIssuesResponse> => { ret
  * @returns DueMemoryTrackers OK
  * @throws ApiError
  */
-export const recalling = (data: RecallingData): CancelablePromise<RecallingResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/recalls/recalling',
-    query: {
-        timezone: data.timezone,
-        dueindays: data.dueindays
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const recalling = (data: RecallingData): CancelablePromise<RecallingResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/recalls/recalling',
+        query: {
+            timezone: data.timezone,
+            dueindays: data.dueindays
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1737,16 +1937,18 @@ export const recalling = (data: RecallingData): CancelablePromise<RecallingRespo
  * @returns RecallStatus OK
  * @throws ApiError
  */
-export const overview = (data: OverviewData): CancelablePromise<OverviewResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/recalls/overview',
-    query: {
-        timezone: data.timezone
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const overview = (data: OverviewData): CancelablePromise<OverviewResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/recalls/overview',
+        query: {
+            timezone: data.timezone
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1754,16 +1956,18 @@ export const overview = (data: OverviewData): CancelablePromise<OverviewResponse
  * @returns AnsweredQuestion OK
  * @throws ApiError
  */
-export const showQuestion = (data: ShowQuestionData): CancelablePromise<ShowQuestionResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/recall-prompts/{recallPrompt}',
-    path: {
-        recallPrompt: data.recallPrompt
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const showQuestion = (data: ShowQuestionData): CancelablePromise<ShowQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/recall-prompts/{recallPrompt}',
+        path: {
+            recallPrompt: data.recallPrompt
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1771,16 +1975,18 @@ export const showQuestion = (data: ShowQuestionData): CancelablePromise<ShowQues
  * @returns RecallPrompt OK
  * @throws ApiError
  */
-export const askAquestion = (data: AskAquestionData): CancelablePromise<AskAquestionResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/recall-prompts/{memoryTracker}/question',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const askAquestion = (data: AskAquestionData): CancelablePromise<AskAquestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/recall-prompts/{memoryTracker}/question',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1788,16 +1994,18 @@ export const askAquestion = (data: AskAquestionData): CancelablePromise<AskAques
  * @returns NoteInfo OK
  * @throws ApiError
  */
-export const getNoteInfo = (data: GetNoteInfoData): CancelablePromise<GetNoteInfoResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notes/{note}/note-info',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getNoteInfo = (data: GetNoteInfoData): CancelablePromise<GetNoteInfoResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notes/{note}/note-info',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1806,19 +2014,21 @@ export const getNoteInfo = (data: GetNoteInfoData): CancelablePromise<GetNoteInf
  * @returns GraphRAGResult OK
  * @throws ApiError
  */
-export const getGraph = (data: GetGraphData): CancelablePromise<GetGraphResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notes/{note}/graph',
-    path: {
-        note: data.note
-    },
-    query: {
-        tokenLimit: data.tokenLimit
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getGraph = (data: GetGraphData): CancelablePromise<GetGraphResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notes/{note}/graph',
+        path: {
+            note: data.note
+        },
+        query: {
+            tokenLimit: data.tokenLimit
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1826,16 +2036,18 @@ export const getGraph = (data: GetGraphData): CancelablePromise<GetGraphResponse
  * @returns GraphRAGResult OK
  * @throws ApiError
  */
-export const getDescendants = (data: GetDescendantsData): CancelablePromise<GetDescendantsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notes/{note}/descendants',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getDescendants = (data: GetDescendantsData): CancelablePromise<GetDescendantsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notes/{note}/descendants',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1843,40 +2055,46 @@ export const getDescendants = (data: GetDescendantsData): CancelablePromise<GetD
  * @returns NoteAccessory OK
  * @throws ApiError
  */
-export const showNoteAccessory = (data: ShowNoteAccessoryData): CancelablePromise<ShowNoteAccessoryResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notes/{note}/accessory',
-    path: {
-        note: data.note
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const showNoteAccessory = (data: ShowNoteAccessoryData): CancelablePromise<ShowNoteAccessoryResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notes/{note}/accessory',
+        path: {
+            note: data.note
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns NoteRealm OK
  * @throws ApiError
  */
-export const getRecentNotes = (): CancelablePromise<GetRecentNotesResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notes/recent',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getRecentNotes = (): CancelablePromise<GetRecentNotesResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notes/recent',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns NotebooksViewedByUser OK
  * @throws ApiError
  */
-export const myNotebooks = (): CancelablePromise<MyNotebooksResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebooks',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const myNotebooks = (): CancelablePromise<MyNotebooksResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebooks',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1884,16 +2102,18 @@ export const myNotebooks = (): CancelablePromise<MyNotebooksResponse> => { retur
  * @returns string OK
  * @throws ApiError
  */
-export const downloadNotebookForObsidian = (data: DownloadNotebookForObsidianData): CancelablePromise<DownloadNotebookForObsidianResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebooks/{notebook}/obsidian',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const downloadNotebookForObsidian = (data: DownloadNotebookForObsidianData): CancelablePromise<DownloadNotebookForObsidianResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebooks/{notebook}/obsidian',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1901,16 +2121,18 @@ export const downloadNotebookForObsidian = (data: DownloadNotebookForObsidianDat
  * @returns Note OK
  * @throws ApiError
  */
-export const getNotes = (data: GetNotesData): CancelablePromise<GetNotesResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebooks/{notebook}/notes',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getNotes = (data: GetNotesData): CancelablePromise<GetNotesResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebooks/{notebook}/notes',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1918,28 +2140,32 @@ export const getNotes = (data: GetNotesData): CancelablePromise<GetNotesResponse
  * @returns BareNote OK
  * @throws ApiError
  */
-export const downloadNotebookDump = (data: DownloadNotebookDumpData): CancelablePromise<DownloadNotebookDumpResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebooks/{notebook}/dump',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const downloadNotebookDump = (data: DownloadNotebookDumpData): CancelablePromise<DownloadNotebookDumpResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebooks/{notebook}/dump',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns NotebookCertificateApproval OK
  * @throws ApiError
  */
-export const getAllPendingRequest = (): CancelablePromise<GetAllPendingRequestResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebook_certificate_approvals/get-all-pending-request',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAllPendingRequest = (): CancelablePromise<GetAllPendingRequestResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebook_certificate_approvals/get-all-pending-request',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1947,16 +2173,18 @@ export const getAllPendingRequest = (): CancelablePromise<GetAllPendingRequestRe
  * @returns NotebookCertificateApproval OK
  * @throws ApiError
  */
-export const getApprovalForNotebook = (data: GetApprovalForNotebookData): CancelablePromise<GetApprovalForNotebookResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/notebook_certificate_approvals/for-notebook/{notebook}',
-    path: {
-        notebook: data.notebook
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getApprovalForNotebook = (data: GetApprovalForNotebookData): CancelablePromise<GetApprovalForNotebookResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/notebook_certificate_approvals/for-notebook/{notebook}',
+        path: {
+            notebook: data.notebook
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1964,16 +2192,18 @@ export const getApprovalForNotebook = (data: GetApprovalForNotebookData): Cancel
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const show1 = (data: Show1Data): CancelablePromise<Show1Response> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/memory-trackers/{memoryTracker}',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const show1 = (data: Show1Data): CancelablePromise<Show1Response> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/memory-trackers/{memoryTracker}',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -1981,76 +2211,88 @@ export const show1 = (data: Show1Data): CancelablePromise<Show1Response> => { re
  * @returns SpellingQuestion OK
  * @throws ApiError
  */
-export const getSpellingQuestion = (data: GetSpellingQuestionData): CancelablePromise<GetSpellingQuestionResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/memory-trackers/{memoryTracker}/spelling-question',
-    path: {
-        memoryTracker: data.memoryTracker
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getSpellingQuestion = (data: GetSpellingQuestionData): CancelablePromise<GetSpellingQuestionResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/memory-trackers/{memoryTracker}/spelling-question',
+        path: {
+            memoryTracker: data.memoryTracker
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const getRecentlyReviewed = (): CancelablePromise<GetRecentlyReviewedResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/memory-trackers/recently-reviewed',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getRecentlyReviewed = (): CancelablePromise<GetRecentlyReviewedResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/memory-trackers/recently-reviewed',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns MemoryTracker OK
  * @throws ApiError
  */
-export const getRecentMemoryTrackers = (): CancelablePromise<GetRecentMemoryTrackersResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/memory-trackers/recent',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getRecentMemoryTrackers = (): CancelablePromise<GetRecentMemoryTrackersResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/memory-trackers/recent',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns string OK
  * @throws ApiError
  */
-export const ping = (): CancelablePromise<PingResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/healthcheck',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const ping = (): CancelablePromise<PingResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/healthcheck',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns SuggestedQuestionForFineTuning OK
  * @throws ApiError
  */
-export const getAllSuggestedQuestions = (): CancelablePromise<GetAllSuggestedQuestionsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAllSuggestedQuestions = (): CancelablePromise<GetAllSuggestedQuestionsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns unknown OK
  * @throws ApiError
  */
-export const failureReports = (): CancelablePromise<FailureReportsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/failure-reports',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const failureReports = (): CancelablePromise<FailureReportsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/failure-reports',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2058,28 +2300,32 @@ export const failureReports = (): CancelablePromise<FailureReportsResponse> => {
  * @returns FailureReportForView OK
  * @throws ApiError
  */
-export const show2 = (data: Show2Data): CancelablePromise<Show2Response> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/failure-reports/{failureReport}',
-    path: {
-        failureReport: data.failureReport
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const show2 = (data: Show2Data): CancelablePromise<Show2Response> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/failure-reports/{failureReport}',
+        path: {
+            failureReport: data.failureReport
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns unknown OK
  * @throws ApiError
  */
-export const dataUpgrade = (): CancelablePromise<DataUpgradeResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/data_upgrade',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const dataUpgrade = (): CancelablePromise<DataUpgradeResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/data_upgrade',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2087,16 +2333,18 @@ export const dataUpgrade = (): CancelablePromise<DataUpgradeResponse> => { retur
  * @returns Conversation OK
  * @throws ApiError
  */
-export const getConversation = (data: GetConversationData): CancelablePromise<GetConversationResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/conversation/{conversationId}',
-    path: {
-        conversationId: data.conversationId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getConversation = (data: GetConversationData): CancelablePromise<GetConversationResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/conversation/{conversationId}',
+        path: {
+            conversationId: data.conversationId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2104,16 +2352,18 @@ export const getConversation = (data: GetConversationData): CancelablePromise<Ge
  * @returns ConversationMessage OK
  * @throws ApiError
  */
-export const getConversationMessages = (data: GetConversationMessagesData): CancelablePromise<GetConversationMessagesResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/conversation/{conversationId}/messages',
-    path: {
-        conversationId: data.conversationId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getConversationMessages = (data: GetConversationMessagesData): CancelablePromise<GetConversationMessagesResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/conversation/{conversationId}/messages',
+        path: {
+            conversationId: data.conversationId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2121,40 +2371,46 @@ export const getConversationMessages = (data: GetConversationMessagesData): Canc
  * @returns string OK
  * @throws ApiError
  */
-export const exportConversation = (data: ExportConversationData): CancelablePromise<ExportConversationResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/conversation/{conversationId}/export',
-    path: {
-        conversationId: data.conversationId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const exportConversation = (data: ExportConversationData): CancelablePromise<ExportConversationResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/conversation/{conversationId}/export',
+        path: {
+            conversationId: data.conversationId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns ConversationMessage OK
  * @throws ApiError
  */
-export const getUnreadConversations = (): CancelablePromise<GetUnreadConversationsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/conversation/unread',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getUnreadConversations = (): CancelablePromise<GetUnreadConversationsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/conversation/unread',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns Conversation OK
  * @throws ApiError
  */
-export const getConversationsOfCurrentUser = (): CancelablePromise<GetConversationsOfCurrentUserResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/conversation/all',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getConversationsOfCurrentUser = (): CancelablePromise<GetConversationsOfCurrentUserResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/conversation/all',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2162,28 +2418,32 @@ export const getConversationsOfCurrentUser = (): CancelablePromise<GetConversati
  * @returns CircleForUserView OK
  * @throws ApiError
  */
-export const showCircle = (data: ShowCircleData): CancelablePromise<ShowCircleResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/circles/{circle}',
-    path: {
-        circle: data.circle
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const showCircle = (data: ShowCircleData): CancelablePromise<ShowCircleResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/circles/{circle}',
+        path: {
+            circle: data.circle
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns BazaarNotebook OK
  * @throws ApiError
  */
-export const bazaar = (): CancelablePromise<BazaarResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/bazaar',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const bazaar = (): CancelablePromise<BazaarResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/bazaar',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2191,16 +2451,18 @@ export const bazaar = (): CancelablePromise<BazaarResponse> => { return __reques
  * @returns AssimilationCountDTO OK
  * @throws ApiError
  */
-export const getAssimilationCount = (data: GetAssimilationCountData): CancelablePromise<GetAssimilationCountResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/assimilation/count',
-    query: {
-        timezone: data.timezone
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAssimilationCount = (data: GetAssimilationCountData): CancelablePromise<GetAssimilationCountResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/assimilation/count',
+        query: {
+            timezone: data.timezone
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2208,52 +2470,60 @@ export const getAssimilationCount = (data: GetAssimilationCountData): Cancelable
  * @returns Note OK
  * @throws ApiError
  */
-export const assimilating = (data: AssimilatingData): CancelablePromise<AssimilatingResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/assimilation/assimilating',
-    query: {
-        timezone: data.timezone
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const assimilating = (data: AssimilatingData): CancelablePromise<AssimilatingResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/assimilation/assimilating',
+        query: {
+            timezone: data.timezone
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns AssessmentAttempt OK
  * @throws ApiError
  */
-export const getMyAssessments = (): CancelablePromise<GetMyAssessmentsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/assessment',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getMyAssessments = (): CancelablePromise<GetMyAssessmentsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/assessment',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns DummyForGeneratingTypes OK
  * @throws ApiError
  */
-export const dummyEntryToGenerateDataTypesThatAreRequiredInEventStream = (): CancelablePromise<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/ai/dummy',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const dummyEntryToGenerateDataTypesThatAreRequiredInEventStream = (): CancelablePromise<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/ai/dummy',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @returns string OK
  * @throws ApiError
  */
-export const getAvailableGptModels = (): CancelablePromise<GetAvailableGptModelsResponse> => { return __request(OpenAPI, {
-    method: 'GET',
-    url: '/api/ai/available-gpt-models',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const getAvailableGptModels = (): CancelablePromise<GetAvailableGptModelsResponse> => {
+    return __request(OpenAPI, {
+        method: 'GET',
+        url: '/api/ai/available-gpt-models',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2261,16 +2531,18 @@ export const getAvailableGptModels = (): CancelablePromise<GetAvailableGptModels
  * @returns unknown OK
  * @throws ApiError
  */
-export const deleteToken = (data: DeleteTokenData): CancelablePromise<DeleteTokenResponse> => { return __request(OpenAPI, {
-    method: 'DELETE',
-    url: '/api/user/token/{tokenId}',
-    path: {
-        tokenId: data.tokenId
-    },
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const deleteToken = (data: DeleteTokenData): CancelablePromise<DeleteTokenResponse> => {
+    return __request(OpenAPI, {
+        method: 'DELETE',
+        url: '/api/user/token/{tokenId}',
+        path: {
+            tokenId: data.tokenId
+        },
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
 
 /**
  * @param data The data for the request.
@@ -2278,12 +2550,14 @@ export const deleteToken = (data: DeleteTokenData): CancelablePromise<DeleteToke
  * @returns unknown OK
  * @throws ApiError
  */
-export const deleteFailureReports = (data: DeleteFailureReportsData): CancelablePromise<DeleteFailureReportsResponse> => { return __request(OpenAPI, {
-    method: 'DELETE',
-    url: '/api/failure-reports/delete',
-    body: data.requestBody,
-    mediaType: 'application/json',
-    errors: {
-        500: 'Internal Server Error'
-    }
-}); };
+export const deleteFailureReports = (data: DeleteFailureReportsData): CancelablePromise<DeleteFailureReportsResponse> => {
+    return __request(OpenAPI, {
+        method: 'DELETE',
+        url: '/api/failure-reports/delete',
+        body: data.requestBody,
+        mediaType: 'application/json',
+        errors: {
+            500: 'Internal Server Error'
+        }
+    });
+};
