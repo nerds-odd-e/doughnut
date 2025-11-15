@@ -314,6 +314,21 @@ export const request = <T>(
               transformedBody = await options.responseTransformer(responseBody)
             }
 
+            // Defensive check: ensure response has status
+            if (response.status === undefined || response.status === null) {
+              throw new ApiError(
+                options,
+                {
+                  url,
+                  ok: false,
+                  status: 0,
+                  statusText: 'Unknown Status',
+                  body: undefined,
+                },
+                `Invalid response: response.status is ${response.status}. Response object: ${JSON.stringify(response)}`
+              )
+            }
+
             const result: ApiResult = {
               url,
               ok: response.status >= 200 && response.status < 300,
