@@ -1,7 +1,9 @@
 import { z } from 'zod'
-import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO.js'
-import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO.js'
-import type { NoteCreationResult } from '@generated/backend/models/NoteCreationResult.js'
+import type {
+  NoteCreationDTO,
+  McpNoteAddDTO,
+  NoteCreationResult,
+} from '@generated/backend'
 import { createTool } from './tool-builder.js'
 import { jsonResponse } from '../helpers.js'
 

@@ -1,4 +1,4 @@
-import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
+import type { DoughnutApi } from './DoughnutApiExport.js'
 
 export type ToolResponseContent = { type: 'text'; text: string }
 

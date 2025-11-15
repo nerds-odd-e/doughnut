@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import { findTool, createMockApi, createMockContext } from '../helpers/index.js'
-import type { RestNoteControllerService } from '@generated/backend/services/RestNoteControllerService.js'
+import type { RestNoteControllerService } from '@generated/backend'
 
 describe('get_note_graph tool', () => {
   test('should be defined and have correct name', () => {

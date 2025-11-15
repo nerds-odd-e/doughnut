@@ -1,6 +1,6 @@
 import { describe, test, expect, vi } from 'vitest'
 import { createMockApi, createMockContext, findTool } from '../helpers/index.js'
-import type { RestSearchControllerService } from '@generated/backend/services/RestSearchControllerService.js'
+import type { RestSearchControllerService } from '@generated/backend'
 
 describe('find_most_relevant_note tool', () => {
   // Helper function to create mock API for find_most_relevant_note tests

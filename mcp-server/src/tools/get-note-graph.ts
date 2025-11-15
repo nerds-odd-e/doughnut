@@ -7,7 +7,7 @@ import {
   jsonResponse,
 } from '../helpers.js'
 import type { ToolResponse } from '../types.js'
-import type { DoughnutApi } from '@generated/backend/DoughnutApi.js'
+import type { DoughnutApi } from '../DoughnutApiExport.js'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({

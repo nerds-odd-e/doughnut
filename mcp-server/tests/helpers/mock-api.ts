@@ -1,4 +1,4 @@
-import { DoughnutApi } from '@generated/backend/DoughnutApi.js'
+import { DoughnutApi } from '../../src/DoughnutApiExport.js'
 
 // Helper function to create a real API with selective method overrides
 export function createMockApi(

@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { createTool } from './tool-builder.js'
 import { textResponse, jsonResponse } from '../helpers.js'
-import type { NoteSearchResult } from '@generated/backend/models/NoteSearchResult.js'
+import type { NoteSearchResult } from '@generated/backend'
 
 // Schema definitions co-located with the tool
 const SearchNoteParamsSchema = z.object({
