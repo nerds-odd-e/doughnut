@@ -1042,12 +1042,12 @@ export type EnableFeatureToggleResponse = (Array<{
 
 export type ResetDbAndTestabilitySettingsResponse = (string);
 
-export type UpdateData = {
+export type UpdateSubscriptionData = {
     requestBody: SubscriptionDTO;
     subscription: number;
 };
 
-export type UpdateResponse = (Subscription);
+export type UpdateSubscriptionResponse = (Subscription);
 
 export type DestroySubscriptionResponse = (Array<(number)>);
 
@@ -1132,12 +1132,12 @@ export type CreateNoteAfterData = {
 
 export type CreateNoteAfterResponse = (NoteCreationResult);
 
-export type CreateNoteData = {
+export type CreateNoteUnderParentData = {
     parentNote: number;
     requestBody: NoteCreationDTO;
 };
 
-export type CreateNoteResponse = (NoteCreationResult);
+export type CreateNoteUnderParentResponse = (NoteCreationResult);
 
 export type UpdateWikidataIdData = {
     note: number;
@@ -1199,12 +1199,12 @@ export type GetData = {
 
 export type GetResponse = (Notebook);
 
-export type Update1Data = {
+export type UpdateNotebookData = {
     notebook: number;
     requestBody: NotebookSettings;
 };
 
-export type Update1Response = (Notebook);
+export type UpdateNotebookResponse = (Notebook);
 
 export type UpdateNotebookIndexData = {
     notebook: number;
@@ -1277,11 +1277,11 @@ export type AnswerSpellingData = {
 
 export type AnswerSpellingResponse = (SpellingResultDTO);
 
-export type CreateNote1Data = {
+export type CreateNoteViaMcpData = {
     requestBody: McpNoteAddDTO;
 };
 
-export type CreateNote1Response = (NoteCreationResult);
+export type CreateNoteViaMcpResponse = (NoteCreationResult);
 
 export type UpdateLinkData = {
     link: number;
@@ -1462,11 +1462,11 @@ export type UpdateNoteDetailsData = {
 
 export type UpdateNoteDetailsResponse = (NoteRealm);
 
-export type ShowData = {
+export type ShowNoteData = {
     note: number;
 };
 
-export type ShowResponse = (NoteRealm);
+export type ShowNoteResponse = (NoteRealm);
 
 export type UpdateNoteAccessoriesData = {
     formData?: NoteAccessoriesDTO;
@@ -1623,11 +1623,11 @@ export type GetApprovalForNotebookData = {
 
 export type GetApprovalForNotebookResponse = (NotebookCertificateApproval);
 
-export type Show1Data = {
+export type ShowMemoryTrackerData = {
     memoryTracker: number;
 };
 
-export type Show1Response = (MemoryTracker);
+export type ShowMemoryTrackerResponse = (MemoryTracker);
 
 export type GetSpellingQuestionData = {
     memoryTracker: number;
@@ -1647,11 +1647,11 @@ export type FailureReportsResponse = ({
     [key: string]: unknown;
 });
 
-export type Show2Data = {
+export type ShowFailureReportData = {
     failureReport: number;
 };
 
-export type Show2Response = (FailureReportForView);
+export type ShowFailureReportResponse = (FailureReportForView);
 
 export type DataUpgradeResponse = (Array<{
     [key: string]: unknown;

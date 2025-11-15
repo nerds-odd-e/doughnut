@@ -25,7 +25,7 @@ describe("answered question page", () => {
       vi.spyOn(helper.managedApi.services, "showQuestion").mockResolvedValue(
         answeredQuestion as never
       )
-      vi.spyOn(helper.managedApi.services, "show").mockResolvedValue(
+      vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         makeMe.aNoteRealm.please() as never
       )
       vi.spyOn(

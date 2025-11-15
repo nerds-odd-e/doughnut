@@ -94,14 +94,15 @@ class MemoryTrackerControllerTest {
 
       @Test
       void shouldBeAbleToSeeOwn() throws UnexpectedNoAccessRightException {
-        MemoryTracker memoryTracker = controller.show(rp);
+        MemoryTracker memoryTracker = controller.showMemoryTracker(rp);
         assertThat(memoryTracker, equalTo(rp));
       }
 
       @Test
       void shouldNotBeAbleToSeeOthers() {
         rp = makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
-        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.show(rp));
+        assertThrows(
+            UnexpectedNoAccessRightException.class, () -> controller.showMemoryTracker(rp));
       }
 
       @Test

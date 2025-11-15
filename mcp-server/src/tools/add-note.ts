@@ -2,7 +2,7 @@ import { z } from 'zod'
 import type {
   NoteCreationDTO,
   McpNoteAddDTO,
-  CreateNote1Response,
+  CreateNoteViaMcpResponse,
 } from '@generated/backend'
 import * as Services from '@generated/backend/sdk.gen'
 import { createTool } from './tool-builder.js'
@@ -56,7 +56,7 @@ Response Format:
     parentNote: parentTitle,
     noteCreationDTO: noteCreationDTO,
   }
-  const result: CreateNote1Response = await Services.createNote1({
+  const result: CreateNoteViaMcpResponse = await Services.createNoteViaMcp({
     requestBody: mcpCreationDto,
   })
 

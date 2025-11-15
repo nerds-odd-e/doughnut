@@ -36,7 +36,7 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  vi.spyOn(helper.managedApi.services, "show").mockResolvedValue(
+  vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
     makeMe.aNote.please() as never
   )
   vi.spyOn(helper.managedApi.services, "recalling").mockImplementation(
@@ -81,9 +81,10 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(helper.managedApi.services, "show1").mockResolvedValue(
-        makeMe.aMemoryTracker.please() as never
-      )
+      vi.spyOn(
+        helper.managedApi.services,
+        "showMemoryTracker"
+      ).mockResolvedValue(makeMe.aMemoryTracker.please() as never)
       vi.spyOn(
         helper.managedApi.silent.services,
         "askAQuestion"
@@ -168,9 +169,10 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(helper.managedApi.services, "show1").mockResolvedValue(
-        makeMe.aMemoryTracker.please() as never
-      )
+      vi.spyOn(
+        helper.managedApi.services,
+        "showMemoryTracker"
+      ).mockResolvedValue(makeMe.aMemoryTracker.please() as never)
       vi.spyOn(
         helper.managedApi.silent.services,
         "askAQuestion"

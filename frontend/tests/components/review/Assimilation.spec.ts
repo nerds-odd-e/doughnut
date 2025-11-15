@@ -27,7 +27,7 @@ beforeEach(() => {
   vi.spyOn(helper.managedApi.services, "assimilate").mockImplementation(
     mockedAssimilateCall
   )
-  vi.spyOn(helper.managedApi.services, "show").mockImplementation(
+  vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
     mockedGetNoteCall
   )
   vi.spyOn(helper.managedApi.services, "getNoteInfo").mockImplementation(

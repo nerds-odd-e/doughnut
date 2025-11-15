@@ -41,7 +41,7 @@ class NoteCreationController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  public NoteCreationResult createNote(
+  public NoteCreationResult createNoteUnderParent(
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {

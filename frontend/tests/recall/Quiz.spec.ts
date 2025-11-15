@@ -12,10 +12,10 @@ describe("repeat page", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    vi.spyOn(helper.managedApi.services, "show").mockResolvedValue(
+    vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
       makeMe.aNote.please() as never
     )
-    vi.spyOn(helper.managedApi.services, "show1").mockResolvedValue(
+    vi.spyOn(helper.managedApi.services, "showMemoryTracker").mockResolvedValue(
       makeMe.aMemoryTracker.please() as never
     )
     vi.spyOn(

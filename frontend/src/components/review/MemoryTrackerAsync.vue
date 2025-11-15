@@ -31,7 +31,7 @@ const memoryTracker = ref<MemoryTracker>()
 
 // Methods
 const fetchData = async () => {
-  memoryTracker.value = await managedApi.services.show1({
+  memoryTracker.value = await managedApi.services.showMemoryTracker({
     memoryTracker: props.memoryTrackerId,
   })
 }

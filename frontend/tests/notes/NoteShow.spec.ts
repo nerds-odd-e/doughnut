@@ -19,7 +19,7 @@ describe("new/updated pink banner", () => {
     "should show fresher color if recently updated",
     async (updatedAt, expectedColor) => {
       const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
-      vi.spyOn(helper.managedApi.services, "show").mockResolvedValue(
+      vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         note as never
       )
 
@@ -43,7 +43,9 @@ describe("note wth children", () => {
   const note = makeMe.aNoteRealm.please()
 
   const render = (n: NoteRealm) => {
-    vi.spyOn(helper.managedApi.services, "show").mockResolvedValue(n as never)
+    vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
+      n as never
+    )
     helper
       .component(NoteShow)
       .withRouter()
@@ -56,7 +58,9 @@ describe("note wth children", () => {
 
   it("should call the api", async () => {
     render(note)
-    expect(helper.managedApi.services.show).toBeCalledWith({ note: note.id })
+    expect(helper.managedApi.services.showNote).toBeCalledWith({
+      note: note.id,
+    })
   })
 
   it("should not render children control if no child", async () => {

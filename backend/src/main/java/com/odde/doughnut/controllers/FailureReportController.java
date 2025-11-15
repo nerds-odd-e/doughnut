@@ -43,7 +43,7 @@ class FailureReportController {
   }
 
   @GetMapping("/{failureReport}")
-  public FailureReportForView show(
+  public FailureReportForView showFailureReport(
       @PathVariable("failureReport") @Schema(type = "integer") FailureReport failureReport)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();

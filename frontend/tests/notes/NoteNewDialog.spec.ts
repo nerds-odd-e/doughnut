@@ -29,7 +29,7 @@ describe("adding new note", () => {
       "searchForLinkTargetWithin"
     ).mockImplementation(mockedSearchWithin)
     mockedCreateNote = vi
-      .spyOn(helper.managedApi.services, "createNote")
+      .spyOn(helper.managedApi.services, "createNoteUnderParent")
       .mockResolvedValue({} as never)
   })
 

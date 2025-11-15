@@ -51,7 +51,7 @@ class MemoryTrackerController {
   }
 
   @GetMapping("/{memoryTracker}")
-  public MemoryTracker show(
+  public MemoryTracker showMemoryTracker(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     currentUser.assertLoggedIn();

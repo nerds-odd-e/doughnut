@@ -149,7 +149,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const noteRealm = await this.managedApi.services.show({ note: noteId })
+    const noteRealm = await this.managedApi.services.showNote({ note: noteId })
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
@@ -175,7 +175,7 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDTO
   ) {
-    const nrwp = await this.managedApi.services.createNote({
+    const nrwp = await this.managedApi.services.createNoteUnderParent({
       parentNote: parentId,
       requestBody: data,
     })
