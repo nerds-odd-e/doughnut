@@ -474,6 +474,144 @@ class TestabilityRestControllerServiceInstance extends ServiceInstance {
       errors: { 500: "Internal Server Error" },
     })
   }
+
+  resetDbAndTestabilitySettings(): CancelablePromise<Types.ResetDbAndTestabilitySettingsResponse> {
+    return this.httpRequest.request<Types.ResetDbAndTestabilitySettingsResponse>(
+      {
+        method: "POST",
+        url: "/api/testability/clean_db_and_reset_testability_settings",
+        errors: { 500: "Internal Server Error" },
+      }
+    )
+  }
+
+  injectNotes(
+    requestBody: Types.NotesTestData
+  ): CancelablePromise<Types.InjectNotesResponse> {
+    return this.httpRequest.request<Types.InjectNotesResponse>({
+      method: "POST",
+      url: "/api/testability/inject_notes",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  injectPredefinedQuestion(
+    requestBody: Types.PredefinedQuestionsTestData
+  ): CancelablePromise<Types.InjectPredefinedQuestionResponse> {
+    return this.httpRequest.request<Types.InjectPredefinedQuestionResponse>({
+      method: "POST",
+      url: "/api/testability/inject-predefined-questions",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  linkNotes(
+    requestBody: Types.LinkNotesData["requestBody"]
+  ): CancelablePromise<Types.LinkNotesResponse> {
+    return this.httpRequest.request<Types.LinkNotesResponse>({
+      method: "POST",
+      url: "/api/testability/link_notes",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  injectSuggestedQuestion(
+    requestBody: Types.SuggestedQuestionsData
+  ): CancelablePromise<Types.InjectSuggestedQuestionResponse> {
+    return this.httpRequest.request<Types.InjectSuggestedQuestionResponse>({
+      method: "POST",
+      url: "/api/testability/inject_suggested_questions",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  timeTravel(
+    requestBody: Types.TimeTravel
+  ): CancelablePromise<Types.TimeTravelResponse> {
+    return this.httpRequest.request<Types.TimeTravelResponse>({
+      method: "POST",
+      url: "/api/testability/time_travel",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  timeTravelRelativeToNow(
+    requestBody: Types.TimeTravelRelativeToNow
+  ): CancelablePromise<Types.TimeTravelRelativeToNowResponse> {
+    return this.httpRequest.request<Types.TimeTravelRelativeToNowResponse>({
+      method: "POST",
+      url: "/api/testability/time_travel_relative_to_now",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  triggerException(): CancelablePromise<Types.TriggerExceptionResponse> {
+    return this.httpRequest.request<Types.TriggerExceptionResponse>({
+      method: "POST",
+      url: "/api/testability/trigger_exception",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  shareToBazaar(
+    requestBody: Types.ShareToBazaarData["requestBody"]
+  ): CancelablePromise<Types.ShareToBazaarResponse> {
+    return this.httpRequest.request<Types.ShareToBazaarResponse>({
+      method: "POST",
+      url: "/api/testability/share_to_bazaar",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  injectCircle(
+    requestBody: Types.InjectCircleData["requestBody"]
+  ): CancelablePromise<Types.InjectCircleResponse> {
+    return this.httpRequest.request<Types.InjectCircleResponse>({
+      method: "POST",
+      url: "/api/testability/inject_circle",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  updateCurrentUser(
+    requestBody: Types.UpdateCurrentUserData["requestBody"]
+  ): CancelablePromise<Types.UpdateCurrentUserResponse> {
+    return this.httpRequest.request<Types.UpdateCurrentUserResponse>({
+      method: "POST",
+      url: "/api/testability/update_current_user",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+
+  replaceServiceUrl(
+    requestBody: Types.ReplaceServiceUrlData["requestBody"]
+  ): CancelablePromise<Types.ReplaceServiceUrlResponse> {
+    return this.httpRequest.request<Types.ReplaceServiceUrlResponse>({
+      method: "POST",
+      url: "/api/testability/replace_service_url",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
 }
 
 class RestAiAudioControllerServiceInstance extends ServiceInstance {
@@ -1336,9 +1474,29 @@ class RestFailureReportControllerServiceInstance extends ServiceInstance {
   }
 }
 
-// Stub classes for services that don't have methods called yet
-class RestHealthCheckControllerServiceInstance extends ServiceInstance {}
-class McpNoteCreationControllerServiceInstance extends ServiceInstance {}
+class RestHealthCheckControllerServiceInstance extends ServiceInstance {
+  ping(): CancelablePromise<Types.PingResponse> {
+    return this.httpRequest.request<Types.PingResponse>({
+      method: "GET",
+      url: "/api/healthcheck",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+}
+
+class McpNoteCreationControllerServiceInstance extends ServiceInstance {
+  createNote1(
+    requestBody: Types.McpNoteAddDTO
+  ): CancelablePromise<Types.CreateNote1Response> {
+    return this.httpRequest.request<Types.CreateNote1Response>({
+      method: "POST",
+      url: "/api/mcp/notes/create",
+      body: requestBody,
+      mediaType: "application/json",
+      errors: { 500: "Internal Server Error" },
+    })
+  }
+}
 
 export class DoughnutApi {
   public readonly request: BaseHttpRequest

@@ -33,6 +33,9 @@ const commonConfig = {
         'file:preprocessor',
         createBundler({
           plugins: [createEsbuildPlugin(config)],
+          alias: {
+            '@frontend': path.resolve(__dirname, '../../frontend/src'),
+          },
         })
       )
 

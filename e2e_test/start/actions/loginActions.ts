@@ -1,6 +1,5 @@
 import { mainMenu } from '../pageObjects/mainMenu'
 import start from '../index'
-import { RestHealthCheckControllerService } from '@generated/backend/services/RestHealthCheckControllerService'
 import { extractRequestConfig } from '../utils/apiConfigExtractor'
 
 export const loginActions = {
@@ -25,10 +24,9 @@ export const loginActions = {
     const password = 'password'
     const token = btoa(`${username}:${password}`)
 
-    // Extract healthcheck endpoint config from generated service
-    const config = extractRequestConfig((httpRequest) => {
-      const service = new RestHealthCheckControllerService(httpRequest)
-      return service.ping()
+    // Extract healthcheck endpoint config from DoughnutApi
+    const config = extractRequestConfig((api) => {
+      return api.restHealthCheckController.ping()
     })
 
     cy.request({

@@ -1,6 +1,5 @@
-import type { McpNoteAddDTO } from '@generated/backend/models/McpNoteAddDTO'
-import type { NoteCreationDTO } from '@generated/backend/models/NoteCreationDTO'
-import { McpNoteCreationControllerService } from '@generated/backend/services/McpNoteCreationControllerService'
+import type { McpNoteAddDTO } from '@generated/backend'
+import type { NoteCreationDTO } from '@generated/backend'
 import { extractRequestConfig } from './utils/apiConfigExtractor'
 
 const mcpApi = () => {
@@ -13,10 +12,9 @@ const mcpApi = () => {
             noteCreationDTO,
           }
 
-          // Extract the request configuration from the generated service
-          const config = extractRequestConfig((httpRequest) => {
-            const service = new McpNoteCreationControllerService(httpRequest)
-            return service.createNote1(requestBody)
+          // Extract the request configuration from DoughnutApi
+          const config = extractRequestConfig((api) => {
+            return api.mcpNoteCreationController.createNote1(requestBody)
           })
 
           const req = {

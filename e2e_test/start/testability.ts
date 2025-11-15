@@ -1,15 +1,14 @@
 /// <reference types="Cypress" />
 // @ts-check
-import type { Randomization } from '@generated/backend/models/Randomization'
-import type { QuestionSuggestionParams } from '@generated/backend/models/QuestionSuggestionParams'
+import type { Randomization } from '@generated/backend'
+import type { QuestionSuggestionParams } from '@generated/backend'
 import type ServiceMocker from '../support/ServiceMocker'
-import type { NoteTestData } from '@generated/backend/models/NoteTestData'
-import type { PredefinedQuestionsTestData } from '@generated/backend/models/PredefinedQuestionsTestData'
-import type { TimeTravel } from '@generated/backend/models/TimeTravel'
-import type { TimeTravelRelativeToNow } from '@generated/backend/models/TimeTravelRelativeToNow'
-import type { SuggestedQuestionsData } from '@generated/backend/models/SuggestedQuestionsData'
-import type { NotesTestData } from '@generated/backend/models/NotesTestData'
-import { TestabilityRestControllerService } from '@generated/backend/services/TestabilityRestControllerService'
+import type { NoteTestData } from '@generated/backend'
+import type { PredefinedQuestionsTestData } from '@generated/backend'
+import type { TimeTravel } from '@generated/backend'
+import type { TimeTravelRelativeToNow } from '@generated/backend'
+import type { SuggestedQuestionsData } from '@generated/backend'
+import type { NotesTestData } from '@generated/backend'
 import { extractRequestConfig } from './utils/apiConfigExtractor'
 
 const hourOfDay = (days: number, hours: number) => {
@@ -17,9 +16,8 @@ const hourOfDay = (days: number, hours: number) => {
 }
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
-  const config = extractRequestConfig((httpRequest) => {
-    const service = new TestabilityRestControllerService(httpRequest)
-    return service.resetDbAndTestabilitySettings()
+  const config = extractRequestConfig((api) => {
+    return api.testabilityRestController.resetDbAndTestabilitySettings()
   })
 
   cy.request({
@@ -43,9 +41,10 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.enableFeatureToggle({ enabled: enabled.toString() })
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.enableFeatureToggle({
+          enabled: enabled.toString(),
+        })
       })
 
       cy.request({
@@ -67,9 +66,8 @@ const testability = () => {
         noteTestData,
       }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.injectNotes(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.injectNotes(requestBody)
       })
 
       return cy
@@ -108,9 +106,10 @@ const testability = () => {
     injectPredefinedQuestionsToNotebook(
       predefinedQuestionsTestData: PredefinedQuestionsTestData
     ) {
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.injectPredefinedQuestion(predefinedQuestionsTestData)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.injectPredefinedQuestion(
+          predefinedQuestionsTestData
+        )
       })
 
       cy.request({
@@ -172,9 +171,8 @@ const testability = () => {
           target_id: toNoteId.toString(),
         }
 
-        const config = extractRequestConfig((httpRequest) => {
-          const service = new TestabilityRestControllerService(httpRequest)
-          return service.linkNotes(requestBody)
+        const config = extractRequestConfig((api) => {
+          return api.testabilityRestController.linkNotes(requestBody)
         })
 
         cy.request({
@@ -189,9 +187,10 @@ const testability = () => {
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
       const requestBody: SuggestedQuestionsData = { examples }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.injectSuggestedQuestion(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.injectSuggestedQuestion(
+          requestBody
+        )
       })
 
       cy.request({
@@ -242,9 +241,8 @@ const testability = () => {
     backendTimeTravelToDate(date: Date) {
       const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.timeTravel(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.timeTravel(requestBody)
       })
 
       cy.request({
@@ -260,9 +258,8 @@ const testability = () => {
         travel_to: JSON.stringify(hourOfDay(day, hour)),
       }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.timeTravel(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.timeTravel(requestBody)
       })
 
       cy.request({
@@ -278,9 +275,10 @@ const testability = () => {
         hours: JSON.stringify(hours),
       }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.timeTravelRelativeToNow(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.timeTravelRelativeToNow(
+          requestBody
+        )
       })
 
       return cy.request({
@@ -294,9 +292,8 @@ const testability = () => {
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
       const requestBody: Randomization = { choose: strategy, seed }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.randomizer(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.randomizer(requestBody)
       })
 
       cy.request({
@@ -308,9 +305,8 @@ const testability = () => {
     },
 
     triggerException() {
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.triggerException()
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.triggerException()
       })
 
       cy.request({
@@ -323,9 +319,8 @@ const testability = () => {
     shareToBazaar(noteTopology: string) {
       const requestBody = { noteTopology }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.shareToBazaar(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.shareToBazaar(requestBody)
       })
 
       cy.request({
@@ -337,9 +332,8 @@ const testability = () => {
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.injectCircle(circleInfo)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.injectCircle(circleInfo)
       })
 
       cy.request({
@@ -351,9 +345,8 @@ const testability = () => {
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.updateCurrentUser(hash)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.updateCurrentUser(hash)
       })
 
       cy.request({
@@ -367,9 +360,8 @@ const testability = () => {
     setServiceUrl(serviceName: string, serviceUrl: string) {
       const requestBody = { [serviceName]: serviceUrl }
 
-      const config = extractRequestConfig((httpRequest) => {
-        const service = new TestabilityRestControllerService(httpRequest)
-        return service.replaceServiceUrl(requestBody)
+      const config = extractRequestConfig((api) => {
+        return api.testabilityRestController.replaceServiceUrl(requestBody)
       })
 
       return cy
