@@ -7,7 +7,13 @@ import { Then, When } from '@badeball/cypress-cucumber-preprocessor'
 import start from '../start'
 
 When('Someone triggered an exception', () => {
-  start.testability().triggerException()
+  start
+    .testability()
+    .triggerException()
+    .catch(() => {
+      // Expected: the exception triggers a 500 error which is caught and logged
+      return Promise.resolve()
+    })
 })
 
 Then(
