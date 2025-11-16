@@ -485,7 +485,12 @@ paths:
       tags:
       - subscription-controller
       operationId: destroySubscription
-      parameters: []
+      parameters:
+      - name: subscription
+        in: path
+        required: true
+        schema:
+          type: integer
       responses:
         "500":
           description: Internal Server Error

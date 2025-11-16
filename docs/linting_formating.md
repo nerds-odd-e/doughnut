@@ -44,6 +44,14 @@ From the root of your local `doughnut` source directory, run:
 pnpm cy:format
 ```
 
+#### 2.5. OpenAPI documentation formatting
+
+From the root of your local `doughnut` source directory, run:
+
+```bash
+pnpm openapi:lint
+```
+
 ### 3. Linting
 
 Linting is mostly for the CI server to check for any leaked warnings or errors.
@@ -80,3 +88,13 @@ From the root of your local `doughnut` source directory, run:
 ```bash
 pnpm cy:lint
 ```
+
+#### 3.5. OpenAPI documentation linting
+
+From the root of your local `doughnut` source directory, run:
+
+```bash
+pnpm openapi:lint
+```
+
+**Note:** The OpenAPI linting uses [Redocly CLI](https://redocly.com/docs/cli/) to validate the `open_api_docs.yaml` file. Configuration is defined in `redocly.yaml`.

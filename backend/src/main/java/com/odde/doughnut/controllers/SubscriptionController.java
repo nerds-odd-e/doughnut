@@ -53,7 +53,7 @@ class SubscriptionController {
   @PostMapping("/{subscription}/delete")
   @Transactional
   public List<Integer> destroySubscription(
-      @PathVariable(name = "notebook") @Schema(type = "integer") Subscription subscription)
+      @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(subscription);
     modelFactoryService.remove(subscription);

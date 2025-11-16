@@ -1,5 +1,5 @@
 ---
-description: Linting and code quality checks in the Doughnut project
+description: Linting, formating and code quality checks in the Doughnut project
 alwaysApply: false
 ---
 # Linting in Doughnut Project

@@ -15,5 +15,4 @@ rules:
   no-ambiguous-paths: off
   info-license: off
   no-identical-paths: off
-  path-parameters-defined: off
 

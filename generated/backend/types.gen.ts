@@ -1143,6 +1143,10 @@ export type UpdateSubscriptionData = {
 
 export type UpdateSubscriptionResponse = (Subscription);
 
+export type DestroySubscriptionData = {
+    subscription: number;
+};
+
 export type DestroySubscriptionResponse = (Array<(number)>);
 
 export type CreateSubscriptionData = {
