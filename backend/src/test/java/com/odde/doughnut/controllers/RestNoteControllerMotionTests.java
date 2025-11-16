@@ -35,6 +35,7 @@ class NoteControllerMotionTests {
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
+  @Autowired com.odde.doughnut.services.NoteService noteService;
   private UserModel userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -49,7 +50,8 @@ class NoteControllerMotionTests {
             userModel,
             httpClientAdapter,
             testabilitySettings,
-            noteMotionService);
+            noteMotionService,
+            noteService);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 

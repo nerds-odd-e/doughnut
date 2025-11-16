@@ -184,7 +184,7 @@ authorizationService.assertAuthorization(user, note);
 - Repository aggregation via public field injection
 
 **Target**: `ModelFactoryService` should be removed entirely. All operations should move to appropriate domain services:
-- Model factory methods → Remove (use services directly)
+- Model factory methods → Remove (use services directly) - `toNoteModel()` can be removed
 - User token operations → Move to `UserService`
 - Note embedding operations → Move to `NoteEmbeddingService`
 - Link creation operations → Move to `NoteService` or `LinkService`
@@ -410,7 +410,6 @@ This aligns tests with the stateless services architecture and makes them simple
 ### Models to Convert
 
 - `UserModel` → `UserService`
-- `NoteModel` → `NoteService`
 - `BazaarModel` → `BazaarService`
 
 ### Supporting Classes
