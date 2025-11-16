@@ -16,10 +16,10 @@
               @suggested-title-selected="takeSuggestedTitle"
             />
             <SearchResults
-              v-show="showDropdown && creationData.newTitle"
+              v-show="showDropdown && searchKey"
               v-bind="{
                 noteId: referenceNote.id,
-                inputSearchKey: creationData.newTitle,
+                inputSearchKey: searchKey,
                 isDropdown: true
               }"
               class="title-search-results"
@@ -51,7 +51,7 @@ import type {
 } from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import { ref } from "vue"
+import { ref, computed, watch } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
 import SuggestTitle from "./SuggestTitle.vue"
@@ -86,6 +86,23 @@ const noteFormErrors = ref({
 const suggestedTitle = ref("")
 const processing = ref(false)
 const showDropdown = ref(false)
+const hasUserEditedTitle = ref(false)
+
+// Computed property for search key - only search if user has edited or title is not "Untitled"
+const searchKey = computed(() => {
+  if (!hasUserEditedTitle.value && creationData.value.newTitle === "Untitled") {
+    return ""
+  }
+  return creationData.value.newTitle
+})
+
+// Watch for title changes to track user edits
+watch(
+  () => creationData.value.newTitle,
+  () => {
+    hasUserEditedTitle.value = true
+  }
+)
 
 // Methods
 const processForm = async () => {
@@ -134,6 +151,7 @@ const onSelectWikidataEntry = (selectedSuggestion: WikidataSearchEntity) => {
 const takeSuggestedTitle = (title: string) => {
   creationData.value.newTitle = title
   suggestedTitle.value = ""
+  hasUserEditedTitle.value = true
 }
 
 const onTitleBlur = () => {

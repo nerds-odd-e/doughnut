@@ -40,6 +40,19 @@ describe("adding new note", () => {
 
   const note = makeMe.aNote.topicConstructor("mythical").please()
 
+  it("does not search for initial default 'Untitled' title", async () => {
+    mockedSearchWithin.mockResolvedValue([])
+    helper
+      .component(NoteNewDialog)
+      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .mount()
+
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    expect(mockedSearchWithin).not.toHaveBeenCalled()
+  })
+
   it("search for duplicate", async () => {
     mockedSearchWithin.mockResolvedValue([
       { noteTopology: note.noteTopology, distance: 0.9 },
@@ -57,6 +70,30 @@ describe("adding new note", () => {
     expect(mockedSearchWithin).toHaveBeenCalledWith({
       note: note.id,
       requestBody: expect.objectContaining({ searchKey: "myth" }),
+    })
+  })
+
+  it("search when user edits title back to 'Untitled'", async () => {
+    mockedSearchWithin.mockResolvedValue([])
+    const wrapper = helper
+      .component(NoteNewDialog)
+      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .mount()
+
+    // User edits to something else first
+    await wrapper.find("input#note-title").setValue("myth")
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    // User edits back to "Untitled"
+    await wrapper.find("input#note-title").setValue("Untitled")
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    // Should have searched for "Untitled" (at least the last call)
+    expect(mockedSearchWithin).toHaveBeenCalledWith({
+      note: note.id,
+      requestBody: expect.objectContaining({ searchKey: "Untitled" }),
     })
   })
 
