@@ -30,6 +30,7 @@
 import { ref, onMounted } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const props = defineProps<{
   conversationId: number
@@ -39,17 +40,15 @@ const emit = defineEmits<{
   (e: "close"): void
 }>()
 
+const { managedApi } = useLoadingApi()
 const exportContent = ref("")
 
 onMounted(async () => {
   try {
-    const response = await fetch(
-      `/api/conversation/${props.conversationId}/export`
-    )
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-    exportContent.value = await response.text()
+    const content = await managedApi.services.exportConversation({
+      conversationId: props.conversationId,
+    })
+    exportContent.value = String(content)
   } catch (error) {
     console.error("Failed to fetch export content:", error)
     exportContent.value = "Failed to load export content"
