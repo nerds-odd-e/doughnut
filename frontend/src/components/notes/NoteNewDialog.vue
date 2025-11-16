@@ -9,11 +9,6 @@
               :error-message="noteFormErrors.newTitle"
               @update:model-value="onTitleChange"
             />
-            <SuggestTitle
-              :original-title="creationData.newTitle"
-              :suggested-title="suggestedTitle"
-              @suggested-title-selected="takeSuggestedTitle"
-            />
             <SearchResults
               v-bind="{
                 noteId: referenceNote.id,
@@ -26,6 +21,7 @@
 
           <WikidataSearchByLabel
             :search-key="creationData.newTitle"
+            :current-title="creationData.newTitle"
             v-model="creationData.wikidataId"
             :error-message="noteFormErrors.wikidataId"
             @selected="onSelectWikidataEntry"
@@ -52,7 +48,6 @@ import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
-import SuggestTitle from "./SuggestTitle.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 
@@ -81,7 +76,6 @@ const noteFormErrors = ref({
   wikidataId: undefined as undefined | string,
 })
 
-const suggestedTitle = ref("")
 const processing = ref(false)
 const hasTitleBeenEdited = ref(false)
 
@@ -124,24 +118,25 @@ const processForm = async () => {
   }
 }
 
-const onSelectWikidataEntry = (selectedSuggestion: WikidataSearchEntity) => {
-  const currentLabel = creationData.value.newTitle.toUpperCase()
-  const newLabel = selectedSuggestion.label.toUpperCase()
-
-  if (currentLabel === newLabel) {
-    creationData.value.newTitle = selectedSuggestion.label
-    suggestedTitle.value = ""
-  } else {
-    suggestedTitle.value = selectedSuggestion.label
-  }
-
+const onSelectWikidataEntry = (
+  selectedSuggestion: WikidataSearchEntity,
+  titleAction?: "replace" | "append" | "neither"
+) => {
   creationData.value.wikidataId = selectedSuggestion.id
-}
 
-const takeSuggestedTitle = (title: string) => {
-  creationData.value.newTitle = title
-  suggestedTitle.value = ""
-  hasTitleBeenEdited.value = true
+  if (titleAction === "replace") {
+    creationData.value.newTitle = selectedSuggestion.label
+    hasTitleBeenEdited.value = true
+  } else if (titleAction === "append") {
+    creationData.value.newTitle = `${creationData.value.newTitle} / ${selectedSuggestion.label}`
+    hasTitleBeenEdited.value = true
+  } else if (titleAction === "neither") {
+    // Don't change the title
+  } else {
+    // When titles match (no titleAction), replace with the exact label from Wikidata
+    creationData.value.newTitle = selectedSuggestion.label
+    hasTitleBeenEdited.value = true
+  }
 }
 
 const onTitleChange = () => {

@@ -8,99 +8,65 @@
     placeholder="example: `Q1234`"
   >
     <template #input_prepend>
-      <select
-        v-if="wikiSearchSuggestions?.length > 0"
-        ref="select"
-        size="10"
-        name="wikidataSearchResult"
-        @change="onSelectSearchResult"
-        @blur="removeSearchSuggestions"
-        v-model="selectedOption"
-        class="popup-select daisy-select daisy-select-bordered"
-      >
-        <option disabled value="">- Choose Wikidata Search Result -</option>
-        <option
-          v-for="suggestion in wikiSearchSuggestions"
-          :key="suggestion.id"
-          :value="suggestion.id"
-          scope-name="searchItem"
-        >
-          {{ suggestion.label }} - {{ suggestion.description }}
-        </option>
-      </select>
       <button
         title="Wikidata Id"
         type="button"
         class="daisy-btn daisy-btn-outline daisy-btn-neutral"
-        @click.prevent="fetchSearchResult"
+        @click.prevent="openDialog"
       >
         <SvgSearchWikidata />
       </button>
     </template>
   </TextInput>
+  <WikidataSearchDialog
+    v-if="showDialog"
+    :search-key="searchKey"
+    :current-title="currentTitle"
+    @close="closeDialog"
+    @selected="handleSelected"
+  />
 </template>
 
 <script lang="ts">
 import type { WikidataSearchEntity } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
 import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue"
+import WikidataSearchDialog from "./WikidataSearchDialog.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   props: {
     searchKey: { type: String, required: true },
     modelValue: String,
     errorMessage: String,
+    currentTitle: { type: String, default: "" },
   },
   emits: ["selected", "update:modelValue"],
   components: {
     TextInput,
     SvgSearchWikidata,
+    WikidataSearchDialog,
   },
   data() {
     return {
-      wikiSearchSuggestions: [] as WikidataSearchEntity[],
-      selectedOption: "",
+      showDialog: false,
     }
   },
   methods: {
-    async onSelectSearchResult() {
-      const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
-        return obj.id === this.selectedOption
-      })
-      this.wikiSearchSuggestions = []
-      if (!selectedSuggestion) return
-      this.$emit("selected", selectedSuggestion)
-      this.selectedOption = ""
+    openDialog() {
+      this.showDialog = true
     },
-    removeSearchSuggestions() {
-      this.wikiSearchSuggestions = []
+    closeDialog() {
+      this.showDialog = false
     },
-    async fetchSearchResult() {
-      this.wikiSearchSuggestions =
-        await this.managedApi.services.searchWikidata({
-          search: this.searchKey,
-        })
-      this.$nextTick(() => {
-        const select = this.$refs.select as HTMLSelectElement | undefined
-        select?.focus()
-      })
+    handleSelected(
+      entity: WikidataSearchEntity,
+      titleAction?: "replace" | "append" | "neither"
+    ) {
+      this.showDialog = false
+      this.$emit("selected", entity, titleAction)
     },
   },
 })
 </script>
 
-<style lang="scss" scoped>
-.popup-select {
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 9999;
-  cursor: pointer;
-}
-</style>

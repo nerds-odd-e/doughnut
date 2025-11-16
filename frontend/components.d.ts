@@ -255,6 +255,7 @@ declare module 'vue' {
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
+    WikidataSearchDialog: typeof import('./src/components/notes/WikidataSearchDialog.vue')['default']
   }
 }
 
@@ -503,4 +504,5 @@ declare global {
   const Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
   const WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
+  const WikidataSearchDialog: typeof import('./src/components/notes/WikidataSearchDialog.vue')['default']
 }

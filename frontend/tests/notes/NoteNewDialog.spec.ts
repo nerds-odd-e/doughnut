@@ -10,6 +10,9 @@ vitest.mock("vue-router", () => ({
       value: {},
     },
   }),
+  useRoute: () => ({
+    path: "/",
+  }),
 }))
 
 const mockedSearch = vitest.fn()
@@ -151,68 +154,99 @@ describe("adding new note", () => {
       return wrapper.find("input#note-title")
     }
 
-    const searchWikidata = async (key: string) => {
+    const openWikidataDialog = async (key: string) => {
       await titleInput().setValue(key)
       await wrapper.find("button[title='Wikidata Id']").trigger("click")
-
       await flushPromises()
-
-      return wrapper.find('select[name="wikidataSearchResult"]')
     }
 
-    const searchAndSelectFirstResult = async (key: string) => {
-      const select = await searchWikidata(key)
-      select.findAll("option").at(1)?.setValue()
+    const getDialogSelect = () => {
+      return document.querySelector('select[name="wikidataSearchResult"]')
     }
 
-    const replaceTitle = async () => {
-      await wrapper.find("[id='topicRadio-Replace']").setValue()
-    }
-    const appendTitle = async () => {
-      await wrapper.find("[id='topicRadio-Append']").setValue()
-    }
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    const doNothing = () => {
-      // noop
-    }
-
-    describe("the select for wikidata id", () => {
-      let select
-      beforeEach(async () => {
-        const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
-        mockedWikidataSearch.mockResolvedValue([searchResult])
-        select = await searchWikidata("dog")
-      })
-
-      it("focus on the select", async () => {
-        expect(select.element).toHaveFocus()
-        expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: "dog" })
-      })
-
-      it("remove the select when lose focus", async () => {
-        select.element.blur()
+    const searchAndSelectFirstResult = async (
+      key: string,
+      wikidataId: string
+    ) => {
+      await openWikidataDialog(key)
+      const select = getDialogSelect() as HTMLSelectElement
+      if (select) {
+        select.value = wikidataId
+        select.dispatchEvent(new Event("change"))
         await flushPromises()
-        expect(wrapper.vm.$el).not.toContainElement(select.element)
-      })
+      }
+    }
+
+    const selectTitleAction = async (
+      action: "Replace" | "Append" | "Neither"
+    ): Promise<void> => {
+      const radio = document.querySelector(
+        `input[value="${action}"]`
+      ) as HTMLInputElement
+      if (radio) {
+        radio.checked = true
+        radio.dispatchEvent(new Event("change"))
+        await flushPromises()
+      }
+    }
+
+    it("opens dialog when clicking search button", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      await openWikidataDialog("dog")
+      expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: "dog" })
+      const dialog = document.querySelector(".modal-container")
+      expect(dialog).toBeTruthy()
+    })
+
+    it("closes dialog when cancel is clicked", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      await openWikidataDialog("dog")
+      const cancelButton = document.querySelector(
+        "button.daisy-btn-secondary"
+      ) as HTMLButtonElement
+      if (cancelButton) {
+        await cancelButton.click()
+        await flushPromises()
+      }
+      const dialog = document.querySelector(".modal-container")
+      expect(dialog).toBeFalsy()
     })
 
     it.each`
-      searchTitle | wikidataTitle | action          | expectedTitle
-      ${"dog"}    | ${"dog"}      | ${doNothing}    | ${"dog"}
-      ${"dog"}    | ${"Dog"}      | ${doNothing}    | ${"Dog"}
-      ${"dog"}    | ${"Canine"}   | ${replaceTitle} | ${"Canine"}
-      ${"dog"}    | ${"Canine"}   | ${appendTitle}  | ${"dog / Canine"}
+      searchTitle | wikidataTitle | wikidataId | titleAction  | expectedTitle
+      ${"dog"}    | ${"dog"}      | ${"Q1"}    | ${undefined} | ${"dog"}
+      ${"dog"}    | ${"Dog"}      | ${"Q1"}    | ${undefined} | ${"Dog"}
+      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"replace"} | ${"Canine"}
+      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog / Canine"}
+      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"neither"} | ${"dog"}
     `(
-      "search $searchTitle get $wikidataTitle and choose to $action",
-      async ({ searchTitle, wikidataTitle, action, expectedTitle }) => {
+      "search $searchTitle get $wikidataTitle with action $titleAction results in $expectedTitle",
+      async ({
+        searchTitle,
+        wikidataTitle,
+        wikidataId,
+        titleAction,
+        expectedTitle,
+      }) => {
         const searchResult = makeMe.aWikidataSearchEntity
           .label(wikidataTitle)
+          .id(wikidataId)
           .please()
 
         mockedWikidataSearch.mockResolvedValue([searchResult])
-        await searchAndSelectFirstResult(searchTitle)
+        await searchAndSelectFirstResult(searchTitle, wikidataId)
 
-        action()
+        if (titleAction) {
+          await selectTitleAction(
+            (titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
+              | "Replace"
+              | "Append"
+              | "Neither"
+          )
+        }
+
         await flushPromises()
 
         expect(mockedWikidataSearch).toHaveBeenCalledWith({

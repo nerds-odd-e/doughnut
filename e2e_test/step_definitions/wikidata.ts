@@ -106,12 +106,15 @@ Given(
 When('I search with phrase {string} on Wikidata', (phrase: string) => {
   cy.focused().clear().type(phrase)
   cy.findByRole('button', { name: 'Wikidata Id' }).click()
+  cy.findByText('Search Wikidata').should('be.visible')
 })
 
 When(
   'I select wikidataID {string} from the Wikidata search result',
   (wikidataID: string) => {
-    cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+    cy.get('.modal-container').within(() => {
+      cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+    })
   }
 )
 
