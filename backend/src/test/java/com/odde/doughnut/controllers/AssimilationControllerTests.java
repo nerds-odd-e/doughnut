@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 class AssimilationControllerTests {
   @Autowired private ModelFactoryService modelFactoryService;
   @Autowired private MakeMe makeMe;
+  @Autowired private SubscriptionService subscriptionService;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -35,12 +37,17 @@ class AssimilationControllerTests {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new AssimilationController(modelFactoryService, currentUser, testabilitySettings);
+    controller =
+        new AssimilationController(
+            modelFactoryService, currentUser, subscriptionService, testabilitySettings);
   }
 
   AssimilationController nullUserController() {
     return new AssimilationController(
-        modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        subscriptionService,
+        testabilitySettings);
   }
 
   @Nested

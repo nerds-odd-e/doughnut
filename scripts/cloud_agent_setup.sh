@@ -41,7 +41,7 @@ fi
 # Install required MySQL dependencies
 echo "==> Installing MySQL dependencies..."
 sudo apt-get update -qq
-sudo apt-get install -y -qq libaio-dev libaio1t64 2>&1 | grep -v "^Get:" | grep -v "^Reading" | tail -5 || true
+sudo apt-get install -y -qq libaio-dev libaio1t64 libnuma1 2>&1 | grep -v "^Get:" | grep -v "^Reading" | tail -5 || true
 
 # Create libaio symlink if needed (Ubuntu 24.04 compatibility)
 if [ ! -e "/usr/lib/x86_64-linux-gnu/libaio.so.1" ]; then
