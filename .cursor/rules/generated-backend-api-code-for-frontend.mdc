@@ -14,12 +14,51 @@ You are a full stack developer who prefer to change backend code and frontend co
 
 When a backend controller signature is changed, or a backend data type that is used by any controller signature is changed, we need to re-generate the backend API call code for frontend.
 
-
+**For local development:**
+```bash
+CURSOR_DEV=true nix develop -c pnpm generateTypeScript
 ```
-nix develop -c pnpm generateTypeScript
+
+**For cloud agents:**
+```bash
+pnpm generateTypeScript
 ```
 
 ## detecting related changed
 
 * Don't change the generated code direct. If a change in API is needed, go make the change properly in the backend and run the command in terminal to update the generated code
 * When a backend controller signature is changed or the related data types are changed, not only run the terminal command to regenerate the frontend code, but also check if it affected any usage in the frontend code. The best way to ensure it is by run all the frontend unit test. It should tell where are the affected place.
+
+## OpenAPI Linting Failures
+
+When `pnpm openapi:lint` or `pnpm format:all` fails with OpenAPI validation errors:
+
+1. **Understand the Error**: The linter checks the generated `open_api_docs.yaml` file for issues like duplicate operationIds, missing parameters, etc.
+
+2. **Where to Fix**: 
+   - **DO NOT** edit `open_api_docs.yaml` directly - it is auto-generated
+   - Fix the issue in the **backend Java controller** that generates the problematic endpoint
+   - The OpenAPI spec is generated from Spring Boot controller annotations and method signatures
+
+3. **How to Regenerate**:
+   
+   **For local development:**
+   ```bash
+   CURSOR_DEV=true nix develop -c pnpm generateTypeScript
+   ```
+   
+   **For cloud agents:**
+   ```bash
+   pnpm generateTypeScript
+   ```
+   
+   This command:
+   - Generates the OpenAPI spec from backend controllers (`pnpm backend:generateOpenAPIDocs`)
+   - Generates TypeScript client code from the OpenAPI spec (`pnpm openAPIToTypeScript`)
+
+4. **Common Issues**:
+   - **Duplicate operationIds**: Two endpoints have the same `operationId`. Fix by ensuring each controller method has a unique operationId annotation or method name.
+   - **Missing path parameters**: Controller method doesn't define a path parameter that exists in the `@RequestMapping` path. Add `@PathVariable` annotation to the method parameter.
+   - **Identical paths**: Two endpoints have paths that differ only by parameter names (e.g., `/api/notebooks/{notebookId}/obsidian` and `/api/notebooks/{notebook}/obsidian`). Fix by standardizing parameter names in the controller.
+
+5. **Verification**: After fixing the backend controller, regenerate the OpenAPI spec (see command above) and then run `pnpm openapi:lint` to verify the issue is resolved.

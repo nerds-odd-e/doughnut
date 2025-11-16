@@ -1,0 +1,79 @@
+---
+description: Linting and code quality checks in the Doughnut project
+alwaysApply: false
+---
+# Linting in Doughnut Project
+
+## Overview
+
+This project uses multiple linting tools to ensure code quality:
+- **Biome**: Frontend, Cypress, and root-level TypeScript/JavaScript code
+- **Redocly CLI**: OpenAPI specification validation
+- **Backend linting**: Java code quality checks (via Gradle)
+
+## Linting Philosophy
+
+**IMPORTANT**: Linting is primarily for CI/CD validation. Developers should use `format:all` instead of `lint:all` during development, as formatting also fixes most linting issues automatically.
+
+## Running Linting
+
+### Lint All Code
+
+**For local development:**
+```bash
+CURSOR_DEV=true nix develop -c pnpm lint:all
+```
+
+**For cloud agents:**
+```bash
+pnpm lint:all
+```
+
+This runs:
+- Backend Java linting (`pnpm backend:lint`)
+- Frontend TypeScript/Vue linting (`pnpm frontend:lint`)
+- Cypress E2E test linting (`pnpm cy:lint`)
+- OpenAPI specification linting (`pnpm openapi:lint`)
+
+### Individual Linting Commands
+
+- `pnpm backend:lint` - Java code linting
+- `pnpm frontend:lint` - Frontend TypeScript/Vue linting
+- `pnpm cy:lint` - Cypress E2E test linting
+- `pnpm openapi:lint` - OpenAPI spec validation
+
+## Format vs Lint
+
+- **Use `pnpm format:all`** during development - it fixes formatting and catches most issues
+- **Use `pnpm lint:all`** for CI/CD validation - it checks without fixing
+
+## OpenAPI Linting
+
+The OpenAPI specification (`open_api_docs.yaml`) is validated using Redocly CLI. This file is **auto-generated** from backend controllers.
+
+### When OpenAPI Linting Fails
+
+1. **DO NOT** edit `open_api_docs.yaml` directly - it is auto-generated
+2. **Fix the issue** in the backend Java controller that generates the problematic endpoint
+3. **Regenerate** the OpenAPI spec:
+   - **Local**: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
+   - **Cloud**: `pnpm generateTypeScript`
+4. **Verify** by running `pnpm openapi:lint` again
+
+### Common OpenAPI Issues
+
+- **Duplicate operationIds**: Ensure each controller method has a unique `@Operation(operationId = "...")` annotation or unique method name
+- **Missing path parameters**: Add `@PathVariable` annotation to method parameters that match path variables
+- **Identical paths**: Standardize path parameter names across controllers (e.g., use `{notebook}` consistently, not `{notebookId}` in some places)
+
+See `.cursor/rules/generated-backend-api-code-for-frontend.mdc` for detailed OpenAPI linting failure resolution.
+
+## Linting Tools Configuration
+
+- **Biome**: Configured in `biome.json` (root) and `frontend/biome.json`
+- **Redocly**: Configured in `redocly.yaml`
+- **Backend**: Configured in `backend/build.gradle` (Spotless for formatting, custom linting rules)
+
+## Integration with CI/CD
+
+The `pnpm lint:all` command is used in CI/CD pipelines to ensure code quality. All linting errors must be resolved before merging code.
