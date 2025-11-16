@@ -4,6 +4,11 @@ import * as Services from '@generated/backend/sdk.gen'
 import { OpenAPI } from '@generated/backend/core/OpenAPI'
 import { ApiError } from '@generated/backend/core/ApiError'
 
+type ApiResponse = {
+  status: number
+  body: unknown
+}
+
 const mcpApi = () => {
   return {
     createNote: (parentNote: string, noteCreationDTO: NoteCreationDTO) => {
@@ -20,7 +25,7 @@ const mcpApi = () => {
 
           // Call the service - it will use cy.request via our custom request function
           // The CancelablePromise wraps cy.then() internally, so we need to wrap it
-          const promise = Services.createNote1({ requestBody })
+          const promise = Services.createNoteViaMcp({ requestBody })
             .then(() => {
               // Success - return 200 status
               return { status: 200, body: {} }
@@ -45,12 +50,14 @@ const mcpApi = () => {
       return {
         shouldBeDenied: () => {
           return makeRequest().then((response) => {
-            expect(response.status).to.eq(401)
+            const apiResponse = response as ApiResponse
+            expect(apiResponse.status).to.eq(401)
           })
         },
         shouldBeAccepted: () => {
           return makeRequest().then((response) => {
-            expect(response.status).to.eq(200)
+            const apiResponse = response as ApiResponse
+            expect(apiResponse.status).to.eq(200)
           })
         },
       }
