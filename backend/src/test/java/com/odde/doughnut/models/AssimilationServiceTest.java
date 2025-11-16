@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
+import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssimilationServiceTest {
   @Autowired MakeMe makeMe;
+  @Autowired SubscriptionService subscriptionService;
   UserModel userModel;
   UserModel anotherUser;
   Timestamp day1;
@@ -36,7 +38,11 @@ public class AssimilationServiceTest {
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     assimilationService =
         new AssimilationService(
-            userModel, makeMe.modelFactoryService, day1, ZoneId.of("Asia/Shanghai"));
+            userModel,
+            makeMe.modelFactoryService,
+            subscriptionService,
+            day1,
+            ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
@@ -187,7 +193,11 @@ public class AssimilationServiceTest {
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
-                userModel, makeMe.modelFactoryService, day1_23, ZoneId.of("Asia/Shanghai"));
+                userModel,
+                makeMe.modelFactoryService,
+                subscriptionService,
+                day1_23,
+                ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
 
@@ -197,7 +207,11 @@ public class AssimilationServiceTest {
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
-                userModel, makeMe.modelFactoryService, day2, ZoneId.of("Asia/Shanghai"));
+                userModel,
+                makeMe.modelFactoryService,
+                subscriptionService,
+                day2,
+                ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
     }
@@ -306,7 +320,11 @@ public class AssimilationServiceTest {
       // Create service for early morning check
       earlyMorningService =
           new AssimilationService(
-              userModel, makeMe.modelFactoryService, lateMorning, ZoneId.of("Asia/Shanghai"));
+              userModel,
+              makeMe.modelFactoryService,
+              subscriptionService,
+              lateMorning,
+              ZoneId.of("Asia/Shanghai"));
     }
 
     @Test
