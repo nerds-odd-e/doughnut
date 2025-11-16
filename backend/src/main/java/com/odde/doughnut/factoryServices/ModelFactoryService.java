@@ -116,10 +116,6 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public SubscriptionModel toSubscriptionModel(Subscription sub) {
-    return new SubscriptionModel(sub, this);
-  }
-
   public Authorization toAuthorization(User entity) {
     return new Authorization(entity, this);
   }
