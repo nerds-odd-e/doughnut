@@ -1,16 +1,26 @@
 <template>
   <div>
-    <PopButton btn-class="daisy-btn daisy-btn-primary" title="Add Question">
-      <template #default="{ closer }">
-        <NoteAddQuestion
-          v-bind="{ note }"
-          @close-dialog="
-            closer();
-            questionAdded($event);
-          "
-        />
-      </template>
-    </PopButton>
+    <div class="daisy-flex daisy-gap-2">
+      <PopButton btn-class="daisy-btn daisy-btn-primary" title="Add Question">
+        <template #default="{ closer }">
+          <NoteAddQuestion
+            v-bind="{ note }"
+            @close-dialog="
+              closer();
+              questionAdded($event);
+            "
+          />
+        </template>
+      </PopButton>
+      <button
+        class="daisy-btn daisy-btn-outline"
+        @click="showExportDialog = true"
+        aria-label="Export question generation request"
+        title="Export question generation request for ChatGPT"
+      >
+        <SvgExport />
+      </button>
+    </div>
     <table class="question-table daisy-mt-2" v-if="questions.length">
       <thead>
         <tr>
@@ -71,6 +81,11 @@
       />
     </template>
   </Modal>
+  <QuestionExportDialog
+    v-if="showExportDialog"
+    :note-id="note.id"
+    @close="showExportDialog = false"
+  />
 </template>
 
 <script setup lang="ts">
@@ -80,7 +95,9 @@ import type { Note, PredefinedQuestion } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
+import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
+import SvgExport from "../svgs/SvgExport.vue"
 
 const { managedApi } = useLoadingApi()
 const props = defineProps({
@@ -91,6 +108,7 @@ const props = defineProps({
 })
 const questions = ref<PredefinedQuestion[]>([])
 const openedQuestion = ref<PredefinedQuestion | undefined>()
+const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {
   questions.value = await managedApi.services.getAllQuestionByNote({

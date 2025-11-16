@@ -2700,6 +2700,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallPrompt"
+  /api/predefined-questions/{note}/export-question-generation:
+    get:
+      tags:
+      - predefined-question-controller
+      operationId: exportQuestionGeneration
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConversationExportResponse"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -4433,184 +4457,6 @@ components:
       required:
       - toRepeatCount
       - totalAssimilatedCount
-    NoteInfo:
-      type: object
-      properties:
-        memoryTrackers:
-          type: array
-          items:
-            $ref: "#/components/schemas/MemoryTracker"
-        note:
-          $ref: "#/components/schemas/NoteRealm"
-        createdAt:
-          type: string
-          format: date-time
-        recallSetting:
-          $ref: "#/components/schemas/RecallSetting"
-      required:
-      - createdAt
-      - note
-    BareNote:
-      type: object
-      properties:
-        uri:
-          type: string
-        subjectUriAndTitle:
-          type: string
-        predicate:
-          type: string
-        title:
-          type: string
-        objectUriAndTitle:
-          type: string
-        parentUriAndTitle:
-          type: string
-        relationToFocusNote:
-          type: string
-          enum:
-          - Self
-          - Parent
-          - Object
-          - Child
-          - PriorSibling
-          - YoungerSibling
-          - InboundReference
-          - SubjectOfInboundReference
-          - AncestorInContextualPath
-          - AncestorInObjectContextualPath
-          - ObjectOfReifiedChild
-          - SiblingOfParent
-          - SiblingOfParentOfObject
-          - ChildOfSiblingOfParent
-          - ChildOfSiblingOfParentOfObject
-          - InboundReferenceContextualPath
-          - SiblingOfSubjectOfInboundReference
-          - InboundReferenceToObjectOfReifiedChild
-        details:
-          type: string
-    FocusNote:
-      type: object
-      properties:
-        uri:
-          type: string
-        subjectUriAndTitle:
-          type: string
-        predicate:
-          type: string
-        title:
-          type: string
-        objectUriAndTitle:
-          type: string
-        parentUriAndTitle:
-          type: string
-        relationToFocusNote:
-          type: string
-          enum:
-          - Self
-          - Parent
-          - Object
-          - Child
-          - PriorSibling
-          - YoungerSibling
-          - InboundReference
-          - SubjectOfInboundReference
-          - AncestorInContextualPath
-          - AncestorInObjectContextualPath
-          - ObjectOfReifiedChild
-          - SiblingOfParent
-          - SiblingOfParentOfObject
-          - ChildOfSiblingOfParent
-          - ChildOfSiblingOfParentOfObject
-          - InboundReferenceContextualPath
-          - SiblingOfSubjectOfInboundReference
-          - InboundReferenceToObjectOfReifiedChild
-        details:
-          type: string
-        contextualPath:
-          type: array
-          items:
-            type: string
-        children:
-          type: array
-          items:
-            type: string
-        priorSiblings:
-          type: array
-          items:
-            type: string
-        youngerSiblings:
-          type: array
-          items:
-            type: string
-        inboundReferences:
-          type: array
-          items:
-            type: string
-    GraphRAGResult:
-      type: object
-      properties:
-        focusNote:
-          $ref: "#/components/schemas/FocusNote"
-        relatedNotes:
-          type: array
-          items:
-            $ref: "#/components/schemas/BareNote"
-    NotebooksViewedByUser:
-      type: object
-      properties:
-        notebooks:
-          type: array
-          items:
-            $ref: "#/components/schemas/Notebook"
-        subscriptions:
-          type: array
-          items:
-            $ref: "#/components/schemas/Subscription"
-      required:
-      - notebooks
-    SpellingQuestion:
-      type: object
-      properties:
-        stem:
-          type: string
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-    FailureReport:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        errorName:
-          type: string
-        errorDetail:
-          type: string
-        issueNumber:
-          type: integer
-          format: int32
-        createDatetime:
-          type: string
-          format: date-time
-        githubIssue:
-          $ref: "#/components/schemas/GithubIssue"
-      required:
-      - createDatetime
-      - errorDetail
-      - errorName
-    FailureReportForView:
-      type: object
-      properties:
-        failureReport:
-          $ref: "#/components/schemas/FailureReport"
-        githubIssueUrl:
-          type: string
-    GithubIssue:
-      type: object
-      properties:
-        title:
-          type: string
-        body:
-          type: string
     AssistantMessage:
       allOf:
       - $ref: "#/components/schemas/ChatMessage"
@@ -4848,6 +4694,184 @@ components:
         properties:
           content:
             type: object
+    NoteInfo:
+      type: object
+      properties:
+        memoryTrackers:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemoryTracker"
+        note:
+          $ref: "#/components/schemas/NoteRealm"
+        createdAt:
+          type: string
+          format: date-time
+        recallSetting:
+          $ref: "#/components/schemas/RecallSetting"
+      required:
+      - createdAt
+      - note
+    BareNote:
+      type: object
+      properties:
+        uri:
+          type: string
+        subjectUriAndTitle:
+          type: string
+        predicate:
+          type: string
+        title:
+          type: string
+        objectUriAndTitle:
+          type: string
+        parentUriAndTitle:
+          type: string
+        relationToFocusNote:
+          type: string
+          enum:
+          - Self
+          - Parent
+          - Object
+          - Child
+          - PriorSibling
+          - YoungerSibling
+          - InboundReference
+          - SubjectOfInboundReference
+          - AncestorInContextualPath
+          - AncestorInObjectContextualPath
+          - ObjectOfReifiedChild
+          - SiblingOfParent
+          - SiblingOfParentOfObject
+          - ChildOfSiblingOfParent
+          - ChildOfSiblingOfParentOfObject
+          - InboundReferenceContextualPath
+          - SiblingOfSubjectOfInboundReference
+          - InboundReferenceToObjectOfReifiedChild
+        details:
+          type: string
+    FocusNote:
+      type: object
+      properties:
+        uri:
+          type: string
+        subjectUriAndTitle:
+          type: string
+        predicate:
+          type: string
+        title:
+          type: string
+        objectUriAndTitle:
+          type: string
+        parentUriAndTitle:
+          type: string
+        relationToFocusNote:
+          type: string
+          enum:
+          - Self
+          - Parent
+          - Object
+          - Child
+          - PriorSibling
+          - YoungerSibling
+          - InboundReference
+          - SubjectOfInboundReference
+          - AncestorInContextualPath
+          - AncestorInObjectContextualPath
+          - ObjectOfReifiedChild
+          - SiblingOfParent
+          - SiblingOfParentOfObject
+          - ChildOfSiblingOfParent
+          - ChildOfSiblingOfParentOfObject
+          - InboundReferenceContextualPath
+          - SiblingOfSubjectOfInboundReference
+          - InboundReferenceToObjectOfReifiedChild
+        details:
+          type: string
+        contextualPath:
+          type: array
+          items:
+            type: string
+        children:
+          type: array
+          items:
+            type: string
+        priorSiblings:
+          type: array
+          items:
+            type: string
+        youngerSiblings:
+          type: array
+          items:
+            type: string
+        inboundReferences:
+          type: array
+          items:
+            type: string
+    GraphRAGResult:
+      type: object
+      properties:
+        focusNote:
+          $ref: "#/components/schemas/FocusNote"
+        relatedNotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/BareNote"
+    NotebooksViewedByUser:
+      type: object
+      properties:
+        notebooks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notebook"
+        subscriptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Subscription"
+      required:
+      - notebooks
+    SpellingQuestion:
+      type: object
+      properties:
+        stem:
+          type: string
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+    FailureReport:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        errorName:
+          type: string
+        errorDetail:
+          type: string
+        issueNumber:
+          type: integer
+          format: int32
+        createDatetime:
+          type: string
+          format: date-time
+        githubIssue:
+          $ref: "#/components/schemas/GithubIssue"
+      required:
+      - createDatetime
+      - errorDetail
+      - errorName
+    FailureReportForView:
+      type: object
+      properties:
+        failureReport:
+          $ref: "#/components/schemas/FailureReport"
+        githubIssueUrl:
+          type: string
+    GithubIssue:
+      type: object
+      properties:
+        title:
+          type: string
+        body:
+          type: string
     CircleForUserView:
       type: object
       properties:

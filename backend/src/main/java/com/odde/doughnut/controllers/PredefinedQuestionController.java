@@ -1,12 +1,14 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.dto.ConversationExportResponse;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -34,6 +36,8 @@ class PredefinedQuestionController {
   private final TestabilitySettings testabilitySettings;
 
   private final AiQuestionGenerator aiQuestionGenerator;
+  private final OpenAiApi openAiApi;
+  private final ObjectMapper objectMapper;
 
   public PredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -46,6 +50,8 @@ class PredefinedQuestionController {
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.openAiApi = openAiApi;
+    this.objectMapper = objectMapper;
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi,
@@ -118,5 +124,19 @@ class PredefinedQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(predefinedQuestion.getNote());
     return predefinedQuestionService.toggleApproval(predefinedQuestion);
+  }
+
+  @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")
+  public ConversationExportResponse exportQuestionGeneration(
+      @PathVariable("note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    currentUser.assertAuthorization(note);
+    NotebookAssistantForNoteServiceFactory factory =
+        new NotebookAssistantForNoteServiceFactory(
+            openAiApi, new GlobalSettingsService(modelFactoryService), objectMapper);
+    var service = factory.createNoteQuestionGenerationService(note);
+    var request = service.buildQuestionGenerationRequest(null);
+    String title = note.getTopicConstructor();
+    return new ConversationExportResponse(request, title);
   }
 }

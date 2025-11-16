@@ -1790,6 +1790,12 @@ export type AskAQuestionData = {
 
 export type AskAQuestionResponse = (RecallPrompt);
 
+export type ExportQuestionGenerationData = {
+    note: number;
+};
+
+export type ExportQuestionGenerationResponse = (ConversationExportResponse);
+
 export type GetNoteInfoData = {
     note: number;
 };

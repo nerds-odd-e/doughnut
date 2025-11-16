@@ -288,4 +288,44 @@ class PredefinedQuestionControllerTests {
       assertFalse(approvedQuestion.isApproved());
     }
   }
+
+  @Nested
+  class ExportQuestionGeneration {
+    Note note;
+
+    @BeforeEach
+    void setup() {
+      note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(currentUser)
+              .titleConstructor("There are 42 prefectures in Japan")
+              .please();
+    }
+
+    @Test
+    void shouldNotBeAbleToExportQuestionGenerationForNoteIAmNotAuthorized() {
+      Note otherNote = makeMe.aNote().please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.exportQuestionGeneration(otherNote));
+    }
+
+    @Test
+    void shouldExportQuestionGenerationWithNoteTitle() throws UnexpectedNoAccessRightException {
+      com.odde.doughnut.controllers.dto.ConversationExportResponse response =
+          controller.exportQuestionGeneration(note);
+      assertThat(response.getTitle(), equalTo("There are 42 prefectures in Japan"));
+      assertThat(response.getRequest(), notNullValue());
+    }
+
+    @Test
+    void shouldExportQuestionGenerationWithChatCompletionRequest()
+        throws UnexpectedNoAccessRightException {
+      com.odde.doughnut.controllers.dto.ConversationExportResponse response =
+          controller.exportQuestionGeneration(note);
+      assertThat(response.getRequest().getModel(), notNullValue());
+      assertThat(response.getRequest().getMessages(), notNullValue());
+    }
+  }
 }
