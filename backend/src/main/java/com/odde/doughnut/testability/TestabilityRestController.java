@@ -269,6 +269,7 @@ class TestabilityRestController {
   public String injectCircle(@RequestBody HashMap<String, String> circleInfo) {
     Circle entity = new Circle();
     entity.setName(circleInfo.get("circleName"));
+    modelFactoryService.save(entity);
     Arrays.stream(circleInfo.get("members").split(","))
         .map(String::trim)
         .forEach(

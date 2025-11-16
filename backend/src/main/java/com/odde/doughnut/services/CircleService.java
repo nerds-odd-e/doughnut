@@ -18,7 +18,11 @@ public class CircleService {
 
   public void joinAndSave(Circle circle, User user) {
     circle.getMembers().add(user);
-    entityManager.merge(circle);
+    if (circle.getId() == null) {
+      entityManager.persist(circle);
+    } else {
+      entityManager.merge(circle);
+    }
   }
 
   public Circle findCircleByInvitationCode(String invitationCode) {
