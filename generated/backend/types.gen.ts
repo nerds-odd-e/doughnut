@@ -192,8 +192,8 @@ export type ChatFunctionCall = {
 };
 
 export type ChatMessage = {
-    textContent?: string;
     role?: string;
+    textContent?: string;
     name?: string;
 };
 

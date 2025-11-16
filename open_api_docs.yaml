@@ -4747,9 +4747,9 @@ components:
       discriminator:
         propertyName: role
       properties:
-        textContent:
-          type: string
         role:
+          type: string
+        textContent:
           type: string
         name:
           type: string

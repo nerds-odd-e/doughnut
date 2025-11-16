@@ -72,9 +72,7 @@ class OpenApiDocsTests {
     }
 
     StringBuilder message = new StringBuilder();
-    message.append("OpenAPI docs differ: ")
-        .append(diffCount)
-        .append(" line(s) different");
+    message.append("OpenAPI docs differ: ").append(diffCount).append(" line(s) different");
 
     if (firstDiffLine != -1) {
       message.append(" (lines ").append(firstDiffLine);
