@@ -7,8 +7,6 @@
             <NoteFormTitleOnly
               v-model="creationData.newTitle"
               :error-message="noteFormErrors.newTitle"
-              @focus="showDropdown = true"
-              @blur="onTitleBlur"
             />
             <SuggestTitle
               :original-title="creationData.newTitle"
@@ -16,7 +14,6 @@
               @suggested-title-selected="takeSuggestedTitle"
             />
             <SearchResults
-              v-show="showDropdown && creationData.newTitle"
               v-bind="{
                 noteId: referenceNote.id,
                 inputSearchKey: creationData.newTitle,
@@ -85,7 +82,6 @@ const noteFormErrors = ref({
 
 const suggestedTitle = ref("")
 const processing = ref(false)
-const showDropdown = ref(false)
 
 // Methods
 const processForm = async () => {
@@ -135,12 +131,6 @@ const takeSuggestedTitle = (title: string) => {
   creationData.value.newTitle = title
   suggestedTitle.value = ""
 }
-
-const onTitleBlur = () => {
-  setTimeout(() => {
-    showDropdown.value = false
-  }, 200)
-}
 </script>
 
 <style lang="sass" scoped>
@@ -149,11 +139,40 @@ const onTitleBlur = () => {
   margin-bottom: 1rem
 
 .title-search-results
-  position: absolute
-  top: 100%
-  left: 0
-  right: 0
-  z-index: 1000
+  margin-top: 0.5rem
+  position: relative !important
+  height: 200px
+  overflow-y: auto
+  border: 1px solid hsl(var(--bc) / 0.2)
+  border-radius: 4px
+  background: hsl(var(--b1))
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1)
+
+  :deep(.dropdown-style)
+    position: relative !important
+    width: 100%
+    border: none
+    border-radius: 0
+    box-shadow: none
+    z-index: auto
+    background: transparent
+
+  :deep(.dropdown-list)
+    max-height: none
+    height: 100%
+    overflow-y: auto
+    padding: 0.5rem
+    font-size: 0.75rem
+
+    a
+      font-size: 0.75rem
+
+      &:hover
+        background-color: hsl(var(--b2))
+
+    em
+      font-size: 0.75rem
+      opacity: 0.7
 
 .secondary-info
   margin-top: 1rem

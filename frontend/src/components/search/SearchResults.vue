@@ -18,6 +18,10 @@
       <em>Searching ...</em>
     </div>
 
+    <div v-else-if="searchResult.length === 0 && isDropdown" class="dropdown-list">
+      <em>Similar notes within the same notebook</em>
+    </div>
+
     <div v-else-if="searchResult.length === 0">
       <em>No matching notes found.</em>
     </div>

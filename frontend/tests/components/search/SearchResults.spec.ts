@@ -31,7 +31,7 @@ describe("SearchResults.vue", () => {
     vi.useRealTimers()
   })
 
-  it("shows 'No matching notes found.' when results are empty", async () => {
+  it("shows 'Similar notes within the same notebook' when results are empty in dropdown mode", async () => {
     vi.useFakeTimers()
 
     const empty: Array<unknown> = []
@@ -46,6 +46,32 @@ describe("SearchResults.vue", () => {
     const wrapper = helper
       .component(SearchResults)
       .withProps({ inputSearchKey: "z", isDropdown: true })
+      .mount()
+
+    await nextTick()
+    vi.advanceTimersByTime(600)
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Similar notes within the same notebook")
+
+    vi.useRealTimers()
+  })
+
+  it("shows 'No matching notes found.' when results are empty in non-dropdown mode", async () => {
+    vi.useFakeTimers()
+
+    const empty: Array<unknown> = []
+    vi.spyOn(
+      helper.managedApi.services,
+      "searchForLinkTarget"
+    ).mockResolvedValue(empty as never)
+    vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
+      empty as never
+    )
+
+    const wrapper = helper
+      .component(SearchResults)
+      .withProps({ inputSearchKey: "z", isDropdown: false })
       .mount()
 
     await nextTick()
