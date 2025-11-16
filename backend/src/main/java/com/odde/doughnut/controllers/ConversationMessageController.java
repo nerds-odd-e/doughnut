@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.ConversationExportResponse;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -122,12 +123,14 @@ public class ConversationMessageController {
     return conversation.getConversationMessages();
   }
 
-  @GetMapping(value = "/{conversationId}/export", produces = "text/plain")
-  public String exportConversation(
+  @GetMapping(value = "/{conversationId}/export", produces = "application/json")
+  public ConversationExportResponse exportConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(conversation);
-    return conversationService.exportConversationForChatGPT(conversation);
+    var request = chatCompletionConversationService.buildChatCompletionRequest(conversation);
+    String title = conversationService.getConversationSubject(conversation);
+    return new ConversationExportResponse(request, title);
   }
 
   @GetMapping("/note/{note}")

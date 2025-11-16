@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.ConversationExportResponse;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -19,6 +20,10 @@ import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
+import com.theokanning.openai.completion.chat.AssistantMessage;
+import com.theokanning.openai.completion.chat.ChatMessage;
+import com.theokanning.openai.completion.chat.SystemMessage;
+import com.theokanning.openai.completion.chat.UserMessage;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -505,9 +510,36 @@ class ConversationMessageControllerTest {
           () -> controller.exportConversation(otherConversation));
     }
 
+    private String formatExportResponse(ConversationExportResponse response) {
+      StringBuilder export = new StringBuilder();
+      export.append("# Conversation: ").append(response.getTitle()).append("\n\n");
+      export.append("## Context\n\n");
+      for (ChatMessage message : response.getRequest().getMessages()) {
+        if (message instanceof SystemMessage systemMessage) {
+          export.append(systemMessage.getTextContent()).append("\n\n");
+        }
+      }
+      export.append("## Conversation History\n\n");
+      for (ChatMessage message : response.getRequest().getMessages()) {
+        if (message instanceof UserMessage userMessage) {
+          String content = formatMessage(userMessage.getTextContent());
+          export.append("**User**: ").append(content).append("\n");
+        } else if (message instanceof AssistantMessage assistantMessage) {
+          String content = formatMessage(assistantMessage.getTextContent());
+          export.append("**Assistant**: ").append(content).append("\n");
+        }
+      }
+      return export.toString();
+    }
+
+    private String formatMessage(String message) {
+      return message.replaceAll("^\"|\"$", "").trim();
+    }
+
     @Test
     void shouldExportConversationWithNoteTitle() throws UnexpectedNoAccessRightException {
-      String export = controller.exportConversation(conversation);
+      ConversationExportResponse response = controller.exportConversation(conversation);
+      String export = formatExportResponse(response);
       assertThat(export).contains("# Conversation: There are 42 prefectures in Japan");
     }
 
@@ -520,7 +552,8 @@ class ConversationMessageControllerTest {
           .please();
       makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
 
-      String export = controller.exportConversation(conversation);
+      ConversationExportResponse response = controller.exportConversation(conversation);
+      String export = formatExportResponse(response);
 
       assertThat(export).contains("**User**: Is Naba one of them?");
       assertThat(export).contains("**Assistant**: No. It is not.");
@@ -528,7 +561,8 @@ class ConversationMessageControllerTest {
 
     @Test
     void shouldExportConversationWithContext() throws UnexpectedNoAccessRightException {
-      String export = controller.exportConversation(conversation);
+      ConversationExportResponse response = controller.exportConversation(conversation);
+      String export = formatExportResponse(response);
       assertThat(export).contains("## Context");
       assertThat(export).contains("Focus Note and the notes related to it:");
       assertThat(export).contains("There are 42 prefectures in Japan");
@@ -545,7 +579,8 @@ class ConversationMessageControllerTest {
           .message("Is Naba one of them?")
           .please();
 
-      String export = controller.exportConversation(conversation);
+      ConversationExportResponse response = controller.exportConversation(conversation);
+      String export = formatExportResponse(response);
       assertThat(export).contains("## Conversation History");
     }
   }

@@ -72,9 +72,7 @@ public class ConversationMessageControllerAiReplyTests {
     ChatCompletionConversationService chatCompletionConversationService =
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
-    conversationService =
-        new ConversationService(
-            testabilitySettings, makeMe.modelFactoryService, chatCompletionConversationService);
+    conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
         new ConversationMessageController(
             currentUser, conversationService, chatCompletionConversationService);

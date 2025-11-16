@@ -60,9 +60,33 @@ export type AssimilationCountDTO = {
     totalUnassimilatedCount?: number;
 };
 
+export type AssistantMessage = ChatMessage & {
+    content?: string;
+    refusal?: string;
+    audio?: AssistantMessageAudio;
+    reasoning_content?: string;
+    tool_calls?: Array<ChatToolCall>;
+    /**
+     * @deprecated
+     */
+    function_call?: ChatFunctionCall;
+};
+
+export type AssistantMessageAudio = {
+    id?: string;
+    transcript?: string;
+    data?: string;
+    expires_at?: number;
+};
+
 export type Attachment = {
     tools?: Array<(CodeInterpreterTool | FileSearchTool | FunctionTool)>;
     file_id?: string;
+};
+
+export type Audio = {
+    voice?: string;
+    format?: string;
 };
 
 export type AudioUploadDTO = {
@@ -121,9 +145,75 @@ export type Certificate = {
     creatorName?: string;
 };
 
+export type ChatCompletionRequest = {
+    model?: string;
+    messages?: Array<(AssistantMessage | FunctionMessage | SystemMessage | ToolMessage | UserMessage)>;
+    temperature?: number;
+    n?: number;
+    stream?: boolean;
+    stop?: Array<string>;
+    user?: string;
+    /**
+     * @deprecated
+     */
+    functions?: Array<{
+        [key: string]: unknown;
+    }>;
+    seed?: number;
+    logprobs?: boolean;
+    tools?: Array<ChatTool>;
+    modalities?: Array<string>;
+    audio?: Audio;
+    response_format?: ChatResponseFormat;
+    top_p?: number;
+    stream_options?: StreamOption;
+    max_tokens?: number;
+    presence_penalty?: number;
+    frequency_penalty?: number;
+    logit_bias?: {
+        [key: string]: number;
+    };
+    /**
+     * @deprecated
+     */
+    function_call?: ChatCompletionRequestFunctionCall;
+    top_logprobs?: number;
+    tool_choice?: ToolChoice;
+    parallel_tool_calls?: boolean;
+};
+
+export type ChatCompletionRequestFunctionCall = {
+    name?: string;
+};
+
+export type ChatFunctionCall = {
+    name?: string;
+    arguments?: JsonNode;
+};
+
+export type ChatMessage = {
+    textContent?: string;
+    role?: string;
+    name?: string;
+};
+
 export type ChatResponseFormat = {
     type?: string;
     jsonSchema?: ResponseJsonSchema;
+};
+
+export type ChatTool = {
+    type?: string;
+    function?: {
+        [key: string]: unknown;
+    };
+};
+
+export type ChatToolCall = {
+    index?: number;
+    id?: string;
+    type?: string;
+    function?: ChatFunctionCall;
 };
 
 export type Circle = {
@@ -163,6 +253,11 @@ export type Conversation = {
     conversationInitiator?: User;
     createdAt: string;
     updatedAt: string;
+};
+
+export type ConversationExportResponse = {
+    request: ChatCompletionRequest;
+    title: string;
 };
 
 export type ConversationMessage = {
@@ -324,6 +419,10 @@ export namespace FocusNote {
 
 export type Function = {
     name?: string;
+};
+
+export type FunctionMessage = ChatMessage & {
+    content?: string;
 };
 
 export type FunctionTool = Tool & {
@@ -824,6 +923,10 @@ export type StepDetails = {
     tool_calls?: Array<ToolCall>;
 };
 
+export type StreamOption = {
+    include_usage?: boolean;
+};
+
 export type SubmitToolOutputs = {
     tool_calls?: Array<ToolCall>;
 };
@@ -858,6 +961,10 @@ export type SuggestedQuestionsData = {
 
 export type SuggestedTitleDTO = {
     title?: string;
+};
+
+export type SystemMessage = ChatMessage & {
+    content?: string;
 };
 
 export type Text = {
@@ -940,6 +1047,11 @@ export type ToolChoice = {
     type?: string;
 };
 
+export type ToolMessage = ChatMessage & {
+    content?: string;
+    tool_call_id?: string;
+};
+
 export type ToolResources = {
     code_interpreter?: CodeInterpreterResources;
     file_search?: FileSearchResources;
@@ -980,6 +1092,12 @@ export type UserDTO = {
 
 export type UserForOtherUserView = {
     name?: string;
+};
+
+export type UserMessage = ChatMessage & {
+    content?: {
+        [key: string]: unknown;
+    };
 };
 
 export type UserToken = {
@@ -1771,7 +1889,7 @@ export type ExportConversationData = {
     conversationId: number;
 };
 
-export type ExportConversationResponse = (string);
+export type ExportConversationResponse = (ConversationExportResponse);
 
 export type GetUnreadConversationsResponse = (Array<ConversationMessage>);
 

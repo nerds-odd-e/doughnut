@@ -3195,9 +3195,9 @@ paths:
         "200":
           description: OK
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
+                $ref: "#/components/schemas/ConversationExportResponse"
   /api/conversation/unread:
     get:
       tags:
@@ -4611,6 +4611,243 @@ components:
           type: string
         body:
           type: string
+    AssistantMessage:
+      allOf:
+      - $ref: "#/components/schemas/ChatMessage"
+      - type: object
+        properties:
+          content:
+            type: string
+          refusal:
+            type: string
+          audio:
+            $ref: "#/components/schemas/AssistantMessageAudio"
+          reasoning_content:
+            type: string
+          tool_calls:
+            type: array
+            items:
+              $ref: "#/components/schemas/ChatToolCall"
+          function_call:
+            $ref: "#/components/schemas/ChatFunctionCall"
+            deprecated: true
+    AssistantMessageAudio:
+      type: object
+      properties:
+        id:
+          type: string
+        transcript:
+          type: string
+        data:
+          type: string
+        expires_at:
+          type: integer
+          format: int32
+    Audio:
+      type: object
+      properties:
+        voice:
+          type: string
+        format:
+          type: string
+    ChatCompletionRequest:
+      type: object
+      properties:
+        model:
+          type: string
+        messages:
+          type: array
+          items:
+            oneOf:
+            - $ref: "#/components/schemas/AssistantMessage"
+            - $ref: "#/components/schemas/FunctionMessage"
+            - $ref: "#/components/schemas/SystemMessage"
+            - $ref: "#/components/schemas/ToolMessage"
+            - $ref: "#/components/schemas/UserMessage"
+        temperature:
+          type: number
+          format: double
+        "n":
+          type: integer
+          format: int32
+        stream:
+          type: boolean
+        stop:
+          type: array
+          items:
+            type: string
+        user:
+          type: string
+        functions:
+          type: array
+          deprecated: true
+          items:
+            type: object
+            deprecated: true
+        seed:
+          type: integer
+          format: int32
+        logprobs:
+          type: boolean
+        tools:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChatTool"
+        modalities:
+          type: array
+          items:
+            type: string
+        audio:
+          $ref: "#/components/schemas/Audio"
+        response_format:
+          $ref: "#/components/schemas/ChatResponseFormat"
+        top_p:
+          type: number
+          format: double
+        stream_options:
+          $ref: "#/components/schemas/StreamOption"
+        max_tokens:
+          type: integer
+          format: int32
+        presence_penalty:
+          type: number
+          format: double
+        frequency_penalty:
+          type: number
+          format: double
+        logit_bias:
+          type: object
+          additionalProperties:
+            type: integer
+            format: int32
+        function_call:
+          $ref: "#/components/schemas/ChatCompletionRequestFunctionCall"
+          deprecated: true
+        top_logprobs:
+          type: integer
+          format: int32
+        tool_choice:
+          $ref: "#/components/schemas/ToolChoice"
+        parallel_tool_calls:
+          type: boolean
+    ChatCompletionRequestFunctionCall:
+      type: object
+      properties:
+        name:
+          type: string
+    ChatFunctionCall:
+      type: object
+      properties:
+        name:
+          type: string
+        arguments:
+          $ref: "#/components/schemas/JsonNode"
+    ChatMessage:
+      type: object
+      discriminator:
+        propertyName: role
+      properties:
+        textContent:
+          type: string
+        role:
+          type: string
+        name:
+          type: string
+    ChatResponseFormat:
+      type: object
+      properties:
+        type:
+          type: string
+        jsonSchema:
+          $ref: "#/components/schemas/ResponseJsonSchema"
+    ChatTool:
+      type: object
+      properties:
+        type:
+          type: string
+        function:
+          type: object
+    ChatToolCall:
+      type: object
+      properties:
+        index:
+          type: integer
+          format: int32
+          writeOnly: true
+        id:
+          type: string
+        type:
+          type: string
+        function:
+          $ref: "#/components/schemas/ChatFunctionCall"
+    ConversationExportResponse:
+      type: object
+      properties:
+        request:
+          $ref: "#/components/schemas/ChatCompletionRequest"
+        title:
+          type: string
+      required:
+      - request
+      - title
+    Function:
+      type: object
+      properties:
+        name:
+          type: string
+    FunctionMessage:
+      allOf:
+      - $ref: "#/components/schemas/ChatMessage"
+      - type: object
+        properties:
+          content:
+            type: string
+    JsonNode:
+      type: object
+    ResponseJsonSchema:
+      type: object
+      properties:
+        name:
+          type: string
+        strict:
+          type: boolean
+        schema:
+          type: object
+    StreamOption:
+      type: object
+      properties:
+        include_usage:
+          type: boolean
+    SystemMessage:
+      allOf:
+      - $ref: "#/components/schemas/ChatMessage"
+      - type: object
+        properties:
+          content:
+            type: string
+    ToolChoice:
+      type: object
+      properties:
+        function:
+          $ref: "#/components/schemas/Function"
+        type:
+          type: string
+    ToolMessage:
+      allOf:
+      - $ref: "#/components/schemas/ChatMessage"
+      - type: object
+        properties:
+          content:
+            type: string
+          tool_call_id:
+            type: string
+    UserMessage:
+      allOf:
+      - $ref: "#/components/schemas/ChatMessage"
+      - type: object
+        properties:
+          content:
+            type: object
     CircleForUserView:
       type: object
       properties:
@@ -4682,13 +4919,6 @@ components:
             - $ref: "#/components/schemas/FunctionTool"
         file_id:
           type: string
-    ChatResponseFormat:
-      type: object
-      properties:
-        type:
-          type: string
-        jsonSchema:
-          $ref: "#/components/schemas/ResponseJsonSchema"
     CodeInterpreterResources:
       type: object
       properties:
@@ -4839,11 +5069,6 @@ components:
         properties:
           file_search:
             $ref: "#/components/schemas/FileSearch"
-    Function:
-      type: object
-      properties:
-        name:
-          type: string
     FunctionTool:
       allOf:
       - $ref: "#/components/schemas/Tool"
@@ -4870,8 +5095,6 @@ components:
       properties:
         reason:
           type: string
-    JsonNode:
-      type: object
     LastError:
       type: object
       properties:
@@ -4960,15 +5183,6 @@ components:
           type: string
         submit_tool_outputs:
           $ref: "#/components/schemas/SubmitToolOutputs"
-    ResponseJsonSchema:
-      type: object
-      properties:
-        name:
-          type: string
-        strict:
-          type: boolean
-        schema:
-          type: object
     Run:
       type: object
       properties:
@@ -5216,13 +5430,6 @@ components:
         arguments:
           $ref: "#/components/schemas/JsonNode"
         output:
-          type: string
-    ToolChoice:
-      type: object
-      properties:
-        function:
-          $ref: "#/components/schemas/Function"
-        type:
           type: string
     ToolResources:
       type: object

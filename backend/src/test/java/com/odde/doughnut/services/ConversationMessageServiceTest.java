@@ -42,9 +42,7 @@ class ConversationMessageServiceTest {
     ChatCompletionConversationService chatCompletionConversationService =
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
-    conversationService =
-        new ConversationService(
-            testabilitySettings, this.modelFactoryService, chatCompletionConversationService);
+    conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);

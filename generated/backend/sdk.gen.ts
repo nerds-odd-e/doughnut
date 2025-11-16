@@ -2373,7 +2373,7 @@ export const getConversationMessages = (data: GetConversationMessagesData): Canc
 /**
  * @param data The data for the request.
  * @param data.conversationId
- * @returns string OK
+ * @returns ConversationExportResponse OK
  * @throws ApiError
  */
 export const exportConversation = (data: ExportConversationData): CancelablePromise<ExportConversationResponse> => {

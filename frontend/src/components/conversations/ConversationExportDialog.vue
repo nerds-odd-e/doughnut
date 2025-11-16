@@ -45,10 +45,10 @@ const exportContent = ref("")
 
 onMounted(async () => {
   try {
-    const content = await managedApi.services.exportConversation({
+    const response = (await managedApi.services.exportConversation({
       conversationId: props.conversationId,
-    })
-    exportContent.value = String(content)
+    })) as unknown
+    exportContent.value = JSON.stringify(response, null, 2)
   } catch (error) {
     console.error("Failed to fetch export content:", error)
     exportContent.value = "Failed to load export content"
