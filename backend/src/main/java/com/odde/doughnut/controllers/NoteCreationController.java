@@ -28,7 +28,8 @@ class NoteCreationController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteService noteService) {
     this.currentUser = currentUser;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
@@ -36,7 +37,8 @@ class NoteCreationController {
         new NoteConstructionService(
             currentUser.getEntity(),
             testabilitySettings.getCurrentUTCTimestamp(),
-            modelFactoryService);
+            modelFactoryService,
+            noteService);
   }
 
   @PostMapping(value = "/{parentNote}/create")

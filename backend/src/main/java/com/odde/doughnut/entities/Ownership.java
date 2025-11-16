@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.NoteService;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -62,8 +63,10 @@ public class Ownership {
       Timestamp currentUTCTimestamp,
       ModelFactoryService modelFactoryService,
       String topicConstructor) {
+    NoteService noteService =
+        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityManager);
     final Note note =
-        new NoteConstructionService(user, currentUTCTimestamp, modelFactoryService)
+        new NoteConstructionService(user, currentUTCTimestamp, modelFactoryService, noteService)
             .createNote(null, topicConstructor);
     note.buildNotebookForHeadNote(this, user);
     modelFactoryService.save(note.getNotebook());

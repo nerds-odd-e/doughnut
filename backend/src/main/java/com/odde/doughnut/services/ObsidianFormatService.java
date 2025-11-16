@@ -25,9 +25,14 @@ public class ObsidianFormatService {
   public ObsidianFormatService(User user, ModelFactoryService modelFactoryService) {
     TestabilitySettings testabilitySettings = new TestabilitySettings();
     this.modelFactoryService = modelFactoryService;
+    NoteService noteService =
+        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityManager);
     noteConstructionService =
         new NoteConstructionService(
-            user, testabilitySettings.getCurrentUTCTimestamp(), this.modelFactoryService);
+            user,
+            testabilitySettings.getCurrentUTCTimestamp(),
+            this.modelFactoryService,
+            noteService);
   }
 
   public byte[] exportToObsidian(Note headNote) throws IOException {

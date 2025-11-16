@@ -25,7 +25,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder(MakeMe makeMe) {
     super(
         makeMe,
-        new NoteConstructionService(null, new Timestamp(System.currentTimeMillis()), null)
+        new NoteConstructionService(null, new Timestamp(System.currentTimeMillis()), null, null)
             .createNote(null, ""));
     if (Strings.isEmpty(entity.getTopicConstructor())) titleConstructor(titleCounter.generate());
     details("descrption");

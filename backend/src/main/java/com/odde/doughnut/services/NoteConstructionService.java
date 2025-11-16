@@ -17,7 +17,10 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 
 public record NoteConstructionService(
-    User user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
+    User user,
+    Timestamp currentUTCTimestamp,
+    ModelFactoryService modelFactoryService,
+    NoteService noteService) {
 
   public Note createNote(Note parentNote, String topicConstructor) {
     final Note note = new Note();
@@ -33,7 +36,7 @@ public record NoteConstructionService(
       throws DuplicateWikidataIdException, IOException, InterruptedException {
     Note note = createNote(parentNote, topicConstructor);
     if (wikidataIdWithApi != null) {
-      wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
+      wikidataIdWithApi.associateNoteToWikidata(note, noteService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
       wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
     }

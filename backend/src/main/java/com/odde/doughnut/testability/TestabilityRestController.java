@@ -105,7 +105,8 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null).createNote(null, title);
+          new NoteConstructionService(user, currentUTCTimestamp, null, null)
+              .createNote(null, title);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
       note.setTopicConstructor(title);

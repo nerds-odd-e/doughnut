@@ -63,10 +63,6 @@ public class ModelFactoryService {
             });
   }
 
-  public NoteModel toNoteModel(Note note) {
-    return new NoteModel(note, this);
-  }
-
   public BazaarModel toBazaarModel() {
     return new BazaarModel(this);
   }
