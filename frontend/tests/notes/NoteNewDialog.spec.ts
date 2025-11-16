@@ -89,7 +89,9 @@ describe("adding new note", () => {
     expect(mockedSemanticSearch).not.toHaveBeenCalled()
   })
 
-  it("does not search when title is changed to 'Untitled'", async () => {
+  it("does search when title is changed back to 'Untitled' after editing", async () => {
+    mockedSearchWithin.mockResolvedValue([])
+    mockedSemanticSearchWithin.mockResolvedValue([])
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -109,10 +111,10 @@ describe("adding new note", () => {
     vi.runOnlyPendingTimers()
     await flushPromises()
 
-    expect(mockedSearchWithin).not.toHaveBeenCalled()
-    expect(mockedSearch).not.toHaveBeenCalled()
-    expect(mockedSemanticSearchWithin).not.toHaveBeenCalled()
-    expect(mockedSemanticSearch).not.toHaveBeenCalled()
+    expect(mockedSearchWithin).toHaveBeenCalledWith({
+      note: note.id,
+      requestBody: expect.objectContaining({ searchKey: "Untitled" }),
+    })
   })
 
   describe("submit form", () => {

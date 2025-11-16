@@ -51,7 +51,7 @@ import type {
 } from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
 import SuggestTitle from "./SuggestTitle.vue"
@@ -86,18 +86,30 @@ const noteFormErrors = ref({
 const suggestedTitle = ref("")
 const processing = ref(false)
 const showDropdown = ref(false)
+const hasTitleBeenEdited = ref(false)
 
 const DEFAULT_TITLE = "Untitled"
+
+watch(
+  () => creationData.value.newTitle,
+  (newTitle, oldTitle) => {
+    if (oldTitle !== undefined && newTitle !== oldTitle) {
+      hasTitleBeenEdited.value = true
+    }
+  }
+)
+
 const shouldShowSearch = computed(() => {
   return (
     showDropdown.value &&
     creationData.value.newTitle &&
-    creationData.value.newTitle !== DEFAULT_TITLE
+    (creationData.value.newTitle !== DEFAULT_TITLE || hasTitleBeenEdited.value)
   )
 })
 
 const searchKey = computed(() => {
-  return creationData.value.newTitle === DEFAULT_TITLE
+  return creationData.value.newTitle === DEFAULT_TITLE &&
+    !hasTitleBeenEdited.value
     ? ""
     : creationData.value.newTitle
 })
