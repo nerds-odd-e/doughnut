@@ -7,63 +7,19 @@ import type { OpenAPIConfig } from '@generated/backend/core/OpenAPI'
 import { CancelablePromise } from '@generated/backend/core/CancelablePromise'
 import { ApiError } from '@generated/backend/core/ApiError'
 import type { ApiResult } from '@generated/backend/core/ApiResult'
-
-// Re-export helper functions that services might need
-export {
-  getFormData,
+import {
   getQueryString,
-  getHeaders,
-  getRequestBody,
+  getRequestBody as getRequestBodyFromGenerated,
+  resolve,
+  isStringWithValue,
+  base64,
 } from '@generated/backend/core/request'
 
-const isString = (value: unknown): value is string => {
-  return typeof value === 'string'
-}
-
-const isStringWithValue = (value: unknown): value is string => {
-  return isString(value) && value !== ''
-}
-
-const base64 = (str: string): string => {
-  try {
-    return btoa(str)
-  } catch {
-    // @ts-ignore
-    return Buffer.from(str).toString('base64')
-  }
-}
-
-const getQueryString = (params: Record<string, unknown>): string => {
-  const qs: string[] = []
-
-  const append = (key: string, value: unknown) => {
-    qs.push(`${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
-  }
-
-  const encodePair = (key: string, value: unknown) => {
-    if (value === undefined || value === null) {
-      return
-    }
-
-    if (value instanceof Date) {
-      append(key, value.toISOString())
-    } else if (Array.isArray(value)) {
-      value.forEach((v) => encodePair(key, v))
-    } else if (typeof value === 'object') {
-      Object.entries(value).forEach(([k, v]) => encodePair(`${key}[${k}]`, v))
-    } else {
-      append(key, value)
-    }
-  }
-
-  Object.entries(params).forEach(([key, value]) => encodePair(key, value))
-
-  return qs.length ? `?${qs.join('&')}` : ''
-}
+// Re-export helper functions that services might need
+export { getFormData, getRequestBody } from '@generated/backend/core/request'
 
 const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
   const encoder = config.ENCODE_PATH || encodeURI
-
   const path = options.url
     .replace('{api-version}', config.VERSION)
     .replace(/{(.*?)}/g, (substring: string, group: string) => {
@@ -72,21 +28,8 @@ const getUrl = (config: OpenAPIConfig, options: ApiRequestOptions): string => {
       }
       return substring
     })
-
   const url = config.BASE + path
   return options.query ? url + getQueryString(options.query) : url
-}
-
-type Resolver<T> = (options: ApiRequestOptions<T>) => Promise<T>
-
-const resolve = async <T>(
-  options: ApiRequestOptions<T>,
-  resolver?: T | Resolver<T>
-): Promise<T | undefined> => {
-  if (typeof resolver === 'function') {
-    return (resolver as Resolver<T>)(options)
-  }
-  return resolver
 }
 
 const getHeaders = async <T>(
@@ -111,10 +54,7 @@ const getHeaders = async <T>(
   })
     .filter(([, value]) => value !== undefined && value !== null)
     .reduce(
-      (headers, [key, value]) => ({
-        ...headers,
-        [key]: String(value),
-      }),
+      (acc, [key, value]) => ({ ...acc, [key]: String(value) }),
       {} as Record<string, string>
     )
 
@@ -123,8 +63,7 @@ const getHeaders = async <T>(
   }
 
   if (isStringWithValue(username) && isStringWithValue(password)) {
-    const credentials = base64(`${username}:${password}`)
-    headers.Authorization = `Basic ${credentials}`
+    headers.Authorization = `Basic ${base64(`${username}:${password}`)}`
   }
 
   if (options.body !== undefined) {
@@ -140,30 +79,67 @@ const getHeaders = async <T>(
   return headers
 }
 
-const getRequestBody = (options: ApiRequestOptions): unknown => {
-  if (options.body !== undefined) {
-    if (
-      options.mediaType?.includes('application/json') ||
-      options.mediaType?.includes('+json')
-    ) {
-      return JSON.stringify(options.body)
-    } else if (
-      typeof options.body === 'string' ||
-      options.body instanceof FormData
-    ) {
-      return options.body
-    } else {
-      return JSON.stringify(options.body)
+const getRequestBody = getRequestBodyFromGenerated
+
+const validateResponse = (
+  response: unknown,
+  options: ApiRequestOptions,
+  url: string
+): Cypress.Response<unknown> => {
+  if (!response || typeof response !== 'object') {
+    throw new ApiError(
+      options,
+      {
+        url,
+        ok: false,
+        status: 0,
+        statusText: 'Invalid Response',
+        body: undefined,
+      },
+      `Invalid response: response is not an object. Response: ${JSON.stringify(response)}`
+    )
+  }
+
+  const responseObj = response as Record<string, unknown>
+  if (
+    !('status' in responseObj) ||
+    responseObj.status === undefined ||
+    responseObj.status === null
+  ) {
+    const responseKeys = Object.keys(responseObj)
+    throw new ApiError(
+      options,
+      {
+        url,
+        ok: false,
+        status: 0,
+        statusText: 'Unknown Status',
+        body: undefined,
+      },
+      `Invalid response: response.status is ${responseObj.status}. Response keys: ${responseKeys.join(', ')}. Response object: ${JSON.stringify(response)}`
+    )
+  }
+
+  return response as Cypress.Response<unknown>
+}
+
+const parseResponseBody = (body: unknown, status: number): unknown => {
+  if (status === 204) return undefined
+  if (typeof body === 'string') {
+    try {
+      return JSON.parse(body)
+    } catch {
+      return body
     }
   }
-  return undefined
+  return body
 }
 
 const catchErrorCodes = (
   options: ApiRequestOptions,
   result: ApiResult
 ): void => {
-  const errors: Record<number, string> = {
+  const errorMessages: Record<number, string> = {
     400: 'Bad Request',
     401: 'Unauthorized',
     402: 'Payment Required',
@@ -207,14 +183,12 @@ const catchErrorCodes = (
     ...options.errors,
   }
 
-  const error = errors[result.status]
-  if (error) {
-    throw new ApiError(options, result, error)
+  const errorMessage = errorMessages[result.status]
+  if (errorMessage) {
+    throw new ApiError(options, result, errorMessage)
   }
 
   if (!result.ok) {
-    const errorStatus = result.status ?? 'unknown'
-    const errorStatusText = result.statusText ?? 'unknown'
     const errorBody = (() => {
       try {
         return JSON.stringify(result.body, null, 2)
@@ -222,11 +196,10 @@ const catchErrorCodes = (
         return undefined
       }
     })()
-
     throw new ApiError(
       options,
       result,
-      `Generic Error: status: ${errorStatus}; status text: ${errorStatusText}; body: ${errorBody}`
+      `Generic Error: status: ${result.status ?? 'unknown'}; status text: ${result.statusText ?? 'unknown'}; body: ${errorBody}`
     )
   }
 }
@@ -243,71 +216,35 @@ export const request = <T>(
   options: ApiRequestOptions<T>
 ): CancelablePromise<T> => {
   return new CancelablePromise((resolve, reject, onCancel) => {
-    if (onCancel.isCancelled) {
-      return
-    }
+    if (onCancel.isCancelled) return
 
-    // Use cy.then() to ensure we're in the Cypress command chain
     cy.then(async () => {
       try {
         const url = getUrl(config, options)
         const body = getRequestBody(options)
         const headers = await getHeaders(config, options)
 
-        // Use cy.request instead of fetch
         cy.request({
           method: options.method,
           url,
           headers,
           body: body as any,
-          failOnStatusCode: false, // We'll handle errors ourselves
+          failOnStatusCode: false,
         }).then(async (response) => {
           try {
-            // Validate that response is a valid Cypress response object
-            if (!response || typeof response !== 'object') {
-              throw new ApiError(
-                options,
-                {
-                  url,
-                  ok: false,
-                  status: 0,
-                  statusText: 'Invalid Response',
-                  body: undefined,
-                },
-                `Invalid response: response is not an object. Response: ${JSON.stringify(response)}`
-              )
-            }
-
-            // Validate that response has a status property
-            // This check is critical - cy.request() should always return an object with a status property
-            if (
-              !('status' in response) ||
-              response.status === undefined ||
-              response.status === null
-            ) {
-              // Log the actual response structure for debugging
-              const responseKeys = response ? Object.keys(response) : []
-              throw new ApiError(
-                options,
-                {
-                  url,
-                  ok: false,
-                  status: 0,
-                  statusText: 'Unknown Status',
-                  body: undefined,
-                },
-                `Invalid response: response.status is ${response.status}. Response keys: ${responseKeys.join(', ')}. Response object: ${JSON.stringify(response)}`
-              )
-            }
+            const validatedResponse = validateResponse(response, options, url)
 
             // Process response through interceptors
-            // Create a Response-like object for interceptors
             const responseLike = {
-              ok: response.status >= 200 && response.status < 300,
-              status: response.status,
-              statusText: response.statusText || '',
-              headers: new Headers(response.headers as Record<string, string>),
-              body: response.body,
+              ok:
+                validatedResponse.status >= 200 &&
+                validatedResponse.status < 300,
+              status: validatedResponse.status,
+              statusText: validatedResponse.statusText || '',
+              headers: new Headers(
+                validatedResponse.headers as Record<string, string>
+              ),
+              body: validatedResponse.body,
             } as Response
 
             let processedResponse = responseLike
@@ -315,54 +252,40 @@ export const request = <T>(
               processedResponse = (await fn(processedResponse)) as Response
             }
 
-            // Extract response body
-            let responseBody: unknown
-            if (response.status !== 204) {
-              try {
-                if (typeof response.body === 'string') {
-                  try {
-                    responseBody = JSON.parse(response.body)
-                  } catch {
-                    responseBody = response.body
-                  }
-                } else {
-                  responseBody = response.body
-                }
-              } catch {
-                responseBody = undefined
-              }
-            } else {
-              responseBody = undefined
-            }
+            // Parse response body
+            const responseBody = parseResponseBody(
+              validatedResponse.body,
+              validatedResponse.status
+            )
 
             // Get response header if specified
             const responseHeader = options.responseHeader
-              ? response.headers[options.responseHeader.toLowerCase()]
+              ? validatedResponse.headers[options.responseHeader.toLowerCase()]
               : undefined
 
             // Apply response transformer if provided
             let transformedBody = responseHeader ?? responseBody
             if (
               options.responseTransformer &&
-              response.status >= 200 &&
-              response.status < 300
+              validatedResponse.status >= 200 &&
+              validatedResponse.status < 300
             ) {
               transformedBody = await options.responseTransformer(responseBody)
             }
 
             const result: ApiResult = {
               url,
-              ok: response.status >= 200 && response.status < 300,
-              status: response.status,
-              statusText: response.statusText || '',
+              ok:
+                validatedResponse.status >= 200 &&
+                validatedResponse.status < 300,
+              status: validatedResponse.status,
+              statusText: validatedResponse.statusText || '',
               body: transformedBody,
             }
 
             catchErrorCodes(options, result)
-
             resolve(result.body as T)
           } catch (error) {
-            // Handle any errors from cy.request() or processing
             if (error instanceof ApiError) {
               reject(error)
             } else {
