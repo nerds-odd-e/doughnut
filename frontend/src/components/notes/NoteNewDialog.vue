@@ -16,10 +16,10 @@
               @suggested-title-selected="takeSuggestedTitle"
             />
             <SearchResults
-              v-show="showDropdown && creationData.newTitle"
+              v-show="shouldShowSearch"
               v-bind="{
                 noteId: referenceNote.id,
-                inputSearchKey: creationData.newTitle,
+                inputSearchKey: searchKey,
                 isDropdown: true
               }"
               class="title-search-results"
@@ -27,7 +27,7 @@
           </div>
 
           <WikidataSearchByLabel
-            :search-key="creationData.newTitle"
+            :search-key="searchKey"
             v-model="creationData.wikidataId"
             :error-message="noteFormErrors.wikidataId"
             @selected="onSelectWikidataEntry"
@@ -51,7 +51,7 @@ import type {
 } from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
 import SuggestTitle from "./SuggestTitle.vue"
@@ -86,6 +86,21 @@ const noteFormErrors = ref({
 const suggestedTitle = ref("")
 const processing = ref(false)
 const showDropdown = ref(false)
+
+const DEFAULT_TITLE = "Untitled"
+const shouldShowSearch = computed(() => {
+  return (
+    showDropdown.value &&
+    creationData.value.newTitle &&
+    creationData.value.newTitle !== DEFAULT_TITLE
+  )
+})
+
+const searchKey = computed(() => {
+  return creationData.value.newTitle === DEFAULT_TITLE
+    ? ""
+    : creationData.value.newTitle
+})
 
 // Methods
 const processForm = async () => {

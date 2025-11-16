@@ -14,6 +14,8 @@ vitest.mock("vue-router", () => ({
 
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()
+const mockedSemanticSearch = vitest.fn()
+const mockedSemanticSearchWithin = vitest.fn()
 let mockedCreateNote: ReturnType<typeof vi.fn>
 
 describe("adding new note", () => {
@@ -28,6 +30,17 @@ describe("adding new note", () => {
       helper.managedApi.services,
       "searchForLinkTargetWithin"
     ).mockImplementation(mockedSearchWithin)
+    vi.spyOn(helper.managedApi.services, "semanticSearch").mockImplementation(
+      mockedSemanticSearch
+    )
+    vi.spyOn(
+      helper.managedApi.services,
+      "semanticSearchWithin"
+    ).mockImplementation(mockedSemanticSearchWithin)
+    mockedSearch.mockResolvedValue([])
+    mockedSearchWithin.mockResolvedValue([])
+    mockedSemanticSearch.mockResolvedValue([])
+    mockedSemanticSearchWithin.mockResolvedValue([])
     mockedCreateNote = vi
       .spyOn(helper.managedApi.services, "createNoteUnderParent")
       .mockResolvedValue({} as never)
@@ -44,6 +57,7 @@ describe("adding new note", () => {
     mockedSearchWithin.mockResolvedValue([
       { noteTopology: note.noteTopology, distance: 0.9 },
     ])
+    mockedSemanticSearchWithin.mockResolvedValue([])
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -58,6 +72,47 @@ describe("adding new note", () => {
       note: note.id,
       requestBody: expect.objectContaining({ searchKey: "myth" }),
     })
+  })
+
+  it("does not search when title is default 'Untitled'", async () => {
+    helper
+      .component(NoteNewDialog)
+      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .mount()
+
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    expect(mockedSearchWithin).not.toHaveBeenCalled()
+    expect(mockedSearch).not.toHaveBeenCalled()
+    expect(mockedSemanticSearchWithin).not.toHaveBeenCalled()
+    expect(mockedSemanticSearch).not.toHaveBeenCalled()
+  })
+
+  it("does not search when title is changed to 'Untitled'", async () => {
+    const wrapper = helper
+      .component(NoteNewDialog)
+      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .mount()
+    await wrapper.find("input#note-title").setValue("myth")
+
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    mockedSearchWithin.mockClear()
+    mockedSearch.mockClear()
+    mockedSemanticSearchWithin.mockClear()
+    mockedSemanticSearch.mockClear()
+
+    await wrapper.find("input#note-title").setValue("Untitled")
+
+    vi.runOnlyPendingTimers()
+    await flushPromises()
+
+    expect(mockedSearchWithin).not.toHaveBeenCalled()
+    expect(mockedSearch).not.toHaveBeenCalled()
+    expect(mockedSemanticSearchWithin).not.toHaveBeenCalled()
+    expect(mockedSemanticSearch).not.toHaveBeenCalled()
   })
 
   describe("submit form", () => {
