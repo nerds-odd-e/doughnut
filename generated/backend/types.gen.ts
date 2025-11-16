@@ -1322,6 +1322,12 @@ export type ResetNotebookIndexData = {
 
 export type ResetNotebookIndexResponse = (unknown);
 
+export type DownloadNotebookForObsidianData = {
+    notebook: number;
+};
+
+export type DownloadNotebookForObsidianResponse = (string);
+
 export type ImportObsidianData = {
     formData?: {
         /**
@@ -1332,7 +1338,7 @@ export type ImportObsidianData = {
     /**
      * Notebook ID
      */
-    notebookId: number;
+    notebook: number;
 };
 
 export type ImportObsidianResponse = (unknown);
@@ -1694,12 +1700,6 @@ export type ShowNoteAccessoryResponse = (NoteAccessory);
 export type GetRecentNotesResponse = (Array<NoteRealm>);
 
 export type MyNotebooksResponse = (NotebooksViewedByUser);
-
-export type DownloadNotebookForObsidianData = {
-    notebook: number;
-};
-
-export type DownloadNotebookForObsidianResponse = (string);
 
 export type GetNotesData = {
     notebook: number;

@@ -1240,14 +1240,38 @@ paths:
                 type: string
         "200":
           description: OK
-  /api/notebooks/{notebookId}/obsidian:
+  /api/notebooks/{notebook}/obsidian:
+    get:
+      tags:
+      - notebook-controller
+      operationId: downloadNotebookForObsidian
+      parameters:
+      - name: notebook
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: byte
     post:
       tags:
       - notebook-controller
       summary: Import Obsidian file
       operationId: importObsidian
       parameters:
-      - name: notebookId
+      - name: notebook
         in: path
         description: Notebook ID
         required: true
@@ -2816,31 +2840,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
-  /api/notebooks/{notebook}/obsidian:
-    get:
-      tags:
-      - notebook-controller
-      operationId: downloadNotebookForObsidian
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
-                format: byte
   /api/notebooks/{notebook}/notes:
     get:
       tags:

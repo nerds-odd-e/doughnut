@@ -193,13 +193,13 @@ class NotebookController {
   }
 
   @Operation(summary = "Import Obsidian file")
-  @PostMapping(value = "/{notebookId}/obsidian", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PostMapping(value = "/{notebook}/obsidian", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @ResponseStatus(HttpStatus.OK)
   @Transactional
   public void importObsidian(
       @Parameter(description = "Obsidian zip file to import") @RequestParam("file")
           MultipartFile file,
-      @Parameter(description = "Notebook ID") @PathVariable("notebookId") @Schema(type = "integer")
+      @Parameter(description = "Notebook ID") @PathVariable("notebook") @Schema(type = "integer")
           Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
     currentUser.assertLoggedIn();

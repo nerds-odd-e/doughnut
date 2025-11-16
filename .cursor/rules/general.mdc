@@ -4,6 +4,16 @@ globs:
 alwaysApply: true
 ---
 
+# The use of nix
+
+**CRITICAL: This project uses nix to manage the development environment locally. For Cloud Agent, see the later instructions**
+
+**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true` when running them through `nix develop -c` (When running as a local agent):**
+
+```bash
+CURSOR_DEV=true nix develop -c <command>
+```
+
 # Development Environment Setup
 
 ## Starting the Development Environment
@@ -58,20 +68,6 @@ pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question
 ```
 
 **Note:** Cloud agents do NOT need the `CURSOR_DEV=true nix develop -c` prefix.
-
-### For Local Development (Human Developers)
-
-**CRITICAL: This project uses nix to manage the development environment locally.**
-
-There is a bug in Cursor IDE that prevents detection of `nix develop` completion in agent mode. 
-
-**When running as a local agent, YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true` when running them through `nix develop -c`:**
-
-```bash
-CURSOR_DEV=true nix develop -c <command>
-```
-
-**DO NOT run commands without the `CURSOR_DEV=true` prefix!** Without it, the terminal will hang and not return control to the agent.
 
 #### Running Tests for Local Development
 

@@ -14,5 +14,4 @@ rules:
   operation-4xx-response: off
   no-ambiguous-paths: off
   info-license: off
-  no-identical-paths: off
 
