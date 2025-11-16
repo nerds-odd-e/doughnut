@@ -8,6 +8,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
+import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 class PredefinedQuestionController {
   private final ModelFactoryService modelFactoryService;
   private final PredefinedQuestionService predefinedQuestionService;
+  private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
 
   private final UserModel currentUser;
 
@@ -36,10 +38,12 @@ class PredefinedQuestionController {
   public PredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
+      SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper) {
     this.modelFactoryService = modelFactoryService;
+    this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     aiQuestionGenerator =
@@ -70,9 +74,8 @@ class PredefinedQuestionController {
           PredefinedQuestion predefinedQuestion,
       @Valid @RequestBody QuestionSuggestionCreationParams suggestion) {
     SuggestedQuestionForFineTuning sqft = new SuggestedQuestionForFineTuning();
-    var suggestedQuestionForFineTuningService =
-        modelFactoryService.toSuggestedQuestionForFineTuningService(sqft);
     return suggestedQuestionForFineTuningService.suggestQuestionForFineTuning(
+        sqft,
         predefinedQuestion,
         suggestion,
         currentUser.getEntity(),

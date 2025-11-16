@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -36,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 class PredefinedQuestionControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -51,6 +53,7 @@ class PredefinedQuestionControllerTests {
         new PredefinedQuestionController(
             openAiApi,
             modelFactoryService,
+            suggestedQuestionForFineTuningService,
             currentUser,
             testabilitySettings,
             getTestObjectMapper());
@@ -60,6 +63,7 @@ class PredefinedQuestionControllerTests {
     return new PredefinedQuestionController(
         openAiApi,
         modelFactoryService,
+        suggestedQuestionForFineTuningService,
         makeMe.aNullUserModelPlease(),
         testabilitySettings,
         getTestObjectMapper());

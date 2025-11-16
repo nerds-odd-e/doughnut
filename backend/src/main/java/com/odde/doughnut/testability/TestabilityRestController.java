@@ -11,6 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.EntityManagerFactory;
@@ -40,6 +41,7 @@ class TestabilityRestController {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
+  @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -290,7 +292,7 @@ class TestabilityRestController {
         example -> {
           SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
           suggestion.setUser(currentUser.getEntity());
-          modelFactoryService.toSuggestedQuestionForFineTuningService(suggestion).update(example);
+          suggestedQuestionForFineTuningService.update(suggestion, example);
         });
     return "OK";
   }
