@@ -411,7 +411,6 @@ This aligns tests with the stateless services architecture and makes them simple
 
 - `UserModel` → `UserService`
 - `NoteModel` → `NoteService`
-- `SubscriptionModel` → `SubscriptionService`
 - `NoteMotionModel` → `NoteMotionService` or integrate into `NoteService`
 - `BazaarModel` → `BazaarService`
 
@@ -427,7 +426,7 @@ This aligns tests with the stateless services architecture and makes them simple
 These services currently use models and need to be updated:
 
 - `RecallService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead.
-- `AssimilationService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead.
+- `AssimilationService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead. (Now uses `SubscriptionService` instead of `SubscriptionModel`)
 - `MemoryTrackerService`: Currently creates `UserModel` internally. Should use `UserService` instead.
 - `NotebookService`: Currently not a Spring bean, should be converted to `@Service` bean and take `Notebook` entity as parameter.
 
