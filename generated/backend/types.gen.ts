@@ -66,7 +66,7 @@ export type Attachment = {
 };
 
 export type AudioUploadDTO = {
-    uploadAudioFile?: (Blob | File);
+    uploadAudioFile?: Blob | File;
     additionalProcessingInstructions?: string;
     previousNoteDetailsToAppendTo?: string;
     midSpeech?: boolean;
@@ -144,7 +144,7 @@ export type CircleJoiningByInvitation = {
 };
 
 export type CodeInterpreterResources = {
-    file_ids?: Array<(string)>;
+    file_ids?: Array<string>;
 };
 
 export type CodeInterpreterTool = Tool;
@@ -275,7 +275,7 @@ export type FileSearchRankingOptions = {
 };
 
 export type FileSearchResources = {
-    vector_store_ids?: Array<(string)>;
+    vector_store_ids?: Array<string>;
     vector_stores?: Array<VectorStore>;
 };
 
@@ -292,11 +292,11 @@ export type FocusNote = {
     parentUriAndTitle?: string;
     relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
     details?: string;
-    contextualPath?: Array<(string)>;
-    children?: Array<(string)>;
-    priorSiblings?: Array<(string)>;
-    youngerSiblings?: Array<(string)>;
-    inboundReferences?: Array<(string)>;
+    contextualPath?: Array<string>;
+    children?: Array<string>;
+    priorSiblings?: Array<string>;
+    youngerSiblings?: Array<string>;
+    inboundReferences?: Array<string>;
 };
 
 export namespace FocusNote {
@@ -441,7 +441,7 @@ export type Message = {
     content?: Array<MessageContent>;
     attachments?: Array<Attachment>;
     metadata?: {
-        [key: string]: (string);
+        [key: string]: string;
     };
     created_at?: number;
     thread_id?: string;
@@ -471,7 +471,7 @@ export type MessageDelta = {
 
 export type MultipleChoicesQuestion = {
     stem: string;
-    choices: Array<(string)>;
+    choices: Array<string>;
 };
 
 export type Note = {
@@ -490,7 +490,7 @@ export type NoteAccessoriesDTO = {
     imageUrl?: string;
     imageMask?: string;
     useParentImage?: boolean;
-    uploadImage?: (Blob | File);
+    uploadImage?: Blob | File;
 };
 
 export type NoteAccessory = {
@@ -739,7 +739,7 @@ export type Run = {
     instructions?: string;
     tools?: Array<(CodeInterpreterTool | FileSearchTool | FunctionTool)>;
     metadata?: {
-        [key: string]: (string);
+        [key: string]: string;
     };
     usage?: Usage;
     temperature?: number;
@@ -773,7 +773,7 @@ export type RunStep = {
     type?: string;
     status?: string;
     metadata?: {
-        [key: string]: (string);
+        [key: string]: string;
     };
     usage?: Usage;
     created_at?: number;
@@ -996,7 +996,7 @@ export type VectorStore = {
     bytes?: number;
     status?: string;
     metadata?: {
-        [key: string]: (string);
+        [key: string]: string;
     };
     created_at?: number;
     file_counts?: FileCounts;
@@ -1038,7 +1038,7 @@ export type CloseAllGithubIssuesResponse = (string);
 
 export type UpdateCurrentUserData = {
     requestBody: {
-        [key: string]: (string);
+        [key: string]: string;
     };
 };
 
@@ -1064,7 +1064,7 @@ export type TimeTravelResponse = (Array<{
 
 export type ShareToBazaarData = {
     requestBody: {
-        [key: string]: (string);
+        [key: string]: string;
     };
 };
 
@@ -1072,7 +1072,7 @@ export type ShareToBazaarResponse = (string);
 
 export type ReplaceServiceUrlData = {
     requestBody: {
-        [key: string]: (string);
+        [key: string]: string;
     };
 };
 
@@ -1088,7 +1088,7 @@ export type RandomizerResponse = (Array<{
 
 export type LinkNotesData = {
     requestBody: {
-        [key: string]: (string);
+        [key: string]: string;
     };
 };
 
@@ -1105,12 +1105,12 @@ export type InjectNotesData = {
 };
 
 export type InjectNotesResponse = ({
-    [key: string]: (number);
+    [key: string]: number;
 });
 
 export type InjectCircleData = {
     requestBody: {
-        [key: string]: (string);
+        [key: string]: string;
     };
 };
 
@@ -1126,7 +1126,7 @@ export type GetFeatureToggleResponse = (boolean);
 
 export type EnableFeatureToggleData = {
     requestBody: {
-        [key: string]: (string);
+        [key: string]: string;
     };
 };
 
@@ -1147,7 +1147,7 @@ export type DestroySubscriptionData = {
     subscription: number;
 };
 
-export type DestroySubscriptionResponse = (Array<(number)>);
+export type DestroySubscriptionResponse = (Array<number>);
 
 export type CreateSubscriptionData = {
     notebook: number;
@@ -1333,7 +1333,7 @@ export type ImportObsidianData = {
         /**
          * Obsidian zip file to import
          */
-        file: (Blob | File);
+        file: Blob | File;
     };
     /**
      * Notebook ID
@@ -1801,7 +1801,7 @@ export type GetMyAssessmentsResponse = (Array<AssessmentAttempt>);
 
 export type DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponse = (DummyForGeneratingTypes);
 
-export type GetAvailableGptModelsResponse = (Array<(string)>);
+export type GetAvailableGptModelsResponse = (Array<string>);
 
 export type DeleteTokenData = {
     tokenId: number;
@@ -1810,7 +1810,7 @@ export type DeleteTokenData = {
 export type DeleteTokenResponse = (unknown);
 
 export type DeleteFailureReportsData = {
-    requestBody: Array<(number)>;
+    requestBody: Array<number>;
 };
 
 export type DeleteFailureReportsResponse = (unknown);
