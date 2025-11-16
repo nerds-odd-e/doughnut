@@ -41,6 +41,7 @@ class NoteControllerTests {
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
+  @Autowired com.odde.doughnut.services.NoteService noteService;
   private UserModel userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -55,7 +56,8 @@ class NoteControllerTests {
             userModel,
             httpClientAdapter,
             testabilitySettings,
-            noteMotionService);
+            noteMotionService,
+            noteService);
   }
 
   @Nested

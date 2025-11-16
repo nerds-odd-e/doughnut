@@ -31,6 +31,7 @@ class NoteControllerRecentNotesTests {
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
+  @Autowired com.odde.doughnut.services.NoteService noteService;
   private UserModel userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -44,7 +45,8 @@ class NoteControllerRecentNotesTests {
             userModel,
             httpClientAdapter,
             testabilitySettings,
-            noteMotionService);
+            noteMotionService,
+            noteService);
   }
 
   @Test
@@ -82,7 +84,8 @@ class NoteControllerRecentNotesTests {
             userModel,
             httpClientAdapter,
             testabilitySettings,
-            noteMotionService);
+            noteMotionService,
+            noteService);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }

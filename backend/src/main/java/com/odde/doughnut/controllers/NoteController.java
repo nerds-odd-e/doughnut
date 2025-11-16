@@ -10,6 +10,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
@@ -40,17 +41,20 @@ class NoteController {
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
   private final NoteMotionService noteMotionService;
+  private final NoteService noteService;
 
   public NoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
-      NoteMotionService noteMotionService) {
+      NoteMotionService noteMotionService,
+      NoteService noteService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
+    this.noteService = noteService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -65,7 +69,7 @@ class NoteController {
     WikidataIdWithApi wikidataIdWithApi =
         wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
     try {
-      wikidataIdWithApi.associateNoteToWikidata(note, modelFactoryService);
+      wikidataIdWithApi.associateNoteToWikidata(note, noteService);
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(wikidataAssociationCreation, "wikidataAssociationCreation");
@@ -125,7 +129,7 @@ class NoteController {
   public List<NoteRealm> deleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
+    noteService.destroy(note, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
@@ -139,7 +143,7 @@ class NoteController {
   public NoteRealm undoDeleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
-    modelFactoryService.toNoteModel(note).restore();
+    noteService.restore(note);
     modelFactoryService.entityManager.flush();
 
     return note.toNoteRealm(currentUser.getEntity());
