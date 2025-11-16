@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -77,10 +76,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder linkTo(Note referTo, LinkType linkType) {
     reificationBuilders.add(makeMe.aReification().between(entity, referTo, linkType));
     return this;
-  }
-
-  public NoteBuilder inCircle(CircleModel circleModel) {
-    return inCircle(circleModel.getEntity());
   }
 
   public NoteBuilder inCircle(Circle circle) {

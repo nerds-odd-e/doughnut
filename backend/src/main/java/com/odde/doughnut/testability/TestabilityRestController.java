@@ -7,9 +7,9 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
@@ -38,6 +38,7 @@ class TestabilityRestController {
   @Autowired UserRepository userRepository;
   @Autowired UserModel currentUser;
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
@@ -268,12 +269,11 @@ class TestabilityRestController {
   public String injectCircle(@RequestBody HashMap<String, String> circleInfo) {
     Circle entity = new Circle();
     entity.setName(circleInfo.get("circleName"));
-    CircleModel circleModel = modelFactoryService.toCircleModel(entity);
     Arrays.stream(circleInfo.get("members").split(","))
         .map(String::trim)
         .forEach(
             s -> {
-              circleModel.joinAndSave(getUserModelByExternalIdentifier(s));
+              circleService.joinAndSave(entity, getUserModelByExternalIdentifier(s));
             });
     return "OK";
   }
