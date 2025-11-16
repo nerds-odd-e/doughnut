@@ -45,10 +45,18 @@ const sidebarStyle = computed(() => {
 })
 
 // Route watcher
-const route = useRoute()
-watch(route, () => {
-  emit("close_request")
-})
+let route
+try {
+  route = useRoute()
+  if (route) {
+    watch(route, () => {
+      emit("close_request")
+    })
+  }
+} catch {
+  // Router not available (e.g., in tests without router)
+  // Skip route watching
+}
 
 // ESC key handler - only for non-popup modals
 const handleEscape = (event: KeyboardEvent) => {

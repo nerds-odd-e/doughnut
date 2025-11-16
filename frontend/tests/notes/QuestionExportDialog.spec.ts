@@ -26,6 +26,7 @@ describe("QuestionExportDialog", () => {
     const { getByTestId } = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
+      .withRouter()
       .render()
 
     await waitFor(() => {
@@ -52,6 +53,7 @@ describe("QuestionExportDialog", () => {
     const { getByTestId } = helper
       .component(QuestionExportDialog)
       .withProps({ noteId: note.id })
+      .withRouter()
       .render()
 
     await waitFor(() => {

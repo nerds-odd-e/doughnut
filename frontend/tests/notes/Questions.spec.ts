@@ -50,6 +50,7 @@ describe("Questions", () => {
     const { getByLabelText, getByTestId } = helper
       .component(Questions)
       .withProps({ note })
+      .withRouter()
       .render()
 
     await flushPromises()
