@@ -12,7 +12,6 @@ import type { ApiResult } from '@generated/backend/core/ApiResult'
 export {
   getFormData,
   getQueryString,
-  getUrl,
   getHeaders,
   getRequestBody,
 } from '@generated/backend/core/request'
@@ -264,6 +263,43 @@ export const request = <T>(
           failOnStatusCode: false, // We'll handle errors ourselves
         }).then(async (response) => {
           try {
+            // Validate that response is a valid Cypress response object
+            if (!response || typeof response !== 'object') {
+              throw new ApiError(
+                options,
+                {
+                  url,
+                  ok: false,
+                  status: 0,
+                  statusText: 'Invalid Response',
+                  body: undefined,
+                },
+                `Invalid response: response is not an object. Response: ${JSON.stringify(response)}`
+              )
+            }
+
+            // Validate that response has a status property
+            // This check is critical - cy.request() should always return an object with a status property
+            if (
+              !('status' in response) ||
+              response.status === undefined ||
+              response.status === null
+            ) {
+              // Log the actual response structure for debugging
+              const responseKeys = response ? Object.keys(response) : []
+              throw new ApiError(
+                options,
+                {
+                  url,
+                  ok: false,
+                  status: 0,
+                  statusText: 'Unknown Status',
+                  body: undefined,
+                },
+                `Invalid response: response.status is ${response.status}. Response keys: ${responseKeys.join(', ')}. Response object: ${JSON.stringify(response)}`
+              )
+            }
+
             // Process response through interceptors
             // Create a Response-like object for interceptors
             const responseLike = {
@@ -314,21 +350,6 @@ export const request = <T>(
               transformedBody = await options.responseTransformer(responseBody)
             }
 
-            // Defensive check: ensure response has status
-            if (response.status === undefined || response.status === null) {
-              throw new ApiError(
-                options,
-                {
-                  url,
-                  ok: false,
-                  status: 0,
-                  statusText: 'Unknown Status',
-                  body: undefined,
-                },
-                `Invalid response: response.status is ${response.status}. Response object: ${JSON.stringify(response)}`
-              )
-            }
-
             const result: ApiResult = {
               url,
               ok: response.status >= 200 && response.status < 300,
@@ -341,7 +362,28 @@ export const request = <T>(
 
             resolve(result.body as T)
           } catch (error) {
-            reject(error)
+            // Handle any errors from cy.request() or processing
+            if (error instanceof ApiError) {
+              reject(error)
+            } else {
+              const errorMessage =
+                error && typeof error === 'object' && 'message' in error
+                  ? String(error.message)
+                  : String(error)
+              reject(
+                new ApiError(
+                  options,
+                  {
+                    url,
+                    ok: false,
+                    status: 0,
+                    statusText: 'Request Failed',
+                    body: undefined,
+                  },
+                  `cy.request() failed: ${errorMessage}`
+                )
+              )
+            }
           }
         })
       } catch (error) {
