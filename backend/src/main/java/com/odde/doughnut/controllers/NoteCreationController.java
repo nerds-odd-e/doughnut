@@ -72,7 +72,7 @@ class NoteCreationController {
             wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
     return new NoteCreationResult(
-        new NoteViewer(currentUser.getEntity(), note).toJsonObject(),
-        new NoteViewer(currentUser.getEntity(), note.getParent()).toJsonObject());
+        note.toNoteRealm(currentUser.getEntity()),
+        note.getParent().toNoteRealm(currentUser.getEntity()));
   }
 }

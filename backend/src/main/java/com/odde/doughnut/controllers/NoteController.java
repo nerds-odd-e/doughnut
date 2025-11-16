@@ -8,7 +8,6 @@ import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteMotionModel;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.WikidataService;
@@ -71,7 +70,7 @@ class NoteController {
       throw new BindException(bindingResult);
     }
     modelFactoryService.save(note);
-    return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
+    return note.toNoteRealm(currentUser.getEntity());
   }
 
   @GetMapping("/{note}")
@@ -79,7 +78,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertReadAuthorization(note);
     User user = currentUser.getEntity();
-    return new NoteViewer(user, note).toJsonObject();
+    return note.toNoteRealm(user);
   }
 
   @PatchMapping(
@@ -112,7 +111,7 @@ class NoteController {
     currentUser.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
     noteInfo.setMemoryTrackers(currentUser.getMemoryTrackersFor(note));
-    noteInfo.setNote(new NoteViewer(currentUser.getEntity(), note).toJsonObject());
+    noteInfo.setNote(note.toNoteRealm(currentUser.getEntity()));
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());
     return noteInfo;
@@ -127,7 +126,7 @@ class NoteController {
     modelFactoryService.entityManager.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
-      return List.of(new NoteViewer(currentUser.getEntity(), parentNote).toJsonObject());
+      return List.of(parentNote.toNoteRealm(currentUser.getEntity()));
     }
     return List.of();
   }
@@ -140,7 +139,7 @@ class NoteController {
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();
 
-    return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
+    return note.toNoteRealm(currentUser.getEntity());
   }
 
   @PostMapping(value = "/{note}/review-setting")
@@ -183,7 +182,7 @@ class NoteController {
 
     return Stream.of(parentBefore, note.getParent())
         .distinct()
-        .map(parent -> new NoteViewer(currentUser.getEntity(), parent).toJsonObject())
+        .map(parent -> parent.toNoteRealm(currentUser.getEntity()))
         .toList();
   }
 
@@ -194,7 +193,7 @@ class NoteController {
         .noteRepository
         .findRecentNotesByUser(currentUser.getEntity().getId())
         .stream()
-        .map(note -> new NoteViewer(currentUser.getEntity(), note).toJsonObject())
+        .map(note -> note.toNoteRealm(currentUser.getEntity()))
         .toList();
   }
 

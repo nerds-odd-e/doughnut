@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -74,9 +73,7 @@ public record NoteConstructionService(
     try {
       Note note =
           createNoteWithWikidataInfo(parentNote, wikidataIdWithApi, noteCreation.getNewTitle());
-      return new NoteCreationResult(
-          new NoteViewer(user, note).toJsonObject(),
-          new NoteViewer(user, parentNote).toJsonObject());
+      return new NoteCreationResult(note.toNoteRealm(user), parentNote.toNoteRealm(user));
     } catch (DuplicateWikidataIdException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(noteCreation, "noteCreation");
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
