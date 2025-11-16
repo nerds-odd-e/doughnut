@@ -7,10 +7,10 @@ import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
+import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
@@ -40,15 +40,18 @@ class NoteController {
   private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
+  private final NoteMotionService noteMotionService;
 
   public NoteController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      NoteMotionService noteMotionService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.noteMotionService = noteMotionService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -175,11 +178,9 @@ class NoteController {
     currentUser.assertAuthorization(targetNote);
 
     boolean asFirstChildBoolean = asFirstChild.compareToIgnoreCase("asFirstChild") == 0;
-    NoteMotionModel noteMotion =
-        modelFactoryService.motionOfMoveAfter(note, targetNote, asFirstChildBoolean);
-    noteMotion.validate();
+    noteMotionService.validate(note, targetNote, asFirstChildBoolean);
     Note parentBefore = note.getParent();
-    noteMotion.execute();
+    noteMotionService.execute(note, targetNote, asFirstChildBoolean);
 
     return Stream.of(parentBefore, note.getParent())
         .distinct()

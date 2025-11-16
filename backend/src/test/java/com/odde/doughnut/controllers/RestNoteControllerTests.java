@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -39,6 +40,7 @@ class NoteControllerTests {
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
+  @Autowired NoteMotionService noteMotionService;
   private UserModel userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -48,7 +50,8 @@ class NoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
 
     controller =
-        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
   }
 
   @Nested

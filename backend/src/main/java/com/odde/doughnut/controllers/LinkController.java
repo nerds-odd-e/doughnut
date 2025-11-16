@@ -10,6 +10,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -33,14 +34,17 @@ class LinkController {
   private final TestabilitySettings testabilitySettings;
 
   private UserModel currentUser;
+  private final NoteMotionService noteMotionService;
 
   public LinkController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      UserModel currentUser) {
+      UserModel currentUser,
+      NoteMotionService noteMotionService) {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
+    this.noteMotionService = noteMotionService;
   }
 
   @PostMapping(value = "/{link}")
@@ -65,9 +69,7 @@ class LinkController {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUser.assertAuthorization(sourceNote);
     currentUser.assertAuthorization(targetNote);
-    modelFactoryService
-        .motionOfMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild)
-        .execute();
+    noteMotionService.executeMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild);
     User user = currentUser.getEntity();
     return List.of(
         new NoteViewer(user, sourceNote).toJsonObject(),

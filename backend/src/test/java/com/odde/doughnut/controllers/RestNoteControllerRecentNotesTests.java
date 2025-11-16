@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
@@ -29,6 +30,7 @@ class NoteControllerRecentNotesTests {
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
+  @Autowired NoteMotionService noteMotionService;
   private UserModel userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -37,7 +39,8 @@ class NoteControllerRecentNotesTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
   }
 
   @Test
@@ -70,7 +73,8 @@ class NoteControllerRecentNotesTests {
   void shouldNotAllowAccessWhenNotLoggedIn() {
     userModel = makeMe.aNullUserModelPlease();
     controller =
-        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }

@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
@@ -33,6 +34,7 @@ class NoteControllerMotionTests {
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
+  @Autowired NoteMotionService noteMotionService;
   private UserModel userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -42,7 +44,8 @@ class NoteControllerMotionTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new NoteController(modelFactoryService, userModel, httpClientAdapter, testabilitySettings);
+        new NoteController(
+            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 
