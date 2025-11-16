@@ -1,0 +1,19 @@
+apis:
+  main:
+    root: open_api_docs.yaml
+
+extends:
+  - recommended
+
+rules:
+  operation-operationId-unique: error
+  no-duplicated-tag-names: error
+  operation-summary: off
+  struct: off
+  security-defined: off
+  operation-4xx-response: off
+  no-ambiguous-paths: off
+  info-license: off
+  no-identical-paths: off
+  path-parameters-defined: off
+
