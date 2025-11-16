@@ -124,11 +124,6 @@ public class ModelFactoryService {
     return new Authorization(entity, this);
   }
 
-  public SuggestedQuestionForFineTuningModel toSuggestedQuestionForFineTuningService(
-      SuggestedQuestionForFineTuning suggestion) {
-    return new SuggestedQuestionForFineTuningModel(suggestion, this);
-  }
-
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
       entityManager.persist(entity);

@@ -414,7 +414,6 @@ This aligns tests with the stateless services architecture and makes them simple
 - `SubscriptionModel` → `SubscriptionService`
 - `NoteMotionModel` → `NoteMotionService` or integrate into `NoteService`
 - `BazaarModel` → `BazaarService`
-- `SuggestedQuestionForFineTuningModel` → `SuggestedQuestionForFineTuningService`
 
 ### Supporting Classes
 

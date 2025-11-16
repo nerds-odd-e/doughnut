@@ -6,6 +6,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.FineTuningService;
+import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.theokanning.openai.client.OpenAiApi;
@@ -24,13 +25,16 @@ class FineTuningDataController {
   private final UserModel currentUser;
   private final FineTuningService fineTuningService;
   private final OtherAiServices otherAiServices;
+  private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
 
   public FineTuningDataController(
       ModelFactoryService modelFactoryService,
+      SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       UserModel currentUser,
       OpenAiApi openAiApi,
       OtherAiServices otherAiServices) {
     this.modelFactoryService = modelFactoryService;
+    this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.currentUser = currentUser;
     this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
     this.otherAiServices = otherAiServices;
@@ -44,9 +48,7 @@ class FineTuningDataController {
       @RequestBody QuestionSuggestionParams suggestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return modelFactoryService
-        .toSuggestedQuestionForFineTuningService(suggestedQuestion)
-        .update(suggestion);
+    return suggestedQuestionForFineTuningService.update(suggestedQuestion, suggestion);
   }
 
   @PostMapping("/{suggestedQuestion}/duplicate")
@@ -56,9 +58,7 @@ class FineTuningDataController {
           SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return modelFactoryService
-        .toSuggestedQuestionForFineTuningService(suggestedQuestion)
-        .duplicate();
+    return suggestedQuestionForFineTuningService.duplicate(suggestedQuestion);
   }
 
   @PostMapping("/{suggestedQuestion}/delete")
@@ -68,7 +68,7 @@ class FineTuningDataController {
           SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAdminAuthorization();
-    return modelFactoryService.toSuggestedQuestionForFineTuningService(suggestedQuestion).delete();
+    return suggestedQuestionForFineTuningService.delete(suggestedQuestion);
   }
 
   @PostMapping("/upload-and-trigger-fine-tuning")
