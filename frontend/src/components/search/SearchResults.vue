@@ -236,6 +236,16 @@ watch(
   () => props.inputSearchKey,
   () => {
     searchTerm.value.searchKey = props.inputSearchKey
+    // When search key is empty and we have a noteId (dropdown mode in notebook context),
+    // set recentResult to empty array to show "Similar notes within the same notebook"
+    // instead of "Searching ..."
+    if (
+      props.inputSearchKey.trim() === "" &&
+      props.noteId &&
+      props.isDropdown
+    ) {
+      recentResult.value = []
+    }
   }
 )
 
@@ -245,6 +255,12 @@ onMounted(() => {
     searchTerm.value.allMyNotebooksAndSubscriptions = true
   }
   searchTerm.value.searchKey = props.inputSearchKey
+  // When search key is empty and we have a noteId (dropdown mode in notebook context),
+  // set recentResult to empty array to show "Similar notes within the same notebook"
+  // instead of "Searching ..."
+  if (props.inputSearchKey.trim() === "" && props.noteId && props.isDropdown) {
+    recentResult.value = []
+  }
 })
 
 onBeforeUnmount(() => {

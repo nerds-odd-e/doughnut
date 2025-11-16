@@ -57,6 +57,19 @@ describe("SearchResults.vue", () => {
     vi.useRealTimers()
   })
 
+  it("shows 'Similar notes within the same notebook' when search key is empty in dropdown mode with noteId", async () => {
+    const wrapper = helper
+      .component(SearchResults)
+      .withProps({ inputSearchKey: "", noteId: 1, isDropdown: true })
+      .mount()
+
+    await nextTick()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Similar notes within the same notebook")
+    expect(wrapper.text()).not.toContain("Searching ...")
+  })
+
   it("shows 'No matching notes found.' when results are empty in non-dropdown mode", async () => {
     vi.useFakeTimers()
 
