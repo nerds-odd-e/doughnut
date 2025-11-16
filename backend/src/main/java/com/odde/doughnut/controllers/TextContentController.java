@@ -6,7 +6,6 @@ import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -61,6 +60,6 @@ class TextContentController {
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     modelFactoryService.save(note);
-    return new NoteViewer(currentUser.getEntity(), note).toJsonObject();
+    return note.toNoteRealm(currentUser.getEntity());
   }
 }

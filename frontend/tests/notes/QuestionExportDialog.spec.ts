@@ -16,6 +16,9 @@ vitest.mock("vue-router", () => ({
 describe("QuestionExportDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.spyOn(console, "error").mockImplementation(() => {
+      // Suppress console.error in tests
+    })
   })
 
   it("fetches and displays export content", async () => {

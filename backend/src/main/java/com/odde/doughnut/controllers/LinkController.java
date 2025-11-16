@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -71,9 +70,7 @@ class LinkController {
     currentUser.assertAuthorization(targetNote);
     noteMotionService.executeMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild);
     User user = currentUser.getEntity();
-    return List.of(
-        new NoteViewer(user, sourceNote).toJsonObject(),
-        new NoteViewer(user, targetNote).toJsonObject());
+    return List.of(sourceNote.toNoteRealm(user), targetNote.toNoteRealm(user));
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
@@ -102,9 +99,6 @@ class LinkController {
   private List<NoteRealm> getNoteRealm(Note link, User user) {
     Note nt = modelFactoryService.entityManager.find(Note.class, link.getTargetNote().getId());
     Note np = modelFactoryService.entityManager.find(Note.class, link.getParent().getId());
-    return List.of(
-        new NoteViewer(user, link).toJsonObject(),
-        new NoteViewer(user, nt).toJsonObject(),
-        new NoteViewer(user, np).toJsonObject());
+    return List.of(link.toNoteRealm(user), nt.toNoteRealm(user), np.toNoteRealm(user));
   }
 }
