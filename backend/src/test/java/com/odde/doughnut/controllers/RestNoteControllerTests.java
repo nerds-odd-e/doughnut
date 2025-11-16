@@ -51,7 +51,11 @@ class NoteControllerTests {
 
     controller =
         new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            noteMotionService);
   }
 
   @Nested

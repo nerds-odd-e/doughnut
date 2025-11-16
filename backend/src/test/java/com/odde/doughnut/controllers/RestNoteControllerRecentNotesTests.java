@@ -40,7 +40,11 @@ class NoteControllerRecentNotesTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            noteMotionService);
   }
 
   @Test
@@ -74,7 +78,11 @@ class NoteControllerRecentNotesTests {
     userModel = makeMe.aNullUserModelPlease();
     controller =
         new NoteController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteMotionService);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            noteMotionService);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }
