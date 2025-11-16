@@ -8,8 +8,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.PredefinedQuestionService;
+import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -130,9 +130,9 @@ class PredefinedQuestionController {
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
-    var request =
-        NoteQuestionGenerationService.buildQuestionGenerationRequest(
-            globalSettingsService, note, objectMapper, null);
+    QuestionGenerationRequestBuilder requestBuilder =
+        new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
+    var request = requestBuilder.buildQuestionGenerationRequest(note, null);
     String title = note.getTopicConstructor();
     return new ConversationExportResponse(request, title);
   }

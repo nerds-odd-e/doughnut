@@ -18,6 +18,7 @@ public class NoteQuestionGenerationService {
   private final Note note;
   private final OpenAiApiHandler openAiApiHandler;
   private final ObjectMapper objectMapper;
+  private final QuestionGenerationRequestBuilder requestBuilder;
 
   public NoteQuestionGenerationService(
       GlobalSettingsService globalSettingsService,
@@ -28,6 +29,7 @@ public class NoteQuestionGenerationService {
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
+    this.requestBuilder = new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
   }
 
   public MCQWithAnswer generateQuestion(MessageRequest additionalMessage)
@@ -36,35 +38,11 @@ public class NoteQuestionGenerationService {
   }
 
   public ChatCompletionRequest buildQuestionGenerationRequest(MessageRequest additionalMessage) {
-    return buildQuestionGenerationRequest(
-        globalSettingsService, note, objectMapper, additionalMessage);
-  }
-
-  public static ChatCompletionRequest buildQuestionGenerationRequest(
-      GlobalSettingsService globalSettingsService,
-      Note note,
-      ObjectMapper objectMapper,
-      MessageRequest additionalMessage) {
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        getChatRequestBuilder(globalSettingsService, note, objectMapper);
-
-    String instructions = note.getNotebookAssistantInstructions();
-    if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addSystemMessage(instructions);
-    }
-
-    // Add the question generation instruction (this also sets up JSON schema response format)
-    chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool());
-    // Add any additional message if provided (after the question generation instruction)
-    if (additionalMessage != null) {
-      chatRequestBuilder.addUserMessage(additionalMessage.getContent().toString());
-    }
-    return chatRequestBuilder.build();
+    return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
   }
 
   private MCQWithAnswer generateQuestionWithChatCompletion(MessageRequest additionalMessage) {
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        getChatRequestBuilder(globalSettingsService, note, objectMapper);
+    OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
@@ -104,8 +82,7 @@ public class NoteQuestionGenerationService {
   }
 
   private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(MCQWithAnswer question) {
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        getChatRequestBuilder(globalSettingsService, note, objectMapper);
+    OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
@@ -128,12 +105,5 @@ public class NoteQuestionGenerationService {
             throw new RuntimeException(e);
           }
         });
-  }
-
-  private static OpenAIChatRequestBuilder getChatRequestBuilder(
-      GlobalSettingsService globalSettingsService, Note note, ObjectMapper objectMapper) {
-    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    String noteDescription = note.getGraphRAGDescription(objectMapper);
-    return new OpenAIChatRequestBuilder().model(modelName).addSystemMessage(noteDescription);
   }
 }
