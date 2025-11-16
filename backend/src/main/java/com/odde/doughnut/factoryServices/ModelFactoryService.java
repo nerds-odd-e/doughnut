@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.NotebookService;
+import com.odde.doughnut.services.TimestampService;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
@@ -39,6 +40,7 @@ public class ModelFactoryService {
 
   @Autowired public NoteEmbeddingRepository noteEmbeddingRepository;
   @Autowired public NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
+  @Autowired public TimestampService timestampService;
 
   public void storeNoteEmbedding(Note note, java.util.List<Float> embedding) {
     noteEmbeddingJdbcRepository.insert(note.getId(), embedding);
@@ -113,7 +115,7 @@ public class ModelFactoryService {
   }
 
   public UserModel toUserModel(User user) {
-    return new UserModel(user, this);
+    return new UserModel(user, this, timestampService);
   }
 
   public SubscriptionModel toSubscriptionModel(Subscription sub) {

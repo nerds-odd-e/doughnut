@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.models.TimestampOperations;
+import com.odde.doughnut.services.TimestampService;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -79,8 +79,8 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
 
   private MemoryTracker() {}
 
-  public Timestamp calculateNextRecallAt() {
-    return TimestampOperations.addHoursToTimestamp(
+  public Timestamp calculateNextRecallAt(TimestampService timestampService) {
+    return timestampService.addHoursToTimestamp(
         getLastRecalledAt(), forgettingCurve().getRepeatInHours());
   }
 
@@ -88,27 +88,30 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getForgettingCurveIndex());
   }
 
-  public void reviewFailed(Timestamp currentUTCTimestamp) {
+  public void reviewFailed(Timestamp currentUTCTimestamp, TimestampService timestampService) {
     setForgettingCurveIndex(forgettingCurve().failed());
-    setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+    setNextRecallAt(timestampService.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
 
-  public void reviewedSuccessfully(Timestamp currentUTCTimestamp) {
+  public void reviewedSuccessfully(
+      Timestamp currentUTCTimestamp, TimestampService timestampService) {
     long delayInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextRecallAt());
+        timestampService.getDiffInHours(
+            currentUTCTimestamp, calculateNextRecallAt(timestampService));
 
     setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours));
 
     setLastRecalledAt(currentUTCTimestamp);
-    setNextRecallAt(calculateNextRecallAt());
+    setNextRecallAt(calculateNextRecallAt(timestampService));
   }
 
-  public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {
+  public void markAsRepeated(
+      Timestamp currentUTCTimestamp, boolean successful, TimestampService timestampService) {
     setRepetitionCount(getRepetitionCount() + 1);
     if (successful) {
-      reviewedSuccessfully(currentUTCTimestamp);
+      reviewedSuccessfully(currentUTCTimestamp, timestampService);
     } else {
-      reviewFailed(currentUTCTimestamp);
+      reviewFailed(currentUTCTimestamp, timestampService);
     }
   }
 }

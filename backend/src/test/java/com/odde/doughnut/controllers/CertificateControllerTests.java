@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CertificateControllerTests {
   public static final int oneYearInHours = 8760;
   @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
   private UserModel currentUser;
   private CertificateController controller;
   Timestamp currentTime;
@@ -60,7 +61,7 @@ public class CertificateControllerTests {
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
       Timestamp expiryDate =
-          TimestampOperations.addHoursToTimestamp(
+          timestampService.addHoursToTimestamp(
               new Timestamp(currentTime.getTime()), oneYearInHours);
       assertEquals(expiryDate, cert.getExpiryDate());
     }
@@ -70,7 +71,7 @@ public class CertificateControllerTests {
       makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(20, 20).please();
       Timestamp currentTimeAtStart = currentTime;
       Timestamp newStartDate =
-          TimestampOperations.addHoursToTimestamp(
+          timestampService.addHoursToTimestamp(
               new Timestamp(currentTime.getTime()), oneYearInHours);
       testabilitySettings.timeTravelTo(newStartDate);
       Certificate certLater = controller.claimCertificate(notebook);

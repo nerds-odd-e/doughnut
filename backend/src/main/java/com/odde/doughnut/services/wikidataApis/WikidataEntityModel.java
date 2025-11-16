@@ -1,14 +1,18 @@
 package com.odde.doughnut.services.wikidataApis;
 
 import com.odde.doughnut.entities.Coordinate;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntity;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WikidataEntityModel extends WikidataEntityModelOfProperties {
-  public WikidataEntityModel(WikidataEntity entity) {
+  private final TimestampService timestampService;
+
+  public WikidataEntityModel(WikidataEntity entity, TimestampService timestampService) {
     super(entity);
+    this.timestampService = timestampService;
   }
 
   private Boolean isHuman() {
@@ -24,7 +28,7 @@ public class WikidataEntityModel extends WikidataEntityModelOfProperties {
             getCountryOfOriginValue()
                 .flatMap(
                     wikidataId1 -> wikidataId1.withApi(wikidataApi).fetchEnglishTitleFromApi()),
-            getBirthdayValue().map(WikidataValue::formattedTime))
+            getBirthdayValue().map(value -> value.formattedTime(timestampService)))
         .filter(Optional::isPresent)
         .map(Optional::get)
         .filter(value -> !value.isBlank())

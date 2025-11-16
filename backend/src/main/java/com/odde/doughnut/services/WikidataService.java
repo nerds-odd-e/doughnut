@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.util.List;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public record WikidataService(WikidataApi wikidataApi) {
-  public WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
+public record WikidataService(WikidataApi wikidataApi, TimestampService timestampService) {
+  public WikidataService(
+      HttpClientAdapter httpClientAdapter, String wikidataUrl, TimestampService timestampService) {
     this(
         new WikidataApi(
-            new QueryBuilder(httpClientAdapter, UriComponentsBuilder.fromHttpUrl(wikidataUrl))));
+            new QueryBuilder(httpClientAdapter, UriComponentsBuilder.fromHttpUrl(wikidataUrl))),
+        timestampService);
   }
 
   public List<WikidataSearchEntity> searchWikidata(String search)
@@ -21,6 +23,6 @@ public record WikidataService(WikidataApi wikidataApi) {
   }
 
   public WikidataIdWithApi wrapWikidataIdWithApi(String wikidataId) {
-    return new WikidataId(wikidataId).withApi(wikidataApi);
+    return new WikidataId(wikidataId).withApi(wikidataApi, timestampService);
   }
 }

@@ -11,6 +11,7 @@ import com.odde.doughnut.models.NoteMotionModel;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
@@ -45,12 +46,14 @@ class NoteController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      TimestampService timestampService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+        new WikidataService(
+            httpClientAdapter, testabilitySettings.getWikidataServiceUrl(), timestampService);
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")

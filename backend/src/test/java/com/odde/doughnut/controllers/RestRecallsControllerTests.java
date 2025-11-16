@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -29,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 class RecallsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -37,12 +38,14 @@ class RecallsControllerTests {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RecallsController(modelFactoryService, currentUser, testabilitySettings);
+    controller =
+        new RecallsController(
+            modelFactoryService, currentUser, testabilitySettings, timestampService);
   }
 
   RecallsController nullUserController() {
     return new RecallsController(
-        modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings, timestampService);
   }
 
   @Nested
@@ -61,7 +64,7 @@ class RecallsControllerTests {
       RecallStatus status = controller.overview("Asia/Shanghai");
 
       assertEquals(
-          TimestampOperations.addHoursToTimestamp(currentTime, 24), status.getRecallWindowEndAt());
+          timestampService.addHoursToTimestamp(currentTime, 24), status.getRecallWindowEndAt());
     }
   }
 
@@ -94,7 +97,7 @@ class RecallsControllerTests {
       testabilitySettings.timeTravelTo(currentTime);
       makeMe
           .aMemoryTrackerBy(currentUser)
-          .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
+          .nextRecallAt(timestampService.addHoursToTimestamp(currentTime, nextRecallAtHours))
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(expectedCount));
@@ -111,7 +114,7 @@ class RecallsControllerTests {
       assertEquals(1, dueMemoryTrackers.toRepeatCount);
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertEquals(
-          TimestampOperations.addHoursToTimestamp(currentTime, 24),
+          timestampService.addHoursToTimestamp(currentTime, 24),
           dueMemoryTrackers.getRecallWindowEndAt());
     }
   }

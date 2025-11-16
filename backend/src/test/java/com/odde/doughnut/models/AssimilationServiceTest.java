@@ -36,7 +36,11 @@ public class AssimilationServiceTest {
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     assimilationService =
         new AssimilationService(
-            userModel, makeMe.modelFactoryService, day1, ZoneId.of("Asia/Shanghai"));
+            userModel,
+            makeMe.modelFactoryService,
+            day1,
+            ZoneId.of("Asia/Shanghai"),
+            makeMe.getTimestampService());
   }
 
   @Test
@@ -187,7 +191,11 @@ public class AssimilationServiceTest {
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
-                userModel, makeMe.modelFactoryService, day1_23, ZoneId.of("Asia/Shanghai"));
+                userModel,
+                makeMe.modelFactoryService,
+                day1_23,
+                ZoneId.of("Asia/Shanghai"),
+                makeMe.getTimestampService());
         assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
 
@@ -197,7 +205,11 @@ public class AssimilationServiceTest {
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
-                userModel, makeMe.modelFactoryService, day2, ZoneId.of("Asia/Shanghai"));
+                userModel,
+                makeMe.modelFactoryService,
+                day2,
+                ZoneId.of("Asia/Shanghai"),
+                makeMe.getTimestampService());
         assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
     }
@@ -306,7 +318,11 @@ public class AssimilationServiceTest {
       // Create service for early morning check
       earlyMorningService =
           new AssimilationService(
-              userModel, makeMe.modelFactoryService, lateMorning, ZoneId.of("Asia/Shanghai"));
+              userModel,
+              makeMe.modelFactoryService,
+              lateMorning,
+              ZoneId.of("Asia/Shanghai"),
+              makeMe.getTimestampService());
     }
 
     @Test

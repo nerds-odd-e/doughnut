@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -44,10 +45,12 @@ public class McpNoteCreationController {
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteSearchService noteSearchService,
-      NoteRepository noteRepository) {
+      NoteRepository noteRepository,
+      TimestampService timestampService) {
     this.currentUser = currentUser;
     this.wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+        new WikidataService(
+            httpClientAdapter, testabilitySettings.getWikidataServiceUrl(), timestampService);
     this.noteConstructionService =
         new NoteConstructionService(
             currentUser.getEntity(),

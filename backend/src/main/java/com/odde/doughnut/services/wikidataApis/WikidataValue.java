@@ -2,7 +2,7 @@ package com.odde.doughnut.services.wikidataApis;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.entities.Coordinate;
-import com.odde.doughnut.models.TimestampOperations;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataDatavalue;
 
 public record WikidataValue(WikidataDatavalue datavalue) {
@@ -21,7 +21,7 @@ public record WikidataValue(WikidataDatavalue datavalue) {
     return new Coordinate(datavalue.mustGetStringValue());
   }
 
-  public String formattedTime() {
-    return TimestampOperations.formatISOTimeToYearSupportingBC(datavalue.mustGetISOTime());
+  public String formattedTime(TimestampService timestampService) {
+    return timestampService.formatISOTimeToYearSupportingBC(datavalue.mustGetISOTime());
   }
 }

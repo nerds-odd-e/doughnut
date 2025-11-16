@@ -31,7 +31,8 @@ public class MemoryTrackerServiceTest {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    memoryTrackerService = new MemoryTrackerService(modelFactoryService);
+    memoryTrackerService =
+        new MemoryTrackerService(modelFactoryService, makeMe.getTimestampService());
   }
 
   @Nested

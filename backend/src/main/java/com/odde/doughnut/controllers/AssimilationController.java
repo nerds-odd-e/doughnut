@@ -7,6 +7,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
@@ -23,6 +24,7 @@ class AssimilationController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final MemoryTrackerService memoryTrackerService;
+  private final TimestampService timestampService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -30,11 +32,13 @@ class AssimilationController {
   public AssimilationController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      TimestampService timestampService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
+    this.timestampService = timestampService;
+    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService, timestampService);
   }
 
   @GetMapping("/assimilating")
@@ -44,7 +48,8 @@ class AssimilationController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    return new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
+    return new AssimilationService(
+            currentUser, modelFactoryService, currentUTCTimestamp, timeZone, timestampService)
         .getNotesToAssimilate()
         .toList();
   }
@@ -65,7 +70,8 @@ class AssimilationController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    return new AssimilationService(currentUser, modelFactoryService, currentUTCTimestamp, timeZone)
+    return new AssimilationService(
+            currentUser, modelFactoryService, currentUTCTimestamp, timeZone, timestampService)
         .getCounts();
   }
 }

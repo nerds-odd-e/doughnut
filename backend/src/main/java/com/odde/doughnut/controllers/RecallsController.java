@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.RecallService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
@@ -22,6 +23,7 @@ import org.springframework.web.context.annotation.SessionScope;
 class RecallsController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
+  private final TimestampService timestampService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -29,10 +31,12 @@ class RecallsController {
   public RecallsController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      TimestampService timestampService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.timestampService = timestampService;
   }
 
   @GetMapping("/overview")
@@ -41,7 +45,8 @@ class RecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+    return new RecallService(
+            currentUser, currentUTCTimestamp, timeZone, modelFactoryService, timestampService)
         .getRecallStatus();
   }
 
@@ -53,7 +58,8 @@ class RecallsController {
     currentUser.assertLoggedIn();
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+    return new RecallService(
+            currentUser, currentUTCTimestamp, timeZone, modelFactoryService, timestampService)
         .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -18,16 +17,19 @@ public class RecallService {
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
   private final ModelFactoryService modelFactoryService;
+  private final TimestampService timestampService;
 
   public RecallService(
       UserModel userModel,
       Timestamp currentUTCTimestamp,
       ZoneId timeZone,
-      ModelFactoryService modelFactoryService) {
+      ModelFactoryService modelFactoryService,
+      TimestampService timestampService) {
     this.userModel = userModel;
     this.currentUTCTimestamp = currentUTCTimestamp;
     this.timeZone = timeZone;
     this.modelFactoryService = modelFactoryService;
+    this.timestampService = timestampService;
   }
 
   private int totalAssimilatedCount() {
@@ -37,7 +39,7 @@ public class RecallService {
 
   private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(int dueInDays) {
     return userModel.getMemoryTrackerNeedToRepeat(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
+        timestampService.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
   }
 
   public RecallStatus getRecallStatus() {
@@ -45,7 +47,7 @@ public class RecallService {
     recallStatus.toRepeatCount = getToRecallCount();
     recallStatus.totalAssimilatedCount = totalAssimilatedCount();
     recallStatus.setRecallWindowEndAt(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
+        timestampService.addHoursToTimestamp(currentUTCTimestamp, 24));
     return recallStatus;
   }
 

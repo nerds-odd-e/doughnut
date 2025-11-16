@@ -15,8 +15,8 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -36,6 +36,7 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   private UserModel userModel;
@@ -348,7 +349,7 @@ class MemoryTrackerControllerTest {
         assertThat(
             memoryTracker.getNextRecallAt(),
             lessThan(
-                TimestampOperations.addHoursToTimestamp(
+                timestampService.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
     }

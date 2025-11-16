@@ -9,8 +9,8 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -37,6 +37,7 @@ class NoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   private UserModel userModel;
@@ -194,7 +195,7 @@ class NoteControllerTests {
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(child);
 
-        timestamp = TimestampOperations.addHoursToTimestamp(timestamp, 1);
+        timestamp = timestampService.addHoursToTimestamp(timestamp, 1);
         testabilitySettings.timeTravelTo(timestamp);
         controller.deleteNote(subject);
 

@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RecallServiceWithSpacedRepetitionAlgorithmTest {
   @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
   UserModel userModel;
   UserModel anotherUser;
 
@@ -113,9 +115,8 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
         MemoryTracker memoryTracker =
             makeMe.aMemoryTrackerFor(note).by(userModel).afterNthStrictRepetition(ntimes).please();
         Timestamp currentUTCTimestamp =
-            TimestampOperations.addHoursToTimestamp(
-                memoryTracker.getNextRecallAt(), daysDelay * 24);
-        memoryTracker.markAsRepeated(currentUTCTimestamp, true);
+            timestampService.addHoursToTimestamp(memoryTracker.getNextRecallAt(), daysDelay * 24);
+        memoryTracker.markAsRepeated(currentUTCTimestamp, true, timestampService);
         assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
       }
     }
@@ -129,7 +130,6 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
   }
 
   private Timestamp daysAfterBase(MemoryTracker memoryTracker, Integer reviewDay) {
-    return TimestampOperations.addHoursToTimestamp(
-        memoryTracker.getLastRecalledAt(), reviewDay * 24);
+    return timestampService.addHoursToTimestamp(memoryTracker.getLastRecalledAt(), reviewDay * 24);
   }
 }

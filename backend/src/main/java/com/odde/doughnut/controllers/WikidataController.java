@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.WikidataEntityData;
 import com.odde.doughnut.controllers.dto.WikidataSearchEntity;
 import com.odde.doughnut.exceptions.WikidataServiceErrorException;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -24,9 +25,12 @@ public class WikidataController {
   WikidataService wikidataService;
 
   public WikidataController(
-      TestabilitySettings testabilitySettings, HttpClientAdapter httpClientAdapter) {
+      TestabilitySettings testabilitySettings,
+      HttpClientAdapter httpClientAdapter,
+      TimestampService timestampService) {
     wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+        new WikidataService(
+            httpClientAdapter, testabilitySettings.getWikidataServiceUrl(), timestampService);
   }
 
   @GetMapping("/entity-data/{wikidataId}")

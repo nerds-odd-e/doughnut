@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -9,39 +9,39 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import org.springframework.stereotype.Service;
 
-public abstract class TimestampOperations {
-  public static Timestamp addHoursToTimestamp(Timestamp timestamp, int hoursToAdd) {
+@Service
+public class TimestampService {
+  public Timestamp addHoursToTimestamp(Timestamp timestamp, int hoursToAdd) {
     ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.of("UTC"));
     return Timestamp.from(zonedDateTime.plusHours(hoursToAdd).toInstant());
   }
 
-  public static int getDayId(Timestamp timestamp, ZoneId timeZone) {
-    ZonedDateTime userLocalDateTime = TimestampOperations.getZonedDateTime(timestamp, timeZone);
+  public int getDayId(Timestamp timestamp, ZoneId timeZone) {
+    ZonedDateTime userLocalDateTime = getZonedDateTime(timestamp, timeZone);
     return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
   }
 
-  public static Timestamp alignByHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
+  public Timestamp alignByHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final ZonedDateTime alignedZonedDt = alignDayAndHourByHalfADay(currentUTCTimestamp, timeZone);
     return Timestamp.from(alignedZonedDt.withMinute(0).withSecond(0).toInstant());
   }
 
-  private static ZonedDateTime alignDayAndHourByHalfADay(
-      Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    final ZonedDateTime zonedDateTime =
-        TimestampOperations.getZonedDateTime(currentUTCTimestamp, timeZone);
+  private ZonedDateTime alignDayAndHourByHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    final ZonedDateTime zonedDateTime = getZonedDateTime(currentUTCTimestamp, timeZone);
     if (zonedDateTime.getHour() < 12) {
       return zonedDateTime.withHour(12);
     }
     return zonedDateTime.plusDays(1).withHour(0);
   }
 
-  public static ZonedDateTime getZonedDateTime(Timestamp timestamp, ZoneId timeZone) {
+  public ZonedDateTime getZonedDateTime(Timestamp timestamp, ZoneId timeZone) {
     ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
     return systemLocalDateTime.withZoneSameInstant(timeZone);
   }
 
-  public static long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextRecallAt) {
+  public long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextRecallAt) {
     long diff = currentUTCTimestamp.getTime() - nextRecallAt.getTime();
     return TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS);
   }
@@ -53,7 +53,7 @@ public abstract class TimestampOperations {
    * @param inputTime ISO time string (e.g., "2020-01-01T00:00:00Z", "-0044-03-15T00:00:00Z")
    * @return Formatted date string (e.g., "01 January 2020", "January 1170", "1170", "1171 B.C.")
    */
-  public static String formatISOTimeToYearSupportingBC(String inputTime) {
+  public String formatISOTimeToYearSupportingBC(String inputTime) {
     DateTimeFormatter formatter =
         DateTimeFormatter.ofPattern("dd MMMM yyyy")
             .withZone(ZoneId.systemDefault())
@@ -124,7 +124,7 @@ public abstract class TimestampOperations {
     }
   }
 
-  public static Timestamp getStartOfDay(Timestamp timestamp, ZoneId zoneId) {
+  public Timestamp getStartOfDay(Timestamp timestamp, ZoneId zoneId) {
     LocalDateTime localDateTime =
         timestamp
             .toInstant()

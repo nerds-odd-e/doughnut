@@ -12,11 +12,18 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.TimestampOperations;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
+@SpringBootTest
+@ActiveProfiles("test")
 public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
+  @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
   final int currentForgettingCurveIndex =
       DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2;
   final int baselineForgettingCurveIndex =
@@ -76,13 +83,13 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
   }
 
   private int getNextForgettingCurveIndexWithDelay(int delayInHours) {
-    MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
     User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
     Note note = makeMe.aNote().inMemoryPlease();
     MemoryTracker memoryTracker =
         makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
     memoryTracker.reviewedSuccessfully(
-        TimestampOperations.addHoursToTimestamp(memoryTracker.getNextRecallAt(), delayInHours));
+        timestampService.addHoursToTimestamp(memoryTracker.getNextRecallAt(), delayInHours),
+        timestampService);
     return memoryTracker.getForgettingCurveIndex();
   }
 }

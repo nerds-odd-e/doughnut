@@ -15,9 +15,12 @@ import java.util.List;
 
 public class MemoryTrackerService {
   private final ModelFactoryService modelFactoryService;
+  private final TimestampService timestampService;
 
-  public MemoryTrackerService(ModelFactoryService modelFactoryService) {
+  public MemoryTrackerService(
+      ModelFactoryService modelFactoryService, TimestampService timestampService) {
     this.modelFactoryService = modelFactoryService;
+    this.timestampService = timestampService;
   }
 
   public List<MemoryTracker> assimilate(
@@ -66,7 +69,7 @@ public class MemoryTrackerService {
 
   public void updateForgettingCurve(MemoryTracker memoryTracker, int adjustment) {
     memoryTracker.setForgettingCurveIndex(memoryTracker.getForgettingCurveIndex() + adjustment);
-    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+    memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt(timestampService));
     modelFactoryService.save(memoryTracker);
   }
 
@@ -87,7 +90,7 @@ public class MemoryTrackerService {
 
   public void markAsRepeated(
       Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker) {
-    memoryTracker.markAsRepeated(currentUTCTimestamp, correct);
+    memoryTracker.markAsRepeated(currentUTCTimestamp, correct, timestampService);
     modelFactoryService.save(memoryTracker);
   }
 

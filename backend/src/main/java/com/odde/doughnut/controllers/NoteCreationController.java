@@ -28,10 +28,12 @@ class NoteCreationController {
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      TimestampService timestampService) {
     this.currentUser = currentUser;
     this.wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+        new WikidataService(
+            httpClientAdapter, testabilitySettings.getWikidataServiceUrl(), timestampService);
     this.noteConstructionService =
         new NoteConstructionService(
             currentUser.getEntity(),

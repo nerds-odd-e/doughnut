@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.WikidataEntityData;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.wikidataApis.thirdPartyEntities.WikidataEntityHash;
 import java.io.IOException;
 import java.util.Objects;
@@ -14,15 +15,19 @@ import org.apache.logging.log4j.util.Strings;
 public final class WikidataIdWithApi {
   private final String wikidataId;
   private final WikidataApi wikidataApi;
+  private final TimestampService timestampService;
 
-  public static WikidataIdWithApi create(String wikidataId, WikidataApi wikidataApi) {
+  public static WikidataIdWithApi create(
+      String wikidataId, WikidataApi wikidataApi, TimestampService timestampService) {
     if (Strings.isBlank(wikidataId)) return null;
-    return new WikidataIdWithApi(wikidataId, wikidataApi);
+    return new WikidataIdWithApi(wikidataId, wikidataApi, timestampService);
   }
 
-  private WikidataIdWithApi(String wikidataId, WikidataApi wikidataApi) {
+  private WikidataIdWithApi(
+      String wikidataId, WikidataApi wikidataApi, TimestampService timestampService) {
     this.wikidataId = wikidataId;
     this.wikidataApi = wikidataApi;
+    this.timestampService = timestampService;
   }
 
   public Optional<String> fetchEnglishTitleFromApi() {
@@ -37,7 +42,7 @@ public final class WikidataIdWithApi {
       throws IOException, InterruptedException {
     WikidataEntityHash entityHash = wikidataApi.getEntityHashById(wikidataId);
     if (entityHash == null) return Optional.empty();
-    return entityHash.getEntityModel(wikidataId);
+    return entityHash.getEntityModel(wikidataId, timestampService);
   }
 
   public void extractWikidataInfoToNote(Note note) throws IOException, InterruptedException {

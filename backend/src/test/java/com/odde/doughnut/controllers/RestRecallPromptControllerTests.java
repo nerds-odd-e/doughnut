@@ -12,9 +12,9 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -43,6 +43,7 @@ class RecallPromptControllerTests {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired TimestampService timestampService;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -168,7 +169,7 @@ class RecallPromptControllerTests {
         assertThat(
             memoryTracker.getNextRecallAt(),
             lessThan(
-                TimestampOperations.addHoursToTimestamp(
+                timestampService.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
     }

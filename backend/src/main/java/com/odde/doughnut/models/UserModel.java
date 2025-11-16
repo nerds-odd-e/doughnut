@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.TimestampService;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.List;
@@ -15,10 +16,13 @@ public class UserModel implements ReviewScope {
 
   @Getter protected final User entity;
   protected final ModelFactoryService modelFactoryService;
+  private final TimestampService timestampService;
 
-  public UserModel(User user, ModelFactoryService modelFactoryService) {
+  public UserModel(
+      User user, ModelFactoryService modelFactoryService, TimestampService timestampService) {
     this.entity = user;
     this.modelFactoryService = modelFactoryService;
+    this.timestampService = timestampService;
   }
 
   private Authorization getAuthorization() {
@@ -57,7 +61,7 @@ public class UserModel implements ReviewScope {
 
   public Stream<MemoryTracker> getMemoryTrackerNeedToRepeat(
       Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
+    final Timestamp timestamp = timestampService.alignByHalfADay(currentUTCTimestamp, timeZone);
     return modelFactoryService.memoryTrackerRepository
         .findAllByUserAndNextRecallAtLessThanEqualOrderByNextRecallAt(entity.getId(), timestamp);
   }

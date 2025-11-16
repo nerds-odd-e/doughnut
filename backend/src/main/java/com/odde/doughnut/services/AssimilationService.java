@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewScope;
 import com.odde.doughnut.models.SubscriptionModel;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -18,16 +17,19 @@ public class AssimilationService {
   private final ModelFactoryService modelFactoryService;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
+  private final TimestampService timestampService;
 
   public AssimilationService(
       UserModel user,
       ModelFactoryService modelFactoryService,
       Timestamp currentUTCTimestamp,
-      ZoneId timeZone) {
+      ZoneId timeZone,
+      TimestampService timestampService) {
     userModel = user;
     this.modelFactoryService = modelFactoryService;
     this.currentUTCTimestamp = currentUTCTimestamp;
     this.timeZone = timeZone;
+    this.timestampService = timestampService;
   }
 
   private Stream<Note> getDueNoteToAssimilate(ReviewScope reviewScope, int count) {
@@ -85,12 +87,12 @@ public class AssimilationService {
   }
 
   private List<MemoryTracker> getNotesAssimilatedToday() {
-    Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
+    Timestamp oneDayAgo = timestampService.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
         .filter(
             p ->
-                TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
-                    == TimestampOperations.getDayId(currentUTCTimestamp, timeZone))
+                timestampService.getDayId(p.getAssimilatedAt(), timeZone)
+                    == timestampService.getDayId(currentUTCTimestamp, timeZone))
         .filter(p -> !p.getRemovedFromTracking())
         .toList();
   }

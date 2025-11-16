@@ -7,11 +7,11 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import jakarta.persistence.EntityManagerFactory;
 import java.io.IOException;
@@ -40,6 +40,7 @@ class TestabilityRestController {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
+  @Autowired TimestampService timestampService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -350,7 +351,7 @@ class TestabilityRestController {
   public List<Object> timeTravelRelativeToNow(
       @RequestBody TimeTravelRelativeToNow timeTravelRelativeToNow) {
     Timestamp timestamp =
-        TimestampOperations.addHoursToTimestamp(
+        timestampService.addHoursToTimestamp(
             new Timestamp(System.currentTimeMillis()), timeTravelRelativeToNow.hours);
     testabilitySettings.timeTravelTo(timestamp);
     return Collections.emptyList();

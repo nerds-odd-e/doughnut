@@ -2,14 +2,17 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.TimestampService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 
 public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
+  private final TimestampService timestampService;
 
   public MemoryTrackerBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
     super(makeMe, memoryTracker);
+    this.timestampService = makeMe.getTimestampService();
     assimilatedAt(makeMe.aTimestamp().of(0, 0).please());
   }
 
@@ -31,7 +34,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder afterNthStrictRepetition(Integer repetitionDone) {
     for (int i = 0; i < repetitionDone; i++) {
-      entity.reviewedSuccessfully(entity.getNextRecallAt());
+      entity.reviewedSuccessfully(entity.getNextRecallAt(), timestampService);
     }
     return this;
   }
@@ -41,7 +44,7 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
 
   public MemoryTrackerBuilder forgettingCurveAndNextRecallAt(int value) {
     entity.setForgettingCurveIndex(value);
-    entity.setNextRecallAt(entity.calculateNextRecallAt());
+    entity.setNextRecallAt(entity.calculateNextRecallAt(timestampService));
     return this;
   }
 
