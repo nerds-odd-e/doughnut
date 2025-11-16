@@ -4,6 +4,15 @@ import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import Questions from "@/components/notes/Questions.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
+import { reactive } from "vue"
+
+const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
+vitest.mock("vue-router", () => ({
+  useRoute: () => mockRoute,
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}))
 
 describe("Questions", () => {
   const note = makeMe.aNote.please()

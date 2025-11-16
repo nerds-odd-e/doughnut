@@ -3,6 +3,15 @@ import helper from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { waitFor } from "@testing-library/vue"
+import { reactive } from "vue"
+
+const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
+vitest.mock("vue-router", () => ({
+  useRoute: () => mockRoute,
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}))
 
 describe("QuestionExportDialog", () => {
   beforeEach(() => {
