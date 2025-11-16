@@ -411,7 +411,6 @@ This aligns tests with the stateless services architecture and makes them simple
 
 - `UserModel` → `UserService`
 - `NoteModel` → `NoteService`
-- `NoteMotionModel` → `NoteMotionService` or integrate into `NoteService`
 - `BazaarModel` → `BazaarService`
 
 ### Supporting Classes

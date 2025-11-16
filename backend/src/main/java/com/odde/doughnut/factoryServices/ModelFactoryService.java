@@ -67,20 +67,6 @@ public class ModelFactoryService {
     return new NoteModel(note, this);
   }
 
-  public NoteMotionModel motionOfMoveAfter(Note subject, Note target, Boolean asFirstChild) {
-    return new NoteMotionModel(subject, target, asFirstChild, this);
-  }
-
-  public NoteMotionModel motionOfMoveUnder(Note sourceNote, Note targetNote, Boolean asFirstChild) {
-    if (!asFirstChild) {
-      List<Note> children = targetNote.getChildren();
-      if (!children.isEmpty()) {
-        return motionOfMoveAfter(sourceNote, children.getLast(), false);
-      }
-    }
-    return motionOfMoveAfter(sourceNote, targetNote, true);
-  }
-
   public BazaarModel toBazaarModel() {
     return new BazaarModel(this);
   }

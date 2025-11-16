@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 public class NoteMotionModelTest {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NoteMotionService noteMotionService;
 
   @Autowired MakeMe makeMe;
   Note topNote;
@@ -37,10 +37,8 @@ public class NoteMotionModelTest {
 
   void move(Note subject, Note relativeNote, boolean asFirstChildOfNote)
       throws CyclicLinkDetectedException, MovementNotPossibleException {
-    NoteMotionModel noteMotionModel =
-        modelFactoryService.motionOfMoveAfter(subject, relativeNote, asFirstChildOfNote);
-    noteMotionModel.validate();
-    noteMotionModel.execute();
+    noteMotionService.validate(subject, relativeNote, asFirstChildOfNote);
+    noteMotionService.execute(subject, relativeNote, asFirstChildOfNote);
   }
 
   @Test
