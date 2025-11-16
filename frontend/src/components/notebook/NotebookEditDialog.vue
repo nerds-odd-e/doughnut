@@ -166,7 +166,7 @@ const handleObsidianImport = async (event: Event) => {
 
   try {
     await managedApi.services.importObsidian({
-      notebookId: props.notebook.id,
+      notebook: props.notebook.id,
       formData: { file },
     })
     // Clear file input for reuse

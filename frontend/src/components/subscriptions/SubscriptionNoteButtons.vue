@@ -42,9 +42,11 @@ export default defineComponent({
       if (
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        this.managedApi.services.destroySubscription().then(() => {
-          this.$emit("updated")
-        })
+        this.managedApi.services
+          .destroySubscription({ subscription: this.subscription.id })
+          .then(() => {
+            this.$emit("updated")
+          })
       }
     },
     doneHandler() {
