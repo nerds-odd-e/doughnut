@@ -9,9 +9,9 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/circles")
 class CircleController {
   private final ModelFactoryService modelFactoryService;
+  private final CircleService circleService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -35,9 +36,11 @@ class CircleController {
 
   public CircleController(
       ModelFactoryService modelFactoryService,
+      CircleService circleService,
       TestabilitySettings testabilitySettings,
       UserModel currentUser) {
     this.modelFactoryService = modelFactoryService;
+    this.circleService = circleService;
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
   }
@@ -60,8 +63,7 @@ class CircleController {
   @PostMapping("")
   @Transactional
   public Circle createCircle(@Valid @RequestBody Circle circle) {
-    CircleModel circleModel = modelFactoryService.toCircleModel(circle);
-    circleModel.joinAndSave(currentUser.getEntity());
+    circleService.joinAndSave(circle, currentUser.getEntity());
     return circle;
   }
 
@@ -69,10 +71,9 @@ class CircleController {
   @Transactional
   public Circle joinCircle(@Valid @RequestBody CircleJoiningByInvitation circleJoiningByInvitation)
       throws BindException {
-    CircleModel circleModel =
-        modelFactoryService.findCircleByInvitationCode(
-            circleJoiningByInvitation.getInvitationCode());
-    if (circleModel == null) {
+    Circle circle =
+        circleService.findCircleByInvitationCode(circleJoiningByInvitation.getInvitationCode());
+    if (circle == null) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
       bindingResult.rejectValue("invitationCode", "error.error", "Does not match any circle");
@@ -80,14 +81,14 @@ class CircleController {
       throw new BindException(bindingResult);
     }
     User user = currentUser.getEntity();
-    if (user.inCircle(circleModel.getEntity())) {
+    if (user.inCircle(circle)) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
       bindingResult.rejectValue("invitationCode", "error.error", "You are already in this circle");
       throw new BindException(bindingResult);
     }
-    circleModel.joinAndSave(user);
-    return circleModel.getEntity();
+    circleService.joinAndSave(circle, user);
+    return circle;
   }
 
   @PostMapping({"/{circle}/notebooks"})

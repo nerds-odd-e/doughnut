@@ -116,18 +116,6 @@ public class ModelFactoryService {
     return new UserModel(user, this);
   }
 
-  public CircleModel toCircleModel(Circle circle) {
-    return new CircleModel(circle, this);
-  }
-
-  public CircleModel findCircleByInvitationCode(String invitationCode) {
-    Circle circle = circleRepository.findFirstByInvitationCode(invitationCode);
-    if (circle == null) {
-      return null;
-    }
-    return toCircleModel(circle);
-  }
-
   public SubscriptionModel toSubscriptionModel(Subscription sub) {
     return new SubscriptionModel(sub, this);
   }

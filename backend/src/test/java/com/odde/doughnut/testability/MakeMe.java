@@ -2,7 +2,6 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
@@ -101,8 +100,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return new CircleBuilder(null, this);
   }
 
-  public CircleBuilder theCircle(CircleModel circleModel) {
-    return new CircleBuilder(circleModel, this);
+  public CircleBuilder theCircle(Circle circle) {
+    return new CircleBuilder(circle, this);
   }
 
   public ImageBuilder anImage() {

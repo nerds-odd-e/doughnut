@@ -11,8 +11,8 @@ import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class CircleControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired CircleService circleService;
 
   @Autowired MakeMe makeMe;
   private UserModel userModel;
@@ -39,7 +40,8 @@ class CircleControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new CircleController(modelFactoryService, testabilitySettings, userModel);
+    controller =
+        new CircleController(modelFactoryService, circleService, testabilitySettings, userModel);
   }
 
   @Nested
@@ -48,7 +50,10 @@ class CircleControllerTest {
     void itShouldNotAllowNonMemberToSeeACircle() {
       controller =
           new CircleController(
-              modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
+              modelFactoryService,
+              circleService,
+              testabilitySettings,
+              makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -75,13 +80,13 @@ class CircleControllerTest {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
-      controller = new CircleController(modelFactoryService, testabilitySettings, user);
+      controller =
+          new CircleController(modelFactoryService, circleService, testabilitySettings, user);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
 
-      CircleModel circleModel = modelFactoryService.toCircleModel(circle);
-      circleModel.joinAndSave(user.getEntity());
+      circleService.joinAndSave(circle, user.getEntity());
 
       CircleForUserView expected = new CircleForUserView();
       expected.setId(circle.getId());
@@ -100,7 +105,10 @@ class CircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       controller =
           new CircleController(
-              modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
+              modelFactoryService,
+              circleService,
+              testabilitySettings,
+              makeMe.aNullUserModelPlease());
       assertThrows(
           ResponseStatusException.class,
           () -> {
