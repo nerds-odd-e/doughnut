@@ -8,10 +8,10 @@ Refactor the Rails-inspired model pattern in the `@models` package to follow Spr
 
 ### Architecture Pattern
 
-The current `@models` package (e.g., `UserModel`, `NoteModel`, `CircleModel`, `SubscriptionModel`) follows a Rails-inspired Active Record pattern:
+The current `@models` package (e.g., `UserModel`, `NoteModel`, `SubscriptionModel`) follows a Rails-inspired Active Record pattern:
 
 - **Stateful wrappers**: Each model wraps a single entity instance and holds a `ModelFactoryService` reference
-- **Factory creation**: Models are created via factory methods (`toUserModel()`, `toNoteModel()`, `toCircleModel()`)
+- **Factory creation**: Models are created via factory methods (`toUserModel()`, `toNoteModel()`)
 - **Mixed scoping**: Some models are request-scoped beans (`UserModel` via `CurrentUserFetcherFromRequest`), others are created on-demand
 - **Business logic in models**: Models contain domain logic that operates on the wrapped entity
 
@@ -43,7 +43,7 @@ userModel.setAndSaveDailyAssimilationCount(5);
 
 1. **Not idiomatic Spring Boot**: Spring Boot convention uses stateless `@Service` beans that operate on entities passed as parameters, not stateful wrappers
 2. **Dependency injection awkwardness**: Models require `ModelFactoryService` to be passed in rather than injecting repositories directly
-3. **Inconsistent patterns**: Mix of request-scoped beans (`UserModel`) and factory-created instances (`NoteModel`, `CircleModel`)
+3. **Inconsistent patterns**: Mix of request-scoped beans (`UserModel`) and factory-created instances (`NoteModel`)
 4. **Testing complexity**: Stateful wrappers are harder to test than stateless services
 5. **Thread safety concerns**: Stateful models can lead to concurrency issues if not properly scoped
 6. **Unclear lifecycle**: Factory-created models have unclear lifecycle management compared to Spring-managed beans
@@ -411,7 +411,6 @@ This aligns tests with the stateless services architecture and makes them simple
 
 - `UserModel` → `UserService`
 - `NoteModel` → `NoteService`
-- `CircleModel` → `CircleService`
 - `SubscriptionModel` → `SubscriptionService`
 - `NoteMotionModel` → `NoteMotionService` or integrate into `NoteService`
 - `BazaarModel` → `BazaarService`

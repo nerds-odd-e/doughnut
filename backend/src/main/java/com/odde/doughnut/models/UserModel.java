@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.List;

@@ -12,8 +12,8 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.utils.TimestampOperations;
 import org.junit.jupiter.api.Test;
 
 public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
