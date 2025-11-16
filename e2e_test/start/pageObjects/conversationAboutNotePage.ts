@@ -55,19 +55,11 @@ export class ConversationAboutNotePage {
     return this
   }
 
-  expectExportContainsTitle(title: string) {
-    cy.get('[data-testid="export-textarea"]').should(
-      'contain.value',
-      `"title": "${title}"`
-    )
-    return this
-  }
-
   expectExportContainsUserMessage(message: string) {
     cy.get('[data-testid="export-textarea"]').then(($textarea) => {
       const content = $textarea.val() as string
       const json = JSON.parse(content)
-      const userMessages = json.request.messages.filter(
+      const userMessages = json.messages.filter(
         (m: { role: string; content?: string }) =>
           m.role === 'user' && m.content?.includes(message)
       )
@@ -80,7 +72,7 @@ export class ConversationAboutNotePage {
     cy.get('[data-testid="export-textarea"]').then(($textarea) => {
       const content = $textarea.val() as string
       const json = JSON.parse(content)
-      const assistantMessages = json.request.messages.filter(
+      const assistantMessages = json.messages.filter(
         (m: { role: string; content?: string }) =>
           m.role === 'assistant' && m.content?.includes(reply)
       )

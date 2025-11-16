@@ -113,13 +113,6 @@ When('I export the conversation', () => {
 })
 
 Then(
-  'the export should contain the conversation title {string}',
-  (title: string) => {
-    start.assumeConversationAboutNotePage().expectExportContainsTitle(title)
-  }
-)
-
-Then(
   'the export should contain the user message {string}',
   (message: string) => {
     start

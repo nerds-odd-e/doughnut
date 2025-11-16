@@ -2723,7 +2723,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationExportResponse"
+                $ref: "#/components/schemas/ChatCompletionRequest"
   /api/notes/{note}/note-info:
     get:
       tags:
@@ -3221,7 +3221,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ConversationExportResponse"
+                $ref: "#/components/schemas/ChatCompletionRequest"
   /api/conversation/unread:
     get:
       tags:
@@ -4626,16 +4626,6 @@ components:
           type: string
         function:
           $ref: "#/components/schemas/ChatFunctionCall"
-    ConversationExportResponse:
-      type: object
-      properties:
-        request:
-          $ref: "#/components/schemas/ChatCompletionRequest"
-        title:
-          type: string
-      required:
-      - request
-      - title
     Function:
       type: object
       properties:

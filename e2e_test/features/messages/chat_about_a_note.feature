@@ -38,7 +38,6 @@ Feature: Chat about a note with AI
       | user      | Is Naba one of them? |
       | assistant | No. It is not.       |
     When I export the conversation
-    Then the export should contain the conversation title "There are 42 prefectures in Japan"
-    And the export should contain the user message "Is Naba one of them?"
+    Then the export should contain the user message "Is Naba one of them?"
     And the export should contain the assistant reply "No. It is not."
     And I should be able to copy the export

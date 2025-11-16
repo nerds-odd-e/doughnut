@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.controllers.dto.ConversationExportResponse;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -15,6 +14,7 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
+import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
@@ -125,15 +125,13 @@ class PredefinedQuestionController {
   }
 
   @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")
-  public ConversationExportResponse exportQuestionGeneration(
+  public ChatCompletionRequest exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(note);
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
     QuestionGenerationRequestBuilder requestBuilder =
         new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
-    var request = requestBuilder.buildQuestionGenerationRequest(note, null);
-    String title = note.getTopicConstructor();
-    return new ConversationExportResponse(request, title);
+    return requestBuilder.buildQuestionGenerationRequest(note, null);
   }
 }

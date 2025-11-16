@@ -2015,7 +2015,7 @@ export const askAQuestion = (data: AskAQuestionData): CancelablePromise<AskAQues
 /**
  * @param data The data for the request.
  * @param data.note
- * @returns ConversationExportResponse OK
+ * @returns ChatCompletionRequest OK
  * @throws ApiError
  */
 export const exportQuestionGeneration = (data: ExportQuestionGenerationData): CancelablePromise<ExportQuestionGenerationResponse> => {
@@ -2392,7 +2392,7 @@ export const getConversationMessages = (data: GetConversationMessagesData): Canc
 /**
  * @param data The data for the request.
  * @param data.conversationId
- * @returns ConversationExportResponse OK
+ * @returns ChatCompletionRequest OK
  * @throws ApiError
  */
 export const exportConversation = (data: ExportConversationData): CancelablePromise<ExportConversationResponse> => {

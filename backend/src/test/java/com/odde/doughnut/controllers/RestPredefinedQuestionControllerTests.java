@@ -312,20 +312,12 @@ class PredefinedQuestionControllerTests {
     }
 
     @Test
-    void shouldExportQuestionGenerationWithNoteTitle() throws UnexpectedNoAccessRightException {
-      com.odde.doughnut.controllers.dto.ConversationExportResponse response =
-          controller.exportQuestionGeneration(note);
-      assertThat(response.getTitle(), equalTo("There are 42 prefectures in Japan"));
-      assertThat(response.getRequest(), notNullValue());
-    }
-
-    @Test
     void shouldExportQuestionGenerationWithChatCompletionRequest()
         throws UnexpectedNoAccessRightException {
-      com.odde.doughnut.controllers.dto.ConversationExportResponse response =
+      com.theokanning.openai.completion.chat.ChatCompletionRequest request =
           controller.exportQuestionGeneration(note);
-      assertThat(response.getRequest().getModel(), notNullValue());
-      assertThat(response.getRequest().getMessages(), notNullValue());
+      assertThat(request.getModel(), notNullValue());
+      assertThat(request.getMessages(), notNullValue());
     }
   }
 }

@@ -255,11 +255,6 @@ export type Conversation = {
     updatedAt: string;
 };
 
-export type ConversationExportResponse = {
-    request: ChatCompletionRequest;
-    title: string;
-};
-
 export type ConversationMessage = {
     id: number;
     message: string;
@@ -1794,7 +1789,7 @@ export type ExportQuestionGenerationData = {
     note: number;
 };
 
-export type ExportQuestionGenerationResponse = (ConversationExportResponse);
+export type ExportQuestionGenerationResponse = (ChatCompletionRequest);
 
 export type GetNoteInfoData = {
     note: number;
@@ -1895,7 +1890,7 @@ export type ExportConversationData = {
     conversationId: number;
 };
 
-export type ExportConversationResponse = (ConversationExportResponse);
+export type ExportConversationResponse = (ChatCompletionRequest);
 
 export type GetUnreadConversationsResponse = (Array<ConversationMessage>);
 
