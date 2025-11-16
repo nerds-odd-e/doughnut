@@ -87,8 +87,8 @@ const hasTitleBeenEdited = ref(false)
 
 // Computed property to determine effective search key
 const effectiveSearchKey = computed(() => {
-  // Don't search if title hasn't been edited yet and is still "Untitled"
-  if (!hasTitleBeenEdited.value && creationData.value.newTitle === "Untitled") {
+  // Don't search if title hasn't been edited yet
+  if (!hasTitleBeenEdited.value) {
     return ""
   }
   return creationData.value.newTitle
