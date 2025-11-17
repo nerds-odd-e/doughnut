@@ -28,8 +28,7 @@ When(
   'I need to confirm the association with different label {string}',
   (wikidataTitle: string) => {
     cy.findAllByText(wikidataTitle).should('exist')
-    cy.findByRole('button', { name: 'Confirm' }).click()
-    start.assumeNotePage().wikidataOptions().hasAssociation()
+    start.assumeNotePage().wikidataOptions().confirmAssociation()
   }
 )
 
@@ -104,17 +103,13 @@ Given(
 )
 
 When('I search with phrase {string} on Wikidata', (phrase: string) => {
-  cy.focused().clear().type(phrase)
-  cy.findByRole('button', { name: 'Wikidata Id' }).click()
-  cy.findByText('Search Wikidata').should('be.visible')
+  start.assumeNotePage().wikidataSearch().search(phrase).open()
 })
 
 When(
   'I select wikidataID {string} from the Wikidata search result',
   (wikidataID: string) => {
-    cy.get('.modal-container').within(() => {
-      cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
-    })
+    start.assumeNotePage().wikidataSearch().selectResult(wikidataID)
   }
 )
 

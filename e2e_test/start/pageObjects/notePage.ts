@@ -6,6 +6,7 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { noteSidebar } from './noteSidebar'
+import { assumeWikidataSearchDialog } from './wikidataSearchDialog'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -351,6 +352,10 @@ export const assumeNotePage = (noteTopology?: string) => {
           privateToolbarButton('Edit Wikidata ID').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
+        confirmAssociation() {
+          cy.findByRole('button', { name: 'Confirm' }).click()
+          return this.hasAssociation()
+        },
         hasAssociation() {
           openWikidataOptions()
           const elm = () => {
@@ -391,6 +396,9 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
       cy.pageIsNotLoading()
       return this
+    },
+    wikidataSearch() {
+      return assumeWikidataSearchDialog()
     },
   }
 }

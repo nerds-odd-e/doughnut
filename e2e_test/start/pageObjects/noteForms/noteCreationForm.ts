@@ -1,4 +1,5 @@
 import submittableForm from '../../submittableForm'
+import { assumeWikidataSearchDialog } from '../wikidataSearchDialog'
 
 const noteCreationForm = {
   createNote: (title: string) => {
@@ -16,6 +17,9 @@ const noteCreationForm = {
     const { Title, 'Wikidata Id': wikidataId, ...remainingAttrs } = attributes
     expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)
     return this.createNoteWithWikidataId(Title!, wikidataId)
+  },
+  wikidataSearch() {
+    return assumeWikidataSearchDialog()
   },
 }
 
