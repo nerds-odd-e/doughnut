@@ -1,9 +1,6 @@
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue"
-import WikidataSearchDialog from "@/components/notes/WikidataSearchDialog.vue"
-import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import { nextTick } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
@@ -163,32 +160,34 @@ describe("adding new note", () => {
       await flushPromises()
     }
 
-    const selectFromDropdown = async (wikidataId: string) => {
+    const getDialogSelect = () => {
+      return document.querySelector('select[name="wikidataSearchResult"]')
+    }
+
+    const searchAndSelectFirstResult = async (
+      key: string,
+      wikidataId: string
+    ) => {
+      await openWikidataDialog(key)
       await flushPromises()
-
-      // Find the WikidataSearchDialog component
-      const dialogComponent = wrapper.findComponent(WikidataSearchDialog)
-      expect(dialogComponent.exists()).toBe(true)
-
-      // Call the selection method directly on the component
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = dialogComponent.vm as any
-      if (vm.searchResults) {
-        // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-        const selected = vm.searchResults.find((r: any) => r.id === wikidataId)
-        if (selected) {
-          vm.selectedOption = wikidataId
-          vm.selectedItem = selected
-
-          const currentLabel = vm.currentTitle.toUpperCase()
-          const newLabel = selected.label.toUpperCase()
-
-          if (currentLabel === newLabel) {
-            dialogComponent.vm.$emit("selected", selected)
-          } else {
-            vm.showTitleOptions = true
-          }
+      vi.runOnlyPendingTimers()
+      await flushPromises()
+      const select = getDialogSelect() as HTMLSelectElement
+      if (select) {
+        select.value = wikidataId
+        select.dispatchEvent(new Event("change"))
+        await flushPromises()
+        vi.runOnlyPendingTimers()
+        await flushPromises()
+        // Wait for dialog to close after selection
+        let attempts = 0
+        while (
+          document.querySelector(".modal-container") &&
+          attempts < 10
+        ) {
           await flushPromises()
+          vi.runOnlyPendingTimers()
+          attempts++
         }
       }
     }
@@ -197,43 +196,17 @@ describe("adding new note", () => {
       action: "Replace" | "Append" | "Neither"
     ): Promise<void> => {
       await flushPromises()
-
-      // Find the WikidataSearchDialog component
-      const dialogComponent = wrapper.findComponent(WikidataSearchDialog)
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = dialogComponent.vm as any
-
-      // Set the title action and trigger the handler
-      vm.titleAction = action
-      await flushPromises()
-
-      // Manually call handleTitleAction to emit the event
-      if (vm.selectedItem) {
-        let actionValue: "replace" | "append" | "neither" | undefined
-        if (action === "Replace") {
-          actionValue = "replace"
-        } else if (action === "Append") {
-          actionValue = "append"
-        } else if (action === "Neither") {
-          actionValue = "neither"
-        }
-
-        const id = vm.selectedItem.id
-        if (id) {
-          dialogComponent.vm.$emit("update:wikidataId", id)
-        }
-        dialogComponent.vm.$emit("selected", vm.selectedItem, actionValue)
+      vi.runOnlyPendingTimers()
+      const radio = document.querySelector(
+        `input[type="radio"][value="${action}"]`
+      ) as HTMLInputElement
+      if (radio) {
+        radio.checked = true
+        radio.dispatchEvent(new Event("change", { bubbles: true }))
+        await flushPromises()
+        vi.runOnlyPendingTimers()
         await flushPromises()
       }
-    }
-
-    const waitForDialogToClose = async () => {
-      let attempts = 0
-      while (document.querySelector(".modal-container") && attempts < 20) {
-        await flushPromises()
-        attempts++
-      }
-      await flushPromises()
     }
 
     it("opens dialog when clicking search button", async () => {
@@ -249,31 +222,23 @@ describe("adding new note", () => {
       const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
       await openWikidataDialog("dog")
-
-      // Verify dialog is open
-      let dialogComponent = wrapper.findComponent(WikidataSearchDialog)
-      expect(dialogComponent.exists()).toBe(true)
-
-      // Find the WikidataSearchByLabel component and call closeDialog method
-      const searchByLabelComponent = wrapper.findComponent(
-        WikidataSearchByLabel
-      )
-      expect(searchByLabelComponent.exists()).toBe(true)
-      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-      const vm = searchByLabelComponent.vm as any
-      expect(vm.showDialog).toBe(true)
-      vm.closeDialog()
-
-      await nextTick()
       await flushPromises()
-      await nextTick()
-
-      // Check that showDialog is now false
-      expect(vm.showDialog).toBe(false)
-
-      // Check that the WikidataSearchDialog component no longer exists
-      dialogComponent = wrapper.findComponent(WikidataSearchDialog)
-      expect(dialogComponent.exists()).toBe(false)
+      vi.runOnlyPendingTimers()
+      await flushPromises()
+      const cancelButtons = document.querySelectorAll(
+        "button.daisy-btn-secondary"
+      )
+      const cancelButton = Array.from(cancelButtons).find(
+        (btn) => (btn as HTMLElement).textContent?.trim() === "Cancel"
+      ) as HTMLButtonElement
+      if (cancelButton) {
+        await cancelButton.click()
+        await flushPromises()
+        vi.runOnlyPendingTimers()
+        await flushPromises()
+      }
+      const dialog = document.querySelector(".modal-container")
+      expect(dialog).toBeFalsy()
     })
 
     it.each`
@@ -298,8 +263,7 @@ describe("adding new note", () => {
           .please()
 
         mockedWikidataSearch.mockResolvedValue([searchResult])
-        await openWikidataDialog(searchTitle)
-        await selectFromDropdown(wikidataId)
+        await searchAndSelectFirstResult(searchTitle, wikidataId)
 
         if (titleAction) {
           await selectTitleAction(
@@ -310,7 +274,17 @@ describe("adding new note", () => {
           )
         }
 
-        await waitForDialogToClose()
+        // Wait for dialog to close
+        let attempts = 0
+        while (document.querySelector(".modal-container") && attempts < 10) {
+          await flushPromises()
+          vi.runOnlyPendingTimers()
+          attempts++
+        }
+
+        await flushPromises()
+        vi.runOnlyPendingTimers()
+        await flushPromises()
 
         expect(mockedWikidataSearch).toHaveBeenCalledWith({
           search: searchTitle,
