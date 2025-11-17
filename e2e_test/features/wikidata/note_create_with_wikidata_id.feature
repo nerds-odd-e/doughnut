@@ -19,7 +19,7 @@ Feature: Nested Note Create with wikidata
     When I create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q12345R     |
-    Then I should see an error "The wikidata Id should be Q<numbers>" on "Wikidata Id"
+    Then I should see an error "The wikidata Id should be Q<numbers>" on Wikidata Id in note creation
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Select one of the Wikidata entries from the search result
@@ -38,4 +38,4 @@ Feature: Nested Note Create with wikidata
     When I create a note belonging to "Star":
       | Title | Wikidata Id |
       | Solar | Q123        |
-    Then I should see an error "Duplicate Wikidata ID Detected." on "Wikidata Id"
+    Then I should see an error "Duplicate Wikidata ID Detected." on Wikidata Id in note creation

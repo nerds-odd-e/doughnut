@@ -78,9 +78,16 @@ Given('The wikidata service is not available', () => {
 })
 
 Then(
-  'I should see an error {string} on {string}',
-  (message: string, field: string) => {
-    cy.expectFieldErrorMessage(field, message)
+  'I should see an error {string} on Wikidata Id in note creation',
+  (message: string) => {
+    cy.expectFieldErrorMessage('Wikidata Id', message)
+  }
+)
+
+Then(
+  'I should see an error {string} on Wikidata Id in association',
+  (message: string) => {
+    cy.expectFieldErrorMessage('Wikidata Id', message)
   }
 )
 
