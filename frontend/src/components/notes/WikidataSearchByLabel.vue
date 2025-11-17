@@ -2,7 +2,10 @@
   <button
     title="Wikidata Id"
     type="button"
-    class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-rounded-l-none"
+    :class="[
+      'daisy-btn daisy-rounded-l-none',
+      hasWikidataId ? 'daisy-btn-primary' : 'daisy-btn-outline daisy-btn-neutral',
+    ]"
     @click.prevent="openDialog"
   >
     <SvgWikidata />
@@ -36,6 +39,11 @@ export default defineComponent({
   components: {
     SvgWikidata,
     WikidataSearchDialog,
+  },
+  computed: {
+    hasWikidataId(): boolean {
+      return !!this.modelValue && this.modelValue.trim() !== ""
+    },
   },
   data() {
     return {
