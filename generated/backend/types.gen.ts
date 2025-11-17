@@ -106,6 +106,8 @@ export type BareNote = {
     parentUriAndTitle?: string;
     relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
     details?: string;
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 export namespace BareNote {
@@ -382,6 +384,8 @@ export type FocusNote = {
     parentUriAndTitle?: string;
     relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
     details?: string;
+    createdAt?: string;
+    updatedAt?: string;
     contextualPath?: Array<string>;
     children?: Array<string>;
     priorSiblings?: Array<string>;
