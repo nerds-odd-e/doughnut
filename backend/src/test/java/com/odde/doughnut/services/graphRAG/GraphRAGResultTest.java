@@ -9,6 +9,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
+import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -104,7 +105,37 @@ class GraphRAGResultTest {
 
     // Assert
     assertThat(
-        jsonNode::fieldNames, containsInAnyOrder("uri", "title", "details", "relationToFocusNote"));
+        jsonNode::fieldNames,
+        containsInAnyOrder(
+            "uri", "title", "details", "relationToFocusNote", "createdAt", "updatedAt"));
+  }
+
+  @Test
+  void shouldIncludeCreatedAtAndUpdatedAtWhenSerializedToJson() throws Exception {
+    // Arrange
+    Timestamp createdAt = new Timestamp(System.currentTimeMillis() - 86400000); // 1 day ago
+    Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
+    Note note =
+        makeMe
+            .aNote()
+            .titleConstructor("Test Note")
+            .details("Test Details")
+            .createdAt(createdAt)
+            .updatedAt(updatedAt)
+            .please();
+    makeMe.refresh(note);
+
+    BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
+
+    // Act
+    JsonNode jsonNode = objectMapper.valueToTree(bareNote);
+
+    // Assert
+    assertThat(jsonNode.has("createdAt"), is(true));
+    assertThat(jsonNode.has("updatedAt"), is(true));
+    // Timestamps are serialized as ISO strings when WRITE_DATES_AS_TIMESTAMPS is disabled
+    assertThat(jsonNode.get("createdAt").asText(), is(not(emptyString())));
+    assertThat(jsonNode.get("updatedAt").asText(), is(not(emptyString())));
   }
 
   @Nested
@@ -131,6 +162,34 @@ class GraphRAGResultTest {
       assertThat(jsonString.indexOf("\"title\":"), is(greaterThan(jsonString.indexOf("\"uri\":"))));
       assertThat(
           jsonString.indexOf("\"details\":"), is(greaterThan(jsonString.indexOf("\"title\":"))));
+    }
+
+    @Test
+    void shouldIncludeCreatedAtAndUpdatedAtWhenSerializedToJson() throws Exception {
+      // Arrange
+      Timestamp createdAt = new Timestamp(System.currentTimeMillis() - 86400000); // 1 day ago
+      Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
+      Note note =
+          makeMe
+              .aNote()
+              .titleConstructor("Focus Note")
+              .details("Focus Details")
+              .createdAt(createdAt)
+              .updatedAt(updatedAt)
+              .please();
+      makeMe.refresh(note);
+
+      FocusNote focusNote = FocusNote.fromNote(note);
+
+      // Act
+      JsonNode jsonNode = objectMapper.valueToTree(focusNote);
+
+      // Assert
+      assertThat(jsonNode.has("createdAt"), is(true));
+      assertThat(jsonNode.has("updatedAt"), is(true));
+      // Timestamps are serialized as ISO strings when WRITE_DATES_AS_TIMESTAMPS is disabled
+      assertThat(jsonNode.get("createdAt").asText(), is(not(emptyString())));
+      assertThat(jsonNode.get("updatedAt").asText(), is(not(emptyString())));
     }
   }
 }
