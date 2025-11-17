@@ -20,7 +20,7 @@ const myNotebooksPage = () => {
     },
     creatingNotebook(notebookTopic: string) {
       cy.findByText('Add New Notebook').click()
-      return noteCreationForm.createNote(notebookTopic)
+      return noteCreationForm.createNoteWithTitle(notebookTopic)
     },
     notebookCard(notebook: string) {
       return notebookCard(notebook)

@@ -6,7 +6,7 @@ import { navigateToMyCircles } from './myCirclesPage'
 export const assumeCirclePage = () => ({
   creatingNotebook(notebookTopic: string) {
     cy.findByText('Add New Notebook In This Circle').click()
-    return noteCreationForm.createNote(notebookTopic)
+    return noteCreationForm.createNoteWithTitle(notebookTopic)
   },
   haveMembers(count: number) {
     cy.get('body').find('.circle-member').should('have.length', count)

@@ -27,9 +27,7 @@ Feature: Nested Note creation
     Then I should see that the note creation is not successful
 
   Scenario: Create a new note as next sibling
-    When I create a note after "team":
-      | Title        |
-      | coordination |
+    When I create a note after "team" with title "coordination"
     Then I should see the note tree in the sidebar
       | note-title   |
       | team         |

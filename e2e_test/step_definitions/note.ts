@@ -204,7 +204,7 @@ When(
     start
       .jumpToNotePage(noteTopology)
       .addingChildNote()
-      .createNoteWithAttributes({ Title: title, 'Wikidata Id': wikidataId })
+      .createNoteWithTitleAndWikidataId(title, wikidataId)
   }
 )
 
@@ -506,13 +506,12 @@ Then(
 )
 
 When(
-  'I create a note after {string}:',
-  (noteTopology: string, data: DataTable) => {
-    expect(data.hashes().length).to.equal(1)
+  'I create a note after {string} with title {string}',
+  (noteTopology: string, title: string) => {
     start
       .jumpToNotePage(noteTopology)
       .addingNextSiblingNote()
-      .createNoteWithAttributes(data.hashes()[0]!)
+      .createNoteWithTitle(title)
   }
 )
 
