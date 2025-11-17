@@ -80,18 +80,7 @@ Given('The wikidata service is not available', () => {
 Then(
   'I should see an error {string} on {string}',
   (message: string, field: string) => {
-    if (field === 'Wikidata Id') {
-      // For Wikidata Id, the input is now in the popup, so we need to open it first
-      cy.findByRole('button', { name: 'Wikidata Id' }).click()
-      cy.findByText('Search Wikidata').should('be.visible')
-      cy.findByText('Search Wikidata')
-        .closest('.modal-container')
-        .within(() => {
-          cy.expectFieldErrorMessage(field, message)
-        })
-    } else {
-      cy.expectFieldErrorMessage(field, message)
-    }
+    cy.expectFieldErrorMessage(field, message)
   }
 )
 

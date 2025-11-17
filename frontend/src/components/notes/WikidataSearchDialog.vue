@@ -4,16 +4,6 @@
       <h2>Search Wikidata</h2>
     </template>
     <template #body>
-      <div class="daisy-mb-4">
-        <TextInput
-          scope-name="wikidataID"
-          field="wikidataID"
-          :model-value="currentWikidataId"
-          @update:model-value="handleWikidataIdChange"
-          :error-message="errorMessage"
-          placeholder="example: `Q1234`"
-        />
-      </div>
       <div v-if="loading" class="daisy-text-center daisy-p-4">
         Searching...
       </div>
@@ -86,13 +76,10 @@ import type { WikidataSearchEntity } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
-import TextInput from "../form/TextInput.vue"
 
 const props = defineProps<{
   searchKey: string
   currentTitle: string
-  currentWikidataId?: string
-  errorMessage?: string
 }>()
 
 const emit = defineEmits<{
@@ -101,7 +88,6 @@ const emit = defineEmits<{
     entity: WikidataSearchEntity,
     titleAction?: "replace" | "append" | "neither",
   ]
-  "update:wikidataId": [value: string]
 }>()
 
 const { managedApi } = useLoadingApi()
@@ -137,9 +123,6 @@ const onSelectSearchResult = () => {
   if (!selected) return
 
   selectedItem.value = selected
-  if (selected.id) {
-    emit("update:wikidataId", selected.id)
-  }
 
   const currentLabel = props.currentTitle.toUpperCase()
   const newLabel = selected.label.toUpperCase()
@@ -163,19 +146,11 @@ const handleTitleAction = () => {
     action = "neither"
   }
 
-  const id = selectedItem.value.id
-  if (id) {
-    emit("update:wikidataId", id)
-  }
   emit("selected", selectedItem.value, action)
 }
 
 const handleClose = () => {
   emit("close")
-}
-
-const handleWikidataIdChange = (value: string) => {
-  emit("update:wikidataId", value)
 }
 
 watch(

@@ -1,27 +1,36 @@
 <template>
-  <button
-    title="Wikidata Id"
-    type="button"
-    class="daisy-btn daisy-btn-outline daisy-btn-neutral"
-    @click.prevent="openDialog"
+  <TextInput
+    scope-name="wikidataID"
+    field="wikidataID"
+    :model-value="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
+    :error-message="errorMessage"
+    placeholder="example: `Q1234`"
   >
-    <SvgSearchWikidata />
-  </button>
+    <template #input_prepend>
+      <button
+        title="Wikidata Id"
+        type="button"
+        class="daisy-btn daisy-btn-outline daisy-btn-neutral"
+        @click.prevent="openDialog"
+      >
+        <SvgSearchWikidata />
+      </button>
+    </template>
+  </TextInput>
   <WikidataSearchDialog
     v-if="showDialog"
     :search-key="searchKey"
     :current-title="currentTitle"
-    :current-wikidata-id="modelValue"
-    :error-message="errorMessage"
     @close="closeDialog"
     @selected="handleSelected"
-    @update:wikidata-id="handleWikidataIdUpdate"
   />
 </template>
 
 <script lang="ts">
 import type { WikidataSearchEntity } from "@generated/backend"
-import { defineComponent, nextTick } from "vue"
+import { defineComponent } from "vue"
+import TextInput from "../form/TextInput.vue"
 import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue"
 import WikidataSearchDialog from "./WikidataSearchDialog.vue"
 
@@ -34,6 +43,7 @@ export default defineComponent({
   },
   emits: ["selected", "update:modelValue"],
   components: {
+    TextInput,
     SvgSearchWikidata,
     WikidataSearchDialog,
   },
@@ -49,16 +59,12 @@ export default defineComponent({
     closeDialog() {
       this.showDialog = false
     },
-    async handleSelected(
+    handleSelected(
       entity: WikidataSearchEntity,
       titleAction?: "replace" | "append" | "neither"
     ) {
-      this.$emit("selected", entity, titleAction)
-      await nextTick()
       this.showDialog = false
-    },
-    handleWikidataIdUpdate(value: string) {
-      this.$emit("update:modelValue", value)
+      this.$emit("selected", entity, titleAction)
     },
   },
 })
