@@ -31,7 +31,7 @@ describe("SearchResults.vue", () => {
     vi.useRealTimers()
   })
 
-  it("shows 'Similar notes within the same notebook' when results are empty in dropdown mode", async () => {
+  it("shows 'No matching notes found.' when results are empty in dropdown mode after search", async () => {
     vi.useFakeTimers()
 
     const empty: Array<unknown> = []
@@ -52,7 +52,7 @@ describe("SearchResults.vue", () => {
     vi.advanceTimersByTime(600)
     await flushPromises()
 
-    expect(wrapper.text()).toContain("Similar notes within the same notebook")
+    expect(wrapper.text()).toContain("No matching notes found.")
 
     vi.useRealTimers()
   })

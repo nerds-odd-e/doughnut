@@ -19,7 +19,8 @@
     </div>
 
     <div v-else-if="searchResult.length === 0 && isDropdown" class="dropdown-list">
-      <em>Similar notes within the same notebook</em>
+      <em v-if="trimmedSearchKey === ''">Similar notes within the same notebook</em>
+      <em v-else>No matching notes found.</em>
     </div>
 
     <div v-else-if="searchResult.length === 0">
@@ -194,18 +195,23 @@ const mergeUniqueAndSortByDistance = (
 }
 
 const search = () => {
+  const originalTrimmedKey = trimmedSearchKey.value
+  // If there's no cached result, set recentResult to undefined to show "Searching ..."
+  if (!cachedSearches.value[originalTrimmedKey]) {
+    recentResult.value = undefined
+  }
   timeoutId.value = debounced(async () => {
-    const originalTrimmedKey = trimmedSearchKey.value
+    const trimmedKey = trimmedSearchKey.value
     // perform literal and semantic searches in parallel
     const [literalRes, semanticRes] = await Promise.all([
       relativeSearch(props.noteId, searchTerm.value),
       semanticRelativeSearch(props.noteId, searchTerm.value),
     ])
     const combined = [...literalRes, ...semanticRes]
-    const existing = cachedSearches.value[originalTrimmedKey] ?? []
+    const existing = cachedSearches.value[trimmedKey] ?? []
     const merged = mergeUniqueAndSortByDistance(existing, combined)
-    cachedSearches.value[originalTrimmedKey] = merged
-    recentResult.value = cachedSearches.value[originalTrimmedKey]
+    cachedSearches.value[trimmedKey] = merged
+    recentResult.value = cachedSearches.value[trimmedKey]
   })
 }
 
