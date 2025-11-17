@@ -24,8 +24,8 @@ Feature: User Contests Question generation by AI
     | not legitamate      |  Second question  |
 
   Scenario: I should be able to contest a question
-    Given OpenAI evaluates the question as not legitamate
-    And I learned one note "Scuba Diving" on day 1
-    When I am recalling my note on day 2
-    And I contest the question
-    And I should be asked "Second question"
+    Given I learned one note "Scuba Diving" on day 1
+    And I am recalling my note on day 2
+    And OpenAI evaluates the question as not legitamate
+    When I contest the question
+    Then I should be asked "Second question"
