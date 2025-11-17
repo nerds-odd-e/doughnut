@@ -47,7 +47,7 @@ const sidebarStyle = computed(() => {
 // Route watcher
 const route = useRoute()
 watch(
-  () => route.path,
+  () => route.fullPath,
   () => {
     emit("close_request")
   }
