@@ -62,7 +62,7 @@ When(
       .assumeCirclePage()
       .navigateToChild(parentNoteTitle)
       .addingChildNote()
-      .createNote(noteTopology)
+      .createNoteWithTitle(noteTopology)
   }
 )
 
