@@ -52,7 +52,7 @@ describe("WikidataSearchDialog", () => {
       "No Wikidata entries found for 'nonexistent'"
     )
     const closeButton = modal?.querySelector("button.daisy-btn-secondary")
-    expect(closeButton?.textContent).toBe("Close")
+    expect(closeButton?.textContent?.trim()).toBe("Close")
   })
 
   it("emits close when cancel button is clicked", async () => {
