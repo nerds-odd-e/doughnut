@@ -12,16 +12,7 @@ const noteCreationForm = {
     const form = submittableForm.fill({
       Title: title,
     })
-    // Open the dialog and fill the Wikidata ID input
-    cy.findByRole('button', { name: 'Wikidata Id' }).click()
-    cy.findByText('Search Wikidata').should('be.visible')
-    cy.get('.modal-container').within(() => {
-      cy.formField('Wikidata Id').assignFieldValue(wikidataId)
-    })
-    // Close the dialog
-    cy.get('.modal-container').within(() => {
-      cy.findByRole('button', { name: 'Cancel' }).click()
-    })
+    assumeWikidataSearchDialog().open().setWikidataId(wikidataId).close()
     form.submit()
   },
   wikidataSearch() {

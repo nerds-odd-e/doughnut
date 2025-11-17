@@ -23,8 +23,8 @@ Feature: Nested Note Create with wikidata
     When I am creating a note under "Animals"
     And I search with phrase "dog" on Wikidata
     And I select wikidataID "Q11399" from the Wikidata search result
-    Then I should see that the "Title" becomes "Dog"
-    Then I should see that the "Wikidata Id" becomes "Q11399"
+    Then I should see that the Title becomes "Dog"
+    Then I should see that the Wikidata Id becomes "Q11399"
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with duplicate wikidata id within the same notebook

@@ -26,5 +26,41 @@ export const assumeWikidataSearchDialog = () => {
       cy.findByText('Search Wikidata').should('be.visible')
       return this
     },
+    setWikidataId(wikidataId: string) {
+      cy.findByText('Search Wikidata')
+        .closest('.modal-container')
+        .within(() => {
+          cy.formField('Wikidata Id').assignFieldValue(wikidataId)
+        })
+      return this
+    },
+    close() {
+      cy.findByText('Search Wikidata')
+        .closest('.modal-container')
+        .within(() => {
+          cy.findByRole('button', { name: 'Close' }).click()
+        })
+      return this
+    },
+    expectErrorOnWikidataId(message: string) {
+      this.open()
+      cy.findByText('Search Wikidata')
+        .closest('.modal-container')
+        .within(() => {
+          cy.expectFieldErrorMessage('Wikidata Id', message)
+        })
+      this.close()
+      return this
+    },
+    expectWikidataIdValue(value: string) {
+      this.open()
+      cy.findByText('Search Wikidata')
+        .closest('.modal-container')
+        .within(() => {
+          cy.formField('Wikidata Id').fieldShouldHaveValue(value)
+          cy.findByRole('button', { name: 'Close' }).click()
+        })
+      return this
+    },
   }
 }

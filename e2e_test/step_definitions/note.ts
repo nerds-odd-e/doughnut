@@ -12,6 +12,7 @@ import {
 import NotePath from '../support/NotePath'
 import '../support/string_util'
 import start from '../start'
+import mock_services from '../start/mock_services'
 
 defineParameterType({
   name: 'notepath',
@@ -201,6 +202,7 @@ When(
 When(
   'I create a note belonging to {string} with title {string} and wikidata id {string}',
   (noteTopology: string, title: string, wikidataId: string) => {
+    mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
     start
       .jumpToNotePage(noteTopology)
       .addingChildNote()

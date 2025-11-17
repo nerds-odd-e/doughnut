@@ -80,16 +80,7 @@ Given('The wikidata service is not available', () => {
 Then(
   'I should see an error {string} on Wikidata Id in note creation',
   (message: string) => {
-    // Open the dialog to see the error message
-    cy.findByRole('button', { name: 'Wikidata Id' }).click()
-    cy.findByText('Search Wikidata').should('be.visible')
-    cy.get('.modal-container').within(() => {
-      cy.expectFieldErrorMessage('Wikidata Id', message)
-    })
-    // Close the dialog
-    cy.get('.modal-container').within(() => {
-      cy.findByRole('button', { name: 'Cancel' }).click()
-    })
+    start.assumeNotePage().wikidataSearch().expectErrorOnWikidataId(message)
   }
 )
 
@@ -129,35 +120,13 @@ When(
   }
 )
 
-Then(
-  'I should see that the {string} becomes {string}',
-  (field: string, value: string) => {
-    if (field === 'Wikidata Id') {
-      // Check the value in the dialog if it's open, otherwise reopen it
-      cy.get('body').then(($body) => {
-        if ($body.find('.modal-container').length > 0) {
-          // Dialog is open, check value in dialog
-          cy.get('.modal-container').within(() => {
-            cy.formField(field).fieldShouldHaveValue(value)
-          })
-        } else {
-          // Dialog is closed, reopen it to check the value
-          cy.findByRole('button', { name: 'Wikidata Id' }).click()
-          cy.findByText('Search Wikidata').should('be.visible')
-          cy.get('.modal-container').within(() => {
-            cy.formField(field).fieldShouldHaveValue(value)
-          })
-          // Close the dialog
-          cy.get('.modal-container').within(() => {
-            cy.findByRole('button', { name: 'Cancel' }).click()
-          })
-        }
-      })
-    } else {
-      cy.formField(field).fieldShouldHaveValue(value)
-    }
-  }
-)
+Then('I should see that the Title becomes {string}', (value: string) => {
+  cy.formField('Title').fieldShouldHaveValue(value)
+})
+
+Then('I should see that the Wikidata Id becomes {string}', (value: string) => {
+  start.assumeNotePage().wikidataSearch().expectWikidataIdValue(value)
+})
 
 Then(
   'a map pointing to lat: {string}, lon: {string} is added to the note',
