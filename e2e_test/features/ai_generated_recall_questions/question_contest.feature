@@ -24,8 +24,12 @@ Feature: User Contests Question generation by AI
     | not legitamate      |  Second question  |
 
   Scenario: I should be able to contest a question
+    # this is a difference when running this test local and in CI server 
+    # in local, this test fails because there are two second questions displayed.
+    # Moving the "OpenAI evaluates the question as not legitamate" to right before "I contest the question" fixes the issue.
+    # But it passes the test in CI server.
+    And OpenAI evaluates the question as not legitamate
     Given I learned one note "Scuba Diving" on day 1
     And I am recalling my note on day 2
-    And OpenAI evaluates the question as not legitamate
     When I contest the question
     Then I should be asked "Second question"
