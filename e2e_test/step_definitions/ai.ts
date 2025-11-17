@@ -12,7 +12,9 @@ import '../support/string_util'
 import start, { mock_services } from '../start'
 
 Given('the OpenAI service is unavailable due to invalid system token', () => {
-  mock_services.openAi().alwaysResponseAsUnauthorized()
+  cy.then(async () => {
+    await mock_services.openAi().alwaysResponseAsUnauthorized()
+  })
 })
 
 Then(

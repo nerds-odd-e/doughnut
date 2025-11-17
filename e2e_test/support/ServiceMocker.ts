@@ -155,12 +155,20 @@ class ServiceMocker {
     return this.addStubToMountebank(stub)
   }
 
-  private async addStubToMountebank(stub: Stub): Promise<void> {
-    cy.get(`@${this.stubsName}`).then((stubs) => {
-      const newStubs = [...stubs, stub]
-      cy.wrap(newStubs).as(this.stubsName)
-      return this.mountebank.addStubsToImposter(newStubs as Stub[])
-    })
+  private addStubToMountebank(stub: Stub): Promise<void> {
+    return cy
+      .get(`@${this.stubsName}`)
+      .then((stubs) => {
+        const newStubs = [...stubs, stub]
+        return cy
+          .wrap(newStubs)
+          .as(this.stubsName)
+          .then(() => newStubs)
+      })
+      .then(async (newStubs) => {
+        await this.mountebank.addStubsToImposter(newStubs as Stub[])
+      })
+      .then(() => undefined) as unknown as Promise<void>
   }
 }
 
