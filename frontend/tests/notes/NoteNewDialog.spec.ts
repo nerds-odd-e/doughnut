@@ -169,23 +169,42 @@ describe("adding new note", () => {
       wikidataId: string
     ) => {
       await openWikidataDialog(key)
+      await flushPromises()
+      vi.runOnlyPendingTimers()
+      await flushPromises()
       const select = getDialogSelect() as HTMLSelectElement
       if (select) {
         select.value = wikidataId
         select.dispatchEvent(new Event("change"))
         await flushPromises()
+        vi.runOnlyPendingTimers()
+        await flushPromises()
+        // Wait for dialog to close after selection
+        let attempts = 0
+        while (
+          document.querySelector(".modal-container") &&
+          attempts < 10
+        ) {
+          await flushPromises()
+          vi.runOnlyPendingTimers()
+          attempts++
+        }
       }
     }
 
     const selectTitleAction = async (
       action: "Replace" | "Append" | "Neither"
     ): Promise<void> => {
+      await flushPromises()
+      vi.runOnlyPendingTimers()
       const radio = document.querySelector(
-        `input[value="${action}"]`
+        `input[type="radio"][value="${action}"]`
       ) as HTMLInputElement
       if (radio) {
         radio.checked = true
-        radio.dispatchEvent(new Event("change"))
+        radio.dispatchEvent(new Event("change", { bubbles: true }))
+        await flushPromises()
+        vi.runOnlyPendingTimers()
         await flushPromises()
       }
     }
@@ -203,11 +222,19 @@ describe("adding new note", () => {
       const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
       await openWikidataDialog("dog")
-      const cancelButton = document.querySelector(
+      await flushPromises()
+      vi.runOnlyPendingTimers()
+      await flushPromises()
+      const cancelButtons = document.querySelectorAll(
         "button.daisy-btn-secondary"
+      )
+      const cancelButton = Array.from(cancelButtons).find(
+        (btn) => (btn as HTMLElement).textContent?.trim() === "Cancel"
       ) as HTMLButtonElement
       if (cancelButton) {
         await cancelButton.click()
+        await flushPromises()
+        vi.runOnlyPendingTimers()
         await flushPromises()
       }
       const dialog = document.querySelector(".modal-container")
@@ -247,6 +274,16 @@ describe("adding new note", () => {
           )
         }
 
+        // Wait for dialog to close
+        let attempts = 0
+        while (document.querySelector(".modal-container") && attempts < 10) {
+          await flushPromises()
+          vi.runOnlyPendingTimers()
+          attempts++
+        }
+
+        await flushPromises()
+        vi.runOnlyPendingTimers()
         await flushPromises()
 
         expect(mockedWikidataSearch).toHaveBeenCalledWith({
