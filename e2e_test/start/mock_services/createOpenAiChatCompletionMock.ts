@@ -67,19 +67,13 @@ const openAiChatCompletionStubber = (
 
   return {
     stubQuestionGeneration(argumentsString: string) {
-      return serviceMocker.stubPoster(`/chat/completions`, {
-        object: 'chat.completion',
-        choices: [
-          {
-            message: {
-              role: 'assistant',
-              content: argumentsString,
-            },
-            index: 0,
-            finish_reason: 'stop',
-          },
-        ],
-      })
+      return stubChatCompletion(
+        {
+          role: 'assistant',
+          content: argumentsString,
+        },
+        'stop'
+      )
     },
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch, {
@@ -95,19 +89,13 @@ const openAiChatCompletionStubber = (
       )
     },
     stubQuestionEvaluation(argumentsString: string) {
-      return serviceMocker.stubPoster(`/chat/completions`, {
-        object: 'chat.completion',
-        choices: [
-          {
-            message: {
-              role: 'assistant',
-              content: argumentsString,
-            },
-            index: 0,
-            finish_reason: 'stop',
-          },
-        ],
-      })
+      return stubChatCompletion(
+        {
+          role: 'assistant',
+          content: argumentsString,
+        },
+        'stop'
+      )
     },
   }
 }
