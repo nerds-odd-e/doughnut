@@ -173,29 +173,32 @@ describe("adding new note", () => {
       // Call the selection method directly on the component
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
       const vm = dialogComponent.vm as any
-      if (vm.searchResults) {
-        // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
-        const selected = vm.searchResults.find((r: any) => r.id === wikidataId)
-        if (selected) {
-          vm.selectedOption = wikidataId
-          vm.selectedItem = selected
+      expect(vm.searchResults).toBeDefined()
+      expect(vm.searchResults.length).toBeGreaterThan(0)
 
-          const currentLabel = vm.currentTitle.toUpperCase()
-          const newLabel = selected.label.toUpperCase()
+      // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
+      const selected = vm.searchResults.find((r: any) => r.id === wikidataId)
+      expect(selected).toBeDefined()
 
-          if (currentLabel === newLabel) {
-            dialogComponent.vm.$emit("selected", selected)
-          } else {
-            vm.showTitleOptions = true
-          }
-          await flushPromises()
-        }
+      vm.selectedOption = wikidataId
+      vm.selectedItem = selected
+
+      const currentLabel = vm.currentTitle.toUpperCase()
+      const newLabel = selected.label.toUpperCase()
+
+      if (currentLabel === newLabel) {
+        dialogComponent.vm.$emit("selected", selected)
+      } else {
+        vm.showTitleOptions = true
       }
+      await flushPromises()
     }
 
     const selectTitleAction = async (
-      action: "Replace" | "Append" | "Neither"
+      action: "Replace" | "Append" | "Neither" | undefined
     ): Promise<void> => {
+      if (!action) return
+
       await flushPromises()
 
       // Find the WikidataSearchDialog component
@@ -208,31 +211,27 @@ describe("adding new note", () => {
       await flushPromises()
 
       // Manually call handleTitleAction to emit the event
-      if (vm.selectedItem) {
-        let actionValue: "replace" | "append" | "neither" | undefined
-        if (action === "Replace") {
-          actionValue = "replace"
-        } else if (action === "Append") {
-          actionValue = "append"
-        } else if (action === "Neither") {
-          actionValue = "neither"
-        }
+      expect(vm.selectedItem).toBeDefined()
 
-        const id = vm.selectedItem.id
-        if (id) {
-          dialogComponent.vm.$emit("update:wikidataId", id)
-        }
-        dialogComponent.vm.$emit("selected", vm.selectedItem, actionValue)
-        await flushPromises()
+      const actionValueMap: Record<string, "replace" | "append" | "neither"> = {
+        Replace: "replace",
+        Append: "append",
+        Neither: "neither",
       }
+      const actionValue = actionValueMap[action]
+
+      const id = vm.selectedItem.id
+      expect(id).toBeDefined()
+      dialogComponent.vm.$emit("update:wikidataId", id)
+      dialogComponent.vm.$emit("selected", vm.selectedItem, actionValue)
+      await flushPromises()
     }
 
     const waitForDialogToClose = async () => {
-      let attempts = 0
-      while (document.querySelector(".modal-container") && attempts < 20) {
-        await flushPromises()
-        attempts++
-      }
+      await flushPromises()
+      await nextTick()
+      await flushPromises()
+      await nextTick()
       await flushPromises()
     }
 
@@ -301,14 +300,14 @@ describe("adding new note", () => {
         await openWikidataDialog(searchTitle)
         await selectFromDropdown(wikidataId)
 
-        if (titleAction) {
-          await selectTitleAction(
-            (titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
+        const titleActionCapitalized = titleAction
+          ? ((titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
               | "Replace"
               | "Append"
-              | "Neither"
-          )
-        }
+              | "Neither")
+          : undefined
+
+        await selectTitleAction(titleActionCapitalized)
 
         await waitForDialogToClose()
 
