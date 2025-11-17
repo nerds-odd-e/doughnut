@@ -8,6 +8,12 @@ const noteCreationForm = {
     })
   },
 
+  createNoteWithTitle(title: string) {
+    return submittableForm.submitWith({
+      Title: title,
+    })
+  },
+
   createNoteWithAttributes(attributes: Record<string, string>) {
     const { Title, 'Wikidata Id': wikidataId, ...remainingAttrs } = attributes
     expect(Object.keys(remainingAttrs)).to.have.lengthOf(0)

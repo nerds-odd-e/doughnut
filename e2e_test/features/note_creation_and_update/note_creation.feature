@@ -10,9 +10,7 @@ Feature: Nested Note creation
       | tech  | LeSS in Action |
 
   Scenario: Create a new note belonging to another note
-    When I create a note belonging to "LeSS in Action":
-      | Title        |
-      | Re-quirement |
+    When I create a note belonging to "LeSS in Action" with title "Re-quirement"
     Then I should see the note tree in the sidebar
       | note-title   |
       | team         |
@@ -25,9 +23,7 @@ Feature: Nested Note creation
       | Re-quirement |
 
   Scenario: Create a new note with incorrect info
-    When I create a note belonging to "LeSS in Action":
-      | Title |
-      |       |
+    When I create a note belonging to "LeSS in Action" with title ""
     Then I should see that the note creation is not successful
 
   Scenario: Create a new note as next sibling

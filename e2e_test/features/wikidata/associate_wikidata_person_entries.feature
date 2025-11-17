@@ -16,9 +16,7 @@ Feature: Note creation should have details if wikidata is a person
 
   @usingMockedWikidataService
   Scenario Outline: Create a note for a person with wikidata should auto fill the details
-    When I create a note belonging to "People":
-      | Title         | Wikidata Id   |
-      | <person name> | <Wikidata Id> |
+    When I create a note belonging to "People" with title "<person name>" and wikidata id "<Wikidata Id>"
     Then the note details on the current page should be "<expected details>"
 
     Examples:
@@ -29,17 +27,13 @@ Feature: Note creation should have details if wikidata is a person
 
   @usingMockedWikidataService
   Scenario: Create a note for the country of origin when the person is created
-    When I create a note belonging to "People":
-      | Title     | Wikidata Id |
-      | Confucius | Q4604       |
+    When I create a note belonging to "People" with title "Confucius" and wikidata id "Q4604"
     Then I should see "People/Confucius" with these children
       | note-title |
       | Lu         |
 
   @usingMockedWikidataService
   Scenario: link to the country of orgin note if it already exists
-    When I create a note belonging to "People":
-      | Title           | Wikidata Id |
-      | Wang Chien-ming | Q706446     |
+    When I create a note belonging to "People" with title "Wang Chien-ming" and wikidata id "Q706446"
     Then I should see note "People/Wang Chien-ming" has link "related to" "Taiwan"
 # this check is not sufficient, should check new note is not create for taiwan

@@ -9,16 +9,12 @@ Feature: Nested Note Create with wikidata
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with a wikidata id
     Given Wikidata.org has an entity "Q2102" with label "long animal"
-    When I create a note belonging to "Animals":
-      | Title | Wikidata Id |
-      | snake | Q2102       |
+    When I create a note belonging to "Animals" with title "snake" and wikidata id "Q2102"
     Then the Wiki association of note "snake" should link to "https://www.wikidata.org/wiki/Q2102"
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
-    When I create a note belonging to "Animals":
-      | Title | Wikidata Id |
-      | snake | Q12345R     |
+    When I create a note belonging to "Animals" with title "snake" and wikidata id "Q12345R"
     Then I should see an error "The wikidata Id should be Q<numbers>" on Wikidata Id in note creation
 
   @usingMockedWikidataService @mockBrowserTime
@@ -35,7 +31,5 @@ Feature: Nested Note Create with wikidata
     Given I have a notebook with head note "Star" and notes:
       | Title            | Wikidata Id| Parent Title|
       | Sun              | Q123       | Star        |
-    When I create a note belonging to "Star":
-      | Title | Wikidata Id |
-      | Solar | Q123        |
+    When I create a note belonging to "Star" with title "Solar" and wikidata id "Q123"
     Then I should see an error "Duplicate Wikidata ID Detected." on Wikidata Id in note creation

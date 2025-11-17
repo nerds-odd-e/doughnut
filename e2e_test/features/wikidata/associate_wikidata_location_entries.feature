@@ -11,9 +11,7 @@ Feature: Note creation/edit for a location
 
   @usingMockedWikidataService
   Scenario: New Note creation and wikidata is selected by user
-    When I create a note belonging to "places":
-      | Title     | Wikidata Id |
-      | Singapore | Q334        |
+    When I create a note belonging to "places" with title "Singapore" and wikidata id "Q334"
     Then the note details on the current page should be "Location: 1.3'N, 103.8'E"
 
   @usingMockedWikidataService
@@ -26,7 +24,5 @@ Feature: Note creation/edit for a location
 
   @usingMockedWikidataService
   Scenario: A note can be created for a location with a map and identifying image
-    When I create a note belonging to "places":
-      | Title     | Wikidata Id |
-      | Singapore | Q334        |
+    When I create a note belonging to "places" with title "Singapore" and wikidata id "Q334"
     Then a map pointing to lat: "1.3", lon: "103.8" is added to the note

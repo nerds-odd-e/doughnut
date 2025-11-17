@@ -189,13 +189,22 @@ When(
 )
 
 When(
-  'I create a note belonging to {string}:',
-  (noteTopology: string, data: DataTable) => {
-    expect(data.hashes().length).to.equal(1)
+  'I create a note belonging to {string} with title {string}',
+  (noteTopology: string, title: string) => {
     start
       .jumpToNotePage(noteTopology)
       .addingChildNote()
-      .createNoteWithAttributes(data.hashes()[0]!)
+      .createNoteWithTitle(title)
+  }
+)
+
+When(
+  'I create a note belonging to {string} with title {string} and wikidata id {string}',
+  (noteTopology: string, title: string, wikidataId: string) => {
+    start
+      .jumpToNotePage(noteTopology)
+      .addingChildNote()
+      .createNoteWithAttributes({ Title: title, 'Wikidata Id': wikidataId })
   }
 )
 
