@@ -9,14 +9,13 @@ const noteCreationForm = {
   },
 
   createNoteWithTitleAndWikidataId(title: string, wikidataId: string) {
-    return submittableForm
-      .fill({
-        Title: title,
-      })
-      .fill({
-        'Wikidata Id': wikidataId,
-      })
-      .submit()
+    const form = submittableForm.fill({
+      Title: title,
+    })
+    form.fill({
+      'Wikidata Id': wikidataId,
+    })
+    form.submit()
   },
   wikidataSearch() {
     return assumeWikidataSearchDialog()
