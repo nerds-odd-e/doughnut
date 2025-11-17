@@ -1,7 +1,7 @@
 function searchNote(searchKey: string, options: string[]) {
   options?.forEach((option: string) => cy.formField(option).check())
   cy.findByPlaceholderText('Search').clear().type(searchKey)
-  cy.tick(500)
+  cy.tick(1000)
 }
 
 export const assumeNoteTargetSearchDialog = () => {

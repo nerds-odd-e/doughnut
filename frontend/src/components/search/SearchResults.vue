@@ -165,7 +165,7 @@ const semanticRelativeSearch = async (
   return managedApi.services.semanticSearch({ requestBody: searchTerm })
 }
 
-const debounced = debounce((callback) => callback(), 500)
+const debounced = debounce((callback) => callback(), 1000)
 
 const mergeUniqueAndSortByDistance = (
   existing: NoteSearchResult[],

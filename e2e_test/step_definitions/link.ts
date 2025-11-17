@@ -63,7 +63,7 @@ When(
 When(
   'I should see {string} as the possible duplicate',
   (noteTopicsAsString: string) => {
-    cy.tick(500)
+    cy.tick(1000)
     start
       .assumeNoteTargetSearchDialog()
       .expectExactDropdownTargets(
