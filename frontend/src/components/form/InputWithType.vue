@@ -11,13 +11,23 @@
         {{ titlized }}
       </label>
       <i v-if="hint" class="hint" v-text="hint" />
-      <div class="daisy-join">
+      <div class="daisy-join daisy-w-full">
         <template v-if="$slots.input_prepend">
           <div class="daisy-join-item">
             <slot name="input_prepend" />
           </div>
         </template>
-        <slot />
+        <div v-if="$slots.input_prepend || $slots.input_append" class="daisy-join-item daisy-flex-1">
+          <slot />
+        </div>
+        <template v-else>
+          <slot />
+        </template>
+        <template v-if="$slots.input_append">
+          <div class="daisy-join-item">
+            <slot name="input_append" />
+          </div>
+        </template>
       </div>
     </template>
     <div class="daisy-text-error daisy-text-sm" v-if="!!errorMessage">{{ errorMessage }}</div>

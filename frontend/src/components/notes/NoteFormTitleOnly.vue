@@ -9,8 +9,11 @@
     @update:model-value="$emit('update:modelValue', $event)"
     @blur="emit('blur')"
     @focus="emit('focus')"
-
-  />
+  >
+    <template #input_append v-if="$slots.input_append">
+      <slot name="input_append" />
+    </template>
+  </TextInput>
 </template>
 
 <script setup lang="ts">

@@ -4,7 +4,7 @@
       <slot name="input_prepend" />
     </template>
     <input
-      :class="`daisy-input daisy-input-bordered daisy-w-full ${!!errorMessage ? 'daisy-input-error' : ''}`"
+      :class="`daisy-input daisy-input-bordered daisy-w-full ${!!errorMessage ? 'daisy-input-error' : ''} ${$slots.input_prepend ? 'daisy-rounded-l-none' : ''} ${$slots.input_append ? 'daisy-rounded-r-none' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
       :value="modelValue"
@@ -17,6 +17,9 @@
       @focus="$emit('focus')"
       :disabled="disabled"
     />
+    <template #input_append v-if="$slots.input_append">
+      <slot name="input_append" />
+    </template>
   </InputWithType>
 </template>
 

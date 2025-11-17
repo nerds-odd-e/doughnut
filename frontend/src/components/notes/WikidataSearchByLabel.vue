@@ -2,10 +2,10 @@
   <button
     title="Wikidata Id"
     type="button"
-    class="daisy-btn daisy-btn-outline daisy-btn-neutral"
+    class="daisy-btn daisy-btn-outline daisy-btn-neutral daisy-rounded-l-none"
     @click.prevent="openDialog"
   >
-    <SvgSearchWikidata />
+    <SvgWikidata />
   </button>
   <WikidataSearchDialog
     v-if="showDialog"
@@ -22,7 +22,7 @@
 <script lang="ts">
 import type { WikidataSearchEntity } from "@generated/backend"
 import { defineComponent } from "vue"
-import SvgSearchWikidata from "../svgs/SvgSearchWikidata.vue"
+import SvgWikidata from "../svgs/SvgWikidata.vue"
 import WikidataSearchDialog from "./WikidataSearchDialog.vue"
 
 export default defineComponent({
@@ -34,7 +34,7 @@ export default defineComponent({
   },
   emits: ["selected", "update:modelValue"],
   components: {
-    SvgSearchWikidata,
+    SvgWikidata,
     WikidataSearchDialog,
   },
   data() {

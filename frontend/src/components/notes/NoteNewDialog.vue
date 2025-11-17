@@ -8,7 +8,17 @@
               v-model="creationData.newTitle"
               :error-message="noteFormErrors.newTitle"
               @update:model-value="onTitleChange"
-            />
+            >
+              <template #input_append>
+                <WikidataSearchByLabel
+                  :search-key="creationData.newTitle"
+                  :current-title="creationData.newTitle"
+                  v-model="creationData.wikidataId"
+                  :error-message="noteFormErrors.wikidataId"
+                  @selected="onSelectWikidataEntry"
+                />
+              </template>
+            </NoteFormTitleOnly>
             <SearchResults
               v-bind="{
                 noteId: referenceNote.id,
@@ -18,14 +28,6 @@
               class="title-search-results"
             />
           </div>
-
-          <WikidataSearchByLabel
-            :search-key="creationData.newTitle"
-            :current-title="creationData.newTitle"
-            v-model="creationData.wikidataId"
-            :error-message="noteFormErrors.wikidataId"
-            @selected="onSelectWikidataEntry"
-          />
           <input
             type="submit"
             value="Submit"
