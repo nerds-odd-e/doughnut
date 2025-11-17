@@ -54,7 +54,7 @@ export default defineComponent({
     },
     handleSelected(
       entity: WikidataSearchEntity,
-      titleAction?: "replace" | "append" | "neither"
+      titleAction?: "replace" | "append"
     ) {
       this.showDialog = false
       this.$emit("selected", entity, titleAction)

@@ -120,7 +120,7 @@ const processForm = async () => {
 
 const onSelectWikidataEntry = (
   selectedSuggestion: WikidataSearchEntity,
-  titleAction?: "replace" | "append" | "neither"
+  titleAction?: "replace" | "append"
 ) => {
   creationData.value.wikidataId = selectedSuggestion.id
 
@@ -130,8 +130,6 @@ const onSelectWikidataEntry = (
   } else if (titleAction === "append") {
     creationData.value.newTitle = `${creationData.value.newTitle} / ${selectedSuggestion.label}`
     hasTitleBeenEdited.value = true
-  } else if (titleAction === "neither") {
-    // Don't change the title
   } else {
     // When titles match (no titleAction), replace with the exact label from Wikidata
     creationData.value.newTitle = selectedSuggestion.label

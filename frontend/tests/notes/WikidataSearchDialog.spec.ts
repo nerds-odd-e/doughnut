@@ -197,7 +197,6 @@ describe("WikidataSearchDialog", () => {
     expect(modal?.textContent).toContain("Suggested Title: Canine")
     expect(modal?.querySelector('input[value="Replace"]')).toBeTruthy()
     expect(modal?.querySelector('input[value="Append"]')).toBeTruthy()
-    expect(modal?.querySelector('input[value="Neither"]')).toBeTruthy()
   })
 
   it("emits selected with replace action", async () => {
@@ -254,34 +253,6 @@ describe("WikidataSearchDialog", () => {
     const emitted = wrapper.emitted("selected")?.[0]
     expect(emitted?.[0]).toEqual(searchResult)
     expect(emitted?.[1]).toBe("append")
-  })
-
-  it("emits selected with neither action", async () => {
-    const searchResult = makeMe.aWikidataSearchEntity
-      .label("Canine")
-      .id("Q11399")
-      .please()
-    mockedWikidataSearch.mockResolvedValue([searchResult])
-    const wrapper = mountDialog("dog", "dog")
-    await flushPromises()
-    const modal = document.querySelector(".modal-container")
-    const select = modal?.querySelector(
-      'select[name="wikidataSearchResult"]'
-    ) as HTMLSelectElement
-    expect(select).toBeTruthy()
-    select.value = "Q11399"
-    select.dispatchEvent(new Event("change", { bubbles: true }))
-    await flushPromises()
-    const neitherLabel = modal?.querySelector(
-      'label[for="wikidataTitleAction-Neither"]'
-    ) as HTMLLabelElement
-    expect(neitherLabel).toBeTruthy()
-    neitherLabel.click()
-    await flushPromises()
-    expect(wrapper.emitted("selected")).toBeTruthy()
-    const emitted = wrapper.emitted("selected")?.[0]
-    expect(emitted?.[0]).toEqual(searchResult)
-    expect(emitted?.[1]).toBe("neither")
   })
 
   it("can cancel from title options view", async () => {

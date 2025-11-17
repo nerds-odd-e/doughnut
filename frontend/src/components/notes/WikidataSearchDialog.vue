@@ -49,7 +49,6 @@
           :options="[
             { value: 'Replace', label: 'Replace title' },
             { value: 'Append', label: 'Append title' },
-            { value: 'Neither', label: 'Neither' },
           ]"
           @update:model-value="handleTitleAction"
         />
@@ -83,10 +82,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   close: []
-  selected: [
-    entity: WikidataSearchEntity,
-    titleAction?: "replace" | "append" | "neither",
-  ]
+  selected: [entity: WikidataSearchEntity, titleAction?: "replace" | "append"]
   "update:modelValue": [value: string]
 }>()
 
@@ -97,7 +93,7 @@ const searchResults = ref<WikidataSearchEntity[]>([])
 const selectedOption = ref("")
 const selectedItem = ref<WikidataSearchEntity | null>(null)
 const showTitleOptions = ref(false)
-const titleAction = ref<"Replace" | "Append" | "Neither" | "">("")
+const titleAction = ref<"Replace" | "Append" | "">("")
 const select = ref<HTMLSelectElement | null>(null)
 const localWikidataId = ref(props.modelValue || "")
 const hasSearched = ref(false)
@@ -149,13 +145,11 @@ const onSelectSearchResult = () => {
 const handleTitleAction = () => {
   if (!selectedItem.value) return
 
-  let action: "replace" | "append" | "neither" | undefined
+  let action: "replace" | "append" | undefined
   if (titleAction.value === "Replace") {
     action = "replace"
   } else if (titleAction.value === "Append") {
     action = "append"
-  } else if (titleAction.value === "Neither") {
-    action = "neither"
   }
 
   emit("selected", selectedItem.value, action)

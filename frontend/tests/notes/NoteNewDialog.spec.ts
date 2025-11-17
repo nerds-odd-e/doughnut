@@ -195,7 +195,7 @@ describe("adding new note", () => {
     }
 
     const selectTitleAction = async (
-      action: "Replace" | "Append" | "Neither" | undefined
+      action: "Replace" | "Append" | undefined
     ): Promise<void> => {
       if (!action) return
 
@@ -213,10 +213,9 @@ describe("adding new note", () => {
       // Manually call handleTitleAction to emit the event
       expect(vm.selectedItem).toBeDefined()
 
-      const actionValueMap: Record<string, "replace" | "append" | "neither"> = {
+      const actionValueMap: Record<string, "replace" | "append"> = {
         Replace: "replace",
         Append: "append",
-        Neither: "neither",
       }
       const actionValue = actionValueMap[action]
 
@@ -278,7 +277,6 @@ describe("adding new note", () => {
       ${"dog"}    | ${"Dog"}      | ${"Q1"}    | ${undefined} | ${"Dog"}
       ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"replace"} | ${"Canine"}
       ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"append"}  | ${"dog / Canine"}
-      ${"dog"}    | ${"Canine"}   | ${"Q1"}    | ${"neither"} | ${"dog"}
     `(
       "search $searchTitle get $wikidataTitle with action $titleAction results in $expectedTitle",
       async ({
@@ -300,8 +298,7 @@ describe("adding new note", () => {
         const titleActionCapitalized = titleAction
           ? ((titleAction.charAt(0).toUpperCase() + titleAction.slice(1)) as
               | "Replace"
-              | "Append"
-              | "Neither")
+              | "Append")
           : undefined
 
         await selectTitleAction(titleActionCapitalized)
