@@ -299,8 +299,8 @@ Cypress.Commands.add(
   'expectFieldErrorMessage',
   (field: string, message: string) => {
     cy.formField(field)
-      .parent()
-      .siblings('.daisy-text-error')
+      .closest('.daisy-form-control')
+      .find('.daisy-text-error')
       .findByText(message)
   }
 )
