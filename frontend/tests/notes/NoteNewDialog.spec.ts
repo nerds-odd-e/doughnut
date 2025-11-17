@@ -220,9 +220,6 @@ describe("adding new note", () => {
       }
       const actionValue = actionValueMap[action]
 
-      const id = vm.selectedItem.id
-      expect(id).toBeDefined()
-      dialogComponent.vm.$emit("update:wikidataId", id)
       dialogComponent.vm.$emit("selected", vm.selectedItem, actionValue)
       await flushPromises()
     }
