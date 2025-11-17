@@ -7,11 +7,10 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import { ref } from "vue"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
-  useRoute: () => vi.fn().mockReturnValue(ref(null)),
+  useRoute: () => ({ path: "/" }),
   useRouter: () => ({
     push: mockedPush,
   }),

@@ -1,10 +1,9 @@
 import Modal from "@/components/commons/Modal.vue"
 import { mount } from "@vue/test-utils"
-import { ref } from "vue"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
-  useRoute: () => vi.fn().mockReturnValue(ref(null)),
+  useRoute: () => ({ path: "/" }),
   useRouter: () => ({
     push: mockedPush,
   }),

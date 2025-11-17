@@ -46,9 +46,12 @@ const sidebarStyle = computed(() => {
 
 // Route watcher
 const route = useRoute()
-watch(route, () => {
-  emit("close_request")
-})
+watch(
+  () => route.path,
+  () => {
+    emit("close_request")
+  }
+)
 
 // ESC key handler - only for non-popup modals
 const handleEscape = (event: KeyboardEvent) => {
