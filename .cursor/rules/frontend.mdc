@@ -151,3 +151,25 @@ onMounted(() => {
 5. "mount" vs "render"
    - the test helper can either mount or render the component. "render" will call the testing-library render and mount will call the vuejs test util mount.
    - In either style testing, the test should avoid finding VueJS component in the render or mount result, so that the test can be more end to end.
+
+6. **Avoid If-Conditions in Tests**
+   - Tests must be deterministic - they should always execute the same way
+   - Use assertions instead of if-conditions to ensure tests fail clearly when expectations aren't met
+   - Use sequential async operations instead of loops where possible
+   - Example - Bad (non-deterministic):
+   ```typescript
+   if (vm.searchResults) {
+     const selected = vm.searchResults.find((r) => r.id === wikidataId)
+     if (selected) {
+       // do something
+     }
+   }
+   ```
+   - Example - Good (deterministic):
+   ```typescript
+   expect(vm.searchResults).toBeDefined()
+   expect(vm.searchResults.length).toBeGreaterThan(0)
+   const selected = vm.searchResults.find((r) => r.id === wikidataId)
+   expect(selected).toBeDefined()
+   // do something with selected
+   ```
