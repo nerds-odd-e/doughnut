@@ -9,6 +9,8 @@ import {
   When,
 } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
+import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
+import { assumeWikidataSearchDialog } from '../start/pageObjects/wikidataSearchDialog'
 
 When(
   'I associate the note {string} with wikidata id {string}',
@@ -80,7 +82,7 @@ Given('The wikidata service is not available', () => {
 Then(
   'I should see an error {string} on Wikidata Id in note creation',
   (message: string) => {
-    start.assumeNotePage().wikidataSearch().expectErrorOnWikidataId(message)
+    noteCreationForm.wikidataSearch().expectErrorOnWikidataId(message)
   }
 )
 
@@ -110,13 +112,13 @@ Given(
 )
 
 When('I search with phrase {string} on Wikidata', (phrase: string) => {
-  start.assumeNotePage().wikidataSearch().search(phrase).open()
+  noteCreationForm.searchWikidata(phrase)
 })
 
 When(
   'I select wikidataID {string} from the Wikidata search result',
   (wikidataID: string) => {
-    start.assumeNotePage().wikidataSearch().selectResult(wikidataID)
+    assumeWikidataSearchDialog().selectResult(wikidataID)
   }
 )
 
@@ -125,7 +127,7 @@ Then('I should see that the Title becomes {string}', (value: string) => {
 })
 
 Then('I should see that the Wikidata Id becomes {string}', (value: string) => {
-  start.assumeNotePage().wikidataSearch().expectWikidataIdValue(value)
+  noteCreationForm.wikidataSearch().expectWikidataIdValue(value)
 })
 
 Then(

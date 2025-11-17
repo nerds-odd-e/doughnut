@@ -12,11 +12,16 @@ const noteCreationForm = {
     const form = submittableForm.fill({
       Title: title,
     })
-    assumeWikidataSearchDialog().open().setWikidataId(wikidataId).close()
+    this.wikidataSearch().setWikidataId(wikidataId).close()
     form.submit()
   },
   wikidataSearch() {
+    cy.findByRole('button', { name: 'Wikidata Id' }).click()
     return assumeWikidataSearchDialog()
+  },
+  searchWikidata(phrase: string) {
+    cy.formField('Title').assignFieldValue(phrase)
+    return this.wikidataSearch()
   },
 }
 

@@ -398,6 +398,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
     wikidataSearch() {
+      cy.findByRole('button', { name: 'Wikidata Id' }).click()
       return assumeWikidataSearchDialog()
     },
   }

@@ -49,7 +49,7 @@ describe("SearchResults.vue", () => {
       .mount()
 
     await nextTick()
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(1100)
     await flushPromises()
 
     expect(wrapper.text()).toContain("No matching notes found.")
@@ -88,7 +88,7 @@ describe("SearchResults.vue", () => {
       .mount()
 
     await nextTick()
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(1100)
     await flushPromises()
 
     expect(wrapper.text()).toContain("No matching notes found.")
@@ -129,7 +129,7 @@ describe("SearchResults.vue", () => {
 
     // first debounced call
     await nextTick()
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(1100)
     await flushPromises()
 
     // change search context (noteId) and keep same trimmed key (adds trailing space)
@@ -138,7 +138,7 @@ describe("SearchResults.vue", () => {
     // second debounced schedules another API call for same trimmed key
     // ensure watchers flush
     await nextTick()
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(1100)
     await flushPromises()
 
     expect(firstSpy).toHaveBeenCalledTimes(1)
@@ -189,7 +189,7 @@ describe("SearchResults.vue", () => {
 
     // first batch
     await nextTick()
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(1100)
     await flushPromises()
 
     // second batch using context change to within (noteId)
@@ -197,7 +197,7 @@ describe("SearchResults.vue", () => {
     // ensure watchers flush
     await nextTick()
     await flushPromises()
-    vi.advanceTimersByTime(600)
+    vi.advanceTimersByTime(1100)
     await flushPromises()
 
     // Ensure both endpoints were used once
