@@ -6,7 +6,8 @@ export const assumeWikidataSearchDialog = () => {
       return this
     },
     search(phrase: string) {
-      cy.focused().clear().type(phrase)
+      // Type in the title field (the dialog will search automatically when opened)
+      cy.formField('Title').assignFieldValue(phrase)
       return this
     },
     selectResult(wikidataID: string) {

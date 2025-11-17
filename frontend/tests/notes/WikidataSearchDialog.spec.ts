@@ -20,15 +20,55 @@ describe("WikidataSearchDialog", () => {
     )
   })
 
-  const mountDialog = (searchKey: string, currentTitle: string = "") => {
+  const mountDialog = (
+    searchKey: string,
+    currentTitle: string = "",
+    modelValue: string = "",
+    errorMessage: string = ""
+  ) => {
     return helper
       .component(WikidataSearchDialog)
       .withProps({
         searchKey,
         currentTitle,
+        modelValue,
+        errorMessage,
       })
       .mount({ attachTo: document.body })
   }
+
+  it("shows the current wikidata ID in the input field", async () => {
+    mountDialog("", "", "Q123")
+    await flushPromises()
+    const modal = document.querySelector(".modal-container")
+    const input = modal?.querySelector(
+      'input[id="wikidataID-wikidataID"]'
+    ) as HTMLInputElement
+    expect(input?.value).toBe("Q123")
+  })
+
+  it("emits update:modelValue when user types in the input", async () => {
+    const wrapper = mountDialog("", "", "")
+    await flushPromises()
+    const modal = document.querySelector(".modal-container")
+    const input = modal?.querySelector(
+      'input[id="wikidataID-wikidataID"]'
+    ) as HTMLInputElement
+    expect(input).toBeTruthy()
+    input.value = "Q456"
+    input.dispatchEvent(new Event("input", { bubbles: true }))
+    await flushPromises()
+    expect(wrapper.emitted("update:modelValue")).toBeTruthy()
+    expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["Q456"])
+  })
+
+  it("displays error message in the input field", async () => {
+    mountDialog("", "", "", "Invalid Wikidata ID")
+    await flushPromises()
+    const modal = document.querySelector(".modal-container")
+    const errorMessage = modal?.querySelector(".daisy-text-error")
+    expect(errorMessage?.textContent).toContain("Invalid Wikidata ID")
+  })
 
   it("shows loading state initially", async () => {
     mockedWikidataSearch.mockImplementation(
@@ -51,11 +91,11 @@ describe("WikidataSearchDialog", () => {
     expect(modal?.textContent).toContain(
       "No Wikidata entries found for 'nonexistent'"
     )
-    const closeButton = modal?.querySelector("button.daisy-btn-secondary")
-    expect(closeButton?.textContent?.trim()).toBe("Close")
+    const cancelButton = modal?.querySelector("button.daisy-btn-secondary")
+    expect(cancelButton?.textContent?.trim()).toBe("Close")
   })
 
-  it("emits close when cancel button is clicked", async () => {
+  it("emits close when close button is clicked", async () => {
     mockedWikidataSearch.mockResolvedValue([])
     const wrapper = mountDialog("test")
     await flushPromises()
@@ -103,6 +143,16 @@ describe("WikidataSearchDialog", () => {
     const emitted = wrapper.emitted("selected")?.[0]
     expect(emitted?.[0]).toEqual(searchResult)
     expect(emitted?.[1]).toBeUndefined()
+    // Check that the input value is updated
+    const input = modal?.querySelector(
+      'input[id="wikidataID-wikidataID"]'
+    ) as HTMLInputElement
+    expect(input?.value).toBe("Q11399")
+    // Check that update:modelValue was emitted
+    expect(wrapper.emitted("update:modelValue")).toBeTruthy()
+    expect(
+      wrapper.emitted("update:modelValue")?.some((args) => args[0] === "Q11399")
+    ).toBe(true)
   })
 
   it("emits selected with no titleAction when titles match case-insensitively", async () => {
