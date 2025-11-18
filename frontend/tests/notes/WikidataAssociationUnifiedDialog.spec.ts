@@ -78,7 +78,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
     mountDialog("Test Title")
     await flushPromises()
     const modal = document.querySelector(".modal-container")
-    expect(modal?.textContent).toContain("Search Wikidata")
+    expect(modal?.textContent).toContain("Associate Wikidata")
   })
 
   it("uses custom header title when provided", async () => {

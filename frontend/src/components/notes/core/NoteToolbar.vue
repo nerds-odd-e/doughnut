@@ -47,8 +47,12 @@
           <SvgWikidata :class="{ 'wikidata-has-value': note.wikidataId }" />
         </template>
         <template #default="{ closer }">
-          <WikidataAssociationForEdit
-            v-bind="{ note, storageAccessor }"
+          <WikidataAssociationUnifiedDialog
+            :note="note"
+            :storage-accessor="storageAccessor"
+            :search-key="note.noteTopology.titleOrPredicate"
+            :current-title="note.noteTopology.titleOrPredicate"
+            :show-save-button="true"
             @close-dialog="closer"
           />
         </template>
@@ -193,7 +197,7 @@ import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
-import WikidataAssociationForEdit from "../WikidataAssociationForEdit.vue"
+import WikidataAssociationUnifiedDialog from "../WikidataAssociationUnifiedDialog.vue"
 import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "./NoteExportDialog.vue"
 
