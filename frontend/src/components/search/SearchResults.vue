@@ -14,20 +14,20 @@
       />
     </div>
 
-    <div v-if="searchResult === undefined">
+    <div v-if="searchResult === undefined && trimmedSearchKey !== ''">
       <em>Searching ...</em>
     </div>
 
-    <div v-else-if="searchResult.length === 0 && isDropdown" class="dropdown-list">
+    <div v-else-if="searchResult !== undefined && searchResult.length === 0 && isDropdown" class="dropdown-list">
       <em v-if="trimmedSearchKey === ''">Similar notes within the same notebook</em>
       <em v-else>No matching notes found.</em>
     </div>
 
-    <div v-else-if="searchResult.length === 0">
+    <div v-else-if="searchResult !== undefined && searchResult.length === 0">
       <em>No matching notes found.</em>
     </div>
 
-    <div v-else-if="isDropdown" class="dropdown-list">
+    <div v-else-if="searchResult !== undefined && isDropdown" class="dropdown-list">
       <NoteTitleWithLink
         v-for="noteTopology in searchResult"
         :key="noteTopology.id"
@@ -36,7 +36,7 @@
     </div>
 
     <Cards
-      v-else
+      v-else-if="searchResult !== undefined"
       class="search-result"
       :noteTopologies="searchResult"
       :columns="3"
