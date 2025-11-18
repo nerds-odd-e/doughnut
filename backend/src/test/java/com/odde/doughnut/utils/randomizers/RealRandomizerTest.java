@@ -1,9 +1,9 @@
-package com.odde.doughnut.models.randomizers;
+package com.odde.doughnut.utils.randomizers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.utils.Randomizer;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

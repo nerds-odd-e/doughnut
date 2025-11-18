@@ -18,7 +18,7 @@ import java.util.List;
 public record AiQuestionGenerator(
     OpenAiApi openAiApi,
     GlobalSettingsService globalSettingsService,
-    com.odde.doughnut.models.Randomizer randomizer,
+    com.odde.doughnut.utils.Randomizer randomizer,
     ObjectMapper objectMapper) {
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, MessageRequest additionalMessage) {

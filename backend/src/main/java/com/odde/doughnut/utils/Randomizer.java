@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.utils;
 
 import java.util.List;
 import java.util.Optional;

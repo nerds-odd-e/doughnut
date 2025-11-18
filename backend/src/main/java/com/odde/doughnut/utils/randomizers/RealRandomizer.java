@@ -1,6 +1,6 @@
-package com.odde.doughnut.models.randomizers;
+package com.odde.doughnut.utils.randomizers;
 
-import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.utils.Randomizer;
 import java.util.*;
 
 public class RealRandomizer implements Randomizer {
