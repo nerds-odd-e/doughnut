@@ -145,7 +145,12 @@ const {
   selectSearchResult,
   getTitleAction,
   setWikidataId,
+  showTitleOptionsForEntity,
 } = useWikidataAssociation(searchKeyRef, currentTitleRef, props.modelValue)
+
+defineExpose({
+  showTitleOptionsForEntity,
+})
 
 const select = ref<HTMLSelectElement | null>(null)
 
@@ -168,7 +173,11 @@ const onSelectSearchResult = () => {
 const handleTitleAction = () => {
   if (!selectedItem.value) return
   const action = getTitleAction()
-  emit("selected", selectedItem.value, action)
+  // When showSaveButton is true, don't emit selected immediately
+  // Wait for user to click Save button
+  if (!props.showSaveButton) {
+    emit("selected", selectedItem.value, action)
+  }
 }
 
 const handleClose = () => {
@@ -177,7 +186,14 @@ const handleClose = () => {
 
 const handleSave = () => {
   if (localWikidataId.value && localWikidataId.value.trim() !== "") {
-    emit("save", localWikidataId.value)
+    // If title options are shown and user has selected an action,
+    // emit selected event instead of save
+    if (showTitleOptions.value && selectedItem.value && titleAction.value) {
+      const action = getTitleAction()
+      emit("selected", selectedItem.value, action)
+    } else {
+      emit("save", localWikidataId.value)
+    }
   }
 }
 

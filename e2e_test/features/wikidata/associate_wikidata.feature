@@ -11,13 +11,15 @@ Feature: associate wikidata ID to note
   @usingMockedWikidataService
   Scenario: Associate note to wikidata when the service is not available
     Given The wikidata service is not available
+    And Wikidata search result always has "TDD" with ID "Q1"
     When I associate the note "TDD" with wikidata id "Q1"
     Then I should see an error "The wikidata service is not available" on Wikidata Id in association
 
 
   @usingMockedWikidataService
   Scenario Outline: Associate note to wikidata with validation
-    Given Wikidata.org has an entity "<id>" with label "<wikidata label>"
+    Given Wikidata search result always has "TDD" with ID "<id>"
+    And Wikidata.org has an entity "<id>" with label "<wikidata label>"
     When I associate the note "TDD" with wikidata id "<id>"
     Then I <need to confirm> the association with different label "<wikidata label>"
 
@@ -28,7 +30,8 @@ Feature: associate wikidata ID to note
 
   @usingMockedWikidataService
   Scenario Outline: Associate note to wikipedia via wikidata
-    Given Wikidata.org has an entity "<id>" with label "TDD" and link to wikipedia "<wikipedia link>"
+    Given Wikidata search result always has "TDD" with ID "<id>"
+    And Wikidata.org has an entity "<id>" with label "TDD" and link to wikipedia "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"
     Then the Wiki association of note "TDD" should link to "<expected url>"
 

@@ -79,7 +79,7 @@
           <SvgWikidata />
         </template>
         <template #default="{ closer }">
-          <WikidataAssociationDialog
+          <WikidataAssociationForEdit
             v-bind="{ note, storageAccessor }"
             @close-dialog="closer"
           />

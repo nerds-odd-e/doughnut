@@ -356,6 +356,17 @@ export const assumeNotePage = (noteTopology?: string) => {
           cy.findByRole('button', { name: 'Confirm' }).click()
           return this.hasAssociation()
         },
+        confirmAssociationWithDifferentLabel(wikidataTitle: string) {
+          // Wait for the title options to appear and check that the wikidata title is visible
+          cy.findByText(/Suggested Title:/)
+            .should('be.visible')
+            .should('contain.text', wikidataTitle)
+          // Select "Replace title" option by default
+          cy.findByText('Replace title').click()
+          // Click Save button to confirm
+          cy.findByRole('button', { name: 'Save' }).click()
+          return this.hasAssociation()
+        },
         hasAssociation() {
           openWikidataOptions()
           const elm = () => {

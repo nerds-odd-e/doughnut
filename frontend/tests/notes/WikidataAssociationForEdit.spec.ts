@@ -90,14 +90,14 @@ describe("WikidataAssociationForEdit", () => {
   }
 
   it.each`
-    noteTitle   | wikidataTitle | shouldSave
-    ${"dog"}    | ${"dog"}      | ${true}
-    ${"Dog"}    | ${"dog"}      | ${true}
-    ${"Canine"} | ${"dog"}      | ${true}
-    ${"Canine"} | ${""}         | ${true}
+    noteTitle   | wikidataTitle | shouldSave | needsTitleAction
+    ${"dog"}    | ${"dog"}      | ${true}    | ${false}
+    ${"Dog"}    | ${"dog"}      | ${true}    | ${false}
+    ${"Canine"} | ${"dog"}      | ${true}    | ${true}
+    ${"Canine"} | ${""}         | ${true}    | ${false}
   `(
     "associate $noteTitle with $wikidataTitle via manual input",
-    async ({ noteTitle, wikidataTitle, shouldSave }) => {
+    async ({ noteTitle, wikidataTitle, shouldSave, needsTitleAction }) => {
       vi.clearAllMocks()
       const note = makeMe.aNote.topicConstructor(noteTitle).please()
       const wikidata = makeMe.aWikidataEntity
@@ -113,6 +113,27 @@ describe("WikidataAssociationForEdit", () => {
       expect(
         helper.managedApi.services.fetchWikidataEntityDataById
       ).toBeCalledWith({ wikidataId })
+
+      if (needsTitleAction) {
+        // When titles differ, title options should be shown
+        // User needs to select Replace or Append option, then click Save
+        const modal = document.querySelector(".modal-container")
+        const replaceButton = modal?.querySelector(
+          'label[for*="Replace"]'
+        ) as HTMLLabelElement
+        expect(replaceButton).toBeTruthy()
+        // Select Replace option
+        replaceButton.click()
+        await flushPromises()
+        // Click Save button to confirm
+        const saveButton = Array.from(
+          modal?.querySelectorAll("button") || []
+        ).find((btn) => btn.textContent?.trim() === "Save") as HTMLButtonElement
+        expect(saveButton).toBeTruthy()
+        saveButton.click()
+        await flushPromises()
+      }
+
       expect(mockedUpdateWikidataId).toBeCalledTimes(shouldSave ? 1 : 0)
       if (shouldSave) {
         expect(wrapper.emitted("closeDialog")).toBeTruthy()

@@ -89,6 +89,21 @@ export function useWikidataAssociation(
     localWikidataId.value = value
   }
 
+  const showTitleOptionsForEntity = (entity: WikidataSearchEntity) => {
+    selectedItem.value = entity
+    localWikidataId.value = entity.id || ""
+
+    const comparison = compareTitles(currentTitleValue.value, entity.label)
+
+    if (comparison === "match") {
+      showTitleOptions.value = false
+      return false
+    } else {
+      showTitleOptions.value = true
+      return true
+    }
+  }
+
   // Watch searchKey and fetch results when it changes
   watch(
     searchKeyValue,
@@ -118,6 +133,7 @@ export function useWikidataAssociation(
     getTitleAction,
     resetTitleOptions,
     setWikidataId,
+    showTitleOptionsForEntity,
     compareTitles,
   }
 }

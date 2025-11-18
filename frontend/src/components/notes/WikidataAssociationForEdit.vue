@@ -1,10 +1,11 @@
 <template>
   <WikidataAssociationUnifiedDialog
+    ref="dialogRef"
     :search-key="note.noteTopology.titleOrPredicate"
     :current-title="note.noteTopology.titleOrPredicate"
     :model-value="localWikidataId"
     :error-message="wikidataIdError"
-    header-title="Edit Wikidata Association"
+    :header-title="note.wikidataId ? 'Edit Wikidata Association' : 'Associate Wikidata'"
     :show-save-button="true"
     @close="handleClose"
     @selected="handleSelected"
@@ -14,8 +15,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import type { PropType } from "vue"
+import { ref, nextTick } from "vue"
+import type { PropType, ComponentPublicInstance } from "vue"
 import type { Note, WikidataAssociationCreation } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import useLoadingApi from "@/managedApi/useLoadingApi"
@@ -42,6 +43,10 @@ const props = defineProps({
 })
 
 const emit = defineEmits(["closeDialog"])
+
+const dialogRef = ref<ComponentPublicInstance<{
+  showTitleOptionsForEntity: (entity: WikidataSearchEntity) => boolean
+}> | null>(null)
 
 const localWikidataId = ref(props.note.wikidataId || "")
 const wikidataIdError = ref<string | undefined>(undefined)
@@ -136,9 +141,20 @@ const handleManualSave = async (wikidataId: string) => {
       await saveWikidataId(wikidataId)
     } else {
       // Titles differ - show Replace/Append options via unified dialog
-      // For now, we'll save anyway since user clicked Save
-      // (In a future enhancement, we could show Replace/Append here too)
-      await saveWikidataId(wikidataId)
+      const entity: WikidataSearchEntity = {
+        id: wikidataId,
+        label: res.WikidataTitleInEnglish,
+        description: "",
+      }
+      if (dialogRef.value?.showTitleOptionsForEntity) {
+        dialogRef.value.showTitleOptionsForEntity(entity)
+        await nextTick() // Ensure Vue updates the DOM
+        // Don't save yet - wait for user to select Replace/Append option
+        // The selected event will trigger handleSelected which will save
+      } else {
+        // Fallback: save anyway if dialog ref is not available
+        await saveWikidataId(wikidataId)
+      }
     }
   } catch (e: unknown) {
     if (

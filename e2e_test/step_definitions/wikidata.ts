@@ -29,8 +29,10 @@ When(
 When(
   'I need to confirm the association with different label {string}',
   (wikidataTitle: string) => {
-    cy.findAllByText(wikidataTitle).should('exist')
-    start.assumeNotePage().wikidataOptions().confirmAssociation()
+    start
+      .assumeNotePage()
+      .wikidataOptions()
+      .confirmAssociationWithDifferentLabel(wikidataTitle)
   }
 )
 
