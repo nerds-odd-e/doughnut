@@ -1,4 +1,4 @@
-import WikidataAssociationUnifiedDialog from "@/components/notes/WikidataAssociationUnifiedDialog.vue"
+import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
@@ -9,7 +9,7 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-describe("WikidataAssociationUnifiedDialog", () => {
+describe("WikidataAssociationDialog", () => {
   const mockedWikidataSearch = vitest.fn()
 
   beforeEach(() => {
@@ -28,7 +28,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
     showSaveButton?: boolean
   ) => {
     return helper
-      .component(WikidataAssociationUnifiedDialog)
+      .component(WikidataAssociationDialog)
       .withProps({
         searchKey,
         currentTitle,

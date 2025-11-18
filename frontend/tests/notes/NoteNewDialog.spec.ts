@@ -1,5 +1,5 @@
 import NoteNewDialog from "@/components/notes/NoteNewDialog.vue"
-import WikidataAssociationUnifiedDialog from "@/components/notes/WikidataAssociationUnifiedDialog.vue"
+import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import WikidataSearchByLabel from "@/components/notes/WikidataSearchByLabel.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
@@ -166,10 +166,8 @@ describe("adding new note", () => {
     const selectFromDropdown = async (wikidataId: string) => {
       await flushPromises()
 
-      // Find the WikidataAssociationUnifiedDialog component
-      const dialogComponent = wrapper.findComponent(
-        WikidataAssociationUnifiedDialog
-      )
+      // Find the WikidataAssociationDialog component
+      const dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
       expect(dialogComponent.exists()).toBe(true)
 
       // Call the selection method directly on the component
@@ -203,10 +201,8 @@ describe("adding new note", () => {
 
       await flushPromises()
 
-      // Find the WikidataAssociationUnifiedDialog component
-      const dialogComponent = wrapper.findComponent(
-        WikidataAssociationUnifiedDialog
-      )
+      // Find the WikidataAssociationDialog component
+      const dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
       // biome-ignore lint/suspicious/noExplicitAny: accessing Vue component internals in test
       const vm = dialogComponent.vm as any
 
@@ -250,9 +246,7 @@ describe("adding new note", () => {
       await openWikidataDialog("dog")
 
       // Verify dialog is open
-      let dialogComponent = wrapper.findComponent(
-        WikidataAssociationUnifiedDialog
-      )
+      let dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
       expect(dialogComponent.exists()).toBe(true)
 
       // Find the WikidataSearchByLabel component and call closeDialog method
@@ -272,8 +266,8 @@ describe("adding new note", () => {
       // Check that showDialog is now false
       expect(vm.showDialog).toBe(false)
 
-      // Check that the WikidataAssociationUnifiedDialog component no longer exists
-      dialogComponent = wrapper.findComponent(WikidataAssociationUnifiedDialog)
+      // Check that the WikidataAssociationDialog component no longer exists
+      dialogComponent = wrapper.findComponent(WikidataAssociationDialog)
       expect(dialogComponent.exists()).toBe(false)
     })
 

@@ -1,4 +1,4 @@
-import WikidataAssociationUnifiedDialog from "@/components/notes/WikidataAssociationUnifiedDialog.vue"
+import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue"
 import type { Note } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
@@ -10,7 +10,7 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-describe("WikidataAssociationUnifiedDialog (Edit Mode)", () => {
+describe("WikidataAssociationDialog (Edit Mode)", () => {
   const mockedWikidataSearch = vitest.fn()
   const mockedFetchWikidataEntity = vitest.fn()
   const mockedUpdateWikidataId = vitest.fn()
@@ -34,7 +34,7 @@ describe("WikidataAssociationUnifiedDialog (Edit Mode)", () => {
 
   async function putWikidataIdAndSave(note: Note, wikidataId: string) {
     const wrapper = helper
-      .component(WikidataAssociationUnifiedDialog)
+      .component(WikidataAssociationDialog)
       .withStorageProps({
         note,
       })
@@ -70,7 +70,7 @@ describe("WikidataAssociationUnifiedDialog (Edit Mode)", () => {
     mockedUpdateWikidataId.mockResolvedValue({} as never)
 
     const wrapper = helper
-      .component(WikidataAssociationUnifiedDialog)
+      .component(WikidataAssociationDialog)
       .withStorageProps({
         note,
       })
@@ -150,7 +150,7 @@ describe("WikidataAssociationUnifiedDialog (Edit Mode)", () => {
     mockedWikidataSearch.mockResolvedValue([searchResult])
 
     helper
-      .component(WikidataAssociationUnifiedDialog)
+      .component(WikidataAssociationDialog)
       .withStorageProps({
         note,
       })
