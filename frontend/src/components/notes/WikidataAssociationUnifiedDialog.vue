@@ -10,28 +10,30 @@
         @submit.prevent="handleSave"
       >
         <div class="daisy-mb-4">
-          <div class="daisy-flex daisy-gap-2">
-            <div class="daisy-flex-1">
-              <TextInput
-                scope-name="wikidataID"
-                field="wikidataID"
-                :model-value="localWikidataId"
-                @update:model-value="handleInputChange"
-                :error-message="errorMessage"
-                placeholder="example: `Q1234`"
-              />
-            </div>
-            <button
-              v-if="hasValidWikidataId"
-              type="button"
-              class="daisy-btn daisy-btn-outline daisy-btn-sm"
-              title="open link"
-              @click="handleOpenLink"
-              :disabled="isLoadingUrl"
-            >
-              open link
-            </button>
-          </div>
+          <TextInput
+            scope-name="wikidataID"
+            field="wikidataID"
+            :model-value="localWikidataId"
+            @update:model-value="handleInputChange"
+            :error-message="errorMessage"
+            placeholder="example: `Q1234`"
+          >
+            <template #input_append>
+              <button
+                type="button"
+                class="daisy-btn daisy-rounded-l-none"
+                :class="[
+                  isLoadingUrl ? 'daisy-btn-disabled' : 'daisy-btn-primary',
+                ]"
+                title="open link"
+                @click="handleOpenLink"
+                :disabled="isLoadingUrl || !hasValidWikidataId"
+                v-show="hasValidWikidataId"
+              >
+                <SvgPopup />
+              </button>
+            </template>
+          </TextInput>
         </div>
       </form>
       <div v-else class="daisy-mb-4">
@@ -127,6 +129,7 @@ import TextInput from "../form/TextInput.vue"
 import { useWikidataAssociation } from "@/composables/useWikidataAssociation"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
+import SvgPopup from "../svgs/SvgPopup.vue"
 
 const props = defineProps<{
   searchKey?: string

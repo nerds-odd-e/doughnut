@@ -313,7 +313,8 @@ describe("WikidataAssociationUnifiedDialog", () => {
         'button[title="open link"]'
       ) as HTMLButtonElement
       expect(openLinkButton).toBeTruthy()
-      expect(openLinkButton?.textContent).toContain("open link")
+      // Button should contain SvgPopup icon
+      expect(openLinkButton?.querySelector("svg")).toBeTruthy()
     })
 
     it("does not show open link button when showSaveButton is false", async () => {
@@ -328,8 +329,12 @@ describe("WikidataAssociationUnifiedDialog", () => {
       mountDialog("Test Title", undefined, "", undefined, undefined, true)
       await flushPromises()
       const modal = document.querySelector(".modal-container")
-      const openLinkButton = modal?.querySelector('button[title="open link"]')
-      expect(openLinkButton).toBeFalsy()
+      const openLinkButton = modal?.querySelector(
+        'button[title="open link"]'
+      ) as HTMLButtonElement
+      // Button exists but is hidden with v-show
+      expect(openLinkButton).toBeTruthy()
+      expect(openLinkButton?.style.display).toBe("none")
     })
 
     it("opens Wikipedia URL when available", async () => {
