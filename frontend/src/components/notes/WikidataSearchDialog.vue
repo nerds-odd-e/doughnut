@@ -66,12 +66,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from "vue"
+import { ref, watch, onMounted, nextTick, computed } from "vue"
 import type { WikidataSearchEntity } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
+import { useWikidataAssociation } from "@/composables/useWikidataAssociation"
 
 const props = defineProps<{
   searchKey: string
@@ -86,72 +86,45 @@ const emit = defineEmits<{
   "update:modelValue": [value: string]
 }>()
 
-const { managedApi } = useLoadingApi()
+const searchKeyRef = computed(() => props.searchKey)
+const currentTitleRef = computed(() => props.currentTitle)
 
-const loading = ref(false)
-const searchResults = ref<WikidataSearchEntity[]>([])
-const selectedOption = ref("")
-const selectedItem = ref<WikidataSearchEntity | null>(null)
-const showTitleOptions = ref(false)
-const titleAction = ref<"Replace" | "Append" | "">("")
+const {
+  localWikidataId,
+  loading,
+  searchResults,
+  selectedOption,
+  selectedItem,
+  showTitleOptions,
+  titleAction,
+  hasSearched,
+  fetchSearchResults,
+  selectSearchResult,
+  getTitleAction,
+  setWikidataId,
+} = useWikidataAssociation(searchKeyRef, currentTitleRef, props.modelValue)
+
 const select = ref<HTMLSelectElement | null>(null)
-const localWikidataId = ref(props.modelValue || "")
-const hasSearched = ref(false)
 
 const handleInputChange = (value: string) => {
-  localWikidataId.value = value
+  setWikidataId(value)
   emit("update:modelValue", value)
 }
 
-const fetchSearchResults = async () => {
-  if (!props.searchKey) return
-  loading.value = true
-  hasSearched.value = true
-  try {
-    searchResults.value = await managedApi.services.searchWikidata({
-      search: props.searchKey,
-    })
-    await nextTick()
-    if (select.value && searchResults.value.length > 0) {
-      select.value.focus()
-    }
-  } finally {
-    loading.value = false
-  }
-}
-
 const onSelectSearchResult = () => {
-  const selected = searchResults.value.find(
-    (obj) => obj.id === selectedOption.value
-  )
-  if (!selected) return
-  const selectedId = selected.id
-  if (!selectedId) return
+  const result = selectSearchResult(selectedOption.value)
+  if (!result || !result.entity.id) return
 
-  selectedItem.value = selected
-  localWikidataId.value = selectedId
-  emit("update:modelValue", selectedId)
+  emit("update:modelValue", result.entity.id)
 
-  const currentLabel = props.currentTitle.toUpperCase()
-  const newLabel = selected.label.toUpperCase()
-
-  if (currentLabel === newLabel) {
-    emit("selected", selected)
-  } else {
-    showTitleOptions.value = true
+  if (!result.needsTitleAction) {
+    emit("selected", result.entity)
   }
 }
 
 const handleTitleAction = () => {
   if (!selectedItem.value) return
-
-  let action: "replace" | "append" | undefined
-  if (titleAction.value === "Replace") {
-    action = "replace"
-  } else if (titleAction.value === "Append") {
-    action = "append"
-  }
-
+  const action = getTitleAction()
   emit("selected", selectedItem.value, action)
 }
 
@@ -163,25 +136,22 @@ watch(
   () => props.modelValue,
   (newValue) => {
     if (newValue !== undefined) {
-      localWikidataId.value = newValue
+      setWikidataId(newValue)
     }
   },
   { immediate: true }
 )
 
-watch(
-  () => props.searchKey,
-  () => {
-    if (props.searchKey) {
-      fetchSearchResults()
-    }
-  },
-  { immediate: false }
-)
+watch(searchResults, async () => {
+  await nextTick()
+  if (select.value && searchResults.value.length > 0) {
+    select.value.focus()
+  }
+})
 
 onMounted(() => {
   if (props.modelValue !== undefined) {
-    localWikidataId.value = props.modelValue
+    setWikidataId(props.modelValue)
   }
   if (props.searchKey) {
     fetchSearchResults()
