@@ -55,9 +55,6 @@
 
           <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
             <li class="daisy-menu-item">
-              <NoteWikidataAssociation :wikidata-id="note.wikidataId" />
-            </li>
-            <li class="daisy-menu-item">
               <PopButton title="associate wikidata" class="w-full">
                 <template #button_face>
                   <SvgWikidata />
@@ -226,7 +223,6 @@ import { useRouter } from "vue-router"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForEdit from "../WikidataAssociationForEdit.vue"
-import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "./NoteExportDialog.vue"
 
