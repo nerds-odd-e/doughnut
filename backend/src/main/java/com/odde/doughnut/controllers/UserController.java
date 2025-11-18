@@ -6,8 +6,8 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.Authorization;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -37,7 +37,7 @@ class UserController {
   @PostMapping("")
   @Transactional
   public User createUser(Principal principal, @RequestBody User user) {
-    if (principal == null) Authorization.throwUserNotFound();
+    if (principal == null) AuthorizationService.throwUserNotFound();
     user.setExternalIdentifier(principal.getName());
     modelFactoryService.save(user);
     return user;
