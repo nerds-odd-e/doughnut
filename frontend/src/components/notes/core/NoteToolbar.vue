@@ -64,7 +64,7 @@
                   <span class="ms-2">Edit Wikidata ID</span>
                 </template>
                 <template #default="{ closer }">
-                  <WikidataAssociationDialog
+                  <WikidataAssociationForEdit
                     v-bind="{ note, storageAccessor }"
                     @close-dialog="closer"
                   />
@@ -225,7 +225,7 @@ import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
-import WikidataAssociationDialog from "../WikidataAssociationDialog.vue"
+import WikidataAssociationForEdit from "../WikidataAssociationForEdit.vue"
 import NoteWikidataAssociation from "../NoteWikidataAssociation.vue"
 import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "./NoteExportDialog.vue"

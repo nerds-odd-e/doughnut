@@ -4,7 +4,23 @@
       <h2>{{ headerTitle }}</h2>
     </template>
     <template #body>
-      <div class="daisy-mb-4">
+      <form
+        v-if="showSaveButton"
+        id="wikidata-association-form"
+        @submit.prevent="handleSave"
+      >
+        <div class="daisy-mb-4">
+          <TextInput
+            scope-name="wikidataID"
+            field="wikidataID"
+            :model-value="localWikidataId"
+            @update:model-value="handleInputChange"
+            :error-message="errorMessage"
+            placeholder="example: `Q1234`"
+          />
+        </div>
+      </form>
+      <div v-else class="daisy-mb-4">
         <TextInput
           scope-name="wikidataID"
           field="wikidataID"
@@ -18,12 +34,12 @@
         Searching...
       </div>
       <div
-        v-else-if="searchResults.length === 0 && hasSearched && searchKey"
+        v-else-if="searchResults && searchResults.length === 0 && hasSearched && searchKey"
         class="daisy-text-center daisy-p-4"
       >
         <p>No Wikidata entries found for '{{ searchKey }}'</p>
       </div>
-      <div v-else-if="searchResults.length > 0 && !showTitleOptions">
+      <div v-else-if="searchResults && searchResults.length > 0 && !showTitleOptions">
         <select
           ref="select"
           size="10"
@@ -59,7 +75,28 @@
         />
       </div>
       <div class="daisy-mt-4 daisy-flex daisy-gap-2">
-        <button class="daisy-btn daisy-btn-secondary" @click="handleClose">
+        <button
+          v-if="showSaveButton"
+          type="submit"
+          form="wikidata-association-form"
+          class="daisy-btn daisy-btn-primary"
+          :disabled="!localWikidataId || localWikidataId.trim() === ''"
+        >
+          Save
+        </button>
+        <button
+          v-if="showSaveButton"
+          type="button"
+          class="daisy-btn daisy-btn-secondary"
+          @click="handleClose"
+        >
+          Close
+        </button>
+        <button
+          v-else
+          class="daisy-btn daisy-btn-secondary"
+          @click="handleClose"
+        >
           Close
         </button>
       </div>
@@ -81,12 +118,14 @@ const props = defineProps<{
   modelValue?: string
   errorMessage?: string
   headerTitle?: string
+  showSaveButton?: boolean
 }>()
 
 const emit = defineEmits<{
   close: []
   selected: [entity: WikidataSearchEntity, titleAction?: "replace" | "append"]
   "update:modelValue": [value: string]
+  save: [wikidataId: string]
 }>()
 
 const searchKeyRef = computed(() => props.searchKey || "")
@@ -136,6 +175,12 @@ const handleClose = () => {
   emit("close")
 }
 
+const handleSave = () => {
+  if (localWikidataId.value && localWikidataId.value.trim() !== "") {
+    emit("save", localWikidataId.value)
+  }
+}
+
 watch(
   () => props.modelValue,
   (newValue) => {
@@ -148,7 +193,9 @@ watch(
 
 watch(searchResults, async () => {
   await nextTick()
-  if (select.value && searchResults.value.length > 0) {
+  // Only auto-focus dropdown when NOT in edit mode (showSaveButton is false)
+  // In edit mode, keep focus on input field for direct typing
+  if (!props.showSaveButton && select.value && searchResults.value.length > 0) {
     select.value.focus()
   }
 })
@@ -159,6 +206,17 @@ onMounted(() => {
   }
   if (props.searchKey) {
     fetchSearchResults()
+  }
+  // In edit mode, focus the input field after mount
+  if (props.showSaveButton) {
+    nextTick(() => {
+      const input = document.getElementById(
+        "wikidataID-wikidataID"
+      ) as HTMLInputElement
+      if (input) {
+        input.focus()
+      }
+    })
   }
 })
 </script>
