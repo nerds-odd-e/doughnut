@@ -102,7 +102,8 @@ Then(
       .assumeNotePage(ttile)
       .wikidataOptions()
       .hasAssociation()
-      .expectALinkThatOpensANewWindowWithURL(associationUrl)
+      .openEditDialog()
+      .expectOpenLinkButtonToOpenUrl(associationUrl)
   }
 )
 

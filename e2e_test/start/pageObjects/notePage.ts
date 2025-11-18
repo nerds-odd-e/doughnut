@@ -369,30 +369,36 @@ export const assumeNotePage = (noteTopology?: string) => {
         },
         hasAssociation() {
           openWikidataOptions()
+          return this
+        },
+        openEditDialog() {
+          openWikidataOptions()
+          privateToolbarButton('Edit Wikidata ID').click()
+          return this
+        },
+        expectOpenLinkButtonToOpenUrl(url: string) {
           const elm = () => {
-            return cy.findByRole('button', { name: 'Go to Wikidata' })
+            return cy.findByRole('button', { name: 'open link' })
           }
-          elm()
+          // Wait for the button to be visible (it appears when Wikidata ID is present)
+          elm().should('be.visible')
 
-          return {
-            expectALinkThatOpensANewWindowWithURL(url: string) {
-              cy.window().then((win) => {
-                const popupWindowStub = {
-                  location: { href: undefined },
-                  focus: cy.stub(),
-                }
-                cy.stub(win, 'open').as('open').returns(popupWindowStub)
-                elm().click()
-                cy.get('@open').should('have.been.calledWith', '')
-                // using a callback so that cypress can wait until the stubbed value is assigned
-                cy.wrap(() => popupWindowStub.location.href)
-                  .should((cb) => expect(cb()).equal(url))
-                  .then(() => {
-                    expect(popupWindowStub.focus).to.have.been.called
-                  })
+          cy.window().then((win) => {
+            const popupWindowStub = {
+              location: { href: undefined },
+              focus: cy.stub(),
+            }
+            cy.stub(win, 'open').as('open').returns(popupWindowStub)
+            elm().click()
+            cy.get('@open').should('have.been.calledWith', '')
+            // using a callback so that cypress can wait until the stubbed value is assigned
+            cy.wrap(() => popupWindowStub.location.href)
+              .should((cb) => expect(cb()).equal(url))
+              .then(() => {
+                expect(popupWindowStub.focus).to.have.been.called
               })
-            },
-          }
+          })
+          return this
         },
       }
     },

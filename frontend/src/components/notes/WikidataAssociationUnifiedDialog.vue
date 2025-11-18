@@ -10,14 +10,28 @@
         @submit.prevent="handleSave"
       >
         <div class="daisy-mb-4">
-          <TextInput
-            scope-name="wikidataID"
-            field="wikidataID"
-            :model-value="localWikidataId"
-            @update:model-value="handleInputChange"
-            :error-message="errorMessage"
-            placeholder="example: `Q1234`"
-          />
+          <div class="daisy-flex daisy-gap-2">
+            <div class="daisy-flex-1">
+              <TextInput
+                scope-name="wikidataID"
+                field="wikidataID"
+                :model-value="localWikidataId"
+                @update:model-value="handleInputChange"
+                :error-message="errorMessage"
+                placeholder="example: `Q1234`"
+              />
+            </div>
+            <button
+              v-if="hasValidWikidataId"
+              type="button"
+              class="daisy-btn daisy-btn-outline daisy-btn-sm"
+              title="open link"
+              @click="handleOpenLink"
+              :disabled="isLoadingUrl"
+            >
+              open link
+            </button>
+          </div>
         </div>
       </form>
       <div v-else class="daisy-mb-4">
@@ -111,6 +125,8 @@ import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
 import { useWikidataAssociation } from "@/composables/useWikidataAssociation"
+import useLoadingApi from "@/managedApi/useLoadingApi"
+import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 
 const props = defineProps<{
   searchKey?: string
@@ -153,6 +169,42 @@ defineExpose({
 })
 
 const select = ref<HTMLSelectElement | null>(null)
+const { managedApi } = useLoadingApi()
+const isLoadingUrl = ref(false)
+
+const hasValidWikidataId = computed(() => {
+  return localWikidataId.value && localWikidataId.value.trim() !== ""
+})
+
+const getWikidataItem = async (wikidataId: string) => {
+  return (
+    await managedApi.services.fetchWikidataEntityDataById({
+      wikidataId,
+    })
+  ).WikipediaEnglishUrl
+}
+
+const wikiUrl = async (wikidataId: string) => {
+  const wikipediaEnglishUrl = await getWikidataItem(wikidataId)
+  if (wikipediaEnglishUrl !== "") {
+    return wikipediaEnglishUrl
+  }
+  return `https://www.wikidata.org/wiki/${wikidataId}`
+}
+
+const handleOpenLink = () => {
+  if (!hasValidWikidataId.value) return
+  isLoadingUrl.value = true
+  const urlPromise = wikiUrl(localWikidataId.value)
+  nonBlockingPopup(urlPromise)
+  urlPromise
+    .then(() => {
+      isLoadingUrl.value = false
+    })
+    .catch(() => {
+      isLoadingUrl.value = false
+    })
+}
 
 const handleInputChange = (value: string) => {
   setWikidataId(value)

@@ -25,7 +25,8 @@ describe("WikidataAssociationUnifiedDialog", () => {
     searchKey?: string,
     modelValue?: string,
     errorMessage?: string,
-    headerTitle?: string
+    headerTitle?: string,
+    showSaveButton?: boolean
   ) => {
     return helper
       .component(WikidataAssociationUnifiedDialog)
@@ -35,6 +36,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
         modelValue,
         errorMessage,
         headerTitle,
+        showSaveButton,
       })
       .mount({ attachTo: document.body })
   }
@@ -291,5 +293,108 @@ describe("WikidataAssociationUnifiedDialog", () => {
     await flushPromises()
     expect(wrapper.emitted("update:modelValue")).toBeTruthy()
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["Q999"])
+  })
+
+  describe("open link button", () => {
+    const mockedFetchWikidataEntityDataById = vitest.fn()
+
+    beforeEach(() => {
+      vi.spyOn(
+        helper.managedApi.services,
+        "fetchWikidataEntityDataById"
+      ).mockImplementation(mockedFetchWikidataEntityDataById)
+    })
+
+    it("shows open link button when Wikidata ID is present and showSaveButton is true", async () => {
+      mountDialog("Test Title", undefined, "Q123", undefined, undefined, true)
+      await flushPromises()
+      const modal = document.querySelector(".modal-container")
+      const openLinkButton = modal?.querySelector(
+        'button[title="open link"]'
+      ) as HTMLButtonElement
+      expect(openLinkButton).toBeTruthy()
+      expect(openLinkButton?.textContent).toContain("open link")
+    })
+
+    it("does not show open link button when showSaveButton is false", async () => {
+      mountDialog("Test Title", undefined, "Q123", undefined, undefined, false)
+      await flushPromises()
+      const modal = document.querySelector(".modal-container")
+      const openLinkButton = modal?.querySelector('button[title="open link"]')
+      expect(openLinkButton).toBeFalsy()
+    })
+
+    it("does not show open link button when Wikidata ID is empty", async () => {
+      mountDialog("Test Title", undefined, "", undefined, undefined, true)
+      await flushPromises()
+      const modal = document.querySelector(".modal-container")
+      const openLinkButton = modal?.querySelector('button[title="open link"]')
+      expect(openLinkButton).toBeFalsy()
+    })
+
+    it("opens Wikipedia URL when available", async () => {
+      const wikipediaUrl = "https://en.wikipedia.org/wiki/Test"
+      mockedFetchWikidataEntityDataById.mockResolvedValue({
+        WikipediaEnglishUrl: wikipediaUrl,
+      })
+
+      const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => {
+        return {
+          location: { href: "" },
+          focus: vi.fn(),
+        } as unknown as Window
+      })
+
+      mountDialog("Test Title", undefined, "Q123", undefined, undefined, true)
+      await flushPromises()
+      const modal = document.querySelector(".modal-container")
+      const openLinkButton = modal?.querySelector(
+        'button[title="open link"]'
+      ) as HTMLButtonElement
+
+      openLinkButton.click()
+      await flushPromises()
+
+      expect(windowOpenSpy).toHaveBeenCalledWith("")
+      expect(mockedFetchWikidataEntityDataById).toHaveBeenCalledWith({
+        wikidataId: "Q123",
+      })
+
+      // Wait for the URL to be set
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      windowOpenSpy.mockRestore()
+    })
+
+    it("opens Wikidata URL when Wikipedia URL is not available", async () => {
+      mockedFetchWikidataEntityDataById.mockResolvedValue({
+        WikipediaEnglishUrl: "",
+      })
+
+      const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => {
+        return {
+          location: { href: "" },
+          focus: vi.fn(),
+        } as unknown as Window
+      })
+
+      mountDialog("Test Title", undefined, "Q123", undefined, undefined, true)
+      await flushPromises()
+      const modal = document.querySelector(".modal-container")
+      const openLinkButton = modal?.querySelector(
+        'button[title="open link"]'
+      ) as HTMLButtonElement
+
+      openLinkButton.click()
+      await flushPromises()
+
+      expect(windowOpenSpy).toHaveBeenCalledWith("")
+      expect(mockedFetchWikidataEntityDataById).toHaveBeenCalledWith({
+        wikidataId: "Q123",
+      })
+
+      // Wait for the URL to be set
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      windowOpenSpy.mockRestore()
+    })
   })
 })
