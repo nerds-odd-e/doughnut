@@ -70,6 +70,18 @@ describe("SearchResults.vue", () => {
     expect(wrapper.text()).not.toContain("Searching ...")
   })
 
+  it("does not show 'Searching ...' when search key is empty initially", async () => {
+    const wrapper = helper
+      .component(SearchResults)
+      .withProps({ inputSearchKey: "", isDropdown: false })
+      .mount()
+
+    await nextTick()
+    await flushPromises()
+
+    expect(wrapper.text()).not.toContain("Searching ...")
+  })
+
   it("shows 'No matching notes found.' when results are empty in non-dropdown mode", async () => {
     vi.useFakeTimers()
 
