@@ -1,12 +1,8 @@
 export const assumeWikidataSearchDialog = () => {
-  cy.findByText(
-    /^(Search Wikidata|Associate Wikidata|Edit Wikidata Association)$/
-  ).should('be.visible')
+  cy.findByText('Associate Wikidata').should('be.visible')
 
   const withinModalContainer = (callback: () => void) => {
-    cy.findByText(
-      /^(Search Wikidata|Associate Wikidata|Edit Wikidata Association)$/
-    )
+    cy.findByText('Associate Wikidata')
       .closest('.modal-container')
       .within(callback)
   }

@@ -1,7 +1,7 @@
 <template>
   <Modal @close_request="handleClose">
     <template #header>
-      <h2>{{ headerTitle }}</h2>
+      <h2>Associate Wikidata</h2>
     </template>
     <template #body>
       <form
@@ -151,7 +151,6 @@ const props = defineProps<{
   currentTitle?: string
   modelValue?: string
   errorMessage?: string
-  headerTitle?: string
   showSaveButton?: boolean
   note?: Note
   storageAccessor?: StorageAccessor
@@ -176,13 +175,6 @@ const currentTitleRef = computed(() => {
     return props.note?.noteTopology.titleOrPredicate || ""
   }
   return props.currentTitle || ""
-})
-const headerTitle = computed(() => {
-  if (props.headerTitle) return props.headerTitle
-  if (isAutoSaveMode.value && props.note?.wikidataId) {
-    return "Edit Wikidata Association"
-  }
-  return "Associate Wikidata"
 })
 
 const isAutoSaveMode = computed(() => !!props.note && !!props.storageAccessor)

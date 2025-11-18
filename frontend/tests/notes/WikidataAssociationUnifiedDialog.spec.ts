@@ -25,7 +25,6 @@ describe("WikidataAssociationUnifiedDialog", () => {
     searchKey?: string,
     modelValue?: string,
     errorMessage?: string,
-    headerTitle?: string,
     showSaveButton?: boolean
   ) => {
     return helper
@@ -35,7 +34,6 @@ describe("WikidataAssociationUnifiedDialog", () => {
         currentTitle,
         modelValue,
         errorMessage,
-        headerTitle,
         showSaveButton,
       })
       .mount({ attachTo: document.body })
@@ -79,13 +77,6 @@ describe("WikidataAssociationUnifiedDialog", () => {
     await flushPromises()
     const modal = document.querySelector(".modal-container")
     expect(modal?.textContent).toContain("Associate Wikidata")
-  })
-
-  it("uses custom header title when provided", async () => {
-    mountDialog("Test Title", undefined, undefined, undefined, "Custom Title")
-    await flushPromises()
-    const modal = document.querySelector(".modal-container")
-    expect(modal?.textContent).toContain("Custom Title")
   })
 
   it("shows loading state when searching", async () => {
@@ -306,7 +297,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
     })
 
     it("shows open link button when Wikidata ID is present and showSaveButton is true", async () => {
-      mountDialog("Test Title", undefined, "Q123", undefined, undefined, true)
+      mountDialog("Test Title", undefined, "Q123", undefined, true)
       await flushPromises()
       const modal = document.querySelector(".modal-container")
       const openLinkButton = modal?.querySelector(
@@ -318,7 +309,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
     })
 
     it("does not show open link button when showSaveButton is false", async () => {
-      mountDialog("Test Title", undefined, "Q123", undefined, undefined, false)
+      mountDialog("Test Title", undefined, "Q123", undefined, false)
       await flushPromises()
       const modal = document.querySelector(".modal-container")
       const openLinkButton = modal?.querySelector('button[title="open link"]')
@@ -326,7 +317,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
     })
 
     it("does not show open link button when Wikidata ID is empty", async () => {
-      mountDialog("Test Title", undefined, "", undefined, undefined, true)
+      mountDialog("Test Title", undefined, "", undefined, true)
       await flushPromises()
       const modal = document.querySelector(".modal-container")
       const openLinkButton = modal?.querySelector(
@@ -350,7 +341,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
         } as unknown as Window
       })
 
-      mountDialog("Test Title", undefined, "Q123", undefined, undefined, true)
+      mountDialog("Test Title", undefined, "Q123", undefined, true)
       await flushPromises()
       const modal = document.querySelector(".modal-container")
       const openLinkButton = modal?.querySelector(
@@ -382,7 +373,7 @@ describe("WikidataAssociationUnifiedDialog", () => {
         } as unknown as Window
       })
 
-      mountDialog("Test Title", undefined, "Q123", undefined, undefined, true)
+      mountDialog("Test Title", undefined, "Q123", undefined, true)
       await flushPromises()
       const modal = document.querySelector(".modal-container")
       const openLinkButton = modal?.querySelector(
