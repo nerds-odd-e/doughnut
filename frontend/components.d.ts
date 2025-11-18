@@ -254,6 +254,7 @@ declare module 'vue' {
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
+    WikidataAssociationUnifiedDialog: typeof import('./src/components/notes/WikidataAssociationUnifiedDialog.vue')['default']
     WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
     WikidataSearchDialog: typeof import('./src/components/notes/WikidataSearchDialog.vue')['default']
   }
@@ -503,6 +504,7 @@ declare global {
   const UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
   const Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
   const WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
+  const WikidataAssociationUnifiedDialog: typeof import('./src/components/notes/WikidataAssociationUnifiedDialog.vue')['default']
   const WikidataSearchByLabel: typeof import('./src/components/notes/WikidataSearchByLabel.vue')['default']
   const WikidataSearchDialog: typeof import('./src/components/notes/WikidataSearchDialog.vue')['default']
 }

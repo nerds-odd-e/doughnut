@@ -10,7 +10,7 @@
   >
     <SvgWikidata />
   </button>
-  <WikidataSearchDialog
+  <WikidataAssociationUnifiedDialog
     v-if="showDialog"
     :search-key="searchKey"
     :current-title="currentTitle"
@@ -26,7 +26,7 @@
 import type { WikidataSearchEntity } from "@generated/backend"
 import { defineComponent } from "vue"
 import SvgWikidata from "../svgs/SvgWikidata.vue"
-import WikidataSearchDialog from "./WikidataSearchDialog.vue"
+import WikidataAssociationUnifiedDialog from "./WikidataAssociationUnifiedDialog.vue"
 
 export default defineComponent({
   props: {
@@ -38,7 +38,7 @@ export default defineComponent({
   emits: ["selected", "update:modelValue"],
   components: {
     SvgWikidata,
-    WikidataSearchDialog,
+    WikidataAssociationUnifiedDialog,
   },
   computed: {
     hasWikidataId(): boolean {
