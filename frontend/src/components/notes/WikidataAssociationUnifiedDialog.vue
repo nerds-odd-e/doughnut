@@ -131,7 +131,6 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
-import { useWikidataAssociation } from "@/composables/useWikidataAssociation"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 import SvgPopup from "../svgs/SvgPopup.vue"
@@ -188,25 +187,79 @@ const initialWikidataId = computed(() => {
   return props.modelValue
 })
 
-const {
-  localWikidataId,
-  loading,
-  searchResults,
-  selectedOption,
-  selectedItem,
-  showTitleOptions,
-  titleAction,
-  hasSearched,
-  fetchSearchResults,
-  selectSearchResult,
-  getTitleAction,
-  setWikidataId,
-  showTitleOptionsForEntity,
-} = useWikidataAssociation(
-  searchKeyRef,
-  currentTitleRef,
-  initialWikidataId.value
-)
+const localWikidataId = ref(initialWikidataId.value || "")
+const loading = ref(false)
+const searchResults = ref<WikidataSearchEntity[]>([])
+const selectedOption = ref("")
+const selectedItem = ref<WikidataSearchEntity | null>(null)
+const showTitleOptions = ref(false)
+const titleAction = ref<"Replace" | "Append" | "">("")
+const hasSearched = ref(false)
+const fetchSearchResults = async () => {
+  const key = searchKeyRef.value
+  if (!key) return
+  loading.value = true
+  hasSearched.value = true
+  try {
+    searchResults.value = await managedApi.services.searchWikidata({
+      search: key,
+    })
+  } finally {
+    loading.value = false
+  }
+}
+
+const compareTitles = (
+  current: string,
+  wikidata: string
+): "match" | "different" => {
+  const currentUpper = current.toUpperCase()
+  const wikidataUpper = wikidata.toUpperCase()
+  return currentUpper === wikidataUpper ? "match" : "different"
+}
+
+const selectSearchResult = (wikidataId: string) => {
+  const selected = searchResults.value.find((obj) => obj.id === wikidataId)
+  if (!selected || !selected.id) return null
+
+  selectedItem.value = selected
+  localWikidataId.value = selected.id
+
+  const comparison = compareTitles(currentTitleRef.value, selected.label)
+
+  if (comparison === "match") {
+    showTitleOptions.value = false
+    return { entity: selected, needsTitleAction: false as const }
+  } else {
+    showTitleOptions.value = true
+    return { entity: selected, needsTitleAction: true as const }
+  }
+}
+
+const getTitleAction = (): "replace" | "append" | undefined => {
+  if (titleAction.value === "Replace") return "replace"
+  if (titleAction.value === "Append") return "append"
+  return undefined
+}
+
+const setWikidataId = (value: string) => {
+  localWikidataId.value = value
+}
+
+const showTitleOptionsForEntity = (entity: WikidataSearchEntity) => {
+  selectedItem.value = entity
+  localWikidataId.value = entity.id || ""
+
+  const comparison = compareTitles(currentTitleRef.value, entity.label)
+
+  if (comparison === "match") {
+    showTitleOptions.value = false
+    return false
+  } else {
+    showTitleOptions.value = true
+    return true
+  }
+}
 
 defineExpose({
   showTitleOptionsForEntity,
@@ -463,6 +516,17 @@ watch(
       setWikidataId(newValue)
     }
   }
+)
+
+// Watch searchKey and fetch results when it changes
+watch(
+  searchKeyRef,
+  (newKey) => {
+    if (newKey) {
+      fetchSearchResults()
+    }
+  },
+  { immediate: false }
 )
 
 watch(searchResults, async () => {
