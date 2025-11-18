@@ -42,38 +42,9 @@
         <SvgChat />
       </a>
 
-      <div v-if="note.wikidataId">
-        <div class="daisy-dropdown">
-          <label
-            role="button"
-            tabindex="0"
-            class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-            title="wikidata options"
-          >
-            <SvgWikidata />
-          </label>
-
-          <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
-            <li class="daisy-menu-item">
-              <PopButton title="associate wikidata" class="w-full">
-                <template #button_face>
-                  <SvgWikidata />
-                  <span class="ms-2">Edit Wikidata ID</span>
-                </template>
-                <template #default="{ closer }">
-                  <WikidataAssociationForEdit
-                    v-bind="{ note, storageAccessor }"
-                    @close-dialog="closer"
-                  />
-                </template>
-              </PopButton>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <PopButton v-else title="associate wikidata">
+      <PopButton title="associate wikidata">
         <template #button_face>
-          <SvgWikidata />
+          <SvgWikidata :class="{ 'wikidata-has-value': note.wikidataId }" />
         </template>
         <template #default="{ closer }">
           <WikidataAssociationForEdit
@@ -246,3 +217,10 @@ const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
   closer()
 }
 </script>
+
+<style scoped>
+.wikidata-has-value {
+  filter: drop-shadow(0 0 4px hsl(var(--p) / 0.6));
+  color: hsl(var(--p));
+}
+</style>

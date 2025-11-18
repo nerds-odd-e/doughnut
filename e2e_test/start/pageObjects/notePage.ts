@@ -339,17 +339,13 @@ export const assumeNotePage = (noteTopology?: string) => {
       }
     },
     wikidataOptions() {
-      const openWikidataOptions = () =>
-        privateToolbarButton('wikidata options').click()
-
       return {
         associate(wikiID: string) {
           privateToolbarButton('associate wikidata').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
         reassociationWith(wikiID: string) {
-          openWikidataOptions()
-          privateToolbarButton('Edit Wikidata ID').click()
+          privateToolbarButton('associate wikidata').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
         confirmAssociation() {
@@ -368,12 +364,14 @@ export const assumeNotePage = (noteTopology?: string) => {
           return this.hasAssociation()
         },
         hasAssociation() {
-          openWikidataOptions()
+          // Just verify the button exists - no need to open dropdown anymore
+          cy.findByRole('button', { name: 'associate wikidata' }).should(
+            'exist'
+          )
           return this
         },
         openEditDialog() {
-          openWikidataOptions()
-          privateToolbarButton('Edit Wikidata ID').click()
+          privateToolbarButton('associate wikidata').click()
           return this
         },
         expectOpenLinkButtonToOpenUrl(url: string) {
