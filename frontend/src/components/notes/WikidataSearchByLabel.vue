@@ -13,7 +13,6 @@
   <WikidataAssociationDialog
     v-if="showDialog"
     :search-key="searchKey"
-    :current-title="currentTitle"
     :model-value="modelValue"
     :error-message="errorMessage"
     @close="closeDialog"
@@ -33,7 +32,6 @@ export default defineComponent({
     searchKey: { type: String, required: true },
     modelValue: String,
     errorMessage: String,
-    currentTitle: { type: String, default: "" },
   },
   emits: ["selected", "update:modelValue"],
   components: {

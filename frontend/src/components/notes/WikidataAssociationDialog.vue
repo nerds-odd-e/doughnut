@@ -127,7 +127,6 @@ interface WikidataIdError {
 
 const props = defineProps<{
   searchKey?: string
-  currentTitle?: string
   modelValue?: string
   errorMessage?: string
   showSaveButton?: boolean
@@ -155,13 +154,6 @@ const searchKeyRef = computed(() => {
     return props.note?.noteTopology.titleOrPredicate || ""
   }
   return props.searchKey || ""
-})
-
-const currentTitleRef = computed(() => {
-  if (isAutoSaveMode.value) {
-    return props.note?.noteTopology.titleOrPredicate || ""
-  }
-  return props.currentTitle || ""
 })
 
 const localWikidataIdForEdit = ref(props.note?.wikidataId || "")
@@ -219,7 +211,7 @@ const selectSearchResult = (wikidataId: string) => {
   selectedItem.value = selected
   localWikidataId.value = selected.id
 
-  const comparison = compareTitles(currentTitleRef.value, selected.label)
+  const comparison = compareTitles(searchKeyRef.value, selected.label)
 
   if (comparison === "match") {
     showTitleOptions.value = false
@@ -244,7 +236,7 @@ const showTitleOptionsForEntity = (entity: WikidataSearchEntity) => {
   selectedItem.value = entity
   localWikidataId.value = entity.id || ""
 
-  const comparison = compareTitles(currentTitleRef.value, entity.label)
+  const comparison = compareTitles(searchKeyRef.value, entity.label)
 
   if (comparison === "match") {
     showTitleOptions.value = false
@@ -495,10 +487,7 @@ onMounted(() => {
   if (initialValue !== undefined) {
     setWikidataId(initialValue)
   }
-  const searchKey = isAutoSaveMode.value
-    ? props.note?.noteTopology.titleOrPredicate
-    : props.searchKey
-  if (searchKey) {
+  if (searchKeyRef.value) {
     fetchSearchResults()
   }
   if (props.showSaveButton) {

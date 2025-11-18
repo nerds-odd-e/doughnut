@@ -51,7 +51,6 @@
             :note="note"
             :storage-accessor="storageAccessor"
             :search-key="note.noteTopology.titleOrPredicate"
-            :current-title="note.noteTopology.titleOrPredicate"
             :show-save-button="true"
             @close-dialog="closer"
           />

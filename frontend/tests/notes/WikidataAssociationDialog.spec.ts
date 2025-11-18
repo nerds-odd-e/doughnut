@@ -30,9 +30,8 @@ describe("WikidataAssociationDialog", () => {
   })
 
   const mountDialog = (
-    currentTitle: string,
+    searchKey?: string,
     options?: {
-      searchKey?: string
       modelValue?: string
       errorMessage?: string
       showSaveButton?: boolean
@@ -49,7 +48,7 @@ describe("WikidataAssociationDialog", () => {
     return helper
       .component(WikidataAssociationDialog)
       .withProps({
-        currentTitle,
+        ...(searchKey !== undefined && { searchKey }),
         ...props,
       })
       .mount({ attachTo: document.body })
@@ -91,7 +90,7 @@ describe("WikidataAssociationDialog", () => {
 
     it("emits close when close button is clicked", async () => {
       mockedWikidataSearch.mockResolvedValue([])
-      const wrapper = mountDialog("Test Title", { searchKey: "test" })
+      const wrapper = mountDialog("test")
       await flushPromises()
       const closeButton = getModal()?.querySelector(
         "button.daisy-btn-secondary"
@@ -110,14 +109,14 @@ describe("WikidataAssociationDialog", () => {
             // Never resolves - intentionally empty to test loading state
           })
       )
-      mountDialog("Test Title", { searchKey: "dog" })
+      mountDialog("dog")
       await flushPromises()
       expect(getModal()?.textContent).toContain("Searching...")
     })
 
     it("shows not found message when results are empty and searchKey provided", async () => {
       mockedWikidataSearch.mockResolvedValue([])
-      mountDialog("Test Title", { searchKey: "nonexistent" })
+      mountDialog("nonexistent")
       await flushPromises()
       expect(getModal()?.textContent).toContain(
         "No Wikidata entries found for 'nonexistent'"
@@ -126,7 +125,7 @@ describe("WikidataAssociationDialog", () => {
 
     it("does not show not found message when searchKey is not provided", async () => {
       mockedWikidataSearch.mockResolvedValue([])
-      mountDialog("Test Title")
+      mountDialog()
       await flushPromises()
       expect(getModal()?.textContent).not.toContain("No Wikidata entries found")
     })
@@ -137,7 +136,7 @@ describe("WikidataAssociationDialog", () => {
         .id("Q11399")
         .please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
-      mountDialog("Test Title", { searchKey: "dog" })
+      mountDialog("dog")
       await flushPromises()
       expect(getSelect()).toBeTruthy()
       expect(getSelect()?.textContent).toContain("Dog")
@@ -171,7 +170,7 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("works without searchKey (manual input only)", async () => {
-      const wrapper = mountDialog("Test Title")
+      const wrapper = mountDialog()
       await flushPromises()
       const input = getInput()
       expect(input).toBeTruthy()
@@ -190,7 +189,7 @@ describe("WikidataAssociationDialog", () => {
         .id("Q11399")
         .please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
-      const wrapper = mountDialog("dog", { searchKey: "dog" })
+      const wrapper = mountDialog("dog")
       await flushPromises()
 
       const select = getSelect()
@@ -210,7 +209,7 @@ describe("WikidataAssociationDialog", () => {
         .id("Q11399")
         .please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
-      const wrapper = mountDialog("DOG", { searchKey: "dog" })
+      const wrapper = mountDialog("DOG")
       await flushPromises()
 
       const select = getSelect()
@@ -229,7 +228,7 @@ describe("WikidataAssociationDialog", () => {
         .id("Q11399")
         .please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
-      mountDialog("dog", { searchKey: "dog" })
+      mountDialog("dog")
       await flushPromises()
 
       const select = getSelect()
@@ -248,7 +247,7 @@ describe("WikidataAssociationDialog", () => {
         .id("Q11399")
         .please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
-      const wrapper = mountDialog("dog", { searchKey: "dog" })
+      const wrapper = mountDialog("dog")
       await flushPromises()
 
       const select = getSelect()
@@ -273,7 +272,7 @@ describe("WikidataAssociationDialog", () => {
         .id("Q11399")
         .please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
-      const wrapper = mountDialog("dog", { searchKey: "dog" })
+      const wrapper = mountDialog("dog")
       await flushPromises()
 
       const select = getSelect()

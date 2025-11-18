@@ -12,7 +12,6 @@
               <template #input_append>
                 <WikidataSearchByLabel
                   :search-key="creationData.newTitle"
-                  :current-title="creationData.newTitle"
                   v-model="creationData.wikidataId"
                   :error-message="noteFormErrors.wikidataId"
                   @selected="onSelectWikidataEntry"

@@ -183,7 +183,7 @@ describe("adding new note", () => {
       vm.selectedOption = wikidataId
       vm.selectedItem = selected
 
-      const currentLabel = vm.currentTitle.toUpperCase()
+      const currentLabel = (vm.searchKeyRef || vm.searchKey || "").toUpperCase()
       const newLabel = selected.label.toUpperCase()
 
       if (currentLabel === newLabel) {
