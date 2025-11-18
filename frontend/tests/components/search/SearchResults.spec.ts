@@ -67,10 +67,9 @@ describe("SearchResults.vue", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("Similar notes within the same notebook")
-    expect(wrapper.text()).not.toContain("Searching ...")
   })
 
-  it("does not show 'Searching ...' when search key is empty initially", async () => {
+  it("shows checkboxes but no search message when search key is empty initially in non-dropdown mode", async () => {
     const wrapper = helper
       .component(SearchResults)
       .withProps({ inputSearchKey: "", isDropdown: false })
@@ -79,7 +78,8 @@ describe("SearchResults.vue", () => {
     await nextTick()
     await flushPromises()
 
-    expect(wrapper.text()).not.toContain("Searching ...")
+    expect(wrapper.text()).toContain("All My Notebooks And Subscriptions")
+    expect(wrapper.text()).toContain("All My Circles")
   })
 
   it("shows 'No matching notes found.' when results are empty in non-dropdown mode", async () => {
