@@ -102,12 +102,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick, computed } from "vue"
-import type {
-  WikidataSearchEntity,
-  Note,
-  WikidataAssociationCreation,
-} from "@generated/backend"
-import type { StorageAccessor } from "@/store/createNoteStorage"
+import type { WikidataSearchEntity } from "@generated/backend"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
@@ -115,28 +110,15 @@ import useLoadingApi from "@/managedApi/useLoadingApi"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 import SvgPopup from "../svgs/SvgPopup.vue"
 
-interface WikidataError {
-  body: {
-    message: string
-  }
-}
-
-interface WikidataIdError {
-  wikidataId: string
-}
-
 const props = defineProps<{
   searchKey?: string
   modelValue?: string
   errorMessage?: string
   showSaveButton?: boolean
-  note?: Note
-  storageAccessor?: StorageAccessor
 }>()
 
 const emit = defineEmits<{
   close: []
-  closeDialog: []
   selected: [entity: WikidataSearchEntity, titleAction?: "replace" | "append"]
   "update:modelValue": [value: string]
   save: [wikidataId: string]
@@ -144,28 +126,13 @@ const emit = defineEmits<{
 
 const { managedApi } = useLoadingApi()
 
-const isAutoSaveMode = computed(() => !!props.note && !!props.storageAccessor)
-const hasSaveButton = computed(
-  () => props.showSaveButton || isAutoSaveMode.value
-)
+const hasSaveButton = computed(() => props.showSaveButton || false)
 
-const searchKeyRef = computed(() => {
-  if (isAutoSaveMode.value) {
-    return props.note?.noteTopology.titleOrPredicate || ""
-  }
-  return props.searchKey || ""
-})
+const searchKeyRef = computed(() => props.searchKey || "")
 
-const localWikidataIdForEdit = ref(props.note?.wikidataId || "")
-const wikidataIdError = ref<string | undefined>(undefined)
+const errorMessageComputed = computed(() => props.errorMessage)
 
-const errorMessageComputed = computed(() => {
-  return isAutoSaveMode.value ? wikidataIdError.value : props.errorMessage
-})
-
-const localWikidataId = ref(
-  isAutoSaveMode.value ? localWikidataIdForEdit.value : props.modelValue || ""
-)
+const localWikidataId = ref(props.modelValue || "")
 const loading = ref(false)
 const searchResults = ref<WikidataSearchEntity[]>([])
 const selectedOption = ref("")
@@ -175,7 +142,6 @@ const titleAction = ref<"Replace" | "Append" | "">("")
 const hasSearched = ref(false)
 const select = ref<HTMLSelectElement | null>(null)
 const isLoadingUrl = ref(false)
-const isSaving = ref(false)
 
 const hasValidWikidataId = computed(() => {
   return localWikidataId.value && localWikidataId.value.trim() !== ""
@@ -283,42 +249,23 @@ const handleOpenLink = () => {
 
 const handleInputChange = (value: string) => {
   setWikidataId(value)
-  if (isAutoSaveMode.value) {
-    localWikidataIdForEdit.value = value
-    wikidataIdError.value = undefined
-  } else {
-    emit("update:modelValue", value)
-  }
+  emit("update:modelValue", value)
 }
 
 const onSelectSearchResult = async () => {
   const result = selectSearchResult(selectedOption.value)
   if (!result || !result.entity.id) return
 
-  if (isAutoSaveMode.value) {
-    localWikidataIdForEdit.value = result.entity.id
-    wikidataIdError.value = undefined
-    if (!result.needsTitleAction) {
-      await handleSelectedForEdit(result.entity)
-    }
-  } else {
-    emit("update:modelValue", result.entity.id)
-    if (!result.needsTitleAction) {
-      emit("selected", result.entity)
-    }
+  emit("update:modelValue", result.entity.id)
+  if (!result.needsTitleAction) {
+    emit("selected", result.entity)
   }
 }
 
 const handleTitleAction = async () => {
   if (!selectedItem.value) return
   const action = getTitleAction()
-  if (isAutoSaveMode.value && props.showSaveButton) {
-    // In auto-save mode with showSaveButton, wait for user to click Save
-    // Don't save immediately when title action is selected
-  } else if (isAutoSaveMode.value) {
-    // In auto-save mode without showSaveButton, save immediately
-    await handleSelectedForEdit(selectedItem.value, action)
-  } else if (!props.showSaveButton) {
+  if (!props.showSaveButton) {
     // When showSaveButton is true, don't emit selected immediately
     // Wait for user to click Save button
     emit("selected", selectedItem.value, action)
@@ -326,114 +273,13 @@ const handleTitleAction = async () => {
 }
 
 const handleClose = () => {
-  if (isAutoSaveMode.value) {
-    emit("closeDialog")
-  } else {
-    emit("close")
-  }
-}
-
-const saveWikidataId = async (wikidataId: string) => {
-  if (!props.note || !props.storageAccessor || isSaving.value) return
-  isSaving.value = true
-  try {
-    const associationData: WikidataAssociationCreation = {
-      wikidataId,
-    }
-    await props.storageAccessor
-      .storedApi()
-      .updateWikidataId(props.note.id, associationData)
-    emit("closeDialog")
-  } catch (e: unknown) {
-    isSaving.value = false
-    if (typeof e === "object" && e !== null && "wikidataId" in e) {
-      wikidataIdError.value = (e as WikidataIdError).wikidataId
-    } else {
-      wikidataIdError.value = "An unknown error occurred"
-    }
-  }
-}
-
-const handleError = (e: unknown) => {
-  if (
-    e instanceof Error &&
-    "body" in e &&
-    typeof e.body === "object" &&
-    e.body &&
-    "message" in e.body
-  ) {
-    wikidataIdError.value = (e as WikidataError).body.message
-  } else {
-    wikidataIdError.value = "An unknown error occurred"
-  }
-}
-
-const validateAndSaveWikidataId = async (wikidataId: string) => {
-  if (!props.note) return
-
-  try {
-    const res = await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId,
-    })
-
-    const noteTitleUpper =
-      props.note.noteTopology.titleOrPredicate.toUpperCase()
-    const wikidataTitleUpper = res.WikidataTitleInEnglish.toUpperCase()
-
-    if (
-      wikidataTitleUpper === noteTitleUpper ||
-      res.WikidataTitleInEnglish === ""
-    ) {
-      await saveWikidataId(wikidataId)
-    } else {
-      const entity: WikidataSearchEntity = {
-        id: wikidataId,
-        label: res.WikidataTitleInEnglish,
-        description: "",
-      }
-      showTitleOptionsForEntity(entity)
-      await nextTick()
-    }
-  } catch (e: unknown) {
-    handleError(e)
-  }
-}
-
-const handleSelectedForEdit = async (
-  entity: WikidataSearchEntity,
-  _titleAction?: "replace" | "append"
-) => {
-  if (!entity.id || !props.note) return
-
-  try {
-    await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId: entity.id,
-    })
-    await saveWikidataId(entity.id)
-  } catch (e: unknown) {
-    handleError(e)
-  }
-}
-
-const handleManualSaveForEdit = async (wikidataId: string) => {
-  await validateAndSaveWikidataId(wikidataId)
+  emit("close")
 }
 
 const handleSave = async () => {
   if (!hasValidWikidataId.value) return
 
-  if (isAutoSaveMode.value) {
-    if (showTitleOptions.value && selectedItem.value && titleAction.value) {
-      const action = getTitleAction()
-      await handleSelectedForEdit(selectedItem.value, action)
-    } else {
-      await handleManualSaveForEdit(localWikidataId.value)
-    }
-  } else if (
-    showTitleOptions.value &&
-    selectedItem.value &&
-    titleAction.value
-  ) {
+  if (showTitleOptions.value && selectedItem.value && titleAction.value) {
     const action = getTitleAction()
     emit("selected", selectedItem.value, action)
   } else if (hasSaveButton.value) {
@@ -443,24 +289,13 @@ const handleSave = async () => {
 }
 
 watch(
-  () =>
-    isAutoSaveMode.value ? localWikidataIdForEdit.value : props.modelValue,
+  () => props.modelValue,
   (newValue) => {
     if (newValue !== undefined) {
       setWikidataId(newValue)
     }
   },
   { immediate: true }
-)
-
-watch(
-  () => props.note?.wikidataId,
-  (newValue) => {
-    if (isAutoSaveMode.value && newValue !== undefined) {
-      localWikidataIdForEdit.value = newValue
-      setWikidataId(newValue)
-    }
-  }
 )
 
 watch(
@@ -481,11 +316,8 @@ watch(searchResults, async () => {
 })
 
 onMounted(() => {
-  const initialValue = isAutoSaveMode.value
-    ? localWikidataIdForEdit.value
-    : props.modelValue
-  if (initialValue !== undefined) {
-    setWikidataId(initialValue)
+  if (props.modelValue !== undefined) {
+    setWikidataId(props.modelValue)
   }
   if (searchKeyRef.value) {
     fetchSearchResults()
