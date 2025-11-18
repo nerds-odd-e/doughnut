@@ -255,7 +255,9 @@ const onSelectSearchResult = async () => {
   if (!result || !result.entity.id) return
 
   emit("update:modelValue", result.entity.id)
-  if (!result.needsTitleAction) {
+  // Only emit selected immediately if showSaveButton is false
+  // When showSaveButton is true, wait for user to click Save button
+  if (!result.needsTitleAction && !props.showSaveButton) {
     emit("selected", result.entity)
   }
 }

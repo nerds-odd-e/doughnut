@@ -2488,14 +2488,14 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ConversationMessage"
-  /api/wikidata/search/{search}:
+  /api/wikidata/search:
     get:
       tags:
       - wikidata-controller
       operationId: searchWikidata
       parameters:
       - name: search
-        in: path
+        in: query
         required: true
         schema:
           type: string

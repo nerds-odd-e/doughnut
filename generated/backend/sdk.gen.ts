@@ -1863,8 +1863,8 @@ export const markConversationAsRead = (data: MarkConversationAsReadData): Cancel
 export const searchWikidata = (data: SearchWikidataData): CancelablePromise<SearchWikidataResponse> => {
     return __request(OpenAPI, {
         method: 'GET',
-        url: '/api/wikidata/search/{search}',
-        path: {
+        url: '/api/wikidata/search',
+        query: {
             search: data.search
         },
         errors: {

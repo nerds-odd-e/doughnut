@@ -356,4 +356,148 @@ describe("WikidataAssociationDialog", () => {
       windowOpenSpy.mockRestore()
     })
   })
+
+  describe("edit mode with showSaveButton", () => {
+    const getSaveButton = () =>
+      Array.from(getModal()?.querySelectorAll("button") || []).find(
+        (btn) => btn.textContent?.trim() === "Save"
+      ) as HTMLButtonElement
+
+    it("does not auto-save when selecting from result list if showSaveButton is true", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("dog")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      const wrapper = mountDialog("dog", { showSaveButton: true })
+      await flushPromises()
+
+      const select = getSelect()
+      expect(select).toBeTruthy()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Should NOT emit selected immediately when showSaveButton is true
+      expect(wrapper.emitted("selected")).toBeFalsy()
+      // Should update modelValue
+      expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["Q11399"])
+      // Should show Save button
+      expect(getSaveButton()).toBeTruthy()
+    })
+
+    it("saves when clicking Save button after selecting from result list", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("dog")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      const wrapper = mountDialog("dog", { showSaveButton: true })
+      await flushPromises()
+
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Click Save button
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      saveButton.click()
+      await flushPromises()
+
+      // Should emit save with the wikidata ID
+      expect(wrapper.emitted("save")?.[0]).toEqual(["Q11399"])
+    })
+
+    it("shows title options when selecting result with different title and showSaveButton is true", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Canine")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      mountDialog("dog", { showSaveButton: true })
+      await flushPromises()
+
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Should show title options
+      expect(getModal()?.textContent).toContain("Suggested Title: Canine")
+      expect(getModal()?.querySelector('input[value="Replace"]')).toBeTruthy()
+      expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
+    })
+
+    it("saves with replace action when user selects Replace and clicks Save", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Canine")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      const wrapper = mountDialog("dog", { showSaveButton: true })
+      await flushPromises()
+
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Select Replace option
+      const replaceLabel = getModal()?.querySelector(
+        'label[for*="Replace"]'
+      ) as HTMLLabelElement
+      expect(replaceLabel).toBeTruthy()
+      replaceLabel.click()
+      await flushPromises()
+
+      // Click Save button
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      saveButton.click()
+      await flushPromises()
+
+      // Should emit selected with replace action
+      expect(wrapper.emitted("selected")).toBeTruthy()
+      const emitted = wrapper.emitted("selected")?.[0]
+      expect(emitted?.[0]).toEqual(searchResult)
+      expect(emitted?.[1]).toBe("replace")
+    })
+
+    it("saves with append action when user selects Append and clicks Save", async () => {
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Canine")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      const wrapper = mountDialog("dog", { showSaveButton: true })
+      await flushPromises()
+
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Select Append option
+      const appendLabel = getModal()?.querySelector(
+        'label[for*="Append"]'
+      ) as HTMLLabelElement
+      expect(appendLabel).toBeTruthy()
+      appendLabel.click()
+      await flushPromises()
+
+      // Click Save button
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      saveButton.click()
+      await flushPromises()
+
+      // Should emit selected with append action
+      expect(wrapper.emitted("selected")).toBeTruthy()
+      const emitted = wrapper.emitted("selected")?.[0]
+      expect(emitted?.[0]).toEqual(searchResult)
+      expect(emitted?.[1]).toBe("append")
+    })
+  })
 })
