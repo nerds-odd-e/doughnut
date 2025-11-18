@@ -5,7 +5,6 @@
     </template>
     <template #body>
       <form
-        v-if="hasSaveButton"
         id="wikidata-association-form"
         @submit.prevent="handleSave"
       >
@@ -20,7 +19,6 @@
           >
             <template #input_append>
               <button
-                v-if="hasSaveButton"
                 type="button"
                 class="daisy-btn daisy-rounded-l-none"
                 :class="[
@@ -37,16 +35,6 @@
           </TextInput>
         </div>
       </form>
-      <div v-else class="daisy-mb-4">
-        <TextInput
-          scope-name="wikidataID"
-          field="wikidataID"
-          :model-value="localWikidataId"
-          @update:model-value="handleInputChange"
-          :error-message="errorMessageComputed"
-          placeholder="example: `Q1234`"
-        />
-      </div>
       <div v-if="loading" class="daisy-text-center daisy-p-4">
         Searching...
       </div>
@@ -97,7 +85,7 @@
           type="submit"
           form="wikidata-association-form"
           class="daisy-btn daisy-btn-primary"
-          :disabled="!localWikidataId || localWikidataId.trim() === ''"
+          :disabled="!hasValidWikidataId"
         >
           Save
         </button>
@@ -456,9 +444,10 @@ const handleSave = async () => {
   ) {
     const action = getTitleAction()
     emit("selected", selectedItem.value, action)
-  } else {
+  } else if (hasSaveButton.value) {
     emit("save", localWikidataId.value)
   }
+  // If hasSaveButton is false, form submission does nothing (just prevents default)
 }
 
 watch(

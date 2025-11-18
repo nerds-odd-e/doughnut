@@ -304,13 +304,14 @@ describe("WikidataAssociationDialog", () => {
       expect(openLinkButton?.querySelector("svg")).toBeTruthy()
     })
 
-    it("does not show open link button when showSaveButton is false", async () => {
+    it("shows open link button when showSaveButton is false but Wikidata ID is present", async () => {
       mountDialog("Test Title", { modelValue: "Q123", showSaveButton: false })
       await flushPromises()
       const openLinkButton = getModal()?.querySelector(
         'button[title="open link"]'
-      )
-      expect(openLinkButton).toBeFalsy()
+      ) as HTMLButtonElement
+      expect(openLinkButton).toBeTruthy()
+      expect(openLinkButton?.querySelector("svg")).toBeTruthy()
     })
 
     it("hides open link button when Wikidata ID is empty", async () => {
