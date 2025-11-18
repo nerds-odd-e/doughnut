@@ -30,26 +30,18 @@ describe("WikidataAssociationDialog", () => {
   })
 
   const mountDialog = (
-    searchKey?: string,
+    searchKey: string,
     options?: {
       modelValue?: string
       errorMessage?: string
       showSaveButton?: boolean
-      note?: ReturnType<typeof makeMe.aNote.please>
     }
   ) => {
-    const { note, ...props } = options || {}
-    if (note) {
-      return helper
-        .component(WikidataAssociationDialog)
-        .withStorageProps({ note })
-        .mount({ attachTo: document.body })
-    }
     return helper
       .component(WikidataAssociationDialog)
       .withProps({
-        ...(searchKey !== undefined && { searchKey }),
-        ...props,
+        searchKey,
+        ...options,
       })
       .mount({ attachTo: document.body })
   }
@@ -119,11 +111,11 @@ describe("WikidataAssociationDialog", () => {
       )
     })
 
-    it("does not show not found message when searchKey is not provided", async () => {
+    it("shows not found message when searchKey is provided but no results", async () => {
       mockedWikidataSearch.mockResolvedValue([])
-      mountDialog()
+      mountDialog("test")
       await flushPromises()
-      expect(getModal()?.textContent).not.toContain("No Wikidata entries found")
+      expect(getModal()?.textContent).toContain("No Wikidata entries found")
     })
 
     it("displays search results in select when searchKey is provided", async () => {
@@ -151,12 +143,12 @@ describe("WikidataAssociationDialog", () => {
       expect(wrapper.emitted("update:modelValue")?.[0]).toEqual(["Q456"])
     })
 
-    it("works without searchKey (manual input only)", async () => {
-      const wrapper = mountDialog()
+    it("allows manual input of Wikidata ID", async () => {
+      const wrapper = mountDialog("test")
       await flushPromises()
       const input = getInput()
       expect(input).toBeTruthy()
-      expect(mockedWikidataSearch).not.toHaveBeenCalled()
+      expect(mockedWikidataSearch).toHaveBeenCalled()
       input.value = "Q999"
       input.dispatchEvent(new Event("input", { bubbles: true }))
       await flushPromises()

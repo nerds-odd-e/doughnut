@@ -39,7 +39,7 @@
         Searching...
       </div>
       <div
-        v-else-if="searchResults && searchResults.length === 0 && hasSearched && searchKeyRef"
+        v-else-if="searchResults && searchResults.length === 0 && hasSearched"
         class="daisy-text-center daisy-p-4"
       >
         <p>No Wikidata entries found for '{{ searchKeyRef }}'</p>
@@ -111,7 +111,7 @@ import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 import SvgPopup from "../svgs/SvgPopup.vue"
 
 const props = defineProps<{
-  searchKey?: string
+  searchKey: string
   modelValue?: string
   errorMessage?: string
   showSaveButton?: boolean
@@ -128,7 +128,7 @@ const { managedApi } = useLoadingApi()
 
 const hasSaveButton = computed(() => props.showSaveButton || false)
 
-const searchKeyRef = computed(() => props.searchKey || "")
+const searchKeyRef = computed(() => props.searchKey)
 
 const errorMessageComputed = computed(() => props.errorMessage)
 
@@ -148,13 +148,11 @@ const hasValidWikidataId = computed(() => {
 })
 
 const fetchSearchResults = async () => {
-  const key = searchKeyRef.value
-  if (!key) return
   loading.value = true
   hasSearched.value = true
   try {
     searchResults.value = await managedApi.services.searchWikidata({
-      search: key,
+      search: searchKeyRef.value,
     })
   } finally {
     loading.value = false
@@ -300,10 +298,8 @@ watch(
 
 watch(
   searchKeyRef,
-  (newKey) => {
-    if (newKey) {
-      fetchSearchResults()
-    }
+  () => {
+    fetchSearchResults()
   },
   { immediate: false }
 )
@@ -319,9 +315,7 @@ onMounted(() => {
   if (props.modelValue !== undefined) {
     setWikidataId(props.modelValue)
   }
-  if (searchKeyRef.value) {
-    fetchSearchResults()
-  }
+  fetchSearchResults()
   if (props.showSaveButton) {
     nextTick(() => {
       const input = document.getElementById(
