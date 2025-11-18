@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
@@ -42,6 +43,7 @@ class TestabilityRestController {
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
+  @Autowired BazaarService bazaarService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -250,7 +252,7 @@ class TestabilityRestController {
   @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
     Note note = noteRepository.findFirstByTitle(map.get("noteTopology"));
-    modelFactoryService.toBazaarModel().shareNotebook(note.getNotebook());
+    bazaarService.shareNotebook(note.getNotebook());
     return "OK";
   }
 

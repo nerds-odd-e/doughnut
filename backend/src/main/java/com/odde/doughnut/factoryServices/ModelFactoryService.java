@@ -63,10 +63,6 @@ public class ModelFactoryService {
             });
   }
 
-  public BazaarModel toBazaarModel() {
-    return new BazaarModel(this);
-  }
-
   public Optional<User> findUserById(Integer id) {
     return userRepository.findById(id);
   }
