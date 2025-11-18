@@ -5,7 +5,7 @@
     </template>
     <template #body>
       <form
-        v-if="showSaveButton || isAutoSaveMode"
+        v-if="hasSaveButton"
         id="wikidata-association-form"
         @submit.prevent="handleSave"
       >
@@ -15,11 +15,12 @@
             field="wikidataID"
             :model-value="localWikidataId"
             @update:model-value="handleInputChange"
-            :error-message="isAutoSaveMode ? wikidataIdError : errorMessage"
+            :error-message="errorMessageComputed"
             placeholder="example: `Q1234`"
           >
             <template #input_append>
               <button
+                v-if="hasSaveButton"
                 type="button"
                 class="daisy-btn daisy-rounded-l-none"
                 :class="[
@@ -40,20 +41,20 @@
         <TextInput
           scope-name="wikidataID"
           field="wikidataID"
-            :model-value="localWikidataId"
-            @update:model-value="handleInputChange"
-            :error-message="isAutoSaveMode ? wikidataIdError : errorMessage"
-            placeholder="example: `Q1234`"
+          :model-value="localWikidataId"
+          @update:model-value="handleInputChange"
+          :error-message="errorMessageComputed"
+          placeholder="example: `Q1234`"
         />
       </div>
       <div v-if="loading" class="daisy-text-center daisy-p-4">
         Searching...
       </div>
       <div
-        v-else-if="searchResults && searchResults.length === 0 && hasSearched && searchKey"
+        v-else-if="searchResults && searchResults.length === 0 && hasSearched && searchKeyRef"
         class="daisy-text-center daisy-p-4"
       >
-        <p>No Wikidata entries found for '{{ searchKey }}'</p>
+        <p>No Wikidata entries found for '{{ searchKeyRef }}'</p>
       </div>
       <div v-else-if="searchResults && searchResults.length > 0 && !showTitleOptions">
         <select
@@ -92,7 +93,7 @@
       </div>
       <div class="daisy-mt-4 daisy-flex daisy-gap-2">
         <button
-          v-if="showSaveButton || isAutoSaveMode"
+          v-if="hasSaveButton"
           type="submit"
           form="wikidata-association-form"
           class="daisy-btn daisy-btn-primary"
@@ -101,15 +102,6 @@
           Save
         </button>
         <button
-          v-if="showSaveButton || isAutoSaveMode"
-          type="button"
-          class="daisy-btn daisy-btn-secondary"
-          @click="handleClose"
-        >
-          Close
-        </button>
-        <button
-          v-else
           class="daisy-btn daisy-btn-secondary"
           @click="handleClose"
         >
@@ -163,12 +155,20 @@ const emit = defineEmits<{
   save: [wikidataId: string]
 }>()
 
+const { managedApi } = useLoadingApi()
+
+const isAutoSaveMode = computed(() => !!props.note && !!props.storageAccessor)
+const hasSaveButton = computed(
+  () => props.showSaveButton || isAutoSaveMode.value
+)
+
 const searchKeyRef = computed(() => {
   if (isAutoSaveMode.value) {
     return props.note?.noteTopology.titleOrPredicate || ""
   }
   return props.searchKey || ""
 })
+
 const currentTitleRef = computed(() => {
   if (isAutoSaveMode.value) {
     return props.note?.noteTopology.titleOrPredicate || ""
@@ -176,18 +176,16 @@ const currentTitleRef = computed(() => {
   return props.currentTitle || ""
 })
 
-const isAutoSaveMode = computed(() => !!props.note && !!props.storageAccessor)
 const localWikidataIdForEdit = ref(props.note?.wikidataId || "")
 const wikidataIdError = ref<string | undefined>(undefined)
 
-const initialWikidataId = computed(() => {
-  if (isAutoSaveMode.value) {
-    return localWikidataIdForEdit.value
-  }
-  return props.modelValue
+const errorMessageComputed = computed(() => {
+  return isAutoSaveMode.value ? wikidataIdError.value : props.errorMessage
 })
 
-const localWikidataId = ref(initialWikidataId.value || "")
+const localWikidataId = ref(
+  isAutoSaveMode.value ? localWikidataIdForEdit.value : props.modelValue || ""
+)
 const loading = ref(false)
 const searchResults = ref<WikidataSearchEntity[]>([])
 const selectedOption = ref("")
@@ -195,6 +193,14 @@ const selectedItem = ref<WikidataSearchEntity | null>(null)
 const showTitleOptions = ref(false)
 const titleAction = ref<"Replace" | "Append" | "">("")
 const hasSearched = ref(false)
+const select = ref<HTMLSelectElement | null>(null)
+const isLoadingUrl = ref(false)
+const isSaving = ref(false)
+
+const hasValidWikidataId = computed(() => {
+  return localWikidataId.value && localWikidataId.value.trim() !== ""
+})
+
 const fetchSearchResults = async () => {
   const key = searchKeyRef.value
   if (!key) return
@@ -263,14 +269,6 @@ const showTitleOptionsForEntity = (entity: WikidataSearchEntity) => {
 
 defineExpose({
   showTitleOptionsForEntity,
-})
-
-const select = ref<HTMLSelectElement | null>(null)
-const { managedApi } = useLoadingApi()
-const isLoadingUrl = ref(false)
-
-const hasValidWikidataId = computed(() => {
-  return localWikidataId.value && localWikidataId.value.trim() !== ""
 })
 
 const getWikidataItem = async (wikidataId: string) => {
@@ -355,7 +353,6 @@ const handleClose = () => {
   }
 }
 
-const isSaving = ref(false)
 const saveWikidataId = async (wikidataId: string) => {
   if (!props.note || !props.storageAccessor || isSaving.value) return
   isSaving.value = true
@@ -374,7 +371,51 @@ const saveWikidataId = async (wikidataId: string) => {
     } else {
       wikidataIdError.value = "An unknown error occurred"
     }
-    // Keep dialog open to show error
+  }
+}
+
+const handleError = (e: unknown) => {
+  if (
+    e instanceof Error &&
+    "body" in e &&
+    typeof e.body === "object" &&
+    e.body &&
+    "message" in e.body
+  ) {
+    wikidataIdError.value = (e as WikidataError).body.message
+  } else {
+    wikidataIdError.value = "An unknown error occurred"
+  }
+}
+
+const validateAndSaveWikidataId = async (wikidataId: string) => {
+  if (!props.note) return
+
+  try {
+    const res = await managedApi.services.fetchWikidataEntityDataById({
+      wikidataId,
+    })
+
+    const noteTitleUpper =
+      props.note.noteTopology.titleOrPredicate.toUpperCase()
+    const wikidataTitleUpper = res.WikidataTitleInEnglish.toUpperCase()
+
+    if (
+      wikidataTitleUpper === noteTitleUpper ||
+      res.WikidataTitleInEnglish === ""
+    ) {
+      await saveWikidataId(wikidataId)
+    } else {
+      const entity: WikidataSearchEntity = {
+        id: wikidataId,
+        label: res.WikidataTitleInEnglish,
+        description: "",
+      }
+      showTitleOptionsForEntity(entity)
+      await nextTick()
+    }
+  } catch (e: unknown) {
+    handleError(e)
   }
 }
 
@@ -384,116 +425,39 @@ const handleSelectedForEdit = async (
 ) => {
   if (!entity.id || !props.note) return
 
-  // Validate the Wikidata ID
   try {
-    const res = await managedApi.services.fetchWikidataEntityDataById({
+    await managedApi.services.fetchWikidataEntityDataById({
       wikidataId: entity.id,
     })
-
-    // Check if titles match (case-insensitive)
-    const noteTitleUpper =
-      props.note.noteTopology.titleOrPredicate.toUpperCase()
-    const wikidataTitleUpper = res.WikidataTitleInEnglish.toUpperCase()
-
-    if (
-      wikidataTitleUpper === noteTitleUpper ||
-      res.WikidataTitleInEnglish === ""
-    ) {
-      // Titles match or empty - save directly
-      await saveWikidataId(entity.id)
-    } else {
-      // Titles differ - the unified dialog already showed Replace/Append options
-      // User has chosen an action, so we save with that understanding
-      // (In edit flow, we don't actually change the note title, but the user
-      // has acknowledged the difference via Replace/Append choice)
-      await saveWikidataId(entity.id)
-    }
+    await saveWikidataId(entity.id)
   } catch (e: unknown) {
-    if (
-      e instanceof Error &&
-      "body" in e &&
-      typeof e.body === "object" &&
-      e.body &&
-      "message" in e.body
-    ) {
-      wikidataIdError.value = (e as WikidataError).body.message
-    } else {
-      wikidataIdError.value = "An unknown error occurred"
-    }
-    // Keep dialog open to show error
+    handleError(e)
   }
 }
 
 const handleManualSaveForEdit = async (wikidataId: string) => {
-  if (!props.note) return
-  // Validate the Wikidata ID
-  try {
-    const res = await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId,
-    })
-
-    // Check if titles match (case-insensitive)
-    const noteTitleUpper =
-      props.note.noteTopology.titleOrPredicate.toUpperCase()
-    const wikidataTitleUpper = res.WikidataTitleInEnglish.toUpperCase()
-
-    if (
-      wikidataTitleUpper === noteTitleUpper ||
-      res.WikidataTitleInEnglish === ""
-    ) {
-      // Titles match or empty - save directly
-      await saveWikidataId(wikidataId)
-    } else {
-      // Titles differ - show Replace/Append options via unified dialog
-      const entity: WikidataSearchEntity = {
-        id: wikidataId,
-        label: res.WikidataTitleInEnglish,
-        description: "",
-      }
-      showTitleOptionsForEntity(entity)
-      await nextTick() // Ensure Vue updates the DOM
-      // Don't save yet - wait for user to select Replace/Append option
-      // The handleTitleAction will trigger handleSelectedForEdit which will save
-    }
-  } catch (e: unknown) {
-    if (
-      e instanceof Error &&
-      "body" in e &&
-      typeof e.body === "object" &&
-      e.body &&
-      "message" in e.body
-    ) {
-      wikidataIdError.value = (e as WikidataError).body.message
-    } else {
-      wikidataIdError.value = "An unknown error occurred"
-    }
-    // Keep dialog open to show error
-  }
+  await validateAndSaveWikidataId(wikidataId)
 }
 
 const handleSave = async () => {
-  if (localWikidataId.value && localWikidataId.value.trim() !== "") {
-    if (isAutoSaveMode.value) {
-      // If title options are shown and user has selected an action,
-      // use selected event handler
-      if (showTitleOptions.value && selectedItem.value && titleAction.value) {
-        const action = getTitleAction()
-        await handleSelectedForEdit(selectedItem.value, action)
-      } else {
-        await handleManualSaveForEdit(localWikidataId.value)
-      }
-    } else if (
-      showTitleOptions.value &&
-      selectedItem.value &&
-      titleAction.value
-    ) {
-      // If title options are shown and user has selected an action,
-      // emit selected event instead of save
+  if (!hasValidWikidataId.value) return
+
+  if (isAutoSaveMode.value) {
+    if (showTitleOptions.value && selectedItem.value && titleAction.value) {
       const action = getTitleAction()
-      emit("selected", selectedItem.value, action)
+      await handleSelectedForEdit(selectedItem.value, action)
     } else {
-      emit("save", localWikidataId.value)
+      await handleManualSaveForEdit(localWikidataId.value)
     }
+  } else if (
+    showTitleOptions.value &&
+    selectedItem.value &&
+    titleAction.value
+  ) {
+    const action = getTitleAction()
+    emit("selected", selectedItem.value, action)
+  } else {
+    emit("save", localWikidataId.value)
   }
 }
 
@@ -518,7 +482,6 @@ watch(
   }
 )
 
-// Watch searchKey and fetch results when it changes
 watch(
   searchKeyRef,
   (newKey) => {
@@ -531,8 +494,6 @@ watch(
 
 watch(searchResults, async () => {
   await nextTick()
-  // Only auto-focus dropdown when NOT in edit mode (showSaveButton is false)
-  // In edit mode, keep focus on input field for direct typing
   if (!props.showSaveButton && select.value && searchResults.value.length > 0) {
     select.value.focus()
   }
@@ -551,7 +512,6 @@ onMounted(() => {
   if (searchKey) {
     fetchSearchResults()
   }
-  // In edit mode, focus the input field after mount
   if (props.showSaveButton) {
     nextTick(() => {
       const input = document.getElementById(
