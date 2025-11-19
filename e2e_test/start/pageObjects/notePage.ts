@@ -344,14 +344,6 @@ export const assumeNotePage = (noteTopology?: string) => {
           privateToolbarButton('associate wikidata').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
-        reassociationWith(wikiID: string) {
-          privateToolbarButton('associate wikidata').click()
-          cy.replaceFocusedTextAndEnter(wikiID)
-        },
-        confirmAssociation() {
-          cy.findByRole('button', { name: 'Confirm' }).click()
-          return this.hasAssociation()
-        },
         confirmAssociationWithDifferentLabel(wikidataTitle: string) {
           // Wait for the title options to appear and check that the wikidata title is visible
           cy.findByText(/Suggested Title:/)

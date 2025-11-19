@@ -22,7 +22,7 @@ When(
 When(
   'I change the note {string} to associate with wikidata id {string}',
   (title: string, wikiID: string) => {
-    start.jumpToNotePage(title).wikidataOptions().reassociationWith(wikiID)
+    start.jumpToNotePage(title).wikidataOptions().associate(wikiID)
   }
 )
 
