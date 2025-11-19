@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.utils;
 
 import com.odde.doughnut.algorithms.ImageUtils;
 import com.odde.doughnut.entities.AttachmentBlob;
