@@ -103,7 +103,7 @@ class ConversationMessageControllerTest {
     makeMe
         .aConversation()
         .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-        .from(currentUser.getUserModel())
+        .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     List<Conversation> conversations = controller.getConversationsOfCurrentUser();
@@ -139,7 +139,11 @@ class ConversationMessageControllerTest {
 
     @BeforeEach
     void setup() {
-      conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      conversation =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
     }
 
     @Test
@@ -191,7 +195,11 @@ class ConversationMessageControllerTest {
 
     @Test
     void getZeroUnreadConversationWhenSenderIsCurrentUser() {
-      Conversation conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       makeMe
           .aConversationMessage(conversation)
           .sender(currentUser.getUser())
@@ -209,7 +217,11 @@ class ConversationMessageControllerTest {
 
     @BeforeEach
     void setup() {
-      conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      conversation =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
     }
 
     @Test
@@ -278,7 +290,11 @@ class ConversationMessageControllerTest {
     @Test
     void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
-      Conversation conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
       assertEquals(message, conversationMessage.getMessage());
@@ -298,7 +314,11 @@ class ConversationMessageControllerTest {
 
     @Test
     void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
-      Conversation conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      Conversation conversation =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
 
       makeMe.aConversationMessage(conversation).please();
       List<ConversationMessage> conversations = controller.getConversationMessages(conversation);
@@ -349,9 +369,21 @@ class ConversationMessageControllerTest {
 
     @Test
     void testConversationsOrderedByLastMessageTime() {
-      Conversation conv1 = makeMe.aConversation().from(currentUser.getUserModel()).please();
-      Conversation conv2 = makeMe.aConversation().from(currentUser.getUserModel()).please();
-      Conversation conv3 = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      Conversation conv1 =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
+      Conversation conv2 =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
+      Conversation conv3 =
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
 
       // Add messages with specific timestamps
       makeMe
@@ -380,19 +412,19 @@ class ConversationMessageControllerTest {
       Conversation conv1 =
           makeMe
               .aConversation()
-              .from(currentUser.getUserModel())
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .createdAt(makeMe.aTimestamp().of(1, 1).please())
               .please();
       Conversation conv2 =
           makeMe
               .aConversation()
-              .from(currentUser.getUserModel())
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .createdAt(makeMe.aTimestamp().of(1, 2).please())
               .please();
       Conversation conv3 =
           makeMe
               .aConversation()
-              .from(currentUser.getUserModel())
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .createdAt(makeMe.aTimestamp().of(1, 3).please())
               .please();
 
@@ -418,11 +450,22 @@ class ConversationMessageControllerTest {
     void shouldReturnConversationsAboutNote() {
       // Create conversations about the note
       Conversation conv1 =
-          makeMe.aConversation().from(currentUser.getUserModel()).forANote(note).please();
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .forANote(note)
+              .please();
       Conversation conv2 =
-          makeMe.aConversation().from(currentUser.getUserModel()).forANote(note).please();
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .forANote(note)
+              .please();
       // Create an unrelated conversation
-      makeMe.aConversation().from(currentUser.getUserModel()).please();
+      makeMe
+          .aConversation()
+          .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+          .please();
 
       List<Conversation> conversations = controller.getConversationsAboutNote(note);
       assertEquals(2, conversations.size());
@@ -434,7 +477,11 @@ class ConversationMessageControllerTest {
     void shouldOnlyReturnAccessibleConversations() {
       // Create a conversation the current user initiated
       Conversation conv1 =
-          makeMe.aConversation().from(currentUser.getUserModel()).forANote(note).please();
+          makeMe
+              .aConversation()
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .forANote(note)
+              .please();
       // Create a conversation between other users about the same note
       Conversation conv2 = makeMe.aConversation().from(otherUser).forANote(note).please();
 
@@ -510,7 +557,11 @@ class ConversationMessageControllerTest {
               .titleConstructor("There are 42 prefectures in Japan")
               .please();
       conversation =
-          makeMe.aConversation().forANote(note).from(currentUser.getUserModel()).please();
+          makeMe
+              .aConversation()
+              .forANote(note)
+              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
     }
 
     @Test

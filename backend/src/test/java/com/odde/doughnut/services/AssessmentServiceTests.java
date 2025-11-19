@@ -56,7 +56,10 @@ public class AssessmentServiceTests {
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
       topNote =
-          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
+          makeMe
+              .aHeadNote("OnlineAssessment")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }
@@ -87,7 +90,10 @@ public class AssessmentServiceTests {
     @BeforeEach
     void setup() {
       topNote =
-          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
+          makeMe
+              .aHeadNote("OnlineAssessment")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
     }

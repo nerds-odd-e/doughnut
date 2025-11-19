@@ -52,7 +52,11 @@ public class AssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUserModel()).please();
+      notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
     }
 
     @Test
@@ -223,7 +227,10 @@ public class AssessmentControllerTests {
     @BeforeEach
     void setup() {
       Note topNote =
-          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
+          makeMe
+              .aHeadNote("OnlineAssessment")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
     }

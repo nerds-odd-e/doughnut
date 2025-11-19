@@ -38,7 +38,11 @@ class SubscriptionControllerTest {
   @BeforeEach
   void setup() {
     userModel = new CurrentUser(makeMe.aUser().toModelPlease());
-    topNote = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+    topNote =
+        makeMe
+            .aNote()
+            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
     controller =

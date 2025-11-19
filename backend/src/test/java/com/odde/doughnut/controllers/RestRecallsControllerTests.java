@@ -100,7 +100,7 @@ class RecallsControllerTests {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
       makeMe
-          .aMemoryTrackerBy(currentUser.getUserModel())
+          .aMemoryTrackerBy(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
           .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
@@ -111,7 +111,10 @@ class RecallsControllerTests {
     void shouldIncludeRecallStatusInDueMemoryTrackers() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      makeMe.aMemoryTrackerBy(currentUser.getUserModel()).nextRecallAt(currentTime).please();
+      makeMe
+          .aMemoryTrackerBy(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+          .nextRecallAt(currentTime)
+          .please();
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 

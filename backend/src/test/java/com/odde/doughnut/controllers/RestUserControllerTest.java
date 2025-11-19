@@ -82,7 +82,11 @@ class UserControllerTest {
   @Test
   void getTokensTest() {
     UserToken userToken =
-        makeMe.aUserToken().forUser(userModel.getUserModel()).withLabel("TEST_LABEL").please();
+        makeMe
+            .aUserToken()
+            .forUser(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .withLabel("TEST_LABEL")
+            .please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -107,7 +111,11 @@ class UserControllerTest {
   @Test
   void deleteTokenTest() {
     UserToken userToken =
-        makeMe.aUserToken().forUser(userModel.getUserModel()).withLabel("DELETE_LABEL").please();
+        makeMe
+            .aUserToken()
+            .forUser(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .withLabel("DELETE_LABEL")
+            .please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -124,7 +132,7 @@ class UserControllerTest {
     UserToken userToken2 =
         makeMe
             .aUserToken()
-            .forUser(userModel2.getUserModel())
+            .forUser(makeMe.modelFactoryService.toUserModel(userModel2.getUser()))
             .withLabel("OTHER_USER_TOKEN")
             .please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;

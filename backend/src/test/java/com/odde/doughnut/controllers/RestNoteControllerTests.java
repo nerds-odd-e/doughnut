@@ -84,7 +84,11 @@ class NoteControllerTests {
 
     @Test
     void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      Note note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getFromBazaar(), is(false));
@@ -117,7 +121,11 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel.getUserModel()).please();
+      note =
+          makeMe
+              .aNote("new")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
     }
 
     @Test
@@ -159,7 +167,11 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      parent =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       subject = makeMe.aNote().under(parent).please();
       child = makeMe.aNote("child").under(subject).please();
     }
@@ -220,7 +232,11 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      parent =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       note = makeMe.aNote().under(parent).please();
     }
 
@@ -257,8 +273,16 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      source = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
-      target = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      source =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
+      target =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       link = makeMe.aReification().between(source, target).please();
     }
 
@@ -318,7 +342,11 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      rootNote = makeMe.aNote("Root").creatorAndOwner(userModel.getUserModel()).please();
+      rootNote =
+          makeMe
+              .aNote("Root")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       child1 = makeMe.aNote("Child 1").under(rootNote).please();
       makeMe.refresh(rootNote);
     }

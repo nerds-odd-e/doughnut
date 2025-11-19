@@ -73,7 +73,11 @@ class McpNoteCreationControllerTests {
             noteService,
             authorizationService);
 
-    Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+    Note lordOfTheRingsNote =
+        makeMe
+            .aNote()
+            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .please();
     lordOfTheRingsNote.setTopicConstructor("Lord of the Rings");
     when(noteRepository.findById(org.mockito.ArgumentMatchers.any()))
         .thenReturn(java.util.Optional.of(lordOfTheRingsNote));
@@ -87,7 +91,7 @@ class McpNoteCreationControllerTests {
       var controllerWithoutUser =
           new McpNoteCreationController(
               modelFactoryService,
-              new CurrentUser(modelFactoryService.toUserModel(null)),
+              new CurrentUser(makeMe.modelFactoryService.toUserModel(null)),
               httpClientAdapter,
               testabilitySettings,
               noteSearchService,

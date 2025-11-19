@@ -260,13 +260,15 @@ class TestabilityRestController {
   @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     if (userInfo.containsKey("daily_assimilation_count")) {
-      currentUser
-          .getUserModel()
+      modelFactoryService
+          .toUserModel(currentUser.getUser())
           .setAndSaveDailyAssimilationCount(
               Integer.valueOf(userInfo.get("daily_assimilation_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      currentUser.getUserModel().setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
+      modelFactoryService
+          .toUserModel(currentUser.getUser())
+          .setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
     }
     return "OK";
   }

@@ -53,7 +53,11 @@ class NotebookCertificateApprovalControllerTest {
 
     @Test
     void approvalStatusShouldBeNullIfNotExist() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      Note note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       NotebookCertificateApproval approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
       assertThat(approvalForNotebook, nullValue());
@@ -61,7 +65,11 @@ class NotebookCertificateApprovalControllerTest {
 
     @Test
     void success() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      Note note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
       makeMe.refresh(note.getNotebook());
       NotebookCertificateApproval approvalForNotebook =
@@ -84,7 +92,11 @@ class NotebookCertificateApprovalControllerTest {
     @Test
     void approvalStatusShouldBePendingAfterRequestingApproval()
         throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      Note note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       controller.requestApprovalForNotebook(note.getNotebook());
       makeMe.refresh(note.getNotebook());
       assertFalse(note.getNotebook().isCertifiable());
@@ -99,7 +111,11 @@ class NotebookCertificateApprovalControllerTest {
     @BeforeEach
     void setup() {
       CurrentUser userModel = new CurrentUser(makeMe.anAdmin().toModelPlease());
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
+      notebook =
+          makeMe
+              .aNotebook()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       controller =
           new NotebookCertificateApprovalController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);

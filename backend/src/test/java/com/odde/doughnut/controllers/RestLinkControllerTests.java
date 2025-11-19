@@ -63,14 +63,22 @@ class LinkControllerTests {
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      note2 = makeMe.aNote("flower").creatorAndOwner(userModel.getUserModel()).please();
+      note2 =
+          makeMe
+              .aNote("flower")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       noteMoveDTO.asFirstChild = false;
     }
 
     @Test
     void moveNoteSuccessfully()
         throws BindException, UnexpectedNoAccessRightException, CyclicLinkDetectedException {
-      Note note3 = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      Note note3 =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       noteMoveDTO.asFirstChild = false;
       var result =
           controller().moveNote(note3, note2, noteMoveDTO, makeMe.successfulBindingResult());
@@ -103,14 +111,22 @@ class LinkControllerTests {
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      note2 = makeMe.aNote("flower").creatorAndOwner(userModel.getUserModel()).please();
+      note2 =
+          makeMe
+              .aNote("flower")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       linkCreation.linkType = LinkType.APPLICATION;
     }
 
     @Test
     void createdSuccessfully()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
-      Note note3 = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
+      Note note3 =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
       long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       long afterThingCount = makeMe.modelFactoryService.noteRepository.count();

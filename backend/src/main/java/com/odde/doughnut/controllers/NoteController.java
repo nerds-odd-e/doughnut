@@ -121,7 +121,8 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(currentUser.getUser(), note);
     NoteInfo noteInfo = new NoteInfo();
-    noteInfo.setMemoryTrackers(currentUser.getUserModel().getMemoryTrackersFor(note));
+    noteInfo.setMemoryTrackers(
+        modelFactoryService.toUserModel(currentUser.getUser()).getMemoryTrackersFor(note));
     noteInfo.setNote(note.toNoteRealm(currentUser.getUser()));
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());

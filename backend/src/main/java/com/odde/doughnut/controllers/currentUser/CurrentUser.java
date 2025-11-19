@@ -10,10 +10,6 @@ public class CurrentUser {
     this.userModel = userModel;
   }
 
-  public UserModel getUserModel() {
-    return userModel;
-  }
-
   public User getUser() {
     return userModel.getEntity();
   }

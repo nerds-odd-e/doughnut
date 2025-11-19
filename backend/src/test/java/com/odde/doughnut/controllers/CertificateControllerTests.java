@@ -49,11 +49,16 @@ public class CertificateControllerTests {
       notebook =
           makeMe
               .aNote("Just say 'Yes'")
-              .creatorAndOwner(currentUser.getUserModel())
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .please()
               .getNotebook();
       expectedCertificate =
-          makeMe.aCertificate(notebook, currentUser.getUserModel(), currentTime).please();
+          makeMe
+              .aCertificate(
+                  notebook,
+                  makeMe.modelFactoryService.toUserModel(currentUser.getUser()),
+                  currentTime)
+              .please();
     }
 
     @Test

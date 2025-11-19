@@ -54,7 +54,7 @@ class AssimilationController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     return new AssimilationService(
-            currentUser.getUserModel(),
+            modelFactoryService.toUserModel(currentUser.getUser()),
             modelFactoryService,
             subscriptionService,
             currentUTCTimestamp,
@@ -80,7 +80,7 @@ class AssimilationController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     return new AssimilationService(
-            currentUser.getUserModel(),
+            modelFactoryService.toUserModel(currentUser.getUser()),
             modelFactoryService,
             subscriptionService,
             currentUTCTimestamp,

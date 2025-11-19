@@ -47,7 +47,10 @@ class RecallsController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return new RecallService(
-            currentUser.getUserModel(), currentUTCTimestamp, timeZone, modelFactoryService)
+            modelFactoryService.toUserModel(currentUser.getUser()),
+            currentUTCTimestamp,
+            timeZone,
+            modelFactoryService)
         .getRecallStatus();
   }
 
@@ -60,7 +63,10 @@ class RecallsController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return new RecallService(
-            currentUser.getUserModel(), currentUTCTimestamp, timeZone, modelFactoryService)
+            modelFactoryService.toUserModel(currentUser.getUser()),
+            currentUTCTimestamp,
+            timeZone,
+            modelFactoryService)
         .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

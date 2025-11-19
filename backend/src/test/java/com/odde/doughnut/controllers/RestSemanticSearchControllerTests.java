@@ -87,7 +87,10 @@ class RestSemanticSearchControllerTests {
     @BeforeEach
     void setup() {
       referenceNote =
-          makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUserModel()).please();
+          makeMe
+              .aNote("Reference Note")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
     }
 
     @Test
@@ -149,7 +152,10 @@ class RestSemanticSearchControllerTests {
     @BeforeEach
     void setup() {
       referenceNote =
-          makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUserModel()).please();
+          makeMe
+              .aNote("Reference Note")
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .please();
     }
 
     @Test

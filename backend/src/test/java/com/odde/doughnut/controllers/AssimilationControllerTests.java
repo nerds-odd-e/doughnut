@@ -61,7 +61,11 @@ class AssimilationControllerTests {
   class Assimilating {
     @Test
     void assimilating() {
-      Note n = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
+      Note n =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       assertThat(n.getId(), notNullValue());
       List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -84,7 +88,11 @@ class AssimilationControllerTests {
 
     @Test
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
+      Note note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       note.getRecallSetting().setRememberSpelling(true);
       modelFactoryService.noteRepository.save(note);
 
@@ -109,7 +117,11 @@ class AssimilationControllerTests {
     @Test
     void shouldReturnAssimilationCountsForLoggedInUser() {
       // Create a note that needs assimilation
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
+      Note note =
+          makeMe
+              .aNote()
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .please();
       assertThat(note.getId(), notNullValue());
 
       AssimilationCountDTO counts = controller.getAssimilationCount("Asia/Shanghai");
