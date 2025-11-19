@@ -2,10 +2,7 @@
   <button
     title="Wikidata Id"
     type="button"
-    :class="[
-      'daisy-btn daisy-rounded-l-none',
-      hasWikidataId ? 'daisy-btn-primary' : 'daisy-btn-outline daisy-btn-neutral',
-    ]"
+    :class="buttonClasses"
     @click.prevent="openDialog"
   >
     <SvgWikidata />
@@ -41,6 +38,16 @@ export default defineComponent({
   computed: {
     hasWikidataId(): boolean {
       return !!this.modelValue && this.modelValue.trim() !== ""
+    },
+    buttonClasses(): string[] {
+      const baseClasses = ["daisy-btn", "daisy-rounded-l-none"]
+      if (this.errorMessage) {
+        return [...baseClasses, "daisy-btn-error"]
+      }
+      if (this.hasWikidataId) {
+        return [...baseClasses, "daisy-btn-primary"]
+      }
+      return [...baseClasses, "daisy-btn-outline", "daisy-btn-neutral"]
     },
   },
   data() {
