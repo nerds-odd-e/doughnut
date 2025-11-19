@@ -69,8 +69,7 @@ class RecallPromptControllerTests {
             makeMe.modelFactoryService,
             currentUser,
             testabilitySettings,
-            getTestObjectMapper(),
-            makeMe.userService);
+            getTestObjectMapper());
   }
 
   RecallPromptController nullUserController() {
@@ -79,8 +78,7 @@ class RecallPromptControllerTests {
         modelFactoryService,
         makeMe.aNullUserModelPlease(),
         testabilitySettings,
-        getTestObjectMapper(),
-        makeMe.userService);
+        getTestObjectMapper());
   }
 
   @Nested
@@ -198,8 +196,7 @@ class RecallPromptControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings,
-                    getTestObjectMapper(),
-                    makeMe.userService);
+                    getTestObjectMapper());
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -284,8 +281,7 @@ class RecallPromptControllerTests {
                     makeMe.modelFactoryService,
                     makeMe.aNullUserModelPlease(),
                     testabilitySettings,
-                    getTestObjectMapper(),
-                    makeMe.userService);
+                    getTestObjectMapper());
             restAiController.contest(recallPrompt);
           });
     }

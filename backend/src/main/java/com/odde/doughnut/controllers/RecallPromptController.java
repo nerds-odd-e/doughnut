@@ -9,7 +9,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.RecallQuestionService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -28,18 +27,15 @@ class RecallPromptController {
   private final TestabilitySettings testabilitySettings;
 
   private final RecallQuestionService recallQuestionService;
-  private final UserService userService;
 
   public RecallPromptController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper,
-      UserService userService) {
+      ObjectMapper objectMapper) {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
-    this.userService = userService;
     this.recallQuestionService =
         new RecallQuestionService(
             openAiApi, modelFactoryService, testabilitySettings.getRandomizer(), objectMapper);
@@ -84,8 +80,7 @@ class RecallPromptController {
         recallPrompt,
         answerDTO,
         currentUser.getEntity(),
-        testabilitySettings.getCurrentUTCTimestamp(),
-        userService);
+        testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping(path = "/{recallPrompt}")

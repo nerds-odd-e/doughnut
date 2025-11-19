@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -29,26 +29,25 @@ class AssimilationControllerTests {
   @Autowired private ModelFactoryService modelFactoryService;
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionService subscriptionService;
-  private User currentUser;
+  private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   private AssimilationController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = makeMe.aUser().please();
+    currentUser = makeMe.aUser().toModelPlease();
     controller =
         new AssimilationController(
-            modelFactoryService,
-            currentUser,
-            subscriptionService,
-            makeMe.userService,
-            testabilitySettings);
+            modelFactoryService, currentUser, subscriptionService, testabilitySettings);
   }
 
   AssimilationController nullUserController() {
     return new AssimilationController(
-        modelFactoryService, null, subscriptionService, makeMe.userService, testabilitySettings);
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        subscriptionService,
+        testabilitySettings);
   }
 
   @Nested
@@ -88,7 +87,8 @@ class AssimilationControllerTests {
       controller.assimilate(initialInfo);
 
       List<MemoryTracker> memoryTrackers =
-          modelFactoryService.memoryTrackerRepository.findLast100ByUser(currentUser.getId());
+          modelFactoryService.memoryTrackerRepository.findLast100ByUser(
+              currentUser.getEntity().getId());
       assertThat(
           memoryTrackers.stream().filter(mt -> mt.getNote().getId().equals(note.getId())).count(),
           equalTo(2L));

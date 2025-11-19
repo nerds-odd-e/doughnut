@@ -4,7 +4,9 @@ import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.ReviewScope;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -12,23 +14,27 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class AssimilationService {
-  private final User user;
+  private final UserModel userModel;
+  private final ModelFactoryService modelFactoryService;
   private final SubscriptionService subscriptionService;
-  private final UserService userService;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
 
   public AssimilationService(
-      User user,
+      UserModel user,
+      ModelFactoryService modelFactoryService,
       SubscriptionService subscriptionService,
-      UserService userService,
       Timestamp currentUTCTimestamp,
       ZoneId timeZone) {
-    this.user = user;
+    userModel = user;
+    this.modelFactoryService = modelFactoryService;
     this.subscriptionService = subscriptionService;
-    this.userService = userService;
     this.currentUTCTimestamp = currentUTCTimestamp;
     this.timeZone = timeZone;
+  }
+
+  private Stream<Note> getDueNoteToAssimilate(ReviewScope reviewScope, int count) {
+    return reviewScope.getUnassimilatedNotes().limit(count);
   }
 
   private Stream<Note> getDueNoteToAssimilate(Stream<Note> notes, int count) {
@@ -36,7 +42,7 @@ public class AssimilationService {
   }
 
   private Stream<Subscription> getSubscriptionStream() {
-    return user.getSubscriptions().stream();
+    return userModel.getEntity().getSubscriptions().stream();
   }
 
   public Stream<Note> getNotesToAssimilate() {
@@ -50,7 +56,7 @@ public class AssimilationService {
 
     return Stream.concat(
             getDueNoteFromSubscription(assimilatedNoteIdsForToday),
-            getDueNoteToAssimilate(userService.getUnassimilatedNotes(user), remainingDailyCount))
+            getDueNoteToAssimilate(userModel, remainingDailyCount))
         .limit(remainingDailyCount);
   }
 
@@ -64,16 +70,16 @@ public class AssimilationService {
   }
 
   private int getRemainingDailyAssimilationCount() {
-    return user.getDailyAssimilationCount() - getAssimilatedCountOfTheDay();
+    return userModel.getEntity().getDailyAssimilationCount() - getAssimilatedCountOfTheDay();
   }
 
   public AssimilationCountDTO getCounts() {
     AssimilationCounter counter =
         new AssimilationCounter(
             calculateSubscribedCount(),
-            userService.getUnassimilatedNoteCount(user),
+            userModel.getUnassimilatedNoteCount(),
             getAssimilatedCountOfTheDay(),
-            user.getDailyAssimilationCount());
+            userModel.getEntity().getDailyAssimilationCount());
     return counter.toDTO();
   }
 
@@ -87,7 +93,7 @@ public class AssimilationService {
 
   private List<MemoryTracker> getNotesAssimilatedToday() {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
-    return userService.getRecentMemoryTrackers(user, oneDayAgo).stream()
+    return userModel.getRecentMemoryTrackers(oneDayAgo).stream()
         .filter(
             p ->
                 TimestampOperations.getDayId(p.getAssimilatedAt(), timeZone)
