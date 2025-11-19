@@ -132,6 +132,12 @@ describe("WikidataAssociationForNoteDialog", () => {
       select.dispatchEvent(new Event("change", { bubbles: true }))
       await flushPromises()
 
+      // With showSaveButton=true, need to click Save button
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      saveButton.click()
+      await flushPromises()
+
       expect(mockedFetchWikidataEntity).toHaveBeenCalledWith({
         wikidataId: "Q11399",
       })
