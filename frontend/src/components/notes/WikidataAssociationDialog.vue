@@ -15,22 +15,23 @@
             :model-value="localWikidataId"
             @update:model-value="handleInputChange"
             :error-message="errorMessageComputed"
+            :disabled="props.disabled"
             placeholder="example: `Q1234`"
           >
             <template #input_append>
-              <button
-                type="button"
-                class="daisy-btn daisy-rounded-l-none"
-                :class="[
-                  isLoadingUrl ? 'daisy-btn-disabled' : 'daisy-btn-primary',
-                ]"
-                title="open link"
-                @click="handleOpenLink"
-                :disabled="isLoadingUrl || !hasValidWikidataId"
-                v-show="hasValidWikidataId"
-              >
-                <SvgPopup />
-              </button>
+                    <button
+                      type="button"
+                      class="daisy-btn daisy-rounded-l-none"
+                      :class="[
+                        isLoadingUrl ? 'daisy-btn-disabled' : 'daisy-btn-primary',
+                      ]"
+                      title="open link"
+                      @click="handleOpenLink"
+                      :disabled="isLoadingUrl || !hasValidWikidataId"
+                      v-show="hasValidWikidataId"
+                    >
+                      <SvgPopup />
+                    </button>
             </template>
           </TextInput>
         </div>
@@ -52,6 +53,7 @@
           @change="onSelectSearchResult"
           v-model="selectedOption"
           class="daisy-select daisy-select-bordered daisy-w-full"
+          :disabled="props.disabled"
         >
           <option disabled value="">- Choose Wikidata Search Result -</option>
           <option
@@ -69,15 +71,17 @@
             >Suggested Title: {{ selectedItem?.label }}</span
           >
         </label>
-        <RadioButtons
-          v-model="titleAction"
-          scope-name="wikidataTitleAction"
-          :options="[
-            { value: 'Replace', label: 'Replace title' },
-            { value: 'Append', label: 'Append title' },
-          ]"
-          @update:model-value="handleTitleAction"
-        />
+        <fieldset :disabled="props.disabled">
+          <RadioButtons
+            v-model="titleAction"
+            scope-name="wikidataTitleAction"
+            :options="[
+              { value: 'Replace', label: 'Replace title' },
+              { value: 'Append', label: 'Append title' },
+            ]"
+            @update:model-value="handleTitleAction"
+          />
+        </fieldset>
       </div>
       <div class="daisy-mt-4 daisy-flex daisy-gap-2">
         <button
@@ -85,13 +89,14 @@
           type="submit"
           form="wikidata-association-form"
           class="daisy-btn daisy-btn-primary"
-          :disabled="!hasValidWikidataId"
+          :disabled="!hasValidWikidataId || props.disabled"
         >
           Save
         </button>
         <button
           class="daisy-btn daisy-btn-secondary"
           @click="handleClose"
+          :disabled="props.disabled"
         >
           Close
         </button>
@@ -115,6 +120,7 @@ const props = defineProps<{
   modelValue?: string
   errorMessage?: string
   showSaveButton?: boolean
+  disabled?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -213,6 +219,9 @@ const showTitleOptionsForEntity = (entity: WikidataSearchEntity) => {
 
 defineExpose({
   showTitleOptionsForEntity,
+  get showTitleOptions() {
+    return showTitleOptions.value
+  },
 })
 
 const getWikidataItem = async (wikidataId: string) => {
@@ -279,10 +288,15 @@ const handleClose = () => {
 const handleSave = async () => {
   if (!hasValidWikidataId.value) return
 
-  // If title options are shown and action is selected, it should have been handled
-  // by handleTitleAction already. Only handle save for direct wikidata ID input.
-  if (hasSaveButton.value && !showTitleOptions.value) {
-    emit("save", localWikidataId.value)
+  if (hasSaveButton.value) {
+    // If title options are shown and action is selected, emit selected
+    if (showTitleOptions.value && selectedItem.value && titleAction.value) {
+      const action = getTitleAction()
+      emit("selected", selectedItem.value, action)
+    } else {
+      // Otherwise, just save the wikidata ID (no title update)
+      emit("save", localWikidataId.value)
+    }
   }
   // If hasSaveButton is false, form submission does nothing (just prevents default)
 }

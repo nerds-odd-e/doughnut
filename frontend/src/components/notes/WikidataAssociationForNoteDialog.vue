@@ -5,6 +5,7 @@
     :model-value="localWikidataId"
     :error-message="wikidataIdError"
     :show-save-button="true"
+    :disabled="isProcessing"
     @close="handleClose"
     @save="handleSave"
     @selected="handleSelected"
@@ -12,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, computed } from "vue"
 import type {
   Note,
   WikidataSearchEntity,
@@ -47,6 +48,7 @@ const { managedApi } = useLoadingApi()
 const localWikidataId = ref(props.note.wikidataId || "")
 const wikidataIdError = ref<string | undefined>(undefined)
 const isSaving = ref(false)
+const isProcessing = ref(false)
 
 const saveWikidataId = async (wikidataId: string) => {
   if (isSaving.value) return
@@ -61,6 +63,7 @@ const saveWikidataId = async (wikidataId: string) => {
     emit("closeDialog")
   } catch (e: unknown) {
     isSaving.value = false
+    isProcessing.value = false
     if (typeof e === "object" && e !== null && "wikidataId" in e) {
       wikidataIdError.value = (e as WikidataIdError).wikidataId
     } else {
@@ -87,7 +90,18 @@ const dialogRef = ref<InstanceType<typeof WikidataAssociationDialog> | null>(
   null
 )
 
+const showTitleOptionsInDialog = computed(() => {
+  // Access the exposed property
+  if (!dialogRef.value) return false
+  return (
+    (dialogRef.value as { showTitleOptions?: boolean }).showTitleOptions ??
+    false
+  )
+})
+
 const validateAndSaveWikidataId = async (wikidataId: string) => {
+  if (isProcessing.value) return
+  isProcessing.value = true
   try {
     const res = await managedApi.services.fetchWikidataEntityDataById({
       wikidataId,
@@ -102,8 +116,10 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
       res.WikidataTitleInEnglish === ""
     ) {
       await saveWikidataId(wikidataId)
+      // isProcessing will be reset in saveWikidataId on error, or dialog closes on success
     } else {
       // Show title options using the dialog's exposed method
+      isProcessing.value = false
       const entity: WikidataSearchEntity = {
         id: wikidataId,
         label: res.WikidataTitleInEnglish,
@@ -113,6 +129,7 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
     }
   } catch (e: unknown) {
     handleError(e)
+    isProcessing.value = false
   }
 }
 
@@ -120,13 +137,10 @@ const handleSelectedForEdit = async (
   entity: WikidataSearchEntity,
   titleAction?: "replace" | "append"
 ) => {
-  if (!entity.id) return
+  if (!entity.id || isProcessing.value) return
 
+  isProcessing.value = true
   try {
-    await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId: entity.id,
-    })
-
     // Update title if titleAction is provided
     if (titleAction) {
       const currentTitle = props.note.noteTopology.titleOrPredicate || ""
@@ -137,15 +151,25 @@ const handleSelectedForEdit = async (
         .updateTextField(props.note.id, "edit title", newTitle)
     }
 
+    // Save the Wikidata ID directly - no need to validate again since we already have the entity
     await saveWikidataId(entity.id)
   } catch (e: unknown) {
     handleError(e)
+    isProcessing.value = false
   }
 }
 
 const handleSave = async (wikidataId: string) => {
-  // When save is called, validate and save the wikidata ID
-  await validateAndSaveWikidataId(wikidataId)
+  // Check if title options are currently shown (user already saw the conflict)
+  // If so, save directly without re-validation
+  if (dialogRef.value && showTitleOptionsInDialog.value) {
+    // User clicked Save after seeing title options but without selecting action
+    // Save directly without title update
+    await saveWikidataId(wikidataId)
+  } else {
+    // First time saving, validate and save the wikidata ID
+    await validateAndSaveWikidataId(wikidataId)
+  }
 }
 
 const handleSelected = async (
