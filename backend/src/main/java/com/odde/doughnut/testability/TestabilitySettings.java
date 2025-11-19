@@ -1,10 +1,10 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.dto.Randomization;
-import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
-import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
+import com.odde.doughnut.utils.Randomizer;
+import com.odde.doughnut.utils.randomizers.NonRandomizer;
+import com.odde.doughnut.utils.randomizers.RealRandomizer;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
