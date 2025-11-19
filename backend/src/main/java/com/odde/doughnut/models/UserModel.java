@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.*;
@@ -16,14 +17,15 @@ public class UserModel implements ReviewScope {
 
   @Getter protected final User entity;
   protected final ModelFactoryService modelFactoryService;
+  protected final AuthorizationService authorizationService;
 
-  public UserModel(User user, ModelFactoryService modelFactoryService) {
+  public UserModel(
+      User user,
+      ModelFactoryService modelFactoryService,
+      AuthorizationService authorizationService) {
     this.entity = user;
     this.modelFactoryService = modelFactoryService;
-  }
-
-  private Authorization getAuthorization() {
-    return modelFactoryService.toAuthorization(entity);
+    this.authorizationService = authorizationService;
   }
 
   public String getName() {
@@ -71,18 +73,18 @@ public class UserModel implements ReviewScope {
   }
 
   public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {
-    getAuthorization().assertAuthorization(object);
+    authorizationService.assertAuthorization(entity, object);
   }
 
   public <T> void assertReadAuthorization(T object) throws UnexpectedNoAccessRightException {
-    getAuthorization().assertReadAuthorization(object);
+    authorizationService.assertReadAuthorization(entity, object);
   }
 
   public void assertAdminAuthorization() throws UnexpectedNoAccessRightException {
-    getAuthorization().assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(entity);
   }
 
   public void assertLoggedIn() {
-    getAuthorization().assertLoggedIn();
+    authorizationService.assertLoggedIn(entity);
   }
 }

@@ -72,7 +72,7 @@ public class MemoryTrackerService {
 
   public void updateMemoryTrackerAfterAnsweringQuestion(
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
-    UserModel userModel = new UserModel(user, modelFactoryService);
+    UserModel userModel = modelFactoryService.toUserModel(user);
     List<MemoryTracker> memoryTrackers =
         userModel.getMemoryTrackersFor(recallPrompt.getPredefinedQuestion().getNote());
     memoryTrackers.stream()

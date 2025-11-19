@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookService;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
@@ -40,6 +41,8 @@ public class ModelFactoryService {
   @Autowired public NoteEmbeddingRepository noteEmbeddingRepository;
   @Autowired public NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
 
+  @Autowired public AuthorizationService authorizationService;
+
   public void storeNoteEmbedding(Note note, java.util.List<Float> embedding) {
     noteEmbeddingJdbcRepository.insert(note.getId(), embedding);
   }
@@ -71,7 +74,7 @@ public class ModelFactoryService {
     UserToken usertoken = userTokenRepository.findByToken(token);
 
     if (usertoken == null) {
-      Authorization.throwUserNotFound();
+      AuthorizationService.throwUserNotFound();
     }
 
     return this.findUserById(usertoken.getUserId());
@@ -91,7 +94,7 @@ public class ModelFactoryService {
   }
 
   public UserModel toUserModel(User user) {
-    return new UserModel(user, this);
+    return new UserModel(user, this, authorizationService);
   }
 
   public Authorization toAuthorization(User entity) {

@@ -84,7 +84,7 @@ class McpNoteCreationControllerTests {
       var controllerWithoutUser =
           new McpNoteCreationController(
               modelFactoryService,
-              new UserModel(null, modelFactoryService),
+              modelFactoryService.toUserModel(null),
               httpClientAdapter,
               testabilitySettings,
               noteSearchService,
