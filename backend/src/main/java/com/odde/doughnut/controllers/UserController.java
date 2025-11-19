@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
@@ -22,17 +21,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 class UserController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings;
   private final AuthorizationService authorizationService;
 
   public UserController(
       ModelFactoryService modelFactoryService,
-      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }
@@ -48,7 +44,7 @@ class UserController {
 
   @GetMapping("")
   public User getUserProfile() {
-    return currentUser.getUser();
+    return authorizationService.getCurrentUser();
   }
 
   @PatchMapping("/{user}")
@@ -56,7 +52,7 @@ class UserController {
   public User updateUser(
       @PathVariable @Schema(type = "integer") User user, @Valid @RequestBody UserDTO updates)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), user);
+    authorizationService.assertAuthorization(user);
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
@@ -67,8 +63,8 @@ class UserController {
   @PostMapping("/generate-token")
   @Transactional
   public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    User user = currentUser.getUser();
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
     String uuid = UUID.randomUUID().toString();
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
     return modelFactoryService.save(userToken);
@@ -77,15 +73,15 @@ class UserController {
   @GetMapping("/get-tokens")
   @Transactional
   public List<UserToken> getTokens() {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    User user = currentUser.getUser();
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
     return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
 
   @DeleteMapping("/token/{tokenId}")
   public void deleteToken(@PathVariable @Schema(type = "integer") Integer tokenId) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    User user = currentUser.getUser();
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
 
     Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(tokenId);
     if (userToken.isEmpty()) {

@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 class BazaarControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private BazaarService bazaarService;
+
+  @Autowired
+  private com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
+
   @Autowired private AuthorizationService authorizationService;
   private CurrentUser adminUser;
   private CurrentUser notebookOwner;
@@ -39,6 +44,7 @@ class BazaarControllerTest {
   void setup() {
     adminUser = new CurrentUser(makeMe.anAdmin().please());
     notebookOwner = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, adminUser);
     topNote =
         makeMe
             .aNote()
@@ -46,16 +52,16 @@ class BazaarControllerTest {
             .please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
-    controller = new BazaarController(bazaarService, adminUser, authorizationService);
+    controller = new BazaarController(bazaarService, authorizationService);
   }
 
   @Nested
   class RemoveFromBazaar {
     @Test
     void otherPeopleCannot() {
-      controller =
-          new BazaarController(
-              bazaarService, new CurrentUser(makeMe.aUser().please()), authorizationService);
+      CurrentUser otherUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, otherUser);
+      controller = new BazaarController(bazaarService, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));
@@ -64,7 +70,8 @@ class BazaarControllerTest {
 
     @Test
     void notebookOwnerCan() throws UnexpectedNoAccessRightException {
-      controller = new BazaarController(bazaarService, notebookOwner, authorizationService);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, notebookOwner);
+      controller = new BazaarController(bazaarService, authorizationService);
       controller.removeFromBazaar(bazaarNotebook);
     }
 

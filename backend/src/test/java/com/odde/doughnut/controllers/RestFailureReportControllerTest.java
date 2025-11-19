@@ -13,6 +13,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.NullGithubService;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +35,10 @@ class FailureReportControllerTest {
   @Autowired AuthorizationService authorizationService;
   private GithubService githubService = new NullGithubService();
 
-  FailureReportController controller(CurrentUser userModel) {
+  FailureReportController controller(CurrentUser currentUser) {
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     return new FailureReportController(
-        makeMe.modelFactoryService, githubService, userModel, authorizationService);
+        makeMe.modelFactoryService, githubService, authorizationService);
   }
 
   @Test

@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
@@ -17,15 +16,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/subscriptions")
 class SubscriptionController {
   private final ModelFactoryService modelFactoryService;
-  private final CurrentUser currentUser;
   private final AuthorizationService authorizationService;
 
   public SubscriptionController(
-      ModelFactoryService modelFactoryService,
-      CurrentUser currentUser,
-      AuthorizationService authorizationService) {
+      ModelFactoryService modelFactoryService, AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUser = currentUser;
     this.authorizationService = authorizationService;
   }
 
@@ -35,11 +30,11 @@ class SubscriptionController {
       @PathVariable(name = "notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser.getUser(), notebook);
+    authorizationService.assertReadAuthorization(notebook);
     Subscription subscription = new Subscription();
     subscription.setNotebook(notebook);
     subscription.setFromDTO(subscriptionDTO);
-    subscription.setUser(currentUser.getUser());
+    subscription.setUser(authorizationService.getCurrentUser());
     modelFactoryService.save(subscription);
     return subscription;
   }
@@ -50,7 +45,7 @@ class SubscriptionController {
       @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription,
       @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser.getUser(), subscription.getNotebook());
+    authorizationService.assertReadAuthorization(subscription.getNotebook());
     subscription.setFromDTO(subscriptionDTO);
     modelFactoryService.save(subscription);
     return subscription;
@@ -61,7 +56,7 @@ class SubscriptionController {
   public List<Integer> destroySubscription(
       @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), subscription);
+    authorizationService.assertAuthorization(subscription);
     modelFactoryService.remove(subscription);
     return List.of(1);
   }

@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
@@ -23,16 +22,13 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequestMapping("/api/conversation")
 public class ConversationMessageController {
   private final ConversationService conversationService;
-  private final CurrentUser currentUser;
   private final ChatCompletionConversationService chatCompletionConversationService;
   private final AuthorizationService authorizationService;
 
   public ConversationMessageController(
-      CurrentUser currentUser,
       ConversationService conversationService,
       ChatCompletionConversationService chatCompletionConversationService,
       AuthorizationService authorizationService) {
-    this.currentUser = currentUser;
     this.conversationService = conversationService;
     this.chatCompletionConversationService = chatCompletionConversationService;
     this.authorizationService = authorizationService;
@@ -45,8 +41,9 @@ public class ConversationMessageController {
           AssessmentQuestionInstance assessmentQuestionInstance) {
     Conversation conversation =
         conversationService.startConversationAboutRecallPrompt(
-            assessmentQuestionInstance, currentUser.getUser());
-    conversationService.addMessageToConversation(conversation, currentUser.getUser(), feedback);
+            assessmentQuestionInstance, authorizationService.getCurrentUser());
+    conversationService.addMessageToConversation(
+        conversation, authorizationService.getCurrentUser(), feedback);
     return conversation;
   }
 
@@ -54,28 +51,29 @@ public class ConversationMessageController {
   @Transactional
   public Conversation startConversationAboutNote(
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestBody String message) {
-    return conversationService.startConversationOfNote(note, currentUser.getUser(), message);
+    return conversationService.startConversationOfNote(
+        note, authorizationService.getCurrentUser(), message);
   }
 
   @GetMapping("/all")
   public List<Conversation> getConversationsOfCurrentUser() {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return conversationService.conversationRelatedToUser(currentUser.getUser());
+    authorizationService.assertLoggedIn();
+    return conversationService.conversationRelatedToUser(authorizationService.getCurrentUser());
   }
 
   @GetMapping("/unread")
   public List<ConversationMessage> getUnreadConversations() {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return conversationService.getUnreadConversations(currentUser.getUser());
+    authorizationService.assertLoggedIn();
+    return conversationService.getUnreadConversations(authorizationService.getCurrentUser());
   }
 
   @PatchMapping("/{conversationId}/read")
   public List<ConversationMessage> markConversationAsRead(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), conversation);
-    conversationService.markConversationAsRead(conversation, currentUser.getUser());
-    return conversationService.getUnreadConversations(currentUser.getUser());
+    authorizationService.assertAuthorization(conversation);
+    conversationService.markConversationAsRead(conversation, authorizationService.getCurrentUser());
+    return conversationService.getUnreadConversations(authorizationService.getCurrentUser());
   }
 
   @PostMapping("/{conversationId}/send")
@@ -84,16 +82,16 @@ public class ConversationMessageController {
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), conversation);
+    authorizationService.assertAuthorization(conversation);
     return conversationService.addMessageToConversation(
-        conversation, currentUser.getUser(), message);
+        conversation, authorizationService.getCurrentUser(), message);
   }
 
   @GetMapping("/{conversationId}")
   public Conversation getConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), conversation);
+    authorizationService.assertAuthorization(conversation);
     return conversation;
   }
 
@@ -102,7 +100,7 @@ public class ConversationMessageController {
   public SseEmitter getAiReply(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException, BadRequestException {
-    authorizationService.assertAuthorization(currentUser.getUser(), conversation);
+    authorizationService.assertAuthorization(conversation);
     try {
       Note note = conversation.getSubjectNote();
       if (note == null) {
@@ -123,7 +121,7 @@ public class ConversationMessageController {
   public List<ConversationMessage> getConversationMessages(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), conversation);
+    authorizationService.assertAuthorization(conversation);
     return conversation.getConversationMessages();
   }
 
@@ -131,21 +129,22 @@ public class ConversationMessageController {
   public ChatCompletionRequest exportConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), conversation);
+    authorizationService.assertAuthorization(conversation);
     return chatCompletionConversationService.buildChatCompletionRequest(conversation);
   }
 
   @GetMapping("/note/{note}")
   public List<Conversation> getConversationsAboutNote(
       @PathVariable("note") @Schema(type = "integer") Note note) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return conversationService.getConversationsAboutNote(note, currentUser.getUser());
+    authorizationService.assertLoggedIn();
+    return conversationService.getConversationsAboutNote(
+        note, authorizationService.getCurrentUser());
   }
 
   @PostMapping("/recall-prompt/{recallPrompt}")
   public Conversation startConversationAboutRecallPrompt(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
     return conversationService.startConversationAboutRecallPrompt(
-        recallPrompt, currentUser.getUser());
+        recallPrompt, authorizationService.getCurrentUser());
   }
 }

@@ -11,6 +11,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,16 +29,17 @@ class NotebookCertificateApprovalControllerTest {
   @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   NotebookCertificateApprovalController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     controller =
         new NotebookCertificateApprovalController(
-            modelFactoryService, userModel, testabilitySettings, authorizationService);
+            modelFactoryService,
+            testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -56,7 +58,7 @@ class NotebookCertificateApprovalControllerTest {
       Note note =
           makeMe
               .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .please();
       NotebookCertificateApproval approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
@@ -68,7 +70,7 @@ class NotebookCertificateApprovalControllerTest {
       Note note =
           makeMe
               .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .please();
       makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
       makeMe.refresh(note.getNotebook());
@@ -95,7 +97,7 @@ class NotebookCertificateApprovalControllerTest {
       Note note =
           makeMe
               .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .please();
       controller.requestApprovalForNotebook(note.getNotebook());
       makeMe.refresh(note.getNotebook());
@@ -110,15 +112,16 @@ class NotebookCertificateApprovalControllerTest {
 
     @BeforeEach
     void setup() {
-      CurrentUser userModel = new CurrentUser(makeMe.anAdmin().please());
+      CurrentUser currentUser = new CurrentUser(makeMe.anAdmin().please());
       notebook =
           makeMe
               .aNotebook()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
               .please();
       controller =
           new NotebookCertificateApprovalController(
-              modelFactoryService, userModel, testabilitySettings, authorizationService);
+            modelFactoryService,
+            testabilitySettings, authorizationService);
       approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
       makeMe.refresh(notebook);
     }

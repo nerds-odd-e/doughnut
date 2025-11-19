@@ -18,6 +18,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -65,22 +66,23 @@ class RecallPromptControllerTests {
     evaluation.improvementAdvices = "This question needs improvement";
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
 
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new RecallPromptController(
             openAiApi,
             makeMe.modelFactoryService,
-            currentUser,
             testabilitySettings,
             getTestObjectMapper(),
             authorizationService);
   }
 
   RecallPromptController nullUserController() {
+    CurrentUser nullUser = new CurrentUser(null);
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
     return new RecallPromptController(
-        openAiApi,
-        modelFactoryService,
-        new CurrentUser(null),
-        testabilitySettings,
+            openAiApi,
+            modelFactoryService,
+            testabilitySettings,
         getTestObjectMapper(),
         authorizationService);
   }
@@ -194,11 +196,12 @@ class RecallPromptControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
+            CurrentUser nullUser = new CurrentUser(null);
+            AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
             RecallPromptController restAiController =
                 new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    new CurrentUser(null),
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService);
@@ -280,11 +283,12 @@ class RecallPromptControllerTests {
       assertThrows(
           ResponseStatusException.class,
           () -> {
+            CurrentUser nullUser = new CurrentUser(null);
+            AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
             RecallPromptController restAiController =
                 new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    new CurrentUser(null),
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService);

@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -30,23 +31,23 @@ class SubscriptionControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionRepository subscriptionRepository;
   @Autowired private AuthorizationService authorizationService;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   private Note topNote;
   private Notebook notebook;
   private SubscriptionController controller;
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     topNote =
         makeMe
             .aNote()
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
             .please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
-    controller =
-        new SubscriptionController(makeMe.modelFactoryService, userModel, authorizationService);
+    controller = new SubscriptionController(makeMe.modelFactoryService, authorizationService);
   }
 
   @Test
@@ -54,7 +55,7 @@ class SubscriptionControllerTest {
     SubscriptionDTO subscription = new SubscriptionDTO();
     Subscription result = controller.createSubscription(notebook, subscription);
     assertEquals(topNote, result.getHeadNote());
-    assertEquals(userModel.getUser(), result.getUser());
+    assertEquals(currentUser.getUser(), result.getUser());
   }
 
   @Test
@@ -70,7 +71,7 @@ class SubscriptionControllerTest {
   class Unsubscribe {
     @Test
     void shouldRemoveTheSubscription() throws UnexpectedNoAccessRightException {
-      Subscription subscription = makeMe.aSubscription().forUser(userModel.getUser()).please();
+      Subscription subscription = makeMe.aSubscription().forUser(currentUser.getUser()).please();
       long beforeDestroy = subscriptionRepository.count();
       controller.destroySubscription(subscription);
       assertThat(subscriptionRepository.count(), equalTo(beforeDestroy - 1));

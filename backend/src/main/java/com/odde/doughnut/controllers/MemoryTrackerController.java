@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
@@ -25,7 +24,6 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerController {
   private final ModelFactoryService modelFactoryService;
   private final MemoryTrackerService memoryTrackerService;
-  private CurrentUser currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -34,11 +32,9 @@ class MemoryTrackerController {
 
   public MemoryTrackerController(
       ModelFactoryService modelFactoryService,
-      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
@@ -48,8 +44,8 @@ class MemoryTrackerController {
   public SpellingQuestion getSpellingQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    authorizationService.assertReadAuthorization(currentUser.getUser(), memoryTracker);
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
     return new SpellingQuestion(
         memoryTracker.getNote().getClozeDescription().clozeDetails(),
         memoryTracker.getNote().getNotebook());
@@ -59,8 +55,8 @@ class MemoryTrackerController {
   public MemoryTracker showMemoryTracker(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    authorizationService.assertReadAuthorization(currentUser.getUser(), memoryTracker);
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
     return memoryTracker;
   }
 
@@ -79,7 +75,7 @@ class MemoryTrackerController {
   public MemoryTracker selfEvaluate(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestBody SelfEvaluation selfEvaluation) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     if (memoryTracker == null || memoryTracker.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The memory tracker does not exist.");
     }
@@ -92,7 +88,7 @@ class MemoryTrackerController {
   public MemoryTracker markAsRepeated(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestParam("successful") boolean successful) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     memoryTrackerService.markAsRepeated(
         testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker);
     return memoryTracker;
@@ -100,16 +96,16 @@ class MemoryTrackerController {
 
   @GetMapping("/recent")
   public List<MemoryTracker> getRecentMemoryTrackers() {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     return modelFactoryService.memoryTrackerRepository.findLast100ByUser(
-        currentUser.getUser().getId());
+        authorizationService.getCurrentUser().getId());
   }
 
   @GetMapping("/recently-reviewed")
   public List<MemoryTracker> getRecentlyReviewed() {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     return modelFactoryService.memoryTrackerRepository.findLast100ReviewedByUser(
-        currentUser.getUser().getId());
+        authorizationService.getCurrentUser().getId());
   }
 
   @PostMapping("/{memoryTracker}/answer-spelling")
@@ -117,11 +113,11 @@ class MemoryTrackerController {
   public SpellingResultDTO answerSpelling(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @Valid @RequestBody AnswerSpellingDTO answerDTO) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     return memoryTrackerService.answerSpelling(
         memoryTracker,
         answerDTO,
-        currentUser.getUser(),
+        authorizationService.getCurrentUser(),
         testabilitySettings.getCurrentUTCTimestamp());
   }
 }

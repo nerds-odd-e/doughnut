@@ -13,6 +13,7 @@ import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,17 +35,18 @@ class NoteControllerRecentNotesTests {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
-    controller =
+    currentUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+
+      controller =
         new NoteController(
             modelFactoryService,
-            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
@@ -62,13 +64,13 @@ class NoteControllerRecentNotesTests {
     Note note1 =
         makeMe
             .aNote()
-            .creatorAndOwner(userModel.getUser())
+            .creatorAndOwner(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 0).please())
             .please();
     Note note2 =
         makeMe
             .aNote()
-            .creatorAndOwner(userModel.getUser())
+            .creatorAndOwner(currentUser.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 1).please())
             .please();
 
@@ -80,11 +82,10 @@ class NoteControllerRecentNotesTests {
 
   @Test
   void shouldNotAllowAccessWhenNotLoggedIn() {
-    userModel = new CurrentUser(null);
+    currentUser = new CurrentUser(null);
     controller =
         new NoteController(
             modelFactoryService,
-            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,

@@ -17,6 +17,7 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
@@ -60,11 +61,11 @@ class AiControllerTest {
             openAiApi, globalSettingsService, getTestObjectMapper());
     currentUser = new CurrentUser(makeMe.aUser().please());
     note = makeMe.aNote().please();
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new AiController(
             notebookAssistantForNoteServiceFactory,
             new OtherAiServices(openAiApi),
-            currentUser,
             authorizationService);
   }
 
@@ -87,15 +88,15 @@ class AiControllerTest {
 
     @Test
     void askWithNoteThatCannotAccess() {
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      AiController aiController = new AiController(
+          notebookAssistantForNoteServiceFactory,
+          new OtherAiServices(openAiApi),
+          authorizationService);
       assertThrows(
           ResponseStatusException.class,
-          () ->
-              new AiController(
-                      notebookAssistantForNoteServiceFactory,
-                      new OtherAiServices(openAiApi),
-                      new CurrentUser(null),
-                      authorizationService)
-                  .generateImage("create an image"));
+          () -> aiController.generateImage("create an image"));
     }
 
     @Test
@@ -194,11 +195,12 @@ class AiControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new AiController(
               notebookAssistantForNoteServiceFactory,
               new OtherAiServices(openAiApi),
-              new CurrentUser(null),
               authorizationService);
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));

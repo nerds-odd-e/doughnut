@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -13,16 +12,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/certificate")
 public class CertificateController {
 
-  private final CurrentUser currentUser;
-
   private final ModelFactoryService modelFactoryService;
   private final AuthorizationService authorizationService;
 
   public CertificateController(
-      CurrentUser currentUser,
-      ModelFactoryService modelFactoryService,
-      AuthorizationService authorizationService) {
-    this.currentUser = currentUser;
+      ModelFactoryService modelFactoryService, AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.authorizationService = authorizationService;
   }
@@ -30,14 +24,14 @@ public class CertificateController {
   @PostMapping("/{notebook}")
   @Transactional
   public Certificate claimCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     return modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
-        currentUser.getUser(), notebook);
+        authorizationService.getCurrentUser(), notebook);
   }
 
   @GetMapping("/{notebook}")
   public Certificate getCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
     return modelFactoryService.certificateRepository.findFirstByUserAndNotebook(
-        currentUser.getUser(), notebook);
+        authorizationService.getCurrentUser(), notebook);
   }
 }

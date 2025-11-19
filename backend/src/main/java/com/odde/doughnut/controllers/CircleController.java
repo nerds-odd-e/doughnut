@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
@@ -32,19 +31,16 @@ class CircleController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private CurrentUser currentUser;
   private final AuthorizationService authorizationService;
 
   public CircleController(
       ModelFactoryService modelFactoryService,
       CircleService circleService,
       TestabilitySettings testabilitySettings,
-      CurrentUser currentUser,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.circleService = circleService;
     this.testabilitySettings = testabilitySettings;
-    this.currentUser = currentUser;
     this.authorizationService = authorizationService;
   }
 
@@ -52,20 +48,20 @@ class CircleController {
   public CircleForUserView showCircle(
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), circle);
+    authorizationService.assertAuthorization(circle);
     return circle.jsonCircleForUserView();
   }
 
   @GetMapping("")
   public List<Circle> index() {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return currentUser.getUser().getCircles();
+    authorizationService.assertLoggedIn();
+    return authorizationService.getCurrentUser().getCircles();
   }
 
   @PostMapping("")
   @Transactional
   public Circle createCircle(@Valid @RequestBody Circle circle) {
-    circleService.joinAndSave(circle, currentUser.getUser());
+    circleService.joinAndSave(circle, authorizationService.getCurrentUser());
     return circle;
   }
 
@@ -82,7 +78,7 @@ class CircleController {
 
       throw new BindException(bindingResult);
     }
-    User user = currentUser.getUser();
+    User user = authorizationService.getCurrentUser();
     if (user.inCircle(circle)) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
@@ -99,13 +95,13 @@ class CircleController {
       @PathVariable @Schema(type = "integer") Circle circle,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    authorizationService.assertAuthorization(currentUser.getUser(), circle);
+    authorizationService.assertLoggedIn();
+    authorizationService.assertAuthorization(circle);
     Note note =
         circle
             .getOwnership()
             .createAndPersistNotebook(
-                currentUser.getUser(),
+                authorizationService.getCurrentUser(),
                 testabilitySettings.getCurrentUTCTimestamp(),
                 modelFactoryService,
                 noteCreation.getNewTitle());

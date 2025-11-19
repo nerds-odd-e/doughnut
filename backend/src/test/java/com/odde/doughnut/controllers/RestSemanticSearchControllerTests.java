@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.embedding.EmbeddingRequest;
@@ -38,13 +39,14 @@ class RestSemanticSearchControllerTests {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   private SearchController controller;
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
-    controller = new SearchController(userModel, noteSearchService, authorizationService);
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    controller = new SearchController(noteSearchService, authorizationService);
     // Default: return empty embedding data so semantic search falls back to literal search
     EmbeddingResult empty = new EmbeddingResult();
     empty.setData(java.util.List.of());
@@ -69,8 +71,9 @@ class RestSemanticSearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = new CurrentUser(null);
-      controller = new SearchController(userModel, noteSearchService, authorizationService);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -86,7 +89,10 @@ class RestSemanticSearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -106,8 +112,9 @@ class RestSemanticSearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = new CurrentUser(null);
-      controller = new SearchController(userModel, noteSearchService, authorizationService);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -147,7 +154,10 @@ class RestSemanticSearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test

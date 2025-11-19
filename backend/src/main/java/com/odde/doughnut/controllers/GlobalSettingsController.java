@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -22,15 +21,12 @@ public class GlobalSettingsController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private CurrentUser currentUser;
   private final AuthorizationService authorizationService;
 
   public GlobalSettingsController(
       ModelFactoryService modelFactoryService,
-      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
-    this.currentUser = currentUser;
     this.globalSettingsService = new GlobalSettingsService(modelFactoryService);
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
@@ -45,7 +41,7 @@ public class GlobalSettingsController {
   @Transactional
   public GlobalAiModelSettings setCurrentModelVersions(@RequestBody GlobalAiModelSettings models)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAdminAuthorization(currentUser.getUser());
+    authorizationService.assertAdminAuthorization();
     return globalSettingsService.setCurrentModelVersions(
         models, testabilitySettings.getCurrentUTCTimestamp());
   }

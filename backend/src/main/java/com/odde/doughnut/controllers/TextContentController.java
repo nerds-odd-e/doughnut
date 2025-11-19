@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
@@ -22,8 +21,6 @@ import org.springframework.web.bind.annotation.*;
 class TextContentController {
   private final ModelFactoryService modelFactoryService;
 
-  private CurrentUser currentUser;
-
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
@@ -31,11 +28,9 @@ class TextContentController {
 
   public TextContentController(
       ModelFactoryService modelFactoryService,
-      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
-    this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }
@@ -60,11 +55,11 @@ class TextContentController {
 
   private NoteRealm updateNote(Note note, Consumer<Note> updateFunction)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getUser(), note);
+    authorizationService.assertAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
     modelFactoryService.save(note);
-    return note.toNoteRealm(currentUser.getUser());
+    return note.toNoteRealm(authorizationService.getCurrentUser());
   }
 }

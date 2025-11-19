@@ -16,6 +16,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -44,11 +45,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
   @BeforeEach
   void setup() {
+    CurrentUser adminUser = new CurrentUser(makeMe.anAdmin().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, adminUser);
     controller =
         new FineTuningDataController(
             modelFactoryService,
             new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-            new CurrentUser(makeMe.anAdmin().please()),
             openAiApi,
             new OtherAiServices(openAiApi),
             authorizationService);
@@ -58,11 +60,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class getGoodOpenAIChatGPTFineTuningExample {
     @Test
     void authentication() {
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -113,11 +116,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class SuggestedQuestions {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(null),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -156,11 +160,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -197,11 +202,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -227,11 +233,12 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);

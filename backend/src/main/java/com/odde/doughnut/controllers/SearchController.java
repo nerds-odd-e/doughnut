@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
@@ -23,15 +22,11 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/notes")
 class SearchController {
 
-  private final CurrentUser currentUser;
   private final NoteSearchService noteSearchService;
   private final AuthorizationService authorizationService;
 
   public SearchController(
-      CurrentUser currentUser,
-      NoteSearchService noteSearchService,
-      AuthorizationService authorizationService) {
-    this.currentUser = currentUser;
+      NoteSearchService noteSearchService, AuthorizationService authorizationService) {
     this.noteSearchService = noteSearchService;
     this.authorizationService = authorizationService;
   }
@@ -43,8 +38,8 @@ class SearchController {
     if (searchTerm == null) {
       throw new IllegalArgumentException("SearchTerm cannot be null");
     }
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return noteSearchService.searchForNotes(currentUser.getUser(), searchTerm);
+    authorizationService.assertLoggedIn();
+    return noteSearchService.searchForNotes(authorizationService.getCurrentUser(), searchTerm);
   }
 
   @PostMapping("/{note}/search")
@@ -56,8 +51,9 @@ class SearchController {
     if (searchTerm == null) {
       throw new IllegalArgumentException("SearchTerm cannot be null");
     }
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return noteSearchService.searchForNotesInRelationTo(currentUser.getUser(), searchTerm, note);
+    authorizationService.assertLoggedIn();
+    return noteSearchService.searchForNotesInRelationTo(
+        authorizationService.getCurrentUser(), searchTerm, note);
   }
 
   @PostMapping("/semantic-search")
@@ -67,8 +63,9 @@ class SearchController {
     if (searchTerm == null) {
       throw new IllegalArgumentException("SearchTerm cannot be null");
     }
-    authorizationService.assertLoggedIn(currentUser.getUser());
-    return noteSearchService.semanticSearchForNotes(currentUser.getUser(), searchTerm);
+    authorizationService.assertLoggedIn();
+    return noteSearchService.semanticSearchForNotes(
+        authorizationService.getCurrentUser(), searchTerm);
   }
 
   @PostMapping("/{note}/semantic-search")
@@ -80,8 +77,8 @@ class SearchController {
     if (searchTerm == null) {
       throw new IllegalArgumentException("SearchTerm cannot be null");
     }
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     return noteSearchService.semanticSearchForNotesInRelationTo(
-        currentUser.getUser(), searchTerm, note);
+        authorizationService.getCurrentUser(), searchTerm, note);
   }
 }

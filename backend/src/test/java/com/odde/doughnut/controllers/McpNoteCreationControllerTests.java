@@ -18,6 +18,7 @@ import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -59,13 +60,12 @@ class McpNoteCreationControllerTests {
   @BeforeEach
   void setup() {
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    CurrentUser userModel = new CurrentUser(makeMe.aUser().please());
+    CurrentUser currentUser = new CurrentUser(makeMe.aUser().please());
     noteCreation = new NoteCreationDTO();
     noteCreation.setNewTitle("new note");
     controller =
         new McpNoteCreationController(
             modelFactoryService,
-            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteSearchService,
@@ -73,7 +73,7 @@ class McpNoteCreationControllerTests {
             noteService,
             authorizationService);
 
-    Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+    Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     lordOfTheRingsNote.setTopicConstructor("Lord of the Rings");
     when(noteRepository.findById(org.mockito.ArgumentMatchers.any()))
         .thenReturn(java.util.Optional.of(lordOfTheRingsNote));
@@ -86,9 +86,8 @@ class McpNoteCreationControllerTests {
     void shouldThrowExceptionWhenUserNotFound() {
       var controllerWithoutUser =
           new McpNoteCreationController(
-              modelFactoryService,
-              new CurrentUser(null),
-              httpClientAdapter,
+            modelFactoryService,
+            httpClientAdapter,
               testabilitySettings,
               noteSearchService,
               noteRepository,

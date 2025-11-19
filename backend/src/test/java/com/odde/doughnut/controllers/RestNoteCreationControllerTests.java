@@ -14,6 +14,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -42,17 +43,16 @@ class NoteCreationControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
   @Mock HttpClientAdapter httpClientAdapter;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   NoteCreationController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     controller =
         new NoteCreationController(
             modelFactoryService,
-            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteService,
@@ -89,7 +89,7 @@ class NoteCreationControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       noteCreation.setNewTitle("new title");
     }
 
@@ -308,7 +308,7 @@ class NoteCreationControllerTests {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      Note parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       referenceNote = makeMe.aNote().under(parent).please();
       makeMe.aNote("next sibling").under(parent).please();
       noteCreation.setNewTitle("new note");
@@ -324,7 +324,7 @@ class NoteCreationControllerTests {
 
     @Test
     void shouldNotAllowCreatingSiblingForRootNote() {
-      Note rootNote = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      Note rootNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.createNoteAfter(rootNote, noteCreation));

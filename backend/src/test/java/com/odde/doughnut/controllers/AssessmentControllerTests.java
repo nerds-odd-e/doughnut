@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
@@ -40,9 +41,10 @@ public class AssessmentControllerTests {
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new AssessmentController(
-            makeMe.modelFactoryService, testabilitySettings, currentUser, authorizationService);
+            makeMe.modelFactoryService, testabilitySettings, authorizationService);
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
@@ -61,11 +63,12 @@ public class AssessmentControllerTests {
 
     @Test
     void whenNotLogin() {
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new AssessmentController(
               makeMe.modelFactoryService,
               testabilitySettings,
-              new CurrentUser(null),
               authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
@@ -113,11 +116,12 @@ public class AssessmentControllerTests {
 
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
+      CurrentUser anotherUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherUser);
       controller =
           new AssessmentController(
               makeMe.modelFactoryService,
               testabilitySettings,
-              new CurrentUser(makeMe.aUser().please()),
               authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,

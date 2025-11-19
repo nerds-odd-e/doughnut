@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -31,18 +32,18 @@ class TextContentControllerTests {
   @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   TextContentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note note;
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
-    note = makeMe.aNote("new").creatorAndOwner(userModel.getUser()).please();
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    note = makeMe.aNote("new").creatorAndOwner(currentUser.getUser()).please();
     controller =
-        new TextContentController(
-            modelFactoryService, userModel, testabilitySettings, authorizationService);
+        new TextContentController(modelFactoryService, testabilitySettings, authorizationService);
   }
 
   @Nested

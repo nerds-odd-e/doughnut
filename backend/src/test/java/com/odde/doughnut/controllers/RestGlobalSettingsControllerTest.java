@@ -9,6 +9,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,10 +40,11 @@ class GlobalSettingsControllerTest {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = new CurrentUser(makeMe.anAdmin().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
         new GlobalSettingsController(
-            makeMe.modelFactoryService, currentUser, testabilitySettings, authorizationService);
+            makeMe.modelFactoryService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -81,10 +83,11 @@ class GlobalSettingsControllerTest {
 
     @Test
     void authentication() {
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new GlobalSettingsController(
               makeMe.modelFactoryService,
-              new CurrentUser(makeMe.aUser().please()),
               testabilitySettings,
               authorizationService);
       assertThrows(

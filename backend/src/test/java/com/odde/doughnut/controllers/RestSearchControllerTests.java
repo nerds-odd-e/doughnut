@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,13 +29,14 @@ class SearchControllerTests {
   @Autowired AuthorizationService authorizationService;
   @Autowired NoteSearchService noteSearchService;
 
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   private SearchController controller;
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
-    controller = new SearchController(userModel, noteSearchService, authorizationService);
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    controller = new SearchController(noteSearchService, authorizationService);
   }
 
   @Nested
@@ -52,11 +54,11 @@ class SearchControllerTests {
 
     @Test
     void shouldReturnMatchingNotes() throws UnexpectedNoAccessRightException {
-      Note note1 = makeMe.aNote("Java Programming").creatorAndOwner(userModel.getUser()).please();
-      Note note2 = makeMe.aNote("JavaScript Basics").creatorAndOwner(userModel.getUser()).please();
+      Note note1 = makeMe.aNote("Java Programming").creatorAndOwner(currentUser.getUser()).please();
+      Note note2 = makeMe.aNote("JavaScript Basics").creatorAndOwner(currentUser.getUser()).please();
       makeMe
           .aNote("Python Tutorial")
-          .creatorAndOwner(userModel.getUser())
+          .creatorAndOwner(currentUser.getUser())
           .please(); // Different topic
 
       SearchTerm searchTerm = new SearchTerm();
@@ -76,8 +78,8 @@ class SearchControllerTests {
     @Test
     void shouldSetDistanceZeroForExactMatchesAndPointNineForPartialMatches()
         throws UnexpectedNoAccessRightException {
-      makeMe.aNote("Java").creatorAndOwner(userModel.getUser()).please();
-      makeMe.aNote("Java Programming").creatorAndOwner(userModel.getUser()).please();
+      makeMe.aNote("Java").creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aNote("Java Programming").creatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Java");
@@ -100,8 +102,8 @@ class SearchControllerTests {
 
     @Test
     void shouldRespectSearchScopeSettings() throws UnexpectedNoAccessRightException {
-      Note note1 = makeMe.aNote("Local Note").creatorAndOwner(userModel.getUser()).please();
-      Note note2 = makeMe.aNote("Shared Note").creatorAndOwner(userModel.getUser()).please();
+      Note note1 = makeMe.aNote("Local Note").creatorAndOwner(currentUser.getUser()).please();
+      Note note2 = makeMe.aNote("Shared Note").creatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Note");
@@ -115,8 +117,9 @@ class SearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = new CurrentUser(null);
-      controller = new SearchController(userModel, noteSearchService, authorizationService);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -132,7 +135,7 @@ class SearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUser()).please();
+      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -152,7 +155,7 @@ class SearchControllerTests {
       Note child1 = makeMe.aNote("Child Java Note").under(referenceNote).please();
       Note child2 = makeMe.aNote("Child JavaScript Note").under(referenceNote).please();
       Note unrelated =
-          makeMe.aNote("Unrelated Java Note").creatorAndOwner(userModel.getUser()).please();
+          makeMe.aNote("Unrelated Java Note").creatorAndOwner(currentUser.getUser()).please();
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("Java");
@@ -186,8 +189,9 @@ class SearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = new CurrentUser(null);
-      controller = new SearchController(userModel, noteSearchService, authorizationService);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -227,7 +231,7 @@ class SearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUser()).please();
+      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test

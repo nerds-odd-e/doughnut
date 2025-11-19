@@ -12,6 +12,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +43,6 @@ class AssimilationControllerTests {
     controller =
         new AssimilationController(
             modelFactoryService,
-            currentUser,
             subscriptionService,
             testabilitySettings,
             authorizationService);
@@ -50,9 +50,8 @@ class AssimilationControllerTests {
 
   AssimilationController nullUserController() {
     return new AssimilationController(
-        modelFactoryService,
-        new CurrentUser(null),
-        subscriptionService,
+            modelFactoryService,
+            subscriptionService,
         testabilitySettings,
         authorizationService);
   }

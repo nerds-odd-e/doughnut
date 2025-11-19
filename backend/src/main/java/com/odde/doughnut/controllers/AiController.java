@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -10,6 +9,7 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.bind.annotation.*;
@@ -21,18 +21,16 @@ import org.springframework.web.context.annotation.SessionScope;
 public class AiController {
 
   private final OtherAiServices otherAiServices;
-  private final CurrentUser currentUser;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final AuthorizationService authorizationService;
 
+  @Autowired
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
-      CurrentUser currentUser,
       AuthorizationService authorizationService) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
-    this.currentUser = currentUser;
     this.authorizationService = authorizationService;
   }
 
@@ -45,7 +43,7 @@ public class AiController {
   @PostMapping("/generate-image")
   @Transactional
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
-    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertLoggedIn();
     return new AiGeneratedImage(otherAiServices.getTimage(prompt));
   }
 
@@ -59,7 +57,7 @@ public class AiController {
   public SuggestedTitleDTO suggestTitle(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
-    authorizationService.assertAuthorization(currentUser.getUser(), note);
+    authorizationService.assertAuthorization(note);
     String title =
         notebookAssistantForNoteServiceFactory.createNoteAutomationService(note).suggestTitle();
     return new SuggestedTitleDTO(title);

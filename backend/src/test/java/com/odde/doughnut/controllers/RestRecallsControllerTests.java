@@ -10,6 +10,7 @@ import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -39,14 +40,17 @@ class RecallsControllerTests {
   @BeforeEach
   void setup() {
     currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new RecallsController(
-            modelFactoryService, currentUser, testabilitySettings, authorizationService);
+            modelFactoryService, testabilitySettings, authorizationService);
   }
 
   RecallsController nullUserController() {
+    CurrentUser nullUser = new CurrentUser(null);
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
     return new RecallsController(
-        modelFactoryService, new CurrentUser(null), testabilitySettings, authorizationService);
+        modelFactoryService, testabilitySettings, authorizationService);
   }
 
   @Nested

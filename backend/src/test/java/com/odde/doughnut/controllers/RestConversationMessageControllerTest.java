@@ -19,6 +19,7 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.completion.chat.AssistantMessage;
@@ -61,9 +62,9 @@ class ConversationMessageControllerTest {
     ChatCompletionConversationService chatCompletionConversationService =
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
-            currentUser,
             conversationService,
             chatCompletionConversationService,
             authorizationService);
@@ -155,9 +156,10 @@ class ConversationMessageControllerTest {
       ChatCompletionConversationService chatCompletionConversationService =
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new ConversationMessageController(
-              new CurrentUser(null),
               conversationService,
               chatCompletionConversationService,
               authorizationService);
@@ -500,9 +502,10 @@ class ConversationMessageControllerTest {
       ChatCompletionConversationService chatCompletionConversationService =
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new ConversationMessageController(
-              new CurrentUser(null),
               conversationService,
               chatCompletionConversationService,
               authorizationService);

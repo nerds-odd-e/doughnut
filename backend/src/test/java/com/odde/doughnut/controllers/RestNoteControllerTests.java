@@ -15,6 +15,7 @@ import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -44,18 +45,18 @@ class NoteControllerTests {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
 
     controller =
         new NoteController(
             modelFactoryService,
-            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
@@ -84,7 +85,7 @@ class NoteControllerTests {
 
     @Test
     void shouldBeAbleToSeeOwnNote() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       final NoteRealm noteRealm = controller.showNote(note);
       assertThat(noteRealm.getId(), equalTo(note.getId()));
       assertThat(noteRealm.getFromBazaar(), is(false));
@@ -104,8 +105,12 @@ class NoteControllerTests {
     void shouldReturnTheNoteInfoIfHavingReadingAuth() throws UnexpectedNoAccessRightException {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
-      makeMe.aSubscription().forUser(userModel.getUser()).forNotebook(note.getNotebook()).please();
-      makeMe.refresh(userModel.getUser());
+      makeMe
+          .aSubscription()
+          .forUser(currentUser.getUser())
+          .forNotebook(note.getNotebook())
+          .please();
+      makeMe.refresh(currentUser.getUser());
       assertThat(controller.getNoteInfo(note).getNote().getId(), equalTo(note.getId()));
     }
   }
@@ -117,7 +122,7 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("new").creatorAndOwner(userModel.getUser()).please();
+      note = makeMe.aNote("new").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -159,7 +164,7 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       subject = makeMe.aNote().under(parent).please();
       child = makeMe.aNote("child").under(subject).please();
     }
@@ -175,7 +180,7 @@ class NoteControllerTests {
     void shouldDeleteTheNoteButNotTheUser() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(0));
-      assertTrue(modelFactoryService.findUserById(userModel.getUser().getId()).isPresent());
+      assertTrue(modelFactoryService.findUserById(currentUser.getUser().getId()).isPresent());
     }
 
     @Test
@@ -220,7 +225,7 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      parent = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       note = makeMe.aNote().under(parent).please();
     }
 
@@ -257,8 +262,8 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      source = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
-      target = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      source = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      target = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       link = makeMe.aReification().between(source, target).please();
     }
 
@@ -287,24 +292,26 @@ class NoteControllerTests {
   class SearchTests {
     @BeforeEach
     void setup() {
-      userModel = new CurrentUser(null);
+      currentUser = new CurrentUser(null);
     }
 
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       SearchTerm searchTerm = new SearchTerm();
       SearchController searchController =
-          new SearchController(userModel, noteSearchService, authorizationService);
+          new SearchController(noteSearchService, authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
     }
 
     @Test
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
       SearchController searchController =
-          new SearchController(userModel, noteSearchService, authorizationService);
+          new SearchController(noteSearchService, authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> searchController.searchForLinkTargetWithin(note, searchTerm));
@@ -318,7 +325,7 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-      rootNote = makeMe.aNote("Root").creatorAndOwner(userModel.getUser()).please();
+      rootNote = makeMe.aNote("Root").creatorAndOwner(currentUser.getUser()).please();
       child1 = makeMe.aNote("Child 1").under(rootNote).please();
       makeMe.refresh(rootNote);
     }

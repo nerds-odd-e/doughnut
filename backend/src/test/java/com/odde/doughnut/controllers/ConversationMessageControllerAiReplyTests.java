@@ -19,6 +19,7 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -75,9 +76,9 @@ public class ConversationMessageControllerAiReplyTests {
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
-            currentUser,
             conversationService,
             chatCompletionConversationService,
             authorizationService);

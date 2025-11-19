@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,19 +36,19 @@ class CircleControllerTest {
   @Autowired CircleService circleService;
 
   @Autowired MakeMe makeMe;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   CircleController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new CircleController(
             modelFactoryService,
             circleService,
             testabilitySettings,
-            userModel,
             authorizationService);
   }
 
@@ -55,12 +56,13 @@ class CircleControllerTest {
   class circleIndex {
     @Test
     void itShouldNotAllowNonMemberToSeeACircle() {
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new CircleController(
               modelFactoryService,
               circleService,
               testabilitySettings,
-              new CurrentUser(null),
               authorizationService);
       assertThrows(
           ResponseStatusException.class,
@@ -88,9 +90,10 @@ class CircleControllerTest {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       CurrentUser user = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, user);
       controller =
           new CircleController(
-              modelFactoryService, circleService, testabilitySettings, user, authorizationService);
+              modelFactoryService, circleService, testabilitySettings, authorizationService);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -112,12 +115,13 @@ class CircleControllerTest {
     @Test
     void itShouldAskToLoginOfVisitorIsNotLogin() {
       Circle circle = makeMe.aCircle().please();
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new CircleController(
               modelFactoryService,
               circleService,
               testabilitySettings,
-              new CurrentUser(null),
               authorizationService);
       assertThrows(
           ResponseStatusException.class,
@@ -150,7 +154,7 @@ class CircleControllerTest {
 
     @Test
     void userAlreadyInCircle() {
-      Circle circle = makeMe.aCircle().hasMember(userModel.getUser()).please();
+      Circle circle = makeMe.aCircle().hasMember(currentUser.getUser()).please();
       CircleJoiningByInvitation entity = new CircleJoiningByInvitation();
       entity.setInvitationCode(circle.getInvitationCode());
       BindException exception =

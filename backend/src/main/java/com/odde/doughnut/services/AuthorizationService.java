@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -10,9 +11,20 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class AuthorizationService {
   private final BazaarNotebookRepository bazaarNotebookRepository;
+  private final CurrentUser currentUser;
 
-  public AuthorizationService(BazaarNotebookRepository bazaarNotebookRepository) {
+  public AuthorizationService(
+      BazaarNotebookRepository bazaarNotebookRepository, CurrentUser currentUser) {
     this.bazaarNotebookRepository = bazaarNotebookRepository;
+    this.currentUser = currentUser;
+  }
+
+  public User getCurrentUser() {
+    return currentUser.getUser();
+  }
+
+  public <T> void assertAuthorization(T object) throws UnexpectedNoAccessRightException {
+    assertAuthorization(getCurrentUser(), object);
   }
 
   public <T> void assertAuthorization(User user, T object) throws UnexpectedNoAccessRightException {
@@ -44,6 +56,10 @@ public class AuthorizationService {
     if (!isAdmin(user)) {
       assertAuthorizationNotebook(user, object.getNotebook());
     }
+  }
+
+  public <T> void assertReadAuthorization(T object) throws UnexpectedNoAccessRightException {
+    assertReadAuthorization(getCurrentUser(), object);
   }
 
   public <T> void assertReadAuthorization(User user, T object)
@@ -140,14 +156,26 @@ public class AuthorizationService {
     }
   }
 
+  public void assertAdminAuthorization() throws UnexpectedNoAccessRightException {
+    assertAdminAuthorization(getCurrentUser());
+  }
+
   public void assertAdminAuthorization(User user) throws UnexpectedNoAccessRightException {
     if (!isAdmin(user)) {
       throw new UnexpectedNoAccessRightException();
     }
   }
 
+  public boolean isAdmin() {
+    return isAdmin(getCurrentUser());
+  }
+
   public boolean isAdmin(User user) {
     return user != null && user.isAdmin();
+  }
+
+  public void assertLoggedIn() {
+    assertLoggedIn(getCurrentUser());
   }
 
   public void assertLoggedIn(User user) {

@@ -17,6 +17,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -36,18 +37,18 @@ class LinkControllerTests {
 
   @Autowired MakeMe makeMe;
   @Autowired NoteMotionService noteMotionService;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
   }
 
   LinkController controller() {
     return new LinkController(
         modelFactoryService,
         new TestabilitySettings(),
-        userModel,
         noteMotionService,
         authorizationService);
   }
@@ -63,14 +64,14 @@ class LinkControllerTests {
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      note2 = makeMe.aNote("flower").creatorAndOwner(userModel.getUser()).please();
+      note2 = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
       noteMoveDTO.asFirstChild = false;
     }
 
     @Test
     void moveNoteSuccessfully()
         throws BindException, UnexpectedNoAccessRightException, CyclicLinkDetectedException {
-      Note note3 = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      Note note3 = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       noteMoveDTO.asFirstChild = false;
       var result =
           controller().moveNote(note3, note2, noteMoveDTO, makeMe.successfulBindingResult());
@@ -103,14 +104,14 @@ class LinkControllerTests {
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      note2 = makeMe.aNote("flower").creatorAndOwner(userModel.getUser()).please();
+      note2 = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
       linkCreation.linkType = LinkType.APPLICATION;
     }
 
     @Test
     void createdSuccessfully()
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
-      Note note3 = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
+      Note note3 = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
       controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       long afterThingCount = makeMe.modelFactoryService.noteRepository.count();

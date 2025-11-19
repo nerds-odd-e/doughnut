@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.*;
@@ -22,25 +21,22 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/notes")
 class NoteCreationController {
-  private final CurrentUser currentUser;
   private final WikidataService wikidataService;
   private final NoteConstructionService noteConstructionService;
   private final AuthorizationService authorizationService;
 
   public NoteCreationController(
       ModelFactoryService modelFactoryService,
-      CurrentUser currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteService noteService,
       AuthorizationService authorizationService) {
-    this.currentUser = currentUser;
     this.authorizationService = authorizationService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
     this.noteConstructionService =
         new NoteConstructionService(
-            currentUser.getUser(),
+            authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp(),
             modelFactoryService,
             noteService);
@@ -52,11 +48,11 @@ class NoteCreationController {
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    authorizationService.assertAuthorization(currentUser.getUser(), parentNote);
+    authorizationService.assertAuthorization(parentNote);
     return noteConstructionService.createNoteWithWikidataService(
         parentNote,
         noteCreation,
-        currentUser.getUser(),
+        authorizationService.getCurrentUser(),
         wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
   }
 
@@ -66,7 +62,7 @@ class NoteCreationController {
       @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    authorizationService.assertAuthorization(currentUser.getUser(), referenceNote);
+    authorizationService.assertAuthorization(referenceNote);
     if (referenceNote.getParent() == null) {
       throw new UnexpectedNoAccessRightException();
     }
@@ -75,11 +71,11 @@ class NoteCreationController {
         noteConstructionService.createNoteAfter(
             referenceNote,
             noteCreation,
-            currentUser.getUser(),
+            authorizationService.getCurrentUser(),
             wikidataService.wrapWikidataIdWithApi(noteCreation.wikidataId));
 
     return new NoteCreationResult(
-        note.toNoteRealm(currentUser.getUser()),
-        note.getParent().toNoteRealm(currentUser.getUser()));
+        note.toNoteRealm(authorizationService.getCurrentUser()),
+        note.getParent().toNoteRealm(authorizationService.getCurrentUser()));
   }
 }

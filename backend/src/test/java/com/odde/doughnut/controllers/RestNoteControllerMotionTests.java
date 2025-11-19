@@ -15,6 +15,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,24 +39,24 @@ class NoteControllerMotionTests {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
-  private CurrentUser userModel;
+  private CurrentUser currentUser;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note subject;
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new NoteController(
             modelFactoryService,
-            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
             noteService,
             authorizationService);
-    subject = makeMe.aNote("subject").creatorAndOwner(userModel.getUser()).please();
+    subject = makeMe.aNote("subject").creatorAndOwner(currentUser.getUser()).please();
   }
 
   @Nested
@@ -64,7 +65,7 @@ class NoteControllerMotionTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote("parent").creatorAndOwner(userModel.getUser()).please();
+      parent = makeMe.aNote("parent").creatorAndOwner(currentUser.getUser()).please();
       subject = makeMe.theNote(subject).under(parent).please();
     }
 
