@@ -13,6 +13,7 @@ import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.EntityManagerFactory;
@@ -44,6 +45,7 @@ class TestabilityRestController {
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   @Autowired BazaarService bazaarService;
+  @Autowired UserService userService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -260,15 +262,11 @@ class TestabilityRestController {
   @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     if (userInfo.containsKey("daily_assimilation_count")) {
-      modelFactoryService
-          .toUserModel(currentUser.getUser())
-          .setAndSaveDailyAssimilationCount(
-              Integer.valueOf(userInfo.get("daily_assimilation_count")));
+      userService.setDailyAssimilationCount(
+          currentUser.getUser(), Integer.valueOf(userInfo.get("daily_assimilation_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      modelFactoryService
-          .toUserModel(currentUser.getUser())
-          .setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
+      userService.setSpaceIntervals(currentUser.getUser(), userInfo.get("space_intervals"));
     }
     return "OK";
   }

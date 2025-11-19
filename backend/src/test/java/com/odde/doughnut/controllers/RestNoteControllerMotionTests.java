@@ -13,6 +13,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
@@ -39,6 +40,7 @@ class NoteControllerMotionTests {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
+  @Autowired UserService userService;
   private CurrentUser currentUser;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -55,7 +57,8 @@ class NoteControllerMotionTests {
             testabilitySettings,
             noteMotionService,
             noteService,
-            authorizationService);
+            authorizationService,
+            userService);
     subject = makeMe.aNote("subject").creatorAndOwner(currentUser.getUser()).please();
   }
 

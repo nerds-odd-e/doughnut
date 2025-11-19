@@ -9,6 +9,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -29,15 +30,18 @@ class MemoryTrackerController {
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
+  private final UserService userService;
 
   public MemoryTrackerController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      UserService userService) {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
+    this.userService = userService;
+    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService, userService);
   }
 
   @GetMapping("/{memoryTracker}/spelling-question")

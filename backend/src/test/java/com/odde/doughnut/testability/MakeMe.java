@@ -2,7 +2,6 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +61,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return new BazaarNotebookBuilder(this, notebook);
   }
 
-  public CertificateBuilder aCertificate(Notebook notebook, UserModel user, Timestamp startDate) {
+  public CertificateBuilder aCertificate(Notebook notebook, User user, Timestamp startDate) {
 
     return new CertificateBuilder(notebook, user, startDate, this);
   }
@@ -91,7 +90,7 @@ public class MakeMe extends MakeMeWithoutDB {
     return memoryTrackerBuilder;
   }
 
-  public MemoryTrackerBuilder aMemoryTrackerBy(UserModel user) {
+  public MemoryTrackerBuilder aMemoryTrackerBy(User user) {
     Note note = aNote().please();
     return aMemoryTrackerFor(note).by(user);
   }
@@ -114,10 +113,6 @@ public class MakeMe extends MakeMeWithoutDB {
 
   public ReificationBuilder aReification() {
     return new ReificationBuilder(this);
-  }
-
-  public UserModel aNullUserModelPlease() {
-    return modelFactoryService.toUserModel(null);
   }
 
   public PredefinedQuestionBuilder aPredefinedQuestion() {

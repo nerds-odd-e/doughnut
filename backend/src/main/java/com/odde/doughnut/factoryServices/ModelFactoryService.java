@@ -93,10 +93,6 @@ public class ModelFactoryService {
     userTokenRepository.deleteById(tokenId);
   }
 
-  public UserModel toUserModel(User user) {
-    return new UserModel(user, this);
-  }
-
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
       entityManager.persist(entity);

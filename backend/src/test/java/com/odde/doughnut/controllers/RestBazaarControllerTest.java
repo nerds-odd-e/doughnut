@@ -45,11 +45,7 @@ class BazaarControllerTest {
     adminUser = new CurrentUser(makeMe.anAdmin().please());
     notebookOwner = new CurrentUser(makeMe.aUser().please());
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, adminUser);
-    topNote =
-        makeMe
-            .aNote()
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(notebookOwner.getUser()))
-            .please();
+    topNote = makeMe.aNote().creatorAndOwner(notebookOwner.getUser()).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
     controller = new BazaarController(bazaarService, authorizationService);

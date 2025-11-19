@@ -55,11 +55,7 @@ class NotebookCertificateApprovalControllerTest {
 
     @Test
     void approvalStatusShouldBeNullIfNotExist() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       NotebookCertificateApproval approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
       assertThat(approvalForNotebook, nullValue());
@@ -67,11 +63,7 @@ class NotebookCertificateApprovalControllerTest {
 
     @Test
     void success() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
       makeMe.refresh(note.getNotebook());
       NotebookCertificateApproval approvalForNotebook =
@@ -94,11 +86,7 @@ class NotebookCertificateApprovalControllerTest {
     @Test
     void approvalStatusShouldBePendingAfterRequestingApproval()
         throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       controller.requestApprovalForNotebook(note.getNotebook());
       makeMe.refresh(note.getNotebook());
       assertFalse(note.getNotebook().isCertifiable());
@@ -114,11 +102,7 @@ class NotebookCertificateApprovalControllerTest {
     void setup() {
       CurrentUser currentUser = new CurrentUser(makeMe.anAdmin().please());
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       controller =
           new NotebookCertificateApprovalController(
               modelFactoryService, testabilitySettings, authorizationService);

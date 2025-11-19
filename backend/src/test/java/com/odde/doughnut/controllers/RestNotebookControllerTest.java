@@ -80,11 +80,7 @@ class NotebookControllerTest {
 
     currentUser = new CurrentUser(makeMe.aUser().please());
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
-    topNote =
-        makeMe
-            .aNote()
-            .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-            .please();
+    topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     controller =
         new NotebookController(
             modelFactoryService,
@@ -98,11 +94,7 @@ class NotebookControllerTest {
   class UpdateNotebookIndexEndpoint {
     @Test
     void shouldCallServiceAndRequireAuthorization() throws UnexpectedNoAccessRightException {
-      Notebook nb =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       controller.updateNotebookIndex(nb);
       // If unauthorized, an exception would be thrown before reaching service; no exception here
     }
@@ -183,11 +175,7 @@ class NotebookControllerTest {
 
     @Test
     void shouldBeAbleToEditCertificateExpiry() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       var notebookSettings = new NotebookSettings();
       notebookSettings.setCertificateExpiry(Period.parse("P2Y3M"));
       controller.updateNotebook(note.getNotebook(), notebookSettings);
@@ -203,11 +191,7 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       makeMe.refresh(notebook);
     }
 
@@ -257,11 +241,7 @@ class NotebookControllerTest {
     void setup() {
       currentUser = new CurrentUser(makeMe.aUser().please());
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       makeMe.refresh(notebook);
     }
 
@@ -301,11 +281,7 @@ class NotebookControllerTest {
     @BeforeEach
     void setup() {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -363,11 +339,7 @@ class NotebookControllerTest {
     @BeforeEach
     void setup() {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -406,11 +378,7 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       makeMe.refresh(notebook);
     }
 
@@ -441,11 +409,7 @@ class NotebookControllerTest {
     @BeforeEach
     void setup() {
       // Create notebook with Note1
-      notebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       note1 =
           makeMe
               .aNote("note 1")
@@ -510,10 +474,7 @@ class NotebookControllerTest {
       // Arrange
       CurrentUser otherUserModel = new CurrentUser(makeMe.aUser().please());
       Notebook otherNotebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(otherUserModel.getUser()))
-              .please();
+          makeMe.aNotebook().creatorAndOwner(otherUserModel.getUser()).please();
 
       // Act & Assert
       assertThrows(
