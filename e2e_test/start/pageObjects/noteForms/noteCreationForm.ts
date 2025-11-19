@@ -1,5 +1,5 @@
 import submittableForm from '../../submittableForm'
-import { assumeWikidataSearchDialog } from '../wikidataSearchDialog'
+import { assumeAssociateWikidataDialog } from '../associateWikidataDialog'
 
 const noteCreationForm = {
   createNoteWithTitle(title: string) {
@@ -17,7 +17,7 @@ const noteCreationForm = {
   },
   wikidataSearch() {
     cy.findByRole('button', { name: 'Wikidata Id' }).click()
-    return assumeWikidataSearchDialog()
+    return assumeAssociateWikidataDialog()
   },
   searchWikidata(phrase: string) {
     cy.formField('Title').assignFieldValue(phrase)

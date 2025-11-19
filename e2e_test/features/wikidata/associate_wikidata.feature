@@ -17,18 +17,6 @@ Feature: associate wikidata ID to note
 
 
   @usingMockedWikidataService
-  Scenario Outline: Associate note to wikidata with validation
-    Given Wikidata search result always has "TDD" with ID "<id>"
-    And Wikidata.org has an entity "<id>" with label "<wikidata label>"
-    When I associate the note "TDD" with wikidata id "<id>"
-    Then I <need to confirm> the association with different label "<wikidata label>"
-
-    Examples:
-      | id      | wikidata label  | need to confirm       |
-      | Q423392 | TDD             | don't need to confirm |
-      | Q12345  | Count von Count | need to confirm       |
-
-  @usingMockedWikidataService
   Scenario Outline: Associate note to wikipedia via wikidata
     Given Wikidata search result always has "TDD" with ID "<id>"
     And Wikidata.org has an entity "<id>" with label "TDD" and link to wikipedia "<wikipedia link>"

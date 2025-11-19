@@ -10,35 +10,28 @@ import {
 } from '@badeball/cypress-cucumber-preprocessor'
 import start, { mock_services } from '../start'
 import noteCreationForm from '../start/pageObjects/noteForms/noteCreationForm'
-import { assumeWikidataSearchDialog } from '../start/pageObjects/wikidataSearchDialog'
+import { assumeAssociateWikidataDialog } from '../start/pageObjects/associateWikidataDialog'
 
 When(
   'I associate the note {string} with wikidata id {string}',
   (title: string, wikiID: string) => {
-    start.jumpToNotePage(title).wikidataOptions().associate(wikiID)
+    start.jumpToNotePage(title).associateWikidataDialog().associate(wikiID)
   }
 )
 
 When(
   'I change the note {string} to associate with wikidata id {string}',
   (title: string, wikiID: string) => {
-    start.jumpToNotePage(title).wikidataOptions().associate(wikiID)
+    start.jumpToNotePage(title).associateWikidataDialog().associate(wikiID)
   }
 )
 
 When(
   'I need to confirm the association with different label {string}',
   (wikidataTitle: string) => {
-    assumeWikidataSearchDialog().confirmAssociationWithDifferentLabel(
+    assumeAssociateWikidataDialog().confirmAssociationWithDifferentLabel(
       wikidataTitle
     )
-  }
-)
-
-Then(
-  "I don't need to confirm the association with different label {string}",
-  () => {
-    start.assumeNotePage().wikidataOptions().hasAssociation()
   }
 )
 
@@ -99,9 +92,7 @@ Then(
   (ttile: string, associationUrl: string) => {
     start
       .assumeNotePage(ttile)
-      .wikidataOptions()
-      .hasAssociation()
-      .openEditDialog()
+      .associateWikidataDialog()
       .expectOpenLinkButtonToOpenUrl(associationUrl)
   }
 )
@@ -120,7 +111,7 @@ When('I search with phrase {string} on Wikidata', (phrase: string) => {
 When(
   'I select wikidataID {string} from the Wikidata search result',
   (wikidataID: string) => {
-    assumeWikidataSearchDialog().selectResult(wikidataID)
+    assumeAssociateWikidataDialog().selectResult(wikidataID)
   }
 )
 

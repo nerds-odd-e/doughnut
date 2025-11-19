@@ -6,7 +6,7 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { questionListPage } from './questionListPage'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { noteSidebar } from './noteSidebar'
-import { assumeWikidataSearchDialog } from './wikidataSearchDialog'
+import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -338,48 +338,9 @@ export const assumeNotePage = (noteTopology?: string) => {
         },
       }
     },
-    wikidataOptions() {
-      return {
-        associate(wikiID: string) {
-          privateToolbarButton('associate wikidata').click()
-          cy.replaceFocusedTextAndEnter(wikiID)
-        },
-        hasAssociation() {
-          // Just verify the button exists - no need to open dropdown anymore
-          cy.findByRole('button', { name: 'associate wikidata' }).should(
-            'exist'
-          )
-          return this
-        },
-        openEditDialog() {
-          privateToolbarButton('associate wikidata').click()
-          return this
-        },
-        expectOpenLinkButtonToOpenUrl(url: string) {
-          const elm = () => {
-            return cy.findByRole('button', { name: 'open link' })
-          }
-          // Wait for the button to be visible (it appears when Wikidata ID is present)
-          elm().should('be.visible')
-
-          cy.window().then((win) => {
-            const popupWindowStub = {
-              location: { href: undefined },
-              focus: cy.stub(),
-            }
-            cy.stub(win, 'open').as('open').returns(popupWindowStub)
-            elm().click()
-            cy.get('@open').should('have.been.calledWith', '')
-            // using a callback so that cypress can wait until the stubbed value is assigned
-            cy.wrap(() => popupWindowStub.location.href)
-              .should((cb) => expect(cb()).equal(url))
-              .then(() => {
-                expect(popupWindowStub.focus).to.have.been.called
-              })
-          })
-          return this
-        },
-      }
+    associateWikidataDialog() {
+      privateToolbarButton('associate wikidata').click()
+      return assumeAssociateWikidataDialog()
     },
     importObsidianData(filename: string) {
       clickNotePageMoreOptionsButton('more options')
@@ -392,10 +353,6 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
       cy.pageIsNotLoading()
       return this
-    },
-    wikidataSearch() {
-      cy.findByRole('button', { name: 'Wikidata Id' }).click()
-      return assumeWikidataSearchDialog()
     },
   }
 }
