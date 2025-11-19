@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 import lombok.Getter;
 
-public class UserModel implements ReviewScope {
+public class UserModel {
 
   @Getter protected final User entity;
   protected final ModelFactoryService modelFactoryService;
@@ -47,7 +47,6 @@ public class UserModel implements ReviewScope {
         entity.getId(), entity.getOwnership().getId());
   }
 
-  @Override
   public Stream<Note> getUnassimilatedNotes() {
     return modelFactoryService.noteReviewRepository.findByOwnershipWhereThereIsNoMemoryTracker(
         entity.getId(), entity.getOwnership().getId());

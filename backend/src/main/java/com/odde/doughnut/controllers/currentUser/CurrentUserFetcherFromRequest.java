@@ -57,4 +57,10 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   public UserModel getCurrentUser() {
     return getUser();
   }
+
+  @Bean("currentUserEntity")
+  @RequestScope
+  public User getCurrentUserEntity() {
+    return getUser().getEntity();
+  }
 }

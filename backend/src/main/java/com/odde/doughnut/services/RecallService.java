@@ -4,8 +4,8 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -14,30 +14,34 @@ import java.util.stream.Stream;
 
 public class RecallService {
 
-  private final UserModel userModel;
+  private final User user;
   private final Timestamp currentUTCTimestamp;
   private final ZoneId timeZone;
-  private final ModelFactoryService modelFactoryService;
+  private final MemoryTrackerRepository memoryTrackerRepository;
+  private final UserService userService;
 
   public RecallService(
-      UserModel userModel,
+      User user,
       Timestamp currentUTCTimestamp,
       ZoneId timeZone,
-      ModelFactoryService modelFactoryService) {
-    this.userModel = userModel;
+      MemoryTrackerRepository memoryTrackerRepository,
+      UserService userService) {
+    this.user = user;
     this.currentUTCTimestamp = currentUTCTimestamp;
     this.timeZone = timeZone;
-    this.modelFactoryService = modelFactoryService;
+    this.memoryTrackerRepository = memoryTrackerRepository;
+    this.userService = userService;
   }
 
   private int totalAssimilatedCount() {
-    return modelFactoryService.memoryTrackerRepository.countByUserNotRemoved(
-        userModel.getEntity().getId());
+    return memoryTrackerRepository.countByUserNotRemoved(user.getId());
   }
 
   private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(int dueInDays) {
-    return userModel.getMemoryTrackerNeedToRepeat(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24), timeZone);
+    return userService.getMemoryTrackersNeedToRepeat(
+        user,
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24),
+        timeZone);
   }
 
   public RecallStatus getRecallStatus() {

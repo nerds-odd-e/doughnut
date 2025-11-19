@@ -7,6 +7,8 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -26,13 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RecallServiceWithSpacedRepetitionAlgorithmTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
-  UserModel anotherUser;
+  @Autowired UserService userService;
+  User user;
+  User anotherUser;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").toModelPlease();
-    anotherUser = makeMe.aUser().toModelPlease();
+    user = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").please();
+    anotherUser = makeMe.aUser().please();
   }
 
   @Nested
@@ -41,7 +44,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().creatorAndOwner(userModel).please();
+      note = makeMe.aNote().creatorAndOwner(user).please();
     }
 
     @Test
@@ -68,11 +71,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     void whenThereIsOneReviewedNotesForUser(
         Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
       MemoryTracker memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .by(userModel)
-              .afterNthStrictRepetition(repetitionDone)
-              .please();
+          makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(repetitionDone).please();
       MemoryTracker mostUrgentMemoryTracker =
           getOneMemoryTrackerNeedToRepeat(daysAfterBase(memoryTracker, reviewDay));
       assertThat(mostUrgentMemoryTracker != null, is(expectedToRepeat));
@@ -89,7 +88,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       })
       void atHourInTheNextDay(
           Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
-        MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(userModel).please();
+        MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
         memoryTracker.setNextRecallAt(
             makeMe.aTimestamp().of(2, lastRepeatHour).fromShanghai().please());
         final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).fromShanghai().please();
@@ -112,7 +111,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
       void aMemoryTrackerHasBeenReviewedStrictly(
           int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
         MemoryTracker memoryTracker =
-            makeMe.aMemoryTrackerFor(note).by(userModel).afterNthStrictRepetition(ntimes).please();
+            makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(ntimes).please();
         Timestamp currentUTCTimestamp =
             TimestampOperations.addHoursToTimestamp(
                 memoryTracker.getNextRecallAt(), daysDelay * 24);
@@ -123,8 +122,8 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
   }
 
   private MemoryTracker getOneMemoryTrackerNeedToRepeat(Timestamp timestamp) {
-    return userModel
-        .getMemoryTrackerNeedToRepeat(timestamp, ZoneId.of("Asia/Shanghai"))
+    return userService
+        .getMemoryTrackersNeedToRepeat(user, timestamp, ZoneId.of("Asia/Shanghai"))
         .findFirst()
         .orElse(null);
   }

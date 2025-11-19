@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -29,20 +29,25 @@ import org.springframework.web.server.ResponseStatusException;
 class RecallsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
-  private UserModel currentUser;
+  private User currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   RecallsController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = makeMe.aUser().toModelPlease();
-    controller = new RecallsController(modelFactoryService, currentUser, testabilitySettings);
+    currentUser = makeMe.aUser().please();
+    controller =
+        new RecallsController(
+            modelFactoryService.memoryTrackerRepository,
+            makeMe.userService,
+            currentUser,
+            testabilitySettings);
   }
 
   RecallsController nullUserController() {
     return new RecallsController(
-        modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        modelFactoryService.memoryTrackerRepository, makeMe.userService, null, testabilitySettings);
   }
 
   @Nested
@@ -93,7 +98,8 @@ class RecallsControllerTests {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
       makeMe
-          .aMemoryTrackerBy(currentUser)
+          .aMemoryTrackerFor(makeMe.aNote().creatorAndOwner(currentUser).please())
+          .by(currentUser)
           .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
@@ -104,7 +110,11 @@ class RecallsControllerTests {
     void shouldIncludeRecallStatusInDueMemoryTrackers() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      makeMe.aMemoryTrackerBy(currentUser).nextRecallAt(currentTime).please();
+      makeMe
+          .aMemoryTrackerFor(makeMe.aNote().creatorAndOwner(currentUser).please())
+          .by(currentUser)
+          .nextRecallAt(currentTime)
+          .please();
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 

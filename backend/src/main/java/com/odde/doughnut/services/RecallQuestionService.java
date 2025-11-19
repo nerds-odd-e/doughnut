@@ -77,11 +77,15 @@ public class RecallQuestionService {
   }
 
   public AnsweredQuestion answerQuestion(
-      RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
+      RecallPrompt recallPrompt,
+      AnswerDTO answerDTO,
+      User user,
+      Timestamp currentUTCTimestamp,
+      UserService userService) {
     Answer answer = modelFactoryService.createAnswerForQuestion(recallPrompt, answerDTO);
     MemoryTrackerService memoryTrackerService = new MemoryTrackerService(modelFactoryService);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
-        user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
+        user, currentUTCTimestamp, answer.getCorrect(), recallPrompt, userService);
     return recallPrompt.getAnsweredQuestion();
   }
 }
