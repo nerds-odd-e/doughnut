@@ -5,15 +5,18 @@ import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -24,17 +27,23 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerController {
   private final ModelFactoryService modelFactoryService;
   private final MemoryTrackerService memoryTrackerService;
-  private UserModel currentUser;
+  private final UserService userService;
+  private final AuthorizationService authorizationService;
+  private User currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   public MemoryTrackerController(
       ModelFactoryService modelFactoryService,
-      UserModel currentUser,
+      @Qualifier("currentUserEntity") User currentUser,
+      UserService userService,
+      AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.userService = userService;
+    this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
   }
@@ -43,8 +52,8 @@ class MemoryTrackerController {
   public SpellingQuestion getSpellingQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(memoryTracker);
+    userService.assertLoggedIn(currentUser);
+    authorizationService.assertReadAuthorization(currentUser, memoryTracker);
     return new SpellingQuestion(
         memoryTracker.getNote().getClozeDescription().clozeDetails(),
         memoryTracker.getNote().getNotebook());
@@ -54,8 +63,8 @@ class MemoryTrackerController {
   public MemoryTracker showMemoryTracker(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(memoryTracker);
+    userService.assertLoggedIn(currentUser);
+    authorizationService.assertReadAuthorization(currentUser, memoryTracker);
     return memoryTracker;
   }
 
@@ -74,7 +83,7 @@ class MemoryTrackerController {
   public MemoryTracker selfEvaluate(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestBody SelfEvaluation selfEvaluation) {
-    currentUser.assertLoggedIn();
+    userService.assertLoggedIn(currentUser);
     if (memoryTracker == null || memoryTracker.getId() == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The memory tracker does not exist.");
     }
@@ -87,7 +96,7 @@ class MemoryTrackerController {
   public MemoryTracker markAsRepeated(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @RequestParam("successful") boolean successful) {
-    currentUser.assertLoggedIn();
+    userService.assertLoggedIn(currentUser);
     memoryTrackerService.markAsRepeated(
         testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker);
     return memoryTracker;
@@ -95,16 +104,15 @@ class MemoryTrackerController {
 
   @GetMapping("/recent")
   public List<MemoryTracker> getRecentMemoryTrackers() {
-    currentUser.assertLoggedIn();
-    return modelFactoryService.memoryTrackerRepository.findLast100ByUser(
-        currentUser.getEntity().getId());
+    userService.assertLoggedIn(currentUser);
+    return modelFactoryService.memoryTrackerRepository.findLast100ByUser(currentUser.getId());
   }
 
   @GetMapping("/recently-reviewed")
   public List<MemoryTracker> getRecentlyReviewed() {
-    currentUser.assertLoggedIn();
+    userService.assertLoggedIn(currentUser);
     return modelFactoryService.memoryTrackerRepository.findLast100ReviewedByUser(
-        currentUser.getEntity().getId());
+        currentUser.getId());
   }
 
   @PostMapping("/{memoryTracker}/answer-spelling")
@@ -112,11 +120,8 @@ class MemoryTrackerController {
   public SpellingResultDTO answerSpelling(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
       @Valid @RequestBody AnswerSpellingDTO answerDTO) {
-    currentUser.assertLoggedIn();
+    userService.assertLoggedIn(currentUser);
     return memoryTrackerService.answerSpelling(
-        memoryTracker,
-        answerDTO,
-        currentUser.getEntity(),
-        testabilitySettings.getCurrentUTCTimestamp());
+        memoryTracker, answerDTO, currentUser, testabilitySettings.getCurrentUTCTimestamp());
   }
 }

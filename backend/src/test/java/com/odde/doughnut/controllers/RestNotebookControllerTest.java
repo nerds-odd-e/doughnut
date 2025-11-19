@@ -76,7 +76,9 @@ class NotebookControllerTest {
     controller =
         new NotebookController(
             modelFactoryService,
-            userModel,
+            userModel.getEntity(),
+            makeMe.userService,
+            makeMe.authorizationService,
             testabilitySettings,
             notebookIndexingService,
             bazaarService);
@@ -109,7 +111,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              userModel,
+              null,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);
@@ -124,7 +128,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              userModel,
+              user,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);
@@ -191,7 +197,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              modelFactoryService.toUserModel(anotherUser),
+              anotherUser,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);
@@ -236,7 +244,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              userModel,
+              userModel.getEntity(),
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);
@@ -249,7 +259,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              userModel,
+              userModel.getEntity(),
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);
@@ -374,7 +386,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              modelFactoryService.toUserModel(anotherUser),
+              anotherUser,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);
@@ -472,7 +486,9 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              userModel,
+              null,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
               notebookIndexingService,
               bazaarService);

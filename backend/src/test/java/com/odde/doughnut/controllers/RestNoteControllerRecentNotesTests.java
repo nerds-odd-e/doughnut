@@ -42,7 +42,9 @@ class NoteControllerRecentNotesTests {
     controller =
         new NoteController(
             modelFactoryService,
-            userModel,
+            userModel.getEntity(),
+            makeMe.userService,
+            makeMe.authorizationService,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
@@ -81,7 +83,9 @@ class NoteControllerRecentNotesTests {
     controller =
         new NoteController(
             modelFactoryService,
-            userModel,
+            null,
+            makeMe.userService,
+            makeMe.authorizationService,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,

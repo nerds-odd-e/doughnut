@@ -9,13 +9,15 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -27,19 +29,25 @@ import org.springframework.web.bind.annotation.*;
 class CircleController {
   private final ModelFactoryService modelFactoryService;
   private final CircleService circleService;
+  private final UserService userService;
+  private final AuthorizationService authorizationService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private UserModel currentUser;
+  private User currentUser;
 
   public CircleController(
       ModelFactoryService modelFactoryService,
       CircleService circleService,
+      UserService userService,
+      AuthorizationService authorizationService,
       TestabilitySettings testabilitySettings,
-      UserModel currentUser) {
+      @Qualifier("currentUserEntity") User currentUser) {
     this.modelFactoryService = modelFactoryService;
     this.circleService = circleService;
+    this.userService = userService;
+    this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
   }
@@ -48,20 +56,20 @@ class CircleController {
   public CircleForUserView showCircle(
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(circle);
+    authorizationService.assertAuthorization(currentUser, circle);
     return circle.jsonCircleForUserView();
   }
 
   @GetMapping("")
   public List<Circle> index() {
-    currentUser.assertLoggedIn();
-    return currentUser.getEntity().getCircles();
+    userService.assertLoggedIn(currentUser);
+    return currentUser.getCircles();
   }
 
   @PostMapping("")
   @Transactional
   public Circle createCircle(@Valid @RequestBody Circle circle) {
-    circleService.joinAndSave(circle, currentUser.getEntity());
+    circleService.joinAndSave(circle, currentUser);
     return circle;
   }
 
@@ -78,14 +86,13 @@ class CircleController {
 
       throw new BindException(bindingResult);
     }
-    User user = currentUser.getEntity();
-    if (user.inCircle(circle)) {
+    if (currentUser.inCircle(circle)) {
       BindingResult bindingResult =
           new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
       bindingResult.rejectValue("invitationCode", "error.error", "You are already in this circle");
       throw new BindException(bindingResult);
     }
-    circleService.joinAndSave(circle, user);
+    circleService.joinAndSave(circle, currentUser);
     return circle;
   }
 
@@ -95,13 +102,13 @@ class CircleController {
       @PathVariable @Schema(type = "integer") Circle circle,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertAuthorization(circle);
+    userService.assertLoggedIn(currentUser);
+    authorizationService.assertAuthorization(currentUser, circle);
     Note note =
         circle
             .getOwnership()
             .createAndPersistNotebook(
-                currentUser.getEntity(),
+                currentUser,
                 testabilitySettings.getCurrentUTCTimestamp(),
                 modelFactoryService,
                 noteCreation.getNewTitle());

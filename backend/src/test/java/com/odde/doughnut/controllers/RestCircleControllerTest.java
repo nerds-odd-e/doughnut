@@ -41,7 +41,13 @@ class CircleControllerTest {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new CircleController(modelFactoryService, circleService, testabilitySettings, userModel);
+        new CircleController(
+            modelFactoryService,
+            circleService,
+            makeMe.userService,
+            makeMe.authorizationService,
+            testabilitySettings,
+            userModel.getEntity());
   }
 
   @Nested
@@ -52,8 +58,10 @@ class CircleControllerTest {
           new CircleController(
               modelFactoryService,
               circleService,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease());
+              null);
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -81,7 +89,13 @@ class CircleControllerTest {
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
       controller =
-          new CircleController(modelFactoryService, circleService, testabilitySettings, user);
+          new CircleController(
+              modelFactoryService,
+              circleService,
+              makeMe.userService,
+              makeMe.authorizationService,
+              testabilitySettings,
+              user.getEntity());
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -107,8 +121,10 @@ class CircleControllerTest {
           new CircleController(
               modelFactoryService,
               circleService,
+              makeMe.userService,
+              makeMe.authorizationService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease());
+              null);
       assertThrows(
           ResponseStatusException.class,
           () -> {

@@ -34,7 +34,13 @@ class UserControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new UserController(makeMe.modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new UserController(
+            makeMe.modelFactoryService,
+            userModel.getEntity(),
+            makeMe.userService,
+            makeMe.authorizationService,
+            testabilitySettings);
   }
 
   @Test
@@ -120,7 +126,13 @@ class UserControllerTest {
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken2);
 
-    controller = new UserController(makeMe.modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new UserController(
+            makeMe.modelFactoryService,
+            userModel.getEntity(),
+            makeMe.userService,
+            makeMe.authorizationService,
+            testabilitySettings);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }
