@@ -29,10 +29,9 @@ When(
 When(
   'I need to confirm the association with different label {string}',
   (wikidataTitle: string) => {
-    start
-      .assumeNotePage()
-      .wikidataOptions()
-      .confirmAssociationWithDifferentLabel(wikidataTitle)
+    assumeWikidataSearchDialog().confirmAssociationWithDifferentLabel(
+      wikidataTitle
+    )
   }
 )
 

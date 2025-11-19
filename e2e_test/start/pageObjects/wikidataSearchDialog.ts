@@ -18,6 +18,18 @@ export const assumeWikidataSearchDialog = () => {
       cy.findByRole('button', { name: 'Confirm' }).click()
       return this
     },
+    confirmAssociationWithDifferentLabel(wikidataTitle: string) {
+      withinModalContainer(() => {
+        // Wait for the title options to appear and check that the wikidata title is visible
+        cy.findByText(/Suggested Title:/)
+          .should('be.visible')
+          .should('contain.text', wikidataTitle)
+        // Select "Replace title" option - this will immediately save and close the dialog
+        cy.findByText('Replace title').click()
+      })
+      // Dialog should close automatically after selecting Replace title
+      return this
+    },
     setWikidataId(wikidataId: string) {
       withinModalContainer(() => {
         cy.formField('Wikidata Id').assignFieldValue(wikidataId)

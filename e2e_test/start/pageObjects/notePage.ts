@@ -344,16 +344,6 @@ export const assumeNotePage = (noteTopology?: string) => {
           privateToolbarButton('associate wikidata').click()
           cy.replaceFocusedTextAndEnter(wikiID)
         },
-        confirmAssociationWithDifferentLabel(wikidataTitle: string) {
-          // Wait for the title options to appear and check that the wikidata title is visible
-          cy.findByText(/Suggested Title:/)
-            .should('be.visible')
-            .should('contain.text', wikidataTitle)
-          // Select "Replace title" option - this will immediately save and close the dialog
-          cy.findByText('Replace title').click()
-          // Dialog should close automatically after selecting Replace title
-          return this.hasAssociation()
-        },
         hasAssociation() {
           // Just verify the button exists - no need to open dropdown anymore
           cy.findByRole('button', { name: 'associate wikidata' }).should(
