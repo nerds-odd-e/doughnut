@@ -51,6 +51,7 @@ import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
+import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 
 const router = useRouter()
 
@@ -125,11 +126,12 @@ const onSelectWikidataEntry = (
 ) => {
   creationData.value.wikidataId = selectedSuggestion.id
 
-  if (titleAction === "replace") {
-    creationData.value.newTitle = selectedSuggestion.label
-    hasTitleBeenEdited.value = true
-  } else if (titleAction === "append") {
-    creationData.value.newTitle = `${creationData.value.newTitle} / ${selectedSuggestion.label}`
+  if (titleAction) {
+    creationData.value.newTitle = calculateNewTitle(
+      creationData.value.newTitle,
+      selectedSuggestion,
+      titleAction
+    )
     hasTitleBeenEdited.value = true
   } else {
     // When titles match (no titleAction), replace with the exact label from Wikidata

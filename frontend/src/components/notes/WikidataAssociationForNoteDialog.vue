@@ -21,6 +21,7 @@ import type {
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
+import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 
 interface WikidataError {
   body: {
@@ -117,7 +118,7 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
 
 const handleSelectedForEdit = async (
   entity: WikidataSearchEntity,
-  _titleAction?: "replace" | "append"
+  titleAction?: "replace" | "append"
 ) => {
   if (!entity.id) return
 
@@ -125,6 +126,17 @@ const handleSelectedForEdit = async (
     await managedApi.services.fetchWikidataEntityDataById({
       wikidataId: entity.id,
     })
+
+    // Update title if titleAction is provided
+    if (titleAction) {
+      const currentTitle = props.note.noteTopology.titleOrPredicate || ""
+      const newTitle = calculateNewTitle(currentTitle, entity, titleAction)
+
+      await props.storageAccessor
+        .storedApi()
+        .updateTextField(props.note.id, "edit title", newTitle)
+    }
+
     await saveWikidataId(entity.id)
   } catch (e: unknown) {
     handleError(e)

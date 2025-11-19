@@ -265,11 +265,11 @@ const onSelectSearchResult = async () => {
 const handleTitleAction = async () => {
   if (!selectedItem.value) return
   const action = getTitleAction()
-  if (!props.showSaveButton) {
-    // When showSaveButton is true, don't emit selected immediately
-    // Wait for user to click Save button
-    emit("selected", selectedItem.value, action)
-  }
+  if (!action) return
+
+  // When title action is selected, emit immediately to save and close
+  // This applies to both showSaveButton true and false cases
+  emit("selected", selectedItem.value, action)
 }
 
 const handleClose = () => {
@@ -279,10 +279,9 @@ const handleClose = () => {
 const handleSave = async () => {
   if (!hasValidWikidataId.value) return
 
-  if (showTitleOptions.value && selectedItem.value && titleAction.value) {
-    const action = getTitleAction()
-    emit("selected", selectedItem.value, action)
-  } else if (hasSaveButton.value) {
+  // If title options are shown and action is selected, it should have been handled
+  // by handleTitleAction already. Only handle save for direct wikidata ID input.
+  if (hasSaveButton.value && !showTitleOptions.value) {
     emit("save", localWikidataId.value)
   }
   // If hasSaveButton is false, form submission does nothing (just prevents default)

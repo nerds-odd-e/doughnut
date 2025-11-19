@@ -430,7 +430,7 @@ describe("WikidataAssociationDialog", () => {
       expect(getModal()?.querySelector('input[value="Append"]')).toBeTruthy()
     })
 
-    it("saves with replace action when user selects Replace and clicks Save", async () => {
+    it("saves with replace action immediately when user selects Replace", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Canine")
         .id("Q11399")
@@ -444,7 +444,7 @@ describe("WikidataAssociationDialog", () => {
       select.dispatchEvent(new Event("change", { bubbles: true }))
       await flushPromises()
 
-      // Select Replace option
+      // Select Replace option - this should immediately emit selected
       const replaceLabel = getModal()?.querySelector(
         'label[for*="Replace"]'
       ) as HTMLLabelElement
@@ -452,20 +452,14 @@ describe("WikidataAssociationDialog", () => {
       replaceLabel.click()
       await flushPromises()
 
-      // Click Save button
-      const saveButton = getSaveButton()
-      expect(saveButton).toBeTruthy()
-      saveButton.click()
-      await flushPromises()
-
-      // Should emit selected with replace action
+      // Should emit selected with replace action immediately
       expect(wrapper.emitted("selected")).toBeTruthy()
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)
       expect(emitted?.[1]).toBe("replace")
     })
 
-    it("saves with append action when user selects Append and clicks Save", async () => {
+    it("saves with append action immediately when user selects Append", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Canine")
         .id("Q11399")
@@ -479,7 +473,7 @@ describe("WikidataAssociationDialog", () => {
       select.dispatchEvent(new Event("change", { bubbles: true }))
       await flushPromises()
 
-      // Select Append option
+      // Select Append option - this should immediately emit selected
       const appendLabel = getModal()?.querySelector(
         'label[for*="Append"]'
       ) as HTMLLabelElement
@@ -487,13 +481,7 @@ describe("WikidataAssociationDialog", () => {
       appendLabel.click()
       await flushPromises()
 
-      // Click Save button
-      const saveButton = getSaveButton()
-      expect(saveButton).toBeTruthy()
-      saveButton.click()
-      await flushPromises()
-
-      // Should emit selected with append action
+      // Should emit selected with append action immediately
       expect(wrapper.emitted("selected")).toBeTruthy()
       const emitted = wrapper.emitted("selected")?.[0]
       expect(emitted?.[0]).toEqual(searchResult)

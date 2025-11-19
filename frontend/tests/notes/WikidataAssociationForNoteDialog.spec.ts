@@ -13,6 +13,7 @@ describe("WikidataAssociationForNoteDialog", () => {
   const mockedWikidataSearch = vitest.fn()
   const mockedFetchWikidataEntity = vitest.fn()
   const mockedUpdateWikidataId = vitest.fn()
+  const mockedUpdateNoteTitle = vitest.fn()
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -26,6 +27,9 @@ describe("WikidataAssociationForNoteDialog", () => {
     ).mockImplementation(mockedFetchWikidataEntity)
     vi.spyOn(helper.managedApi.services, "updateWikidataId").mockImplementation(
       mockedUpdateWikidataId
+    )
+    vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockImplementation(
+      mockedUpdateNoteTitle
     )
   })
 
@@ -193,6 +197,190 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: "dog" })
+    })
+
+    it("replaces title immediately when Replace title is selected", async () => {
+      const note = makeMe.aNote.topicConstructor("Canine").please()
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Dog")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      mockedFetchWikidataEntity.mockResolvedValue(
+        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      )
+      mockedUpdateWikidataId.mockResolvedValue({} as never)
+      mockedUpdateNoteTitle.mockResolvedValue({} as never)
+
+      const wrapper = mountDialog(note)
+      await flushPromises()
+
+      // Select from search results
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Select Replace option - this should immediately save and close
+      const replaceLabel = getModal()?.querySelector(
+        'label[for*="Replace"]'
+      ) as HTMLLabelElement
+      expect(replaceLabel).toBeTruthy()
+      replaceLabel.click()
+      await flushPromises()
+
+      // Verify title is replaced
+      expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          newTitle: "Dog",
+        },
+      })
+      // Verify wikidata ID is saved
+      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          wikidataId: "Q11399",
+        },
+      })
+      // Verify dialog is closed
+      expect(wrapper.emitted("closeDialog")).toBeTruthy()
+    })
+
+    it("appends title immediately when Append title is selected", async () => {
+      const note = makeMe.aNote.topicConstructor("Canine").please()
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Dog")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      mockedFetchWikidataEntity.mockResolvedValue(
+        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      )
+      mockedUpdateWikidataId.mockResolvedValue({} as never)
+      mockedUpdateNoteTitle.mockResolvedValue({} as never)
+
+      const wrapper = mountDialog(note)
+      await flushPromises()
+
+      // Select from search results
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Select Append option - this should immediately save and close
+      const appendLabel = getModal()?.querySelector(
+        'label[for*="Append"]'
+      ) as HTMLLabelElement
+      expect(appendLabel).toBeTruthy()
+      appendLabel.click()
+      await flushPromises()
+
+      // Verify title is appended with / separator
+      expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          newTitle: "Canine / Dog",
+        },
+      })
+      // Verify wikidata ID is saved
+      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          wikidataId: "Q11399",
+        },
+      })
+      // Verify dialog is closed
+      expect(wrapper.emitted("closeDialog")).toBeTruthy()
+    })
+
+    it("appends title correctly when current title is empty", async () => {
+      const note = makeMe.aNote.topicConstructor("").please()
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Dog")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      mockedFetchWikidataEntity.mockResolvedValue(
+        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      )
+      mockedUpdateWikidataId.mockResolvedValue({} as never)
+      mockedUpdateNoteTitle.mockResolvedValue({} as never)
+
+      const wrapper = mountDialog(note)
+      await flushPromises()
+
+      // Select from search results
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Select Append option - this should immediately save and close
+      const appendLabel = getModal()?.querySelector(
+        'label[for*="Append"]'
+      ) as HTMLLabelElement
+      expect(appendLabel).toBeTruthy()
+      appendLabel.click()
+      await flushPromises()
+
+      // Verify title is set to the entity label when current title is empty
+      expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          newTitle: "Dog",
+        },
+      })
+      // Verify wikidata ID is saved
+      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          wikidataId: "Q11399",
+        },
+      })
+      // Verify dialog is closed
+      expect(wrapper.emitted("closeDialog")).toBeTruthy()
+    })
+
+    it("only saves wikidata ID when Save is clicked without title action", async () => {
+      const note = makeMe.aNote.topicConstructor("dog").please()
+      const searchResult = makeMe.aWikidataSearchEntity
+        .label("Dog")
+        .id("Q11399")
+        .please()
+      mockedWikidataSearch.mockResolvedValue([searchResult])
+      mockedFetchWikidataEntity.mockResolvedValue(
+        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      )
+      mockedUpdateWikidataId.mockResolvedValue({} as never)
+
+      const wrapper = mountDialog(note)
+      await flushPromises()
+
+      // Select from search results (no title conflict, so no title options shown)
+      const select = getSelect()
+      select.value = "Q11399"
+      select.dispatchEvent(new Event("change", { bubbles: true }))
+      await flushPromises()
+
+      // Click Save button
+      const saveButton = getSaveButton()
+      expect(saveButton).toBeTruthy()
+      saveButton.click()
+      await flushPromises()
+
+      // Verify title is NOT updated (no title action)
+      expect(mockedUpdateNoteTitle).not.toHaveBeenCalled()
+      // Verify wikidata ID is saved
+      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+        note: note.id,
+        requestBody: {
+          wikidataId: "Q11399",
+        },
+      })
+      // Verify dialog is closed
+      expect(wrapper.emitted("closeDialog")).toBeTruthy()
     })
   })
 })
