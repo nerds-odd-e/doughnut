@@ -7,9 +7,9 @@ import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
@@ -42,16 +42,19 @@ class NotebookController {
 
   private final ObsidianFormatService obsidianFormatService;
   private final NotebookIndexingService notebookIndexingService;
+  private final BazaarService bazaarService;
 
   public NotebookController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
-      NotebookIndexingService notebookIndexingService) {
+      NotebookIndexingService notebookIndexingService,
+      BazaarService bazaarService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
+    this.bazaarService = bazaarService;
     this.obsidianFormatService =
         new ObsidianFormatService(currentUser.getEntity(), modelFactoryService);
   }
@@ -106,8 +109,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(notebook);
-    BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    bazaar.shareNotebook(notebook);
+    bazaarService.shareNotebook(notebook);
     return notebook;
   }
 
