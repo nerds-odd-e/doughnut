@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
   FineTuningDataController controller;
   @Mock private OpenAiApi openAiApi;
@@ -47,7 +49,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
             new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
             makeMe.anAdmin().toModelPlease(),
             openAiApi,
-            new OtherAiServices(openAiApi));
+            new OtherAiServices(openAiApi),
+            authorizationService);
   }
 
   @Nested
@@ -60,7 +63,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
               makeMe.aUser().toModelPlease(),
               openAiApi,
-              new OtherAiServices(openAiApi));
+              new OtherAiServices(openAiApi),
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.uploadAndTriggerFineTuning());
     }
@@ -114,7 +118,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
               makeMe.aNullUserModelPlease(),
               openAiApi,
-              new OtherAiServices(openAiApi));
+              new OtherAiServices(openAiApi),
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
     }
@@ -156,7 +161,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
               makeMe.aUser().toModelPlease(),
               openAiApi,
-              new OtherAiServices(openAiApi));
+              new OtherAiServices(openAiApi),
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.updateSuggestedQuestionForFineTuning(suggested, suggest));
@@ -196,7 +202,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
               makeMe.aUser().toModelPlease(),
               openAiApi,
-              new OtherAiServices(openAiApi));
+              new OtherAiServices(openAiApi),
+              authorizationService);
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.duplicate(suggested));
     }
 
@@ -225,7 +232,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
               makeMe.aUser().toModelPlease(),
               openAiApi,
-              new OtherAiServices(openAiApi));
+              new OtherAiServices(openAiApi),
+              authorizationService);
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.delete(suggested));
     }
 

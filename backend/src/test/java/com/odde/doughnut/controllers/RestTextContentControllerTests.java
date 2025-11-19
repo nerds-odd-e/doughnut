@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class TextContentControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
   private UserModel userModel;
@@ -38,7 +40,9 @@ class TextContentControllerTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     note = makeMe.aNote("new").creatorAndOwner(userModel).please();
-    controller = new TextContentController(modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new TextContentController(
+            modelFactoryService, userModel, testabilitySettings, authorizationService);
   }
 
   @Nested

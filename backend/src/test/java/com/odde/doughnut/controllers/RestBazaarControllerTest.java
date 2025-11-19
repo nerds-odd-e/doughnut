@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 class BazaarControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private BazaarService bazaarService;
+  @Autowired private AuthorizationService authorizationService;
   private UserModel adminUser;
   private UserModel notebookOwner;
   private BazaarController controller;
@@ -40,14 +42,15 @@ class BazaarControllerTest {
     topNote = makeMe.aNote().creatorAndOwner(notebookOwner).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
-    controller = new BazaarController(bazaarService, adminUser);
+    controller = new BazaarController(bazaarService, adminUser, authorizationService);
   }
 
   @Nested
   class RemoveFromBazaar {
     @Test
     void otherPeopleCannot() {
-      controller = new BazaarController(bazaarService, makeMe.aUser().toModelPlease());
+      controller =
+          new BazaarController(bazaarService, makeMe.aUser().toModelPlease(), authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));
@@ -56,7 +59,7 @@ class BazaarControllerTest {
 
     @Test
     void notebookOwnerCan() throws UnexpectedNoAccessRightException {
-      controller = new BazaarController(bazaarService, notebookOwner);
+      controller = new BazaarController(bazaarService, notebookOwner, authorizationService);
       controller.removeFromBazaar(bazaarNotebook);
     }
 

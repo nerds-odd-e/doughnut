@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -28,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RecallsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -37,12 +39,17 @@ class RecallsControllerTests {
   @BeforeEach
   void setup() {
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new RecallsController(modelFactoryService, currentUser, testabilitySettings);
+    controller =
+        new RecallsController(
+            modelFactoryService, currentUser, testabilitySettings, authorizationService);
   }
 
   RecallsController nullUserController() {
     return new RecallsController(
-        modelFactoryService, makeMe.aNullUserModelPlease(), testabilitySettings);
+        modelFactoryService,
+        makeMe.aNullUserModelPlease(),
+        testabilitySettings,
+        authorizationService);
   }
 
   @Nested

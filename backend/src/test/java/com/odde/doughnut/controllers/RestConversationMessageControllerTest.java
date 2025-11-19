@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
@@ -42,6 +43,7 @@ class ConversationMessageControllerTest {
 
   @Autowired ConversationService conversationService;
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   private UserModel currentUser;
   ConversationMessageController controller;
 
@@ -60,7 +62,10 @@ class ConversationMessageControllerTest {
             openAiApiHandler, globalSettingsService, objectMapper);
     controller =
         new ConversationMessageController(
-            currentUser, conversationService, chatCompletionConversationService);
+            currentUser,
+            conversationService,
+            chatCompletionConversationService,
+            authorizationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -149,7 +154,8 @@ class ConversationMessageControllerTest {
           new ConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
-              chatCompletionConversationService);
+              chatCompletionConversationService,
+              authorizationService);
       ResponseStatusException exception =
           assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
@@ -447,7 +453,8 @@ class ConversationMessageControllerTest {
           new ConversationMessageController(
               makeMe.aNullUserModelPlease(),
               conversationService,
-              chatCompletionConversationService);
+              chatCompletionConversationService,
+              authorizationService);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));

@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssimilationService;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -29,22 +30,26 @@ class AssimilationController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final AuthorizationService authorizationService;
+
   public AssimilationController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       SubscriptionService subscriptionService,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.subscriptionService = subscriptionService;
     this.testabilitySettings = testabilitySettings;
+    this.authorizationService = authorizationService;
     this.memoryTrackerService = new MemoryTrackerService(modelFactoryService);
   }
 
   @GetMapping("/assimilating")
   @Transactional(readOnly = true)
   public List<Note> assimilating(@RequestParam(value = "timezone") String timezone) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
@@ -57,7 +62,7 @@ class AssimilationController {
   @PostMapping(path = "")
   @Transactional
   public List<MemoryTracker> assimilate(@RequestBody InitialInfo initialInfo) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return memoryTrackerService.assimilate(
         initialInfo, currentUser.getEntity(), testabilitySettings.getCurrentUTCTimestamp());
   }
@@ -66,7 +71,7 @@ class AssimilationController {
   @Transactional(readOnly = true)
   public AssimilationCountDTO getAssimilationCount(
       @RequestParam(value = "timezone") String timezone) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 

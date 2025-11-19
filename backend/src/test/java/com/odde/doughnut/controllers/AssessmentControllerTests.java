@@ -9,6 +9,7 @@ import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -28,6 +29,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 public class AssessmentControllerTests {
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   private UserModel currentUser;
   private AssessmentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -39,7 +41,8 @@ public class AssessmentControllerTests {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = makeMe.aUser().toModelPlease();
     controller =
-        new AssessmentController(makeMe.modelFactoryService, testabilitySettings, currentUser);
+        new AssessmentController(
+            makeMe.modelFactoryService, testabilitySettings, currentUser, authorizationService);
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
@@ -56,7 +59,10 @@ public class AssessmentControllerTests {
     void whenNotLogin() {
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, makeMe.aNullUserModelPlease());
+              makeMe.modelFactoryService,
+              testabilitySettings,
+              makeMe.aNullUserModelPlease(),
+              authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -105,7 +111,10 @@ public class AssessmentControllerTests {
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, makeMe.aUser().toModelPlease());
+              makeMe.modelFactoryService,
+              testabilitySettings,
+              makeMe.aUser().toModelPlease(),
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));

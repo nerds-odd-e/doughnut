@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -24,14 +25,17 @@ public class ConversationMessageController {
   private final ConversationService conversationService;
   private final UserModel currentUser;
   private final ChatCompletionConversationService chatCompletionConversationService;
+  private final AuthorizationService authorizationService;
 
   public ConversationMessageController(
       UserModel currentUser,
       ConversationService conversationService,
-      ChatCompletionConversationService chatCompletionConversationService) {
+      ChatCompletionConversationService chatCompletionConversationService,
+      AuthorizationService authorizationService) {
     this.currentUser = currentUser;
     this.conversationService = conversationService;
     this.chatCompletionConversationService = chatCompletionConversationService;
+    this.authorizationService = authorizationService;
   }
 
   @PostMapping("/assessment-question/{assessmentQuestion}")
@@ -55,13 +59,13 @@ public class ConversationMessageController {
 
   @GetMapping("/all")
   public List<Conversation> getConversationsOfCurrentUser() {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return conversationService.conversationRelatedToUser(currentUser.getEntity());
   }
 
   @GetMapping("/unread")
   public List<ConversationMessage> getUnreadConversations() {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return conversationService.getUnreadConversations(currentUser.getEntity());
   }
 
@@ -69,7 +73,7 @@ public class ConversationMessageController {
   public List<ConversationMessage> markConversationAsRead(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(conversation);
+    authorizationService.assertAuthorization(currentUser.getEntity(), conversation);
     conversationService.markConversationAsRead(conversation, currentUser.getEntity());
     return conversationService.getUnreadConversations(currentUser.getEntity());
   }
@@ -80,7 +84,7 @@ public class ConversationMessageController {
       @RequestBody String message,
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(conversation);
+    authorizationService.assertAuthorization(currentUser.getEntity(), conversation);
     return conversationService.addMessageToConversation(
         conversation, currentUser.getEntity(), message);
   }
@@ -89,7 +93,7 @@ public class ConversationMessageController {
   public Conversation getConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(conversation);
+    authorizationService.assertAuthorization(currentUser.getEntity(), conversation);
     return conversation;
   }
 
@@ -98,7 +102,7 @@ public class ConversationMessageController {
   public SseEmitter getAiReply(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException, BadRequestException {
-    currentUser.assertAuthorization(conversation);
+    authorizationService.assertAuthorization(currentUser.getEntity(), conversation);
     try {
       Note note = conversation.getSubjectNote();
       if (note == null) {
@@ -119,7 +123,7 @@ public class ConversationMessageController {
   public List<ConversationMessage> getConversationMessages(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(conversation);
+    authorizationService.assertAuthorization(currentUser.getEntity(), conversation);
     return conversation.getConversationMessages();
   }
 
@@ -127,14 +131,14 @@ public class ConversationMessageController {
   public ChatCompletionRequest exportConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(conversation);
+    authorizationService.assertAuthorization(currentUser.getEntity(), conversation);
     return chatCompletionConversationService.buildChatCompletionRequest(conversation);
   }
 
   @GetMapping("/note/{note}")
   public List<Conversation> getConversationsAboutNote(
       @PathVariable("note") @Schema(type = "integer") Note note) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return conversationService.getConversationsAboutNote(note, currentUser.getEntity());
   }
 

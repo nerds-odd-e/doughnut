@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -27,15 +28,18 @@ class RecallPromptController {
   private final TestabilitySettings testabilitySettings;
 
   private final RecallQuestionService recallQuestionService;
+  private final AuthorizationService authorizationService;
 
   public RecallPromptController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      AuthorizationService authorizationService) {
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.authorizationService = authorizationService;
     this.recallQuestionService =
         new RecallQuestionService(
             openAiApi, modelFactoryService, testabilitySettings.getRandomizer(), objectMapper);
@@ -45,7 +49,7 @@ class RecallPromptController {
   @Transactional
   public RecallPrompt askAQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return recallQuestionService.generateAQuestion(memoryTracker);
   }
 
@@ -55,7 +59,7 @@ class RecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @RequestBody QuestionContestResult contestResult)
       throws JsonProcessingException {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return recallQuestionService.regenerateAQuestion(
         contestResult,
         recallPrompt.getPredefinedQuestion().getNote(),
@@ -66,7 +70,7 @@ class RecallPromptController {
   @Transactional
   public QuestionContestResult contest(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return recallQuestionService.contest(recallPrompt);
   }
 
@@ -75,7 +79,7 @@ class RecallPromptController {
   public AnsweredQuestion answerQuiz(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return recallQuestionService.answerQuestion(
         recallPrompt,
         answerDTO,
@@ -88,7 +92,7 @@ class RecallPromptController {
   public AnsweredQuestion showQuestion(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(recallPrompt);
+    authorizationService.assertReadAuthorization(currentUser.getEntity(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();
   }
 }

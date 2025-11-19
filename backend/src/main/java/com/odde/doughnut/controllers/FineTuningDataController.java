@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.FineTuningService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
@@ -26,18 +27,21 @@ class FineTuningDataController {
   private final FineTuningService fineTuningService;
   private final OtherAiServices otherAiServices;
   private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
+  private final AuthorizationService authorizationService;
 
   public FineTuningDataController(
       ModelFactoryService modelFactoryService,
       SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       UserModel currentUser,
       OpenAiApi openAiApi,
-      OtherAiServices otherAiServices) {
+      OtherAiServices otherAiServices,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.currentUser = currentUser;
     this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
     this.otherAiServices = otherAiServices;
+    this.authorizationService = authorizationService;
   }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
@@ -47,7 +51,7 @@ class FineTuningDataController {
           SuggestedQuestionForFineTuning suggestedQuestion,
       @RequestBody QuestionSuggestionParams suggestion)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     return suggestedQuestionForFineTuningService.update(suggestedQuestion, suggestion);
   }
 
@@ -57,7 +61,7 @@ class FineTuningDataController {
       @PathVariable("suggestedQuestion") @Schema(type = "integer")
           SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     return suggestedQuestionForFineTuningService.duplicate(suggestedQuestion);
   }
 
@@ -67,14 +71,14 @@ class FineTuningDataController {
       @PathVariable("suggestedQuestion") @Schema(type = "integer")
           SuggestedQuestionForFineTuning suggestedQuestion)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     return suggestedQuestionForFineTuningService.delete(suggestedQuestion);
   }
 
   @PostMapping("/upload-and-trigger-fine-tuning")
   @Transactional
   public void uploadAndTriggerFineTuning() throws UnexpectedNoAccessRightException, IOException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     List<OpenAIChatGPTFineTuningExample> examples1 =
         fineTuningService.getQuestionGenerationTrainingExamples();
     otherAiServices.uploadAndTriggerFineTuning(examples1, "Question");
@@ -86,7 +90,7 @@ class FineTuningDataController {
   @GetMapping("/all-suggested-questions-for-fine-tuning")
   public List<SuggestedQuestionForFineTuning> getAllSuggestedQuestions()
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     return fineTuningService.getSuggestedQuestionForFineTunings();
   }
 }

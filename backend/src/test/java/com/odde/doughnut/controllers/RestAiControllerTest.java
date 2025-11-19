@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
@@ -47,6 +48,7 @@ class AiControllerTest {
   Note note;
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
   @BeforeEach
@@ -60,7 +62,10 @@ class AiControllerTest {
     note = makeMe.aNote().please();
     controller =
         new AiController(
-            notebookAssistantForNoteServiceFactory, new OtherAiServices(openAiApi), currentUser);
+            notebookAssistantForNoteServiceFactory,
+            new OtherAiServices(openAiApi),
+            currentUser,
+            authorizationService);
   }
 
   private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
@@ -84,7 +89,8 @@ class AiControllerTest {
               new AiController(
                       notebookAssistantForNoteServiceFactory,
                       new OtherAiServices(openAiApi),
-                      makeMe.aNullUserModelPlease())
+                      makeMe.aNullUserModelPlease(),
+                      authorizationService)
                   .generateImage("create an image"));
     }
 
@@ -184,7 +190,8 @@ class AiControllerTest {
           new AiController(
               notebookAssistantForNoteServiceFactory,
               new OtherAiServices(openAiApi),
-              makeMe.aNullUserModelPlease());
+              makeMe.aNullUserModelPlease(),
+              authorizationService);
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));
     }

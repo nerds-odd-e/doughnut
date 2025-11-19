@@ -11,6 +11,7 @@ import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NoteControllerMotionTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -51,7 +53,8 @@ class NoteControllerMotionTests {
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
-            noteService);
+            noteService,
+            authorizationService);
     subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
   }
 

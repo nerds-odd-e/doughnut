@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NotebookCertificateApprovalControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
   private UserModel userModel;
@@ -35,7 +37,7 @@ class NotebookCertificateApprovalControllerTest {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new NotebookCertificateApprovalController(
-            modelFactoryService, userModel, testabilitySettings);
+            modelFactoryService, userModel, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -100,7 +102,7 @@ class NotebookCertificateApprovalControllerTest {
       notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
       controller =
           new NotebookCertificateApprovalController(
-              modelFactoryService, userModel, testabilitySettings);
+              modelFactoryService, userModel, testabilitySettings, authorizationService);
       approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
       makeMe.refresh(notebook);
     }

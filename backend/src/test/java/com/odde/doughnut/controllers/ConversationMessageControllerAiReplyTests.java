@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
@@ -48,6 +49,7 @@ public class ConversationMessageControllerAiReplyTests {
   @Mock private OpenAiApi openAiApi;
 
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   ConversationMessageController controller;
   UserModel currentUser;
   Note note;
@@ -75,7 +77,10 @@ public class ConversationMessageControllerAiReplyTests {
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
     controller =
         new ConversationMessageController(
-            currentUser, conversationService, chatCompletionConversationService);
+            currentUser,
+            conversationService,
+            chatCompletionConversationService,
+            authorizationService);
   }
 
   private ObjectMapper getTestObjectMapper() {

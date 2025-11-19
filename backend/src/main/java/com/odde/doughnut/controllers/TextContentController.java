@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -26,13 +27,17 @@ class TextContentController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final AuthorizationService authorizationService;
+
   public TextContentController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.authorizationService = authorizationService;
   }
 
   @PatchMapping(path = "/{note}/title")
@@ -55,7 +60,7 @@ class TextContentController {
 
   private NoteRealm updateNote(Note note, Consumer<Note> updateFunction)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(note);
+    authorizationService.assertAuthorization(currentUser.getEntity(), note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);

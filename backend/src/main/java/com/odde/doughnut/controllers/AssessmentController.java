@@ -6,6 +6,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -22,13 +23,16 @@ class AssessmentController {
 
   private final UserModel currentUser;
   private final AssessmentService assessmentService;
+  private final AuthorizationService authorizationService;
 
   public AssessmentController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      UserModel currentUser) {
+      UserModel currentUser,
+      AuthorizationService authorizationService) {
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
+    this.authorizationService = authorizationService;
     this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
   }
 
@@ -37,8 +41,8 @@ class AssessmentController {
   public AssessmentAttempt generateAssessmentQuestions(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertReadAuthorization(notebook);
+    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertReadAuthorization(currentUser.getEntity(), notebook);
 
     return assessmentService.generateAssessment(notebook, currentUser.getEntity());
   }
@@ -50,8 +54,8 @@ class AssessmentController {
           AssessmentQuestionInstance assessmentQuestionInstance,
       @Valid @RequestBody AnswerDTO answerDTO)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertAuthorization(assessmentQuestionInstance);
+    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertAuthorization(currentUser.getEntity(), assessmentQuestionInstance);
 
     return assessmentService.answerQuestion(assessmentQuestionInstance, answerDTO);
   }
@@ -62,15 +66,15 @@ class AssessmentController {
       @PathVariable("assessmentAttempt") @Schema(type = "integer")
           AssessmentAttempt assessmentAttempt)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertAuthorization(assessmentAttempt);
+    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertAuthorization(currentUser.getEntity(), assessmentAttempt);
     return assessmentService.submitAssessmentResult(
         assessmentAttempt, testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping
   public List<AssessmentAttempt> getMyAssessments() {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return assessmentService.getMyAssessments(currentUser.getEntity());
   }
 }

@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -30,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class CircleControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
   @Autowired CircleService circleService;
 
   @Autowired MakeMe makeMe;
@@ -41,7 +43,12 @@ class CircleControllerTest {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-        new CircleController(modelFactoryService, circleService, testabilitySettings, userModel);
+        new CircleController(
+            modelFactoryService,
+            circleService,
+            testabilitySettings,
+            userModel,
+            authorizationService);
   }
 
   @Nested
@@ -53,7 +60,8 @@ class CircleControllerTest {
               modelFactoryService,
               circleService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease());
+              makeMe.aNullUserModelPlease(),
+              authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -81,7 +89,8 @@ class CircleControllerTest {
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       UserModel user = makeMe.aUser().toModelPlease();
       controller =
-          new CircleController(modelFactoryService, circleService, testabilitySettings, user);
+          new CircleController(
+              modelFactoryService, circleService, testabilitySettings, user, authorizationService);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -108,7 +117,8 @@ class CircleControllerTest {
               modelFactoryService,
               circleService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease());
+              makeMe.aNullUserModelPlease(),
+              authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {

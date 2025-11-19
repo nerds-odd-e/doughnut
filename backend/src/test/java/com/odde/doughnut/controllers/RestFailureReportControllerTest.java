@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.NullGithubService;
@@ -30,10 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class FailureReportControllerTest {
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   private GithubService githubService = new NullGithubService();
 
   FailureReportController controller(UserModel userModel) {
-    return new FailureReportController(makeMe.modelFactoryService, githubService, userModel);
+    return new FailureReportController(
+        makeMe.modelFactoryService, githubService, userModel, authorizationService);
   }
 
   @Test

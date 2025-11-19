@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookIndexingService;
@@ -44,6 +45,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class NotebookControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
   private UserModel userModel;
   private Note topNote;
@@ -79,7 +81,8 @@ class NotebookControllerTest {
             userModel,
             testabilitySettings,
             notebookIndexingService,
-            bazaarService);
+            bazaarService,
+            authorizationService);
   }
 
   @Nested
@@ -112,7 +115,8 @@ class NotebookControllerTest {
               userModel,
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -127,7 +131,8 @@ class NotebookControllerTest {
               userModel,
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
@@ -194,7 +199,8 @@ class NotebookControllerTest {
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
     }
@@ -239,7 +245,8 @@ class NotebookControllerTest {
               userModel,
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
@@ -252,7 +259,8 @@ class NotebookControllerTest {
               userModel,
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
@@ -377,7 +385,8 @@ class NotebookControllerTest {
               modelFactoryService.toUserModel(anotherUser),
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
@@ -475,7 +484,8 @@ class NotebookControllerTest {
               userModel,
               testabilitySettings,
               notebookIndexingService,
-              bazaarService);
+              bazaarService,
+              authorizationService);
 
       // Act & Assert
       ResponseStatusException exception =

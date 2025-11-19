@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
@@ -37,6 +38,7 @@ class PredefinedQuestionController {
 
   private final AiQuestionGenerator aiQuestionGenerator;
   private final ObjectMapper objectMapper;
+  private final AuthorizationService authorizationService;
 
   public PredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
@@ -44,12 +46,14 @@ class PredefinedQuestionController {
       SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       UserModel currentUser,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
     this.objectMapper = objectMapper;
+    this.authorizationService = authorizationService;
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi,
@@ -63,7 +67,7 @@ class PredefinedQuestionController {
   @PostMapping("/generate-question-without-save")
   public PredefinedQuestion generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
     if (MCQWithAnswer == null) {
       return null;
@@ -90,7 +94,7 @@ class PredefinedQuestionController {
   public List<PredefinedQuestion> getAllQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(note);
+    authorizationService.assertAuthorization(currentUser.getEntity(), note);
     return note.getPredefinedQuestions().stream().toList();
   }
 
@@ -100,7 +104,7 @@ class PredefinedQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(note);
+    authorizationService.assertAuthorization(currentUser.getEntity(), note);
     return predefinedQuestionService.addQuestion(note, predefinedQuestion);
   }
 
@@ -110,7 +114,7 @@ class PredefinedQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(note);
+    authorizationService.assertAuthorization(currentUser.getEntity(), note);
     return predefinedQuestionService.refineAIQuestion(note, predefinedQuestion);
   }
 
@@ -120,7 +124,7 @@ class PredefinedQuestionController {
       @PathVariable("predefinedQuestion") @Schema(type = "integer")
           PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(predefinedQuestion.getNote());
+    authorizationService.assertAuthorization(currentUser.getEntity(), predefinedQuestion.getNote());
     return predefinedQuestionService.toggleApproval(predefinedQuestion);
   }
 
@@ -128,7 +132,7 @@ class PredefinedQuestionController {
   public ChatCompletionRequest exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(note);
+    authorizationService.assertAuthorization(currentUser.getEntity(), note);
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
     QuestionGenerationRequestBuilder requestBuilder =
         new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);

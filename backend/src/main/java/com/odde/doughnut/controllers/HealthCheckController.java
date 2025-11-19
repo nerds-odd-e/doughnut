@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -17,6 +18,8 @@ class HealthCheckController {
 
   @Autowired private UserModel currentUser;
 
+  @Autowired private AuthorizationService authorizationService;
+
   @GetMapping("/healthcheck")
   public String ping() {
     return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
@@ -25,7 +28,7 @@ class HealthCheckController {
   @GetMapping("/data_upgrade")
   @Transactional(timeout = 200)
   public List dataUpgrade() throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     return List.of();
   }
 }

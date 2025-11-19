@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -27,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class NoteControllerRecentNotesTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
@@ -46,7 +48,8 @@ class NoteControllerRecentNotesTests {
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
-            noteService);
+            noteService,
+            authorizationService);
   }
 
   @Test
@@ -85,7 +88,8 @@ class NoteControllerRecentNotesTests {
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
-            noteService);
+            noteService,
+            authorizationService);
 
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }

@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 class SubscriptionControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionRepository subscriptionRepository;
+  @Autowired private AuthorizationService authorizationService;
   private UserModel userModel;
   private Note topNote;
   private Notebook notebook;
@@ -39,7 +41,8 @@ class SubscriptionControllerTest {
     topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
-    controller = new SubscriptionController(makeMe.modelFactoryService, userModel);
+    controller =
+        new SubscriptionController(makeMe.modelFactoryService, userModel, authorizationService);
   }
 
   @Test

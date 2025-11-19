@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -49,6 +50,7 @@ class McpNoteCreationControllerTests {
   @Mock HttpClientAdapter httpClientAdapter;
   @MockitoBean NoteSearchService noteSearchService;
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   @Autowired WebApplicationContext webApplicationContext;
   @Autowired NoteService noteService;
 
@@ -68,7 +70,8 @@ class McpNoteCreationControllerTests {
             testabilitySettings,
             noteSearchService,
             noteRepository,
-            noteService);
+            noteService,
+            authorizationService);
 
     Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(userModel).please();
     lordOfTheRingsNote.setTopicConstructor("Lord of the Rings");
@@ -89,7 +92,8 @@ class McpNoteCreationControllerTests {
               testabilitySettings,
               noteSearchService,
               noteRepository,
-              noteService);
+              noteService,
+              authorizationService);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class,

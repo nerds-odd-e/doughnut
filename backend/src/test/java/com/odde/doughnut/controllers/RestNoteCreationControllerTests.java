@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
@@ -37,6 +38,7 @@ import org.springframework.validation.BindException;
 @Transactional
 class NoteCreationControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -49,7 +51,12 @@ class NoteCreationControllerTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new NoteCreationController(
-            modelFactoryService, userModel, httpClientAdapter, testabilitySettings, noteService);
+            modelFactoryService,
+            userModel,
+            httpClientAdapter,
+            testabilitySettings,
+            noteService,
+            authorizationService);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)

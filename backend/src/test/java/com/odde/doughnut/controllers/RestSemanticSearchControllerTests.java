@@ -10,6 +10,7 @@ import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
@@ -31,6 +32,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestSemanticSearchControllerTests {
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   @Autowired NoteSearchService noteSearchService;
 
   @MockitoBean(name = "testableOpenAiApi")
@@ -42,7 +44,7 @@ class RestSemanticSearchControllerTests {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new SearchController(userModel, noteSearchService);
+    controller = new SearchController(userModel, noteSearchService, authorizationService);
     // Default: return empty embedding data so semantic search falls back to literal search
     EmbeddingResult empty = new EmbeddingResult();
     empty.setData(java.util.List.of());
@@ -68,7 +70,7 @@ class RestSemanticSearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new SearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -105,7 +107,7 @@ class RestSemanticSearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new SearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");

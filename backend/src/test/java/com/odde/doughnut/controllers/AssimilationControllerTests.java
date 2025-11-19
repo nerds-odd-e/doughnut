@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -29,6 +30,7 @@ class AssimilationControllerTests {
   @Autowired private ModelFactoryService modelFactoryService;
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionService subscriptionService;
+  @Autowired private AuthorizationService authorizationService;
   private UserModel currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -39,7 +41,11 @@ class AssimilationControllerTests {
     currentUser = makeMe.aUser().toModelPlease();
     controller =
         new AssimilationController(
-            modelFactoryService, currentUser, subscriptionService, testabilitySettings);
+            modelFactoryService,
+            currentUser,
+            subscriptionService,
+            testabilitySettings,
+            authorizationService);
   }
 
   AssimilationController nullUserController() {
@@ -47,7 +53,8 @@ class AssimilationControllerTests {
         modelFactoryService,
         makeMe.aNullUserModelPlease(),
         subscriptionService,
-        testabilitySettings);
+        testabilitySettings,
+        authorizationService);
   }
 
   @Nested

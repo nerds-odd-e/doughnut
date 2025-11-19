@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,20 +22,24 @@ class NotebookCertificateApprovalController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
+  private final AuthorizationService authorizationService;
+
   public NotebookCertificateApprovalController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.authorizationService = authorizationService;
   }
 
   @GetMapping("/for-notebook/{notebook}")
   public NotebookCertificateApproval getApprovalForNotebook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
+    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
     return notebook.getNotebookCertificateApproval();
   }
 
@@ -43,14 +48,14 @@ class NotebookCertificateApprovalController {
   public NotebookCertificateApproval requestApprovalForNotebook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(notebook);
+    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
     return modelFactoryService.notebookService(notebook).requestNotebookApproval().getApproval();
   }
 
   @GetMapping("/get-all-pending-request")
   public List<NotebookCertificateApproval> getAllPendingRequest()
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     return modelFactoryService.notebookCertificateApprovalRepository.findByLastApprovalTimeIsNull();
   }
 
@@ -60,7 +65,7 @@ class NotebookCertificateApprovalController {
       @PathVariable("notebookCertificateApproval") @Schema(type = "integer")
           NotebookCertificateApproval approval)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAdminAuthorization();
+    authorizationService.assertAdminAuthorization(currentUser.getEntity());
     new NotebookCertificateApprovalService(approval, modelFactoryService)
         .approve(testabilitySettings.getCurrentUTCTimestamp());
     return approval;

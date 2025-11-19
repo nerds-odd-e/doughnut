@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,14 +23,17 @@ public class AiController {
   private final OtherAiServices otherAiServices;
   private final UserModel currentUser;
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+  private final AuthorizationService authorizationService;
 
   public AiController(
       NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       OtherAiServices otherAiServices,
-      UserModel currentUser) {
+      UserModel currentUser,
+      AuthorizationService authorizationService) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.otherAiServices = otherAiServices;
     this.currentUser = currentUser;
+    this.authorizationService = authorizationService;
   }
 
   @GetMapping("/dummy")
@@ -41,7 +45,7 @@ public class AiController {
   @PostMapping("/generate-image")
   @Transactional
   public AiGeneratedImage generateImage(@RequestBody String prompt) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return new AiGeneratedImage(otherAiServices.getTimage(prompt));
   }
 
@@ -55,7 +59,7 @@ public class AiController {
   public SuggestedTitleDTO suggestTitle(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
-    currentUser.assertAuthorization(note);
+    authorizationService.assertAuthorization(currentUser.getEntity(), note);
     String title =
         notebookAssistantForNoteServiceFactory.createNoteAutomationService(note).suggestTitle();
     return new SuggestedTitleDTO(title);

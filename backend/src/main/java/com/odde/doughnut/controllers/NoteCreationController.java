@@ -6,6 +6,7 @@ import com.odde.doughnut.exceptions.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.*;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,14 +24,17 @@ class NoteCreationController {
   private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final NoteConstructionService noteConstructionService;
+  private final AuthorizationService authorizationService;
 
   public NoteCreationController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
-      NoteService noteService) {
+      NoteService noteService,
+      AuthorizationService authorizationService) {
     this.currentUser = currentUser;
+    this.authorizationService = authorizationService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
     this.noteConstructionService =
@@ -47,7 +51,7 @@ class NoteCreationController {
       @PathVariable(name = "parentNote") @Schema(type = "integer") Note parentNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    currentUser.assertAuthorization(parentNote);
+    authorizationService.assertAuthorization(currentUser.getEntity(), parentNote);
     return noteConstructionService.createNoteWithWikidataService(
         parentNote,
         noteCreation,
@@ -61,7 +65,7 @@ class NoteCreationController {
       @PathVariable(name = "referenceNote") @Schema(type = "integer") Note referenceNote,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    currentUser.assertAuthorization(referenceNote);
+    authorizationService.assertAuthorization(currentUser.getEntity(), referenceNote);
     if (referenceNote.getParent() == null) {
       throw new UnexpectedNoAccessRightException();
     }

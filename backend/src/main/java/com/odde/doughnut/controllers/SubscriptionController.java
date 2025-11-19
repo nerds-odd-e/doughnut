@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -17,10 +18,15 @@ import org.springframework.web.bind.annotation.*;
 class SubscriptionController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
+  private final AuthorizationService authorizationService;
 
-  public SubscriptionController(ModelFactoryService modelFactoryService, UserModel currentUser) {
+  public SubscriptionController(
+      ModelFactoryService modelFactoryService,
+      UserModel currentUser,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
+    this.authorizationService = authorizationService;
   }
 
   @PostMapping("/notebooks/{notebook}/subscribe")
@@ -29,7 +35,7 @@ class SubscriptionController {
       @PathVariable(name = "notebook") @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(notebook);
+    authorizationService.assertReadAuthorization(currentUser.getEntity(), notebook);
     Subscription subscription = new Subscription();
     subscription.setNotebook(notebook);
     subscription.setFromDTO(subscriptionDTO);
@@ -44,7 +50,8 @@ class SubscriptionController {
       @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription,
       @Valid @RequestBody SubscriptionDTO subscriptionDTO)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertReadAuthorization(subscription.getNotebook());
+    authorizationService.assertReadAuthorization(
+        currentUser.getEntity(), subscription.getNotebook());
     subscription.setFromDTO(subscriptionDTO);
     modelFactoryService.save(subscription);
     return subscription;
@@ -55,7 +62,7 @@ class SubscriptionController {
   public List<Integer> destroySubscription(
       @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(subscription);
+    authorizationService.assertAuthorization(currentUser.getEntity(), subscription);
     modelFactoryService.remove(subscription);
     return List.of(1);
   }

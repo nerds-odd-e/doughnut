@@ -24,14 +24,17 @@ class UserController {
   private final ModelFactoryService modelFactoryService;
   private final UserModel currentUser;
   private final TestabilitySettings testabilitySettings;
+  private final AuthorizationService authorizationService;
 
   public UserController(
       ModelFactoryService modelFactoryService,
       UserModel currentUser,
-      TestabilitySettings testabilitySettings) {
+      TestabilitySettings testabilitySettings,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
     this.testabilitySettings = testabilitySettings;
+    this.authorizationService = authorizationService;
   }
 
   @PostMapping("")
@@ -53,7 +56,7 @@ class UserController {
   public User updateUser(
       @PathVariable @Schema(type = "integer") User user, @Valid @RequestBody UserDTO updates)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(user);
+    authorizationService.assertAuthorization(currentUser.getEntity(), user);
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
@@ -64,7 +67,7 @@ class UserController {
   @PostMapping("/generate-token")
   @Transactional
   public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     User user = currentUser.getEntity();
     String uuid = UUID.randomUUID().toString();
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
@@ -74,14 +77,14 @@ class UserController {
   @GetMapping("/get-tokens")
   @Transactional
   public List<UserToken> getTokens() {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     User user = currentUser.getEntity();
     return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
 
   @DeleteMapping("/token/{tokenId}")
   public void deleteToken(@PathVariable @Schema(type = "integer") Integer tokenId) {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     User user = currentUser.getEntity();
 
     Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(tokenId);

@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -36,6 +37,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class NoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -57,7 +59,8 @@ class NoteControllerTests {
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,
-            noteService);
+            noteService,
+            authorizationService);
   }
 
   @Nested
@@ -294,7 +297,8 @@ class NoteControllerTests {
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
       SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController = new SearchController(userModel, noteSearchService);
+      SearchController searchController =
+          new SearchController(userModel, noteSearchService, authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
     }
@@ -303,7 +307,8 @@ class NoteControllerTests {
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController = new SearchController(userModel, noteSearchService);
+      SearchController searchController =
+          new SearchController(userModel, noteSearchService, authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> searchController.searchForLinkTargetWithin(note, searchTerm));

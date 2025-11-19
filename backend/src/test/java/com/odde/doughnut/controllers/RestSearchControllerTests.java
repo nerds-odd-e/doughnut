@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class SearchControllerTests {
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   @Autowired NoteSearchService noteSearchService;
 
   private UserModel userModel;
@@ -32,7 +34,7 @@ class SearchControllerTests {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new SearchController(userModel, noteSearchService);
+    controller = new SearchController(userModel, noteSearchService, authorizationService);
   }
 
   @Nested
@@ -111,7 +113,7 @@ class SearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new SearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -181,7 +183,7 @@ class SearchControllerTests {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller = new SearchController(userModel, noteSearchService);
+      controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");

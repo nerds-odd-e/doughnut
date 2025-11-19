@@ -94,7 +94,7 @@ public class ModelFactoryService {
   }
 
   public UserModel toUserModel(User user) {
-    return new UserModel(user, this, authorizationService);
+    return new UserModel(user, this);
   }
 
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {

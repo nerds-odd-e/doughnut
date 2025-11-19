@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CertificateControllerTests {
   public static final int oneYearInHours = 8760;
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   private UserModel currentUser;
   private CertificateController controller;
   Timestamp currentTime;
@@ -33,7 +35,8 @@ public class CertificateControllerTests {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = makeMe.aUser().toModelPlease();
-    controller = new CertificateController(currentUser, makeMe.modelFactoryService);
+    controller =
+        new CertificateController(currentUser, makeMe.modelFactoryService, authorizationService);
   }
 
   @Nested

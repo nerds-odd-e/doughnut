@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -31,6 +32,7 @@ import org.springframework.validation.BindException;
 @Transactional
 class LinkControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
   @Autowired NoteMotionService noteMotionService;
@@ -43,7 +45,11 @@ class LinkControllerTests {
 
   LinkController controller() {
     return new LinkController(
-        modelFactoryService, new TestabilitySettings(), userModel, noteMotionService);
+        modelFactoryService,
+        new TestabilitySettings(),
+        userModel,
+        noteMotionService,
+        authorizationService);
   }
 
   @Nested

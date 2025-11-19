@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikidataService;
@@ -37,6 +38,7 @@ public class McpNoteCreationController {
   private final NoteConstructionService noteConstructionService;
   private final NoteSearchService noteSearchService;
   private final NoteRepository noteRepository;
+  private final AuthorizationService authorizationService;
 
   @Autowired
   public McpNoteCreationController(
@@ -46,8 +48,10 @@ public class McpNoteCreationController {
       TestabilitySettings testabilitySettings,
       NoteSearchService noteSearchService,
       NoteRepository noteRepository,
-      NoteService noteService) {
+      NoteService noteService,
+      AuthorizationService authorizationService) {
     this.currentUser = currentUser;
+    this.authorizationService = authorizationService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
     this.noteConstructionService =
@@ -64,7 +68,7 @@ public class McpNoteCreationController {
   @Transactional
   public NoteCreationResult createNoteViaMcp(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
 
     var parentNoteObj = FindParentNote(currentUser.getEntity(), noteCreation);
 
@@ -72,7 +76,7 @@ public class McpNoteCreationController {
       throw new UnexpectedNoAccessRightException();
     }
 
-    currentUser.assertAuthorization(parentNoteObj);
+    authorizationService.assertAuthorization(currentUser.getEntity(), parentNoteObj);
 
     return noteConstructionService.createNoteWithWikidataService(
         parentNoteObj,

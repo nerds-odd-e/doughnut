@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
@@ -27,6 +28,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class UserControllerTest {
   @Autowired MakeMe makeMe;
+  @Autowired AuthorizationService authorizationService;
   UserModel userModel;
   UserController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -34,7 +36,9 @@ class UserControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new UserController(makeMe.modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new UserController(
+            makeMe.modelFactoryService, userModel, testabilitySettings, authorizationService);
   }
 
   @Test
@@ -120,7 +124,9 @@ class UserControllerTest {
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken2);
 
-    controller = new UserController(makeMe.modelFactoryService, userModel, testabilitySettings);
+    controller =
+        new UserController(
+            makeMe.modelFactoryService, userModel, testabilitySettings, authorizationService);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }

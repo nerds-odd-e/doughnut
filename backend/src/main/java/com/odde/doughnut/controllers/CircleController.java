@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,29 +33,32 @@ class CircleController {
   private final TestabilitySettings testabilitySettings;
 
   private UserModel currentUser;
+  private final AuthorizationService authorizationService;
 
   public CircleController(
       ModelFactoryService modelFactoryService,
       CircleService circleService,
       TestabilitySettings testabilitySettings,
-      UserModel currentUser) {
+      UserModel currentUser,
+      AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.circleService = circleService;
     this.testabilitySettings = testabilitySettings;
     this.currentUser = currentUser;
+    this.authorizationService = authorizationService;
   }
 
   @GetMapping("/{circle}")
   public CircleForUserView showCircle(
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertAuthorization(circle);
+    authorizationService.assertAuthorization(currentUser.getEntity(), circle);
     return circle.jsonCircleForUserView();
   }
 
   @GetMapping("")
   public List<Circle> index() {
-    currentUser.assertLoggedIn();
+    authorizationService.assertLoggedIn(currentUser.getEntity());
     return currentUser.getEntity().getCircles();
   }
 
@@ -95,8 +99,8 @@ class CircleController {
       @PathVariable @Schema(type = "integer") Circle circle,
       @Valid @RequestBody NoteCreationDTO noteCreation)
       throws UnexpectedNoAccessRightException {
-    currentUser.assertLoggedIn();
-    currentUser.assertAuthorization(circle);
+    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertAuthorization(currentUser.getEntity(), circle);
     Note note =
         circle
             .getOwnership()
