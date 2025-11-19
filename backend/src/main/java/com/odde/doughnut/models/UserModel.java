@@ -54,7 +54,7 @@ public class UserModel {
 
   public List<MemoryTracker> getRecentMemoryTrackers(Timestamp since) {
     return modelFactoryService.memoryTrackerRepository.findAllByUserAndAssimilatedAtGreaterThan(
-        entity.getId(), since);
+        entity, since);
   }
 
   public Stream<MemoryTracker> getMemoryTrackerNeedToRepeat(

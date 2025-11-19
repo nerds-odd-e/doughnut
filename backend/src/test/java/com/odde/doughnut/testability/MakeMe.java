@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class MakeMe extends MakeMeWithoutDB {
   @Autowired public ModelFactoryService modelFactoryService;
   @Autowired public UserService userService;
-  @Autowired public AuthorizationService authorizationService;
 
   private MakeMe() {}
 

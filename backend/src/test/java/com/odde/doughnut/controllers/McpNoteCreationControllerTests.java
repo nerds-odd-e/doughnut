@@ -63,9 +63,7 @@ class McpNoteCreationControllerTests {
     controller =
         new McpNoteCreationController(
             modelFactoryService,
-            userModel.getEntity(),
-            makeMe.userService,
-            makeMe.authorizationService,
+            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteSearchService,
@@ -86,9 +84,7 @@ class McpNoteCreationControllerTests {
       var controllerWithoutUser =
           new McpNoteCreationController(
               modelFactoryService,
-              null,
-              makeMe.userService,
-              makeMe.authorizationService,
+              modelFactoryService.toUserModel(null),
               httpClientAdapter,
               testabilitySettings,
               noteSearchService,

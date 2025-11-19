@@ -47,9 +47,7 @@ class NoteControllerMotionTests {
     controller =
         new NoteController(
             modelFactoryService,
-            userModel.getEntity(),
-            makeMe.userService,
-            makeMe.authorizationService,
+            userModel,
             httpClientAdapter,
             testabilitySettings,
             noteMotionService,

@@ -7,11 +7,10 @@ import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
@@ -26,7 +25,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.*;
@@ -39,9 +37,7 @@ import org.springframework.web.context.annotation.SessionScope;
 class NoteController {
 
   private final ModelFactoryService modelFactoryService;
-  private final User currentUser;
-  private final UserService userService;
-  private final AuthorizationService authorizationService;
+  private final UserModel currentUser;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
   private final NoteMotionService noteMotionService;
@@ -49,17 +45,13 @@ class NoteController {
 
   public NoteController(
       ModelFactoryService modelFactoryService,
-      @Qualifier("currentUserEntity") User currentUser,
-      UserService userService,
-      AuthorizationService authorizationService,
+      UserModel currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       NoteService noteService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUser = currentUser;
-    this.userService = userService;
-    this.authorizationService = authorizationService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.noteService = noteService;
@@ -73,7 +65,7 @@ class NoteController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @RequestBody WikidataAssociationCreation wikidataAssociationCreation)
       throws BindException, UnexpectedNoAccessRightException, IOException, InterruptedException {
-    authorizationService.assertAuthorization(currentUser, note);
+    currentUser.assertAuthorization(note);
     WikidataIdWithApi wikidataIdWithApi =
         wikidataService.wrapWikidataIdWithApi(wikidataAssociationCreation.wikidataId);
     try {
@@ -85,14 +77,15 @@ class NoteController {
       throw new BindException(bindingResult);
     }
     modelFactoryService.save(note);
-    return note.toNoteRealm(currentUser);
+    return note.toNoteRealm(currentUser.getEntity());
   }
 
   @GetMapping("/{note}")
   public NoteRealm showNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser, note);
-    return note.toNoteRealm(currentUser);
+    currentUser.assertReadAuthorization(note);
+    User user = currentUser.getEntity();
+    return note.toNoteRealm(user);
   }
 
   @PatchMapping(
@@ -103,10 +96,11 @@ class NoteController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
       throws UnexpectedNoAccessRightException, IOException {
-    authorizationService.assertAuthorization(currentUser, note);
+    currentUser.assertAuthorization(note);
 
+    final User user = currentUser.getEntity();
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, currentUser);
+    note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
     modelFactoryService.save(note);
     return note.getNoteAccessory();
   }
@@ -114,17 +108,17 @@ class NoteController {
   @GetMapping("/{note}/accessory")
   public NoteAccessory showNoteAccessory(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser, note);
+    currentUser.assertReadAuthorization(note);
     return note.getNoteAccessory();
   }
 
   @GetMapping("/{note}/note-info")
   public NoteInfo getNoteInfo(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser, note);
+    currentUser.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
-    noteInfo.setMemoryTrackers(userService.getMemoryTrackersFor(currentUser, note));
-    noteInfo.setNote(note.toNoteRealm(currentUser));
+    noteInfo.setMemoryTrackers(currentUser.getMemoryTrackersFor(note));
+    noteInfo.setNote(note.toNoteRealm(currentUser.getEntity()));
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());
     return noteInfo;
@@ -134,12 +128,12 @@ class NoteController {
   @Transactional
   public List<NoteRealm> deleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser, note);
+    currentUser.assertAuthorization(note);
     noteService.destroy(note, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.entityManager.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
-      return List.of(parentNote.toNoteRealm(currentUser));
+      return List.of(parentNote.toNoteRealm(currentUser.getEntity()));
     }
     return List.of();
   }
@@ -148,11 +142,11 @@ class NoteController {
   @Transactional
   public NoteRealm undoDeleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser, note);
+    currentUser.assertAuthorization(note);
     noteService.restore(note);
     modelFactoryService.entityManager.flush();
 
-    return note.toNoteRealm(currentUser);
+    return note.toNoteRealm(currentUser.getEntity());
   }
 
   @PostMapping(value = "/{note}/review-setting")
@@ -161,7 +155,7 @@ class NoteController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody RecallSetting recallSetting)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser, note);
+    currentUser.assertAuthorization(note);
     BeanUtils.copyProperties(recallSetting, note.getRecallSetting());
     modelFactoryService.save(note);
     note.getLinksAndRefers()
@@ -183,8 +177,8 @@ class NoteController {
       throws UnexpectedNoAccessRightException,
           CyclicLinkDetectedException,
           MovementNotPossibleException {
-    authorizationService.assertAuthorization(currentUser, note);
-    authorizationService.assertAuthorization(currentUser, targetNote);
+    currentUser.assertAuthorization(note);
+    currentUser.assertAuthorization(targetNote);
 
     boolean asFirstChildBoolean = asFirstChild.compareToIgnoreCase("asFirstChild") == 0;
     noteMotionService.validate(note, targetNote, asFirstChildBoolean);
@@ -193,15 +187,18 @@ class NoteController {
 
     return Stream.of(parentBefore, note.getParent())
         .distinct()
-        .map(parent -> parent.toNoteRealm(currentUser))
+        .map(parent -> parent.toNoteRealm(currentUser.getEntity()))
         .toList();
   }
 
   @GetMapping("/recent")
   public List<NoteRealm> getRecentNotes() throws UnexpectedNoAccessRightException {
-    userService.assertLoggedIn(currentUser);
-    return modelFactoryService.noteRepository.findRecentNotesByUser(currentUser.getId()).stream()
-        .map(note -> note.toNoteRealm(currentUser))
+    currentUser.assertLoggedIn();
+    return modelFactoryService
+        .noteRepository
+        .findRecentNotesByUser(currentUser.getEntity().getId())
+        .stream()
+        .map(note -> note.toNoteRealm(currentUser.getEntity()))
         .toList();
   }
 
@@ -209,7 +206,7 @@ class NoteController {
   public GraphRAGResult getGraph(
       @PathVariable("note") @Schema(type = "integer") Note note, @RequestParam() int tokenLimit)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser, note);
+    currentUser.assertReadAuthorization(note);
 
     GraphRAGService graphRAGService =
         new GraphRAGService(new CharacterBasedTokenCountingStrategy());
@@ -219,7 +216,7 @@ class NoteController {
   @GetMapping("/{note}/descendants")
   public GraphRAGResult getDescendants(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(currentUser, note);
+    currentUser.assertReadAuthorization(note);
     FocusNote focus = FocusNote.fromNote(note);
     List<BareNote> descendants =
         note.getAllDescendants().map(BareNote::fromNoteWithoutTruncate).toList();

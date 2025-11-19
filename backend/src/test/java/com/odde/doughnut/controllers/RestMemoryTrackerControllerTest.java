@@ -44,13 +44,7 @@ class MemoryTrackerControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller =
-        new MemoryTrackerController(
-            modelFactoryService,
-            userModel.getEntity(),
-            makeMe.userService,
-            makeMe.authorizationService,
-            testabilitySettings);
+    controller = new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
   }
 
   @Nested
@@ -77,13 +71,7 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller =
-          new MemoryTrackerController(
-              modelFactoryService,
-              null,
-              makeMe.userService,
-              makeMe.authorizationService,
-              testabilitySettings);
+      controller = new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
       assertThrows(
@@ -229,13 +217,7 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller =
-          new MemoryTrackerController(
-              modelFactoryService,
-              null,
-              makeMe.userService,
-              makeMe.authorizationService,
-              testabilitySettings);
+      controller = new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
   }
@@ -266,13 +248,7 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       userModel = makeMe.aNullUserModelPlease();
-      controller =
-          new MemoryTrackerController(
-              modelFactoryService,
-              null,
-              makeMe.userService,
-              makeMe.authorizationService,
-              testabilitySettings);
+      controller = new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
     }
   }
@@ -335,13 +311,7 @@ class MemoryTrackerControllerTest {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
       userModel = makeMe.aNullUserModelPlease();
-      controller =
-          new MemoryTrackerController(
-              modelFactoryService,
-              null,
-              makeMe.userService,
-              makeMe.authorizationService,
-              testabilitySettings);
+      controller = new MemoryTrackerController(modelFactoryService, userModel, testabilitySettings);
       assertThrows(
           ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
     }
