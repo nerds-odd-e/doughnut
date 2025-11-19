@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers.currentUser;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import org.springframework.context.annotation.Bean;
@@ -40,11 +39,11 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   }
 
   @Override
-  public UserModel getUser() {
+  public User getUser() {
     if (user == null && externalId != null) {
       user = userRepository.findByExternalIdentifier(externalId);
     }
-    return modelFactoryService.toUserModel(user);
+    return user;
   }
 
   @Override

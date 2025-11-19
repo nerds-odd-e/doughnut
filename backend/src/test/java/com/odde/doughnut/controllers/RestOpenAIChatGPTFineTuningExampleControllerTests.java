@@ -48,7 +48,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
         new FineTuningDataController(
             modelFactoryService,
             new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-            new CurrentUser(makeMe.anAdmin().toModelPlease()),
+            new CurrentUser(makeMe.anAdmin().please()),
             openAiApi,
             new OtherAiServices(openAiApi),
             authorizationService);
@@ -62,7 +62,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().toModelPlease()),
+              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -117,7 +117,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -160,7 +160,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().toModelPlease()),
+              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -201,7 +201,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().toModelPlease()),
+              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -231,7 +231,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
           new FineTuningDataController(
               modelFactoryService,
               new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
-              new CurrentUser(makeMe.aUser().toModelPlease()),
+              new CurrentUser(makeMe.aUser().please()),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);

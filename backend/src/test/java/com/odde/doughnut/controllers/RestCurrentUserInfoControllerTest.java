@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.controllers.dto.CurrentUserInfo;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -30,27 +30,27 @@ class CurrentUserInfoControllerTest {
 
   @Test
   void shouldReturnUserInfoIncludingRoleForLearner() {
-    UserModel userModel = makeMe.aUser().toModelPlease();
-    String externalId = userModel.getEntity().getExternalIdentifier();
+    User user = makeMe.aUser().please();
+    String externalId = user.getExternalIdentifier();
     when(currentUserFetcher.getExternalIdentifier()).thenReturn(externalId);
-    when(currentUserFetcher.getUser()).thenReturn(userModel);
+    when(currentUserFetcher.getUser()).thenReturn(user);
     CurrentUserInfo currentUserInfo = controller(currentUserFetcher).currentUserInfo();
 
     assertThat(currentUserInfo.externalIdentifier, equalTo(externalId));
-    assertThat(currentUserInfo.user, equalTo(userModel.getEntity()));
+    assertThat(currentUserInfo.user, equalTo(user));
     assertFalse(currentUserInfo.user.isAdmin());
   }
 
   @Test
   void shouldReturnUserInfoIncludingRoleForAdmin() {
-    UserModel userModel = makeMe.anAdmin().toModelPlease();
-    String externalId = userModel.getEntity().getExternalIdentifier();
+    User user = makeMe.anAdmin().please();
+    String externalId = user.getExternalIdentifier();
     when(currentUserFetcher.getExternalIdentifier()).thenReturn(externalId);
-    when(currentUserFetcher.getUser()).thenReturn(userModel);
+    when(currentUserFetcher.getUser()).thenReturn(user);
     CurrentUserInfo currentUserInfo = controller(currentUserFetcher).currentUserInfo();
 
     assertThat(currentUserInfo.externalIdentifier, equalTo(externalId));
-    assertThat(currentUserInfo.user, equalTo(userModel.getEntity()));
+    assertThat(currentUserInfo.user, equalTo(user));
     assertTrue(currentUserInfo.user.isAdmin());
   }
 }

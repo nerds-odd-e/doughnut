@@ -38,7 +38,7 @@ class AssimilationControllerTests {
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     controller =
         new AssimilationController(
             modelFactoryService,
@@ -51,7 +51,7 @@ class AssimilationControllerTests {
   AssimilationController nullUserController() {
     return new AssimilationController(
         modelFactoryService,
-        new CurrentUser(makeMe.aNullUserModelPlease()),
+        new CurrentUser(null),
         subscriptionService,
         testabilitySettings,
         authorizationService);
@@ -61,11 +61,7 @@ class AssimilationControllerTests {
   class Assimilating {
     @Test
     void assimilating() {
-      Note n =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note n = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       assertThat(n.getId(), notNullValue());
       List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -88,11 +84,7 @@ class AssimilationControllerTests {
 
     @Test
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       note.getRecallSetting().setRememberSpelling(true);
       modelFactoryService.noteRepository.save(note);
 
@@ -117,11 +109,7 @@ class AssimilationControllerTests {
     @Test
     void shouldReturnAssimilationCountsForLoggedInUser() {
       // Create a note that needs assimilation
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       assertThat(note.getId(), notNullValue());
 
       AssimilationCountDTO counts = controller.getAssimilationCount("Asia/Shanghai");

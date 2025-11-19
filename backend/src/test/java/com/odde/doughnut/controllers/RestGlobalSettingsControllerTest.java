@@ -38,7 +38,7 @@ class GlobalSettingsControllerTest {
   void Setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
-    currentUser = new CurrentUser(makeMe.anAdmin().toModelPlease());
+    currentUser = new CurrentUser(makeMe.anAdmin().please());
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
         new GlobalSettingsController(
@@ -84,7 +84,7 @@ class GlobalSettingsControllerTest {
       controller =
           new GlobalSettingsController(
               makeMe.modelFactoryService,
-              new CurrentUser(makeMe.aUser().toModelPlease()),
+              new CurrentUser(makeMe.aUser().please()),
               testabilitySettings,
               authorizationService);
       assertThrows(

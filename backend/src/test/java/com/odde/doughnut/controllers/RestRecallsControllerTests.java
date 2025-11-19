@@ -38,7 +38,7 @@ class RecallsControllerTests {
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     controller =
         new RecallsController(
             modelFactoryService, currentUser, testabilitySettings, authorizationService);
@@ -46,10 +46,7 @@ class RecallsControllerTests {
 
   RecallsController nullUserController() {
     return new RecallsController(
-        modelFactoryService,
-        new CurrentUser(makeMe.aNullUserModelPlease()),
-        testabilitySettings,
-        authorizationService);
+        modelFactoryService, new CurrentUser(null), testabilitySettings, authorizationService);
   }
 
   @Nested

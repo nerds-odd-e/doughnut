@@ -32,7 +32,7 @@ public class AssessmentServiceTests {
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     service = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
@@ -56,10 +56,7 @@ public class AssessmentServiceTests {
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
       topNote =
-          makeMe
-              .aHeadNote("OnlineAssessment")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }
@@ -90,10 +87,7 @@ public class AssessmentServiceTests {
     @BeforeEach
     void setup() {
       topNote =
-          makeMe
-              .aHeadNote("OnlineAssessment")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
     }

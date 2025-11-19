@@ -41,7 +41,7 @@ class FailureReportControllerTest {
 
   @Test
   void whenNonAdminAccessTheFailureReport() {
-    CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().toModelPlease());
+    CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().please());
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
@@ -55,7 +55,7 @@ class FailureReportControllerTest {
 
     @BeforeEach
     void setup() {
-      admin = new CurrentUser(makeMe.anAdmin().toModelPlease());
+      admin = new CurrentUser(makeMe.anAdmin().please());
 
       // Clear all existing failure reports first to ensure test independence
       makeMe.modelFactoryService.failureReportRepository.deleteAll();
@@ -93,7 +93,7 @@ class FailureReportControllerTest {
 
     @Test
     void nonAdminCannotDeleteFailureReports() {
-      CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().toModelPlease());
+      CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().please());
       List<Integer> idsToDelete =
           failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
 

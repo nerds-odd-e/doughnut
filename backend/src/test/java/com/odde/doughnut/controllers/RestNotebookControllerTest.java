@@ -73,7 +73,7 @@ class NotebookControllerTest {
                               n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
             });
 
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     topNote =
         makeMe
             .aNote()
@@ -116,7 +116,7 @@ class NotebookControllerTest {
   class showNoteTest {
     @Test
     void whenNotLogin() {
-      userModel = new CurrentUser(modelFactoryService.toUserModel(null));
+      userModel = new CurrentUser(null);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -131,7 +131,7 @@ class NotebookControllerTest {
     @Test
     void whenLoggedIn() {
       User user = new User();
-      userModel = new CurrentUser(modelFactoryService.toUserModel(user));
+      userModel = new CurrentUser(user);
       List<Notebook> notebooks = userModel.getUser().getOwnership().getNotebooks();
       controller =
           new NotebookController(
@@ -212,7 +212,7 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              new CurrentUser(modelFactoryService.toUserModel(anotherUser)),
+              new CurrentUser(anotherUser),
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -249,7 +249,7 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+      userModel = new CurrentUser(makeMe.aUser().please());
       notebook =
           makeMe
               .aNotebook()
@@ -415,7 +415,7 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              new CurrentUser(modelFactoryService.toUserModel(anotherUser)),
+              new CurrentUser(anotherUser),
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -502,7 +502,7 @@ class NotebookControllerTest {
     @Test
     void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
       // Arrange
-      CurrentUser otherUserModel = new CurrentUser(makeMe.aUser().toModelPlease());
+      CurrentUser otherUserModel = new CurrentUser(makeMe.aUser().please());
       Notebook otherNotebook =
           makeMe
               .aNotebook()
@@ -518,7 +518,7 @@ class NotebookControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       // Arrange
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller =
           new NotebookController(
               modelFactoryService,

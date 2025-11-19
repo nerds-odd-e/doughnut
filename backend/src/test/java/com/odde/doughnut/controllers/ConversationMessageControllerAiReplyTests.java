@@ -59,20 +59,11 @@ public class ConversationMessageControllerAiReplyTests {
 
   @BeforeEach
   void setUp() {
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
-    note =
-        makeMe
-            .aNote()
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-            .please();
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
 
     setupServices();
-    conversation =
-        makeMe
-            .aConversation()
-            .forANote(note)
-            .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-            .please();
+    conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
   }
 
   private void setupServices() {
@@ -203,18 +194,14 @@ public class ConversationMessageControllerAiReplyTests {
 
     @BeforeEach
     void setup() {
-      questionNote =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      questionNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.approvedQuestionOf(questionNote).please();
       recallConversation =
           makeMe
               .aConversation()
               .forARecallPrompt(recallPrompt)
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .from(currentUser.getUser())
               .please();
 
       OpenAIChatCompletionStreamMocker chatMocker = new OpenAIChatCompletionStreamMocker(openAiApi);

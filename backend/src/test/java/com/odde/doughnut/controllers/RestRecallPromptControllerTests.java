@@ -53,7 +53,7 @@ class RecallPromptControllerTests {
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     testabilitySettings.setRandomization(new Randomization(first, 1));
 
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
@@ -79,7 +79,7 @@ class RecallPromptControllerTests {
     return new RecallPromptController(
         openAiApi,
         modelFactoryService,
-        new CurrentUser(makeMe.aNullUserModelPlease()),
+        new CurrentUser(null),
         testabilitySettings,
         getTestObjectMapper(),
         authorizationService);
@@ -97,7 +97,7 @@ class RecallPromptControllerTests {
       memoryTracker =
           makeMe
               .aMemoryTrackerFor(answerNote)
-              .by(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .by(currentUser.getUser())
               .forgettingCurveAndNextRecallAt(200)
               .please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
@@ -198,7 +198,7 @@ class RecallPromptControllerTests {
                 new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    new CurrentUser(makeMe.aNullUserModelPlease()),
+                    new CurrentUser(null),
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService);
@@ -284,7 +284,7 @@ class RecallPromptControllerTests {
                 new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
-                    new CurrentUser(makeMe.aNullUserModelPlease()),
+                    new CurrentUser(null),
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService);
@@ -344,11 +344,7 @@ class RecallPromptControllerTests {
       // another note is needed, otherwise the note will be the only note in the notebook, and the
       // question cannot be generated.
       makeMe.aNote().under(note).please();
-      MemoryTracker rp =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .by(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       RecallPrompt recallPrompt = controller.askAQuestion(rp);
 
@@ -361,10 +357,7 @@ class RecallPromptControllerTests {
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please(); // Add another note to the notebook
       MemoryTracker memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .by(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       // Create an existing unanswered recall prompt for the note
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
@@ -397,10 +390,7 @@ class RecallPromptControllerTests {
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please(); // Add another note to the notebook
       MemoryTracker memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .by(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       // Create an existing recall prompt with an answer
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
@@ -437,10 +427,7 @@ class RecallPromptControllerTests {
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please(); // Add another note to the notebook
       MemoryTracker memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(note)
-              .by(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
       // Create an existing unanswered recall prompt with a contested question
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
@@ -486,11 +473,7 @@ class RecallPromptControllerTests {
 
     @Test
     void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
-      Note note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       RecallPrompt recallPrompt = recallPromptBuilder.approvedQuestionOf(note).please();
       makeMe.theRecallPrompt(recallPrompt).answerChoiceIndex(1).please();

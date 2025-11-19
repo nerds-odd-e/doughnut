@@ -37,8 +37,8 @@ class BazaarControllerTest {
 
   @BeforeEach
   void setup() {
-    adminUser = new CurrentUser(makeMe.anAdmin().toModelPlease());
-    notebookOwner = new CurrentUser(makeMe.aUser().toModelPlease());
+    adminUser = new CurrentUser(makeMe.anAdmin().please());
+    notebookOwner = new CurrentUser(makeMe.aUser().please());
     topNote =
         makeMe
             .aNote()
@@ -55,7 +55,7 @@ class BazaarControllerTest {
     void otherPeopleCannot() {
       controller =
           new BazaarController(
-              bazaarService, new CurrentUser(makeMe.aUser().toModelPlease()), authorizationService);
+              bazaarService, new CurrentUser(makeMe.aUser().please()), authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));

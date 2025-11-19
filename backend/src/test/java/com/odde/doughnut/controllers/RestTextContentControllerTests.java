@@ -38,12 +38,8 @@ class TextContentControllerTests {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
-    note =
-        makeMe
-            .aNote("new")
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-            .please();
+    userModel = new CurrentUser(makeMe.aUser().please());
+    note = makeMe.aNote("new").creatorAndOwner(userModel.getUser()).please();
     controller =
         new TextContentController(
             modelFactoryService, userModel, testabilitySettings, authorizationService);

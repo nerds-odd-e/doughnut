@@ -40,7 +40,7 @@ class NoteControllerRecentNotesTests {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new NoteController(
             modelFactoryService,
@@ -62,13 +62,13 @@ class NoteControllerRecentNotesTests {
     Note note1 =
         makeMe
             .aNote()
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .creatorAndOwner(userModel.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 0).please())
             .please();
     Note note2 =
         makeMe
             .aNote()
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
+            .creatorAndOwner(userModel.getUser())
             .createdAt(makeMe.aTimestamp().of(0, 1).please())
             .please();
 
@@ -80,7 +80,7 @@ class NoteControllerRecentNotesTests {
 
   @Test
   void shouldNotAllowAccessWhenNotLoggedIn() {
-    userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+    userModel = new CurrentUser(null);
     controller =
         new NoteController(
             modelFactoryService,

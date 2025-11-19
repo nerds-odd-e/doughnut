@@ -39,7 +39,7 @@ public class AssessmentControllerTests {
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     controller =
         new AssessmentController(
             makeMe.modelFactoryService, testabilitySettings, currentUser, authorizationService);
@@ -65,7 +65,7 @@ public class AssessmentControllerTests {
           new AssessmentController(
               makeMe.modelFactoryService,
               testabilitySettings,
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
@@ -117,7 +117,7 @@ public class AssessmentControllerTests {
           new AssessmentController(
               makeMe.modelFactoryService,
               testabilitySettings,
-              new CurrentUser(makeMe.aUser().toModelPlease()),
+              new CurrentUser(makeMe.aUser().please()),
               authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,

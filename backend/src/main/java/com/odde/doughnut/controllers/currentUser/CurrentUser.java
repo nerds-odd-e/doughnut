@@ -1,16 +1,15 @@
 package com.odde.doughnut.controllers.currentUser;
 
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.UserModel;
 
 public class CurrentUser {
-  private final UserModel userModel;
+  private final User user;
 
-  public CurrentUser(UserModel userModel) {
-    this.userModel = userModel;
+  public CurrentUser(User user) {
+    this.user = user;
   }
 
   public User getUser() {
-    return userModel.getEntity();
+    return user;
   }
 }

@@ -58,7 +58,7 @@ class AiControllerTest {
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
             openAiApi, globalSettingsService, getTestObjectMapper());
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     note = makeMe.aNote().please();
     controller =
         new AiController(
@@ -93,7 +93,7 @@ class AiControllerTest {
               new AiController(
                       notebookAssistantForNoteServiceFactory,
                       new OtherAiServices(openAiApi),
-                      new CurrentUser(makeMe.aNullUserModelPlease()),
+                      new CurrentUser(null),
                       authorizationService)
                   .generateImage("create an image"));
     }
@@ -198,7 +198,7 @@ class AiControllerTest {
           new AiController(
               notebookAssistantForNoteServiceFactory,
               new OtherAiServices(openAiApi),
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               authorizationService);
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));

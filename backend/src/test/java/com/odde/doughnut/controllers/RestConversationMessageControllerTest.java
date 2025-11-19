@@ -53,7 +53,7 @@ class ConversationMessageControllerTest {
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
@@ -157,7 +157,7 @@ class ConversationMessageControllerTest {
               openAiApiHandler, globalSettingsService, objectMapper);
       controller =
           new ConversationMessageController(
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               conversationService,
               chatCompletionConversationService,
               authorizationService);
@@ -502,7 +502,7 @@ class ConversationMessageControllerTest {
               openAiApiHandler, globalSettingsService, objectMapper);
       controller =
           new ConversationMessageController(
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               conversationService,
               chatCompletionConversationService,
               authorizationService);

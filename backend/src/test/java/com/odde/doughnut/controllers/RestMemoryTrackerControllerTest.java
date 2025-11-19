@@ -45,7 +45,7 @@ class MemoryTrackerControllerTest {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new MemoryTrackerController(
             modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -73,7 +73,7 @@ class MemoryTrackerControllerTest {
           makeMe
               .aMemoryTrackerBy(
                   modelFactoryService.toUserModel(
-                      new CurrentUser(makeMe.aUser().toModelPlease()).getUser()))
+                      new CurrentUser(makeMe.aUser().please()).getUser()))
               .please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -82,7 +82,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -90,7 +90,7 @@ class MemoryTrackerControllerTest {
           makeMe
               .aMemoryTrackerBy(
                   modelFactoryService.toUserModel(
-                      new CurrentUser(makeMe.aUser().toModelPlease()).getUser()))
+                      new CurrentUser(makeMe.aUser().please()).getUser()))
               .please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
@@ -126,7 +126,7 @@ class MemoryTrackerControllerTest {
             makeMe
                 .aMemoryTrackerBy(
                     modelFactoryService.toUserModel(
-                        new CurrentUser(makeMe.aUser().toModelPlease()).getUser()))
+                        new CurrentUser(makeMe.aUser().please()).getUser()))
                 .please();
         assertThrows(
             UnexpectedNoAccessRightException.class, () -> controller.showMemoryTracker(rp));
@@ -146,7 +146,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(makeMe.aNote().please()).inMemoryPlease();
       SelfEvaluation selfEvaluation =
@@ -249,7 +249,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldNotReturnMemoryTrackersFromOtherUsers() {
-      CurrentUser otherUser = new CurrentUser(makeMe.aUser().toModelPlease());
+      CurrentUser otherUser = new CurrentUser(makeMe.aUser().please());
       makeMe.aMemoryTrackerBy(modelFactoryService.toUserModel(otherUser.getUser())).please();
 
       List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
@@ -259,7 +259,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -300,7 +300,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -365,7 +365,7 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);

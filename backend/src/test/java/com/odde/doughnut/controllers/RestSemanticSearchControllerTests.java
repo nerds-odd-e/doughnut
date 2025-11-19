@@ -43,7 +43,7 @@ class RestSemanticSearchControllerTests {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller = new SearchController(userModel, noteSearchService, authorizationService);
     // Default: return empty embedding data so semantic search falls back to literal search
     EmbeddingResult empty = new EmbeddingResult();
@@ -69,7 +69,7 @@ class RestSemanticSearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
@@ -86,11 +86,7 @@ class RestSemanticSearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote =
-          makeMe
-              .aNote("Reference Note")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-              .please();
+      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUser()).please();
     }
 
     @Test
@@ -110,7 +106,7 @@ class RestSemanticSearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
+      userModel = new CurrentUser(null);
       controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
@@ -151,11 +147,7 @@ class RestSemanticSearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote =
-          makeMe
-              .aNote("Reference Note")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-              .please();
+      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUser()).please();
     }
 
     @Test

@@ -45,7 +45,7 @@ class NoteControllerMotionTests {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new NoteController(
             modelFactoryService,
@@ -55,11 +55,7 @@ class NoteControllerMotionTests {
             noteMotionService,
             noteService,
             authorizationService);
-    subject =
-        makeMe
-            .aNote("subject")
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-            .please();
+    subject = makeMe.aNote("subject").creatorAndOwner(userModel.getUser()).please();
   }
 
   @Nested
@@ -68,11 +64,7 @@ class NoteControllerMotionTests {
 
     @BeforeEach
     void setup() {
-      parent =
-          makeMe
-              .aNote("parent")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-              .please();
+      parent = makeMe.aNote("parent").creatorAndOwner(userModel.getUser()).please();
       subject = makeMe.theNote(subject).under(parent).please();
     }
 

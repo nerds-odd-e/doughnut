@@ -34,7 +34,7 @@ public class CertificateControllerTests {
   void setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     controller =
         new CertificateController(currentUser, makeMe.modelFactoryService, authorizationService);
   }
@@ -49,7 +49,7 @@ public class CertificateControllerTests {
       notebook =
           makeMe
               .aNote("Just say 'Yes'")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .creatorAndOwner(currentUser.getUser())
               .please()
               .getNotebook();
       expectedCertificate =

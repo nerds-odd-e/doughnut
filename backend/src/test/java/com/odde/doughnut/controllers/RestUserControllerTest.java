@@ -35,7 +35,7 @@ class UserControllerTest {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new UserController(
             makeMe.modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -128,7 +128,7 @@ class UserControllerTest {
 
   @Test
   void deleteTokenTestForAnotherUser() {
-    CurrentUser userModel2 = new CurrentUser(makeMe.aUser().toModelPlease());
+    CurrentUser userModel2 = new CurrentUser(makeMe.aUser().please());
     UserToken userToken2 =
         makeMe
             .aUserToken()

@@ -34,7 +34,7 @@ class NotebookCertificateApprovalControllerTest {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new NotebookCertificateApprovalController(
             modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -110,7 +110,7 @@ class NotebookCertificateApprovalControllerTest {
 
     @BeforeEach
     void setup() {
-      CurrentUser userModel = new CurrentUser(makeMe.anAdmin().toModelPlease());
+      CurrentUser userModel = new CurrentUser(makeMe.anAdmin().please());
       notebook =
           makeMe
               .aNotebook()

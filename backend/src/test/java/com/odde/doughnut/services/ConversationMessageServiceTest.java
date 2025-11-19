@@ -44,7 +44,7 @@ class ConversationMessageServiceTest {
             openAiApiHandler, globalSettingsService, objectMapper);
     conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 

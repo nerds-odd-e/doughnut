@@ -48,7 +48,7 @@ class NoteCreationControllerTests {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new NoteCreationController(
             modelFactoryService,
@@ -89,11 +89,7 @@ class NoteCreationControllerTests {
 
     @BeforeEach
     void setup() {
-      parent =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-              .please();
+      parent = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
       noteCreation.setNewTitle("new title");
     }
 
@@ -312,11 +308,7 @@ class NoteCreationControllerTests {
 
     @BeforeEach
     void setup() {
-      Note parent =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-              .please();
+      Note parent = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
       referenceNote = makeMe.aNote().under(parent).please();
       makeMe.aNote("next sibling").under(parent).please();
       noteCreation.setNewTitle("new note");
@@ -332,11 +324,7 @@ class NoteCreationControllerTests {
 
     @Test
     void shouldNotAllowCreatingSiblingForRootNote() {
-      Note rootNote =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(userModel.getUser()))
-              .please();
+      Note rootNote = makeMe.aNote().creatorAndOwner(userModel.getUser()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.createNoteAfter(rootNote, noteCreation));

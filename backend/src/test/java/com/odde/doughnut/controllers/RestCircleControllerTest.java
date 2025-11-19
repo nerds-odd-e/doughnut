@@ -41,7 +41,7 @@ class CircleControllerTest {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     controller =
         new CircleController(
             modelFactoryService,
@@ -60,7 +60,7 @@ class CircleControllerTest {
               modelFactoryService,
               circleService,
               testabilitySettings,
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               authorizationService);
       assertThrows(
           ResponseStatusException.class,
@@ -87,7 +87,7 @@ class CircleControllerTest {
   class ShowCircle {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
-      CurrentUser user = new CurrentUser(makeMe.aUser().toModelPlease());
+      CurrentUser user = new CurrentUser(makeMe.aUser().please());
       controller =
           new CircleController(
               modelFactoryService, circleService, testabilitySettings, user, authorizationService);
@@ -117,7 +117,7 @@ class CircleControllerTest {
               modelFactoryService,
               circleService,
               testabilitySettings,
-              new CurrentUser(makeMe.aNullUserModelPlease()),
+              new CurrentUser(null),
               authorizationService);
       assertThrows(
           ResponseStatusException.class,

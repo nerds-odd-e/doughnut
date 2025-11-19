@@ -37,7 +37,7 @@ class SubscriptionControllerTest {
 
   @BeforeEach
   void setup() {
-    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    userModel = new CurrentUser(makeMe.aUser().please());
     topNote =
         makeMe
             .aNote()
