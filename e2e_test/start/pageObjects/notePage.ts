@@ -357,10 +357,9 @@ export const assumeNotePage = (noteTopology?: string) => {
           cy.findByText(/Suggested Title:/)
             .should('be.visible')
             .should('contain.text', wikidataTitle)
-          // Select "Replace title" option by default
+          // Select "Replace title" option - this will immediately save and close the dialog
           cy.findByText('Replace title').click()
-          // Click Save button to confirm
-          cy.findByRole('button', { name: 'Save' }).click()
+          // Dialog should close automatically after selecting Replace title
           return this.hasAssociation()
         },
         hasAssociation() {

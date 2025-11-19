@@ -44,7 +44,7 @@ Feature: associate wikidata ID to note
   Scenario: Associate note to wikipedia via wikidata using real service
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different label "Count von Count"
-    And the Wiki association of note "TDD" should link to "https://en.wikipedia.org/wiki/Count_von_Count"
+    And the Wiki association of note "Count von Count" should link to "https://en.wikipedia.org/wiki/Count_von_Count"
 
 
   @usingMockedWikidataService @mockBrowserTime
