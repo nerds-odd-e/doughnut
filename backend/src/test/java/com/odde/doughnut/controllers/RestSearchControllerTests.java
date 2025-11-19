@@ -10,8 +10,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,8 @@ class SearchControllerTests {
     @Test
     void shouldReturnMatchingNotes() throws UnexpectedNoAccessRightException {
       Note note1 = makeMe.aNote("Java Programming").creatorAndOwner(currentUser.getUser()).please();
-      Note note2 = makeMe.aNote("JavaScript Basics").creatorAndOwner(currentUser.getUser()).please();
+      Note note2 =
+          makeMe.aNote("JavaScript Basics").creatorAndOwner(currentUser.getUser()).please();
       makeMe
           .aNote("Python Tutorial")
           .creatorAndOwner(currentUser.getUser())
@@ -135,7 +136,8 @@ class SearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -231,7 +233,8 @@ class SearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test

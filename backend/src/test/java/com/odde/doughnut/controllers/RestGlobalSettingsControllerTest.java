@@ -8,8 +8,8 @@ import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,9 +87,7 @@ class GlobalSettingsControllerTest {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new GlobalSettingsController(
-              makeMe.modelFactoryService,
-              testabilitySettings,
-              authorizationService);
+              makeMe.modelFactoryService, testabilitySettings, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.setCurrentModelVersions(settings));

@@ -46,10 +46,7 @@ class CircleControllerTest {
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new CircleController(
-            modelFactoryService,
-            circleService,
-            testabilitySettings,
-            authorizationService);
+            modelFactoryService, circleService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -60,10 +57,7 @@ class CircleControllerTest {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new CircleController(
-              modelFactoryService,
-              circleService,
-              testabilitySettings,
-              authorizationService);
+              modelFactoryService, circleService, testabilitySettings, authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -119,10 +113,7 @@ class CircleControllerTest {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new CircleController(
-              modelFactoryService,
-              circleService,
-              testabilitySettings,
-              authorizationService);
+              modelFactoryService, circleService, testabilitySettings, authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {

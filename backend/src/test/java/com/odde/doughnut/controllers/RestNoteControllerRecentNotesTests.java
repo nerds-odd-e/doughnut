@@ -12,8 +12,8 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,9 +42,9 @@ class NoteControllerRecentNotesTests {
   @BeforeEach
   void setup() {
     currentUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
 
-      controller =
+    controller =
         new NoteController(
             modelFactoryService,
             httpClientAdapter,
@@ -82,16 +82,7 @@ class NoteControllerRecentNotesTests {
 
   @Test
   void shouldNotAllowAccessWhenNotLoggedIn() {
-    currentUser = new CurrentUser(null);
-    controller =
-        new NoteController(
-            modelFactoryService,
-            httpClientAdapter,
-            testabilitySettings,
-            noteMotionService,
-            noteService,
-            authorizationService);
-
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
     assertThrows(ResponseStatusException.class, () -> controller.getRecentNotes());
   }
 }

@@ -16,8 +16,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -47,10 +47,7 @@ class LinkControllerTests {
 
   LinkController controller() {
     return new LinkController(
-        modelFactoryService,
-        new TestabilitySettings(),
-        noteMotionService,
-        authorizationService);
+        modelFactoryService, new TestabilitySettings(), noteMotionService, authorizationService);
   }
 
   @Nested

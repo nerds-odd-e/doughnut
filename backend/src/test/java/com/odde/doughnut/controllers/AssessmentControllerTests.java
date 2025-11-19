@@ -10,8 +10,8 @@ import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
@@ -67,9 +67,7 @@ public class AssessmentControllerTests {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService,
-              testabilitySettings,
-              authorizationService);
+              makeMe.modelFactoryService, testabilitySettings, authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -120,9 +118,7 @@ public class AssessmentControllerTests {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherUser);
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService,
-              testabilitySettings,
-              authorizationService);
+              makeMe.modelFactoryService, testabilitySettings, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));

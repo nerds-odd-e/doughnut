@@ -9,8 +9,8 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -42,15 +42,13 @@ class RecallsControllerTests {
     currentUser = new CurrentUser(makeMe.aUser().please());
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
-        new RecallsController(
-            modelFactoryService, testabilitySettings, authorizationService);
+        new RecallsController(modelFactoryService, testabilitySettings, authorizationService);
   }
 
   RecallsController nullUserController() {
     CurrentUser nullUser = new CurrentUser(null);
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
-    return new RecallsController(
-        modelFactoryService, testabilitySettings, authorizationService);
+    return new RecallsController(modelFactoryService, testabilitySettings, authorizationService);
   }
 
   @Nested

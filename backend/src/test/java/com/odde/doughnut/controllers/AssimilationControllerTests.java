@@ -11,8 +11,8 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SubscriptionService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,21 +39,12 @@ class AssimilationControllerTests {
 
   @BeforeEach
   void setup() {
+
     currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new AssimilationController(
-            modelFactoryService,
-            subscriptionService,
-            testabilitySettings,
-            authorizationService);
-  }
-
-  AssimilationController nullUserController() {
-    return new AssimilationController(
-            modelFactoryService,
-            subscriptionService,
-        testabilitySettings,
-        authorizationService);
+            modelFactoryService, subscriptionService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -68,8 +59,8 @@ class AssimilationControllerTests {
 
     @Test
     void notLoggedIn() {
-      assertThrows(
-          ResponseStatusException.class, () -> nullUserController().assimilating("Asia/Shanghai"));
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
+      assertThrows(ResponseStatusException.class, () -> controller.assimilating("Asia/Shanghai"));
     }
   }
 
@@ -77,8 +68,9 @@ class AssimilationControllerTests {
   class CreateInitialReviewPoint {
     @Test
     void create() {
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
       InitialInfo info = new InitialInfo();
-      assertThrows(ResponseStatusException.class, () -> nullUserController().assimilate(info));
+      assertThrows(ResponseStatusException.class, () -> controller.assimilate(info));
     }
 
     @Test
@@ -118,9 +110,9 @@ class AssimilationControllerTests {
 
     @Test
     void shouldThrowExceptionWhenUserNotLoggedIn() {
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
       assertThrows(
-          ResponseStatusException.class,
-          () -> nullUserController().getAssimilationCount("Asia/Shanghai"));
+          ResponseStatusException.class, () -> controller.getAssimilationCount("Asia/Shanghai"));
     }
   }
 }

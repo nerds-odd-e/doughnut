@@ -79,9 +79,7 @@ public class ConversationMessageControllerAiReplyTests {
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
-            conversationService,
-            chatCompletionConversationService,
-            authorizationService);
+            conversationService, chatCompletionConversationService, authorizationService);
   }
 
   private ObjectMapper getTestObjectMapper() {

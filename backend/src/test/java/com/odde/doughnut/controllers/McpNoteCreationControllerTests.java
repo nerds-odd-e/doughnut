@@ -17,8 +17,8 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -61,6 +61,7 @@ class McpNoteCreationControllerTests {
   void setup() {
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     CurrentUser currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     noteCreation = new NoteCreationDTO();
     noteCreation.setNewTitle("new note");
     controller =
@@ -84,20 +85,13 @@ class McpNoteCreationControllerTests {
 
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
-      var controllerWithoutUser =
-          new McpNoteCreationController(
-            modelFactoryService,
-            httpClientAdapter,
-              testabilitySettings,
-              noteSearchService,
-              noteRepository,
-              noteService,
-              authorizationService);
+
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class,
               () -> {
-                controllerWithoutUser.createNoteViaMcp(GeneratorMcpNoteAddDTO("Harry Potter"));
+                controller.createNoteViaMcp(GeneratorMcpNoteAddDTO("Harry Potter"));
               });
       assertEquals(HttpStatus.UNAUTHORIZED, exception.getStatusCode());
     }

@@ -17,8 +17,8 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -80,9 +80,9 @@ class RecallPromptControllerTests {
     CurrentUser nullUser = new CurrentUser(null);
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
     return new RecallPromptController(
-            openAiApi,
-            modelFactoryService,
-            testabilitySettings,
+        openAiApi,
+        modelFactoryService,
+        testabilitySettings,
         getTestObjectMapper(),
         authorizationService);
   }

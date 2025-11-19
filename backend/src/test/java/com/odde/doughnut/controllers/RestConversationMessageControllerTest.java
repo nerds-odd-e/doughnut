@@ -65,9 +65,7 @@ class ConversationMessageControllerTest {
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
-            conversationService,
-            chatCompletionConversationService,
-            authorizationService);
+            conversationService, chatCompletionConversationService, authorizationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -160,9 +158,7 @@ class ConversationMessageControllerTest {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new ConversationMessageController(
-              conversationService,
-              chatCompletionConversationService,
-              authorizationService);
+              conversationService, chatCompletionConversationService, authorizationService);
       ResponseStatusException exception =
           assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
@@ -506,9 +502,7 @@ class ConversationMessageControllerTest {
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new ConversationMessageController(
-              conversationService,
-              chatCompletionConversationService,
-              authorizationService);
+              conversationService, chatCompletionConversationService, authorizationService);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));

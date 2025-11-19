@@ -6,8 +6,8 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -37,8 +37,7 @@ public class CertificateControllerTests {
     testabilitySettings.timeTravelTo(currentTime);
     currentUser = new CurrentUser(makeMe.aUser().please());
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
-    controller =
-        new CertificateController(makeMe.modelFactoryService, authorizationService);
+    controller = new CertificateController(makeMe.modelFactoryService, authorizationService);
   }
 
   @Nested

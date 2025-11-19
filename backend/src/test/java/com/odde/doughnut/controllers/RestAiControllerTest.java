@@ -90,13 +90,13 @@ class AiControllerTest {
     void askWithNoteThatCannotAccess() {
       CurrentUser nullUser = new CurrentUser(null);
       AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
-      AiController aiController = new AiController(
-          notebookAssistantForNoteServiceFactory,
-          new OtherAiServices(openAiApi),
-          authorizationService);
+      AiController aiController =
+          new AiController(
+              notebookAssistantForNoteServiceFactory,
+              new OtherAiServices(openAiApi),
+              authorizationService);
       assertThrows(
-          ResponseStatusException.class,
-          () -> aiController.generateImage("create an image"));
+          ResponseStatusException.class, () -> aiController.generateImage("create an image"));
     }
 
     @Test

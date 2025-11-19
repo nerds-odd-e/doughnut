@@ -49,8 +49,7 @@ class MemoryTrackerControllerTest {
     currentUser = new CurrentUser(makeMe.aUser().please());
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
-        new MemoryTrackerController(
-            modelFactoryService, testabilitySettings, authorizationService);
+        new MemoryTrackerController(modelFactoryService, testabilitySettings, authorizationService);
   }
 
   @Nested

@@ -10,8 +10,8 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -36,10 +36,10 @@ class NotebookCertificateApprovalControllerTest {
   @BeforeEach
   void setup() {
     currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new NotebookCertificateApprovalController(
-            modelFactoryService,
-            testabilitySettings, authorizationService);
+            modelFactoryService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -113,6 +113,7 @@ class NotebookCertificateApprovalControllerTest {
     @BeforeEach
     void setup() {
       CurrentUser currentUser = new CurrentUser(makeMe.anAdmin().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       notebook =
           makeMe
               .aNotebook()
@@ -120,8 +121,7 @@ class NotebookCertificateApprovalControllerTest {
               .please();
       controller =
           new NotebookCertificateApprovalController(
-            modelFactoryService,
-            testabilitySettings, authorizationService);
+              modelFactoryService, testabilitySettings, authorizationService);
       approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
       makeMe.refresh(notebook);
     }
