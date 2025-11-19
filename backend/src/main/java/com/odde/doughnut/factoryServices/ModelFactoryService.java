@@ -97,10 +97,6 @@ public class ModelFactoryService {
     return new UserModel(user, this, authorizationService);
   }
 
-  public Authorization toAuthorization(User entity) {
-    return new Authorization(entity, this);
-  }
-
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     if (entity.getId() == null) {
       entityManager.persist(entity);
