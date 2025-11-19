@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.CircleForUserView;
+import com.odde.doughnut.controllers.dto.UserForOtherUserView;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -67,5 +69,16 @@ public class Circle extends EntityIdentifiedByIdOnly {
         .limit(targetStringLength)
         .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
         .toString();
+  }
+
+  public CircleForUserView jsonCircleForUserView() {
+    CircleForUserView circleForUserView = new CircleForUserView();
+    circleForUserView.setId(this.getId());
+    circleForUserView.setName(this.getName());
+    circleForUserView.setInvitationCode(this.getInvitationCode());
+    circleForUserView.setNotebooks(
+        this.getOwnership().jsonNotebooksViewedByUser(this.getOwnership().getNotebooks()));
+    circleForUserView.setMembers(UserForOtherUserView.fromList(this.getMembers()));
+    return circleForUserView;
   }
 }

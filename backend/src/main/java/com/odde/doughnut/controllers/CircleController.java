@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -50,8 +49,7 @@ class CircleController {
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
     currentUser.assertAuthorization(circle);
-    JsonViewer jsonViewer = new JsonViewer();
-    return jsonViewer.jsonCircleForUserView(circle);
+    return circle.jsonCircleForUserView();
   }
 
   @GetMapping("")

@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
@@ -72,5 +73,11 @@ public class Ownership {
     modelFactoryService.save(note.getNotebook());
     modelFactoryService.save(note);
     return note;
+  }
+
+  public NotebooksViewedByUser jsonNotebooksViewedByUser(List<Notebook> allNotebooks) {
+    NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
+    notebooksViewedByUser.notebooks = allNotebooks;
+    return notebooksViewedByUser;
   }
 }

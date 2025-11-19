@@ -7,7 +7,6 @@ import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookIndexingService;
@@ -65,7 +64,7 @@ class NotebookController {
 
     User user = currentUser.getEntity();
     NotebooksViewedByUser notebooksViewedByUser =
-        new JsonViewer().jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
+        user.getOwnership().jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
     notebooksViewedByUser.subscriptions = user.getSubscriptions();
     return notebooksViewedByUser;
   }
