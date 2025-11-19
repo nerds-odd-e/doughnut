@@ -8,10 +8,10 @@ Refactor the Rails-inspired model pattern in the `@models` package to follow Spr
 
 ### Architecture Pattern
 
-The current `@models` package (e.g., `UserModel`, `NoteModel`, `SubscriptionModel`) follows a Rails-inspired Active Record pattern:
+The current `@models` package (e.g., `UserModel`) follows a Rails-inspired Active Record pattern:
 
 - **Stateful wrappers**: Each model wraps a single entity instance and holds a `ModelFactoryService` reference
-- **Factory creation**: Models are created via factory methods (`toUserModel()`, `toNoteModel()`)
+- **Factory creation**: Models are created via factory methods (`toUserModel()`)
 - **Mixed scoping**: Some models are request-scoped beans (`UserModel` via `CurrentUserFetcherFromRequest`), others are created on-demand
 - **Business logic in models**: Models contain domain logic that operates on the wrapped entity
 
@@ -43,7 +43,7 @@ userModel.setAndSaveDailyAssimilationCount(5);
 
 1. **Not idiomatic Spring Boot**: Spring Boot convention uses stateless `@Service` beans that operate on entities passed as parameters, not stateful wrappers
 2. **Dependency injection awkwardness**: Models require `ModelFactoryService` to be passed in rather than injecting repositories directly
-3. **Inconsistent patterns**: Mix of request-scoped beans (`UserModel`) and factory-created instances (`NoteModel`)
+3. **Inconsistent patterns**: Mix of request-scoped beans (`UserModel`) and factory-created instances
 4. **Testing complexity**: Stateful wrappers are harder to test than stateless services
 5. **Thread safety concerns**: Stateful models can lead to concurrency issues if not properly scoped
 6. **Unclear lifecycle**: Factory-created models have unclear lifecycle management compared to Spring-managed beans
@@ -51,6 +51,9 @@ userModel.setAndSaveDailyAssimilationCount(5);
 ### Existing Services Pattern
 
 The codebase already has some services following Spring Boot conventions:
+- ✅ `AuthorizationService`: Already converted to `@Service` bean
+- ✅ `BazaarService`: Already converted to `@Service` bean (BazaarModel converted)
+- ✅ `SubscriptionService`: Already converted to `@Service` bean
 - `RecallService`: Stateless service but takes `UserModel` as parameter (needs refactoring)
 - `AssimilationService`: Takes `UserModel` as parameter (needs refactoring)
 - `MemoryTrackerService`: Creates `UserModel` internally (needs refactoring)
@@ -149,32 +152,7 @@ This maintains convenience while following Spring Boot conventions.
 
 #### Authorization Pattern
 
-The current `Authorization` record should be converted to `AuthorizationService` as a stateless `@Service` bean.
-
-**Target pattern:**
-```java
-@Service
-public class AuthorizationService {
-    private final ModelFactoryService modelFactoryService; // Or inject needed repositories
-    
-    public void assertAuthorization(User user, Object object) throws UnexpectedNoAccessRightException {
-        // Current Authorization logic
-    }
-    
-    public void assertReadAuthorization(User user, Object object) throws UnexpectedNoAccessRightException {
-        // Current Authorization logic
-    }
-    
-    public void assertAdminAuthorization(User user) throws UnexpectedNoAccessRightException {
-        // Current Authorization logic
-    }
-}
-```
-
-**Usage:**
-```java
-authorizationService.assertAuthorization(user, note);
-```
+✅ **COMPLETED**: `AuthorizationService` has been converted to a stateless `@Service` bean and is being used throughout the codebase.
 
 #### ModelFactoryService Evolution
 
@@ -184,7 +162,7 @@ authorizationService.assertAuthorization(user, note);
 - Repository aggregation via public field injection
 
 **Target**: `ModelFactoryService` should be removed entirely. All operations should move to appropriate domain services:
-- Model factory methods → Remove (use services directly) - `toNoteModel()` can be removed
+- Model factory methods → Remove (use services directly) - `toUserModel()` needs to be removed once `UserService` is created
 - User token operations → Move to `UserService`
 - Note embedding operations → Move to `NoteEmbeddingService`
 - Link creation operations → Move to `NoteService` or `LinkService`
@@ -410,11 +388,12 @@ This aligns tests with the stateless services architecture and makes them simple
 ### Models to Convert
 
 - `UserModel` → `UserService`
-- `BazaarModel` → `BazaarService`
+- ✅ `BazaarModel` → `BazaarService` (COMPLETED)
 
 ### Supporting Classes
 
-- `Authorization` record: Convert to `AuthorizationService` as a `@Service` bean
+- ✅ `Authorization` record: Converted to `AuthorizationService` as a `@Service` bean (COMPLETED)
+- ✅ `ImageBuilder`: Moved from `models` package to `utils` package (COMPLETED)
 - `ModelFactoryService`: Remove entirely, move all operations to appropriate domain services
 - `CurrentUserFetcherFromRequest`: Update to provide `User` entity instead of `UserModel`
 - Controllers: Update to inject services and receive `User` entity instead of `UserModel`
@@ -424,7 +403,7 @@ This aligns tests with the stateless services architecture and makes them simple
 These services currently use models and need to be updated:
 
 - `RecallService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead.
-- `AssimilationService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead. (Now uses `SubscriptionService` instead of `SubscriptionModel`)
+- `AssimilationService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead. (✅ Already uses `SubscriptionService` instead of `SubscriptionModel`)
 - `MemoryTrackerService`: Currently creates `UserModel` internally. Should use `UserService` instead.
 - `NotebookService`: Currently not a Spring bean, should be converted to `@Service` bean and take `Notebook` entity as parameter.
 
