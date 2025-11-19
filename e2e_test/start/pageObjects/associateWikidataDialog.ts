@@ -8,18 +8,23 @@ export const assumeAssociateWikidataDialog = () => {
   }
 
   return {
+    // Actions - Input/Selection
     associate(wikiID: string) {
-      cy.replaceFocusedTextAndEnter(wikiID)
+      withinModalContainer(() => {
+        cy.formField('Wikidata Id').assignFieldValue(wikiID).type('{enter}')
+      })
+      return this
+    },
+    setWikidataId(wikidataId: string) {
+      withinModalContainer(() => {
+        cy.formField('Wikidata Id').assignFieldValue(wikidataId)
+      })
       return this
     },
     selectResult(wikidataID: string) {
       withinModalContainer(() => {
         cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
       })
-      return this
-    },
-    confirmAssociation() {
-      cy.findByRole('button', { name: 'Confirm' }).click()
       return this
     },
     confirmAssociationWithDifferentLabel(wikidataTitle: string) {
@@ -34,17 +39,13 @@ export const assumeAssociateWikidataDialog = () => {
       // Dialog should close automatically after selecting Replace title
       return this
     },
-    setWikidataId(wikidataId: string) {
-      withinModalContainer(() => {
-        cy.formField('Wikidata Id').assignFieldValue(wikidataId)
-      })
-      return this
-    },
     close() {
       withinModalContainer(() => {
         cy.findByRole('button', { name: 'Close' }).click()
       })
     },
+
+    // Assertions
     expectErrorOnWikidataId(message: string) {
       withinModalContainer(() => {
         cy.expectFieldErrorMessage('Wikidata Id', message)
@@ -60,26 +61,26 @@ export const assumeAssociateWikidataDialog = () => {
       return this
     },
     expectOpenLinkButtonToOpenUrl(url: string) {
-      const elm = () => {
-        return cy.findByRole('button', { name: 'open link' })
-      }
-      // Wait for the button to be visible (it appears when Wikidata ID is present)
-      elm().should('be.visible')
+      withinModalContainer(() => {
+        const elm = cy.findByRole('button', { name: 'open link' })
+        // Wait for the button to be visible (it appears when Wikidata ID is present)
+        elm.should('be.visible')
 
-      cy.window().then((win) => {
-        const popupWindowStub = {
-          location: { href: undefined },
-          focus: cy.stub(),
-        }
-        cy.stub(win, 'open').as('open').returns(popupWindowStub)
-        elm().click()
-        cy.get('@open').should('have.been.calledWith', '')
-        // using a callback so that cypress can wait until the stubbed value is assigned
-        cy.wrap(() => popupWindowStub.location.href)
-          .should((cb) => expect(cb()).equal(url))
-          .then(() => {
-            expect(popupWindowStub.focus).to.have.been.called
-          })
+        cy.window().then((win) => {
+          const popupWindowStub = {
+            location: { href: undefined },
+            focus: cy.stub(),
+          }
+          cy.stub(win, 'open').as('open').returns(popupWindowStub)
+          elm.click()
+          cy.get('@open').should('have.been.calledWith', '')
+          // using a callback so that cypress can wait until the stubbed value is assigned
+          cy.wrap(() => popupWindowStub.location.href)
+            .should((cb) => expect(cb()).equal(url))
+            .then(() => {
+              expect(popupWindowStub.focus).to.have.been.called
+            })
+        })
       })
       return this
     },
