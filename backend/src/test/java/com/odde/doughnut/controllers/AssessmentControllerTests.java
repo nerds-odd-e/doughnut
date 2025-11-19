@@ -3,11 +3,11 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
@@ -30,7 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class AssessmentControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private AssessmentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -39,7 +39,7 @@ public class AssessmentControllerTests {
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new AssessmentController(
             makeMe.modelFactoryService, testabilitySettings, currentUser, authorizationService);
@@ -52,7 +52,7 @@ public class AssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser).please();
+      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUserModel()).please();
     }
 
     @Test
@@ -61,7 +61,7 @@ public class AssessmentControllerTests {
           new AssessmentController(
               makeMe.modelFactoryService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease(),
+              new CurrentUser(makeMe.aNullUserModelPlease()),
               authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
@@ -102,7 +102,7 @@ public class AssessmentControllerTests {
     @BeforeEach
     void setup() {
       AssessmentAttempt assessmentAttempt =
-          makeMe.anAssessmentAttempt(currentUser.getEntity()).withOneQuestion().please();
+          makeMe.anAssessmentAttempt(currentUser.getUser()).withOneQuestion().please();
       assessmentQuestionInstance = assessmentAttempt.getAssessmentQuestionInstances().get(0);
       answerDTO.setChoiceIndex(0);
     }
@@ -113,7 +113,7 @@ public class AssessmentControllerTests {
           new AssessmentController(
               makeMe.modelFactoryService,
               testabilitySettings,
-              makeMe.aUser().toModelPlease(),
+              new CurrentUser(makeMe.aUser().toModelPlease()),
               authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -144,7 +144,7 @@ public class AssessmentControllerTests {
     @BeforeEach
     void setup() {
       assessmentAttempt =
-          makeMe.anAssessmentAttempt(currentUser.getEntity()).withNQuestions(3).please();
+          makeMe.anAssessmentAttempt(currentUser.getUser()).withNQuestions(3).please();
     }
 
     @Test
@@ -222,7 +222,8 @@ public class AssessmentControllerTests {
 
     @BeforeEach
     void setup() {
-      Note topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      Note topNote =
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
       makeMe.theNote(topNote).withNChildrenThat(2, NoteBuilder::hasAnApprovedQuestion).please();
       notebook = topNote.getNotebook();
     }
@@ -235,7 +236,7 @@ public class AssessmentControllerTests {
 
     @Test
     void shouldReturnOneAssessmentHistory() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).please();
+      makeMe.anAssessmentAttempt(currentUser.getUser()).notebook(notebook).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertEquals(1, assessmentHistories.size());
     }
@@ -250,14 +251,14 @@ public class AssessmentControllerTests {
 
     @Test
     void shouldReturnOnePassAssessmentHistory() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 4).please();
+      makeMe.anAssessmentAttempt(currentUser.getUser()).notebook(notebook).score(5, 4).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertTrue(assessmentHistories.getFirst().getIsPass());
     }
 
     @Test
     void shouldReturnOneFailAssessmentHistory() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(5, 2).please();
+      makeMe.anAssessmentAttempt(currentUser.getUser()).notebook(notebook).score(5, 2).please();
       List<AssessmentAttempt> assessmentHistories = controller.getMyAssessments();
       assertFalse(assessmentHistories.getFirst().getIsPass());
     }

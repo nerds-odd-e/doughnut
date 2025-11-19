@@ -3,10 +3,10 @@ package com.odde.doughnut.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -25,14 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssessmentServiceTests {
   @Autowired MakeMe makeMe;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private AssessmentService service;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     service = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
@@ -45,8 +45,7 @@ public class AssessmentServiceTests {
     Set<Integer> performAssessments(int numberOfAttempts) {
       Set<Integer> questionIds = new HashSet<>();
       for (int i = 0; i < numberOfAttempts; i++) {
-        AssessmentAttempt assessment =
-            service.generateAssessment(notebook, currentUser.getEntity());
+        AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getUser());
         Integer questionId = assessment.getAssessmentQuestionInstances().get(0).getId();
         questionIds.add(questionId);
       }
@@ -56,7 +55,8 @@ public class AssessmentServiceTests {
     @BeforeEach
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      topNote =
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }
@@ -86,7 +86,8 @@ public class AssessmentServiceTests {
 
     @BeforeEach
     void setup() {
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      topNote =
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(5);
     }
@@ -94,7 +95,7 @@ public class AssessmentServiceTests {
     @Test
     void shouldReturn5QuestionsWhenThereAreMoreThan5NotesWithQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnApprovedQuestion).please();
-      AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getEntity());
+      AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getUser());
       assertEquals(5, assessment.getAssessmentQuestionInstances().size());
     }
 
@@ -102,7 +103,7 @@ public class AssessmentServiceTests {
     void shouldPersistTheQuestion() {
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
       makeMe.theNote(topNote).withNChildrenThat(1, NoteBuilder::hasAnApprovedQuestion).please();
-      AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getEntity());
+      AssessmentAttempt assessment = service.generateAssessment(notebook, currentUser.getUser());
       assertThat(assessment.getAssessmentQuestionInstances().get(0).getId()).isNotNull();
     }
 
@@ -110,14 +111,14 @@ public class AssessmentServiceTests {
     void shouldThrowExceptionWhenThereAreNotEnoughQuestions() {
       makeMe.theNote(topNote).withNChildrenThat(4, NoteBuilder::hasAnApprovedQuestion).please();
       assertThrows(
-          ApiException.class, () -> service.generateAssessment(notebook, currentUser.getEntity()));
+          ApiException.class, () -> service.generateAssessment(notebook, currentUser.getUser()));
     }
 
     @Test
     void shouldGetOneApprovedQuestionFromEachNoteOnly() {
       makeMe.theNote(topNote).withNChildrenThat(5, NoteBuilder::hasAnUnapprovedQuestion).please();
       assertThrows(
-          ApiException.class, () -> service.generateAssessment(notebook, currentUser.getEntity()));
+          ApiException.class, () -> service.generateAssessment(notebook, currentUser.getUser()));
     }
   }
 }

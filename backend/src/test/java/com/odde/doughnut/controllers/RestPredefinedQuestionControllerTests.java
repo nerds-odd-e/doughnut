@@ -8,12 +8,12 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -41,7 +41,7 @@ class PredefinedQuestionControllerTests {
   @Autowired AuthorizationService authorizationService;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   @Autowired MakeMe makeMe;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -50,7 +50,7 @@ class PredefinedQuestionControllerTests {
   @BeforeEach
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new PredefinedQuestionController(
             openAiApi,
@@ -67,7 +67,7 @@ class PredefinedQuestionControllerTests {
         openAiApi,
         modelFactoryService,
         suggestedQuestionForFineTuningService,
-        makeMe.aNullUserModelPlease(),
+        new CurrentUser(makeMe.aNullUserModelPlease()),
         testabilitySettings,
         getTestObjectMapper(),
         authorizationService);
@@ -91,7 +91,7 @@ class PredefinedQuestionControllerTests {
 
     @BeforeEach
     void setup() throws PredefinedQuestionNotPossibleException {
-      note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       predefinedQuestion =
           makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
@@ -157,11 +157,12 @@ class PredefinedQuestionControllerTests {
 
     @BeforeEach
     void setUp() {
-      Note headNote = makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser).please();
+      Note headNote =
+          makeMe.aHeadNote("My reading list").creatorAndOwner(currentUser.getUserModel()).please();
       makeMe.theNote(headNote).withNChildren(10).please();
       noteWithoutQuestions =
           makeMe.aNote("Zen and the Art of Motorcycle Maintenance").under(headNote).please();
-      Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser).please();
+      Note lila = makeMe.aNote("Lila").creatorAndOwner(currentUser.getUserModel()).please();
       noteWithQuestions = makeMe.theNote(lila).hasAnApprovedQuestion().please();
     }
 
@@ -208,7 +209,7 @@ class PredefinedQuestionControllerTests {
 
     @Test
     void persistent() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       controller.addQuestionManually(note, mcqWithAnswer);
       makeMe.refresh(note);
@@ -230,7 +231,7 @@ class PredefinedQuestionControllerTests {
     @Test
     void givenQuestion_thenReturnRefineQuestion() throws UnexpectedNoAccessRightException {
       // Setup
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       PredefinedQuestion predefinedQuestion = makeMe.aPredefinedQuestion().please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
@@ -243,7 +244,7 @@ class PredefinedQuestionControllerTests {
     @Test
     void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
           new ObjectMapperConfig()
               .objectMapper()
@@ -261,7 +262,7 @@ class PredefinedQuestionControllerTests {
 
     @BeforeEach
     void setUp() {
-      subjectNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+      subjectNote = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
     }
 
     @Test
@@ -302,7 +303,7 @@ class PredefinedQuestionControllerTests {
       note =
           makeMe
               .aNote()
-              .creatorAndOwner(currentUser)
+              .creatorAndOwner(currentUser.getUserModel())
               .titleConstructor("There are 42 prefectures in Japan")
               .please();
     }

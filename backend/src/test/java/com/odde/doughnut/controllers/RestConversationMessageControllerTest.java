@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -44,7 +45,7 @@ class ConversationMessageControllerTest {
   @Autowired ConversationService conversationService;
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   ConversationMessageController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
@@ -52,7 +53,7 @@ class ConversationMessageControllerTest {
 
   @BeforeEach
   void setup() {
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
@@ -102,7 +103,7 @@ class ConversationMessageControllerTest {
     makeMe
         .aConversation()
         .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-        .from(currentUser)
+        .from(currentUser.getUserModel())
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     List<Conversation> conversations = controller.getConversationsOfCurrentUser();
@@ -113,7 +114,7 @@ class ConversationMessageControllerTest {
   void testGetFeedbackThreadsAsReceiver() {
     makeMe
         .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
-        .owner(currentUser.getEntity())
+        .owner(currentUser.getUser())
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     List<Conversation> conversations = controller.getConversationsOfCurrentUser();
@@ -122,7 +123,7 @@ class ConversationMessageControllerTest {
 
   @Test
   void testGetFeedbackThreadsAsAMemberOfACircle() {
-    Circle myCircle = makeMe.aCircle().hasMember(currentUser.getEntity()).please();
+    Circle myCircle = makeMe.aCircle().hasMember(currentUser.getUser()).please();
     makeMe
         .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
         .owner(myCircle)
@@ -138,7 +139,7 @@ class ConversationMessageControllerTest {
 
     @BeforeEach
     void setup() {
-      conversation = makeMe.aConversation().from(currentUser).please();
+      conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
     }
 
     @Test
@@ -152,7 +153,7 @@ class ConversationMessageControllerTest {
               openAiApiHandler, globalSettingsService, objectMapper);
       controller =
           new ConversationMessageController(
-              makeMe.aNullUserModelPlease(),
+              new CurrentUser(makeMe.aNullUserModelPlease()),
               conversationService,
               chatCompletionConversationService,
               authorizationService);
@@ -163,7 +164,7 @@ class ConversationMessageControllerTest {
 
     @Test
     void getOneUnreadConversationCountOfCurrentUser() {
-      makeMe.aConversationMessage(conversation).sender(currentUser.getEntity()).please();
+      makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
       makeMe.aConversationMessage(conversation).sender(makeMe.aUser().please()).please();
       int conversations = controller.getUnreadConversations().size();
       assertEquals(1, conversations);
@@ -182,7 +183,7 @@ class ConversationMessageControllerTest {
 
     @Test
     void zeroUnreadConversationCountForSender() {
-      makeMe.aConversationMessage(conversation).sender(currentUser.getEntity()).please();
+      makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
 
       int conversations = controller.getUnreadConversations().size();
       assertEquals(0, conversations);
@@ -190,10 +191,10 @@ class ConversationMessageControllerTest {
 
     @Test
     void getZeroUnreadConversationWhenSenderIsCurrentUser() {
-      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
       makeMe
           .aConversationMessage(conversation)
-          .sender(currentUser.getEntity())
+          .sender(currentUser.getUser())
           .readByReceiver()
           .please();
 
@@ -208,7 +209,7 @@ class ConversationMessageControllerTest {
 
     @BeforeEach
     void setup() {
-      conversation = makeMe.aConversation().from(currentUser).please();
+      conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
     }
 
     @Test
@@ -238,7 +239,7 @@ class ConversationMessageControllerTest {
     @Test
     void testMarkConversationAsReadBySender() throws UnexpectedNoAccessRightException {
       ConversationMessage msg =
-          makeMe.aConversationMessage(conversation).sender(currentUser.getEntity()).please();
+          makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
       controller.markConversationAsRead(conversation);
       assertEquals(false, msg.getReadByReceiver());
     }
@@ -259,7 +260,7 @@ class ConversationMessageControllerTest {
       String message = "This is a message";
       makeMe
           .theNotebook(assessmentQuestionInstance.getAssessmentAttempt().getNotebook())
-          .owner(currentUser.getEntity())
+          .owner(currentUser.getUser())
           .please();
       Conversation conversation =
           makeMe
@@ -277,7 +278,7 @@ class ConversationMessageControllerTest {
     @Test
     void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
-      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
       assertEquals(message, conversationMessage.getMessage());
@@ -297,7 +298,7 @@ class ConversationMessageControllerTest {
 
     @Test
     void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
-      Conversation conversation = makeMe.aConversation().from(currentUser).please();
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUserModel()).please();
 
       makeMe.aConversationMessage(conversation).please();
       List<ConversationMessage> conversations = controller.getConversationMessages(conversation);
@@ -323,7 +324,7 @@ class ConversationMessageControllerTest {
           (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
       Conversation conversation = conversations.getFirst();
-      assertEquals(conversation.getConversationInitiator(), currentUser.getEntity());
+      assertEquals(conversation.getConversationInitiator(), currentUser.getUser());
     }
 
     @Test
@@ -348,9 +349,9 @@ class ConversationMessageControllerTest {
 
     @Test
     void testConversationsOrderedByLastMessageTime() {
-      Conversation conv1 = makeMe.aConversation().from(currentUser).please();
-      Conversation conv2 = makeMe.aConversation().from(currentUser).please();
-      Conversation conv3 = makeMe.aConversation().from(currentUser).please();
+      Conversation conv1 = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      Conversation conv2 = makeMe.aConversation().from(currentUser.getUserModel()).please();
+      Conversation conv3 = makeMe.aConversation().from(currentUser.getUserModel()).please();
 
       // Add messages with specific timestamps
       makeMe
@@ -379,19 +380,19 @@ class ConversationMessageControllerTest {
       Conversation conv1 =
           makeMe
               .aConversation()
-              .from(currentUser)
+              .from(currentUser.getUserModel())
               .createdAt(makeMe.aTimestamp().of(1, 1).please())
               .please();
       Conversation conv2 =
           makeMe
               .aConversation()
-              .from(currentUser)
+              .from(currentUser.getUserModel())
               .createdAt(makeMe.aTimestamp().of(1, 2).please())
               .please();
       Conversation conv3 =
           makeMe
               .aConversation()
-              .from(currentUser)
+              .from(currentUser.getUserModel())
               .createdAt(makeMe.aTimestamp().of(1, 3).please())
               .please();
 
@@ -416,10 +417,12 @@ class ConversationMessageControllerTest {
     @Test
     void shouldReturnConversationsAboutNote() {
       // Create conversations about the note
-      Conversation conv1 = makeMe.aConversation().from(currentUser).forANote(note).please();
-      Conversation conv2 = makeMe.aConversation().from(currentUser).forANote(note).please();
+      Conversation conv1 =
+          makeMe.aConversation().from(currentUser.getUserModel()).forANote(note).please();
+      Conversation conv2 =
+          makeMe.aConversation().from(currentUser.getUserModel()).forANote(note).please();
       // Create an unrelated conversation
-      makeMe.aConversation().from(currentUser).please();
+      makeMe.aConversation().from(currentUser.getUserModel()).please();
 
       List<Conversation> conversations = controller.getConversationsAboutNote(note);
       assertEquals(2, conversations.size());
@@ -430,7 +433,8 @@ class ConversationMessageControllerTest {
     @Test
     void shouldOnlyReturnAccessibleConversations() {
       // Create a conversation the current user initiated
-      Conversation conv1 = makeMe.aConversation().from(currentUser).forANote(note).please();
+      Conversation conv1 =
+          makeMe.aConversation().from(currentUser.getUserModel()).forANote(note).please();
       // Create a conversation between other users about the same note
       Conversation conv2 = makeMe.aConversation().from(otherUser).forANote(note).please();
 
@@ -451,7 +455,7 @@ class ConversationMessageControllerTest {
               openAiApiHandler, globalSettingsService, objectMapper);
       controller =
           new ConversationMessageController(
-              makeMe.aNullUserModelPlease(),
+              new CurrentUser(makeMe.aNullUserModelPlease()),
               conversationService,
               chatCompletionConversationService,
               authorizationService);
@@ -479,7 +483,7 @@ class ConversationMessageControllerTest {
       List<Conversation> conversations =
           (List<Conversation>) modelFactoryService.conversationRepository.findAll();
       assertEquals(1, conversations.size());
-      assertEquals(conversation.getConversationInitiator(), currentUser.getEntity());
+      assertEquals(conversation.getConversationInitiator(), currentUser.getUser());
     }
 
     @Test
@@ -505,7 +509,8 @@ class ConversationMessageControllerTest {
               .creatorAndOwner(noteOwner)
               .titleConstructor("There are 42 prefectures in Japan")
               .please();
-      conversation = makeMe.aConversation().forANote(note).from(currentUser).please();
+      conversation =
+          makeMe.aConversation().forANote(note).from(currentUser.getUserModel()).please();
     }
 
     @Test
@@ -552,7 +557,7 @@ class ConversationMessageControllerTest {
     void shouldExportConversationWithMessages() throws UnexpectedNoAccessRightException {
       makeMe
           .aConversationMessage(conversation)
-          .sender(currentUser.getEntity())
+          .sender(currentUser.getUser())
           .message("Is Naba one of them?")
           .please();
       makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
@@ -580,7 +585,7 @@ class ConversationMessageControllerTest {
     void shouldExportConversationWithHistory() throws UnexpectedNoAccessRightException {
       makeMe
           .aConversationMessage(conversation)
-          .sender(currentUser.getEntity())
+          .sender(currentUser.getUser())
           .message("Is Naba one of them?")
           .please();
 

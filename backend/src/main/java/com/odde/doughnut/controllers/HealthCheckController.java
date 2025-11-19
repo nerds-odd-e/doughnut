@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 class HealthCheckController {
   @Autowired private Environment environment;
 
-  @Autowired private UserModel currentUser;
+  @Autowired private CurrentUser currentUser;
 
   @Autowired private AuthorizationService authorizationService;
 
@@ -28,7 +28,7 @@ class HealthCheckController {
   @GetMapping("/data_upgrade")
   @Transactional(timeout = 200)
   public List dataUpgrade() throws UnexpectedNoAccessRightException {
-    authorizationService.assertAdminAuthorization(currentUser.getEntity());
+    authorizationService.assertAdminAuthorization(currentUser.getUser());
     return List.of();
   }
 }

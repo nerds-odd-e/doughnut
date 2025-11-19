@@ -5,11 +5,11 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -42,13 +42,13 @@ class NoteCreationControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
   @Mock HttpClientAdapter httpClientAdapter;
-  private UserModel userModel;
+  private CurrentUser userModel;
   NoteCreationController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new NoteCreationController(
             modelFactoryService,
@@ -89,7 +89,7 @@ class NoteCreationControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().creatorAndOwner(userModel).please();
+      parent = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       noteCreation.setNewTitle("new title");
     }
 
@@ -308,7 +308,7 @@ class NoteCreationControllerTests {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note parent = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       referenceNote = makeMe.aNote().under(parent).please();
       makeMe.aNote("next sibling").under(parent).please();
       noteCreation.setNewTitle("new note");
@@ -324,7 +324,7 @@ class NoteCreationControllerTests {
 
     @Test
     void shouldNotAllowCreatingSiblingForRootNote() {
-      Note rootNote = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note rootNote = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.createNoteAfter(rootNote, noteCreation));

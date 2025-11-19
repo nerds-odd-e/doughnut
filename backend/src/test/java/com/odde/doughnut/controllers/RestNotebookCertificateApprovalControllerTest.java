@@ -4,10 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.testability.MakeMe;
@@ -28,13 +28,13 @@ class NotebookCertificateApprovalControllerTest {
   @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
+  private CurrentUser userModel;
   NotebookCertificateApprovalController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new NotebookCertificateApprovalController(
             modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -53,7 +53,7 @@ class NotebookCertificateApprovalControllerTest {
 
     @Test
     void approvalStatusShouldBeNullIfNotExist() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       NotebookCertificateApproval approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
       assertThat(approvalForNotebook, nullValue());
@@ -61,7 +61,7 @@ class NotebookCertificateApprovalControllerTest {
 
     @Test
     void success() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
       makeMe.refresh(note.getNotebook());
       NotebookCertificateApproval approvalForNotebook =
@@ -84,7 +84,7 @@ class NotebookCertificateApprovalControllerTest {
     @Test
     void approvalStatusShouldBePendingAfterRequestingApproval()
         throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       controller.requestApprovalForNotebook(note.getNotebook());
       makeMe.refresh(note.getNotebook());
       assertFalse(note.getNotebook().isCertifiable());
@@ -98,8 +98,8 @@ class NotebookCertificateApprovalControllerTest {
 
     @BeforeEach
     void setup() {
-      UserModel userModel = makeMe.anAdmin().toModelPlease();
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      CurrentUser userModel = new CurrentUser(makeMe.anAdmin().toModelPlease());
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
       controller =
           new NotebookCertificateApprovalController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);

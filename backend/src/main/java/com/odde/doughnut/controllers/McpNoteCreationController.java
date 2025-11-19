@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
@@ -9,7 +10,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
@@ -33,7 +33,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/mcp/notes")
 public class McpNoteCreationController {
 
-  private final UserModel currentUser;
+  private final CurrentUser currentUser;
   private final WikidataService wikidataService;
   private final NoteConstructionService noteConstructionService;
   private final NoteSearchService noteSearchService;
@@ -43,7 +43,7 @@ public class McpNoteCreationController {
   @Autowired
   public McpNoteCreationController(
       ModelFactoryService modelFactoryService,
-      UserModel currentUser,
+      CurrentUser currentUser,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteSearchService noteSearchService,
@@ -56,7 +56,7 @@ public class McpNoteCreationController {
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
     this.noteConstructionService =
         new NoteConstructionService(
-            currentUser.getEntity(),
+            currentUser.getUser(),
             testabilitySettings.getCurrentUTCTimestamp(),
             modelFactoryService,
             noteService);
@@ -68,20 +68,20 @@ public class McpNoteCreationController {
   @Transactional
   public NoteCreationResult createNoteViaMcp(@Valid @RequestBody McpNoteAddDTO noteCreation)
       throws UnexpectedNoAccessRightException, InterruptedException, IOException, BindException {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
 
-    var parentNoteObj = FindParentNote(currentUser.getEntity(), noteCreation);
+    var parentNoteObj = FindParentNote(currentUser.getUser(), noteCreation);
 
     if (parentNoteObj.equals(new Note())) {
       throw new UnexpectedNoAccessRightException();
     }
 
-    authorizationService.assertAuthorization(currentUser.getEntity(), parentNoteObj);
+    authorizationService.assertAuthorization(currentUser.getUser(), parentNoteObj);
 
     return noteConstructionService.createNoteWithWikidataService(
         parentNoteObj,
         noteCreation.noteCreationDTO,
-        currentUser.getEntity(),
+        currentUser.getUser(),
         wikidataService.wrapWikidataIdWithApi(noteCreation.noteCreationDTO.wikidataId));
   }
 

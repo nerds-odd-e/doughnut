@@ -7,10 +7,10 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
@@ -43,7 +43,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class AiControllerTest {
   AiController controller;
-  UserModel currentUser;
+  CurrentUser currentUser;
 
   Note note;
   @Mock OpenAiApi openAiApi;
@@ -58,7 +58,7 @@ class AiControllerTest {
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
             openAiApi, globalSettingsService, getTestObjectMapper());
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     note = makeMe.aNote().please();
     controller =
         new AiController(
@@ -78,7 +78,7 @@ class AiControllerTest {
 
     @BeforeEach
     void setup() {
-      aNote = makeMe.aNote("sanskrit").creatorAndOwner(currentUser).please();
+      aNote = makeMe.aNote("sanskrit").creatorAndOwner(currentUser.getUserModel()).please();
     }
 
     @Test
@@ -89,7 +89,7 @@ class AiControllerTest {
               new AiController(
                       notebookAssistantForNoteServiceFactory,
                       new OtherAiServices(openAiApi),
-                      makeMe.aNullUserModelPlease(),
+                      new CurrentUser(makeMe.aNullUserModelPlease()),
                       authorizationService)
                   .generateImage("create an image"));
     }
@@ -150,7 +150,7 @@ class AiControllerTest {
 
     @BeforeEach
     void setup() {
-      testNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
@@ -190,7 +190,7 @@ class AiControllerTest {
           new AiController(
               notebookAssistantForNoteServiceFactory,
               new OtherAiServices(openAiApi),
-              makeMe.aNullUserModelPlease(),
+              new CurrentUser(makeMe.aNullUserModelPlease()),
               authorizationService);
 
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));

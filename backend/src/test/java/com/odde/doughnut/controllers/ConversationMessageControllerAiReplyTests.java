@@ -7,13 +7,13 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -51,7 +51,7 @@ public class ConversationMessageControllerAiReplyTests {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
   ConversationMessageController controller;
-  UserModel currentUser;
+  CurrentUser currentUser;
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   private ConversationService conversationService;
@@ -59,11 +59,11 @@ public class ConversationMessageControllerAiReplyTests {
 
   @BeforeEach
   void setUp() {
-    currentUser = makeMe.aUser().toModelPlease();
-    note = makeMe.aNote().creatorAndOwner(currentUser).please();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
+    note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
 
     setupServices();
-    conversation = makeMe.aConversation().forANote(note).from(currentUser).please();
+    conversation = makeMe.aConversation().forANote(note).from(currentUser.getUserModel()).please();
   }
 
   private void setupServices() {
@@ -102,7 +102,7 @@ public class ConversationMessageControllerAiReplyTests {
       // Add a user message first
       makeMe
           .aConversationMessage(conversation)
-          .sender(currentUser.getEntity())
+          .sender(currentUser.getUser())
           .message("Hello!")
           .please();
 
@@ -194,11 +194,15 @@ public class ConversationMessageControllerAiReplyTests {
 
     @BeforeEach
     void setup() {
-      questionNote = makeMe.aNote().creatorAndOwner(currentUser).please();
+      questionNote = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.approvedQuestionOf(questionNote).please();
       recallConversation =
-          makeMe.aConversation().forARecallPrompt(recallPrompt).from(currentUser).please();
+          makeMe
+              .aConversation()
+              .forARecallPrompt(recallPrompt)
+              .from(currentUser.getUserModel())
+              .please();
 
       OpenAIChatCompletionStreamMocker chatMocker = new OpenAIChatCompletionStreamMocker(openAiApi);
       chatMocker.withMessage("I am a Chatbot").mockStreamResponse();

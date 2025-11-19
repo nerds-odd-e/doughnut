@@ -6,10 +6,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
@@ -38,12 +38,12 @@ class RestSemanticSearchControllerTests {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
-  private UserModel userModel;
+  private CurrentUser userModel;
   private SearchController controller;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller = new SearchController(userModel, noteSearchService, authorizationService);
     // Default: return empty embedding data so semantic search falls back to literal search
     EmbeddingResult empty = new EmbeddingResult();
@@ -69,7 +69,7 @@ class RestSemanticSearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
@@ -86,7 +86,8 @@ class RestSemanticSearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUserModel()).please();
     }
 
     @Test
@@ -106,7 +107,7 @@ class RestSemanticSearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller = new SearchController(userModel, noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
@@ -147,7 +148,8 @@ class RestSemanticSearchControllerTests {
 
     @BeforeEach
     void setup() {
-      referenceNote = makeMe.aNote("Reference Note").creatorAndOwner(userModel).please();
+      referenceNote =
+          makeMe.aNote("Reference Note").creatorAndOwner(userModel.getUserModel()).please();
     }
 
     @Test

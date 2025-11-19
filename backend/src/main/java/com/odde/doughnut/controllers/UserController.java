@@ -1,12 +1,12 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 class UserController {
   private final ModelFactoryService modelFactoryService;
-  private final UserModel currentUser;
+  private final CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings;
   private final AuthorizationService authorizationService;
 
   public UserController(
       ModelFactoryService modelFactoryService,
-      UserModel currentUser,
+      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
@@ -48,7 +48,7 @@ class UserController {
 
   @GetMapping("")
   public User getUserProfile() {
-    return currentUser.getEntity();
+    return currentUser.getUser();
   }
 
   @PatchMapping("/{user}")
@@ -56,7 +56,7 @@ class UserController {
   public User updateUser(
       @PathVariable @Schema(type = "integer") User user, @Valid @RequestBody UserDTO updates)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), user);
+    authorizationService.assertAuthorization(currentUser.getUser(), user);
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
@@ -67,8 +67,8 @@ class UserController {
   @PostMapping("/generate-token")
   @Transactional
   public UserToken generateToken(@Valid @RequestBody TokenConfigDTO tokenConfig) {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    User user = currentUser.getEntity();
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    User user = currentUser.getUser();
     String uuid = UUID.randomUUID().toString();
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
     return modelFactoryService.save(userToken);
@@ -77,15 +77,15 @@ class UserController {
   @GetMapping("/get-tokens")
   @Transactional
   public List<UserToken> getTokens() {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    User user = currentUser.getEntity();
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    User user = currentUser.getUser();
     return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
   }
 
   @DeleteMapping("/token/{tokenId}")
   public void deleteToken(@PathVariable @Schema(type = "integer") Integer tokenId) {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    User user = currentUser.getEntity();
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    User user = currentUser.getUser();
 
     Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(tokenId);
     if (userToken.isEmpty()) {

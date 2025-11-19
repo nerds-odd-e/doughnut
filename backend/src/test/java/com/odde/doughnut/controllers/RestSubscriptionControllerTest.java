@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -12,7 +13,6 @@ import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,15 +30,15 @@ class SubscriptionControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionRepository subscriptionRepository;
   @Autowired private AuthorizationService authorizationService;
-  private UserModel userModel;
+  private CurrentUser userModel;
   private Note topNote;
   private Notebook notebook;
   private SubscriptionController controller;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    topNote = makeMe.aNote().creatorAndOwner(userModel).please();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    topNote = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
     controller =
@@ -50,7 +50,7 @@ class SubscriptionControllerTest {
     SubscriptionDTO subscription = new SubscriptionDTO();
     Subscription result = controller.createSubscription(notebook, subscription);
     assertEquals(topNote, result.getHeadNote());
-    assertEquals(userModel.getEntity(), result.getUser());
+    assertEquals(userModel.getUser(), result.getUser());
   }
 
   @Test
@@ -66,7 +66,7 @@ class SubscriptionControllerTest {
   class Unsubscribe {
     @Test
     void shouldRemoveTheSubscription() throws UnexpectedNoAccessRightException {
-      Subscription subscription = makeMe.aSubscription().forUser(userModel.getEntity()).please();
+      Subscription subscription = makeMe.aSubscription().forUser(userModel.getUser()).please();
       long beforeDestroy = subscriptionRepository.count();
       controller.destroySubscription(subscription);
       assertThat(subscriptionRepository.count(), equalTo(beforeDestroy - 1));

@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -22,7 +22,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/recalls")
 class RecallsController {
   private final ModelFactoryService modelFactoryService;
-  private final UserModel currentUser;
+  private final CurrentUser currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -31,7 +31,7 @@ class RecallsController {
 
   public RecallsController(
       ModelFactoryService modelFactoryService,
-      UserModel currentUser,
+      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
@@ -43,10 +43,11 @@ class RecallsController {
   @GetMapping("/overview")
   @Transactional(readOnly = true)
   public RecallStatus overview(@RequestParam(value = "timezone") String timezone) {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+    return new RecallService(
+            currentUser.getUserModel(), currentUTCTimestamp, timeZone, modelFactoryService)
         .getRecallStatus();
   }
 
@@ -55,10 +56,11 @@ class RecallsController {
   public DueMemoryTrackers recalling(
       @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return new RecallService(currentUser, currentUTCTimestamp, timeZone, modelFactoryService)
+    return new RecallService(
+            currentUser.getUserModel(), currentUTCTimestamp, timeZone, modelFactoryService)
         .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }

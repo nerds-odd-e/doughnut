@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
@@ -15,7 +16,6 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -40,12 +40,12 @@ class MemoryTrackerControllerTest {
   @Autowired AuthorizationService authorizationService;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-  private UserModel userModel;
+  private CurrentUser userModel;
   MemoryTrackerController controller;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new MemoryTrackerController(
             modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -56,7 +56,11 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldReturnClozedDetailsAsQuestionStem() throws UnexpectedNoAccessRightException {
       Note note =
-          makeMe.aNote("moon").details("partner of earth").creatorAndOwner(userModel).please();
+          makeMe
+              .aNote("moon")
+              .details("partner of earth")
+              .creatorAndOwner(userModel.getUserModel())
+              .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
       SpellingQuestion question = controller.getSpellingQuestion(memoryTracker);
@@ -66,7 +70,9 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldNotBeAbleToGetSpellingQuestionForOthersMemoryTracker() {
       MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
+          makeMe
+              .aMemoryTrackerBy(new CurrentUser(makeMe.aUser().toModelPlease()).getUserModel())
+              .please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getSpellingQuestion(memoryTracker));
@@ -74,12 +80,14 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);
       MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
+          makeMe
+              .aMemoryTrackerBy(new CurrentUser(makeMe.aUser().toModelPlease()).getUserModel())
+              .please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
     }
@@ -95,7 +103,8 @@ class MemoryTrackerControllerTest {
       void setup() {
         // fix the time
         testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-        rp = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
+        rp =
+            makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel.getUserModel()).please();
       }
 
       @Test
@@ -106,7 +115,10 @@ class MemoryTrackerControllerTest {
 
       @Test
       void shouldNotBeAbleToSeeOthers() {
-        rp = makeMe.aMemoryTrackerBy(makeMe.aUser().toModelPlease()).please();
+        rp =
+            makeMe
+                .aMemoryTrackerBy(new CurrentUser(makeMe.aUser().toModelPlease()).getUserModel())
+                .please();
         assertThrows(
             UnexpectedNoAccessRightException.class, () -> controller.showMemoryTracker(rp));
       }
@@ -125,7 +137,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(makeMe.aNote().please()).inMemoryPlease();
       SelfEvaluation selfEvaluation =
@@ -157,7 +169,8 @@ class MemoryTrackerControllerTest {
 
       @BeforeEach
       void setup() {
-        rp = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
+        rp =
+            makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel.getUserModel()).please();
       }
 
       @Test
@@ -184,7 +197,7 @@ class MemoryTrackerControllerTest {
     @Test
     void itMustUpdateTheMemoryTrackerRecord() {
       Note note = makeMe.aNote().please();
-      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(userModel).please();
+      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(userModel.getUserModel()).please();
       Integer oldRepetitionCount = rp.getRepetitionCount();
       controller.markAsRepeated(rp, true);
       assertThat(rp.getRepetitionCount(), equalTo(oldRepetitionCount + 1));
@@ -201,8 +214,10 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldReturnMemoryTrackersForCurrentUser() {
-      MemoryTracker rp1 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
-      MemoryTracker rp2 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp1 =
+          makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel.getUserModel()).please();
+      MemoryTracker rp2 =
+          makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel.getUserModel()).please();
 
       List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
@@ -212,8 +227,8 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldNotReturnMemoryTrackersFromOtherUsers() {
-      UserModel otherUser = makeMe.aUser().toModelPlease();
-      makeMe.aMemoryTrackerBy(otherUser).please();
+      CurrentUser otherUser = new CurrentUser(makeMe.aUser().toModelPlease());
+      makeMe.aMemoryTrackerBy(otherUser.getUserModel()).please();
 
       List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
@@ -222,7 +237,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -240,8 +255,10 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldReturnRecentlyReviewedForCurrentUser() {
-      MemoryTracker rp1 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
-      MemoryTracker rp2 = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel).please();
+      MemoryTracker rp1 =
+          makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel.getUserModel()).please();
+      MemoryTracker rp2 =
+          makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(userModel.getUserModel()).please();
 
       // Mark as reviewed
       controller.markAsRepeated(rp1, true);
@@ -255,7 +272,7 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -275,7 +292,7 @@ class MemoryTrackerControllerTest {
       memoryTracker =
           makeMe
               .aMemoryTrackerFor(answerNote)
-              .by(userModel)
+              .by(userModel.getUserModel())
               .forgettingCurveAndNextRecallAt(200)
               .spelling()
               .please();
@@ -320,7 +337,7 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller =
           new MemoryTrackerController(
               modelFactoryService, userModel, testabilitySettings, authorizationService);

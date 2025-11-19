@@ -4,10 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -31,14 +31,14 @@ class RecallsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   RecallsController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new RecallsController(
             modelFactoryService, currentUser, testabilitySettings, authorizationService);
@@ -47,7 +47,7 @@ class RecallsControllerTests {
   RecallsController nullUserController() {
     return new RecallsController(
         modelFactoryService,
-        makeMe.aNullUserModelPlease(),
+        new CurrentUser(makeMe.aNullUserModelPlease()),
         testabilitySettings,
         authorizationService);
   }
@@ -100,7 +100,7 @@ class RecallsControllerTests {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
       makeMe
-          .aMemoryTrackerBy(currentUser)
+          .aMemoryTrackerBy(currentUser.getUserModel())
           .nextRecallAt(TimestampOperations.addHoursToTimestamp(currentTime, nextRecallAtHours))
           .please();
       DueMemoryTrackers dueMemoryTrackers = controller.recalling(timezone, null);
@@ -111,7 +111,7 @@ class RecallsControllerTests {
     void shouldIncludeRecallStatusInDueMemoryTrackers() {
       Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
       testabilitySettings.timeTravelTo(currentTime);
-      makeMe.aMemoryTrackerBy(currentUser).nextRecallAt(currentTime).please();
+      makeMe.aMemoryTrackerBy(currentUser.getUserModel()).nextRecallAt(currentTime).please();
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 

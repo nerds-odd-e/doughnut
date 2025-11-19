@@ -7,12 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.EmbeddingService;
@@ -47,7 +47,7 @@ class NotebookControllerTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
+  private CurrentUser userModel;
   private Note topNote;
   NotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -73,8 +73,8 @@ class NotebookControllerTest {
                               n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
             });
 
-    userModel = makeMe.aUser().toModelPlease();
-    topNote = makeMe.aNote().creatorAndOwner(userModel).please();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    topNote = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
     controller =
         new NotebookController(
             modelFactoryService,
@@ -89,7 +89,7 @@ class NotebookControllerTest {
   class UpdateNotebookIndexEndpoint {
     @Test
     void shouldCallServiceAndRequireAuthorization() throws UnexpectedNoAccessRightException {
-      Notebook nb = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      Notebook nb = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
       controller.updateNotebookIndex(nb);
       // If unauthorized, an exception would be thrown before reaching service; no exception here
     }
@@ -108,7 +108,7 @@ class NotebookControllerTest {
   class showNoteTest {
     @Test
     void whenNotLogin() {
-      userModel = modelFactoryService.toUserModel(null);
+      userModel = new CurrentUser(modelFactoryService.toUserModel(null));
       controller =
           new NotebookController(
               modelFactoryService,
@@ -123,8 +123,8 @@ class NotebookControllerTest {
     @Test
     void whenLoggedIn() {
       User user = new User();
-      userModel = modelFactoryService.toUserModel(user);
-      List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
+      userModel = new CurrentUser(modelFactoryService.toUserModel(user));
+      List<Notebook> notebooks = userModel.getUser().getOwnership().getNotebooks();
       controller =
           new NotebookController(
               modelFactoryService,
@@ -170,7 +170,7 @@ class NotebookControllerTest {
 
     @Test
     void shouldBeAbleToEditCertificateExpiry() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
       var notebookSettings = new NotebookSettings();
       notebookSettings.setCertificateExpiry(Period.parse("P2Y3M"));
       controller.updateNotebook(note.getNotebook(), notebookSettings);
@@ -186,7 +186,7 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
       makeMe.refresh(notebook);
     }
 
@@ -196,7 +196,7 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              modelFactoryService.toUserModel(anotherUser),
+              new CurrentUser(modelFactoryService.toUserModel(anotherUser)),
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -217,7 +217,8 @@ class NotebookControllerTest {
     @Test
     void shouldNotBeAbleToMoveNotebookThatIsCreatedByAnotherUser() {
       User anotherUser = makeMe.aUser().please();
-      Circle circle1 = makeMe.aCircle().hasMember(anotherUser).hasMember(userModel).please();
+      Circle circle1 =
+          makeMe.aCircle().hasMember(anotherUser).hasMember(userModel.getUser()).please();
       Note note = makeMe.aNote().creator(anotherUser).inCircle(circle1).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -232,8 +233,8 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      userModel = makeMe.aUser().toModelPlease();
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
       makeMe.refresh(notebook);
     }
 
@@ -275,7 +276,7 @@ class NotebookControllerTest {
     @BeforeEach
     void setup() {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
     }
 
     @Test
@@ -333,7 +334,7 @@ class NotebookControllerTest {
     @BeforeEach
     void setup() {
       testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
     }
 
     @Test
@@ -372,7 +373,7 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
       makeMe.refresh(notebook);
     }
 
@@ -382,7 +383,7 @@ class NotebookControllerTest {
       controller =
           new NotebookController(
               modelFactoryService,
-              modelFactoryService.toUserModel(anotherUser),
+              new CurrentUser(modelFactoryService.toUserModel(anotherUser)),
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -402,7 +403,7 @@ class NotebookControllerTest {
     @BeforeEach
     void setup() {
       // Create notebook with Note1
-      notebook = makeMe.aNotebook().creatorAndOwner(userModel).please();
+      notebook = makeMe.aNotebook().creatorAndOwner(userModel.getUserModel()).please();
       note1 =
           makeMe
               .aNote("note 1")
@@ -465,8 +466,9 @@ class NotebookControllerTest {
     @Test
     void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
       // Arrange
-      UserModel otherUserModel = makeMe.aUser().toModelPlease();
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(otherUserModel).please();
+      CurrentUser otherUserModel = new CurrentUser(makeMe.aUser().toModelPlease());
+      Notebook otherNotebook =
+          makeMe.aNotebook().creatorAndOwner(otherUserModel.getUserModel()).please();
 
       // Act & Assert
       assertThrows(
@@ -477,7 +479,7 @@ class NotebookControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       // Arrange
-      userModel = makeMe.aNullUserModelPlease();
+      userModel = new CurrentUser(makeMe.aNullUserModelPlease());
       controller =
           new NotebookController(
               modelFactoryService,

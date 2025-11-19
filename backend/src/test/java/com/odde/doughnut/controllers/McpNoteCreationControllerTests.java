@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
@@ -12,7 +13,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -59,7 +59,7 @@ class McpNoteCreationControllerTests {
   @BeforeEach
   void setup() {
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    UserModel userModel = makeMe.aUser().toModelPlease();
+    CurrentUser userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     noteCreation = new NoteCreationDTO();
     noteCreation.setNewTitle("new note");
     controller =
@@ -73,7 +73,7 @@ class McpNoteCreationControllerTests {
             noteService,
             authorizationService);
 
-    Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(userModel).please();
+    Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(userModel.getUserModel()).please();
     lordOfTheRingsNote.setTopicConstructor("Lord of the Rings");
     when(noteRepository.findById(org.mockito.ArgumentMatchers.any()))
         .thenReturn(java.util.Optional.of(lordOfTheRingsNote));
@@ -87,7 +87,7 @@ class McpNoteCreationControllerTests {
       var controllerWithoutUser =
           new McpNoteCreationController(
               modelFactoryService,
-              modelFactoryService.toUserModel(null),
+              new CurrentUser(modelFactoryService.toUserModel(null)),
               httpClientAdapter,
               testabilitySettings,
               noteSearchService,

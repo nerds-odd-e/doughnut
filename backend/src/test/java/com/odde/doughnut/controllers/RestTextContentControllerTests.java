@@ -4,13 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -31,15 +31,15 @@ class TextContentControllerTests {
   @Autowired AuthorizationService authorizationService;
 
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
+  private CurrentUser userModel;
   TextContentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note note;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    note = makeMe.aNote("new").creatorAndOwner(userModel).please();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
+    note = makeMe.aNote("new").creatorAndOwner(userModel.getUserModel()).please();
     controller =
         new TextContentController(
             modelFactoryService, userModel, testabilitySettings, authorizationService);

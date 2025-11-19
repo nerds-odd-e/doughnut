@@ -5,12 +5,12 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -38,14 +38,14 @@ class NoteControllerMotionTests {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
-  private UserModel userModel;
+  private CurrentUser userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note subject;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new NoteController(
             modelFactoryService,
@@ -55,7 +55,7 @@ class NoteControllerMotionTests {
             noteMotionService,
             noteService,
             authorizationService);
-    subject = makeMe.aNote("subject").creatorAndOwner(userModel).please();
+    subject = makeMe.aNote("subject").creatorAndOwner(userModel.getUserModel()).please();
   }
 
   @Nested
@@ -64,7 +64,7 @@ class NoteControllerMotionTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote("parent").creatorAndOwner(userModel).please();
+      parent = makeMe.aNote("parent").creatorAndOwner(userModel.getUserModel()).please();
       subject = makeMe.theNote(subject).under(parent).please();
     }
 

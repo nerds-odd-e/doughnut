@@ -4,10 +4,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -34,13 +34,13 @@ class NoteControllerRecentNotesTests {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
-  private UserModel userModel;
+  private CurrentUser userModel;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new NoteController(
             modelFactoryService,
@@ -62,13 +62,13 @@ class NoteControllerRecentNotesTests {
     Note note1 =
         makeMe
             .aNote()
-            .creatorAndOwner(userModel)
+            .creatorAndOwner(userModel.getUserModel())
             .createdAt(makeMe.aTimestamp().of(0, 0).please())
             .please();
     Note note2 =
         makeMe
             .aNote()
-            .creatorAndOwner(userModel)
+            .creatorAndOwner(userModel.getUserModel())
             .createdAt(makeMe.aTimestamp().of(0, 1).please())
             .please();
 
@@ -80,7 +80,7 @@ class NoteControllerRecentNotesTests {
 
   @Test
   void shouldNotAllowAccessWhenNotLoggedIn() {
-    userModel = makeMe.aNullUserModelPlease();
+    userModel = new CurrentUser(makeMe.aNullUserModelPlease());
     controller =
         new NoteController(
             modelFactoryService,

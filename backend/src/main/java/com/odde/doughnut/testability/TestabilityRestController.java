@@ -1,13 +1,13 @@
 package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
@@ -38,7 +38,7 @@ class TestabilityRestController {
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
-  @Autowired UserModel currentUser;
+  @Autowired CurrentUser currentUser;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
@@ -239,7 +239,7 @@ class TestabilityRestController {
 
   private User getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
     if (Strings.isEmpty(externalIdentifier)) {
-      User user = currentUser.getEntity();
+      User user = currentUser.getUser();
       if (user == null) {
         throw new RuntimeException("There is no current user");
       }
@@ -260,11 +260,13 @@ class TestabilityRestController {
   @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     if (userInfo.containsKey("daily_assimilation_count")) {
-      currentUser.setAndSaveDailyAssimilationCount(
-          Integer.valueOf(userInfo.get("daily_assimilation_count")));
+      currentUser
+          .getUserModel()
+          .setAndSaveDailyAssimilationCount(
+              Integer.valueOf(userInfo.get("daily_assimilation_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      currentUser.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
+      currentUser.getUserModel().setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
     }
     return "OK";
   }
@@ -294,7 +296,7 @@ class TestabilityRestController {
     testData.examples.forEach(
         example -> {
           SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
-          suggestion.setUser(currentUser.getEntity());
+          suggestion.setUser(currentUser.getUser());
           suggestedQuestionForFineTuningService.update(suggestion, example);
         });
     return "OK";

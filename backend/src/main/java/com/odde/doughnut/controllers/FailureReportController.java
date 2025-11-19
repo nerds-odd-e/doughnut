@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GithubService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 class FailureReportController {
   private final ModelFactoryService modelFactoryService;
   private final GithubService realGithubService;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private final AuthorizationService authorizationService;
 
   public FailureReportController(
       ModelFactoryService modelFactoryService,
       GithubService realGithubService,
-      UserModel currentUser,
+      CurrentUser currentUser,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
     this.realGithubService = realGithubService;
@@ -36,8 +36,8 @@ class FailureReportController {
 
   @GetMapping("")
   public Iterable<FailureReport> failureReports() throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    authorizationService.assertAdminAuthorization(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertAdminAuthorization(currentUser.getUser());
     return modelFactoryService.failureReportRepository.findAll();
   }
 
@@ -50,8 +50,8 @@ class FailureReportController {
   public FailureReportForView showFailureReport(
       @PathVariable("failureReport") @Schema(type = "integer") FailureReport failureReport)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    authorizationService.assertAdminAuthorization(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertAdminAuthorization(currentUser.getUser());
     FailureReportForView failureReportForView = new FailureReportForView();
     failureReportForView.failureReport = failureReport;
     failureReportForView.githubIssueUrl =
@@ -62,8 +62,8 @@ class FailureReportController {
   @DeleteMapping("/delete")
   public void deleteFailureReports(@RequestBody List<Integer> ids)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    authorizationService.assertAdminAuthorization(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertAdminAuthorization(currentUser.getUser());
     ids.forEach(
         id -> {
           modelFactoryService

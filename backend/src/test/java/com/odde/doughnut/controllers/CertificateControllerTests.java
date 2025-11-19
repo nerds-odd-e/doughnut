@@ -2,9 +2,9 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -25,7 +25,7 @@ public class CertificateControllerTests {
   public static final int oneYearInHours = 8760;
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private CertificateController controller;
   Timestamp currentTime;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -34,7 +34,7 @@ public class CertificateControllerTests {
   void setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new CertificateController(currentUser, makeMe.modelFactoryService, authorizationService);
   }
@@ -46,8 +46,14 @@ public class CertificateControllerTests {
 
     @BeforeEach
     void setup() {
-      notebook = makeMe.aNote("Just say 'Yes'").creatorAndOwner(currentUser).please().getNotebook();
-      expectedCertificate = makeMe.aCertificate(notebook, currentUser, currentTime).please();
+      notebook =
+          makeMe
+              .aNote("Just say 'Yes'")
+              .creatorAndOwner(currentUser.getUserModel())
+              .please()
+              .getNotebook();
+      expectedCertificate =
+          makeMe.aCertificate(notebook, currentUser.getUserModel(), currentTime).please();
     }
 
     @Test
@@ -59,7 +65,7 @@ public class CertificateControllerTests {
             }
           };
       Certificate cert = controller.getCertificate(notebook);
-      assertEquals(currentUser.getEntity(), cert.getUser());
+      assertEquals(currentUser.getUser(), cert.getUser());
       assertEquals(notebook, cert.getNotebook());
       assertEquals(currentTime, cert.getStartDate());
       Timestamp expiryDate =
@@ -70,7 +76,7 @@ public class CertificateControllerTests {
 
     @Test
     void SaveTwiceGetOriginalStartDate() {
-      makeMe.anAssessmentAttempt(currentUser.getEntity()).notebook(notebook).score(20, 20).please();
+      makeMe.anAssessmentAttempt(currentUser.getUser()).notebook(notebook).score(20, 20).please();
       Timestamp currentTimeAtStart = currentTime;
       Timestamp newStartDate =
           TimestampOperations.addHoursToTimestamp(

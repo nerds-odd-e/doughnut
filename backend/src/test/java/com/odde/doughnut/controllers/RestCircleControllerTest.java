@@ -5,13 +5,13 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.MakeMe;
@@ -35,13 +35,13 @@ class CircleControllerTest {
   @Autowired CircleService circleService;
 
   @Autowired MakeMe makeMe;
-  private UserModel userModel;
+  private CurrentUser userModel;
   CircleController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new CircleController(
             modelFactoryService,
@@ -60,7 +60,7 @@ class CircleControllerTest {
               modelFactoryService,
               circleService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease(),
+              new CurrentUser(makeMe.aNullUserModelPlease()),
               authorizationService);
       assertThrows(
           ResponseStatusException.class,
@@ -87,7 +87,7 @@ class CircleControllerTest {
   class ShowCircle {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
-      UserModel user = makeMe.aUser().toModelPlease();
+      CurrentUser user = new CurrentUser(makeMe.aUser().toModelPlease());
       controller =
           new CircleController(
               modelFactoryService, circleService, testabilitySettings, user, authorizationService);
@@ -95,7 +95,7 @@ class CircleControllerTest {
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
 
-      circleService.joinAndSave(circle, user.getEntity());
+      circleService.joinAndSave(circle, user.getUser());
 
       CircleForUserView expected = new CircleForUserView();
       expected.setId(circle.getId());
@@ -117,7 +117,7 @@ class CircleControllerTest {
               modelFactoryService,
               circleService,
               testabilitySettings,
-              makeMe.aNullUserModelPlease(),
+              new CurrentUser(makeMe.aNullUserModelPlease()),
               authorizationService);
       assertThrows(
           ResponseStatusException.class,
@@ -150,7 +150,7 @@ class CircleControllerTest {
 
     @Test
     void userAlreadyInCircle() {
-      Circle circle = makeMe.aCircle().hasMember(userModel).please();
+      Circle circle = makeMe.aCircle().hasMember(userModel.getUser()).please();
       CircleJoiningByInvitation entity = new CircleJoiningByInvitation();
       entity.setInvitationCode(circle.getInvitationCode());
       BindException exception =

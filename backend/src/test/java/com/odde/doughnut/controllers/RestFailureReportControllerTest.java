@@ -7,9 +7,9 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.testability.MakeMe;
@@ -34,14 +34,14 @@ class FailureReportControllerTest {
   @Autowired AuthorizationService authorizationService;
   private GithubService githubService = new NullGithubService();
 
-  FailureReportController controller(UserModel userModel) {
+  FailureReportController controller(CurrentUser userModel) {
     return new FailureReportController(
         makeMe.modelFactoryService, githubService, userModel, authorizationService);
   }
 
   @Test
   void whenNonAdminAccessTheFailureReport() {
-    UserModel nonAdmin = makeMe.aUser().toModelPlease();
+    CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().toModelPlease());
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
@@ -50,12 +50,12 @@ class FailureReportControllerTest {
 
   @Nested
   class DeleteFailureReportsTest {
-    UserModel admin;
+    CurrentUser admin;
     List<FailureReport> failureReports;
 
     @BeforeEach
     void setup() {
-      admin = makeMe.anAdmin().toModelPlease();
+      admin = new CurrentUser(makeMe.anAdmin().toModelPlease());
 
       // Clear all existing failure reports first to ensure test independence
       makeMe.modelFactoryService.failureReportRepository.deleteAll();
@@ -93,7 +93,7 @@ class FailureReportControllerTest {
 
     @Test
     void nonAdminCannotDeleteFailureReports() {
-      UserModel nonAdmin = makeMe.aUser().toModelPlease();
+      CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().toModelPlease());
       List<Integer> idsToDelete =
           failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
 

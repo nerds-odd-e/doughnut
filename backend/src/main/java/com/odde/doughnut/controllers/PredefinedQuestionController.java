@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
@@ -31,7 +31,7 @@ class PredefinedQuestionController {
   private final PredefinedQuestionService predefinedQuestionService;
   private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
 
-  private final UserModel currentUser;
+  private final CurrentUser currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -44,7 +44,7 @@ class PredefinedQuestionController {
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
-      UserModel currentUser,
+      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService) {
@@ -67,7 +67,7 @@ class PredefinedQuestionController {
   @PostMapping("/generate-question-without-save")
   public PredefinedQuestion generateQuestionWithoutSave(
       @RequestParam(value = "note") @Schema(type = "integer") Note note) {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
     MCQWithAnswer MCQWithAnswer = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
     if (MCQWithAnswer == null) {
       return null;
@@ -86,7 +86,7 @@ class PredefinedQuestionController {
         sqft,
         predefinedQuestion,
         suggestion,
-        currentUser.getEntity(),
+        currentUser.getUser(),
         testabilitySettings.getCurrentUTCTimestamp());
   }
 
@@ -94,7 +94,7 @@ class PredefinedQuestionController {
   public List<PredefinedQuestion> getAllQuestionByNote(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), note);
+    authorizationService.assertAuthorization(currentUser.getUser(), note);
     return note.getPredefinedQuestions().stream().toList();
   }
 
@@ -104,7 +104,7 @@ class PredefinedQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), note);
+    authorizationService.assertAuthorization(currentUser.getUser(), note);
     return predefinedQuestionService.addQuestion(note, predefinedQuestion);
   }
 
@@ -114,7 +114,7 @@ class PredefinedQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note,
       @RequestBody PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), note);
+    authorizationService.assertAuthorization(currentUser.getUser(), note);
     return predefinedQuestionService.refineAIQuestion(note, predefinedQuestion);
   }
 
@@ -124,7 +124,7 @@ class PredefinedQuestionController {
       @PathVariable("predefinedQuestion") @Schema(type = "integer")
           PredefinedQuestion predefinedQuestion)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), predefinedQuestion.getNote());
+    authorizationService.assertAuthorization(currentUser.getUser(), predefinedQuestion.getNote());
     return predefinedQuestionService.toggleApproval(predefinedQuestion);
   }
 
@@ -132,7 +132,7 @@ class PredefinedQuestionController {
   public ChatCompletionRequest exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), note);
+    authorizationService.assertAuthorization(currentUser.getUser(), note);
     GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
     QuestionGenerationRequestBuilder requestBuilder =
         new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);

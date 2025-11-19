@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
@@ -7,7 +8,6 @@ import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookIndexingService;
@@ -35,7 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/notebooks")
 class NotebookController {
   private final ModelFactoryService modelFactoryService;
-  private final UserModel currentUser;
+  private final CurrentUser currentUser;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -47,7 +47,7 @@ class NotebookController {
 
   public NotebookController(
       ModelFactoryService modelFactoryService,
-      UserModel currentUser,
+      CurrentUser currentUser,
       TestabilitySettings testabilitySettings,
       NotebookIndexingService notebookIndexingService,
       BazaarService bazaarService,
@@ -59,14 +59,14 @@ class NotebookController {
     this.bazaarService = bazaarService;
     this.authorizationService = authorizationService;
     this.obsidianFormatService =
-        new ObsidianFormatService(currentUser.getEntity(), modelFactoryService);
+        new ObsidianFormatService(currentUser.getUser(), modelFactoryService);
   }
 
   @GetMapping("")
   public NotebooksViewedByUser myNotebooks() {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
 
-    User user = currentUser.getEntity();
+    User user = currentUser.getUser();
     NotebooksViewedByUser notebooksViewedByUser =
         user.getOwnership().jsonNotebooksViewedByUser(user.getOwnership().getNotebooks());
     notebooksViewedByUser.subscriptions = user.getSubscriptions();
@@ -76,8 +76,8 @@ class NotebookController {
   @PostMapping({"/create"})
   @Transactional
   public RedirectToNoteResponse createNotebook(@Valid @RequestBody NoteCreationDTO noteCreation) {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    User userEntity = currentUser.getEntity();
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    User userEntity = currentUser.getUser();
     Note note =
         userEntity
             .getOwnership()
@@ -93,7 +93,7 @@ class NotebookController {
       @PathVariable @Schema(type = "integer") Notebook notebook,
       @Valid @RequestBody NotebookSettings notebookSettings)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     notebook.getNotebookSettings().update(notebookSettings);
     modelFactoryService.save(notebook);
     return notebook;
@@ -102,7 +102,7 @@ class NotebookController {
   @GetMapping(value = "/{notebook}")
   public Notebook get(@PathVariable @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
+    authorizationService.assertLoggedIn(currentUser.getUser());
     return notebook;
   }
 
@@ -111,7 +111,7 @@ class NotebookController {
   public Notebook shareNotebook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     bazaarService.shareNotebook(notebook);
     return notebook;
   }
@@ -122,7 +122,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook,
       @PathVariable("circle") @Schema(type = "integer") Circle circle)
       throws UnexpectedNoAccessRightException {
-    if (notebook.getCreatorEntity().getId() != currentUser.getEntity().getId()) {
+    if (notebook.getCreatorEntity().getId() != currentUser.getUser().getId()) {
       throw new UnexpectedNoAccessRightException();
     }
     notebook.setOwnership(circle.getOwnership());
@@ -134,14 +134,14 @@ class NotebookController {
   public List<BareNote> downloadNotebookDump(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     return notebook.getNoteBriefs();
   }
 
   @GetMapping("{notebook}/notes")
   public List<Note> getNotes(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     return notebook.getNotes();
   }
 
@@ -152,7 +152,7 @@ class NotebookController {
       @RequestBody UpdateAiAssistantRequest request)
       throws UnexpectedNoAccessRightException {
 
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
 
     NotebookAiAssistant assistant =
         modelFactoryService.notebookAiAssistantRepository.findByNotebookId(notebook.getId());
@@ -173,7 +173,7 @@ class NotebookController {
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
 
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     return modelFactoryService.notebookAiAssistantRepository.findByNotebookId(notebook.getId());
   }
 
@@ -181,7 +181,7 @@ class NotebookController {
   public ResponseEntity<byte[]> downloadNotebookForObsidian(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
 
     byte[] zipBytes = obsidianFormatService.exportToObsidian(notebook.getHeadNote());
 
@@ -207,8 +207,8 @@ class NotebookController {
       @Parameter(description = "Notebook ID") @PathVariable("notebook") @Schema(type = "integer")
           Notebook notebook)
       throws UnexpectedNoAccessRightException, IOException {
-    authorizationService.assertLoggedIn(currentUser.getEntity());
-    authorizationService.assertReadAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertLoggedIn(currentUser.getUser());
+    authorizationService.assertReadAuthorization(currentUser.getUser(), notebook);
     obsidianFormatService.importFromObsidian(file, notebook);
   }
 
@@ -217,7 +217,7 @@ class NotebookController {
   public void updateNotebookIndex(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     notebookIndexingService.updateNotebookIndex(notebook);
   }
 
@@ -226,7 +226,7 @@ class NotebookController {
   public void resetNotebookIndex(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), notebook);
+    authorizationService.assertAuthorization(currentUser.getUser(), notebook);
     notebookIndexingService.resetNotebookIndex(notebook);
   }
 }

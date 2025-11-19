@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.LinkCreation;
 import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.controllers.dto.NoteRealm;
@@ -8,7 +9,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -33,14 +33,14 @@ class LinkController {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private final NoteMotionService noteMotionService;
   private final AuthorizationService authorizationService;
 
   public LinkController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      UserModel currentUser,
+      CurrentUser currentUser,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
@@ -55,10 +55,10 @@ class LinkController {
   public List<NoteRealm> updateLink(
       @PathVariable @Schema(type = "integer") Note link, @RequestBody LinkCreation linkCreation)
       throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(currentUser.getEntity(), link);
+    authorizationService.assertAuthorization(currentUser.getUser(), link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.save(link);
-    return getNoteRealm(link, currentUser.getEntity());
+    return getNoteRealm(link, currentUser.getUser());
   }
 
   @PostMapping(value = "/move/{sourceNote}/{targetNote}")
@@ -70,10 +70,10 @@ class LinkController {
       BindingResult bindingResult)
       throws UnexpectedNoAccessRightException, BindException, CyclicLinkDetectedException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
-    authorizationService.assertAuthorization(currentUser.getEntity(), sourceNote);
-    authorizationService.assertAuthorization(currentUser.getEntity(), targetNote);
+    authorizationService.assertAuthorization(currentUser.getUser(), sourceNote);
+    authorizationService.assertAuthorization(currentUser.getUser(), targetNote);
     noteMotionService.executeMoveUnder(sourceNote, targetNote, noteMoveDTO.asFirstChild);
-    User user = currentUser.getEntity();
+    User user = currentUser.getUser();
     return List.of(sourceNote.toNoteRealm(user), targetNote.toNoteRealm(user));
   }
 
@@ -86,9 +86,9 @@ class LinkController {
       BindingResult bindingResult)
       throws UnexpectedNoAccessRightException, CyclicLinkDetectedException, BindException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
-    authorizationService.assertAuthorization(currentUser.getEntity(), sourceNote);
-    authorizationService.assertReadAuthorization(currentUser.getEntity(), targetNote);
-    User user = currentUser.getEntity();
+    authorizationService.assertAuthorization(currentUser.getUser(), sourceNote);
+    authorizationService.assertReadAuthorization(currentUser.getUser(), targetNote);
+    User user = currentUser.getUser();
     Note link =
         modelFactoryService.createLink(
             sourceNote,

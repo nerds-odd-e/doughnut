@@ -4,13 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -29,13 +29,13 @@ import org.springframework.web.server.ResponseStatusException;
 class UserControllerTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  UserModel userModel;
+  CurrentUser userModel;
   UserController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    userModel = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new UserController(
             makeMe.modelFactoryService, userModel, testabilitySettings, authorizationService);
@@ -44,7 +44,7 @@ class UserControllerTest {
   @Test
   void createUserWhileSessionTimeout() {
     assertThrows(
-        ResponseStatusException.class, () -> controller.createUser(null, userModel.getEntity()));
+        ResponseStatusException.class, () -> controller.createUser(null, userModel.getUser()));
   }
 
   @Test
@@ -53,7 +53,7 @@ class UserControllerTest {
     dto.setName("new name");
     dto.setSpaceIntervals("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15");
     dto.setDailyAssimilationCount(12);
-    User response = controller.updateUser(userModel.getEntity(), dto);
+    User response = controller.updateUser(userModel.getUser(), dto);
     assertThat(response.getName(), equalTo(dto.getName()));
     assertThat(response.getSpaceIntervals(), equalTo(dto.getSpaceIntervals()));
     assertThat(response.getDailyAssimilationCount(), equalTo(dto.getDailyAssimilationCount()));
@@ -74,14 +74,15 @@ class UserControllerTest {
     tokenConfig.setLabel("TEST_LABEL");
     UserToken userToken = controller.generateToken(tokenConfig);
 
-    assertThat(userToken.getUserId(), equalTo(userModel.getEntity().getId()));
+    assertThat(userToken.getUserId(), equalTo(userModel.getUser().getId()));
     assertThat(userToken.getLabel(), equalTo("TEST_LABEL"));
     assertThat(userToken.getToken().length(), equalTo(36));
   }
 
   @Test
   void getTokensTest() {
-    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("TEST_LABEL").please();
+    UserToken userToken =
+        makeMe.aUserToken().forUser(userModel.getUserModel()).withLabel("TEST_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -93,7 +94,7 @@ class UserControllerTest {
 
   @Test
   void getTokensWithMultipleTokens() {
-    UserToken userToken = new UserToken(userModel.getEntity().getId(), "token", "LABEL");
+    UserToken userToken = new UserToken(userModel.getUser().getId(), "token", "LABEL");
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -105,7 +106,8 @@ class UserControllerTest {
 
   @Test
   void deleteTokenTest() {
-    UserToken userToken = makeMe.aUserToken().forUser(userModel).withLabel("DELETE_LABEL").please();
+    UserToken userToken =
+        makeMe.aUserToken().forUser(userModel.getUserModel()).withLabel("DELETE_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -118,9 +120,13 @@ class UserControllerTest {
 
   @Test
   void deleteTokenTestForAnotherUser() {
-    UserModel userModel2 = makeMe.aUser().toModelPlease();
+    CurrentUser userModel2 = new CurrentUser(makeMe.aUser().toModelPlease());
     UserToken userToken2 =
-        makeMe.aUserToken().forUser(userModel2).withLabel("OTHER_USER_TOKEN").please();
+        makeMe
+            .aUserToken()
+            .forUser(userModel2.getUserModel())
+            .withLabel("OTHER_USER_TOKEN")
+            .please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken2);
 

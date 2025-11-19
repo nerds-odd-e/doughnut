@@ -4,11 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.BazaarNotebook;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.testability.MakeMe;
@@ -28,8 +28,8 @@ class BazaarControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private BazaarService bazaarService;
   @Autowired private AuthorizationService authorizationService;
-  private UserModel adminUser;
-  private UserModel notebookOwner;
+  private CurrentUser adminUser;
+  private CurrentUser notebookOwner;
   private BazaarController controller;
   private Note topNote;
   private Notebook notebook;
@@ -37,9 +37,9 @@ class BazaarControllerTest {
 
   @BeforeEach
   void setup() {
-    adminUser = makeMe.anAdmin().toModelPlease();
-    notebookOwner = makeMe.aUser().toModelPlease();
-    topNote = makeMe.aNote().creatorAndOwner(notebookOwner).please();
+    adminUser = new CurrentUser(makeMe.anAdmin().toModelPlease());
+    notebookOwner = new CurrentUser(makeMe.aUser().toModelPlease());
+    topNote = makeMe.aNote().creatorAndOwner(notebookOwner.getUserModel()).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
     controller = new BazaarController(bazaarService, adminUser, authorizationService);
@@ -50,7 +50,8 @@ class BazaarControllerTest {
     @Test
     void otherPeopleCannot() {
       controller =
-          new BazaarController(bazaarService, makeMe.aUser().toModelPlease(), authorizationService);
+          new BazaarController(
+              bazaarService, new CurrentUser(makeMe.aUser().toModelPlease()), authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));

@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
@@ -30,7 +30,7 @@ class ConversationMessageServiceTest {
   @Autowired MakeMe makeMe;
   private ConversationService conversationService;
   private AssessmentService assessmentService;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
@@ -44,7 +44,7 @@ class ConversationMessageServiceTest {
             openAiApiHandler, globalSettingsService, objectMapper);
     conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
   }
 
@@ -57,7 +57,8 @@ class ConversationMessageServiceTest {
     @BeforeEach
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
-      topNote = makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser).please();
+      topNote =
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUserModel()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }
@@ -67,7 +68,7 @@ class ConversationMessageServiceTest {
           .theNote(topNote)
           .withNChildrenThat(1, noteBuilder -> noteBuilder.hasApprovedQuestions(10))
           .please();
-      return assessmentService.generateAssessment(notebook, currentUser.getEntity());
+      return assessmentService.generateAssessment(notebook, currentUser.getUser());
     }
 
     @Test
@@ -76,7 +77,7 @@ class ConversationMessageServiceTest {
       String message = "This feedback is wrong";
       ConversationMessage conversationMessage =
           conversationService.addMessageToConversation(
-              conversation, currentUser.getEntity(), message);
+              conversation, currentUser.getUser(), message);
       assertEquals(message, conversationMessage.getMessage());
     }
 
@@ -84,7 +85,7 @@ class ConversationMessageServiceTest {
     void shouldReturnListConversationDetail() {
       Conversation conversation = getConversation();
       String message = "This feedback is wrong";
-      conversationService.addMessageToConversation(conversation, currentUser.getEntity(), message);
+      conversationService.addMessageToConversation(conversation, currentUser.getUser(), message);
       makeMe.refresh(conversation);
       List<ConversationMessage> conversationMessages = conversation.getConversationMessages();
       assertEquals(1, conversationMessages.size());
@@ -98,7 +99,7 @@ class ConversationMessageServiceTest {
       return makeMe
           .aConversation()
           .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-          .from(currentUser)
+          .from(currentUser.getUserModel())
           .please();
     }
   }
@@ -110,7 +111,7 @@ class ConversationMessageServiceTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.approvedQuestionOf(note).answerChoiceIndex(1).please();
     }
@@ -119,12 +120,12 @@ class ConversationMessageServiceTest {
     void shouldSetCorrectOwnershipAndSubject() {
       Conversation conversation =
           conversationService.startConversationAboutRecallPrompt(
-              recallPrompt, currentUser.getEntity());
+              recallPrompt, currentUser.getUser());
 
       makeMe.refresh(conversation);
       assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
       assertEquals(note.getNotebook().getOwnership(), conversation.getSubjectOwnership());
-      assertEquals(currentUser.getEntity(), conversation.getConversationInitiator());
+      assertEquals(currentUser.getUser(), conversation.getConversationInitiator());
     }
   }
 }

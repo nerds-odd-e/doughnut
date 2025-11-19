@@ -4,11 +4,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.testability.MakeMe;
@@ -31,14 +31,14 @@ class AssimilationControllerTests {
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionService subscriptionService;
   @Autowired private AuthorizationService authorizationService;
-  private UserModel currentUser;
+  private CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   private AssimilationController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = makeMe.aUser().toModelPlease();
+    currentUser = new CurrentUser(makeMe.aUser().toModelPlease());
     controller =
         new AssimilationController(
             modelFactoryService,
@@ -51,7 +51,7 @@ class AssimilationControllerTests {
   AssimilationController nullUserController() {
     return new AssimilationController(
         modelFactoryService,
-        makeMe.aNullUserModelPlease(),
+        new CurrentUser(makeMe.aNullUserModelPlease()),
         subscriptionService,
         testabilitySettings,
         authorizationService);
@@ -61,7 +61,7 @@ class AssimilationControllerTests {
   class Assimilating {
     @Test
     void assimilating() {
-      Note n = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note n = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       assertThat(n.getId(), notNullValue());
       List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Asia/Shanghai");
       assertThat(memoryTrackerWithRecallSettings, hasSize(1));
@@ -84,7 +84,7 @@ class AssimilationControllerTests {
 
     @Test
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       note.getRecallSetting().setRememberSpelling(true);
       modelFactoryService.noteRepository.save(note);
 
@@ -95,7 +95,7 @@ class AssimilationControllerTests {
 
       List<MemoryTracker> memoryTrackers =
           modelFactoryService.memoryTrackerRepository.findLast100ByUser(
-              currentUser.getEntity().getId());
+              currentUser.getUser().getId());
       assertThat(
           memoryTrackers.stream().filter(mt -> mt.getNote().getId().equals(note.getId())).count(),
           equalTo(2L));
@@ -109,7 +109,7 @@ class AssimilationControllerTests {
     @Test
     void shouldReturnAssimilationCountsForLoggedInUser() {
       // Create a note that needs assimilation
-      Note note = makeMe.aNote().creatorAndOwner(currentUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUserModel()).please();
       assertThat(note.getId(), notNullValue());
 
       AssimilationCountDTO counts = controller.getAssimilationCount("Asia/Shanghai");
