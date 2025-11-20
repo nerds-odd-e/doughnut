@@ -7,18 +7,14 @@ import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
 import com.theokanning.openai.client.OpenAiApi;
@@ -33,23 +29,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class AiControllerTest {
+class AiControllerTest extends ControllerTestBase {
   AiController controller;
-  CurrentUser currentUser;
 
   Note note;
   @Mock OpenAiApi openAiApi;
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
   NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
   @BeforeEach
@@ -59,9 +45,8 @@ class AiControllerTest {
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
             openAiApi, globalSettingsService, getTestObjectMapper());
-    currentUser = new CurrentUser(makeMe.aUser().please());
+    currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote().please();
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new AiController(
             notebookAssistantForNoteServiceFactory,
@@ -88,8 +73,7 @@ class AiControllerTest {
 
     @Test
     void askWithNoteThatCannotAccess() {
-      CurrentUser nullUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      currentUser.setUser(null);
       AiController aiController =
           new AiController(
               notebookAssistantForNoteServiceFactory,
@@ -195,8 +179,7 @@ class AiControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      CurrentUser nullUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      currentUser.setUser(null);
       controller =
           new AiController(
               notebookAssistantForNoteServiceFactory,
