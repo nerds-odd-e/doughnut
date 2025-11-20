@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.services.UserService;
@@ -35,7 +36,8 @@ class RecallPromptController {
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
-      UserService userService) {
+      UserService userService,
+      AnswerService answerService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallQuestionService =
@@ -44,7 +46,8 @@ class RecallPromptController {
             modelFactoryService,
             testabilitySettings.getRandomizer(),
             objectMapper,
-            userService);
+            userService,
+            answerService);
   }
 
   @GetMapping("/{memoryTracker}/question")

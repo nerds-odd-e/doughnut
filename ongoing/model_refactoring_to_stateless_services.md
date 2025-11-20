@@ -58,8 +58,8 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - `createLink(Note sourceNote, Note targetNote, User creator, LinkType type, Timestamp currentUTCTimestamp)` ✅
 - `buildALink(...)` (static method) ✅
 
-**Answer Creation Operations** → Move to `AssessmentService` or `AnswerService`:
-- `createAnswerForQuestion(AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO)`
+✅ **Answer Creation Operations** → Moved to `AnswerService`:
+- `createAnswerForQuestion(AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO)` ✅
 
 **Entity Persistence Operations:**
 - `save(T entity)`, `merge(T entity)`, `remove(T entity)` - Services should use `EntityPersister` instead of going through `ModelFactoryService`

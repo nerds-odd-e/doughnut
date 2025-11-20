@@ -12,6 +12,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -38,6 +39,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
   @Autowired UserService userService;
+  @Autowired AnswerService answerService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -64,7 +66,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
             testabilitySettings,
             getTestObjectMapper(),
             authorizationService,
-            userService);
+            userService,
+            answerService);
   }
 
   RecallPromptController nullUserController() {
@@ -75,7 +78,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
         testabilitySettings,
         getTestObjectMapper(),
         authorizationService,
-        userService);
+        userService,
+        answerService);
   }
 
   @Nested
@@ -195,7 +199,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService,
-                    userService);
+                    userService,
+                    answerService);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -282,7 +287,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService,
-                    userService);
+                    userService,
+                    answerService);
             restAiController.contest(recallPrompt);
           });
     }

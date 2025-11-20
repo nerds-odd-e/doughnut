@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 class ConversationMessageServiceTest {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired AnswerService answerService;
   private ConversationService conversationService;
   private AssessmentService assessmentService;
   private CurrentUser currentUser;
@@ -45,7 +46,8 @@ class ConversationMessageServiceTest {
     conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
-    assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
+    assessmentService =
+        new AssessmentService(makeMe.modelFactoryService, testabilitySettings, answerService);
   }
 
   @Nested

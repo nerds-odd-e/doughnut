@@ -1,6 +1,5 @@
 package com.odde.doughnut.factoryServices;
 
-import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.services.AuthorizationService;
@@ -50,12 +49,5 @@ public class ModelFactoryService {
 
   public <T extends EntityIdentifiedByIdOnly> T remove(T entity) {
     return entityPersister.remove(entity);
-  }
-
-  public Answer createAnswerForQuestion(
-      AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO) {
-    Answer answer = answerableQuestionInstance.buildAnswer(answerDTO);
-    save(answerableQuestionInstance);
-    return answer;
   }
 }

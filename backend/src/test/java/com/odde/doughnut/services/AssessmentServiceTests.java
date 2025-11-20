@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssessmentServiceTests {
   @Autowired MakeMe makeMe;
+  @Autowired com.odde.doughnut.services.AnswerService answerService;
   private CurrentUser currentUser;
   private AssessmentService service;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -33,7 +34,7 @@ public class AssessmentServiceTests {
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
-    service = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
+    service = new AssessmentService(makeMe.modelFactoryService, testabilitySettings, answerService);
   }
 
   @Nested

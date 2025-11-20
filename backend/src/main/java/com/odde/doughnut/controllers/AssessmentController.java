@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -28,10 +29,12 @@ class AssessmentController {
   public AssessmentController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      AnswerService answerService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.assessmentService = new AssessmentService(modelFactoryService, testabilitySettings);
+    this.assessmentService =
+        new AssessmentService(modelFactoryService, testabilitySettings, answerService);
   }
 
   @PostMapping("/questions/{notebook}")

@@ -7,7 +7,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AssessmentService;
+import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -24,9 +24,9 @@ public class AssessmentControllerTests extends ControllerTestBase {
   private AssessmentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
-  private AssessmentService assessmentService;
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
+  @Autowired AnswerService answerService;
 
   @BeforeEach
   void setup() {
@@ -34,8 +34,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssessmentController(
-            makeMe.modelFactoryService, testabilitySettings, authorizationService);
-    assessmentService = new AssessmentService(makeMe.modelFactoryService, testabilitySettings);
+            makeMe.modelFactoryService, testabilitySettings, authorizationService, answerService);
   }
 
   @Nested
@@ -52,7 +51,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, authorizationService);
+              makeMe.modelFactoryService, testabilitySettings, authorizationService, answerService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -102,7 +101,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, authorizationService);
+              makeMe.modelFactoryService, testabilitySettings, authorizationService, answerService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));

@@ -16,11 +16,15 @@ import java.util.Objects;
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
   private final TestabilitySettings testabilitySettings;
+  private final AnswerService answerService;
 
   public AssessmentService(
-      ModelFactoryService modelFactoryService, TestabilitySettings testabilitySettings) {
+      ModelFactoryService modelFactoryService,
+      TestabilitySettings testabilitySettings,
+      AnswerService answerService) {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
+    this.answerService = answerService;
   }
 
   public AssessmentAttempt generateAssessment(Notebook notebook, User user) {
@@ -107,7 +111,7 @@ public class AssessmentService {
 
   public AssessmentQuestionInstance answerQuestion(
       AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO) {
-    modelFactoryService.createAnswerForQuestion(assessmentQuestionInstance, answerDTO);
+    answerService.createAnswerForQuestion(assessmentQuestionInstance, answerDTO);
     return assessmentQuestionInstance;
   }
 }
