@@ -9,7 +9,6 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.sql.Timestamp;
 import java.util.function.Consumer;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 class TextContentController {
   private final EntityPersister entityPersister;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;

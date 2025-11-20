@@ -13,7 +13,6 @@ import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +27,6 @@ class CircleController {
   private final CircleService circleService;
   private final NotebookService notebookService;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;

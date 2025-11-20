@@ -11,7 +11,6 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ class MemoryTrackerController {
   private final EntityPersister entityPersister;
   private final MemoryTrackerService memoryTrackerService;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;

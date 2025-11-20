@@ -17,7 +17,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +36,6 @@ class NotebookController {
   private final EntityPersister entityPersister;
   private final NotebookService notebookService;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final ObsidianFormatService obsidianFormatService;

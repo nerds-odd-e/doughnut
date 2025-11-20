@@ -9,7 +9,6 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/recall-prompts")
 class RecallPromptController {
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final RecallQuestionService recallQuestionService;

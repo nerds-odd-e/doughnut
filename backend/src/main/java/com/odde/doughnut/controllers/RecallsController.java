@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import jakarta.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/recalls")
 class RecallsController {
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;

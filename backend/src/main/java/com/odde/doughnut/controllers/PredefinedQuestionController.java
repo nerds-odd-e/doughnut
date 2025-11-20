@@ -15,7 +15,6 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,6 @@ class PredefinedQuestionController {
   private final PredefinedQuestionService predefinedQuestionService;
   private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AiQuestionGenerator aiQuestionGenerator;

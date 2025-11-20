@@ -13,7 +13,6 @@ import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,6 @@ class LinkController {
   private final EntityPersister entityPersister;
   private final NoteService noteService;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final NoteMotionService noteMotionService;

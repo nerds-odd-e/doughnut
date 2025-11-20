@@ -9,7 +9,6 @@ import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
-import jakarta.annotation.Resource;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -26,7 +25,6 @@ class AssimilationController {
   private final SubscriptionService subscriptionService;
   private final UserService userService;
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
