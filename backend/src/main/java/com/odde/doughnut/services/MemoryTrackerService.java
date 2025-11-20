@@ -118,4 +118,24 @@ public class MemoryTrackerService {
     markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
     return new SpellingResultDTO(note, spellingAnswer, correct);
   }
+
+  public void softDeleteMemoryTrackersForNotes(List<Note> notes) {
+    if (notes.isEmpty()) {
+      return;
+    }
+    List<Integer> noteIds = notes.stream().map(Note::getId).toList();
+    List<MemoryTracker> memoryTrackers = memoryTrackerRepository.findByNoteIds(noteIds);
+    memoryTrackers.forEach(mt -> mt.setRemovedFromTracking(true));
+    memoryTrackers.forEach(entityPersister::save);
+  }
+
+  public void restoreMemoryTrackersForNotes(List<Note> notes) {
+    if (notes.isEmpty()) {
+      return;
+    }
+    List<Integer> noteIds = notes.stream().map(Note::getId).toList();
+    List<MemoryTracker> memoryTrackers = memoryTrackerRepository.findByNoteIds(noteIds);
+    memoryTrackers.forEach(mt -> mt.setRemovedFromTracking(false));
+    memoryTrackers.forEach(entityPersister::save);
+  }
 }
