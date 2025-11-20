@@ -4,39 +4,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.convention.TestBean;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class UserControllerTest {
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
-  @TestBean CurrentUser currentUser;
+class UserControllerTest extends ControllerTestBase {
   UserController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-
-  static CurrentUser currentUser() {
-    return new CurrentUser();
-  }
 
   @BeforeEach
   void setup() {
