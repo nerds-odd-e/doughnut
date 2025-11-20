@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
@@ -13,33 +12,20 @@ import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class SubscriptionControllerTest {
-  @Autowired private MakeMe makeMe;
+class SubscriptionControllerTest extends ControllerTestBase {
   @Autowired private SubscriptionRepository subscriptionRepository;
-  @Autowired private AuthorizationService authorizationService;
-  private CurrentUser currentUser;
   private Note topNote;
   private Notebook notebook;
   private SubscriptionController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     topNote =
         makeMe
             .aNote()

@@ -3,32 +3,17 @@ package com.odde.doughnut.controllers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class GlobalSettingsControllerTest {
+class GlobalSettingsControllerTest extends ControllerTestBase {
   GlobalSettingsController controller;
-  CurrentUser currentUser;
-
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
 
   Timestamp currentTime;
 
@@ -39,8 +24,7 @@ class GlobalSettingsControllerTest {
   void Setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
-    currentUser = new CurrentUser(makeMe.anAdmin().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.anAdmin().please());
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
         new GlobalSettingsController(
@@ -83,8 +67,7 @@ class GlobalSettingsControllerTest {
 
     @Test
     void authentication() {
-      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller =
           new GlobalSettingsController(
               makeMe.modelFactoryService, testabilitySettings, authorizationService);

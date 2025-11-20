@@ -7,19 +7,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
 import java.io.IOException;
@@ -31,28 +27,19 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NotebookControllerTest {
+class NotebookControllerTest extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired
   com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
 
-  @Autowired AuthorizationService authorizationService;
-  @Autowired MakeMe makeMe;
-  private CurrentUser currentUser;
   private Note topNote;
   NotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -78,8 +65,7 @@ class NotebookControllerTest {
                               n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
             });
 
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     topNote =
         makeMe
             .aNote()
@@ -121,8 +107,7 @@ class NotebookControllerTest {
   class showNoteTest {
     @Test
     void whenNotLogin() {
-      currentUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(null);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -136,8 +121,7 @@ class NotebookControllerTest {
     @Test
     void whenLoggedIn() {
       User user = new User();
-      currentUser = new CurrentUser(user);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(user);
       List<Notebook> notebooks = currentUser.getUser().getOwnership().getNotebooks();
       controller =
           new NotebookController(
@@ -214,8 +198,7 @@ class NotebookControllerTest {
     @Test
     void whenNotAuthorized() {
       User anotherUser = makeMe.aUser().please();
-      CurrentUser anotherCurrentUser = new CurrentUser(anotherUser);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherCurrentUser);
+      currentUser.setUser(anotherUser);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -255,8 +238,7 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      currentUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(makeMe.aUser().please());
       notebook =
           makeMe
               .aNotebook()
@@ -417,8 +399,7 @@ class NotebookControllerTest {
     @Test
     void whenNotAuthorized() {
       User anotherUser = makeMe.aUser().please();
-      CurrentUser anotherCurrentUser = new CurrentUser(anotherUser);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherCurrentUser);
+      currentUser.setUser(anotherUser);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -508,12 +489,9 @@ class NotebookControllerTest {
     @Test
     void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
       // Arrange
-      CurrentUser otherUserModel = new CurrentUser(makeMe.aUser().please());
+      User otherUser = makeMe.aUser().please();
       Notebook otherNotebook =
-          makeMe
-              .aNotebook()
-              .creatorAndOwner(modelFactoryService.toUserModel(otherUserModel.getUser()))
-              .please();
+          makeMe.aNotebook().creatorAndOwner(modelFactoryService.toUserModel(otherUser)).please();
 
       // Act & Assert
       assertThrows(
@@ -524,8 +502,7 @@ class NotebookControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       // Arrange
-      currentUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(null);
       controller =
           new NotebookController(
               modelFactoryService,

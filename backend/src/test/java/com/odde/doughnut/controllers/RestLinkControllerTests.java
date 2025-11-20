@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.LinkCreation;
 import com.odde.doughnut.controllers.dto.NoteMoveDTO;
 import com.odde.doughnut.entities.LinkType;
@@ -14,35 +13,22 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class LinkControllerTests {
+class LinkControllerTests extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired AuthorizationService authorizationService;
 
-  @Autowired MakeMe makeMe;
   @Autowired NoteMotionService noteMotionService;
-  private CurrentUser currentUser;
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
   }
 
   LinkController controller() {
