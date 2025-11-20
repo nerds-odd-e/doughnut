@@ -88,16 +88,13 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `FailureReportFactory` - Now accepts `FailureReportRepository` instead of `ModelFactoryService`
 - ✅ `ControllerSetup` - Now injects `FailureReportRepository` directly
 
-**Remaining Files Using ModelFactoryService:**
-- `FineTuningDataController` - Still uses `ModelFactoryService` (needs refactoring)
-- `ConversationService` - Still uses `ModelFactoryService` (needs refactoring)
-- `FineTuningService` - Still uses `ModelFactoryService` (needs refactoring)
-- `MakeMe` (test utility) - Still exposes `ModelFactoryService` for backward compatibility with tests
-
-**Next Steps:**
-- Refactor remaining controllers and services to inject repositories directly
-- Update remaining test files to use direct repository injection
-- Remove `ModelFactoryService` class entirely once all usages are migrated
+✅ **Final Migration Completed:**
+- ✅ `FineTuningDataController` - Now injects `FineTuningService` as a bean
+- ✅ `ConversationService` - Now injects `ConversationRepository` and `ConversationMessageRepository` directly
+- ✅ `FineTuningService` - Now injects `QuestionSuggestionForFineTuningRepository` directly and converted to `@Service` bean
+- ✅ `MakeMe` (test utility) - Removed `ModelFactoryService` dependency
+- ✅ `EmbeddingMaintenanceJobTests` - Updated to inject `NotebookRepository` directly
+- ✅ `ModelFactoryService` class - Removed entirely
 
 ## Success Criteria
 
@@ -107,5 +104,5 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ All services use constructor injection instead of field injection
 - ✅ All tests updated and passing
 - ✅ Code follows Spring Boot conventions consistently
-- ⏳ All `ModelFactoryService` operations migrated to appropriate domain services
-- ⏳ `ModelFactoryService` removed entirely
+- ✅ All `ModelFactoryService` operations migrated to appropriate domain services
+- ✅ `ModelFactoryService` removed entirely

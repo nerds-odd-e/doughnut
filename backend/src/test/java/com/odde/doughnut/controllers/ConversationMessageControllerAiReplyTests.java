@@ -12,6 +12,8 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.RecallPrompt;
+import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
+import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -43,6 +45,8 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired ConversationRepository conversationRepository;
+  @Autowired ConversationMessageRepository conversationMessageRepository;
   private ConversationService conversationService;
   Conversation conversation;
 
@@ -61,7 +65,9 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
     ChatCompletionConversationService chatCompletionConversationService =
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
-    conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
+    conversationService =
+        new ConversationService(
+            testabilitySettings, conversationRepository, conversationMessageRepository);
     controller =
         new ConversationMessageController(
             conversationService, chatCompletionConversationService, authorizationService);

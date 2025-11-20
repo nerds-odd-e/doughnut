@@ -8,9 +8,10 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
+import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.FineTuningService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.theokanning.openai.client.OpenAiApi;
@@ -27,19 +28,20 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FineTuningDataControllerTests extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   FineTuningDataController controller;
   @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.anAdmin().please());
+    FineTuningService fineTuningService =
+        new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
     controller =
         new FineTuningDataController(
-            modelFactoryService,
-            new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
-            openAiApi,
+            fineTuningService,
             new OtherAiServices(openAiApi),
+            new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
             authorizationService);
   }
 
@@ -48,12 +50,13 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void authentication() {
       currentUser.setUser(makeMe.aUser().please());
+      FineTuningService fineTuningService =
+          new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
       controller =
           new FineTuningDataController(
-              modelFactoryService,
-              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
-              openAiApi,
+              fineTuningService,
               new OtherAiServices(openAiApi),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.uploadAndTriggerFineTuning());
@@ -103,12 +106,13 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
       currentUser.setUser(null);
+      FineTuningService fineTuningService =
+          new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
       controller =
           new FineTuningDataController(
-              modelFactoryService,
-              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
-              openAiApi,
+              fineTuningService,
               new OtherAiServices(openAiApi),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.getAllSuggestedQuestions());
@@ -146,12 +150,13 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void itShouldNotAllowNonAdmin() {
       currentUser.setUser(makeMe.aUser().please());
+      FineTuningService fineTuningService =
+          new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
       controller =
           new FineTuningDataController(
-              modelFactoryService,
-              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
-              openAiApi,
+              fineTuningService,
               new OtherAiServices(openAiApi),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -160,10 +165,9 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
 
     @Test
     void onlyUpdate() throws UnexpectedNoAccessRightException {
-      long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
+      long oldCount = questionSuggestionForFineTuningRepository.count();
       controller.updateSuggestedQuestionForFineTuning(suggested, suggest);
-      assertThat(
-          modelFactoryService.questionSuggestionForFineTuningRepository.count(), equalTo(oldCount));
+      assertThat(questionSuggestionForFineTuningRepository.count(), equalTo(oldCount));
     }
 
     @Test
@@ -187,12 +191,13 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void itShouldNotAllowNonAdmin() {
       currentUser.setUser(makeMe.aUser().please());
+      FineTuningService fineTuningService =
+          new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
       controller =
           new FineTuningDataController(
-              modelFactoryService,
-              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
-              openAiApi,
+              fineTuningService,
               new OtherAiServices(openAiApi),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               authorizationService);
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.duplicate(suggested));
     }
@@ -217,23 +222,22 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void itShouldNotAllowNonAdmin() {
       currentUser.setUser(makeMe.aUser().please());
+      FineTuningService fineTuningService =
+          new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
       controller =
           new FineTuningDataController(
-              modelFactoryService,
-              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
-              openAiApi,
+              fineTuningService,
               new OtherAiServices(openAiApi),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               authorizationService);
       assertThrows(UnexpectedNoAccessRightException.class, () -> controller.delete(suggested));
     }
 
     @Test
     void createANewIdenticalSuggestion() throws UnexpectedNoAccessRightException {
-      var beforeCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
+      var beforeCount = questionSuggestionForFineTuningRepository.count();
       controller.delete(suggested);
-      assertThat(
-          modelFactoryService.questionSuggestionForFineTuningRepository.count(),
-          equalTo(beforeCount - 1));
+      assertThat(questionSuggestionForFineTuningRepository.count(), equalTo(beforeCount - 1));
     }
   }
 }

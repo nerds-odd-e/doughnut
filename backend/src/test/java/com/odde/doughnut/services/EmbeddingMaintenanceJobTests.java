@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 class EmbeddingMaintenanceJobTests {
 
   @Autowired MakeMe makeMe;
+  @Autowired NotebookRepository notebookRepository;
 
   @Mock NotebookIndexingService notebookIndexingService;
 
@@ -36,10 +37,7 @@ class EmbeddingMaintenanceJobTests {
     makeMe.aNote().under(nb1.getHeadNote()).please();
     makeMe.aNote().under(nb2.getHeadNote()).please();
 
-    // Use a real repository to enumerate notebooks
-    NotebookRepository repo = makeMe.modelFactoryService.notebookRepository;
-
-    job = new EmbeddingMaintenanceJob(repo, notebookIndexingService);
+    job = new EmbeddingMaintenanceJob(notebookRepository, notebookIndexingService);
   }
 
   @Test

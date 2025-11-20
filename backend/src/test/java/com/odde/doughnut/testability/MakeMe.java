@@ -2,7 +2,6 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteEmbeddingService;
 import com.odde.doughnut.testability.builders.*;
 import java.sql.Timestamp;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MakeMe extends MakeMeWithoutDB {
-  @Autowired public ModelFactoryService modelFactoryService;
   @Autowired public EntityPersister entityPersister;
   @Autowired public NoteEmbeddingService noteEmbeddingService;
 

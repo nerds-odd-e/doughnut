@@ -6,7 +6,8 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
+import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
@@ -22,7 +23,8 @@ public class ConversationService {
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
-  private final ModelFactoryService modelFactoryService;
+  private final ConversationRepository conversationRepository;
+  private final ConversationMessageRepository conversationMessageRepository;
 
   private Conversation initializeConversation(User initiator) {
     Conversation conversation = new Conversation();
@@ -34,28 +36,27 @@ public class ConversationService {
       AssessmentQuestionInstance assessmentQuestionInstance, User initiator) {
     Conversation conversation = initializeConversation(initiator);
     conversation.setAssessmentQuestionInstance(assessmentQuestionInstance);
-    return modelFactoryService.conversationRepository.save(conversation);
+    return conversationRepository.save(conversation);
   }
 
   public Conversation startConversationAboutRecallPrompt(
       RecallPrompt recallPrompt, User initiator) {
     Conversation conversation = initializeConversation(initiator);
     conversation.setRecallPrompt(recallPrompt);
-    modelFactoryService.conversationRepository.save(conversation);
+    conversationRepository.save(conversation);
     return conversation;
   }
 
   public Conversation startConversationOfNote(Note note, User initiator, String message) {
     Conversation conversation = initializeConversation(initiator);
     conversation.setNote(note);
-    modelFactoryService.conversationRepository.save(conversation);
+    conversationRepository.save(conversation);
     addMessageToConversation(conversation, initiator, message);
     return conversation;
   }
 
   public List<Conversation> conversationRelatedToUser(User user) {
-    return modelFactoryService.conversationRepository
-        .findByUserInSubjectOwnershipOrConversationInitiator(user);
+    return conversationRepository.findByUserInSubjectOwnershipOrConversationInitiator(user);
   }
 
   public ConversationMessage addMessageToConversation(
@@ -68,7 +69,7 @@ public class ConversationService {
     conversationMessage.setMessage(message);
     conversationMessage.setCreatedAt(currentUTCTimestamp);
 
-    return modelFactoryService.conversationMessageRepository.save(conversationMessage);
+    return conversationMessageRepository.save(conversationMessage);
   }
 
   public void markConversationAsRead(Conversation conversation, User user) {
@@ -79,13 +80,13 @@ public class ConversationService {
               if (!conversationMessage.getReadByReceiver()
                   && !Objects.equals(conversationMessage.getSender(), user)) {
                 conversationMessage.setReadByReceiver(true);
-                modelFactoryService.conversationMessageRepository.save(conversationMessage);
+                conversationMessageRepository.save(conversationMessage);
               }
             });
   }
 
   public List<ConversationMessage> getUnreadConversations(User user) {
-    return modelFactoryService.conversationRepository.findUnreadMessagesByUser(user);
+    return conversationRepository.findUnreadMessagesByUser(user);
   }
 
   public List<Conversation> getConversationsAboutNote(Note note, User entity) {

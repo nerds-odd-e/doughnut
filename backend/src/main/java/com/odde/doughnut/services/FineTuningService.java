@@ -1,27 +1,31 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+@Service
 public class FineTuningService {
-  private final ModelFactoryService modelFactoryService;
+  private final QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
 
   public final OpenAiApiHandler openAiApiHandler;
 
-  public FineTuningService(ModelFactoryService modelFactoryService, OpenAiApi openAiApi) {
-    this.modelFactoryService = modelFactoryService;
+  public FineTuningService(
+      QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository,
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+    this.questionSuggestionForFineTuningRepository = questionSuggestionForFineTuningRepository;
     this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
   }
 
   public List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {
     List<SuggestedQuestionForFineTuning> suggestedQuestionForFineTunings = new ArrayList<>();
-    modelFactoryService
-        .questionSuggestionForFineTuningRepository
+    questionSuggestionForFineTuningRepository
         .findAll()
         .forEach(suggestedQuestionForFineTunings::add);
     return suggestedQuestionForFineTunings;

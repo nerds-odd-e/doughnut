@@ -10,8 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
+import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
@@ -35,7 +36,8 @@ class ConversationMessageControllerTest extends ControllerTestBase {
   @Autowired ConversationService conversationService;
   ConversationMessageController controller;
 
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired ConversationRepository conversationRepository;
+  @Autowired ConversationMessageRepository conversationMessageRepository;
   @Autowired GlobalSettingsService globalSettingsService;
   AssessmentQuestionInstance assessmentQuestionInstance;
 
@@ -60,8 +62,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
   void teststartConversationAboutAssessmentQuestionReturnsOk() {
     String feedback = "This is a feedback";
     controller.startConversationAboutAssessmentQuestion(feedback, assessmentQuestionInstance);
-    List<Conversation> conversations =
-        (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+    List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
     assertEquals(1, conversations.size());
   }
 
@@ -71,8 +72,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     Conversation conversation =
         controller.startConversationAboutAssessmentQuestion(feedback, assessmentQuestionInstance);
 
-    List<Conversation> conversations =
-        (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+    List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
 
     makeMe.refresh(conversation);
     var conversationDetail = conversation.getConversationMessages();
@@ -249,7 +249,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
       List<ConversationMessage> conversationMessages =
-          (List<ConversationMessage>) modelFactoryService.conversationMessageRepository.findAll();
+          (List<ConversationMessage>) conversationMessageRepository.findAll();
       assertEquals(1, conversationMessages.size());
       assertEquals(message, conversationMessage.getMessage());
     }
@@ -299,8 +299,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @Test
     void shouldStartConversation() {
       controller.startConversationAboutNote(note, msg);
-      List<Conversation> conversations =
-          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+      List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
       assertEquals(1, conversations.size());
       Conversation conversation = conversations.getFirst();
       assertEquals(conversation.getConversationInitiator(), currentUser.getUser());
@@ -455,8 +454,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @Test
     void shouldStartConversation() {
       Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
-      List<Conversation> conversations =
-          (List<Conversation>) modelFactoryService.conversationRepository.findAll();
+      List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
       assertEquals(1, conversations.size());
       assertEquals(conversation.getConversationInitiator(), currentUser.getUser());
     }

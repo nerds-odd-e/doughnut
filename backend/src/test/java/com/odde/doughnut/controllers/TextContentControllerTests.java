@@ -9,17 +9,13 @@ import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerTests extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
-
   TextContentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note note;

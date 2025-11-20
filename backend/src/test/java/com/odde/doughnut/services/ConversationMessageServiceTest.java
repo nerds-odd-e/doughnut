@@ -7,8 +7,9 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
 import com.odde.doughnut.entities.repositories.CertificateRepository;
+import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
+import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -25,13 +26,14 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class ConversationMessageServiceTest {
-  @Autowired ModelFactoryService modelFactoryService;
   @Autowired EntityPersister entityPersister;
   @Autowired MakeMe makeMe;
   @Autowired AnswerService answerService;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
   @Autowired CertificateRepository certificateRepository;
+  @Autowired ConversationRepository conversationRepository;
+  @Autowired ConversationMessageRepository conversationMessageRepository;
   private ConversationService conversationService;
   private AssessmentService assessmentService;
   private CurrentUser currentUser;
@@ -39,7 +41,9 @@ class ConversationMessageServiceTest {
 
   @BeforeEach
   void setup() {
-    conversationService = new ConversationService(testabilitySettings, this.modelFactoryService);
+    conversationService =
+        new ConversationService(
+            testabilitySettings, conversationRepository, conversationMessageRepository);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
     assessmentService =

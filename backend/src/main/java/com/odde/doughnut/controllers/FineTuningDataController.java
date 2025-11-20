@@ -3,42 +3,28 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.FineTuningService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.theokanning.openai.client.OpenAiApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
 
+@RequiredArgsConstructor
 @RestController
 @SessionScope
 @RequestMapping("/api/fine-tuning")
 class FineTuningDataController {
-  private final ModelFactoryService modelFactoryService;
   private final FineTuningService fineTuningService;
   private final OtherAiServices otherAiServices;
   private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   private final AuthorizationService authorizationService;
-
-  public FineTuningDataController(
-      ModelFactoryService modelFactoryService,
-      SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
-      OpenAiApi openAiApi,
-      OtherAiServices otherAiServices,
-      AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
-    this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
-    this.fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
-    this.otherAiServices = otherAiServices;
-    this.authorizationService = authorizationService;
-  }
 
   @PatchMapping("/{suggestedQuestion}/update-suggested-question-for-fine-tuning")
   @Transactional

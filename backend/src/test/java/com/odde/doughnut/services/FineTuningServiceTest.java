@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
@@ -24,14 +24,14 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class FineTuningServiceTest {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   @Autowired MakeMe makeMe;
   private FineTuningService fineTuningService;
   @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
-    fineTuningService = new FineTuningService(this.modelFactoryService, openAiApi);
+    fineTuningService = new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
   }
 
   @Nested
