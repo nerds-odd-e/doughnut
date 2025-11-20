@@ -67,10 +67,7 @@ public class Ownership {
       EntityPersister entityPersister,
       String topicConstructor) {
     NoteService noteService =
-        new NoteService(
-            modelFactoryService.noteRepository,
-            modelFactoryService.entityManager,
-            modelFactoryService.entityPersister);
+        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityPersister);
     final Note note =
         new NoteConstructionService(
                 user, currentUTCTimestamp, modelFactoryService, entityPersister, noteService)

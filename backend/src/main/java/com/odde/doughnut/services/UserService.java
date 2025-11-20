@@ -8,8 +8,8 @@ import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteReviewRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.entities.repositories.UserTokenRepository;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.utils.TimestampOperations;
-import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -21,31 +21,31 @@ import org.springframework.stereotype.Service;
 public class UserService {
   private final NoteReviewRepository noteReviewRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
-  private final EntityManager entityManager;
+  private final EntityPersister entityPersister;
   private final UserRepository userRepository;
   private final UserTokenRepository userTokenRepository;
 
   public UserService(
       NoteReviewRepository noteReviewRepository,
       MemoryTrackerRepository memoryTrackerRepository,
-      EntityManager entityManager,
+      EntityPersister entityPersister,
       UserRepository userRepository,
       UserTokenRepository userTokenRepository) {
     this.noteReviewRepository = noteReviewRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
-    this.entityManager = entityManager;
+    this.entityPersister = entityPersister;
     this.userRepository = userRepository;
     this.userTokenRepository = userTokenRepository;
   }
 
   public void setDailyAssimilationCount(User user, Integer count) {
     user.setDailyAssimilationCount(count);
-    entityManager.merge(user);
+    entityPersister.merge(user);
   }
 
   public void setSpaceIntervals(User user, String spaceIntervals) {
     user.setSpaceIntervals(spaceIntervals);
-    entityManager.merge(user);
+    entityPersister.merge(user);
   }
 
   public int getUnassimilatedNoteCount(User user) {

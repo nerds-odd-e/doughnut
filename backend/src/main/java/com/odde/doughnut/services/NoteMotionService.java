@@ -4,16 +4,16 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
-import jakarta.persistence.EntityManager;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
 public class NoteMotionService {
-  private final EntityManager entityManager;
+  private final EntityPersister entityPersister;
 
-  public NoteMotionService(EntityManager entityManager) {
-    this.entityManager = entityManager;
+  public NoteMotionService(EntityPersister entityPersister) {
+    this.entityPersister = entityPersister;
   }
 
   public void execute(Note subject, Note relativeToNote, boolean asFirstChildOfNote)
@@ -30,14 +30,12 @@ public class NoteMotionService {
     subject.adjustPositionAsAChildOfParentInMemory();
 
     // Save all descendants as their notebooks have changed
-    subject.getAllDescendants().forEach(entityManager::merge);
-    entityManager.merge(subject);
-    entityManager.flush();
+    subject.getAllDescendants().forEach(entityPersister::merge);
+    entityPersister.merge(subject);
+    entityPersister.flush();
 
     if (notebook.getHeadNote() == subject) {
-      Notebook mergedNotebook = entityManager.merge(notebook);
-      entityManager.remove(mergedNotebook);
-      entityManager.flush();
+      entityPersister.remove(notebook);
     }
   }
 

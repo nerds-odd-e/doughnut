@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
 import org.apache.logging.log4j.util.Strings;
@@ -14,13 +13,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class NoteService {
   private final NoteRepository noteRepository;
-  private final EntityManager entityManager;
   private final EntityPersister entityPersister;
 
-  public NoteService(
-      NoteRepository noteRepository, EntityManager entityManager, EntityPersister entityPersister) {
+  public NoteService(NoteRepository noteRepository, EntityPersister entityPersister) {
     this.noteRepository = noteRepository;
-    this.entityManager = entityManager;
     this.entityPersister = entityPersister;
   }
 
@@ -28,23 +24,23 @@ public class NoteService {
     if (note.getNotebook() != null) {
       if (note.getNotebook().getHeadNote() == note) {
         note.getNotebook().setDeletedAt(currentUTCTimestamp);
-        entityManager.merge(note.getNotebook());
+        entityPersister.merge(note.getNotebook());
       }
     }
 
     note.setDeletedAt(currentUTCTimestamp);
-    entityManager.merge(note);
+    entityPersister.merge(note);
   }
 
   public void restore(Note note) {
     if (note.getNotebook() != null) {
       if (note.getNotebook().getHeadNote() == note) {
         note.getNotebook().setDeletedAt(null);
-        entityManager.merge(note.getNotebook());
+        entityPersister.merge(note.getNotebook());
       }
     }
     note.setDeletedAt(null);
-    entityManager.merge(note);
+    entityPersister.merge(note);
   }
 
   public boolean hasDuplicateWikidataId(Note note) {

@@ -30,10 +30,7 @@ public class ObsidianFormatService {
     this.modelFactoryService = modelFactoryService;
     this.entityPersister = entityPersister;
     NoteService noteService =
-        new NoteService(
-            modelFactoryService.noteRepository,
-            modelFactoryService.entityManager,
-            modelFactoryService.entityPersister);
+        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityPersister);
     noteConstructionService =
         new NoteConstructionService(
             user,
