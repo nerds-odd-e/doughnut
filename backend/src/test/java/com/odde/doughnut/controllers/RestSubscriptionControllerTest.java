@@ -40,7 +40,11 @@ class SubscriptionControllerTest {
   void setup() {
     currentUser = new CurrentUser(makeMe.aUser().please());
     AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
-    topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+    topNote =
+        makeMe
+            .aNote()
+            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+            .please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
     controller = new SubscriptionController(makeMe.modelFactoryService, authorizationService);

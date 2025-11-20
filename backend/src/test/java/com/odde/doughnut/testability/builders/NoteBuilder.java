@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -50,6 +51,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
       throw new AssertionError("creator already set for " + entity.toString());
     entity.setCreator(user);
     return this;
+  }
+
+  public NoteBuilder creatorAndOwner(UserModel userModel) {
+    return creatorAndOwner(userModel.getEntity());
   }
 
   public NoteBuilder ownership(Ownership ownership) {

@@ -31,7 +31,7 @@ public class UserModelSearchTest {
   @Autowired MakeMe makeMe;
   @Autowired NoteSearchService noteSearchService;
   User user;
-  User anotherUser;
+  UserModel anotherUser;
   Note note;
   final SearchTerm searchTerm = new SearchTerm();
 
@@ -39,7 +39,7 @@ public class UserModelSearchTest {
   void setup() {
     user = makeMe.aUser().please();
     note = makeMe.aNote().creatorAndOwner(user).please();
-    anotherUser = makeMe.aUser().please();
+    anotherUser = makeMe.aUser().toModelPlease();
   }
 
   private List<NoteSearchResult> search() {

@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
@@ -23,13 +22,13 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserModelAuthorityTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  User user;
-  User anotherUser;
+  UserModel userModel;
+  UserModel anotherUser;
 
   @BeforeEach
   void setup() {
-    user = makeMe.aUser().please();
-    anotherUser = makeMe.aUser().please();
+    userModel = makeMe.aUser().toModelPlease();
+    anotherUser = makeMe.aUser().toModelPlease();
   }
 
   @Nested
@@ -47,13 +46,13 @@ public class UserModelAuthorityTest {
     void userCanNotAccessNotesBelongToCircle() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> authorizationService.assertAuthorization(user, note));
+          () -> authorizationService.assertAuthorization(userModel.getEntity(), note));
     }
 
     @Test
     void userCanAccessNotesBelongToCircleIfIsAMember() throws UnexpectedNoAccessRightException {
-      makeMe.theCircle(circle).hasMember(user).please();
-      authorizationService.assertAuthorization(user, note);
+      makeMe.theCircle(circle).hasMember(userModel).please();
+      authorizationService.assertAuthorization(userModel.getEntity(), note);
     }
   }
 
@@ -70,7 +69,9 @@ public class UserModelAuthorityTest {
     void userCanNotAccessNotesBelongToCircle() {
       assertThrows(
           ResponseStatusException.class,
-          () -> authorizationService.assertReadAuthorization(null, note));
+          () ->
+              authorizationService.assertReadAuthorization(
+                  makeMe.aNullUserModelPlease().getEntity(), note));
     }
   }
 }

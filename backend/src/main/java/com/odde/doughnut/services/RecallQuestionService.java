@@ -16,16 +16,13 @@ public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
   private final ModelFactoryService modelFactoryService;
   private final AiQuestionGenerator aiQuestionGenerator;
-  private final UserService userService;
 
   public RecallQuestionService(
       OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
       Randomizer randomizer,
-      ObjectMapper objectMapper,
-      UserService userService) {
+      ObjectMapper objectMapper) {
     this.modelFactoryService = modelFactoryService;
-    this.userService = userService;
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi, new GlobalSettingsService(modelFactoryService), randomizer, objectMapper);
@@ -82,8 +79,7 @@ public class RecallQuestionService {
   public AnsweredQuestion answerQuestion(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
     Answer answer = modelFactoryService.createAnswerForQuestion(recallPrompt, answerDTO);
-    MemoryTrackerService memoryTrackerService =
-        new MemoryTrackerService(modelFactoryService, userService);
+    MemoryTrackerService memoryTrackerService = new MemoryTrackerService(modelFactoryService);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();

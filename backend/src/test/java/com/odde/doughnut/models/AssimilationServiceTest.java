@@ -7,7 +7,6 @@ import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.SubscriptionService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -27,20 +26,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class AssimilationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired SubscriptionService subscriptionService;
-  @Autowired UserService userService;
-  User user;
-  User anotherUser;
+  UserModel userModel;
+  UserModel anotherUser;
   Timestamp day1;
   AssimilationService assimilationService;
 
   @BeforeEach
   void setup() {
-    user = makeMe.aUser().please();
-    anotherUser = makeMe.aUser().please();
+    userModel = makeMe.aUser().toModelPlease();
+    anotherUser = makeMe.aUser().toModelPlease();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
     assimilationService =
         new AssimilationService(
-            user, userService, subscriptionService, day1, ZoneId.of("Asia/Shanghai"));
+            userModel,
+            makeMe.modelFactoryService,
+            subscriptionService,
+            day1,
+            ZoneId.of("Asia/Shanghai"));
   }
 
   @Test
@@ -57,15 +59,15 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      note1 = makeMe.aNote("note1").creatorAndOwner(user).please();
-      note2 = makeMe.aNote("note2").creatorAndOwner(user).please();
+      note1 = makeMe.aNote("note1").creatorAndOwner(userModel).please();
+      note2 = makeMe.aNote("note2").creatorAndOwner(userModel).please();
     }
 
     @Test
     void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(2));
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note1));
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
       assertThat(assimilationService.getCounts().getDueCount(), equalTo(1));
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
@@ -91,7 +93,7 @@ public class AssimilationServiceTest {
       @BeforeEach
       void thereIsALinkAndAnotherNote() {
         note1ToNote2 = makeMe.aReification().between(note1, note2).please();
-        anotherNote = makeMe.aNote("another note").creatorAndOwner(user).please();
+        anotherNote = makeMe.aNote("another note").creatorAndOwner(userModel).please();
       }
 
       private List<Note> getAllDueMemoryTrackers() {
@@ -154,7 +156,7 @@ public class AssimilationServiceTest {
 
       @BeforeEach
       void setup() {
-        userService.setDailyAssimilationCount(user, 1);
+        userModel.setAndSaveDailyAssimilationCount(1);
       }
 
       @Test
@@ -164,13 +166,18 @@ public class AssimilationServiceTest {
 
       @Test
       void shouldNotIncludeNotesThatAreAlreadyReviewed() {
-        makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
         assertThat(getFirstInitialMemoryTracker(assimilationService), is(nullValue()));
       }
 
       @Test
       void shouldNotCountSkippedMemoryTracker() {
-        makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).removedFromTracking().please();
+        makeMe
+            .aMemoryTrackerFor(note1)
+            .by(userModel)
+            .assimilatedAt(day1)
+            .removedFromTracking()
+            .please();
         assertThat(getFirstInitialMemoryTracker(assimilationService), is(note2));
       }
 
@@ -182,21 +189,29 @@ public class AssimilationServiceTest {
 
       @Test
       void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
-        makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
         Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
-                user, userService, subscriptionService, day1_23, ZoneId.of("Asia/Shanghai"));
+                userModel,
+                makeMe.modelFactoryService,
+                subscriptionService,
+                day1_23,
+                ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), is(nullValue()));
       }
 
       @Test
       void theDailyCountShouldBeResetOnNextDay() {
-        makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
+        makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
         Timestamp day2 = makeMe.aTimestamp().of(2, 1).fromShanghai().please();
         AssimilationService recallService =
             new AssimilationService(
-                user, userService, subscriptionService, day2, ZoneId.of("Asia/Shanghai"));
+                userModel,
+                makeMe.modelFactoryService,
+                subscriptionService,
+                day2,
+                ZoneId.of("Asia/Shanghai"));
         assertThat(getFirstInitialMemoryTracker(recallService), equalTo(note2));
       }
     }
@@ -213,8 +228,13 @@ public class AssimilationServiceTest {
       Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().under(top).please();
       note2 = makeMe.aNote().under(top).please();
-      makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
-      makeMe.refresh(user);
+      makeMe
+          .aSubscription()
+          .forNotebook(top.getNotebook())
+          .forUser(userModel.entity)
+          .daily(1)
+          .please();
+      makeMe.refresh(userModel.getEntity());
     }
 
     @Test
@@ -232,8 +252,8 @@ public class AssimilationServiceTest {
 
     @Test
     void reviewedMoreThanPlanned() {
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(day1).please();
-      makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(day1).please();
+      makeMe.aMemoryTrackerFor(note2).by(userModel).assimilatedAt(day1).please();
       assertThat(getFirstInitialMemoryTracker(assimilationService), nullValue());
     }
   }
@@ -243,9 +263,9 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      Circle please = makeMe.aCircle().hasMember(user).please();
+      Circle please = makeMe.aCircle().hasMember(userModel).please();
       makeMe.aNote().inCircle(please).please();
-      makeMe.refresh(user);
+      makeMe.refresh(userModel.getEntity());
     }
 
     @Test
@@ -266,7 +286,7 @@ public class AssimilationServiceTest {
 
     @BeforeEach
     void setup() {
-      makeMe.theUser(user).dailyAssimilationCount(2).please();
+      makeMe.theUser(userModel.getEntity()).dailyAssimilationCount(2).please();
       // Set up subscription notes
       User anotherUser = makeMe.aUser().please();
       Note top = makeMe.aNote().skipMemoryTracking().creatorAndOwner(anotherUser).please();
@@ -276,26 +296,35 @@ public class AssimilationServiceTest {
       note4 = makeMe.aNote().under(top).please();
 
       // Set up subscription with daily limit of 1
-      makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(user).daily(1).please();
+      makeMe
+          .aSubscription()
+          .forNotebook(top.getNotebook())
+          .forUser(userModel.entity)
+          .daily(1)
+          .please();
 
       // Set up a note that belongs to the user
-      makeMe.aNote().creatorAndOwner(user).please();
+      makeMe.aNote().creatorAndOwner(userModel).please();
 
-      makeMe.refresh(user);
+      makeMe.refresh(userModel.getEntity());
 
       // Set up timestamps for last night 11pm and next day 6am
       earlyMorning = makeMe.aTimestamp().of(1, 6).fromShanghai().please();
       lateMorning = makeMe.aTimestamp().of(1, 10).fromShanghai().please();
 
       // Review more notes than daily limit last night
-      makeMe.aMemoryTrackerFor(note1).by(user).assimilatedAt(earlyMorning).please();
-      makeMe.aMemoryTrackerFor(note2).by(user).assimilatedAt(earlyMorning).please();
-      makeMe.aMemoryTrackerFor(note3).by(user).assimilatedAt(earlyMorning).please();
+      makeMe.aMemoryTrackerFor(note1).by(userModel).assimilatedAt(earlyMorning).please();
+      makeMe.aMemoryTrackerFor(note2).by(userModel).assimilatedAt(earlyMorning).please();
+      makeMe.aMemoryTrackerFor(note3).by(userModel).assimilatedAt(earlyMorning).please();
 
       // Create service for early morning check
       earlyMorningService =
           new AssimilationService(
-              user, userService, subscriptionService, lateMorning, ZoneId.of("Asia/Shanghai"));
+              userModel,
+              makeMe.modelFactoryService,
+              subscriptionService,
+              lateMorning,
+              ZoneId.of("Asia/Shanghai"));
     }
 
     @Test

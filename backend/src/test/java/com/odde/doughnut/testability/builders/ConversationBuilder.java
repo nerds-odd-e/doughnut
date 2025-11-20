@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -37,6 +38,10 @@ public class ConversationBuilder extends EntityBuilder<Conversation> {
   public ConversationBuilder forANote(Note note) {
     this.entity.setNote(note);
     return this;
+  }
+
+  public ConversationBuilder from(UserModel currentUser) {
+    return from(currentUser.getEntity());
   }
 
   public ConversationBuilder from(User currentUser) {

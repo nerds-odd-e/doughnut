@@ -8,17 +8,16 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MemoryTrackerService {
   private final ModelFactoryService modelFactoryService;
-  private final UserService userService;
 
-  public MemoryTrackerService(ModelFactoryService modelFactoryService, UserService userService) {
+  public MemoryTrackerService(ModelFactoryService modelFactoryService) {
     this.modelFactoryService = modelFactoryService;
-    this.userService = userService;
   }
 
   public List<MemoryTracker> assimilate(
@@ -73,8 +72,9 @@ public class MemoryTrackerService {
 
   public void updateMemoryTrackerAfterAnsweringQuestion(
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
+    UserModel userModel = modelFactoryService.toUserModel(user);
     List<MemoryTracker> memoryTrackers =
-        userService.getMemoryTrackersFor(user, recallPrompt.getPredefinedQuestion().getNote());
+        userModel.getMemoryTrackersFor(recallPrompt.getPredefinedQuestion().getNote());
     memoryTrackers.stream()
         .filter(
             tracker -> {

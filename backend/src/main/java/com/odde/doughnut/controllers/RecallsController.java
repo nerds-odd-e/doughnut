@@ -2,10 +2,9 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
-import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
 import java.sql.Timestamp;
@@ -21,22 +20,20 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/recalls")
 class RecallsController {
+  private final ModelFactoryService modelFactoryService;
+
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
-  private final UserService userService;
-  private final MemoryTrackerRepository memoryTrackerRepository;
 
   public RecallsController(
+      ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService,
-      UserService userService,
-      MemoryTrackerRepository memoryTrackerRepository) {
+      AuthorizationService authorizationService) {
+    this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.userService = userService;
-    this.memoryTrackerRepository = memoryTrackerRepository;
   }
 
   @GetMapping("/overview")
@@ -46,11 +43,10 @@ class RecallsController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return new RecallService(
-            authorizationService.getCurrentUser(),
+            modelFactoryService.toUserModel(authorizationService.getCurrentUser()),
             currentUTCTimestamp,
             timeZone,
-            userService,
-            memoryTrackerRepository)
+            modelFactoryService)
         .getRecallStatus();
   }
 
@@ -63,11 +59,10 @@ class RecallsController {
     ZoneId timeZone = ZoneId.of(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return new RecallService(
-            authorizationService.getCurrentUser(),
+            modelFactoryService.toUserModel(authorizationService.getCurrentUser()),
             currentUTCTimestamp,
             timeZone,
-            userService,
-            memoryTrackerRepository)
+            modelFactoryService)
         .getDueMemoryTrackers(dueInDays == null ? 0 : dueInDays);
   }
 }
