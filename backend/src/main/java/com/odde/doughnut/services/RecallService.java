@@ -11,51 +11,46 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Stream;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RecallService {
 
-  private final User user;
   private final UserService userService;
-  private final Timestamp currentUTCTimestamp;
-  private final ZoneId timeZone;
   private final MemoryTrackerRepository memoryTrackerRepository;
 
-  public RecallService(
-      User user,
-      UserService userService,
-      Timestamp currentUTCTimestamp,
-      ZoneId timeZone,
-      MemoryTrackerRepository memoryTrackerRepository) {
-    this.user = user;
+  @Autowired
+  public RecallService(UserService userService, MemoryTrackerRepository memoryTrackerRepository) {
     this.userService = userService;
-    this.currentUTCTimestamp = currentUTCTimestamp;
-    this.timeZone = timeZone;
     this.memoryTrackerRepository = memoryTrackerRepository;
   }
 
-  private int totalAssimilatedCount() {
+  private int totalAssimilatedCount(User user) {
     return memoryTrackerRepository.countByUserNotRemoved(user.getId());
   }
 
-  private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(int dueInDays) {
+  private Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(
+      User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
     return userService.getMemoryTrackersNeedToRepeat(
         user,
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, dueInDays * 24),
         timeZone);
   }
 
-  public RecallStatus getRecallStatus() {
+  public RecallStatus getRecallStatus(User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
     RecallStatus recallStatus = new RecallStatus();
-    recallStatus.toRepeatCount = getToRecallCount();
-    recallStatus.totalAssimilatedCount = totalAssimilatedCount();
+    recallStatus.toRepeatCount = getToRecallCount(user, currentUTCTimestamp, timeZone);
+    recallStatus.totalAssimilatedCount = totalAssimilatedCount(user);
     recallStatus.setRecallWindowEndAt(
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
     return recallStatus;
   }
 
-  public DueMemoryTrackers getDueMemoryTrackers(int dueInDays) {
+  public DueMemoryTrackers getDueMemoryTrackers(
+      User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
     List<MemoryTrackerLite> toRepeat =
-        getMemoryTrackersNeedToRepeat(dueInDays)
+        getMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, dueInDays)
             .map(
                 mt -> {
                   MemoryTrackerLite lite = new MemoryTrackerLite();
@@ -69,7 +64,7 @@ public class RecallService {
     dueMemoryTrackers.setToRepeat(toRepeat);
 
     // Set recall status (always based on dueInDays=0)
-    RecallStatus status = getRecallStatus();
+    RecallStatus status = getRecallStatus(user, currentUTCTimestamp, timeZone);
     dueMemoryTrackers.toRepeatCount = status.toRepeatCount;
     dueMemoryTrackers.totalAssimilatedCount = status.totalAssimilatedCount;
     dueMemoryTrackers.setRecallWindowEndAt(status.getRecallWindowEndAt());
@@ -77,7 +72,7 @@ public class RecallService {
     return dueMemoryTrackers;
   }
 
-  public int getToRecallCount() {
-    return (int) getMemoryTrackersNeedToRepeat(0).count();
+  public int getToRecallCount(User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    return (int) getMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, 0).count();
   }
 }
