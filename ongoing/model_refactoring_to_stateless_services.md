@@ -28,11 +28,13 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - `RecallService`: Refactored to take `User` entity and `UserService` instead of `UserModel`
 - `AssimilationService`: Refactored to take `User` entity and `UserService` instead of `UserModel`
 - `MemoryTrackerService`: Refactored to use `UserService` instead of creating `UserModel` internally
+- `UserService`: Added user token operations (`findUserByToken`, `findTokensByUser`, `findTokenByTokenId`, `deleteToken`)
 
 ✅ **Test Improvements:**
 - Tests now use entities directly via `makeMe.aUser().please()` instead of `toModelPlease()`
 - Tests inject domain services instead of `ModelFactoryService` for model creation
 - Tests call service methods with entities as parameters
+- `ControllerTestBase`: Added `UserService` injection for controller tests
 
 ## Remaining Work
 
@@ -40,11 +42,11 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 
 `ModelFactoryService` still contains operations that should be moved to appropriate domain services:
 
-**User Token Operations** → Move to `UserService`:
-- `findUserByToken(String token)`
-- `findTokensByUser(Integer id)`
-- `findTokenByTokenId(Integer id)`
-- `deleteToken(Integer tokenId)`
+✅ **User Token Operations** → Moved to `UserService`:
+- `findUserByToken(String token)` ✅
+- `findTokensByUser(Integer id)` ✅
+- `findTokenByTokenId(Integer id)` ✅
+- `deleteToken(Integer tokenId)` ✅
 
 **Note Embedding Operations** → Move to `NoteEmbeddingService`:
 - `storeNoteEmbedding(Note note, List<Float> embedding)`

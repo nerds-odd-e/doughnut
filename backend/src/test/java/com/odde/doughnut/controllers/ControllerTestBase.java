@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public abstract class ControllerTestBase {
   @Autowired protected MakeMe makeMe;
   @Autowired protected AuthorizationService authorizationService;
+  @Autowired protected UserService userService;
 
   @TestBean protected CurrentUser currentUser;
 

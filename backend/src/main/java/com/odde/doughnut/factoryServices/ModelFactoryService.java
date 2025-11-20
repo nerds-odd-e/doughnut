@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.services.AuthorizationService;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,6 @@ public class ModelFactoryService {
   @Autowired public ConversationMessageRepository conversationMessageRepository;
   @Autowired public NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
   @Autowired public RecallPromptRepository recallPromptRepository;
-  @Autowired public UserTokenRepository userTokenRepository;
 
   @Autowired
   public QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
@@ -67,29 +65,6 @@ public class ModelFactoryService {
 
   public Optional<User> findUserById(Integer id) {
     return userRepository.findById(id);
-  }
-
-  public Optional<User> findUserByToken(String token) {
-    UserToken usertoken = userTokenRepository.findByToken(token);
-
-    if (usertoken == null) {
-      AuthorizationService.throwUserNotFound();
-    }
-
-    return this.findUserById(usertoken.getUserId());
-  }
-
-  public Optional<List<UserToken>> findTokensByUser(Integer id) {
-    List<UserToken> usertokens = userTokenRepository.findByUserId(id);
-    return Optional.ofNullable(usertokens);
-  }
-
-  public Optional<UserToken> findTokenByTokenId(Integer id) {
-    return userTokenRepository.findById(id);
-  }
-
-  public void deleteToken(Integer tokenId) {
-    userTokenRepository.deleteById(tokenId);
   }
 
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {

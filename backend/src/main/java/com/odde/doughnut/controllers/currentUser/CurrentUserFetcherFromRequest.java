@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers.currentUser;
 
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Principal;
 import org.springframework.context.annotation.Bean;
@@ -13,20 +13,18 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
   private final UserRepository userRepository;
-  private final ModelFactoryService modelFactoryService;
+  private final UserService userService;
   private String externalId = null;
   private User user = null;
 
   public CurrentUserFetcherFromRequest(
-      HttpServletRequest request,
-      UserRepository userRepository,
-      ModelFactoryService modelFactoryService) {
+      HttpServletRequest request, UserRepository userRepository, UserService userService) {
     this.userRepository = userRepository;
-    this.modelFactoryService = modelFactoryService;
+    this.userService = userService;
     String authHeader = request.getHeader("Authorization");
     if (authHeader != null && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
-      user = modelFactoryService.findUserByToken(token).orElse(null);
+      user = userService.findUserByToken(token).orElse(null);
       if (user != null) {
         externalId = user.getExternalIdentifier();
         return;

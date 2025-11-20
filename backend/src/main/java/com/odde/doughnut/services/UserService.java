@@ -3,13 +3,17 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteReviewRepository;
+import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.entities.repositories.UserTokenRepository;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +22,20 @@ public class UserService {
   private final NoteReviewRepository noteReviewRepository;
   private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityManager entityManager;
+  private final UserRepository userRepository;
+  private final UserTokenRepository userTokenRepository;
 
   public UserService(
       NoteReviewRepository noteReviewRepository,
       MemoryTrackerRepository memoryTrackerRepository,
-      EntityManager entityManager) {
+      EntityManager entityManager,
+      UserRepository userRepository,
+      UserTokenRepository userTokenRepository) {
     this.noteReviewRepository = noteReviewRepository;
     this.memoryTrackerRepository = memoryTrackerRepository;
     this.entityManager = entityManager;
+    this.userRepository = userRepository;
+    this.userTokenRepository = userTokenRepository;
   }
 
   public void setDailyAssimilationCount(User user, Integer count) {
@@ -62,5 +72,28 @@ public class UserService {
   public List<MemoryTracker> getMemoryTrackersFor(User user, Note note) {
     if (user == null) return List.of();
     return memoryTrackerRepository.findByUserAndNote(user.getId(), note.getId());
+  }
+
+  public Optional<User> findUserByToken(String token) {
+    UserToken usertoken = userTokenRepository.findByToken(token);
+
+    if (usertoken == null) {
+      AuthorizationService.throwUserNotFound();
+    }
+
+    return userRepository.findById(usertoken.getUserId());
+  }
+
+  public Optional<List<UserToken>> findTokensByUser(Integer id) {
+    List<UserToken> usertokens = userTokenRepository.findByUserId(id);
+    return Optional.ofNullable(usertokens);
+  }
+
+  public Optional<UserToken> findTokenByTokenId(Integer id) {
+    return userTokenRepository.findById(id);
+  }
+
+  public void deleteToken(Integer tokenId) {
+    userTokenRepository.deleteById(tokenId);
   }
 }

@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -23,14 +24,17 @@ class UserController {
   private final ModelFactoryService modelFactoryService;
   private final TestabilitySettings testabilitySettings;
   private final AuthorizationService authorizationService;
+  private final UserService userService;
 
   public UserController(
       ModelFactoryService modelFactoryService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      UserService userService) {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
+    this.userService = userService;
   }
 
   @PostMapping("")
@@ -75,7 +79,7 @@ class UserController {
   public List<UserToken> getTokens() {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
-    return modelFactoryService.findTokensByUser(user.getId()).orElse(List.of());
+    return userService.findTokensByUser(user.getId()).orElse(List.of());
   }
 
   @DeleteMapping("/token/{tokenId}")
@@ -83,7 +87,7 @@ class UserController {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
 
-    Optional<UserToken> userToken = modelFactoryService.findTokenByTokenId(tokenId);
+    Optional<UserToken> userToken = userService.findTokenByTokenId(tokenId);
     if (userToken.isEmpty()) {
       throw new org.springframework.web.server.ResponseStatusException(
           org.springframework.http.HttpStatus.NOT_FOUND, "Token not found");
@@ -95,6 +99,6 @@ class UserController {
           "Token does not belong to the current user");
     }
 
-    modelFactoryService.deleteToken(tokenId);
+    userService.deleteToken(tokenId);
   }
 }

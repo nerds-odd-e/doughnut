@@ -24,7 +24,8 @@ class UserControllerTest extends ControllerTestBase {
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     controller =
-        new UserController(makeMe.modelFactoryService, testabilitySettings, authorizationService);
+        new UserController(
+            makeMe.modelFactoryService, testabilitySettings, authorizationService, userService);
   }
 
   @Test
@@ -113,7 +114,8 @@ class UserControllerTest extends ControllerTestBase {
     modelFactoryService.save(userToken2);
 
     controller =
-        new UserController(makeMe.modelFactoryService, testabilitySettings, authorizationService);
+        new UserController(
+            makeMe.modelFactoryService, testabilitySettings, authorizationService, userService);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }

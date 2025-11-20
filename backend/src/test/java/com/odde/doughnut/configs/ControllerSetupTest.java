@@ -18,6 +18,7 @@ import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.RealGithubService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -40,6 +41,7 @@ public class ControllerSetupTest {
   @Autowired MakeMe makeMe;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired UserRepository userRepository;
+  @Autowired UserService userService;
   @Mock RealGithubService githubService;
   MockHttpServletRequest request = new MockHttpServletRequest();
   @Mock TestabilitySettings testabilitySettings;
@@ -50,8 +52,7 @@ public class ControllerSetupTest {
   @BeforeEach
   void setup() {
     when(testabilitySettings.getGithubService()).thenReturn(githubService);
-    currentUserFetcher =
-        new CurrentUserFetcherFromRequest(request, userRepository, modelFactoryService);
+    currentUserFetcher = new CurrentUserFetcherFromRequest(request, userRepository, userService);
     controllerSetup =
         new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
   }
@@ -95,8 +96,7 @@ public class ControllerSetupTest {
   void shouldRecordUserInfo() {
     User user = makeMe.aUser().please();
     request.setUserPrincipal(() -> user.getExternalIdentifier());
-    currentUserFetcher =
-        new CurrentUserFetcherFromRequest(request, userRepository, modelFactoryService);
+    currentUserFetcher = new CurrentUserFetcherFromRequest(request, userRepository, userService);
     controllerSetup =
         new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
     FailureReport failureReport = catchExceptionAndGetFailureReport();
