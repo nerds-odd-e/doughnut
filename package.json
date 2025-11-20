@@ -101,7 +101,7 @@
       "form-data": ">=4.0.4",
       "tmp": ">=0.2.4",
       "js-yaml": ">=4.1.1",
-      "glob": ">=10.5.0"
+      "glob": ">=11.1.0"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
