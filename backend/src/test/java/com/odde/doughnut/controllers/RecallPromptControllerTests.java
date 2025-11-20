@@ -7,15 +7,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.MemoryTrackerService;
-import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -31,18 +27,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class RecallPromptControllerTests extends ControllerTestBase {
-  @Mock OpenAiApi openAiApi;
-  @Autowired RecallPromptRepository recallPromptRepository;
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
+
   @Autowired MakeMe makeMe;
-  @Autowired UserService userService;
-  @Autowired AnswerService answerService;
+  @Autowired RecallQuestionService recallQuestionService;
   @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired MemoryTrackerService memoryTrackerService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -64,31 +59,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     controller =
         new RecallPromptController(
-            openAiApi,
-            recallPromptRepository,
-            makeMe.entityPersister,
-            testabilitySettings,
-            getTestObjectMapper(),
-            authorizationService,
-            userService,
-            answerService,
-            globalSettingsService,
-            memoryTrackerService);
+            recallQuestionService, testabilitySettings, authorizationService);
   }
 
   RecallPromptController nullUserController() {
     currentUser.setUser(null);
     return new RecallPromptController(
-        openAiApi,
-        recallPromptRepository,
-        makeMe.entityPersister,
-        testabilitySettings,
-        getTestObjectMapper(),
-        authorizationService,
-        userService,
-        answerService,
-        globalSettingsService,
-        memoryTrackerService);
+        recallQuestionService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -203,16 +180,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
             currentUser.setUser(null);
             RecallPromptController restAiController =
                 new RecallPromptController(
-                    openAiApi,
-                    recallPromptRepository,
-                    makeMe.entityPersister,
-                    testabilitySettings,
-                    getTestObjectMapper(),
-                    authorizationService,
-                    userService,
-                    answerService,
-                    globalSettingsService,
-                    memoryTrackerService);
+                    recallQuestionService, testabilitySettings, authorizationService);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -294,16 +262,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
             currentUser.setUser(null);
             RecallPromptController restAiController =
                 new RecallPromptController(
-                    openAiApi,
-                    recallPromptRepository,
-                    makeMe.entityPersister,
-                    testabilitySettings,
-                    getTestObjectMapper(),
-                    authorizationService,
-                    userService,
-                    answerService,
-                    globalSettingsService,
-                    memoryTrackerService);
+                    recallQuestionService, testabilitySettings, authorizationService);
             restAiController.contest(recallPrompt);
           });
     }
@@ -537,9 +496,5 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(result.rejected, equalTo(true));
       assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
     }
-  }
-
-  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
   }
 }

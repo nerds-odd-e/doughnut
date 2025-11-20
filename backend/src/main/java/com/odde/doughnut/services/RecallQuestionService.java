@@ -8,11 +8,15 @@ import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.utils.Randomizer;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
   private final RecallPromptRepository recallPromptRepository;
@@ -21,13 +25,13 @@ public class RecallQuestionService {
   private final AnswerService answerService;
   private final MemoryTrackerService memoryTrackerService;
 
+  @Autowired
   public RecallQuestionService(
-      OpenAiApi openAiApi,
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       RecallPromptRepository recallPromptRepository,
       EntityPersister entityPersister,
-      Randomizer randomizer,
+      TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
-      UserService userService,
       AnswerService answerService,
       GlobalSettingsService globalSettingsService,
       MemoryTrackerService memoryTrackerService) {
@@ -36,7 +40,8 @@ public class RecallQuestionService {
     this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
     aiQuestionGenerator =
-        new AiQuestionGenerator(openAiApi, globalSettingsService, randomizer, objectMapper);
+        new AiQuestionGenerator(
+            openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
     this.predefinedQuestionService =
         new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
   }
