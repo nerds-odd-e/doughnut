@@ -23,16 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 class NoteEmbeddingServiceTests {
 
   @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
-  // Use real DB via ModelFactoryService; no mocks here
+  @Autowired NoteEmbeddingService service;
   @Autowired MakeMe makeMe;
 
-  NoteEmbeddingService service;
   Note note;
   Notebook notebook;
 
   @BeforeEach
   void setup() {
-    service = new NoteEmbeddingService(makeMe.modelFactoryService);
     notebook = makeMe.aNotebook().please();
     note = makeMe.aNote().under(notebook.getHeadNote()).please();
   }

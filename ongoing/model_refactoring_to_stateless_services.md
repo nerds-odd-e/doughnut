@@ -48,11 +48,11 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - `findTokenByTokenId(Integer id)` ✅
 - `deleteToken(Integer tokenId)` ✅
 
-**Note Embedding Operations** → Move to `NoteEmbeddingService`:
-- `storeNoteEmbedding(Note note, List<Float> embedding)`
-- `deleteNoteEmbeddingByNoteId(Integer noteId)`
-- `deleteNoteEmbeddingsByNotebookId(Integer notebookId)`
-- `getNoteEmbeddingAsFloats(Integer noteId)`
+✅ **Note Embedding Operations** → Moved to `NoteEmbeddingService`:
+- `storeNoteEmbedding(Note note, List<Float> embedding)` ✅
+- `deleteNoteEmbeddingByNoteId(Integer noteId)` ✅
+- `deleteNoteEmbeddingsByNotebookId(Integer notebookId)` ✅
+- `getNoteEmbeddingAsFloats(Integer noteId)` ✅
 
 **Link Creation Operations** → Move to `NoteService` or create `LinkService`:
 - `createLink(Note sourceNote, Note targetNote, User creator, LinkType type, Timestamp currentUTCTimestamp)`

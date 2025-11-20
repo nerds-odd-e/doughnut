@@ -35,33 +35,7 @@ public class ModelFactoryService {
 
   @Autowired public NotebookAiAssistantRepository notebookAiAssistantRepository;
 
-  @Autowired public NoteEmbeddingRepository noteEmbeddingRepository;
-  @Autowired public NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
-
   @Autowired public AuthorizationService authorizationService;
-
-  public void storeNoteEmbedding(Note note, java.util.List<Float> embedding) {
-    noteEmbeddingJdbcRepository.insert(note.getId(), embedding);
-  }
-
-  public void deleteNoteEmbeddingByNoteId(Integer noteId) {
-    noteEmbeddingRepository.deleteByNoteId(noteId);
-  }
-
-  public void deleteNoteEmbeddingsByNotebookId(Integer notebookId) {
-    noteEmbeddingRepository.deleteByNotebookId(notebookId);
-  }
-
-  public java.util.Optional<java.util.List<Float>> getNoteEmbeddingAsFloats(Integer noteId) {
-    return noteEmbeddingJdbcRepository
-        .select(noteId)
-        .map(
-            bytes -> {
-              NoteEmbedding ne = new NoteEmbedding();
-              ne.setEmbedding(bytes);
-              return ne.getEmbeddingAsFloats();
-            });
-  }
 
   public Optional<User> findUserById(Integer id) {
     return userRepository.findById(id);

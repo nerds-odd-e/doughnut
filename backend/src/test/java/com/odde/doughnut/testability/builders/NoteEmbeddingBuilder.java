@@ -34,8 +34,8 @@ public class NoteEmbeddingBuilder extends EntityBuilder<NoteEmbedding> {
 
   @Override
   public NoteEmbedding please(boolean persistNeeded) {
-    // Insert via the JDBC repository to respect env-specific column types
-    makeMe.modelFactoryService.noteEmbeddingJdbcRepository.insert(note.getId(), embedding);
+    // Insert via the service to respect env-specific column types
+    makeMe.noteEmbeddingService.storeEmbedding(note, embedding);
     // Return transient entity (not actually persisted via JPA)
     return entity;
   }
