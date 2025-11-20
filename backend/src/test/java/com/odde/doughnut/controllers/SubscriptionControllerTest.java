@@ -19,9 +19,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class SubscriptionControllerTest extends ControllerTestBase {
   @Autowired private SubscriptionRepository subscriptionRepository;
+  @Autowired SubscriptionController controller;
   private Note topNote;
   private Notebook notebook;
-  private SubscriptionController controller;
 
   @BeforeEach
   void setup() {
@@ -29,7 +29,6 @@ class SubscriptionControllerTest extends ControllerTestBase {
     topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
-    controller = new SubscriptionController(makeMe.entityPersister, authorizationService);
   }
 
   @Test
