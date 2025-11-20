@@ -14,7 +14,10 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AssessmentService {
   private final AssessmentAttemptRepository assessmentAttemptRepository;
   private final CertificateRepository certificateRepository;
@@ -22,6 +25,7 @@ public class AssessmentService {
   private final TestabilitySettings testabilitySettings;
   private final AnswerService answerService;
 
+  @Autowired
   public AssessmentService(
       AssessmentAttemptRepository assessmentAttemptRepository,
       CertificateRepository certificateRepository,

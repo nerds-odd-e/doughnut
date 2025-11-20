@@ -2,11 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
-import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -29,21 +25,12 @@ class AssessmentController {
 
   @Autowired
   public AssessmentController(
-      AssessmentAttemptRepository assessmentAttemptRepository,
-      CertificateRepository certificateRepository,
-      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService,
-      AnswerService answerService) {
+      AssessmentService assessmentService,
+      AuthorizationService authorizationService) {
     this.testabilitySettings = testabilitySettings;
+    this.assessmentService = assessmentService;
     this.authorizationService = authorizationService;
-    this.assessmentService =
-        new AssessmentService(
-            assessmentAttemptRepository,
-            certificateRepository,
-            entityPersister,
-            testabilitySettings,
-            answerService);
   }
 
   @PostMapping("/questions/{notebook}")

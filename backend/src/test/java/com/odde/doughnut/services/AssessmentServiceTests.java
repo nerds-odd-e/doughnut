@@ -6,10 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
-import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.exceptions.ApiException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -28,25 +25,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssessmentServiceTests {
   @Autowired MakeMe makeMe;
-  @Autowired EntityPersister entityPersister;
-  @Autowired com.odde.doughnut.services.AnswerService answerService;
-  @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
-  @Autowired CertificateRepository certificateRepository;
+  @Autowired AssessmentService service;
+  @Autowired TestabilitySettings testabilitySettings;
   private CurrentUser currentUser;
-  private AssessmentService service;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
-    service =
-        new AssessmentService(
-            assessmentAttemptRepository,
-            certificateRepository,
-            entityPersister,
-            testabilitySettings,
-            answerService);
   }
 
   @Nested

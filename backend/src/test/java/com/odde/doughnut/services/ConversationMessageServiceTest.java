@@ -5,11 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
-import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -26,18 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class ConversationMessageServiceTest {
-  @Autowired EntityPersister entityPersister;
   @Autowired MakeMe makeMe;
-  @Autowired AnswerService answerService;
   @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
-  @Autowired CertificateRepository certificateRepository;
   @Autowired ConversationRepository conversationRepository;
   @Autowired ConversationMessageRepository conversationMessageRepository;
+  @Autowired AssessmentService assessmentService;
+  @Autowired TestabilitySettings testabilitySettings;
   private ConversationService conversationService;
-  private AssessmentService assessmentService;
   private CurrentUser currentUser;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
@@ -46,13 +39,6 @@ class ConversationMessageServiceTest {
             testabilitySettings, conversationRepository, conversationMessageRepository);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
-    assessmentService =
-        new AssessmentService(
-            assessmentAttemptRepository,
-            certificateRepository,
-            entityPersister,
-            testabilitySettings,
-            answerService);
   }
 
   @Nested

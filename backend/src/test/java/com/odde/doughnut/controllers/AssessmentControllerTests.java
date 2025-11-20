@@ -6,10 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
-import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AnswerService;
+import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -23,27 +22,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 public class AssessmentControllerTests extends ControllerTestBase {
-  private AssessmentController controller;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-
+  @Autowired AssessmentService assessmentService;
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
-  @Autowired AnswerService answerService;
   @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
-  @Autowired CertificateRepository certificateRepository;
+  @Autowired TestabilitySettings testabilitySettings;
+
+  private AssessmentController controller;
 
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser.setUser(makeMe.aUser().please());
     controller =
-        new AssessmentController(
-            assessmentAttemptRepository,
-            certificateRepository,
-            makeMe.entityPersister,
-            testabilitySettings,
-            authorizationService,
-            answerService);
+        new AssessmentController(testabilitySettings, assessmentService, authorizationService);
   }
 
   @Nested
@@ -59,13 +51,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
     void whenNotLogin() {
       currentUser.setUser(null);
       controller =
-          new AssessmentController(
-              assessmentAttemptRepository,
-              certificateRepository,
-              makeMe.entityPersister,
-              testabilitySettings,
-              authorizationService,
-              answerService);
+          new AssessmentController(testabilitySettings, assessmentService, authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -114,13 +100,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
       currentUser.setUser(makeMe.aUser().please());
       controller =
-          new AssessmentController(
-              assessmentAttemptRepository,
-              certificateRepository,
-              makeMe.entityPersister,
-              testabilitySettings,
-              authorizationService,
-              answerService);
+          new AssessmentController(testabilitySettings, assessmentService, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));
