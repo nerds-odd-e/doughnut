@@ -35,7 +35,7 @@ importers:
         version: 1.8.0
       '@badeball/cypress-cucumber-preprocessor':
         specifier: ^23.2.1
-        version: 23.2.1(@babel/core@7.28.5)(cypress@15.6.0)(typescript@5.9.3)
+        version: 23.2.1(@babel/core@7.28.5)(cypress@15.7.0)(typescript@5.9.3)
       '@bahmutov/cypress-esbuild-preprocessor':
         specifier: ^2.2.7
         version: 2.2.7(esbuild@0.27.0)
@@ -56,7 +56,7 @@ importers:
         version: 2.11.1(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
-        version: 10.1.0(cypress@15.6.0)
+        version: 10.1.0(cypress@15.7.0)
       '@types/cypress-cucumber-preprocessor':
         specifier: ^4.0.5
         version: 4.0.5
@@ -70,17 +70,17 @@ importers:
         specifier: ^0.5.16
         version: 0.5.16
       cypress:
-        specifier: 15.6.0
-        version: 15.6.0
+        specifier: 15.7.0
+        version: 15.7.0
       cypress-file-upload:
         specifier: ^5.0.8
-        version: 5.0.8(cypress@15.6.0)
+        version: 5.0.8(cypress@15.7.0)
       github_action_sound:
         specifier: ^1.0.5
         version: 1.0.5
       got:
-        specifier: ^14.6.3
-        version: 14.6.3
+        specifier: ^14.6.4
+        version: 14.6.4
       jsdom:
         specifier: ^27.2.0
         version: 27.2.0(postcss@8.5.6)
@@ -2445,8 +2445,8 @@ packages:
     peerDependencies:
       cypress: '>3.0.0'
 
-  cypress@15.6.0:
-    resolution: {integrity: sha512-Vqo66GG1vpxZ7H1oDX9umfmzA3nF7Wy80QAc3VjwPREO5zTY4d1xfQFNPpOWleQl9vpdmR2z1liliOcYlRX6rQ==}
+  cypress@15.7.0:
+    resolution: {integrity: sha512-1C81zKxnQckYm2XGi37rPV4rN0bzUoWhydhKdOyshJn5gJKszEx5as9VLSZI0jp0ye49QxmnbU4TtMpcD+OmGQ==}
     engines: {node: ^20.1.0 || ^22.0.0 || >=24.0.0}
     hasBin: true
 
@@ -3184,8 +3184,8 @@ packages:
     resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
 
-  got@14.6.3:
-    resolution: {integrity: sha512-u1nNamHo7oAkyTkMD7g0F0pIvW6vNAF9CCmtkh8ZQrlToKJZ5wEPQHFqt6RzaZC0rJMzH+rnjIElyTsIkT0wQw==}
+  got@14.6.4:
+    resolution: {integrity: sha512-DjsLab39NUMf5iYlK9asVCkHMhaA2hEhrlmf+qXRhjEivuuBHWYbjmty9DA3OORUwZgENTB+6vSmY2ZW8gFHVw==}
     engines: {node: '>=20'}
 
   graceful-fs@4.2.11:
@@ -6259,7 +6259,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
-  '@badeball/cypress-cucumber-preprocessor@23.2.1(@babel/core@7.28.5)(cypress@15.6.0)(typescript@5.9.3)':
+  '@badeball/cypress-cucumber-preprocessor@23.2.1(@babel/core@7.28.5)(cypress@15.7.0)(typescript@5.9.3)':
     dependencies:
       '@cucumber/ci-environment': 10.0.1
       '@cucumber/cucumber': 12.2.0
@@ -6275,7 +6275,7 @@ snapshots:
       cli-table: 0.3.11
       common-ancestor-path: 1.0.1
       cosmiconfig: 9.0.0(typescript@5.9.3)
-      cypress: 15.6.0
+      cypress: 15.7.0
       debug: 4.4.3(supports-color@8.1.1)
       error-stack-parser: 2.1.4
       find-cypress-specs: 1.54.6(@babel/core@7.28.5)
@@ -7250,11 +7250,11 @@ snapshots:
 
   '@teppeis/multimaps@3.0.0': {}
 
-  '@testing-library/cypress@10.1.0(cypress@15.6.0)':
+  '@testing-library/cypress@10.1.0(cypress@15.7.0)':
     dependencies:
       '@babel/runtime': 7.28.4
       '@testing-library/dom': 10.4.1
-      cypress: 15.6.0
+      cypress: 15.7.0
 
   '@testing-library/dom@10.4.1':
     dependencies:
@@ -8261,11 +8261,11 @@ snapshots:
 
   culori@3.3.0: {}
 
-  cypress-file-upload@5.0.8(cypress@15.6.0):
+  cypress-file-upload@5.0.8(cypress@15.7.0):
     dependencies:
-      cypress: 15.6.0
+      cypress: 15.7.0
 
-  cypress@15.6.0:
+  cypress@15.7.0:
     dependencies:
       '@cypress/request': 3.0.9
       '@cypress/xvfb': 1.2.4(supports-color@8.1.1)
@@ -8303,7 +8303,6 @@ snapshots:
       process: 0.11.10
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
-      semver: 7.7.2
       supports-color: 8.1.1
       systeminformation: 5.27.7
       tmp: 0.2.5
@@ -9191,7 +9190,7 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  got@14.6.3:
+  got@14.6.4:
     dependencies:
       '@sindresorhus/is': 7.1.0
       byte-counter: 0.1.0
