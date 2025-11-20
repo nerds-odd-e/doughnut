@@ -42,8 +42,8 @@ public record NoteConstructionService(
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
       wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
     }
-    modelFactoryService.entityManager.flush();
-    modelFactoryService.entityManager.refresh(note);
+    modelFactoryService.entityPersister.flush();
+    modelFactoryService.entityPersister.refresh(note);
     return note;
   }
 

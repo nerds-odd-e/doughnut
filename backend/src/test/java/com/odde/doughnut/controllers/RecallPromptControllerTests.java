@@ -378,7 +378,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       // Verify that no new prompt was created
       long count =
           modelFactoryService
-              .entityManager
+              .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
       assertThat(count, equalTo(1L));
@@ -415,7 +415,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       // Verify that a new prompt was created
       long count =
           modelFactoryService
-              .entityManager
+              .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
       assertThat(count, equalTo(2L));
@@ -459,7 +459,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       // Verify that a new prompt was created
       long count =
           modelFactoryService
-              .entityManager
+              .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
       assertThat(count, equalTo(2L));

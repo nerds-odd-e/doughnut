@@ -1,7 +1,6 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.repositories.*;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,6 @@ public class ModelFactoryService {
   @Autowired public GlobalSettingRepository globalSettingRepository;
   @Autowired public AssessmentAttemptRepository assessmentAttemptRepository;
   @Autowired public EntityPersister entityPersister;
-  @Autowired public EntityManager entityManager;
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;
   @Autowired public ConversationRepository conversationRepository;

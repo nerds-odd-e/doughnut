@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.EntityIdentifiedByIdOnly;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,5 +41,9 @@ public class EntityPersister {
 
   public void refresh(Object entity) {
     entityManager.refresh(entity);
+  }
+
+  public <T> TypedQuery<T> createQuery(String qlString, Class<T> resultClass) {
+    return entityManager.createQuery(qlString, resultClass);
   }
 }

@@ -29,7 +29,7 @@ public class MemoryTrackerService {
 
   public List<MemoryTracker> assimilate(
       InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
-    Note note = modelFactoryService.entityManager.find(Note.class, initialInfo.noteId);
+    Note note = modelFactoryService.entityPersister.find(Note.class, initialInfo.noteId);
     MemoryTracker memoryTracker =
         createMemoryTracker(
             note,

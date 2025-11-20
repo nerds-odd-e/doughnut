@@ -236,10 +236,10 @@ class TestabilityRestController {
   @Transactional
   public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
     Note sourceNote =
-        modelFactoryService.entityManager.find(
+        modelFactoryService.entityPersister.find(
             Note.class, Integer.valueOf(linkInfo.get("source_id")));
     Note targetNote =
-        modelFactoryService.entityManager.find(
+        modelFactoryService.entityPersister.find(
             Note.class, Integer.valueOf(linkInfo.get("target_id")));
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();

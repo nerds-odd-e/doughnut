@@ -178,11 +178,11 @@ public class ObsidianFormatService {
     newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted
-    modelFactoryService.entityManager.flush();
+    modelFactoryService.entityPersister.flush();
 
     // Refresh both entities to get the latest state
-    modelFactoryService.entityManager.refresh(newNote);
-    modelFactoryService.entityManager.refresh(currentParent);
+    modelFactoryService.entityPersister.refresh(newNote);
+    modelFactoryService.entityPersister.refresh(currentParent);
 
     if (!entry.isDirectory() && isLastPart) {
       addContentToNote(newNote, zipIn);

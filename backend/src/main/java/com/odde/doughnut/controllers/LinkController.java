@@ -105,8 +105,8 @@ class LinkController {
   }
 
   private List<NoteRealm> getNoteRealm(Note link, User user) {
-    Note nt = modelFactoryService.entityManager.find(Note.class, link.getTargetNote().getId());
-    Note np = modelFactoryService.entityManager.find(Note.class, link.getParent().getId());
+    Note nt = modelFactoryService.entityPersister.find(Note.class, link.getTargetNote().getId());
+    Note np = modelFactoryService.entityPersister.find(Note.class, link.getParent().getId());
     return List.of(link.toNoteRealm(user), nt.toNoteRealm(user), np.toNoteRealm(user));
   }
 }

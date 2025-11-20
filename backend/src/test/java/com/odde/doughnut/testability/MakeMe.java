@@ -81,8 +81,8 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public <T> T refresh(T object) {
-    modelFactoryService.entityManager.flush();
-    modelFactoryService.entityManager.refresh(object);
+    entityPersister.flush();
+    entityPersister.refresh(object);
     return object;
   }
 

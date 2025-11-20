@@ -139,7 +139,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     noteService.destroy(note, testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.entityManager.flush();
+    modelFactoryService.entityPersister.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
       return List.of(parentNote.toNoteRealm(authorizationService.getCurrentUser()));
@@ -153,7 +153,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     noteService.restore(note);
-    modelFactoryService.entityManager.flush();
+    modelFactoryService.entityPersister.flush();
 
     return note.toNoteRealm(authorizationService.getCurrentUser());
   }
