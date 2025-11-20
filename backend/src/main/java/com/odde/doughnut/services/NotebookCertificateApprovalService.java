@@ -1,23 +1,22 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.NotebookCertificateApproval;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import jakarta.persistence.EntityManager;
 import java.sql.Timestamp;
 
 public class NotebookCertificateApprovalService {
   private final NotebookCertificateApproval certificateApproval;
-  private final ModelFactoryService modelFactoryService;
+  private final EntityManager entityManager;
 
   public NotebookCertificateApprovalService(
-      NotebookCertificateApproval certificateApproval, ModelFactoryService modelFactoryService) {
-
+      NotebookCertificateApproval certificateApproval, EntityManager entityManager) {
     this.certificateApproval = certificateApproval;
-    this.modelFactoryService = modelFactoryService;
+    this.entityManager = entityManager;
   }
 
   public NotebookCertificateApproval approve(Timestamp currentUTCTimestamp) {
     certificateApproval.setLastApprovalTime(currentUTCTimestamp);
-    modelFactoryService.save(certificateApproval);
+    entityManager.merge(certificateApproval);
     return certificateApproval;
   }
 

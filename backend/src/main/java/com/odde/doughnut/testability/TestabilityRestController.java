@@ -12,6 +12,7 @@ import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.model.PredefinedQuestionsTestData;
@@ -46,6 +47,7 @@ class TestabilityRestController {
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   @Autowired BazaarService bazaarService;
   @Autowired UserService userService;
+  @Autowired NotebookService notebookService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -208,9 +210,8 @@ class TestabilityRestController {
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(predefinedQuestions.size());
     modelFactoryService.save(notebook);
     if (notebookCertifiable != null && notebookCertifiable) {
-      modelFactoryService
-          .notebookService(notebook)
-          .requestNotebookApproval()
+      notebookService
+          .requestNotebookApproval(notebook)
           .approve(testabilitySettings.getCurrentUTCTimestamp());
     }
   }

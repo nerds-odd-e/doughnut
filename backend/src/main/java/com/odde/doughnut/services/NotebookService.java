@@ -2,22 +2,21 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.NotebookCertificateApproval;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Service;
 
+@Service
 public class NotebookService {
-  private final Notebook notebook;
-  private final ModelFactoryService modelFactoryService;
+  private final EntityManager entityManager;
 
-  public NotebookService(Notebook notebook, ModelFactoryService modelFactoryService) {
-
-    this.notebook = notebook;
-    this.modelFactoryService = modelFactoryService;
+  public NotebookService(EntityManager entityManager) {
+    this.entityManager = entityManager;
   }
 
-  public NotebookCertificateApprovalService requestNotebookApproval() {
+  public NotebookCertificateApprovalService requestNotebookApproval(Notebook notebook) {
     NotebookCertificateApproval certificateApproval = new NotebookCertificateApproval();
     certificateApproval.setNotebook(notebook);
-    modelFactoryService.save(certificateApproval);
-    return new NotebookCertificateApprovalService(certificateApproval, modelFactoryService);
+    entityManager.persist(certificateApproval);
+    return new NotebookCertificateApprovalService(certificateApproval, entityManager);
   }
 }

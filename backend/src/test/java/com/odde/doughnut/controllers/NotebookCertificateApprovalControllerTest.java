@@ -5,17 +5,21 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NotebookCertificateApprovalRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NotebookService notebookService;
+  @Autowired NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
+  @Autowired EntityManager entityManager;
 
   NotebookCertificateApprovalController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -25,7 +29,11 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new NotebookCertificateApprovalController(
-            modelFactoryService, testabilitySettings, authorizationService);
+            notebookService,
+            notebookCertificateApprovalRepository,
+            testabilitySettings,
+            authorizationService,
+            entityManager);
   }
 
   @Nested
@@ -50,7 +58,7 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
     @Test
     void success() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
+      notebookService.requestNotebookApproval(note.getNotebook());
       makeMe.refresh(note.getNotebook());
       NotebookCertificateApproval approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
@@ -90,8 +98,12 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
       notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       controller =
           new NotebookCertificateApprovalController(
-              modelFactoryService, testabilitySettings, authorizationService);
-      approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
+              notebookService,
+              notebookCertificateApprovalRepository,
+              testabilitySettings,
+              authorizationService,
+              entityManager);
+      approval = notebookService.requestNotebookApproval(notebook);
       makeMe.refresh(notebook);
     }
 
