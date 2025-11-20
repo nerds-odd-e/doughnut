@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class RestOpenAIChatGPTFineTuningExampleControllerTests extends ControllerTestBase {
+public class FineTuningDataControllerTests extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
   FineTuningDataController controller;
   @Mock private OpenAiApi openAiApi;

@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.*;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;

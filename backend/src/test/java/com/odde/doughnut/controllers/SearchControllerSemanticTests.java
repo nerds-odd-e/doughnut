@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
-class RestSemanticSearchControllerTests extends ControllerTestBase {
+class SearchControllerSemanticTests extends ControllerTestBase {
   @Autowired NoteSearchService noteSearchService;
 
   @MockitoBean(name = "testableOpenAiApi")
