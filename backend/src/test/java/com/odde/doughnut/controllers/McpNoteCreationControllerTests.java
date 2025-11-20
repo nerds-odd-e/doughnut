@@ -17,6 +17,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -30,7 +31,6 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -56,12 +56,12 @@ class McpNoteCreationControllerTests {
   @Autowired NoteService noteService;
 
   @Autowired private ModelFactoryService modelFactoryService;
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
 
   @BeforeEach
   void setup() {
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    currentUser.setUser(makeMe.aUser().please());
+    CurrentUser currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     noteCreation = new NoteCreationDTO();
     noteCreation.setNewTitle("new note");
     controller =
@@ -86,7 +86,7 @@ class McpNoteCreationControllerTests {
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
 
-      currentUser.setUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class,

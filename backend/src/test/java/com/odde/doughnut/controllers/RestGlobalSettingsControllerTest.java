@@ -8,6 +8,7 @@ import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class GlobalSettingsControllerTest {
   GlobalSettingsController controller;
-  @TestBean CurrentUser currentUser = new CurrentUser(null);
+  CurrentUser currentUser;
 
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
@@ -39,7 +39,8 @@ class GlobalSettingsControllerTest {
   void Setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
-    currentUser.setUser(makeMe.anAdmin().please());
+    currentUser = new CurrentUser(makeMe.anAdmin().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
         new GlobalSettingsController(
@@ -82,7 +83,8 @@ class GlobalSettingsControllerTest {
 
     @Test
     void authentication() {
-      currentUser.setUser(makeMe.aUser().please());
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new GlobalSettingsController(
               makeMe.modelFactoryService, testabilitySettings, authorizationService);

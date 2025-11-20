@@ -15,6 +15,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OtherAiServices;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
@@ -29,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,13 +40,13 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
   FineTuningDataController controller;
   @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.anAdmin().please());
+    CurrentUser adminUser = new CurrentUser(makeMe.anAdmin().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, adminUser);
     controller =
         new FineTuningDataController(
             modelFactoryService,
@@ -60,7 +60,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class getGoodOpenAIChatGPTFineTuningExample {
     @Test
     void authentication() {
-      currentUser.setUser(makeMe.aUser().please());
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -115,7 +116,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class SuggestedQuestions {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
-      currentUser.setUser(null);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -158,7 +160,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
-      currentUser.setUser(makeMe.aUser().please());
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -199,7 +202,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
-      currentUser.setUser(makeMe.aUser().please());
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -229,7 +233,8 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
-      currentUser.setUser(makeMe.aUser().please());
+      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
       controller =
           new FineTuningDataController(
               modelFactoryService,

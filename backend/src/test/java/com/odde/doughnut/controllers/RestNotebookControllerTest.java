@@ -18,6 +18,7 @@ import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.graphRAG.BareNote;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
@@ -33,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -52,7 +52,7 @@ class NotebookControllerTest {
 
   @Autowired AuthorizationService authorizationService;
   @Autowired MakeMe makeMe;
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+  private CurrentUser currentUser;
   private Note topNote;
   NotebookController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -78,7 +78,8 @@ class NotebookControllerTest {
                               n, Optional.of(List.of(1.0f, 2.0f, 3.0f))));
             });
 
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     controller =
         new NotebookController(
@@ -112,7 +113,8 @@ class NotebookControllerTest {
   class showNoteTest {
     @Test
     void whenNotLogin() {
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -126,7 +128,8 @@ class NotebookControllerTest {
     @Test
     void whenLoggedIn() {
       User user = new User();
-      currentUser.setUser(user);
+      currentUser = new CurrentUser(user);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       List<Notebook> notebooks = currentUser.getUser().getOwnership().getNotebooks();
       controller =
           new NotebookController(
@@ -195,7 +198,8 @@ class NotebookControllerTest {
     @Test
     void whenNotAuthorized() {
       User anotherUser = makeMe.aUser().please();
-      currentUser.setUser(anotherUser);
+      CurrentUser anotherCurrentUser = new CurrentUser(anotherUser);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherCurrentUser);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -235,7 +239,8 @@ class NotebookControllerTest {
 
     @BeforeEach
     void setup() {
-      currentUser.setUser(makeMe.aUser().please());
+      currentUser = new CurrentUser(makeMe.aUser().please());
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       makeMe.refresh(notebook);
     }
@@ -380,7 +385,8 @@ class NotebookControllerTest {
     @Test
     void whenNotAuthorized() {
       User anotherUser = makeMe.aUser().please();
-      currentUser.setUser(anotherUser);
+      CurrentUser anotherCurrentUser = new CurrentUser(anotherUser);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherCurrentUser);
       controller =
           new NotebookController(
               modelFactoryService,
@@ -466,8 +472,9 @@ class NotebookControllerTest {
     @Test
     void shouldNotBeAbleToAccessNotebookIDontHaveAccessTo() {
       // Arrange
-      User otherUser = makeMe.aUser().please();
-      Notebook otherNotebook = makeMe.aNotebook().creatorAndOwner(otherUser).please();
+      CurrentUser otherUserModel = new CurrentUser(makeMe.aUser().please());
+      Notebook otherNotebook =
+          makeMe.aNotebook().creatorAndOwner(otherUserModel.getUser()).please();
 
       // Act & Assert
       assertThrows(
@@ -478,7 +485,8 @@ class NotebookControllerTest {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       // Arrange
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller =
           new NotebookController(
               modelFactoryService,

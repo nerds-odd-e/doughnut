@@ -17,6 +17,7 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.OpenAiResponse;
@@ -34,7 +35,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -44,7 +44,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class AiControllerTest {
   AiController controller;
-  @TestBean CurrentUser currentUser = new CurrentUser(null);
+  CurrentUser currentUser;
 
   Note note;
   @Mock OpenAiApi openAiApi;
@@ -59,8 +59,9 @@ class AiControllerTest {
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
             openAiApi, globalSettingsService, getTestObjectMapper());
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     note = makeMe.aNote().please();
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new AiController(
             notebookAssistantForNoteServiceFactory,
@@ -83,7 +84,8 @@ class AiControllerTest {
 
     @Test
     void askWithNoteThatCannotAccess() {
-      currentUser.setUser(null);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       AiController aiController =
           new AiController(
               notebookAssistantForNoteServiceFactory,
@@ -185,7 +187,8 @@ class AiControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new AiController(
               notebookAssistantForNoteServiceFactory,

@@ -18,6 +18,7 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.completion.chat.AssistantMessage;
@@ -32,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -45,7 +45,7 @@ class ConversationMessageControllerTest {
   @Autowired ConversationService conversationService;
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+  private CurrentUser currentUser;
   ConversationMessageController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
@@ -53,7 +53,7 @@ class ConversationMessageControllerTest {
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
@@ -61,6 +61,7 @@ class ConversationMessageControllerTest {
     ChatCompletionConversationService chatCompletionConversationService =
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
             conversationService, chatCompletionConversationService, authorizationService);
@@ -148,7 +149,8 @@ class ConversationMessageControllerTest {
       ChatCompletionConversationService chatCompletionConversationService =
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
-      currentUser.setUser(null);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new ConversationMessageController(
               conversationService, chatCompletionConversationService, authorizationService);
@@ -448,7 +450,8 @@ class ConversationMessageControllerTest {
       ChatCompletionConversationService chatCompletionConversationService =
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
-      currentUser.setUser(null);
+      CurrentUser nullUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
       controller =
           new ConversationMessageController(
               conversationService, chatCompletionConversationService, authorizationService);

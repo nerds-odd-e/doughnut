@@ -16,6 +16,7 @@ import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,14 +41,15 @@ class NoteControllerMotionTests {
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
   @Autowired UserService userService;
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+  private CurrentUser currentUser;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   Note subject;
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new NoteController(
             modelFactoryService,

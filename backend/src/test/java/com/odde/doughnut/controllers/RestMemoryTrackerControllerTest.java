@@ -18,6 +18,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -28,7 +29,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -43,12 +43,13 @@ class MemoryTrackerControllerTest {
   @Autowired UserService userService;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+  private CurrentUser currentUser;
   MemoryTrackerController controller;
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new MemoryTrackerController(
             modelFactoryService, testabilitySettings, authorizationService, userService);
@@ -72,7 +73,8 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldNotBeAbleToGetSpellingQuestionForOthersMemoryTracker() {
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerBy(new CurrentUser(makeMe.aUser().please()).getUser()).please();
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.getSpellingQuestion(memoryTracker));
@@ -80,11 +82,13 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller =
           new MemoryTrackerController(
               modelFactoryService, testabilitySettings, authorizationService, userService);
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerBy(new CurrentUser(makeMe.aUser().please()).getUser()).please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
     }
@@ -219,8 +223,8 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldNotReturnMemoryTrackersFromOtherUsers() {
-      User otherUser = makeMe.aUser().please();
-      makeMe.aMemoryTrackerBy(otherUser).please();
+      CurrentUser otherUser = new CurrentUser(makeMe.aUser().please());
+      makeMe.aMemoryTrackerBy(otherUser.getUser()).please();
 
       List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
 
@@ -229,7 +233,8 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller =
           new MemoryTrackerController(
               modelFactoryService, testabilitySettings, authorizationService, userService);
@@ -264,7 +269,8 @@ class MemoryTrackerControllerTest {
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller =
           new MemoryTrackerController(
               modelFactoryService, testabilitySettings, authorizationService, userService);
@@ -329,7 +335,8 @@ class MemoryTrackerControllerTest {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller =
           new MemoryTrackerController(
               modelFactoryService, testabilitySettings, authorizationService, userService);

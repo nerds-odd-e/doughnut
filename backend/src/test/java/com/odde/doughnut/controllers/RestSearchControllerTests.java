@@ -10,13 +10,13 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
+import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -29,12 +29,13 @@ class SearchControllerTests {
   @Autowired AuthorizationService authorizationService;
   @Autowired NoteSearchService noteSearchService;
 
-  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+  private CurrentUser currentUser;
   private SearchController controller;
 
   @BeforeEach
   void setup() {
-    currentUser.setUser(makeMe.aUser().please());
+    currentUser = new CurrentUser(makeMe.aUser().please());
+    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller = new SearchController(noteSearchService, authorizationService);
   }
 
@@ -117,7 +118,8 @@ class SearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
@@ -189,7 +191,8 @@ class SearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      currentUser.setUser(null);
+      currentUser = new CurrentUser(null);
+      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
