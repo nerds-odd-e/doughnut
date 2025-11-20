@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.search.NoteSearchService;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
@@ -22,17 +21,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class SearchControllerSemanticTests extends ControllerTestBase {
-  @Autowired NoteSearchService noteSearchService;
-
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
-  private SearchController controller;
+  @Autowired SearchController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller = new SearchController(noteSearchService, authorizationService);
     // Default: return empty embedding data so semantic search falls back to literal search
     EmbeddingResult empty = new EmbeddingResult();
     empty.setData(java.util.List.of());
@@ -58,7 +54,6 @@ class SearchControllerSemanticTests extends ControllerTestBase {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       currentUser.setUser(null);
-      controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
@@ -98,7 +93,6 @@ class SearchControllerSemanticTests extends ControllerTestBase {
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
       currentUser.setUser(null);
-      controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("test");
