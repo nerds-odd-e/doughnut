@@ -4,9 +4,10 @@ import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SE
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
+import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.time.ZoneOffset;
@@ -15,17 +16,20 @@ import java.util.List;
 import java.util.Objects;
 
 public class AssessmentService {
-  private final ModelFactoryService modelFactoryService;
+  private final AssessmentAttemptRepository assessmentAttemptRepository;
+  private final CertificateRepository certificateRepository;
   private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final AnswerService answerService;
 
   public AssessmentService(
-      ModelFactoryService modelFactoryService,
+      AssessmentAttemptRepository assessmentAttemptRepository,
+      CertificateRepository certificateRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AnswerService answerService) {
-    this.modelFactoryService = modelFactoryService;
+    this.assessmentAttemptRepository = assessmentAttemptRepository;
+    this.certificateRepository = certificateRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.answerService = answerService;
@@ -66,7 +70,7 @@ public class AssessmentService {
   }
 
   public List<AssessmentAttempt> getMyAssessments(User user) {
-    return modelFactoryService.assessmentAttemptRepository.findAllByUser(user);
+    return assessmentAttemptRepository.findAllByUser(user);
   }
 
   private void claimCertificateForPassedAssessment(Notebook notebook, User user) {
@@ -76,8 +80,7 @@ public class AssessmentService {
   }
 
   private Certificate getOrBuildACertificateFor(Notebook notebook, User user) {
-    Certificate oldCert =
-        modelFactoryService.certificateRepository.findFirstByUserAndNotebook(user, notebook);
+    Certificate oldCert = certificateRepository.findFirstByUserAndNotebook(user, notebook);
     if (oldCert != null) {
       return oldCert;
     }

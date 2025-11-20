@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
+import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AnswerService;
@@ -27,6 +29,8 @@ public class AssessmentControllerTests extends ControllerTestBase {
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
   @Autowired AnswerService answerService;
+  @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
+  @Autowired CertificateRepository certificateRepository;
 
   @BeforeEach
   void setup() {
@@ -34,7 +38,8 @@ public class AssessmentControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssessmentController(
-            makeMe.modelFactoryService,
+            assessmentAttemptRepository,
+            certificateRepository,
             makeMe.entityPersister,
             testabilitySettings,
             authorizationService,
@@ -55,7 +60,8 @@ public class AssessmentControllerTests extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService,
+              assessmentAttemptRepository,
+              certificateRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
@@ -109,7 +115,8 @@ public class AssessmentControllerTests extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService,
+              assessmentAttemptRepository,
+              certificateRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
@@ -180,8 +187,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
       Timestamp timestamp = makeMe.aTimestamp().please();
       testabilitySettings.timeTravelTo(timestamp);
       controller.submitAssessmentResult(assessmentAttempt);
-      AssessmentAttempt assessmentAttempt =
-          makeMe.modelFactoryService.assessmentAttemptRepository.findAll().iterator().next();
+      AssessmentAttempt assessmentAttempt = assessmentAttemptRepository.findAll().iterator().next();
       assertEquals(timestamp, assessmentAttempt.getSubmittedAt());
     }
 

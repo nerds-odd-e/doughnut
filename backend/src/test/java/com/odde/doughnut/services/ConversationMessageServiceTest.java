@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
+import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -28,6 +30,8 @@ class ConversationMessageServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired AnswerService answerService;
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
+  @Autowired CertificateRepository certificateRepository;
   private ConversationService conversationService;
   private AssessmentService assessmentService;
   private CurrentUser currentUser;
@@ -40,7 +44,11 @@ class ConversationMessageServiceTest {
     currentUser = new CurrentUser(makeMe.aUser().please());
     assessmentService =
         new AssessmentService(
-            makeMe.modelFactoryService, entityPersister, testabilitySettings, answerService);
+            assessmentAttemptRepository,
+            certificateRepository,
+            entityPersister,
+            testabilitySettings,
+            answerService);
   }
 
   @Nested

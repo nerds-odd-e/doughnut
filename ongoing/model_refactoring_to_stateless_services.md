@@ -61,6 +61,8 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `GlobalSettingsController` - Now injects `GlobalSettingRepository` directly
 - ✅ `AiAudioController` - Now injects `GlobalSettingRepository` directly
 - ✅ `UserController` - Removed unused `ModelFactoryService` dependency
+- ✅ `CertificateController` - Now injects `CertificateRepository` directly
+- ✅ `AssessmentController` - Now injects `AssessmentAttemptRepository` and `CertificateRepository` directly
 
 ✅ **Major Services Refactored:**
 - ✅ `MemoryTrackerService` - Now injects `EntityPersister` directly
@@ -70,6 +72,7 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `PredefinedQuestionService` - Removed `ModelFactoryService` dependency
 - ✅ `GlobalSettingsService` - Now injects `GlobalSettingRepository` directly
 - ✅ `Ownership` entity - Now accepts `NoteRepository` as parameter
+- ✅ `AssessmentService` - Now injects `AssessmentAttemptRepository` and `CertificateRepository` directly
 
 ✅ **Test Infrastructure:**
 - ✅ `RecallPromptControllerTests` - Updated to use direct repository injection
@@ -77,9 +80,6 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `TestabilityRestController` - Updated to use `CircleRepository` and `NoteRepository` directly
 
 **Remaining Files Using ModelFactoryService:**
-- `AssessmentController` - Still uses `ModelFactoryService` (needs refactoring)
-- `AssessmentService` - Still uses `ModelFactoryService` (needs refactoring)
-- `CertificateController` - Still uses `ModelFactoryService` (needs refactoring)
 - `FineTuningDataController` - Still uses `ModelFactoryService` (needs refactoring)
 - `FailureReportController` - Still uses `ModelFactoryService` (needs refactoring)
 - `FailureReportFactory` - Still uses `ModelFactoryService` (needs refactoring)
