@@ -26,7 +26,7 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     this.entity = note.getNotebook();
   }
 
-  public NotebookBuilder creatorAndOwner(com.odde.doughnut.entities.User user) {
+  public NotebookBuilder creatorAndOwner(User user) {
     noteBuilder.creatorAndOwner(user);
     return this;
   }
