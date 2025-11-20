@@ -3,12 +3,15 @@ package com.odde.doughnut.factoryServices;
 import com.odde.doughnut.entities.EntityIdentifiedByIdOnly;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EntityPersister {
-  @Autowired private EntityManager entityManager;
+  private final EntityManager entityManager;
+
+  public EntityPersister(EntityManager entityManager) {
+    this.entityManager = entityManager;
+  }
 
   public <T> T save(T entity) {
     if (entity instanceof EntityIdentifiedByIdOnly instance) {

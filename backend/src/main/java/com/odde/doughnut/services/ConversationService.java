@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.testability.TestabilitySettings;
-import jakarta.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
@@ -20,9 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConversationService {
 
-  @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
-
   private final ConversationRepository conversationRepository;
   private final ConversationMessageRepository conversationMessageRepository;
 
