@@ -1,9 +1,8 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import com.odde.doughnut.utils.TimestampOperations;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

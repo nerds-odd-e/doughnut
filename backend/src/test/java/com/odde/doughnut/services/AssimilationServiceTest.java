@@ -1,13 +1,10 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.AssimilationService;
-import com.odde.doughnut.services.SubscriptionService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.time.ZoneId;

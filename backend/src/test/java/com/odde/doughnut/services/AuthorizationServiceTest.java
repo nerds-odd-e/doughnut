@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class UserModelAuthorityTest {
+public class AuthorizationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
   User user;

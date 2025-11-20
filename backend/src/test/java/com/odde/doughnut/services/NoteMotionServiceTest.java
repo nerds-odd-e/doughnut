@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
-import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class NoteMotionModelTest {
+public class NoteMotionServiceTest {
   @Autowired NoteMotionService noteMotionService;
 
   @Autowired MakeMe makeMe;

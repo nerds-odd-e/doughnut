@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services.search;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -7,7 +7,6 @@ import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

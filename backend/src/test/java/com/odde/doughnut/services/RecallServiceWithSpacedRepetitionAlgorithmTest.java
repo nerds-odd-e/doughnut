@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;

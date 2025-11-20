@@ -1,4 +1,4 @@
-package com.odde.doughnut.models.quizFacotries;
+package com.odde.doughnut.testability.builders;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
