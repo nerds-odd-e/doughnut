@@ -8,6 +8,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +16,15 @@ import org.springframework.stereotype.Service;
 public class NoteService {
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
+  private final MemoryTrackerService memoryTrackerService;
 
-  public NoteService(NoteRepository noteRepository, EntityPersister entityPersister) {
+  public NoteService(
+      NoteRepository noteRepository,
+      EntityPersister entityPersister,
+      MemoryTrackerService memoryTrackerService) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
+    this.memoryTrackerService = memoryTrackerService;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -30,6 +36,9 @@ public class NoteService {
   }
 
   public void destroy(Note note, Timestamp currentUTCTimestamp) {
+    List<Note> noteAndDescendants =
+        Stream.concat(Stream.of(note), note.getAllDescendants()).toList();
+
     if (note.getNotebook() != null) {
       if (note.getNotebook().getHeadNote() == note) {
         note.getNotebook().setDeletedAt(currentUTCTimestamp);
@@ -39,9 +48,14 @@ public class NoteService {
 
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
+
+    memoryTrackerService.softDeleteMemoryTrackersForNotes(noteAndDescendants);
   }
 
   public void restore(Note note) {
+    List<Note> noteAndDescendants =
+        Stream.concat(Stream.of(note), note.getAllDescendants()).toList();
+
     if (note.getNotebook() != null) {
       if (note.getNotebook().getHeadNote() == note) {
         note.getNotebook().setDeletedAt(null);
@@ -50,6 +64,8 @@ public class NoteService {
     }
     note.setDeletedAt(null);
     entityPersister.merge(note);
+
+    memoryTrackerService.restoreMemoryTrackersForNotes(noteAndDescendants);
   }
 
   public boolean hasDuplicateWikidataId(Note note) {

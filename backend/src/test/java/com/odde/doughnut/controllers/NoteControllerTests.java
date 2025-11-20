@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteMotionService;
@@ -29,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
 
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
@@ -179,6 +181,29 @@ class NoteControllerTests extends ControllerTestBase {
       assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
     }
 
+    @Test
+    void shouldSoftDeleteMemoryTrackersForDeletedNote() throws UnexpectedNoAccessRightException {
+      MemoryTracker subjectTracker =
+          makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+      controller.deleteNote(subject);
+      makeMe.entityPersister.refresh(subjectTracker);
+      assertThat(subjectTracker.getRemovedFromTracking(), is(true));
+    }
+
+    @Test
+    void shouldSoftDeleteMemoryTrackersForDescendantsWhenDeletingNote()
+        throws UnexpectedNoAccessRightException {
+      MemoryTracker subjectTracker =
+          makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+      MemoryTracker childTracker =
+          makeMe.aMemoryTrackerFor(child).by(currentUser.getUser()).please();
+      controller.deleteNote(subject);
+      makeMe.entityPersister.refresh(subjectTracker);
+      makeMe.entityPersister.refresh(childTracker);
+      assertThat(subjectTracker.getRemovedFromTracking(), is(true));
+      assertThat(childTracker.getRemovedFromTracking(), is(true));
+    }
+
     @Nested
     class UndoDeleteNoteTest {
       @Test
@@ -201,6 +226,20 @@ class NoteControllerTests extends ControllerTestBase {
 
         controller.undoDeleteNote(subject);
         assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
+      }
+
+      @Test
+      void shouldRestoreMemoryTrackersWhenUndoDeleteNote() throws UnexpectedNoAccessRightException {
+        MemoryTracker subjectTracker =
+            makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        MemoryTracker childTracker =
+            makeMe.aMemoryTrackerFor(child).by(currentUser.getUser()).please();
+        controller.deleteNote(subject);
+        controller.undoDeleteNote(subject);
+        makeMe.entityPersister.refresh(subjectTracker);
+        makeMe.entityPersister.refresh(childTracker);
+        assertThat(subjectTracker.getRemovedFromTracking(), is(false));
+        assertThat(childTracker.getRemovedFromTracking(), is(false));
       }
     }
   }
