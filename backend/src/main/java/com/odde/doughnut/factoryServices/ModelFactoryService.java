@@ -23,6 +23,7 @@ public class ModelFactoryService {
   @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public GlobalSettingRepository globalSettingRepository;
   @Autowired public AssessmentAttemptRepository assessmentAttemptRepository;
+  @Autowired public EntityPersister entityPersister;
   @Autowired public EntityManager entityManager;
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;
@@ -93,22 +94,15 @@ public class ModelFactoryService {
   }
 
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
-    if (entity.getId() == null) {
-      entityManager.persist(entity);
-      return entity;
-    }
-    return entityManager.merge(entity);
+    return entityPersister.save(entity);
   }
 
   public <T extends EntityIdentifiedByIdOnly> T merge(T entity) {
-    return entityManager.merge(entity);
+    return entityPersister.merge(entity);
   }
 
   public <T extends EntityIdentifiedByIdOnly> T remove(T entity) {
-    T nb = entityManager.merge(entity);
-    entityManager.remove(nb);
-    entityManager.flush();
-    return nb;
+    return entityPersister.remove(entity);
   }
 
   public Note createLink(

@@ -42,7 +42,7 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 **Target:**
 - Convert to stateless `@Service` bean
 - Take `Notebook` entity as method parameter instead of wrapping it
-- Inject repositories and `EntityManager` directly via constructor
+- Inject repositories and `EntityPersister` directly via constructor
 - Remove factory method `ModelFactoryService.notebookService()`
 
 **Example Target Pattern:**
@@ -50,19 +50,19 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 @Service
 public class NotebookService {
     private final NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
-    private final EntityManager entityManager;
+    private final EntityPersister entityPersister;
     
     public NotebookService(
         NotebookCertificateApprovalRepository notebookCertificateApprovalRepository,
-        EntityManager entityManager) {
+        EntityPersister entityPersister) {
         this.notebookCertificateApprovalRepository = notebookCertificateApprovalRepository;
-        this.entityManager = entityManager;
+        this.entityPersister = entityPersister;
     }
     
     public NotebookCertificateApprovalService requestNotebookApproval(Notebook notebook) {
         NotebookCertificateApproval certificateApproval = new NotebookCertificateApproval();
         certificateApproval.setNotebook(notebook);
-        entityManager.persist(certificateApproval);
+        entityPersister.save(certificateApproval);
         return new NotebookCertificateApprovalService(certificateApproval, ...);
     }
 }
@@ -92,7 +92,9 @@ public class NotebookService {
 - `createAnswerForQuestion(AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO)`
 
 **Entity Persistence Operations:**
-- `save(T entity)`, `merge(T entity)`, `remove(T entity)` - Services should use `EntityManager` directly instead of going through `ModelFactoryService`
+- `save(T entity)`, `merge(T entity)`, `remove(T entity)` - Services should use `EntityPersister` instead of going through `ModelFactoryService`
+- `EntityPersister` wraps `EntityManager` and provides persistence operations (`save`, `merge`, `remove`, `find`, `flush`, `refresh`, `persist`)
+- When `ModelFactoryService` is removed, services should inject and use `EntityPersister` directly
 
 **Repository Aggregation:**
 - `ModelFactoryService` currently aggregates repositories via public field injection
@@ -103,7 +105,7 @@ public class NotebookService {
 
 - `NotebookService` converted to stateless `@Service` bean
 - All `ModelFactoryService` operations migrated to appropriate domain services
-- Services use `EntityManager` directly for persistence operations
+- Services use `EntityPersister` for persistence operations (instead of `EntityManager` or `ModelFactoryService`)
 - All services use constructor injection instead of field injection
 - `ModelFactoryService` removed entirely
 - All tests updated and passing
