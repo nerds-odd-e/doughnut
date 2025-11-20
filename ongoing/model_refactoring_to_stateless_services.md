@@ -74,6 +74,7 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `GlobalSettingsService` - Now injects `GlobalSettingRepository` directly
 - ✅ `Ownership` entity - Now accepts `NoteRepository` as parameter
 - ✅ `AssessmentService` - Now injects `AssessmentAttemptRepository` and `CertificateRepository` directly
+- ✅ `NotebookIndexingService` - Now injects `NoteRepository` directly
 
 ✅ **Test Infrastructure:**
 - ✅ `RecallPromptControllerTests` - Updated to use direct repository injection
@@ -81,6 +82,7 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `TestabilityRestController` - Updated to use `CircleRepository` and `NoteRepository` directly
 - ✅ `FailureReportControllerTest` - Updated to use `FailureReportRepository` directly
 - ✅ `ControllerSetupTest` - Updated to use `FailureReportRepository` directly
+- ✅ `NotebookReindexingServiceTests` - Updated to use `NoteRepository` directly
 
 ✅ **Factories and Config Refactored:**
 - ✅ `FailureReportFactory` - Now accepts `FailureReportRepository` instead of `ModelFactoryService`
@@ -89,7 +91,6 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 **Remaining Files Using ModelFactoryService:**
 - `FineTuningDataController` - Still uses `ModelFactoryService` (needs refactoring)
 - `ConversationService` - Still uses `ModelFactoryService` (needs refactoring)
-- `NotebookIndexingService` - Still uses `ModelFactoryService` (needs refactoring)
 - `FineTuningService` - Still uses `ModelFactoryService` (needs refactoring)
 - `MakeMe` (test utility) - Still exposes `ModelFactoryService` for backward compatibility with tests
 

@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -12,17 +12,17 @@ public class NotebookIndexingService {
   private final EmbeddingService embeddingService;
   private final NoteEmbeddingService noteEmbeddingService;
   private final NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
-  private final ModelFactoryService modelFactoryService;
+  private final NoteRepository noteRepository;
 
   public NotebookIndexingService(
       EmbeddingService embeddingService,
       NoteEmbeddingService noteEmbeddingService,
       NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository,
-      ModelFactoryService modelFactoryService) {
+      NoteRepository noteRepository) {
     this.embeddingService = embeddingService;
     this.noteEmbeddingService = noteEmbeddingService;
     this.noteEmbeddingJdbcRepository = noteEmbeddingJdbcRepository;
-    this.modelFactoryService = modelFactoryService;
+    this.noteRepository = noteRepository;
   }
 
   /** Reset the index for a notebook by deleting all embeddings without regenerating them. */
@@ -40,9 +40,7 @@ public class NotebookIndexingService {
 
     if (candidateIds.isEmpty()) return;
 
-    @SuppressWarnings("unchecked")
-    List<Note> candidates =
-        (List<Note>) modelFactoryService.noteRepository.findAllById(candidateIds);
+    List<Note> candidates = (List<Note>) noteRepository.findAllById(candidateIds);
 
     embeddingService
         .streamEmbeddingsForNoteList(candidates)

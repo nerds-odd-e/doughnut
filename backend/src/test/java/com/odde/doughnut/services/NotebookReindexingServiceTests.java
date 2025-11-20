@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingRepository;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +30,7 @@ class NotebookReindexingServiceTests {
   @Autowired NoteEmbeddingService noteEmbeddingService;
   @Autowired NoteEmbeddingRepository noteEmbeddingRepository;
   @Autowired NoteEmbeddingJdbcRepository noteEmbeddingJdbcRepository;
-  @Autowired com.odde.doughnut.factoryServices.ModelFactoryService modelFactoryService;
+  @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
 
   // Service removed; keep tests minimal for update/reset endpoints in controller
@@ -81,8 +82,7 @@ class NotebookReindexingServiceTests {
     // mimic controller update behavior by streaming embeddings for selected candidates
     List<Integer> candidateIds =
         noteEmbeddingJdbcRepository.selectNoteIdsNeedingIndexUpdateByNotebookId(notebook.getId());
-    List<Note> candidates =
-        (List<Note>) modelFactoryService.noteRepository.findAllById(candidateIds);
+    List<Note> candidates = (List<Note>) noteRepository.findAllById(candidateIds);
     embeddingService
         .streamEmbeddingsForNoteList(candidates)
         .forEach(
