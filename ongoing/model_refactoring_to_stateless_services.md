@@ -54,9 +54,9 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - `deleteNoteEmbeddingsByNotebookId(Integer notebookId)` ✅
 - `getNoteEmbeddingAsFloats(Integer noteId)` ✅
 
-**Link Creation Operations** → Move to `NoteService` or create `LinkService`:
-- `createLink(Note sourceNote, Note targetNote, User creator, LinkType type, Timestamp currentUTCTimestamp)`
-- `buildALink(...)` (static method)
+✅ **Link Creation Operations** → Moved to `NoteService`:
+- `createLink(Note sourceNote, Note targetNote, User creator, LinkType type, Timestamp currentUTCTimestamp)` ✅
+- `buildALink(...)` (static method) ✅
 
 **Answer Creation Operations** → Move to `AssessmentService` or `AnswerService`:
 - `createAnswerForQuestion(AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO)`

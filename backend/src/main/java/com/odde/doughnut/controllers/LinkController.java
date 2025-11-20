@@ -10,6 +10,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/links")
 class LinkController {
   private final ModelFactoryService modelFactoryService;
+  private final NoteService noteService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -37,10 +39,12 @@ class LinkController {
 
   public LinkController(
       ModelFactoryService modelFactoryService,
+      NoteService noteService,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
+    this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.authorizationService = authorizationService;
@@ -86,7 +90,7 @@ class LinkController {
     authorizationService.assertReadAuthorization(targetNote);
     User user = authorizationService.getCurrentUser();
     Note link =
-        modelFactoryService.createLink(
+        noteService.createLink(
             sourceNote,
             targetNote,
             user,

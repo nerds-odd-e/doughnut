@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.services.AuthorizationService;
 import jakarta.persistence.EntityManager;
-import java.sql.Timestamp;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,36 +50,6 @@ public class ModelFactoryService {
 
   public <T extends EntityIdentifiedByIdOnly> T remove(T entity) {
     return entityPersister.remove(entity);
-  }
-
-  public Note createLink(
-      Note sourceNote,
-      Note targetNote,
-      User creator,
-      LinkType type,
-      Timestamp currentUTCTimestamp) {
-    if (type == null || type == LinkType.NO_LINK) return null;
-    Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
-    save(link);
-    return link;
-  }
-
-  public static Note buildALink(
-      Note sourceNote,
-      Note targetNote,
-      User creator,
-      LinkType type,
-      Timestamp currentUTCTimestamp) {
-    final Note note = new Note();
-    note.initialize(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
-    note.setTargetNote(targetNote);
-    note.getRecallSetting()
-        .setLevel(
-            Math.max(
-                sourceNote.getRecallSetting().getLevel(),
-                targetNote.getRecallSetting().getLevel()));
-
-    return note;
   }
 
   public Answer createAnswerForQuestion(

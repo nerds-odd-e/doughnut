@@ -65,7 +65,10 @@ public class Ownership {
       ModelFactoryService modelFactoryService,
       String topicConstructor) {
     NoteService noteService =
-        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityManager);
+        new NoteService(
+            modelFactoryService.noteRepository,
+            modelFactoryService.entityManager,
+            modelFactoryService.entityPersister);
     final Note note =
         new NoteConstructionService(user, currentUTCTimestamp, modelFactoryService, noteService)
             .createNote(null, topicConstructor);

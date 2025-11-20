@@ -1,7 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -18,8 +18,7 @@ public class ReificationBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder between(Note from, Note to, LinkType linkType) {
     this.entity =
-        ModelFactoryService.buildALink(
-            from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
+        NoteService.buildALink(from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
     return new NoteBuilder(entity, makeMe);
   }
 

@@ -12,6 +12,7 @@ import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.NoteConstructionService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
@@ -50,6 +51,7 @@ class TestabilityRestController {
   @Autowired UserService userService;
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
+  @Autowired NoteService noteService;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
   @Transactional
@@ -238,7 +240,7 @@ class TestabilityRestController {
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     User creator = sourceNote.getCreator();
-    modelFactoryService.createLink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    noteService.createLink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     return "OK";
   }
 

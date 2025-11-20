@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -26,6 +27,8 @@ class LinkControllerTests extends ControllerTestBase {
 
   @Autowired NoteMotionService noteMotionService;
 
+  @Autowired NoteService noteService;
+
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
@@ -33,7 +36,11 @@ class LinkControllerTests extends ControllerTestBase {
 
   LinkController controller() {
     return new LinkController(
-        modelFactoryService, new TestabilitySettings(), noteMotionService, authorizationService);
+        modelFactoryService,
+        noteService,
+        new TestabilitySettings(),
+        noteMotionService,
+        authorizationService);
   }
 
   @Nested

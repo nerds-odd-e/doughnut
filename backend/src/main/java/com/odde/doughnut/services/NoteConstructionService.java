@@ -58,7 +58,7 @@ public record NoteConstructionService(
                 .findFirst()
                 .ifPresentOrElse(
                     existingNote -> {
-                      modelFactoryService.createLink(
+                      noteService.createLink(
                           parentNote, existingNote, user, LinkType.RELATED_TO, currentUTCTimestamp);
                     },
                     () -> {
