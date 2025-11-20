@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.convention.TestBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -30,14 +30,17 @@ import org.springframework.web.server.ResponseStatusException;
 class UserControllerTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  CurrentUser currentUser;
+  @TestBean CurrentUser currentUser;
   UserController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
+  static CurrentUser currentUser() {
+    return new CurrentUser();
+  }
+
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new UserController(makeMe.modelFactoryService, testabilitySettings, authorizationService);
   }
@@ -129,11 +132,11 @@ class UserControllerTest {
 
   @Test
   void deleteTokenTestForAnotherUser() {
-    CurrentUser currentUser2 = new CurrentUser(makeMe.aUser().please());
+    User anotherUser = makeMe.aUser().please();
     UserToken userToken2 =
         makeMe
             .aUserToken()
-            .forUser(makeMe.modelFactoryService.toUserModel(currentUser2.getUser()))
+            .forUser(makeMe.modelFactoryService.toUserModel(anotherUser))
             .withLabel("OTHER_USER_TOKEN")
             .please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
