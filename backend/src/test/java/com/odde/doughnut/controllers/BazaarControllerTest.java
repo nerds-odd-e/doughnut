@@ -19,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class BazaarControllerTest extends ControllerTestBase {
   @Autowired private BazaarService bazaarService;
 
-  @Autowired
-  private com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
-
-  private BazaarController controller;
+  @Autowired BazaarController controller;
   private Note topNote;
   private Notebook notebook;
   private BazaarNotebook bazaarNotebook;
@@ -35,7 +32,6 @@ class BazaarControllerTest extends ControllerTestBase {
     topNote = makeMe.aNote().creatorAndOwner(notebookOwnerUser).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
-    controller = new BazaarController(bazaarService, authorizationService);
   }
 
   @Nested
@@ -43,7 +39,6 @@ class BazaarControllerTest extends ControllerTestBase {
     @Test
     void otherPeopleCannot() {
       currentUser.setUser(makeMe.aUser().please());
-      controller = new BazaarController(bazaarService, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.removeFromBazaar(bazaarNotebook));
@@ -53,7 +48,6 @@ class BazaarControllerTest extends ControllerTestBase {
     @Test
     void notebookOwnerCan() throws UnexpectedNoAccessRightException {
       currentUser.setUser(notebookOwnerUser);
-      controller = new BazaarController(bazaarService, authorizationService);
       controller.removeFromBazaar(bazaarNotebook);
     }
 

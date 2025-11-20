@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
-import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -19,20 +18,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class RecallsControllerTests extends ControllerTestBase {
-  @Autowired RecallService recallService;
+  @Autowired RecallsController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-
-  RecallsController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller = new RecallsController(testabilitySettings, authorizationService, recallService);
   }
 
   RecallsController nullUserController() {
     currentUser.setUser(null);
-    return new RecallsController(testabilitySettings, authorizationService, recallService);
+    return controller;
   }
 
   @Nested

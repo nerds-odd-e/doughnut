@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.testability.MakeMe;
 import org.hamcrest.Matchers;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,12 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AttachmentControllerTests {
   @Autowired MakeMe makeMe;
-  AttachmentController controller;
-
-  @BeforeEach
-  void setup() {
-    controller = new AttachmentController();
-  }
+  @Autowired AttachmentController controller;
 
   @Test
   void imageDownload() {
