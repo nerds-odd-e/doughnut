@@ -3,15 +3,11 @@ package com.odde.doughnut.controllers;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AssessmentService;
-import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
@@ -19,19 +15,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-public class AssessmentControllerTests {
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
-  private CurrentUser currentUser;
+public class AssessmentControllerTests extends ControllerTestBase {
   private AssessmentController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -40,8 +26,7 @@ public class AssessmentControllerTests {
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssessmentController(
             makeMe.modelFactoryService, testabilitySettings, authorizationService);
@@ -63,8 +48,7 @@ public class AssessmentControllerTests {
 
     @Test
     void whenNotLogin() {
-      CurrentUser nullUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      currentUser.setUser(null);
       controller =
           new AssessmentController(
               makeMe.modelFactoryService, testabilitySettings, authorizationService);
@@ -114,8 +98,7 @@ public class AssessmentControllerTests {
 
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
-      CurrentUser anotherUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, anotherUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller =
           new AssessmentController(
               makeMe.modelFactoryService, testabilitySettings, authorizationService);

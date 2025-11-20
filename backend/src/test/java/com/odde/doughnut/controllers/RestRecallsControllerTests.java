@@ -4,13 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -20,34 +16,23 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class RecallsControllerTests {
+class RecallsControllerTests extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired AuthorizationService authorizationService;
-  @Autowired MakeMe makeMe;
-  private CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   RecallsController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new RecallsController(modelFactoryService, testabilitySettings, authorizationService);
   }
 
   RecallsController nullUserController() {
-    CurrentUser nullUser = new CurrentUser(null);
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+    currentUser.setUser(null);
     return new RecallsController(modelFactoryService, testabilitySettings, authorizationService);
   }
 

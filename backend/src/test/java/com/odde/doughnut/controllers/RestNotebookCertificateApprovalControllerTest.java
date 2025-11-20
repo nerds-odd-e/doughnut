@@ -4,39 +4,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NotebookCertificateApprovalControllerTest {
+class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired AuthorizationService authorizationService;
 
-  @Autowired MakeMe makeMe;
-  private CurrentUser currentUser;
   NotebookCertificateApprovalController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new NotebookCertificateApprovalController(
             modelFactoryService, testabilitySettings, authorizationService);
@@ -112,8 +98,7 @@ class NotebookCertificateApprovalControllerTest {
 
     @BeforeEach
     void setup() {
-      CurrentUser currentUser = new CurrentUser(makeMe.anAdmin().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(makeMe.anAdmin().please());
       notebook =
           makeMe
               .aNotebook()

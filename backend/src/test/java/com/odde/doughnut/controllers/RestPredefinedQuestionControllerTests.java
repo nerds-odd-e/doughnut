@@ -8,17 +8,13 @@ import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
@@ -29,20 +25,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class PredefinedQuestionControllerTests {
+class PredefinedQuestionControllerTests extends ControllerTestBase {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired AuthorizationService authorizationService;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
-  @Autowired MakeMe makeMe;
-  private CurrentUser currentUser;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -51,8 +38,7 @@ class PredefinedQuestionControllerTests {
   @BeforeEach
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new PredefinedQuestionController(
             openAiApi,
@@ -64,8 +50,7 @@ class PredefinedQuestionControllerTests {
   }
 
   PredefinedQuestionController nullUserController() {
-    CurrentUser nullUser = new CurrentUser(null);
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+    currentUser.setUser(null);
     return new PredefinedQuestionController(
         openAiApi,
         modelFactoryService,

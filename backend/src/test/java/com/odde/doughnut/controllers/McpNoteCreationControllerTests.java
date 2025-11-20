@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
@@ -13,12 +12,9 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,20 +25,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class McpNoteCreationControllerTests {
+class McpNoteCreationControllerTests extends ControllerTestBase {
 
   private McpNoteCreationController controller;
   private NoteCreationDTO noteCreation;
@@ -50,8 +40,6 @@ class McpNoteCreationControllerTests {
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Mock HttpClientAdapter httpClientAdapter;
   @MockitoBean NoteSearchService noteSearchService;
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
   @Autowired WebApplicationContext webApplicationContext;
   @Autowired NoteService noteService;
 
@@ -60,8 +48,7 @@ class McpNoteCreationControllerTests {
   @BeforeEach
   void setup() {
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    CurrentUser currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     noteCreation = new NoteCreationDTO();
     noteCreation.setNewTitle("new note");
     controller =
@@ -86,7 +73,7 @@ class McpNoteCreationControllerTests {
     @Test
     void shouldThrowExceptionWhenUserNotFound() {
 
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
+      currentUser.setUser(null);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class,

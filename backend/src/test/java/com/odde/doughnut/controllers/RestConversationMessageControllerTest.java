@@ -9,18 +9,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.completion.chat.AssistantMessage;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -32,21 +28,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class ConversationMessageControllerTest {
+class ConversationMessageControllerTest extends ControllerTestBase {
 
   @Autowired ConversationService conversationService;
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
-  private CurrentUser currentUser;
   ConversationMessageController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
@@ -54,7 +41,7 @@ class ConversationMessageControllerTest {
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
+    currentUser.setUser(makeMe.aUser().please());
     GlobalSettingsService globalSettingsService =
         new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
@@ -62,7 +49,6 @@ class ConversationMessageControllerTest {
     ChatCompletionConversationService chatCompletionConversationService =
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
             conversationService, chatCompletionConversationService, authorizationService);
@@ -154,8 +140,7 @@ class ConversationMessageControllerTest {
       ChatCompletionConversationService chatCompletionConversationService =
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
-      CurrentUser nullUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      currentUser.setUser(null);
       controller =
           new ConversationMessageController(
               conversationService, chatCompletionConversationService, authorizationService);
@@ -498,8 +483,7 @@ class ConversationMessageControllerTest {
       ChatCompletionConversationService chatCompletionConversationService =
           new ChatCompletionConversationService(
               openAiApiHandler, globalSettingsService, objectMapper);
-      CurrentUser nullUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      currentUser.setUser(null);
       controller =
           new ConversationMessageController(
               conversationService, chatCompletionConversationService, authorizationService);

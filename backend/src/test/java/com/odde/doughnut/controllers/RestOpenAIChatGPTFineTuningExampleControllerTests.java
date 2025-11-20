@@ -6,17 +6,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -29,24 +25,15 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-public class RestOpenAIChatGPTFineTuningExampleControllerTests {
+public class RestOpenAIChatGPTFineTuningExampleControllerTests extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired AuthorizationService authorizationService;
-  @Autowired MakeMe makeMe;
   FineTuningDataController controller;
   @Mock private OpenAiApi openAiApi;
 
   @BeforeEach
   void setup() {
-    CurrentUser adminUser = new CurrentUser(makeMe.anAdmin().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, adminUser);
+    currentUser.setUser(makeMe.anAdmin().please());
     controller =
         new FineTuningDataController(
             modelFactoryService,
@@ -60,8 +47,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class getGoodOpenAIChatGPTFineTuningExample {
     @Test
     void authentication() {
-      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -116,8 +102,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
   class SuggestedQuestions {
     @Test
     void shouldThrowExceptionIfUserDoesNotHaveReadingAuth_whenCallGetGoodTrainingData() {
-      CurrentUser nullUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+      currentUser.setUser(null);
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -160,8 +145,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
-      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -202,8 +186,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
-      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller =
           new FineTuningDataController(
               modelFactoryService,
@@ -233,8 +216,7 @@ public class RestOpenAIChatGPTFineTuningExampleControllerTests {
 
     @Test
     void itShouldNotAllowNonAdmin() {
-      CurrentUser nonAdminUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nonAdminUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller =
           new FineTuningDataController(
               modelFactoryService,

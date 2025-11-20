@@ -2,31 +2,17 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-public class CertificateControllerTests {
+public class CertificateControllerTests extends ControllerTestBase {
   public static final int oneYearInHours = 8760;
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
-  private CurrentUser currentUser;
   private CertificateController controller;
   Timestamp currentTime;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -35,8 +21,7 @@ public class CertificateControllerTests {
   void setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller = new CertificateController(makeMe.modelFactoryService, authorizationService);
   }
 

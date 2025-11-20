@@ -4,38 +4,24 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class SearchControllerTests {
-  @Autowired MakeMe makeMe;
-  @Autowired AuthorizationService authorizationService;
+class SearchControllerTests extends ControllerTestBase {
   @Autowired NoteSearchService noteSearchService;
 
-  private CurrentUser currentUser;
   private SearchController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller = new SearchController(noteSearchService, authorizationService);
   }
 
@@ -118,8 +104,7 @@ class SearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      currentUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(null);
       controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
@@ -191,8 +176,7 @@ class SearchControllerTests {
 
     @Test
     void shouldNotAllowSearchWhenNotLoggedIn() {
-      currentUser = new CurrentUser(null);
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+      currentUser.setUser(null);
       controller = new SearchController(noteSearchService, authorizationService);
 
       SearchTerm searchTerm = new SearchTerm();
