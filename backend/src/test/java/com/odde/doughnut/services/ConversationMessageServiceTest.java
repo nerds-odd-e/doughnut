@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ConversationMessageServiceTest {
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired EntityPersister entityPersister;
   @Autowired MakeMe makeMe;
   @Autowired AnswerService answerService;
   @Autowired GlobalSettingsService globalSettingsService;
@@ -37,7 +39,8 @@ class ConversationMessageServiceTest {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
     assessmentService =
-        new AssessmentService(makeMe.modelFactoryService, testabilitySettings, answerService);
+        new AssessmentService(
+            makeMe.modelFactoryService, entityPersister, testabilitySettings, answerService);
   }
 
   @Nested

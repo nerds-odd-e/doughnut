@@ -4,7 +4,7 @@ import com.odde.doughnut.controllers.dto.SubscriptionDTO;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -15,12 +15,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/subscriptions")
 class SubscriptionController {
-  private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final AuthorizationService authorizationService;
 
   public SubscriptionController(
-      ModelFactoryService modelFactoryService, AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
+      EntityPersister entityPersister, AuthorizationService authorizationService) {
+    this.entityPersister = entityPersister;
     this.authorizationService = authorizationService;
   }
 
@@ -35,7 +35,7 @@ class SubscriptionController {
     subscription.setNotebook(notebook);
     subscription.setFromDTO(subscriptionDTO);
     subscription.setUser(authorizationService.getCurrentUser());
-    modelFactoryService.save(subscription);
+    entityPersister.save(subscription);
     return subscription;
   }
 
@@ -47,7 +47,7 @@ class SubscriptionController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(subscription.getNotebook());
     subscription.setFromDTO(subscriptionDTO);
-    modelFactoryService.save(subscription);
+    entityPersister.save(subscription);
     return subscription;
   }
 
@@ -57,7 +57,7 @@ class SubscriptionController {
       @PathVariable(name = "subscription") @Schema(type = "integer") Subscription subscription)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(subscription);
-    modelFactoryService.remove(subscription);
+    entityPersister.remove(subscription);
     return List.of(1);
   }
 }

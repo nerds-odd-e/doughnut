@@ -61,10 +61,14 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 ✅ **Answer Creation Operations** → Moved to `AnswerService`:
 - `createAnswerForQuestion(AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO)` ✅
 
-**Entity Persistence Operations:**
-- `save(T entity)`, `merge(T entity)`, `remove(T entity)` - Services should use `EntityPersister` instead of going through `ModelFactoryService`
-- `EntityPersister` wraps `EntityManager` and provides persistence operations (`save`, `merge`, `remove`, `find`, `flush`, `refresh`, `persist`)
-- When `ModelFactoryService` is removed, services should inject and use `EntityPersister` directly
+✅ **Entity Persistence Operations** → Migrated to `EntityPersister`:
+- `save(T entity)`, `merge(T entity)`, `remove(T entity)` ✅
+- All services now inject and use `EntityPersister` directly instead of going through `ModelFactoryService`
+- All controllers now inject and use `EntityPersister` directly
+- Test builders (`EntityBuilder`, `NoteBuilder`) updated to use `EntityPersister`
+- `Ownership.java` entity updated to accept `EntityPersister` as parameter
+- `TestabilityRestController` updated to use `EntityPersister`
+- All test files updated to use `EntityPersister`
 
 **Repository Aggregation:**
 - `ModelFactoryService` currently aggregates repositories via public field injection

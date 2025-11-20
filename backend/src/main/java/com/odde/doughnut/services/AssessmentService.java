@@ -5,6 +5,7 @@ import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SE
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
@@ -15,14 +16,17 @@ import java.util.Objects;
 
 public class AssessmentService {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final AnswerService answerService;
 
   public AssessmentService(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AnswerService answerService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.answerService = answerService;
   }
@@ -37,7 +41,7 @@ public class AssessmentService {
     assessmentAttempt.setNotebook(notebook);
     assessmentAttempt.setUser(user);
 
-    return modelFactoryService.save(assessmentAttempt);
+    return entityPersister.save(assessmentAttempt);
   }
 
   public AssessmentAttempt submitAssessmentResult(
@@ -52,7 +56,7 @@ public class AssessmentService {
     assessmentAttempt.setAnswersCorrect(totalCorrectAnswer);
     assessmentAttempt.setSubmittedAt(currentUTCTimestamp);
 
-    modelFactoryService.save(assessmentAttempt);
+    entityPersister.save(assessmentAttempt);
 
     if (assessmentAttempt.getIsPass() && assessmentAttempt.getNotebook().isCertifiable()) {
       claimCertificateForPassedAssessment(
@@ -93,7 +97,7 @@ public class AssessmentService {
                 .plus(cert.getNotebook().getNotebookSettings().getCertificateExpiry())
                 .toInstant());
     cert.setExpiryDate(expiryDate);
-    modelFactoryService.save(cert);
+    entityPersister.save(cert);
   }
 
   private void getLastAssessmentAttemptAndItMustBePassed(Notebook notebook, User user) {

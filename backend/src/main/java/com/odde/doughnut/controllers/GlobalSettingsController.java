@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
@@ -25,9 +26,10 @@ public class GlobalSettingsController {
 
   public GlobalSettingsController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
-    this.globalSettingsService = new GlobalSettingsService(modelFactoryService);
+    this.globalSettingsService = new GlobalSettingsService(modelFactoryService, entityPersister);
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }

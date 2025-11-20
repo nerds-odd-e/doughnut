@@ -32,7 +32,11 @@ class CircleControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new CircleController(
-            modelFactoryService, circleService, testabilitySettings, authorizationService);
+            modelFactoryService,
+            makeMe.entityPersister,
+            circleService,
+            testabilitySettings,
+            authorizationService);
   }
 
   @Nested
@@ -42,7 +46,11 @@ class CircleControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new CircleController(
-              modelFactoryService, circleService, testabilitySettings, authorizationService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              circleService,
+              testabilitySettings,
+              authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -71,7 +79,11 @@ class CircleControllerTest extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new CircleController(
-              modelFactoryService, circleService, testabilitySettings, authorizationService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              circleService,
+              testabilitySettings,
+              authorizationService);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -96,7 +108,11 @@ class CircleControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new CircleController(
-              modelFactoryService, circleService, testabilitySettings, authorizationService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              circleService,
+              testabilitySettings,
+              authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {

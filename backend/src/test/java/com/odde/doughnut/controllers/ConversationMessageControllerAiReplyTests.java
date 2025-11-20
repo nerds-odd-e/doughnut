@@ -149,7 +149,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
       notebookAiAssistant.setAdditionalInstructionsToAi("Always use Spanish.");
       notebookAiAssistant.setCreatedAt(currentUTCTimestamp);
       notebookAiAssistant.setUpdatedAt(currentUTCTimestamp);
-      makeMe.modelFactoryService.save(notebookAiAssistant);
+      makeMe.entityPersister.save(notebookAiAssistant);
       makeMe.refresh(note.getNotebook());
 
       controller.getAiReply(conversation);

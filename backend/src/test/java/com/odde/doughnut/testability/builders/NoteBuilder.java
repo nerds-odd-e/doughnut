@@ -24,7 +24,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder(MakeMe makeMe) {
     super(
         makeMe,
-        new NoteConstructionService(null, new Timestamp(System.currentTimeMillis()), null, null)
+        new NoteConstructionService(
+                null, new Timestamp(System.currentTimeMillis()), null, null, null)
             .createNote(null, ""));
     if (Strings.isEmpty(entity.getTopicConstructor())) titleConstructor(titleCounter.generate());
     details("descrption");
@@ -92,7 +93,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
       entity.getNotebook().setOwnership(entity.getCreator().getOwnership());
     }
     if (entity.getNotebook().getId() == null && needPersist) {
-      makeMe.modelFactoryService.save(entity.getNotebook());
+      makeMe.entityPersister.save(entity.getNotebook());
     }
   }
 

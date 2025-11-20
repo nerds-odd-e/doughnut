@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import java.io.IOException;
@@ -20,13 +21,14 @@ public record NoteConstructionService(
     User user,
     Timestamp currentUTCTimestamp,
     ModelFactoryService modelFactoryService,
+    EntityPersister entityPersister,
     NoteService noteService) {
 
   public Note createNote(Note parentNote, String topicConstructor) {
     final Note note = new Note();
     note.initialize(user, parentNote, currentUTCTimestamp, topicConstructor);
-    if (modelFactoryService != null) {
-      modelFactoryService.save(note);
+    if (entityPersister != null) {
+      entityPersister.save(note);
     }
     return note;
   }
@@ -97,7 +99,7 @@ public record NoteConstructionService(
             .getNote();
     note.setSiblingOrderToInsertAfter(referenceNote);
     note.adjustPositionAsAChildOfParentInMemory();
-    modelFactoryService.save(note);
+    entityPersister.save(note);
     return note;
   }
 }

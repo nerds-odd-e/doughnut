@@ -42,6 +42,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
     controller =
         new NoteCreationController(
             modelFactoryService,
+            makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
             noteService,

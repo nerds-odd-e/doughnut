@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.ByteArrayOutputStream;
@@ -20,11 +21,14 @@ public class ObsidianFormatService {
 
   private final NoteConstructionService noteConstructionService;
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final Set<String> usedPaths = new HashSet<>();
 
-  public ObsidianFormatService(User user, ModelFactoryService modelFactoryService) {
+  public ObsidianFormatService(
+      User user, ModelFactoryService modelFactoryService, EntityPersister entityPersister) {
     TestabilitySettings testabilitySettings = new TestabilitySettings();
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     NoteService noteService =
         new NoteService(
             modelFactoryService.noteRepository,
@@ -35,6 +39,7 @@ public class ObsidianFormatService {
             user,
             testabilitySettings.getCurrentUTCTimestamp(),
             this.modelFactoryService,
+            entityPersister,
             noteService);
   }
 
@@ -173,7 +178,7 @@ public class ObsidianFormatService {
     }
 
     Note newNote = noteConstructionService.createNote(currentParent, noteName);
-    newNote = modelFactoryService.save(newNote);
+    newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted
     modelFactoryService.entityManager.flush();
@@ -215,7 +220,7 @@ public class ObsidianFormatService {
           // Copy the children to the existing note
           note.getChildren().forEach(child -> child.setParentNote(existingNote));
           // Remove the temporary note
-          modelFactoryService.remove(note);
+          entityPersister.remove(note);
           return;
         }
       }
@@ -232,7 +237,7 @@ public class ObsidianFormatService {
     } else {
       note.prependDescription(content);
     }
-    modelFactoryService.save(note);
+    entityPersister.save(note);
   }
 
   private Map<String, String> parseFrontmatter(String frontmatter) {
@@ -256,6 +261,6 @@ public class ObsidianFormatService {
       }
     }
     existingNote.prependDescription(content);
-    modelFactoryService.save(existingNote);
+    entityPersister.save(existingNote);
   }
 }

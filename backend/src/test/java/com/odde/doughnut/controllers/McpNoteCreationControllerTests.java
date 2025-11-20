@@ -54,6 +54,7 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
     controller =
         new McpNoteCreationController(
             modelFactoryService,
+            makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
             noteSearchService,

@@ -29,7 +29,8 @@ class TextContentControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote("new").creatorAndOwner(currentUser.getUser()).please();
     controller =
-        new TextContentController(modelFactoryService, testabilitySettings, authorizationService);
+        new TextContentController(
+            makeMe.entityPersister, testabilitySettings, authorizationService);
   }
 
   @Nested

@@ -23,7 +23,7 @@ public abstract class EntityBuilder<T> {
     beforeCreate(persistNeeded);
     if (persistNeeded) {
       if (entity instanceof EntityIdentifiedByIdOnly) {
-        makeMe.modelFactoryService.save((EntityIdentifiedByIdOnly) entity);
+        makeMe.entityPersister.save((EntityIdentifiedByIdOnly) entity);
       } else {
         makeMe.modelFactoryService.entityManager.persist(entity);
       }

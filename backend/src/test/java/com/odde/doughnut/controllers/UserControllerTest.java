@@ -9,7 +9,6 @@ import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +24,11 @@ class UserControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new UserController(
-            makeMe.modelFactoryService, testabilitySettings, authorizationService, userService);
+            makeMe.modelFactoryService,
+            makeMe.entityPersister,
+            testabilitySettings,
+            authorizationService,
+            userService);
   }
 
   @Test
@@ -70,8 +73,7 @@ class UserControllerTest extends ControllerTestBase {
   void getTokensTest() {
     UserToken userToken =
         makeMe.aUserToken().forUser(currentUser.getUser()).withLabel("TEST_LABEL").please();
-    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
-    modelFactoryService.save(userToken);
+    makeMe.entityPersister.save(userToken);
 
     List<UserToken> getTokens = controller.getTokens();
 
@@ -82,8 +84,7 @@ class UserControllerTest extends ControllerTestBase {
   @Test
   void getTokensWithMultipleTokens() {
     UserToken userToken = new UserToken(currentUser.getUser().getId(), "token", "LABEL");
-    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
-    modelFactoryService.save(userToken);
+    makeMe.entityPersister.save(userToken);
 
     List<UserToken> getTokens = controller.getTokens();
 
@@ -95,8 +96,7 @@ class UserControllerTest extends ControllerTestBase {
   void deleteTokenTest() {
     UserToken userToken =
         makeMe.aUserToken().forUser(currentUser.getUser()).withLabel("DELETE_LABEL").please();
-    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
-    modelFactoryService.save(userToken);
+    makeMe.entityPersister.save(userToken);
 
     controller.deleteToken(userToken.getId());
 
@@ -110,12 +110,15 @@ class UserControllerTest extends ControllerTestBase {
     User anotherUser = makeMe.aUser().please();
     UserToken userToken2 =
         makeMe.aUserToken().forUser(anotherUser).withLabel("OTHER_USER_TOKEN").please();
-    ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
-    modelFactoryService.save(userToken2);
+    makeMe.entityPersister.save(userToken2);
 
     controller =
         new UserController(
-            makeMe.modelFactoryService, testabilitySettings, authorizationService, userService);
+            makeMe.modelFactoryService,
+            makeMe.entityPersister,
+            testabilitySettings,
+            authorizationService,
+            userService);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }

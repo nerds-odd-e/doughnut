@@ -6,6 +6,7 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GraphRAGService;
@@ -38,6 +39,7 @@ import org.springframework.web.context.annotation.SessionScope;
 class NoteController {
 
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
   private final NoteMotionService noteMotionService;
@@ -47,6 +49,7 @@ class NoteController {
 
   public NoteController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
@@ -54,6 +57,7 @@ class NoteController {
       AuthorizationService authorizationService,
       UserService userService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.noteService = noteService;
@@ -80,7 +84,7 @@ class NoteController {
       bindingResult.rejectValue("wikidataId", "duplicate", "Duplicate Wikidata ID Detected.");
       throw new BindException(bindingResult);
     }
-    modelFactoryService.save(note);
+    entityPersister.save(note);
     return note.toNoteRealm(authorizationService.getCurrentUser());
   }
 
@@ -105,7 +109,7 @@ class NoteController {
     final User user = authorizationService.getCurrentUser();
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
-    modelFactoryService.save(note);
+    entityPersister.save(note);
     return note.getNoteAccessory();
   }
 
@@ -162,13 +166,13 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     BeanUtils.copyProperties(recallSetting, note.getRecallSetting());
-    modelFactoryService.save(note);
+    entityPersister.save(note);
     note.getLinksAndRefers()
         .forEach(
             link -> {
               link.getRecallSetting()
                   .setLevel(Math.max(link.getRecallSetting().getLevel(), recallSetting.getLevel()));
-              modelFactoryService.save(link);
+              entityPersister.save(link);
             });
     return new RedirectToNoteResponse(note.getId());
   }

@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
@@ -24,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/memory-trackers")
 class MemoryTrackerController {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final MemoryTrackerService memoryTrackerService;
 
   @Resource(name = "testabilitySettings")
@@ -33,13 +35,16 @@ class MemoryTrackerController {
 
   public MemoryTrackerController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       UserService userService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService, userService);
+    this.memoryTrackerService =
+        new MemoryTrackerService(modelFactoryService, entityPersister, userService);
   }
 
   @GetMapping("/{memoryTracker}/spelling-question")
@@ -68,7 +73,7 @@ class MemoryTrackerController {
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     memoryTracker.setRemovedFromTracking(true);
     memoryTracker.setLastRecalledAt(testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.save(memoryTracker);
+    entityPersister.save(memoryTracker);
     return memoryTracker;
   }
 

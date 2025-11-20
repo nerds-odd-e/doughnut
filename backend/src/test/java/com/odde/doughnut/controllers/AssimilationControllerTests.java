@@ -32,6 +32,7 @@ class AssimilationControllerTests extends ControllerTestBase {
     controller =
         new AssimilationController(
             modelFactoryService,
+            makeMe.entityPersister,
             subscriptionService,
             testabilitySettings,
             authorizationService,

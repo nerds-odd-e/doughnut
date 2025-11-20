@@ -43,6 +43,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
         new PredefinedQuestionController(
             openAiApi,
             modelFactoryService,
+            makeMe.entityPersister,
             suggestedQuestionForFineTuningService,
             testabilitySettings,
             getTestObjectMapper(),
@@ -54,6 +55,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     return new PredefinedQuestionController(
         openAiApi,
         modelFactoryService,
+        makeMe.entityPersister,
         suggestedQuestionForFineTuningService,
         testabilitySettings,
         getTestObjectMapper(),

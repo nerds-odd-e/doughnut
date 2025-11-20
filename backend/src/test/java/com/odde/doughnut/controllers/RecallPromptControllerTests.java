@@ -64,6 +64,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
         new RecallPromptController(
             openAiApi,
             makeMe.modelFactoryService,
+            makeMe.entityPersister,
             testabilitySettings,
             getTestObjectMapper(),
             authorizationService,
@@ -76,6 +77,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     return new RecallPromptController(
         openAiApi,
         modelFactoryService,
+        makeMe.entityPersister,
         testabilitySettings,
         getTestObjectMapper(),
         authorizationService,
@@ -197,6 +199,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
                 new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
+                    makeMe.entityPersister,
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService,
@@ -285,6 +288,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
                 new RecallPromptController(
                     openAiApi,
                     makeMe.modelFactoryService,
+                    makeMe.entityPersister,
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService,
@@ -435,10 +439,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
       PredefinedQuestion contestedQuestion =
           makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
       contestedQuestion.setContested(true);
-      modelFactoryService.save(contestedQuestion);
+      makeMe.entityPersister.save(contestedQuestion);
       RecallPrompt existingPrompt = makeMe.aRecallPrompt().please();
       existingPrompt.setPredefinedQuestion(contestedQuestion);
-      modelFactoryService.save(existingPrompt);
+      makeMe.entityPersister.save(existingPrompt);
 
       // Mock the AI to generate a new question
       MCQWithAnswer newQuestion =

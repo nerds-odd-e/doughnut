@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
@@ -44,6 +45,7 @@ class TestabilityRestController {
   @Autowired UserRepository userRepository;
   @Autowired CurrentUser currentUser;
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired EntityPersister entityPersister;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
@@ -82,7 +84,7 @@ class TestabilityRestController {
     User user = new User();
     user.setExternalIdentifier(externalIdentifier);
     user.setName(name);
-    modelFactoryService.save(user);
+    entityPersister.save(user);
   }
 
   static class NoteTestData {
@@ -115,7 +117,7 @@ class TestabilityRestController {
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null, null)
+          new NoteConstructionService(user, currentUTCTimestamp, null, null, null)
               .createNote(null, title);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
@@ -149,14 +151,15 @@ class TestabilityRestController {
         User user,
         Ownership ownership,
         Map<String, Note> titleNoteMap,
-        ModelFactoryService modelFactoryService) {
+        ModelFactoryService modelFactoryService,
+        EntityPersister entityPersister) {
       noteTestData.forEach(
           injection -> {
             Note note = titleNoteMap.get(injection.title);
 
             if (Strings.isBlank(injection.parentTitle)) {
               note.buildNotebookForHeadNote(ownership, user);
-              modelFactoryService.save(note.getNotebook());
+              entityPersister.save(note.getNotebook());
             } else {
               note.setParentNote(
                   getParentNote(
@@ -173,8 +176,8 @@ class TestabilityRestController {
     }
 
     private void saveByOriginalOrder(
-        Map<String, Note> titleNoteMap, ModelFactoryService modelFactoryService) {
-      noteTestData.forEach((inject -> modelFactoryService.save(titleNoteMap.get(inject.title))));
+        Map<String, Note> titleNoteMap, EntityPersister entityPersister) {
+      noteTestData.forEach((inject -> entityPersister.save(titleNoteMap.get(inject.title))));
     }
   }
 
@@ -187,8 +190,9 @@ class TestabilityRestController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
-    notesTestData.buildNoteTree(user, ownership, titleNoteMap, this.modelFactoryService);
-    notesTestData.saveByOriginalOrder(titleNoteMap, this.modelFactoryService);
+    notesTestData.buildNoteTree(
+        user, ownership, titleNoteMap, this.modelFactoryService, this.entityPersister);
+    notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
   }
@@ -199,7 +203,7 @@ class TestabilityRestController {
       @RequestBody PredefinedQuestionsTestData predefinedQuestionsTestData) {
     List<PredefinedQuestion> predefinedQuestions =
         predefinedQuestionsTestData.buildPredefinedQuestions(this.modelFactoryService);
-    predefinedQuestions.forEach(question -> modelFactoryService.save(question));
+    predefinedQuestions.forEach(question -> entityPersister.save(question));
     updateNotebookSettings(
         predefinedQuestions, predefinedQuestionsTestData.getNotebookCertifiable());
     return predefinedQuestions;
@@ -212,7 +216,7 @@ class TestabilityRestController {
     }
     Notebook notebook = predefinedQuestions.getFirst().getNote().getNotebook();
     notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(predefinedQuestions.size());
-    modelFactoryService.save(notebook);
+    entityPersister.save(notebook);
     if (notebookCertifiable != null && notebookCertifiable) {
       NotebookCertificateApproval approval = notebookService.requestNotebookApproval(notebook);
       notebookCertificateApprovalService.approve(
@@ -281,7 +285,7 @@ class TestabilityRestController {
   public String injectCircle(@RequestBody HashMap<String, String> circleInfo) {
     Circle entity = new Circle();
     entity.setName(circleInfo.get("circleName"));
-    modelFactoryService.save(entity);
+    entityPersister.save(entity);
     Arrays.stream(circleInfo.get("members").split(","))
         .map(String::trim)
         .forEach(

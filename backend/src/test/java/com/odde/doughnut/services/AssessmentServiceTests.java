@@ -7,6 +7,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.ApiException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class AssessmentServiceTests {
   @Autowired MakeMe makeMe;
+  @Autowired EntityPersister entityPersister;
   @Autowired com.odde.doughnut.services.AnswerService answerService;
   private CurrentUser currentUser;
   private AssessmentService service;
@@ -34,7 +36,9 @@ public class AssessmentServiceTests {
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
-    service = new AssessmentService(makeMe.modelFactoryService, testabilitySettings, answerService);
+    service =
+        new AssessmentService(
+            makeMe.modelFactoryService, entityPersister, testabilitySettings, answerService);
   }
 
   @Nested

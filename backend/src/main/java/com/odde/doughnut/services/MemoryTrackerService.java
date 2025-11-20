@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -14,10 +15,15 @@ import java.util.List;
 
 public class MemoryTrackerService {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final UserService userService;
 
-  public MemoryTrackerService(ModelFactoryService modelFactoryService, UserService userService) {
+  public MemoryTrackerService(
+      ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
+      UserService userService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.userService = userService;
   }
 
@@ -68,7 +74,7 @@ public class MemoryTrackerService {
   public void updateForgettingCurve(MemoryTracker memoryTracker, int adjustment) {
     memoryTracker.setForgettingCurveIndex(memoryTracker.getForgettingCurveIndex() + adjustment);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
-    modelFactoryService.save(memoryTracker);
+    entityPersister.save(memoryTracker);
   }
 
   public void updateMemoryTrackerAfterAnsweringQuestion(
@@ -88,7 +94,7 @@ public class MemoryTrackerService {
   public void markAsRepeated(
       Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker) {
     memoryTracker.markAsRepeated(currentUTCTimestamp, correct);
-    modelFactoryService.save(memoryTracker);
+    entityPersister.save(memoryTracker);
   }
 
   public SpellingResultDTO answerSpelling(

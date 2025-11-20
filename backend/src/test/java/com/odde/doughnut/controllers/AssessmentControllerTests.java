@@ -34,7 +34,11 @@ public class AssessmentControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssessmentController(
-            makeMe.modelFactoryService, testabilitySettings, authorizationService, answerService);
+            makeMe.modelFactoryService,
+            makeMe.entityPersister,
+            testabilitySettings,
+            authorizationService,
+            answerService);
   }
 
   @Nested
@@ -51,7 +55,11 @@ public class AssessmentControllerTests extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, authorizationService, answerService);
+              makeMe.modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService,
+              answerService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -101,7 +109,11 @@ public class AssessmentControllerTests extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new AssessmentController(
-              makeMe.modelFactoryService, testabilitySettings, authorizationService, answerService);
+              makeMe.modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService,
+              answerService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));

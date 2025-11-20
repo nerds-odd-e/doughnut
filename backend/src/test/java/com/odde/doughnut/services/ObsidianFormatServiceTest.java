@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasItems;
 
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import java.io.ByteArrayInputStream;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 class ObsidianFormatServiceTest {
   @Autowired private MakeMe makeMe;
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired EntityPersister entityPersister;
 
   private ObsidianFormatService obsidianFormatService;
   private Note headNote;
@@ -36,7 +38,7 @@ class ObsidianFormatServiceTest {
   void setup() {
     var user = makeMe.aUser().please();
     headNote = makeMe.aNote().please();
-    obsidianFormatService = new ObsidianFormatService(user, modelFactoryService);
+    obsidianFormatService = new ObsidianFormatService(user, modelFactoryService, entityPersister);
   }
 
   @Test

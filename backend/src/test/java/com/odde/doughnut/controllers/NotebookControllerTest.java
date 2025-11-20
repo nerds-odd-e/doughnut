@@ -70,6 +70,7 @@ class NotebookControllerTest extends ControllerTestBase {
     controller =
         new NotebookController(
             modelFactoryService,
+            makeMe.entityPersister,
             testabilitySettings,
             notebookIndexingService,
             bazaarService,
@@ -103,6 +104,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -118,6 +120,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -186,6 +189,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -232,6 +236,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -245,6 +250,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -371,6 +377,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
@@ -469,6 +476,7 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               modelFactoryService,
+              makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,

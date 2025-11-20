@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/text_content")
 class TextContentController {
-  private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -27,10 +27,10 @@ class TextContentController {
   private final AuthorizationService authorizationService;
 
   public TextContentController(
-      ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }
@@ -59,7 +59,7 @@ class TextContentController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.setUpdatedAt(currentUTCTimestamp);
     updateFunction.accept(note);
-    modelFactoryService.save(note);
+    entityPersister.save(note);
     return note.toNoteRealm(authorizationService.getCurrentUser());
   }
 }

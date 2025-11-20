@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -10,11 +11,15 @@ import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public PredefinedQuestionService(
-      ModelFactoryService modelFactoryService, AiQuestionGenerator aiQuestionGenerator) {
+      ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
+      AiQuestionGenerator aiQuestionGenerator) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
@@ -23,8 +28,8 @@ public class PredefinedQuestionService {
 
     Notebook parentNotebook = note.getNotebook();
     parentNotebook.setUpdated_at(new Timestamp(System.currentTimeMillis()));
-    modelFactoryService.save(parentNotebook);
-    modelFactoryService.save(predefinedQuestion);
+    entityPersister.save(parentNotebook);
+    entityPersister.save(predefinedQuestion);
     return predefinedQuestion;
   }
 
@@ -40,7 +45,7 @@ public class PredefinedQuestionService {
 
   public PredefinedQuestion toggleApproval(PredefinedQuestion question) {
     question.setApproved(!question.isApproved());
-    modelFactoryService.save(question);
+    entityPersister.save(question);
     return question;
   }
 
@@ -54,7 +59,7 @@ public class PredefinedQuestionService {
     QuestionContestResult result = questionContestResult.getQuestionContestResult(mcqWithAnswer);
     if (!result.rejected) {
       predefinedQuestion.setContested(true);
-      modelFactoryService.merge(predefinedQuestion);
+      entityPersister.merge(predefinedQuestion);
     }
     return result;
   }
@@ -66,7 +71,7 @@ public class PredefinedQuestionService {
     }
 
     PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
-    modelFactoryService.save(result);
+    entityPersister.save(result);
 
     // Auto-evaluate the generated question
     QuestionContestResult contestResult = contest(result);
@@ -82,8 +87,8 @@ public class PredefinedQuestionService {
       // Create and save the regenerated question
       PredefinedQuestion regenerated =
           PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
-      return modelFactoryService.save(regenerated);
+      return entityPersister.save(regenerated);
     }
-    return modelFactoryService.save(result);
+    return entityPersister.save(result);
   }
 }

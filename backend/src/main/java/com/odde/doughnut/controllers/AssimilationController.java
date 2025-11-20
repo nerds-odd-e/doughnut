@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.AuthorizationService;
@@ -36,6 +37,7 @@ class AssimilationController {
   @Autowired
   public AssimilationController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       SubscriptionService subscriptionService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
@@ -45,7 +47,8 @@ class AssimilationController {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
-    this.memoryTrackerService = new MemoryTrackerService(modelFactoryService, userService);
+    this.memoryTrackerService =
+        new MemoryTrackerService(modelFactoryService, entityPersister, userService);
   }
 
   @GetMapping("/assimilating")

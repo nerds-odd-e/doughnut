@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/links")
 class LinkController {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final NoteService noteService;
 
   @Resource(name = "testabilitySettings")
@@ -39,11 +41,13 @@ class LinkController {
 
   public LinkController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       NoteService noteService,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
@@ -57,7 +61,7 @@ class LinkController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
-    modelFactoryService.save(link);
+    entityPersister.save(link);
     return getNoteRealm(link, authorizationService.getCurrentUser());
   }
 

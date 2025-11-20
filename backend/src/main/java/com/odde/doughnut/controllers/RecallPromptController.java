@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.AuthorizationService;
@@ -33,6 +34,7 @@ class RecallPromptController {
   public RecallPromptController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
@@ -44,6 +46,7 @@ class RecallPromptController {
         new RecallQuestionService(
             openAiApi,
             modelFactoryService,
+            entityPersister,
             testabilitySettings.getRandomizer(),
             objectMapper,
             userService,

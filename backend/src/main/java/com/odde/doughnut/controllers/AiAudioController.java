@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.SRTProcessor;
@@ -21,11 +22,15 @@ class AiAudioController {
 
   OtherAiServices otherAiServices;
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
 
   public AiAudioController(
-      OtherAiServices otherAiServices, ModelFactoryService modelFactoryService) {
+      OtherAiServices otherAiServices,
+      ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister) {
     this.otherAiServices = otherAiServices;
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
   }
 
   @PostMapping(
@@ -59,6 +64,6 @@ class AiAudioController {
   }
 
   private GlobalSettingsService getGlobalSettingsService() {
-    return new GlobalSettingsService(modelFactoryService);
+    return new GlobalSettingsService(modelFactoryService, entityPersister);
   }
 }

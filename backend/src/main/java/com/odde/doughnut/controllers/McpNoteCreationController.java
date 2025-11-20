@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
@@ -41,6 +42,7 @@ public class McpNoteCreationController {
   @Autowired
   public McpNoteCreationController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteSearchService noteSearchService,
@@ -55,6 +57,7 @@ public class McpNoteCreationController {
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp(),
             modelFactoryService,
+            entityPersister,
             noteService);
     this.noteSearchService = noteSearchService;
     this.noteRepository = noteRepository;

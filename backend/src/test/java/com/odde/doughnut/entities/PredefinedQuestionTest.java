@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
+  @Autowired EntityPersister entityPersister;
   User user;
   AiQuestionGenerator aiQuestionGenerator = mock(AiQuestionGenerator.class);
 
@@ -78,7 +80,8 @@ class PredefinedQuestionTest {
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
 
       PredefinedQuestionService service =
-          new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
+          new PredefinedQuestionService(
+              makeMe.modelFactoryService, entityPersister, aiQuestionGenerator);
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
@@ -94,7 +97,8 @@ class PredefinedQuestionTest {
           .thenReturn(regeneratedQuestion);
 
       PredefinedQuestionService service =
-          new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
+          new PredefinedQuestionService(
+              makeMe.modelFactoryService, entityPersister, aiQuestionGenerator);
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
@@ -112,13 +116,14 @@ class PredefinedQuestionTest {
 
       // Use ArgumentCaptor to capture questions being saved
       ModelFactoryService mockModelFactory = mock(ModelFactoryService.class);
+      EntityPersister mockEntityPersister = mock(EntityPersister.class);
       ArgumentCaptor<PredefinedQuestion> questionCaptor =
           ArgumentCaptor.forClass(PredefinedQuestion.class);
-      when(mockModelFactory.save(questionCaptor.capture())).thenAnswer(i -> i.getArgument(0));
+      when(mockEntityPersister.save(questionCaptor.capture())).thenAnswer(i -> i.getArgument(0));
 
       // Execute
       PredefinedQuestionService service =
-          new PredefinedQuestionService(mockModelFactory, aiQuestionGenerator);
+          new PredefinedQuestionService(mockModelFactory, mockEntityPersister, aiQuestionGenerator);
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       // Verify
@@ -151,7 +156,8 @@ class PredefinedQuestionTest {
 
   private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
     PredefinedQuestionService predefinedQuestionService =
-        new PredefinedQuestionService(makeMe.modelFactoryService, aiQuestionGenerator);
+        new PredefinedQuestionService(
+            makeMe.modelFactoryService, entityPersister, aiQuestionGenerator);
     return predefinedQuestionService.generateAFeasibleQuestion(note);
   }
 }

@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.entities.GlobalSettings;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
@@ -11,34 +12,44 @@ public class GlobalSettingsService {
 
   public static final String DEFAULT_CHAT_MODEL = "gpt-4o-mini";
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
 
-  public GlobalSettingsService(ModelFactoryService modelFactoryService) {
+  public GlobalSettingsService(
+      ModelFactoryService modelFactoryService, EntityPersister entityPersister) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
   }
 
   public GlobalSettingsKeyValue globalSettingQuestionGeneration() {
     return new GlobalSettingsKeyValue(
-        "question_generation_model", DEFAULT_CHAT_MODEL, modelFactoryService);
+        "question_generation_model", DEFAULT_CHAT_MODEL, modelFactoryService, entityPersister);
   }
 
   public GlobalSettingsKeyValue globalSettingEvaluation() {
-    return new GlobalSettingsKeyValue("evaluation_model", DEFAULT_CHAT_MODEL, modelFactoryService);
+    return new GlobalSettingsKeyValue(
+        "evaluation_model", DEFAULT_CHAT_MODEL, modelFactoryService, entityPersister);
   }
 
   public GlobalSettingsKeyValue globalSettingOthers() {
-    return new GlobalSettingsKeyValue("others_model", DEFAULT_CHAT_MODEL, modelFactoryService);
+    return new GlobalSettingsKeyValue(
+        "others_model", DEFAULT_CHAT_MODEL, modelFactoryService, entityPersister);
   }
 
   public static class GlobalSettingsKeyValue implements SettingAccessor {
     private final String keyName;
     private final String defaultValue;
     private final ModelFactoryService modelFactoryService;
+    private final EntityPersister entityPersister;
 
     public GlobalSettingsKeyValue(
-        String keyName, String defaultValue, ModelFactoryService modelFactoryService) {
+        String keyName,
+        String defaultValue,
+        ModelFactoryService modelFactoryService,
+        EntityPersister entityPersister) {
       this.keyName = keyName;
       this.defaultValue = defaultValue;
       this.modelFactoryService = modelFactoryService;
+      this.entityPersister = entityPersister;
     }
 
     @Override
@@ -51,7 +62,7 @@ public class GlobalSettingsService {
       GlobalSettings settings = getGlobalSettings();
       settings.setValue(value);
       settings.setUpdatedAt(currentUTCTimestamp);
-      modelFactoryService.save(settings);
+      entityPersister.save(settings);
     }
 
     public Timestamp getCreatedAt() {

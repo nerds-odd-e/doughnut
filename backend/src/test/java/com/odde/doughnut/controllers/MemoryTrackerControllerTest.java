@@ -39,7 +39,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new MemoryTrackerController(
-            modelFactoryService, testabilitySettings, authorizationService, userService);
+            modelFactoryService,
+            makeMe.entityPersister,
+            testabilitySettings,
+            authorizationService,
+            userService);
   }
 
   @Nested
@@ -71,7 +75,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService, testabilitySettings, authorizationService, userService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService,
+              userService);
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
@@ -220,7 +228,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService, testabilitySettings, authorizationService, userService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService,
+              userService);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
   }
@@ -255,7 +267,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService, testabilitySettings, authorizationService, userService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService,
+              userService);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
     }
   }
@@ -320,7 +336,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService, testabilitySettings, authorizationService, userService);
+              modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService,
+              userService);
       assertThrows(
           ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
     }

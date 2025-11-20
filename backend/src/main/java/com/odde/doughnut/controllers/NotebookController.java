@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
@@ -34,6 +35,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/notebooks")
 class NotebookController {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -45,17 +47,20 @@ class NotebookController {
 
   public NotebookController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NotebookIndexingService notebookIndexingService,
       BazaarService bazaarService,
       AuthorizationService authorizationService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
     this.bazaarService = bazaarService;
     this.authorizationService = authorizationService;
     this.obsidianFormatService =
-        new ObsidianFormatService(authorizationService.getCurrentUser(), modelFactoryService);
+        new ObsidianFormatService(
+            authorizationService.getCurrentUser(), modelFactoryService, entityPersister);
   }
 
   @GetMapping("")
@@ -78,8 +83,11 @@ class NotebookController {
         userEntity
             .getOwnership()
             .createAndPersistNotebook(
-                userEntity, testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService, noteCreation.getNewTitle());
+                userEntity,
+                testabilitySettings.getCurrentUTCTimestamp(),
+                modelFactoryService,
+                entityPersister,
+                noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());
   }
 
@@ -91,7 +99,7 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
     notebook.getNotebookSettings().update(notebookSettings);
-    modelFactoryService.save(notebook);
+    entityPersister.save(notebook);
     return notebook;
   }
 
@@ -122,7 +130,7 @@ class NotebookController {
       throw new UnexpectedNoAccessRightException();
     }
     notebook.setOwnership(circle.getOwnership());
-    modelFactoryService.save(notebook);
+    entityPersister.save(notebook);
     return notebook;
   }
 

@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.UserService;
@@ -22,16 +23,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/user")
 class UserController {
   private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
   private final TestabilitySettings testabilitySettings;
   private final AuthorizationService authorizationService;
   private final UserService userService;
 
   public UserController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       UserService userService) {
     this.modelFactoryService = modelFactoryService;
+    this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
@@ -42,7 +46,7 @@ class UserController {
   public User createUser(Principal principal, @RequestBody User user) {
     if (principal == null) AuthorizationService.throwUserNotFound();
     user.setExternalIdentifier(principal.getName());
-    modelFactoryService.save(user);
+    entityPersister.save(user);
     return user;
   }
 
@@ -60,7 +64,7 @@ class UserController {
     user.setName(updates.getName());
     user.setSpaceIntervals(updates.getSpaceIntervals());
     user.setDailyAssimilationCount(updates.getDailyAssimilationCount());
-    modelFactoryService.save(user);
+    entityPersister.save(user);
     return user;
   }
 
@@ -71,7 +75,7 @@ class UserController {
     User user = authorizationService.getCurrentUser();
     String uuid = UUID.randomUUID().toString();
     UserToken userToken = new UserToken(user.getId(), uuid, tokenConfig.getLabel());
-    return modelFactoryService.save(userToken);
+    return entityPersister.save(userToken);
   }
 
   @GetMapping("/get-tokens")

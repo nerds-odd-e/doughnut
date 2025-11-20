@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.*;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.*;
 import com.odde.doughnut.services.AuthorizationService;
@@ -26,6 +27,7 @@ class NoteCreationController {
 
   public NoteCreationController(
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
       NoteService noteService,
@@ -38,6 +40,7 @@ class NoteCreationController {
             authorizationService.getCurrentUser(),
             testabilitySettings.getCurrentUTCTimestamp(),
             modelFactoryService,
+            entityPersister,
             noteService);
   }
 

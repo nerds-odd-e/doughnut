@@ -188,7 +188,7 @@ class NoteQuestionGenerationServiceTests {
       Timestamp currentTime = new Timestamp(System.currentTimeMillis());
       notebookAiAssistant.setCreatedAt(currentTime);
       notebookAiAssistant.setUpdatedAt(currentTime);
-      makeMe.modelFactoryService.save(notebookAiAssistant);
+      makeMe.entityPersister.save(notebookAiAssistant);
       makeMe.refresh(testNote.getNotebook());
       service =
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);

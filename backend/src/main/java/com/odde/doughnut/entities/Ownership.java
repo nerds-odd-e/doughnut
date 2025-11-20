@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
@@ -63,6 +64,7 @@ public class Ownership {
       User user,
       Timestamp currentUTCTimestamp,
       ModelFactoryService modelFactoryService,
+      EntityPersister entityPersister,
       String topicConstructor) {
     NoteService noteService =
         new NoteService(
@@ -70,11 +72,12 @@ public class Ownership {
             modelFactoryService.entityManager,
             modelFactoryService.entityPersister);
     final Note note =
-        new NoteConstructionService(user, currentUTCTimestamp, modelFactoryService, noteService)
+        new NoteConstructionService(
+                user, currentUTCTimestamp, modelFactoryService, entityPersister, noteService)
             .createNote(null, topicConstructor);
     note.buildNotebookForHeadNote(this, user);
-    modelFactoryService.save(note.getNotebook());
-    modelFactoryService.save(note);
+    entityPersister.save(note.getNotebook());
+    entityPersister.save(note);
     return note;
   }
 

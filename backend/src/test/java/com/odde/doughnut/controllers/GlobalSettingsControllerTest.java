@@ -28,7 +28,10 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.anAdmin().please());
     controller =
         new GlobalSettingsController(
-            makeMe.modelFactoryService, testabilitySettings, authorizationService);
+            makeMe.modelFactoryService,
+            makeMe.entityPersister,
+            testabilitySettings,
+            authorizationService);
   }
 
   @Nested
@@ -70,7 +73,10 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new GlobalSettingsController(
-              makeMe.modelFactoryService, testabilitySettings, authorizationService);
+              makeMe.modelFactoryService,
+              makeMe.entityPersister,
+              testabilitySettings,
+              authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.setCurrentModelVersions(settings));

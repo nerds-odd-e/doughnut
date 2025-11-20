@@ -37,6 +37,7 @@ class LinkControllerTests extends ControllerTestBase {
   LinkController controller() {
     return new LinkController(
         modelFactoryService,
+        makeMe.entityPersister,
         noteService,
         new TestabilitySettings(),
         noteMotionService,
