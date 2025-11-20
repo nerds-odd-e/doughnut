@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.FailureReport;
-import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.FailureReportService;
 import com.odde.doughnut.services.GithubService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/failure-reports")
 class FailureReportController {
-  private final FailureReportRepository failureReportRepository;
+  private final FailureReportService failureReportService;
   private final GithubService realGithubService;
   private final AuthorizationService authorizationService;
 
   public FailureReportController(
-      FailureReportRepository failureReportRepository,
+      FailureReportService failureReportService,
       GithubService realGithubService,
       AuthorizationService authorizationService) {
-    this.failureReportRepository = failureReportRepository;
+    this.failureReportService = failureReportService;
     this.realGithubService = realGithubService;
     this.authorizationService = authorizationService;
   }
@@ -34,7 +34,7 @@ class FailureReportController {
   public Iterable<FailureReport> failureReports() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
-    return failureReportRepository.findAll();
+    return failureReportService.getAllFailureReports();
   }
 
   static class FailureReportForView {
@@ -60,9 +60,6 @@ class FailureReportController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
-    ids.forEach(
-        id -> {
-          failureReportRepository.findById(id).ifPresent(failureReportRepository::delete);
-        });
+    failureReportService.deleteFailureReports(ids);
   }
 }

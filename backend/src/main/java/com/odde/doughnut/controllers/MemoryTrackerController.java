@@ -5,12 +5,10 @@ import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
-import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -24,7 +22,6 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/api/memory-trackers")
 class MemoryTrackerController {
-  private final MemoryTrackerRepository memoryTrackerRepository;
   private final EntityPersister entityPersister;
   private final MemoryTrackerService memoryTrackerService;
 
@@ -34,16 +31,14 @@ class MemoryTrackerController {
   private final AuthorizationService authorizationService;
 
   public MemoryTrackerController(
-      MemoryTrackerRepository memoryTrackerRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      UserService userService) {
-    this.memoryTrackerRepository = memoryTrackerRepository;
+      MemoryTrackerService memoryTrackerService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
-    this.memoryTrackerService = new MemoryTrackerService(entityPersister, userService);
+    this.memoryTrackerService = memoryTrackerService;
   }
 
   @GetMapping("/{memoryTracker}/spelling-question")
@@ -103,13 +98,13 @@ class MemoryTrackerController {
   @GetMapping("/recent")
   public List<MemoryTracker> getRecentMemoryTrackers() {
     authorizationService.assertLoggedIn();
-    return memoryTrackerRepository.findLast100ByUser(authorizationService.getCurrentUser().getId());
+    return memoryTrackerService.findLast100ByUser(authorizationService.getCurrentUser().getId());
   }
 
   @GetMapping("/recently-reviewed")
   public List<MemoryTracker> getRecentlyReviewed() {
     authorizationService.assertLoggedIn();
-    return memoryTrackerRepository.findLast100ReviewedByUser(
+    return memoryTrackerService.findLast100ReviewedByUser(
         authorizationService.getCurrentUser().getId());
   }
 

@@ -7,11 +7,10 @@ import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
@@ -26,9 +25,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/circles")
 class CircleController {
-  private final NoteRepository noteRepository;
-  private final EntityPersister entityPersister;
   private final CircleService circleService;
+  private final NotebookService notebookService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -36,14 +34,12 @@ class CircleController {
   private final AuthorizationService authorizationService;
 
   public CircleController(
-      NoteRepository noteRepository,
-      EntityPersister entityPersister,
       CircleService circleService,
+      NotebookService notebookService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
-    this.noteRepository = noteRepository;
-    this.entityPersister = entityPersister;
     this.circleService = circleService;
+    this.notebookService = notebookService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }
@@ -102,14 +98,11 @@ class CircleController {
     authorizationService.assertLoggedIn();
     authorizationService.assertAuthorization(circle);
     Note note =
-        circle
-            .getOwnership()
-            .createAndPersistNotebook(
-                authorizationService.getCurrentUser(),
-                testabilitySettings.getCurrentUTCTimestamp(),
-                noteRepository,
-                entityPersister,
-                noteCreation.getNewTitle());
+        notebookService.createNotebookForOwnership(
+            circle.getOwnership(),
+            authorizationService.getCurrentUser(),
+            testabilitySettings.getCurrentUTCTimestamp(),
+            noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());
   }
 }

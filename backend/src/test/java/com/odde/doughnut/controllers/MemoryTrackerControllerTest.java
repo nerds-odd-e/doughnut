@@ -16,6 +16,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -30,6 +31,7 @@ import org.springframework.web.server.ResponseStatusException;
 class MemoryTrackerControllerTest extends ControllerTestBase {
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired UserService userService;
+  @Autowired MemoryTrackerService memoryTrackerService;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   MemoryTrackerController controller;
@@ -39,11 +41,10 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new MemoryTrackerController(
-            memoryTrackerRepository,
             makeMe.entityPersister,
             testabilitySettings,
             authorizationService,
-            userService);
+            memoryTrackerService);
   }
 
   @Nested
@@ -75,11 +76,10 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
-              userService);
+              memoryTrackerService);
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
@@ -228,11 +228,10 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
-              userService);
+              memoryTrackerService);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
   }
@@ -267,11 +266,10 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
-              userService);
+              memoryTrackerService);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
     }
   }
@@ -336,11 +334,10 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
-              userService);
+              memoryTrackerService);
       assertThrows(
           ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
     }

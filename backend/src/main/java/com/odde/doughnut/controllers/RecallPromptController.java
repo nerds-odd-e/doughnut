@@ -11,6 +11,7 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -41,7 +42,8 @@ class RecallPromptController {
       AuthorizationService authorizationService,
       UserService userService,
       AnswerService answerService,
-      GlobalSettingsService globalSettingsService) {
+      GlobalSettingsService globalSettingsService,
+      MemoryTrackerService memoryTrackerService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallQuestionService =
@@ -53,7 +55,8 @@ class RecallPromptController {
             objectMapper,
             userService,
             answerService,
-            globalSettingsService);
+            globalSettingsService,
+            memoryTrackerService);
   }
 
   @GetMapping("/{memoryTracker}/question")

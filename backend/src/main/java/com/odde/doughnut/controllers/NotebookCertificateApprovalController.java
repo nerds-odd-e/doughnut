@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NotebookCertificateApprovalRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 class NotebookCertificateApprovalController {
   private final NotebookService notebookService;
   private final NotebookCertificateApprovalService notebookCertificateApprovalService;
-  private final NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -28,12 +26,10 @@ class NotebookCertificateApprovalController {
   public NotebookCertificateApprovalController(
       NotebookService notebookService,
       NotebookCertificateApprovalService notebookCertificateApprovalService,
-      NotebookCertificateApprovalRepository notebookCertificateApprovalRepository,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
     this.notebookService = notebookService;
     this.notebookCertificateApprovalService = notebookCertificateApprovalService;
-    this.notebookCertificateApprovalRepository = notebookCertificateApprovalRepository;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }
@@ -59,7 +55,7 @@ class NotebookCertificateApprovalController {
   public List<NotebookCertificateApproval> getAllPendingRequest()
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAdminAuthorization();
-    return notebookCertificateApprovalRepository.findByLastApprovalTimeIsNull();
+    return notebookCertificateApprovalService.findByLastApprovalTimeIsNull();
   }
 
   @PostMapping(value = "/{notebookCertificateApproval}/approve")

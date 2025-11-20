@@ -6,12 +6,12 @@ import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.entities.repositories.NotebookAiAssistantRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookIndexingService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.ObsidianFormatService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -36,8 +36,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/notebooks")
 class NotebookController {
   private final NoteRepository noteRepository;
-  private final NotebookAiAssistantRepository notebookAiAssistantRepository;
   private final EntityPersister entityPersister;
+  private final NotebookService notebookService;
 
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
@@ -49,19 +49,19 @@ class NotebookController {
 
   public NotebookController(
       NoteRepository noteRepository,
-      NotebookAiAssistantRepository notebookAiAssistantRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NotebookIndexingService notebookIndexingService,
       BazaarService bazaarService,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      NotebookService notebookService) {
     this.noteRepository = noteRepository;
-    this.notebookAiAssistantRepository = notebookAiAssistantRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
     this.bazaarService = bazaarService;
     this.authorizationService = authorizationService;
+    this.notebookService = notebookService;
     this.obsidianFormatService =
         new ObsidianFormatService(
             authorizationService.getCurrentUser(), noteRepository, entityPersister);
@@ -84,14 +84,11 @@ class NotebookController {
     authorizationService.assertLoggedIn();
     User userEntity = authorizationService.getCurrentUser();
     Note note =
-        userEntity
-            .getOwnership()
-            .createAndPersistNotebook(
-                userEntity,
-                testabilitySettings.getCurrentUTCTimestamp(),
-                noteRepository,
-                entityPersister,
-                noteCreation.getNewTitle());
+        notebookService.createNotebookForOwnership(
+            userEntity.getOwnership(),
+            userEntity,
+            testabilitySettings.getCurrentUTCTimestamp(),
+            noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());
   }
 
@@ -162,8 +159,7 @@ class NotebookController {
 
     authorizationService.assertAuthorization(notebook);
 
-    NotebookAiAssistant assistant =
-        notebookAiAssistantRepository.findByNotebookId(notebook.getId());
+    NotebookAiAssistant assistant = notebookService.findByNotebookId(notebook.getId());
     if (assistant == null) {
       assistant = new NotebookAiAssistant();
       assistant.setNotebook(notebook);
@@ -173,7 +169,7 @@ class NotebookController {
     assistant.setAdditionalInstructionsToAi(request.getAdditionalInstructions());
     assistant.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
 
-    return notebookAiAssistantRepository.save(assistant);
+    return notebookService.save(assistant);
   }
 
   @GetMapping("/{notebook}/ai-assistant")
@@ -182,7 +178,7 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
 
     authorizationService.assertAuthorization(notebook);
-    return notebookAiAssistantRepository.findByNotebookId(notebook.getId());
+    return notebookService.findByNotebookId(notebook.getId());
   }
 
   @GetMapping("/{notebook}/obsidian")

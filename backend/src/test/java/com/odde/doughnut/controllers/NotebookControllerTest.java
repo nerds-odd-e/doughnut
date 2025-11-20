@@ -16,6 +16,7 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookIndexingService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
@@ -38,6 +39,7 @@ import org.springframework.web.server.ResponseStatusException;
 class NotebookControllerTest extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired NotebookAiAssistantRepository notebookAiAssistantRepository;
+  @Autowired NotebookService notebookService;
 
   @Autowired
   com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
@@ -72,12 +74,12 @@ class NotebookControllerTest extends ControllerTestBase {
     controller =
         new NotebookController(
             noteRepository,
-            notebookAiAssistantRepository,
             makeMe.entityPersister,
             testabilitySettings,
             notebookIndexingService,
             bazaarService,
-            authorizationService);
+            authorizationService,
+            notebookService);
   }
 
   @Nested
@@ -107,12 +109,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
       assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
     }
 
@@ -124,12 +126,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
       assertEquals(notebooks, controller.myNotebooks().notebooks);
     }
   }
@@ -194,12 +196,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
       assertThrows(
           UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
     }
@@ -242,12 +244,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
       List<Note> result = controller.getNotes(notebook);
       assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
     }
@@ -257,12 +259,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
       PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
       predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
       List<Note> result = controller.getNotes(notebook);
@@ -385,12 +387,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.downloadNotebookForObsidian(notebook));
@@ -485,12 +487,12 @@ class NotebookControllerTest extends ControllerTestBase {
       controller =
           new NotebookController(
               noteRepository,
-              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
               bazaarService,
-              authorizationService);
+              authorizationService,
+              notebookService);
 
       // Act & Assert
       ResponseStatusException exception =

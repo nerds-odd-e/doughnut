@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.FailureReportService;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.testability.NullGithubService;
 import java.util.ArrayList;
@@ -23,11 +24,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class FailureReportControllerTest extends ControllerTestBase {
   @Autowired FailureReportRepository failureReportRepository;
+  @Autowired FailureReportService failureReportService;
   private GithubService githubService = new NullGithubService();
 
   FailureReportController controller() {
-    return new FailureReportController(
-        failureReportRepository, githubService, authorizationService);
+    return new FailureReportController(failureReportService, githubService, authorizationService);
   }
 
   @Test

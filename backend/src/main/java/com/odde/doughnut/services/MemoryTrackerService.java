@@ -7,18 +7,34 @@ import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Service;
 
+@Service
 public class MemoryTrackerService {
   private final EntityPersister entityPersister;
   private final UserService userService;
+  private final MemoryTrackerRepository memoryTrackerRepository;
 
-  public MemoryTrackerService(EntityPersister entityPersister, UserService userService) {
+  public MemoryTrackerService(
+      EntityPersister entityPersister,
+      UserService userService,
+      MemoryTrackerRepository memoryTrackerRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
+    this.memoryTrackerRepository = memoryTrackerRepository;
+  }
+
+  public List<MemoryTracker> findLast100ByUser(Integer userId) {
+    return memoryTrackerRepository.findLast100ByUser(userId);
+  }
+
+  public List<MemoryTracker> findLast100ReviewedByUser(Integer userId) {
+    return memoryTrackerRepository.findLast100ReviewedByUser(userId);
   }
 
   public List<MemoryTracker> assimilate(

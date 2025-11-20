@@ -34,7 +34,6 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
 
     controller =
         new NoteController(
-            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,

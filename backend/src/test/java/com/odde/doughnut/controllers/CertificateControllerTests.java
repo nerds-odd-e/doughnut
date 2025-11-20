@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.CertificateRepository;
+import com.odde.doughnut.services.CertificateService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -19,13 +20,14 @@ public class CertificateControllerTests extends ControllerTestBase {
   Timestamp currentTime;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Autowired CertificateRepository certificateRepository;
+  @Autowired CertificateService certificateService;
 
   @BeforeEach
   void setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser.setUser(makeMe.aUser().please());
-    controller = new CertificateController(certificateRepository, authorizationService);
+    controller = new CertificateController(certificateService, authorizationService);
   }
 
   @Nested

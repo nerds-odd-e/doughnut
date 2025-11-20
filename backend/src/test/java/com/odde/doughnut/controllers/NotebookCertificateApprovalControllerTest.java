@@ -30,7 +30,6 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
         new NotebookCertificateApprovalController(
             notebookService,
             notebookCertificateApprovalService,
-            notebookCertificateApprovalRepository,
             testabilitySettings,
             authorizationService);
   }
@@ -99,7 +98,6 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
           new NotebookCertificateApprovalController(
               notebookService,
               notebookCertificateApprovalService,
-              notebookCertificateApprovalRepository,
               testabilitySettings,
               authorizationService);
       approval = notebookService.requestNotebookApproval(notebook);

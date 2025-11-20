@@ -2,8 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.repositories.CertificateRepository;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.CertificateService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/certificate")
 public class CertificateController {
 
-  private final CertificateRepository certificateRepository;
+  private final CertificateService certificateService;
   private final AuthorizationService authorizationService;
 
   public CertificateController(
-      CertificateRepository certificateRepository, AuthorizationService authorizationService) {
-    this.certificateRepository = certificateRepository;
+      CertificateService certificateService, AuthorizationService authorizationService) {
+    this.certificateService = certificateService;
     this.authorizationService = authorizationService;
   }
 
@@ -25,13 +25,13 @@ public class CertificateController {
   @Transactional
   public Certificate claimCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
     authorizationService.assertLoggedIn();
-    return certificateRepository.findFirstByUserAndNotebook(
+    return certificateService.findFirstByUserAndNotebook(
         authorizationService.getCurrentUser(), notebook);
   }
 
   @GetMapping("/{notebook}")
   public Certificate getCertificate(@PathVariable @Schema(type = "integer") Notebook notebook) {
-    return certificateRepository.findFirstByUserAndNotebook(
+    return certificateService.findFirstByUserAndNotebook(
         authorizationService.getCurrentUser(), notebook);
   }
 }

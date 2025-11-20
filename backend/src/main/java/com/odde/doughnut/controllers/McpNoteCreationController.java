@@ -35,7 +35,7 @@ public class McpNoteCreationController {
   private final WikidataService wikidataService;
   private final NoteConstructionService noteConstructionService;
   private final NoteSearchService noteSearchService;
-  private final NoteRepository noteRepository;
+  private final NoteService noteService;
   private final AuthorizationService authorizationService;
 
   @Autowired
@@ -58,7 +58,7 @@ public class McpNoteCreationController {
             entityPersister,
             noteService);
     this.noteSearchService = noteSearchService;
-    this.noteRepository = noteRepository;
+    this.noteService = noteService;
   }
 
   @PostMapping(value = "/create")
@@ -96,7 +96,7 @@ public class McpNoteCreationController {
       throw new UnexpectedNoAccessRightException();
     }
     int parentId = results.get(0).getNoteTopology().getId();
-    Optional<Note> parentNoteObj = noteRepository.findById(parentId);
+    Optional<Note> parentNoteObj = noteService.findById(parentId);
 
     return parentNoteObj.orElseGet(Note::new);
   }

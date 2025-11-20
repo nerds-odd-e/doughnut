@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,14 @@ public class NoteService {
   public NoteService(NoteRepository noteRepository, EntityPersister entityPersister) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
+  }
+
+  public List<Note> findRecentNotesByUser(Integer userId) {
+    return noteRepository.findRecentNotesByUser(userId);
+  }
+
+  public Optional<Note> findById(Integer id) {
+    return noteRepository.findById(id);
   }
 
   public void destroy(Note note, Timestamp currentUTCTimestamp) {

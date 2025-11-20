@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -41,6 +42,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired UserService userService;
   @Autowired AnswerService answerService;
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired MemoryTrackerService memoryTrackerService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -70,7 +72,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
             authorizationService,
             userService,
             answerService,
-            globalSettingsService);
+            globalSettingsService,
+            memoryTrackerService);
   }
 
   RecallPromptController nullUserController() {
@@ -84,7 +87,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
         authorizationService,
         userService,
         answerService,
-        globalSettingsService);
+        globalSettingsService,
+        memoryTrackerService);
   }
 
   @Nested
@@ -207,7 +211,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
                     authorizationService,
                     userService,
                     answerService,
-                    globalSettingsService);
+                    globalSettingsService,
+                    memoryTrackerService);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -297,7 +302,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
                     authorizationService,
                     userService,
                     answerService,
-                    globalSettingsService);
+                    globalSettingsService,
+                    memoryTrackerService);
             restAiController.contest(recallPrompt);
           });
     }

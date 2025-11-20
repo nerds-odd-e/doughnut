@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
@@ -38,7 +37,6 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/notes")
 class NoteController {
 
-  private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
@@ -48,7 +46,6 @@ class NoteController {
   private final UserService userService;
 
   public NoteController(
-      NoteRepository noteRepository,
       EntityPersister entityPersister,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
@@ -56,7 +53,6 @@ class NoteController {
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService) {
-    this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
@@ -203,9 +199,7 @@ class NoteController {
   @GetMapping("/recent")
   public List<NoteRealm> getRecentNotes() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
-    return noteRepository
-        .findRecentNotesByUser(authorizationService.getCurrentUser().getId())
-        .stream()
+    return noteService.findRecentNotesByUser(authorizationService.getCurrentUser().getId()).stream()
         .map(note -> note.toNoteRealm(authorizationService.getCurrentUser()))
         .toList();
   }

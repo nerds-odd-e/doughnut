@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -28,12 +29,14 @@ class AssimilationControllerTests extends ControllerTestBase {
 
   private AssimilationController controller;
 
+  @Autowired private MemoryTrackerService memoryTrackerService;
+
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssimilationController(
-            makeMe.entityPersister,
+            memoryTrackerService,
             subscriptionService,
             testabilitySettings,
             authorizationService,

@@ -38,7 +38,6 @@ class NoteControllerMotionTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new NoteController(
-            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
