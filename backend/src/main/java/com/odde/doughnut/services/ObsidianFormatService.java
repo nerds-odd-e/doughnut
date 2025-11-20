@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -15,28 +14,39 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Service
 public class ObsidianFormatService {
 
-  private final NoteConstructionService noteConstructionService;
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
+  private final AuthorizationService authorizationService;
+  private final TestabilitySettings testabilitySettings;
+  private final NoteService noteService;
   private final Set<String> usedPaths = new HashSet<>();
 
   public ObsidianFormatService(
-      User user, NoteRepository noteRepository, EntityPersister entityPersister) {
-    TestabilitySettings testabilitySettings = new TestabilitySettings();
+      NoteRepository noteRepository,
+      EntityPersister entityPersister,
+      AuthorizationService authorizationService,
+      TestabilitySettings testabilitySettings,
+      NoteService noteService) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
-    NoteService noteService = new NoteService(noteRepository, entityPersister);
-    noteConstructionService =
-        new NoteConstructionService(
-            user,
-            testabilitySettings.getCurrentUTCTimestamp(),
-            noteRepository,
-            entityPersister,
-            noteService);
+    this.authorizationService = authorizationService;
+    this.testabilitySettings = testabilitySettings;
+    this.noteService = noteService;
+  }
+
+  private NoteConstructionService getNoteConstructionService() {
+    return new NoteConstructionService(
+        authorizationService.getCurrentUser(),
+        testabilitySettings.getCurrentUTCTimestamp(),
+        noteRepository,
+        entityPersister,
+        noteService);
   }
 
   public byte[] exportToObsidian(Note headNote) throws IOException {
@@ -173,7 +183,7 @@ public class ObsidianFormatService {
       return existingNote;
     }
 
-    Note newNote = noteConstructionService.createNote(currentParent, noteName);
+    Note newNote = getNoteConstructionService().createNote(currentParent, noteName);
     newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted

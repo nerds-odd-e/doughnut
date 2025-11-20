@@ -3,12 +3,13 @@ package com.odde.doughnut.services;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -28,17 +30,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ObsidianFormatServiceTest {
   @Autowired private MakeMe makeMe;
-  @Autowired NoteRepository noteRepository;
-  @Autowired EntityPersister entityPersister;
+  @Autowired ObsidianFormatService obsidianFormatService;
+  @Autowired TestabilitySettings testabilitySettings;
+  @MockitoBean AuthorizationService authorizationService;
 
-  private ObsidianFormatService obsidianFormatService;
   private Note headNote;
+  private User user;
 
   @BeforeEach
   void setup() {
-    var user = makeMe.aUser().please();
+    user = makeMe.aUser().please();
     headNote = makeMe.aNote().please();
-    obsidianFormatService = new ObsidianFormatService(user, noteRepository, entityPersister);
+    when(authorizationService.getCurrentUser()).thenReturn(user);
   }
 
   @Test

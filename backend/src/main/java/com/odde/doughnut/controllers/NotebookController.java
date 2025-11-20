@@ -5,7 +5,6 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -35,7 +34,6 @@ import org.springframework.web.multipart.MultipartFile;
 @SessionScope
 @RequestMapping("/api/notebooks")
 class NotebookController {
-  private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final NotebookService notebookService;
 
@@ -48,23 +46,20 @@ class NotebookController {
   private final AuthorizationService authorizationService;
 
   public NotebookController(
-      NoteRepository noteRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NotebookIndexingService notebookIndexingService,
       BazaarService bazaarService,
       AuthorizationService authorizationService,
-      NotebookService notebookService) {
-    this.noteRepository = noteRepository;
+      NotebookService notebookService,
+      ObsidianFormatService obsidianFormatService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
     this.bazaarService = bazaarService;
     this.authorizationService = authorizationService;
     this.notebookService = notebookService;
-    this.obsidianFormatService =
-        new ObsidianFormatService(
-            authorizationService.getCurrentUser(), noteRepository, entityPersister);
+    this.obsidianFormatService = obsidianFormatService;
   }
 
   @GetMapping("")
