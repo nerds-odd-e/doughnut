@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -28,14 +27,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiQuestionGeneratorTests {
   @Mock OpenAiApi openAiApi;
-  @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired GlobalSettingsService globalSettingsService;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   AiQuestionGenerator aiQuestionGenerator;
 
   @BeforeEach
   void setup() {
-    GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
     var objectMapper = new ObjectMapperConfig().objectMapper();
     aiQuestionGenerator =
         new AiQuestionGenerator(
@@ -111,11 +109,7 @@ class AiQuestionGeneratorTests {
     Randomizer mockedRandomizer = mock(Randomizer.class);
     var objectMapper = new ObjectMapperConfig().objectMapper();
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
-        new AiQuestionGenerator(
-            openAiApi,
-            new GlobalSettingsService(modelFactoryService),
-            mockedRandomizer,
-            objectMapper);
+        new AiQuestionGenerator(openAiApi, globalSettingsService, mockedRandomizer, objectMapper);
 
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();

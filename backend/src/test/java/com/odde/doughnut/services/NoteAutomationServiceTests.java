@@ -33,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 class NoteAutomationServiceTests {
   @Mock OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
+  @Autowired GlobalSettingsService globalSettingsService;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
   private NoteAutomationService service;
@@ -47,8 +48,6 @@ class NoteAutomationServiceTests {
 
     // Initialize common services
     OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = getTestObjectMapper();
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
         new ChatCompletionNoteAutomationService(

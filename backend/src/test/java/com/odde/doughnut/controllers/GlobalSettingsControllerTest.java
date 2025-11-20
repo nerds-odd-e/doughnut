@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class GlobalSettingsControllerTest extends ControllerTestBase {
   GlobalSettingsController controller;
@@ -18,14 +19,13 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
   Timestamp currentTime;
 
   TestabilitySettings testabilitySettings = new TestabilitySettings();
-  GlobalSettingsService globalSettingsService;
+  @Autowired GlobalSettingsService globalSettingsService;
 
   @BeforeEach
   void Setup() {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser.setUser(makeMe.anAdmin().please());
-    globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     controller =
         new GlobalSettingsController(
             makeMe.modelFactoryService, testabilitySettings, authorizationService);

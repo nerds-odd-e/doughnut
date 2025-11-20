@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NoteQuestionGenerationServiceTests {
   @Mock OpenAiApi openAiApi;
-  GlobalSettingsService globalSettingsService;
+  @Autowired GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
   NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -49,7 +49,6 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
             openAiApi, globalSettingsService, getTestObjectMapper());

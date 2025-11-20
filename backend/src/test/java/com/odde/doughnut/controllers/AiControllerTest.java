@@ -29,6 +29,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerTest extends ControllerTestBase {
@@ -36,12 +37,11 @@ class AiControllerTest extends ControllerTestBase {
 
   Note note;
   @Mock OpenAiApi openAiApi;
+  @Autowired GlobalSettingsService globalSettingsService;
   NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
 
   @BeforeEach
   void Setup() {
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
             openAiApi, globalSettingsService, getTestObjectMapper());

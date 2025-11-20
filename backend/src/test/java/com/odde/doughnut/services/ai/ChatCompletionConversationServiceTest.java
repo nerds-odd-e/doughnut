@@ -31,20 +31,17 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 class ChatCompletionConversationServiceTest {
 
   @Autowired MakeMe makeMe;
+  @Autowired GlobalSettingsService globalSettingsService;
   @Mock OpenAiApiHandler openAiApiHandler;
   @Mock ConversationService conversationService;
 
   private ObjectMapper objectMapper;
   private ChatCompletionConversationService service;
-  private GlobalSettingsService globalSettingsService;
 
   @BeforeEach
   void setup() {
     MockitoAnnotations.openMocks(this);
     objectMapper = new ObjectMapperConfig().objectMapper();
-
-    // Use real GlobalSettingsService with makeMe's factory service
-    globalSettingsService = new GlobalSettingsService(makeMe.modelFactoryService);
 
     service =
         new ChatCompletionConversationService(

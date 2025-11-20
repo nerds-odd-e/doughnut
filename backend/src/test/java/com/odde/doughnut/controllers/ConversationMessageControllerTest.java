@@ -36,13 +36,12 @@ class ConversationMessageControllerTest extends ControllerTestBase {
   ConversationMessageController controller;
 
   @Autowired ModelFactoryService modelFactoryService;
+  @Autowired GlobalSettingsService globalSettingsService;
   AssessmentQuestionInstance assessmentQuestionInstance;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
     OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
     ChatCompletionConversationService chatCompletionConversationService =
@@ -128,8 +127,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void forLoginUserOnly() {
-      GlobalSettingsService globalSettingsService =
-          new GlobalSettingsService(makeMe.modelFactoryService);
       ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
       OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
       ChatCompletionConversationService chatCompletionConversationService =
@@ -428,8 +425,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void shouldRequireLogin() {
-      GlobalSettingsService globalSettingsService =
-          new GlobalSettingsService(makeMe.modelFactoryService);
       ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
       OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
       ChatCompletionConversationService chatCompletionConversationService =

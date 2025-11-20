@@ -32,13 +32,12 @@ class AiOpenAiAssistantFactoryWithDBTest {
   private AiQuestionGenerator aiQuestionGenerator;
   @Mock private OpenAiApi openAiApi;
   @Autowired MakeMe makeMe;
+  @Autowired GlobalSettingsService globalSettingsService;
   private OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi, globalSettingsService, new NonRandomizer(), getTestObjectMapper());

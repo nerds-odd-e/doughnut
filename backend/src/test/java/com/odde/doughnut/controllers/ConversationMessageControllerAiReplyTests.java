@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class ConversationMessageControllerAiReplyTests extends ControllerTestBase {
@@ -41,6 +42,7 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   ConversationMessageController controller;
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired GlobalSettingsService globalSettingsService;
   private ConversationService conversationService;
   Conversation conversation;
 
@@ -54,8 +56,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   }
 
   private void setupServices() {
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(makeMe.modelFactoryService);
     ObjectMapper objectMapper = getTestObjectMapper();
     OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
     ChatCompletionConversationService chatCompletionConversationService =

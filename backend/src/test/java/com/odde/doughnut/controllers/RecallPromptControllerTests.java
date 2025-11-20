@@ -40,6 +40,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Autowired MakeMe makeMe;
   @Autowired UserService userService;
   @Autowired AnswerService answerService;
+  @Autowired GlobalSettingsService globalSettingsService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -304,7 +305,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void useTheRightModel() {
-      GlobalSettingsService globalSettingsService = new GlobalSettingsService(modelFactoryService);
       globalSettingsService
           .globalSettingEvaluation()
           .setKeyValue(makeMe.aTimestamp().please(), "gpt-new");
