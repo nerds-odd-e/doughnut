@@ -40,40 +40,59 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 
 ### ModelFactoryService Migration
 
-`ModelFactoryService` still contains operations that should be moved to appropriate domain services:
+✅ **All Business Operations Migrated:**
+- ✅ User Token Operations → Moved to `UserService`
+- ✅ Note Embedding Operations → Moved to `NoteEmbeddingService`
+- ✅ Link Creation Operations → Moved to `NoteService`
+- ✅ Answer Creation Operations → Moved to `AnswerService`
+- ✅ Entity Persistence Operations → Migrated to `EntityPersister`
 
-✅ **User Token Operations** → Moved to `UserService`:
-- `findUserByToken(String token)` ✅
-- `findTokensByUser(Integer id)` ✅
-- `findTokenByTokenId(Integer id)` ✅
-- `deleteToken(Integer tokenId)` ✅
+✅ **Major Controllers Refactored:**
+- ✅ `LinkController` - Now injects `EntityPersister` and `NoteRepository` directly
+- ✅ `NoteController` - Now injects `NoteRepository` directly
+- ✅ `NotebookController` - Now injects `NoteRepository` and `NotebookAiAssistantRepository` directly
+- ✅ `RecallPromptController` - Now injects `RecallPromptRepository` and `GlobalSettingsService` directly
+- ✅ `AssimilationController` - Now injects `EntityPersister` directly
+- ✅ `MemoryTrackerController` - Now injects `MemoryTrackerRepository` directly
+- ✅ `NoteCreationController` - Now injects `NoteRepository` directly
+- ✅ `McpNoteCreationController` - Now injects `NoteRepository` directly
+- ✅ `CircleController` - Now injects `NoteRepository` directly
+- ✅ `PredefinedQuestionController` - Now injects `GlobalSettingRepository` directly
+- ✅ `GlobalSettingsController` - Now injects `GlobalSettingRepository` directly
+- ✅ `AiAudioController` - Now injects `GlobalSettingRepository` directly
+- ✅ `UserController` - Removed unused `ModelFactoryService` dependency
 
-✅ **Note Embedding Operations** → Moved to `NoteEmbeddingService`:
-- `storeNoteEmbedding(Note note, List<Float> embedding)` ✅
-- `deleteNoteEmbeddingByNoteId(Integer noteId)` ✅
-- `deleteNoteEmbeddingsByNotebookId(Integer notebookId)` ✅
-- `getNoteEmbeddingAsFloats(Integer noteId)` ✅
+✅ **Major Services Refactored:**
+- ✅ `MemoryTrackerService` - Now injects `EntityPersister` directly
+- ✅ `NoteConstructionService` - Now injects `NoteRepository` directly
+- ✅ `ObsidianFormatService` - Now injects `NoteRepository` directly
+- ✅ `RecallQuestionService` - Now injects `RecallPromptRepository` and `GlobalSettingsService` directly
+- ✅ `PredefinedQuestionService` - Removed `ModelFactoryService` dependency
+- ✅ `GlobalSettingsService` - Now injects `GlobalSettingRepository` directly
+- ✅ `Ownership` entity - Now accepts `NoteRepository` as parameter
 
-✅ **Link Creation Operations** → Moved to `NoteService`:
-- `createLink(Note sourceNote, Note targetNote, User creator, LinkType type, Timestamp currentUTCTimestamp)` ✅
-- `buildALink(...)` (static method) ✅
+✅ **Test Infrastructure:**
+- ✅ `RecallPromptControllerTests` - Updated to use direct repository injection
+- ✅ `PredefinedQuestionsTestData` - Updated to use `NoteRepository` directly
+- ✅ `TestabilityRestController` - Updated to use `CircleRepository` and `NoteRepository` directly
 
-✅ **Answer Creation Operations** → Moved to `AnswerService`:
-- `createAnswerForQuestion(AnswerableQuestionInstance answerableQuestionInstance, AnswerDTO answerDTO)` ✅
+**Remaining Files Using ModelFactoryService:**
+- `AssessmentController` - Still uses `ModelFactoryService` (needs refactoring)
+- `AssessmentService` - Still uses `ModelFactoryService` (needs refactoring)
+- `CertificateController` - Still uses `ModelFactoryService` (needs refactoring)
+- `FineTuningDataController` - Still uses `ModelFactoryService` (needs refactoring)
+- `FailureReportController` - Still uses `ModelFactoryService` (needs refactoring)
+- `FailureReportFactory` - Still uses `ModelFactoryService` (needs refactoring)
+- `ConversationService` - Still uses `ModelFactoryService` (needs refactoring)
+- `ControllerSetup` - Still uses `ModelFactoryService` (needs refactoring)
+- `NotebookIndexingService` - Still uses `ModelFactoryService` (needs refactoring)
+- `FineTuningService` - Still uses `ModelFactoryService` (needs refactoring)
+- `MakeMe` (test utility) - Still exposes `ModelFactoryService` for backward compatibility with tests
 
-✅ **Entity Persistence Operations** → Migrated to `EntityPersister`:
-- `save(T entity)`, `merge(T entity)`, `remove(T entity)` ✅
-- All services now inject and use `EntityPersister` directly instead of going through `ModelFactoryService`
-- All controllers now inject and use `EntityPersister` directly
-- Test builders (`EntityBuilder`, `NoteBuilder`) updated to use `EntityPersister`
-- `Ownership.java` entity updated to accept `EntityPersister` as parameter
-- `TestabilityRestController` updated to use `EntityPersister`
-- All test files updated to use `EntityPersister`
-
-**Repository Aggregation:**
-- `ModelFactoryService` currently aggregates repositories via public field injection
-- Once operations are moved to domain services, repositories should be injected directly into those services
-- `ModelFactoryService` can be removed entirely once all operations are migrated
+**Next Steps:**
+- Refactor remaining controllers and services to inject repositories directly
+- Update remaining test files to use direct repository injection
+- Remove `ModelFactoryService` class entirely once all usages are migrated
 
 ## Success Criteria
 

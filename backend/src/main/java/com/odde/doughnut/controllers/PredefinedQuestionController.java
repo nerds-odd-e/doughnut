@@ -3,9 +3,9 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/predefined-questions")
 class PredefinedQuestionController {
-  private final ModelFactoryService modelFactoryService;
   private final EntityPersister entityPersister;
   private final PredefinedQuestionService predefinedQuestionService;
   private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
@@ -38,29 +37,28 @@ class PredefinedQuestionController {
   private final AiQuestionGenerator aiQuestionGenerator;
   private final ObjectMapper objectMapper;
   private final AuthorizationService authorizationService;
+  private final GlobalSettingsService globalSettingsService;
 
   public PredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
+      GlobalSettingRepository globalSettingRepository,
       EntityPersister entityPersister,
       SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
     this.entityPersister = entityPersister;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.testabilitySettings = testabilitySettings;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
+    this.globalSettingsService =
+        new GlobalSettingsService(globalSettingRepository, entityPersister);
     aiQuestionGenerator =
         new AiQuestionGenerator(
-            openAiApi,
-            new GlobalSettingsService(modelFactoryService, entityPersister),
-            testabilitySettings.getRandomizer(),
-            objectMapper);
+            openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
     this.predefinedQuestionService =
-        new PredefinedQuestionService(modelFactoryService, entityPersister, aiQuestionGenerator);
+        new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
   }
 
   @PostMapping("/generate-question-without-save")
@@ -132,8 +130,6 @@ class PredefinedQuestionController {
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    GlobalSettingsService globalSettingsService =
-        new GlobalSettingsService(modelFactoryService, entityPersister);
     QuestionGenerationRequestBuilder requestBuilder =
         new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
     return requestBuilder.buildQuestionGenerationRequest(note, null);

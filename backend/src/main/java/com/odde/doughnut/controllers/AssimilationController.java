@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
@@ -24,7 +23,6 @@ import org.springframework.web.context.annotation.SessionScope;
 @SessionScope
 @RequestMapping("/api/assimilation")
 class AssimilationController {
-  private final ModelFactoryService modelFactoryService;
   private final MemoryTrackerService memoryTrackerService;
   private final SubscriptionService subscriptionService;
   private final UserService userService;
@@ -36,19 +34,16 @@ class AssimilationController {
 
   @Autowired
   public AssimilationController(
-      ModelFactoryService modelFactoryService,
       EntityPersister entityPersister,
       SubscriptionService subscriptionService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       UserService userService) {
-    this.modelFactoryService = modelFactoryService;
     this.subscriptionService = subscriptionService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
-    this.memoryTrackerService =
-        new MemoryTrackerService(modelFactoryService, entityPersister, userService);
+    this.memoryTrackerService = new MemoryTrackerService(entityPersister, userService);
   }
 
   @GetMapping("/assimilating")

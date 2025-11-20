@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.utils.Randomizer;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
-  private final ModelFactoryService modelFactoryService;
+  private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
   private final UserService userService;
@@ -23,24 +23,21 @@ public class RecallQuestionService {
 
   public RecallQuestionService(
       OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
+      RecallPromptRepository recallPromptRepository,
       EntityPersister entityPersister,
       Randomizer randomizer,
       ObjectMapper objectMapper,
       UserService userService,
-      AnswerService answerService) {
-    this.modelFactoryService = modelFactoryService;
+      AnswerService answerService,
+      GlobalSettingsService globalSettingsService) {
+    this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.answerService = answerService;
     aiQuestionGenerator =
-        new AiQuestionGenerator(
-            openAiApi,
-            new GlobalSettingsService(modelFactoryService, entityPersister),
-            randomizer,
-            objectMapper);
+        new AiQuestionGenerator(openAiApi, globalSettingsService, randomizer, objectMapper);
     this.predefinedQuestionService =
-        new PredefinedQuestionService(modelFactoryService, entityPersister, aiQuestionGenerator);
+        new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
@@ -54,8 +51,7 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt findExistingUnansweredRecallPrompt(Note note) {
-    List<RecallPrompt> results =
-        modelFactoryService.recallPromptRepository.findUnansweredByNote(note);
+    List<RecallPrompt> results = recallPromptRepository.findUnansweredByNote(note);
     return results.isEmpty() ? null : results.get(0);
   }
 
@@ -93,7 +89,7 @@ public class RecallQuestionService {
       RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     MemoryTrackerService memoryTrackerService =
-        new MemoryTrackerService(modelFactoryService, entityPersister, userService);
+        new MemoryTrackerService(entityPersister, userService);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();

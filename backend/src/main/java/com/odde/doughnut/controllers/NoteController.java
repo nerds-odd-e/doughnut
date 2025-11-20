@@ -2,12 +2,12 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.NoteMotionService;
@@ -38,7 +38,7 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/notes")
 class NoteController {
 
-  private final ModelFactoryService modelFactoryService;
+  private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final WikidataService wikidataService;
   private final TestabilitySettings testabilitySettings;
@@ -48,7 +48,7 @@ class NoteController {
   private final UserService userService;
 
   public NoteController(
-      ModelFactoryService modelFactoryService,
+      NoteRepository noteRepository,
       EntityPersister entityPersister,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
@@ -56,7 +56,7 @@ class NoteController {
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService) {
-    this.modelFactoryService = modelFactoryService;
+    this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
@@ -139,7 +139,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     noteService.destroy(note, testabilitySettings.getCurrentUTCTimestamp());
-    modelFactoryService.entityPersister.flush();
+    entityPersister.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
       return List.of(parentNote.toNoteRealm(authorizationService.getCurrentUser()));
@@ -153,7 +153,7 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     noteService.restore(note);
-    modelFactoryService.entityPersister.flush();
+    entityPersister.flush();
 
     return note.toNoteRealm(authorizationService.getCurrentUser());
   }
@@ -203,8 +203,7 @@ class NoteController {
   @GetMapping("/recent")
   public List<NoteRealm> getRecentNotes() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
-    return modelFactoryService
-        .noteRepository
+    return noteRepository
         .findRecentNotesByUser(authorizationService.getCurrentUser().getId())
         .stream()
         .map(note -> note.toNoteRealm(authorizationService.getCurrentUser()))

@@ -10,8 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
+import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -28,7 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class PredefinedQuestionControllerTests extends ControllerTestBase {
   @Mock OpenAiApi openAiApi;
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired GlobalSettingRepository globalSettingRepository;
+  @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -42,7 +44,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     controller =
         new PredefinedQuestionController(
             openAiApi,
-            modelFactoryService,
+            globalSettingRepository,
             makeMe.entityPersister,
             suggestedQuestionForFineTuningService,
             testabilitySettings,
@@ -54,7 +56,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     currentUser.setUser(null);
     return new PredefinedQuestionController(
         openAiApi,
-        modelFactoryService,
+        globalSettingRepository,
         makeMe.entityPersister,
         suggestedQuestionForFineTuningService,
         testabilitySettings,
@@ -131,11 +133,9 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
 
     @Test
     void createMarkedQuestionInDatabase() {
-      long oldCount = modelFactoryService.questionSuggestionForFineTuningRepository.count();
+      long oldCount = questionSuggestionForFineTuningRepository.count();
       controller.suggestQuestionForFineTuning(predefinedQuestion, suggestionWithPositiveFeedback);
-      assertThat(
-          modelFactoryService.questionSuggestionForFineTuningRepository.count(),
-          equalTo(oldCount + 1));
+      assertThat(questionSuggestionForFineTuningRepository.count(), equalTo(oldCount + 1));
     }
   }
 

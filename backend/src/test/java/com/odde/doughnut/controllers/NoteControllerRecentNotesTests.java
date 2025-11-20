@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerRecentNotesTests extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NoteRepository noteRepository;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
@@ -34,7 +34,7 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
 
     controller =
         new NoteController(
-            modelFactoryService,
+            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,

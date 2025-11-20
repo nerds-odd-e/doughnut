@@ -3,8 +3,8 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,22 +20,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class ObsidianFormatService {
 
   private final NoteConstructionService noteConstructionService;
-  private final ModelFactoryService modelFactoryService;
+  private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final Set<String> usedPaths = new HashSet<>();
 
   public ObsidianFormatService(
-      User user, ModelFactoryService modelFactoryService, EntityPersister entityPersister) {
+      User user, NoteRepository noteRepository, EntityPersister entityPersister) {
     TestabilitySettings testabilitySettings = new TestabilitySettings();
-    this.modelFactoryService = modelFactoryService;
+    this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
-    NoteService noteService =
-        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityPersister);
+    NoteService noteService = new NoteService(noteRepository, entityPersister);
     noteConstructionService =
         new NoteConstructionService(
             user,
             testabilitySettings.getCurrentUTCTimestamp(),
-            this.modelFactoryService,
+            noteRepository,
             entityPersister,
             noteService);
   }
@@ -167,7 +166,7 @@ public class ObsidianFormatService {
   private Note processNotePart(
       Note currentParent, String noteName, ZipEntry entry, ZipInputStream zipIn, boolean isLastPart)
       throws IOException {
-    currentParent = modelFactoryService.noteRepository.findById(currentParent.getId()).orElse(null);
+    currentParent = noteRepository.findById(currentParent.getId()).orElse(null);
     Note existingNote = findExistingNote(currentParent, noteName);
 
     if (existingNote != null) {
@@ -178,11 +177,11 @@ public class ObsidianFormatService {
     newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted
-    modelFactoryService.entityPersister.flush();
+    entityPersister.flush();
 
     // Refresh both entities to get the latest state
-    modelFactoryService.entityPersister.refresh(newNote);
-    modelFactoryService.entityPersister.refresh(currentParent);
+    entityPersister.refresh(newNote);
+    entityPersister.refresh(currentParent);
 
     if (!entry.isDirectory() && isLastPart) {
       addContentToNote(newNote, zipIn);
@@ -209,7 +208,7 @@ public class ObsidianFormatService {
       // Check if note with this ID exists
       if (metadata.containsKey("note_id")) {
         Integer noteId = Integer.parseInt(metadata.get("note_id"));
-        Note existingNote = modelFactoryService.noteRepository.findById(noteId).orElse(null);
+        Note existingNote = noteRepository.findById(noteId).orElse(null);
 
         if (existingNote != null) {
           // Update existing note instead of creating new one

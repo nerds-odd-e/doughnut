@@ -7,9 +7,9 @@ import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/circles")
 class CircleController {
-  private final ModelFactoryService modelFactoryService;
+  private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
   private final CircleService circleService;
 
@@ -36,12 +36,12 @@ class CircleController {
   private final AuthorizationService authorizationService;
 
   public CircleController(
-      ModelFactoryService modelFactoryService,
+      NoteRepository noteRepository,
       EntityPersister entityPersister,
       CircleService circleService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
+    this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
     this.circleService = circleService;
     this.testabilitySettings = testabilitySettings;
@@ -107,7 +107,7 @@ class CircleController {
             .createAndPersistNotebook(
                 authorizationService.getCurrentUser(),
                 testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService,
+                noteRepository,
                 entityPersister,
                 noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());

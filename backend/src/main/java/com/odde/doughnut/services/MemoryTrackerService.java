@@ -8,28 +8,22 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MemoryTrackerService {
-  private final ModelFactoryService modelFactoryService;
   private final EntityPersister entityPersister;
   private final UserService userService;
 
-  public MemoryTrackerService(
-      ModelFactoryService modelFactoryService,
-      EntityPersister entityPersister,
-      UserService userService) {
-    this.modelFactoryService = modelFactoryService;
+  public MemoryTrackerService(EntityPersister entityPersister, UserService userService) {
     this.entityPersister = entityPersister;
     this.userService = userService;
   }
 
   public List<MemoryTracker> assimilate(
       InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
-    Note note = modelFactoryService.entityPersister.find(Note.class, initialInfo.noteId);
+    Note note = entityPersister.find(Note.class, initialInfo.noteId);
     MemoryTracker memoryTracker =
         createMemoryTracker(
             note,

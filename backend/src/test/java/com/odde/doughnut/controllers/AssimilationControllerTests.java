@@ -7,7 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -19,7 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class AssimilationControllerTests extends ControllerTestBase {
-  @Autowired private ModelFactoryService modelFactoryService;
+  @Autowired private NoteRepository noteRepository;
+  @Autowired private MemoryTrackerRepository memoryTrackerRepository;
   @Autowired private SubscriptionService subscriptionService;
   @Autowired private UserService userService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -31,7 +33,6 @@ class AssimilationControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssimilationController(
-            modelFactoryService,
             makeMe.entityPersister,
             subscriptionService,
             testabilitySettings,
@@ -69,7 +70,7 @@ class AssimilationControllerTests extends ControllerTestBase {
     void shouldCreateTwoMemoryTrackersWhenRememberSpellingIsTrue() {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       note.getRecallSetting().setRememberSpelling(true);
-      modelFactoryService.noteRepository.save(note);
+      noteRepository.save(note);
 
       InitialInfo initialInfo = new InitialInfo();
       initialInfo.noteId = note.getId();
@@ -77,8 +78,7 @@ class AssimilationControllerTests extends ControllerTestBase {
       controller.assimilate(initialInfo);
 
       List<MemoryTracker> memoryTrackers =
-          modelFactoryService.memoryTrackerRepository.findLast100ByUser(
-              currentUser.getUser().getId());
+          memoryTrackerRepository.findLast100ByUser(currentUser.getUser().getId());
       assertThat(
           memoryTrackers.stream().filter(mt -> mt.getNote().getId().equals(note.getId())).count(),
           equalTo(2L));

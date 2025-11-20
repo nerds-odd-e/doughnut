@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteService;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/links")
 class LinkController {
-  private final ModelFactoryService modelFactoryService;
   private final EntityPersister entityPersister;
   private final NoteService noteService;
 
@@ -40,13 +38,11 @@ class LinkController {
   private final AuthorizationService authorizationService;
 
   public LinkController(
-      ModelFactoryService modelFactoryService,
       EntityPersister entityPersister,
       NoteService noteService,
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
     this.entityPersister = entityPersister;
     this.noteService = noteService;
     this.testabilitySettings = testabilitySettings;
@@ -105,8 +101,8 @@ class LinkController {
   }
 
   private List<NoteRealm> getNoteRealm(Note link, User user) {
-    Note nt = modelFactoryService.entityPersister.find(Note.class, link.getTargetNote().getId());
-    Note np = modelFactoryService.entityPersister.find(Note.class, link.getParent().getId());
+    Note nt = entityPersister.find(Note.class, link.getTargetNote().getId());
+    Note np = entityPersister.find(Note.class, link.getParent().getId());
     return List.of(link.toNoteRealm(user), nt.toNoteRealm(user), np.toNoteRealm(user));
   }
 }

@@ -6,10 +6,8 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -22,21 +20,15 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/user")
 class UserController {
-  private final ModelFactoryService modelFactoryService;
   private final EntityPersister entityPersister;
-  private final TestabilitySettings testabilitySettings;
   private final AuthorizationService authorizationService;
   private final UserService userService;
 
   public UserController(
-      ModelFactoryService modelFactoryService,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
       UserService userService) {
-    this.modelFactoryService = modelFactoryService;
     this.entityPersister = entityPersister;
-    this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.userService = userService;
   }

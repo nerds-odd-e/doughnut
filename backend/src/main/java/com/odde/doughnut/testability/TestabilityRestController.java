@@ -5,10 +5,10 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.CircleRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
@@ -44,7 +44,7 @@ class TestabilityRestController {
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
   @Autowired CurrentUser currentUser;
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired CircleRepository circleRepository;
   @Autowired EntityPersister entityPersister;
   @Autowired CircleService circleService;
   @Autowired TestabilitySettings testabilitySettings;
@@ -151,7 +151,7 @@ class TestabilityRestController {
         User user,
         Ownership ownership,
         Map<String, Note> titleNoteMap,
-        ModelFactoryService modelFactoryService,
+        NoteRepository noteRepository,
         EntityPersister entityPersister) {
       noteTestData.forEach(
           injection -> {
@@ -162,8 +162,7 @@ class TestabilityRestController {
               entityPersister.save(note.getNotebook());
             } else {
               note.setParentNote(
-                  getParentNote(
-                      titleNoteMap, modelFactoryService.noteRepository, injection.parentTitle));
+                  getParentNote(titleNoteMap, noteRepository, injection.parentTitle));
             }
           });
     }
@@ -191,7 +190,7 @@ class TestabilityRestController {
 
     Map<String, Note> titleNoteMap = notesTestData.buildIndividualNotes(user, currentUTCTimestamp);
     notesTestData.buildNoteTree(
-        user, ownership, titleNoteMap, this.modelFactoryService, this.entityPersister);
+        user, ownership, titleNoteMap, this.noteRepository, this.entityPersister);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     return titleNoteMap.values().stream()
         .collect(Collectors.toMap(note -> note.getTopicConstructor(), Note::getId));
@@ -202,7 +201,7 @@ class TestabilityRestController {
   public List<PredefinedQuestion> injectPredefinedQuestion(
       @RequestBody PredefinedQuestionsTestData predefinedQuestionsTestData) {
     List<PredefinedQuestion> predefinedQuestions =
-        predefinedQuestionsTestData.buildPredefinedQuestions(this.modelFactoryService);
+        predefinedQuestionsTestData.buildPredefinedQuestions(this.noteRepository);
     predefinedQuestions.forEach(question -> entityPersister.save(question));
     updateNotebookSettings(
         predefinedQuestions, predefinedQuestionsTestData.getNotebookCertifiable());
@@ -226,7 +225,7 @@ class TestabilityRestController {
 
   private Ownership getOwnership(NotesTestData notesTestData, User user) {
     if (notesTestData.circleName != null) {
-      Circle circle = modelFactoryService.circleRepository.findByName(notesTestData.circleName);
+      Circle circle = circleRepository.findByName(notesTestData.circleName);
       return circle.getOwnership();
     }
     return user.getOwnership();
@@ -235,12 +234,8 @@ class TestabilityRestController {
   @PostMapping("/link_notes")
   @Transactional
   public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
-    Note sourceNote =
-        modelFactoryService.entityPersister.find(
-            Note.class, Integer.valueOf(linkInfo.get("source_id")));
-    Note targetNote =
-        modelFactoryService.entityPersister.find(
-            Note.class, Integer.valueOf(linkInfo.get("target_id")));
+    Note sourceNote = entityPersister.find(Note.class, Integer.valueOf(linkInfo.get("source_id")));
+    Note targetNote = entityPersister.find(Note.class, Integer.valueOf(linkInfo.get("target_id")));
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     User creator = sourceNote.getCreator();

@@ -14,8 +14,8 @@ import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerControllerTest extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired UserService userService;
 
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -39,7 +39,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new MemoryTrackerController(
-            modelFactoryService,
+            memoryTrackerRepository,
             makeMe.entityPersister,
             testabilitySettings,
             authorizationService,
@@ -75,7 +75,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService,
+              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
@@ -228,7 +228,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService,
+              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
@@ -267,7 +267,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService,
+              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,
@@ -336,7 +336,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new MemoryTrackerController(
-              modelFactoryService,
+              memoryTrackerRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService,

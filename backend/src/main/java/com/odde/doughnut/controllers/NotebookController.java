@@ -5,9 +5,10 @@ import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
 import com.odde.doughnut.controllers.dto.RedirectToNoteResponse;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookAiAssistantRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookIndexingService;
@@ -34,7 +35,8 @@ import org.springframework.web.multipart.MultipartFile;
 @SessionScope
 @RequestMapping("/api/notebooks")
 class NotebookController {
-  private final ModelFactoryService modelFactoryService;
+  private final NoteRepository noteRepository;
+  private final NotebookAiAssistantRepository notebookAiAssistantRepository;
   private final EntityPersister entityPersister;
 
   @Resource(name = "testabilitySettings")
@@ -46,13 +48,15 @@ class NotebookController {
   private final AuthorizationService authorizationService;
 
   public NotebookController(
-      ModelFactoryService modelFactoryService,
+      NoteRepository noteRepository,
+      NotebookAiAssistantRepository notebookAiAssistantRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       NotebookIndexingService notebookIndexingService,
       BazaarService bazaarService,
       AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
+    this.noteRepository = noteRepository;
+    this.notebookAiAssistantRepository = notebookAiAssistantRepository;
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.notebookIndexingService = notebookIndexingService;
@@ -60,7 +64,7 @@ class NotebookController {
     this.authorizationService = authorizationService;
     this.obsidianFormatService =
         new ObsidianFormatService(
-            authorizationService.getCurrentUser(), modelFactoryService, entityPersister);
+            authorizationService.getCurrentUser(), noteRepository, entityPersister);
   }
 
   @GetMapping("")
@@ -85,7 +89,7 @@ class NotebookController {
             .createAndPersistNotebook(
                 userEntity,
                 testabilitySettings.getCurrentUTCTimestamp(),
-                modelFactoryService,
+                noteRepository,
                 entityPersister,
                 noteCreation.getNewTitle());
     return new RedirectToNoteResponse(note.getId());
@@ -159,7 +163,7 @@ class NotebookController {
     authorizationService.assertAuthorization(notebook);
 
     NotebookAiAssistant assistant =
-        modelFactoryService.notebookAiAssistantRepository.findByNotebookId(notebook.getId());
+        notebookAiAssistantRepository.findByNotebookId(notebook.getId());
     if (assistant == null) {
       assistant = new NotebookAiAssistant();
       assistant.setNotebook(notebook);
@@ -169,7 +173,7 @@ class NotebookController {
     assistant.setAdditionalInstructionsToAi(request.getAdditionalInstructions());
     assistant.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
 
-    return modelFactoryService.notebookAiAssistantRepository.save(assistant);
+    return notebookAiAssistantRepository.save(assistant);
   }
 
   @GetMapping("/{notebook}/ai-assistant")
@@ -178,7 +182,7 @@ class NotebookController {
       throws UnexpectedNoAccessRightException {
 
     authorizationService.assertAuthorization(notebook);
-    return modelFactoryService.notebookAiAssistantRepository.findByNotebookId(notebook.getId());
+    return notebookAiAssistantRepository.findByNotebookId(notebook.getId());
   }
 
   @GetMapping("/{notebook}/obsidian")

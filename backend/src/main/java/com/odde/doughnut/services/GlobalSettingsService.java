@@ -2,8 +2,8 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.entities.GlobalSettings;
+import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
 
@@ -11,44 +11,44 @@ import org.springframework.stereotype.Service;
 public class GlobalSettingsService {
 
   public static final String DEFAULT_CHAT_MODEL = "gpt-4o-mini";
-  private final ModelFactoryService modelFactoryService;
+  private final GlobalSettingRepository globalSettingRepository;
   private final EntityPersister entityPersister;
 
   public GlobalSettingsService(
-      ModelFactoryService modelFactoryService, EntityPersister entityPersister) {
-    this.modelFactoryService = modelFactoryService;
+      GlobalSettingRepository globalSettingRepository, EntityPersister entityPersister) {
+    this.globalSettingRepository = globalSettingRepository;
     this.entityPersister = entityPersister;
   }
 
   public GlobalSettingsKeyValue globalSettingQuestionGeneration() {
     return new GlobalSettingsKeyValue(
-        "question_generation_model", DEFAULT_CHAT_MODEL, modelFactoryService, entityPersister);
+        "question_generation_model", DEFAULT_CHAT_MODEL, globalSettingRepository, entityPersister);
   }
 
   public GlobalSettingsKeyValue globalSettingEvaluation() {
     return new GlobalSettingsKeyValue(
-        "evaluation_model", DEFAULT_CHAT_MODEL, modelFactoryService, entityPersister);
+        "evaluation_model", DEFAULT_CHAT_MODEL, globalSettingRepository, entityPersister);
   }
 
   public GlobalSettingsKeyValue globalSettingOthers() {
     return new GlobalSettingsKeyValue(
-        "others_model", DEFAULT_CHAT_MODEL, modelFactoryService, entityPersister);
+        "others_model", DEFAULT_CHAT_MODEL, globalSettingRepository, entityPersister);
   }
 
   public static class GlobalSettingsKeyValue implements SettingAccessor {
     private final String keyName;
     private final String defaultValue;
-    private final ModelFactoryService modelFactoryService;
+    private final GlobalSettingRepository globalSettingRepository;
     private final EntityPersister entityPersister;
 
     public GlobalSettingsKeyValue(
         String keyName,
         String defaultValue,
-        ModelFactoryService modelFactoryService,
+        GlobalSettingRepository globalSettingRepository,
         EntityPersister entityPersister) {
       this.keyName = keyName;
       this.defaultValue = defaultValue;
-      this.modelFactoryService = modelFactoryService;
+      this.globalSettingRepository = globalSettingRepository;
       this.entityPersister = entityPersister;
     }
 
@@ -71,7 +71,7 @@ public class GlobalSettingsService {
 
     private GlobalSettings getGlobalSettings() {
       GlobalSettings currentQuestionGenerationModelVersion =
-          modelFactoryService.globalSettingRepository.findByKeyName(keyName);
+          globalSettingRepository.findByKeyName(keyName);
       if (currentQuestionGenerationModelVersion == null) {
         GlobalSettings globalSettings = new GlobalSettings();
         globalSettings.setKeyName(keyName);
@@ -83,10 +83,6 @@ public class GlobalSettingsService {
 
     public String keyName() {
       return keyName;
-    }
-
-    public ModelFactoryService modelFactoryService() {
-      return modelFactoryService;
     }
   }
 

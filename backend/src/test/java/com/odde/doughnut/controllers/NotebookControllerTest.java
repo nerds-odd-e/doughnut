@@ -10,8 +10,9 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.UpdateAiAssistantRequest;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
+import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.NotebookAiAssistantRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.NotebookIndexingService;
@@ -35,7 +36,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.server.ResponseStatusException;
 
 class NotebookControllerTest extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NoteRepository noteRepository;
+  @Autowired NotebookAiAssistantRepository notebookAiAssistantRepository;
 
   @Autowired
   com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
@@ -69,7 +71,8 @@ class NotebookControllerTest extends ControllerTestBase {
     topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     controller =
         new NotebookController(
-            modelFactoryService,
+            noteRepository,
+            notebookAiAssistantRepository,
             makeMe.entityPersister,
             testabilitySettings,
             notebookIndexingService,
@@ -103,7 +106,8 @@ class NotebookControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
@@ -119,7 +123,8 @@ class NotebookControllerTest extends ControllerTestBase {
       List<Notebook> notebooks = currentUser.getUser().getOwnership().getNotebooks();
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
@@ -134,9 +139,9 @@ class NotebookControllerTest extends ControllerTestBase {
 
     @Test
     void shareMyNote() throws UnexpectedNoAccessRightException {
-      long oldCount = modelFactoryService.bazaarNotebookRepository.count();
+      long oldCount = bazaarNotebookRepository.count();
       controller.shareNotebook(topNote.getNotebook());
-      assertThat(modelFactoryService.bazaarNotebookRepository.count(), equalTo(oldCount + 1));
+      assertThat(bazaarNotebookRepository.count(), equalTo(oldCount + 1));
     }
 
     @Test
@@ -188,7 +193,8 @@ class NotebookControllerTest extends ControllerTestBase {
       currentUser.setUser(anotherUser);
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
@@ -235,7 +241,8 @@ class NotebookControllerTest extends ControllerTestBase {
     void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
@@ -249,7 +256,8 @@ class NotebookControllerTest extends ControllerTestBase {
     void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
@@ -376,7 +384,8 @@ class NotebookControllerTest extends ControllerTestBase {
       currentUser.setUser(anotherUser);
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,
@@ -475,7 +484,8 @@ class NotebookControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new NotebookController(
-              modelFactoryService,
+              noteRepository,
+              notebookAiAssistantRepository,
               makeMe.entityPersister,
               testabilitySettings,
               notebookIndexingService,

@@ -10,8 +10,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.UserService;
@@ -36,7 +36,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 class RecallPromptControllerTests extends ControllerTestBase {
   @Mock OpenAiApi openAiApi;
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired RecallPromptRepository recallPromptRepository;
   @Autowired MakeMe makeMe;
   @Autowired UserService userService;
   @Autowired AnswerService answerService;
@@ -63,26 +63,28 @@ class RecallPromptControllerTests extends ControllerTestBase {
     controller =
         new RecallPromptController(
             openAiApi,
-            makeMe.modelFactoryService,
+            recallPromptRepository,
             makeMe.entityPersister,
             testabilitySettings,
             getTestObjectMapper(),
             authorizationService,
             userService,
-            answerService);
+            answerService,
+            globalSettingsService);
   }
 
   RecallPromptController nullUserController() {
     currentUser.setUser(null);
     return new RecallPromptController(
         openAiApi,
-        modelFactoryService,
+        recallPromptRepository,
         makeMe.entityPersister,
         testabilitySettings,
         getTestObjectMapper(),
         authorizationService,
         userService,
-        answerService);
+        answerService,
+        globalSettingsService);
   }
 
   @Nested
@@ -198,13 +200,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
             RecallPromptController restAiController =
                 new RecallPromptController(
                     openAiApi,
-                    makeMe.modelFactoryService,
+                    recallPromptRepository,
                     makeMe.entityPersister,
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService,
                     userService,
-                    answerService);
+                    answerService,
+                    globalSettingsService);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -287,13 +290,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
             RecallPromptController restAiController =
                 new RecallPromptController(
                     openAiApi,
-                    makeMe.modelFactoryService,
+                    recallPromptRepository,
                     makeMe.entityPersister,
                     testabilitySettings,
                     getTestObjectMapper(),
                     authorizationService,
                     userService,
-                    answerService);
+                    answerService,
+                    globalSettingsService);
             restAiController.contest(recallPrompt);
           });
     }
@@ -377,7 +381,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       // Verify that no new prompt was created
       long count =
-          modelFactoryService
+          makeMe
               .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
@@ -414,7 +418,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       // Verify that a new prompt was created
       long count =
-          modelFactoryService
+          makeMe
               .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
@@ -458,7 +462,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       // Verify that a new prompt was created
       long count =
-          modelFactoryService
+          makeMe
               .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();

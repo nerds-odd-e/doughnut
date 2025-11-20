@@ -2,8 +2,8 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.dto.NotebooksViewedByUser;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import jakarta.persistence.Entity;
@@ -63,14 +63,13 @@ public class Ownership {
   public Note createAndPersistNotebook(
       User user,
       Timestamp currentUTCTimestamp,
-      ModelFactoryService modelFactoryService,
+      NoteRepository noteRepository,
       EntityPersister entityPersister,
       String topicConstructor) {
-    NoteService noteService =
-        new NoteService(modelFactoryService.noteRepository, modelFactoryService.entityPersister);
+    NoteService noteService = new NoteService(noteRepository, entityPersister);
     final Note note =
         new NoteConstructionService(
-                user, currentUTCTimestamp, modelFactoryService, entityPersister, noteService)
+                user, currentUTCTimestamp, noteRepository, entityPersister, noteService)
             .createNote(null, topicConstructor);
     note.buildNotebookForHeadNote(this, user);
     entityPersister.save(note.getNotebook());

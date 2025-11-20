@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
+import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -20,6 +21,7 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
 
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired GlobalSettingRepository globalSettingRepository;
 
   @BeforeEach
   void Setup() {
@@ -28,7 +30,7 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.anAdmin().please());
     controller =
         new GlobalSettingsController(
-            makeMe.modelFactoryService,
+            globalSettingRepository,
             makeMe.entityPersister,
             testabilitySettings,
             authorizationService);
@@ -73,7 +75,7 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new GlobalSettingsController(
-              makeMe.modelFactoryService,
+              globalSettingRepository,
               makeMe.entityPersister,
               testabilitySettings,
               authorizationService);
@@ -103,9 +105,9 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     @Test
     void avoidDuplicate() throws UnexpectedNoAccessRightException {
       controller.setCurrentModelVersions(settings);
-      long count = makeMe.modelFactoryService.globalSettingRepository.count();
+      long count = globalSettingRepository.count();
       controller.setCurrentModelVersions(settings);
-      assertEquals(count, makeMe.modelFactoryService.globalSettingRepository.count());
+      assertEquals(count, globalSettingRepository.count());
     }
   }
 }

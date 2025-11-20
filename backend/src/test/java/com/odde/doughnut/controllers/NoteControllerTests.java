@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
@@ -28,7 +28,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NoteRepository noteRepository;
 
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
@@ -44,7 +44,7 @@ class NoteControllerTests extends ControllerTestBase {
 
     controller =
         new NoteController(
-            modelFactoryService,
+            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
@@ -224,7 +224,7 @@ class NoteControllerTests extends ControllerTestBase {
       WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
       wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);
-      Note sameNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
+      Note sameNote = noteRepository.findById(note.getId()).get();
       assertThat(sameNote.getWikidataId(), equalTo("Q123"));
     }
 

@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AnswerService;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -33,24 +34,26 @@ class RecallPromptController {
 
   public RecallPromptController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      ModelFactoryService modelFactoryService,
+      RecallPromptRepository recallPromptRepository,
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
       UserService userService,
-      AnswerService answerService) {
+      AnswerService answerService,
+      GlobalSettingsService globalSettingsService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallQuestionService =
         new RecallQuestionService(
             openAiApi,
-            modelFactoryService,
+            recallPromptRepository,
             entityPersister,
             testabilitySettings.getRandomizer(),
             objectMapper,
             userService,
-            answerService);
+            answerService,
+            globalSettingsService);
   }
 
   @GetMapping("/{memoryTracker}/question")

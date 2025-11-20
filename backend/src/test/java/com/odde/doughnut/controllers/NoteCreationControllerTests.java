@@ -7,8 +7,8 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
 
 class NoteCreationControllerTests extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -41,7 +41,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new NoteCreationController(
-            modelFactoryService,
+            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
@@ -93,9 +93,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
     @Test
     void shouldBeAbleToCreateAThing()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
-      long beforeThingCount = makeMe.modelFactoryService.noteRepository.count();
+      long beforeThingCount = noteRepository.count();
       controller.createNoteUnderParent(parent, noteCreation);
-      long afterThingCount = makeMe.modelFactoryService.noteRepository.count();
+      long afterThingCount = noteRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
 
@@ -333,7 +333,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
     void shouldInsertNoteAfterReferenceNoteAndBeforeNextSibling()
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
-      Note createdNote = makeMe.modelFactoryService.noteRepository.findById(response.getId()).get();
+      Note createdNote = noteRepository.findById(response.getId()).get();
 
       // Get all siblings in order
       List<Note> siblings = createdNote.getParent().getChildren();

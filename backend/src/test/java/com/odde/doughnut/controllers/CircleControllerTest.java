@@ -9,8 +9,8 @@ import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,8 +21,8 @@ import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
 class CircleControllerTest extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
   @Autowired CircleService circleService;
+  @Autowired NoteRepository noteRepository;
 
   CircleController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -32,7 +32,7 @@ class CircleControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new CircleController(
-            modelFactoryService,
+            noteRepository,
             makeMe.entityPersister,
             circleService,
             testabilitySettings,
@@ -46,7 +46,7 @@ class CircleControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new CircleController(
-              modelFactoryService,
+              noteRepository,
               makeMe.entityPersister,
               circleService,
               testabilitySettings,
@@ -79,7 +79,7 @@ class CircleControllerTest extends ControllerTestBase {
       currentUser.setUser(makeMe.aUser().please());
       controller =
           new CircleController(
-              modelFactoryService,
+              noteRepository,
               makeMe.entityPersister,
               circleService,
               testabilitySettings,
@@ -108,7 +108,7 @@ class CircleControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       controller =
           new CircleController(
-              modelFactoryService,
+              noteRepository,
               makeMe.entityPersister,
               circleService,
               testabilitySettings,

@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -43,8 +42,6 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
   @Autowired WebApplicationContext webApplicationContext;
   @Autowired NoteService noteService;
 
-  @Autowired private ModelFactoryService modelFactoryService;
-
   @BeforeEach
   void setup() {
     MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -53,12 +50,11 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
     noteCreation.setNewTitle("new note");
     controller =
         new McpNoteCreationController(
-            modelFactoryService,
+            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
             noteSearchService,
-            noteRepository,
             noteService,
             authorizationService);
 

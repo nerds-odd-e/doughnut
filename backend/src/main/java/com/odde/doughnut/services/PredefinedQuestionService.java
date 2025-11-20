@@ -3,22 +3,17 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
 
 public class PredefinedQuestionService {
-  private final ModelFactoryService modelFactoryService;
   private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
 
   public PredefinedQuestionService(
-      ModelFactoryService modelFactoryService,
-      EntityPersister entityPersister,
-      AiQuestionGenerator aiQuestionGenerator) {
-    this.modelFactoryService = modelFactoryService;
+      EntityPersister entityPersister, AiQuestionGenerator aiQuestionGenerator) {
     this.entityPersister = entityPersister;
     this.aiQuestionGenerator = aiQuestionGenerator;
   }

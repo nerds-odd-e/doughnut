@@ -5,9 +5,9 @@ import com.odde.doughnut.controllers.dto.NoteCreationResult;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -20,7 +20,7 @@ import org.springframework.validation.BindingResult;
 public record NoteConstructionService(
     User user,
     Timestamp currentUTCTimestamp,
-    ModelFactoryService modelFactoryService,
+    NoteRepository noteRepository,
     EntityPersister entityPersister,
     NoteService noteService) {
 
@@ -42,8 +42,8 @@ public record NoteConstructionService(
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));
       wikidataIdWithApi.getAuthors().forEach(wwa -> createSubNote(note, wwa));
     }
-    modelFactoryService.entityPersister.flush();
-    modelFactoryService.entityPersister.refresh(note);
+    entityPersister.flush();
+    entityPersister.refresh(note);
     return note;
   }
 
@@ -52,8 +52,7 @@ public record NoteConstructionService(
     Optional<String> optionalTitle = subWikidataIdWithApi.fetchEnglishTitleFromApi();
     optionalTitle.ifPresent(
         subNoteTitle ->
-            modelFactoryService
-                .noteRepository
+            noteRepository
                 .noteWithWikidataIdWithinNotebook(
                     parentNote.getNotebook().getId(), subWikidataIdWithApi.wikidataId())
                 .stream()

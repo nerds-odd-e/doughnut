@@ -22,13 +22,7 @@ class UserControllerTest extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new UserController(
-            makeMe.modelFactoryService,
-            makeMe.entityPersister,
-            testabilitySettings,
-            authorizationService,
-            userService);
+    controller = new UserController(makeMe.entityPersister, authorizationService, userService);
   }
 
   @Test
@@ -112,13 +106,7 @@ class UserControllerTest extends ControllerTestBase {
         makeMe.aUserToken().forUser(anotherUser).withLabel("OTHER_USER_TOKEN").please();
     makeMe.entityPersister.save(userToken2);
 
-    controller =
-        new UserController(
-            makeMe.modelFactoryService,
-            makeMe.entityPersister,
-            testabilitySettings,
-            authorizationService,
-            userService);
+    controller = new UserController(makeMe.entityPersister, authorizationService, userService);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }

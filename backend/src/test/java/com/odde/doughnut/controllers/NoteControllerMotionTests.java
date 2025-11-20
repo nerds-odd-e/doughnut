@@ -6,10 +6,10 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NoteControllerMotionTests extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NoteRepository noteRepository;
 
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
@@ -38,7 +38,7 @@ class NoteControllerMotionTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new NoteController(
-            modelFactoryService,
+            noteRepository,
             makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
