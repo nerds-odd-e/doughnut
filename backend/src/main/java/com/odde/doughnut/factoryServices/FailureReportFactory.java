@@ -2,6 +2,7 @@ package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GithubService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,7 +16,7 @@ public record FailureReportFactory(
     Exception exception,
     CurrentUserFetcher currentUserFetcher,
     GithubService githubService,
-    ModelFactoryService modelFactoryService) {
+    FailureReportRepository failureReportRepository) {
 
   public void createUnlessAllowed() throws IOException, InterruptedException {
     if (exception instanceof ResponseStatusException) return;
@@ -30,7 +31,7 @@ public record FailureReportFactory(
   private FailureReport saveFailureReport(FailureReport failureReport) {
     // it has to use repository directly because
     // a transaction may not be available when handling exception
-    return modelFactoryService.failureReportRepository.save(failureReport);
+    return failureReportRepository.save(failureReport);
   }
 
   private FailureReport createFailureReport() {

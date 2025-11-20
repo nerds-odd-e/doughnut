@@ -12,11 +12,11 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.controllers.dto.ApiError;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.exceptions.OpenAITimeoutException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.RealGithubService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.MakeMe;
@@ -39,7 +39,7 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 public class ControllerSetupTest {
   @Autowired MakeMe makeMe;
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired FailureReportRepository failureReportRepository;
   @Autowired UserRepository userRepository;
   @Autowired UserService userService;
   @Mock RealGithubService githubService;
@@ -54,28 +54,28 @@ public class ControllerSetupTest {
     when(testabilitySettings.getGithubService()).thenReturn(githubService);
     currentUserFetcher = new CurrentUserFetcherFromRequest(request, userRepository, userService);
     controllerSetup =
-        new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
+        new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
   }
 
   @Test
   void shouldNotRecordResponseStatusException() {
-    long count = makeMe.modelFactoryService.failureReportRepository.count();
+    long count = failureReportRepository.count();
     assertThrows(
         ResponseStatusException.class,
         () ->
             controllerSetup.handleSystemException(
                 request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
-    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
+    assertThat(failureReportRepository.count(), equalTo(count));
   }
 
   @Test
   void shouldNotRecordUnexpectedNoAccessRightException() {
-    long count = makeMe.modelFactoryService.failureReportRepository.count();
+    long count = failureReportRepository.count();
     assertThrows(
         UnexpectedNoAccessRightException.class,
         () ->
             controllerSetup.handleSystemException(request, new UnexpectedNoAccessRightException()));
-    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
+    assertThat(failureReportRepository.count(), equalTo(count));
   }
 
   @Test
@@ -98,7 +98,7 @@ public class ControllerSetupTest {
     request.setUserPrincipal(() -> user.getExternalIdentifier());
     currentUserFetcher = new CurrentUserFetcherFromRequest(request, userRepository, userService);
     controllerSetup =
-        new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
+        new ControllerSetup(failureReportRepository, currentUserFetcher, testabilitySettings);
     FailureReport failureReport = catchExceptionAndGetFailureReport();
     assertThat(failureReport.getErrorDetail(), containsString(user.getExternalIdentifier()));
     assertThat(failureReport.getErrorDetail(), containsString(user.getName()));
@@ -144,6 +144,6 @@ public class ControllerSetupTest {
     assertThrows(
         RuntimeException.class,
         () -> controllerSetup.handleSystemException(request, new RuntimeException()));
-    return makeMe.modelFactoryService.failureReportRepository.findAll().iterator().next();
+    return failureReportRepository.findAll().iterator().next();
   }
 }

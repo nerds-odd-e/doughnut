@@ -63,6 +63,7 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `UserController` - Removed unused `ModelFactoryService` dependency
 - ✅ `CertificateController` - Now injects `CertificateRepository` directly
 - ✅ `AssessmentController` - Now injects `AssessmentAttemptRepository` and `CertificateRepository` directly
+- ✅ `FailureReportController` - Now injects `FailureReportRepository` directly
 
 ✅ **Major Services Refactored:**
 - ✅ `MemoryTrackerService` - Now injects `EntityPersister` directly
@@ -78,13 +79,16 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - ✅ `RecallPromptControllerTests` - Updated to use direct repository injection
 - ✅ `PredefinedQuestionsTestData` - Updated to use `NoteRepository` directly
 - ✅ `TestabilityRestController` - Updated to use `CircleRepository` and `NoteRepository` directly
+- ✅ `FailureReportControllerTest` - Updated to use `FailureReportRepository` directly
+- ✅ `ControllerSetupTest` - Updated to use `FailureReportRepository` directly
+
+✅ **Factories and Config Refactored:**
+- ✅ `FailureReportFactory` - Now accepts `FailureReportRepository` instead of `ModelFactoryService`
+- ✅ `ControllerSetup` - Now injects `FailureReportRepository` directly
 
 **Remaining Files Using ModelFactoryService:**
 - `FineTuningDataController` - Still uses `ModelFactoryService` (needs refactoring)
-- `FailureReportController` - Still uses `ModelFactoryService` (needs refactoring)
-- `FailureReportFactory` - Still uses `ModelFactoryService` (needs refactoring)
 - `ConversationService` - Still uses `ModelFactoryService` (needs refactoring)
-- `ControllerSetup` - Still uses `ModelFactoryService` (needs refactoring)
 - `NotebookIndexingService` - Still uses `ModelFactoryService` (needs refactoring)
 - `FineTuningService` - Still uses `ModelFactoryService` (needs refactoring)
 - `MakeMe` (test utility) - Still exposes `ModelFactoryService` for backward compatibility with tests

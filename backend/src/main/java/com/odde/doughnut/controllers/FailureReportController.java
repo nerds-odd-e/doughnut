@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GithubService;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/failure-reports")
 class FailureReportController {
-  private final ModelFactoryService modelFactoryService;
+  private final FailureReportRepository failureReportRepository;
   private final GithubService realGithubService;
   private final AuthorizationService authorizationService;
 
   public FailureReportController(
-      ModelFactoryService modelFactoryService,
+      FailureReportRepository failureReportRepository,
       GithubService realGithubService,
       AuthorizationService authorizationService) {
-    this.modelFactoryService = modelFactoryService;
+    this.failureReportRepository = failureReportRepository;
     this.realGithubService = realGithubService;
     this.authorizationService = authorizationService;
   }
@@ -34,7 +34,7 @@ class FailureReportController {
   public Iterable<FailureReport> failureReports() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertAdminAuthorization();
-    return modelFactoryService.failureReportRepository.findAll();
+    return failureReportRepository.findAll();
   }
 
   static class FailureReportForView {
@@ -62,12 +62,7 @@ class FailureReportController {
     authorizationService.assertAdminAuthorization();
     ids.forEach(
         id -> {
-          modelFactoryService
-              .failureReportRepository
-              .findById(id)
-              .ifPresent(
-                  failureReport ->
-                      modelFactoryService.failureReportRepository.delete(failureReport));
+          failureReportRepository.findById(id).ifPresent(failureReportRepository::delete);
         });
   }
 }

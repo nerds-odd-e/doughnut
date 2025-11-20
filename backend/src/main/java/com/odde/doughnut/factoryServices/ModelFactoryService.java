@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class ModelFactoryService {
   @Autowired public NoteRepository noteRepository;
-  @Autowired public FailureReportRepository failureReportRepository;
   @Autowired public AssessmentAttemptRepository assessmentAttemptRepository;
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public CertificateRepository certificateRepository;

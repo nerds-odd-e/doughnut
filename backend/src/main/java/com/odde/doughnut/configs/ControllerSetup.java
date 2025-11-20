@@ -2,10 +2,10 @@ package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.controllers.dto.ApiError;
+import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.factoryServices.FailureReportFactory;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.SneakyThrows;
@@ -18,15 +18,15 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class ControllerSetup {
-  @Autowired private final ModelFactoryService modelFactoryService;
+  @Autowired private final FailureReportRepository failureReportRepository;
   @Autowired private final CurrentUserFetcher currentUserFetcher;
   @Autowired private final TestabilitySettings testabilitySettings;
 
   public ControllerSetup(
-      ModelFactoryService modelFactoryService,
+      FailureReportRepository failureReportRepository,
       CurrentUserFetcher currentUserFetcher,
       TestabilitySettings testabilitySettings) {
-    this.modelFactoryService = modelFactoryService;
+    this.failureReportRepository = failureReportRepository;
     this.currentUserFetcher = currentUserFetcher;
     this.testabilitySettings = testabilitySettings;
   }
@@ -41,7 +41,7 @@ public class ControllerSetup {
             exception,
             currentUserFetcher,
             testabilitySettings.getGithubService(),
-            modelFactoryService);
+            failureReportRepository);
     failureReportFactory.createUnlessAllowed();
 
     throw exception;

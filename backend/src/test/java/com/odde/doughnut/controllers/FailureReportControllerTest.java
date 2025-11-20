@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.testability.NullGithubService;
@@ -18,13 +19,15 @@ import java.util.stream.StreamSupport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class FailureReportControllerTest extends ControllerTestBase {
+  @Autowired FailureReportRepository failureReportRepository;
   private GithubService githubService = new NullGithubService();
 
   FailureReportController controller() {
     return new FailureReportController(
-        makeMe.modelFactoryService, githubService, authorizationService);
+        failureReportRepository, githubService, authorizationService);
   }
 
   @Test
@@ -45,7 +48,7 @@ class FailureReportControllerTest extends ControllerTestBase {
       currentUser.setUser(makeMe.anAdmin().please());
 
       // Clear all existing failure reports first to ensure test independence
-      makeMe.modelFactoryService.failureReportRepository.deleteAll();
+      failureReportRepository.deleteAll();
 
       failureReports = new ArrayList<>();
       failureReports.add(makeMe.aFailureReport().please());
