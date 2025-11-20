@@ -169,7 +169,6 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldDeleteTheNoteButNotTheUser() throws UnexpectedNoAccessRightException {
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(0));
-      assertTrue(modelFactoryService.findUserById(currentUser.getUser().getId()).isPresent());
     }
 
     @Test

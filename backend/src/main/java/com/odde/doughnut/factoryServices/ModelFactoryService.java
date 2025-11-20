@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.services.AuthorizationService;
 import jakarta.persistence.EntityManager;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +33,6 @@ public class ModelFactoryService {
   @Autowired public NotebookAiAssistantRepository notebookAiAssistantRepository;
 
   @Autowired public AuthorizationService authorizationService;
-
-  public Optional<User> findUserById(Integer id) {
-    return userRepository.findById(id);
-  }
 
   public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
     return entityPersister.save(entity);
