@@ -1,7 +1,5 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.entities.EntityIdentifiedByIdOnly;
-
 public abstract class EntityBuilder<T> {
   protected final MakeMe makeMe;
   protected T entity;
@@ -22,11 +20,7 @@ public abstract class EntityBuilder<T> {
   public T please(boolean persistNeeded) {
     beforeCreate(persistNeeded);
     if (persistNeeded) {
-      if (entity instanceof EntityIdentifiedByIdOnly) {
-        makeMe.entityPersister.save((EntityIdentifiedByIdOnly) entity);
-      } else {
-        makeMe.modelFactoryService.entityManager.persist(entity);
-      }
+      makeMe.entityPersister.save(entity);
     }
     afterCreate(persistNeeded);
     return entity;

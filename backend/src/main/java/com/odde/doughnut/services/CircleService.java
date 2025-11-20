@@ -3,26 +3,22 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.CircleRepository;
-import jakarta.persistence.EntityManager;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CircleService {
   private final CircleRepository circleRepository;
-  private final EntityManager entityManager;
+  private final EntityPersister entityPersister;
 
-  public CircleService(CircleRepository circleRepository, EntityManager entityManager) {
+  public CircleService(CircleRepository circleRepository, EntityPersister entityPersister) {
     this.circleRepository = circleRepository;
-    this.entityManager = entityManager;
+    this.entityPersister = entityPersister;
   }
 
   public void joinAndSave(Circle circle, User user) {
     circle.getMembers().add(user);
-    if (circle.getId() == null) {
-      entityManager.persist(circle);
-    } else {
-      entityManager.merge(circle);
-    }
+    entityPersister.save(circle);
   }
 
   public Circle findCircleByInvitationCode(String invitationCode) {

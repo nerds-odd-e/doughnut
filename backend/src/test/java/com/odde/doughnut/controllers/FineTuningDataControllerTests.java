@@ -37,7 +37,7 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     controller =
         new FineTuningDataController(
             modelFactoryService,
-            new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
+            new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
             openAiApi,
             new OtherAiServices(openAiApi),
             authorizationService);
@@ -51,7 +51,7 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
       controller =
           new FineTuningDataController(
               modelFactoryService,
-              new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -106,7 +106,7 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
       controller =
           new FineTuningDataController(
               modelFactoryService,
-              new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -149,7 +149,7 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
       controller =
           new FineTuningDataController(
               modelFactoryService,
-              new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -190,7 +190,7 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
       controller =
           new FineTuningDataController(
               modelFactoryService,
-              new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);
@@ -220,7 +220,7 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
       controller =
           new FineTuningDataController(
               modelFactoryService,
-              new SuggestedQuestionForFineTuningService(modelFactoryService.entityManager),
+              new SuggestedQuestionForFineTuningService(makeMe.entityPersister),
               openAiApi,
               new OtherAiServices(openAiApi),
               authorizationService);

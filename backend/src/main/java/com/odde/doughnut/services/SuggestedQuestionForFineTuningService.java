@@ -5,16 +5,16 @@ import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.User;
-import jakarta.persistence.EntityManager;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SuggestedQuestionForFineTuningService {
-  private final EntityManager entityManager;
+  private final EntityPersister entityPersister;
 
-  public SuggestedQuestionForFineTuningService(EntityManager entityManager) {
-    this.entityManager = entityManager;
+  public SuggestedQuestionForFineTuningService(EntityPersister entityPersister) {
+    this.entityPersister = entityPersister;
   }
 
   public SuggestedQuestionForFineTuning update(
@@ -24,7 +24,7 @@ public class SuggestedQuestionForFineTuningService {
     entity.setComment(params.comment);
     entity.setPositiveFeedback(params.positiveFeedback);
     entity.setRealCorrectAnswers(params.realCorrectAnswers);
-    return entityManager.merge(entity);
+    return entityPersister.merge(entity);
   }
 
   public SuggestedQuestionForFineTuning suggestQuestionForFineTuning(
@@ -42,11 +42,7 @@ public class SuggestedQuestionForFineTuningService {
     if (suggestionCreationParams.isPositiveFeedback) {
       entity.setRealCorrectAnswers("%d".formatted(predefinedQuestion.getCorrectAnswerIndex()));
     }
-    if (entity.getId() == null) {
-      entityManager.persist(entity);
-      return entity;
-    }
-    return entityManager.merge(entity);
+    return entityPersister.save(entity);
   }
 
   public SuggestedQuestionForFineTuning duplicate(SuggestedQuestionForFineTuning entity) {
@@ -56,12 +52,12 @@ public class SuggestedQuestionForFineTuningService {
     newObject.setPreservedNoteContent(entity.getPreservedNoteContent());
     newObject.setComment(entity.getComment());
     newObject.setPositiveFeedback(entity.isPositiveFeedback());
-    entityManager.persist(newObject);
+    entityPersister.save(newObject);
     return newObject;
   }
 
   public SuggestedQuestionForFineTuning delete(SuggestedQuestionForFineTuning entity) {
-    entityManager.remove(entity);
+    entityPersister.remove(entity);
     return entity;
   }
 }
