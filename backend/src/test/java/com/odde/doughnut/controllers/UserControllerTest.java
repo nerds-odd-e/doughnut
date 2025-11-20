@@ -9,20 +9,18 @@ import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class UserControllerTest extends ControllerTestBase {
-  UserController controller;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired UserController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller = new UserController(makeMe.entityPersister, authorizationService, userService);
   }
 
   @Test
@@ -105,8 +103,6 @@ class UserControllerTest extends ControllerTestBase {
     UserToken userToken2 =
         makeMe.aUserToken().forUser(anotherUser).withLabel("OTHER_USER_TOKEN").please();
     makeMe.entityPersister.save(userToken2);
-
-    controller = new UserController(makeMe.entityPersister, authorizationService, userService);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
   }
