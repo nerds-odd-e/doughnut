@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -30,10 +29,6 @@ public class UserBuilder extends EntityBuilder<User> {
   public UserBuilder withSpaceIntervals(String spaceIntervals) {
     entity.setSpaceIntervals(spaceIntervals);
     return this;
-  }
-
-  public UserModel toModelPlease() {
-    return makeMe.modelFactoryService.toUserModel(please());
   }
 
   @Override

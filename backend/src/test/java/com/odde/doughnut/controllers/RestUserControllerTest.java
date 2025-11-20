@@ -68,11 +68,7 @@ class UserControllerTest extends ControllerTestBase {
   @Test
   void getTokensTest() {
     UserToken userToken =
-        makeMe
-            .aUserToken()
-            .forUser(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-            .withLabel("TEST_LABEL")
-            .please();
+        makeMe.aUserToken().forUser(currentUser.getUser()).withLabel("TEST_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -97,11 +93,7 @@ class UserControllerTest extends ControllerTestBase {
   @Test
   void deleteTokenTest() {
     UserToken userToken =
-        makeMe
-            .aUserToken()
-            .forUser(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-            .withLabel("DELETE_LABEL")
-            .please();
+        makeMe.aUserToken().forUser(currentUser.getUser()).withLabel("DELETE_LABEL").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken);
 
@@ -116,11 +108,7 @@ class UserControllerTest extends ControllerTestBase {
   void deleteTokenTestForAnotherUser() {
     User anotherUser = makeMe.aUser().please();
     UserToken userToken2 =
-        makeMe
-            .aUserToken()
-            .forUser(makeMe.modelFactoryService.toUserModel(anotherUser))
-            .withLabel("OTHER_USER_TOKEN")
-            .please();
+        makeMe.aUserToken().forUser(anotherUser).withLabel("OTHER_USER_TOKEN").please();
     ModelFactoryService modelFactoryService = makeMe.modelFactoryService;
     modelFactoryService.save(userToken2);
 

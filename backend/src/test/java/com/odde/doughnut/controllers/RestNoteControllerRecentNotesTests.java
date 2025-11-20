@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NoteMotionService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -23,6 +24,7 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
+  @Autowired UserService userService;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
@@ -37,7 +39,8 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
             testabilitySettings,
             noteMotionService,
             noteService,
-            authorizationService);
+            authorizationService,
+            userService);
   }
 
   @Test

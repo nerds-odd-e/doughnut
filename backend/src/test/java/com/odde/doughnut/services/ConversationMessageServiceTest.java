@@ -58,10 +58,7 @@ class ConversationMessageServiceTest {
     void setup() {
       testabilitySettings.setRandomization(new Randomization(Randomization.RandomStrategy.seed, 1));
       topNote =
-          makeMe
-              .aHeadNote("OnlineAssessment")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+          makeMe.aHeadNote("OnlineAssessment").creatorAndOwner(currentUser.getUser()).please();
       notebook = topNote.getNotebook();
       notebook.getNotebookSettings().setNumberOfQuestionsInAssessment(1);
     }
@@ -102,7 +99,7 @@ class ConversationMessageServiceTest {
       return makeMe
           .aConversation()
           .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-          .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+          .from(currentUser.getUser())
           .please();
     }
   }
@@ -114,11 +111,7 @@ class ConversationMessageServiceTest {
 
     @BeforeEach
     void setup() {
-      note =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
       recallPrompt = recallPromptBuilder.approvedQuestionOf(note).answerChoiceIndex(1).please();
     }

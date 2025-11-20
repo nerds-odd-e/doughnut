@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.SubscriptionService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 class AssimilationControllerTests extends ControllerTestBase {
   @Autowired private ModelFactoryService modelFactoryService;
   @Autowired private SubscriptionService subscriptionService;
+  @Autowired private UserService userService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   private AssimilationController controller;
@@ -29,7 +31,11 @@ class AssimilationControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssimilationController(
-            modelFactoryService, subscriptionService, testabilitySettings, authorizationService);
+            modelFactoryService,
+            subscriptionService,
+            testabilitySettings,
+            authorizationService,
+            userService);
   }
 
   @Nested

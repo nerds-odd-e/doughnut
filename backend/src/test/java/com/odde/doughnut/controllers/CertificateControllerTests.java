@@ -39,12 +39,7 @@ public class CertificateControllerTests extends ControllerTestBase {
               .please()
               .getNotebook();
       expectedCertificate =
-          makeMe
-              .aCertificate(
-                  notebook,
-                  makeMe.modelFactoryService.toUserModel(currentUser.getUser()),
-                  currentTime)
-              .please();
+          makeMe.aCertificate(notebook, currentUser.getUser(), currentTime).please();
     }
 
     @Test

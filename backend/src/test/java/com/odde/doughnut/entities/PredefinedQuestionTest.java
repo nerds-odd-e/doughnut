@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -27,12 +26,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
+  User user;
   AiQuestionGenerator aiQuestionGenerator = mock(AiQuestionGenerator.class);
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    user = makeMe.aUser().please();
   }
 
   @Nested

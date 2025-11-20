@@ -11,6 +11,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.NoteService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
@@ -42,6 +43,7 @@ class NoteController {
   private final NoteMotionService noteMotionService;
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
+  private final UserService userService;
 
   public NoteController(
       ModelFactoryService modelFactoryService,
@@ -49,12 +51,14 @@ class NoteController {
       TestabilitySettings testabilitySettings,
       NoteMotionService noteMotionService,
       NoteService noteService,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      UserService userService) {
     this.modelFactoryService = modelFactoryService;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
+    this.userService = userService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -118,9 +122,7 @@ class NoteController {
     authorizationService.assertReadAuthorization(note);
     NoteInfo noteInfo = new NoteInfo();
     noteInfo.setMemoryTrackers(
-        modelFactoryService
-            .toUserModel(authorizationService.getCurrentUser())
-            .getMemoryTrackersFor(note));
+        userService.getMemoryTrackersFor(authorizationService.getCurrentUser(), note));
     noteInfo.setNote(note.toNoteRealm(authorizationService.getCurrentUser()));
     noteInfo.setCreatedAt(note.getCreatedAt());
     noteInfo.setRecallSetting(note.getRecallSetting());

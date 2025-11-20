@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -36,6 +37,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Mock OpenAiApi openAiApi;
   @Autowired ModelFactoryService modelFactoryService;
   @Autowired MakeMe makeMe;
+  @Autowired UserService userService;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -61,7 +63,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
             makeMe.modelFactoryService,
             testabilitySettings,
             getTestObjectMapper(),
-            authorizationService);
+            authorizationService,
+            userService);
   }
 
   RecallPromptController nullUserController() {
@@ -71,7 +74,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
         modelFactoryService,
         testabilitySettings,
         getTestObjectMapper(),
-        authorizationService);
+        authorizationService,
+        userService);
   }
 
   @Nested
@@ -190,7 +194,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
                     makeMe.modelFactoryService,
                     testabilitySettings,
                     getTestObjectMapper(),
-                    authorizationService);
+                    authorizationService,
+                    userService);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
             restAiController.regenerate(recallPrompt, contestResult);
@@ -276,7 +281,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
                     makeMe.modelFactoryService,
                     testabilitySettings,
                     getTestObjectMapper(),
-                    authorizationService);
+                    authorizationService,
+                    userService);
             restAiController.contest(recallPrompt);
           });
     }

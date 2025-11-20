@@ -12,7 +12,6 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
@@ -88,7 +87,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     makeMe
         .aConversation()
         .forAnAssessmentQuestionInstance(assessmentQuestionInstance)
-        .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+        .from(currentUser.getUser())
         .please();
     makeMe.aConversation().forAnAssessmentQuestionInstance(assessmentQuestionInstance).please();
     List<Conversation> conversations = controller.getConversationsOfCurrentUser();
@@ -124,11 +123,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      conversation =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      conversation = makeMe.aConversation().from(currentUser.getUser()).please();
     }
 
     @Test
@@ -178,11 +173,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void getZeroUnreadConversationWhenSenderIsCurrentUser() {
-      Conversation conversation =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
       makeMe
           .aConversationMessage(conversation)
           .sender(currentUser.getUser())
@@ -200,11 +191,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      conversation =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      conversation = makeMe.aConversation().from(currentUser.getUser()).please();
     }
 
     @Test
@@ -273,11 +260,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     @Test
     void initiatorShouldBeAbleToReply() throws UnexpectedNoAccessRightException {
       String message = "This is a message";
-      Conversation conversation =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
       ConversationMessage conversationMessage =
           controller.replyToConversation(message, conversation);
       assertEquals(message, conversationMessage.getMessage());
@@ -297,11 +280,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void testGetMessageThreadsFromConversation() throws UnexpectedNoAccessRightException {
-      Conversation conversation =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
 
       makeMe.aConversationMessage(conversation).please();
       List<ConversationMessage> conversations = controller.getConversationMessages(conversation);
@@ -316,7 +295,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      User noteOwner = makeMe.aUser().please();
       note = makeMe.aNote().creatorAndOwner(noteOwner).please();
     }
 
@@ -352,21 +331,9 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void testConversationsOrderedByLastMessageTime() {
-      Conversation conv1 =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
-      Conversation conv2 =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
-      Conversation conv3 =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      Conversation conv1 = makeMe.aConversation().from(currentUser.getUser()).please();
+      Conversation conv2 = makeMe.aConversation().from(currentUser.getUser()).please();
+      Conversation conv3 = makeMe.aConversation().from(currentUser.getUser()).please();
 
       // Add messages with specific timestamps
       makeMe
@@ -395,19 +362,19 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       Conversation conv1 =
           makeMe
               .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .from(currentUser.getUser())
               .createdAt(makeMe.aTimestamp().of(1, 1).please())
               .please();
       Conversation conv2 =
           makeMe
               .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .from(currentUser.getUser())
               .createdAt(makeMe.aTimestamp().of(1, 2).please())
               .please();
       Conversation conv3 =
           makeMe
               .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
+              .from(currentUser.getUser())
               .createdAt(makeMe.aTimestamp().of(1, 3).please())
               .please();
 
@@ -424,7 +391,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      User noteOwner = makeMe.aUser().please();
       note = makeMe.aNote().creatorAndOwner(noteOwner).please();
       otherUser = makeMe.aUser().please();
     }
@@ -433,22 +400,11 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void shouldReturnConversationsAboutNote() {
       // Create conversations about the note
       Conversation conv1 =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .forANote(note)
-              .please();
+          makeMe.aConversation().from(currentUser.getUser()).forANote(note).please();
       Conversation conv2 =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .forANote(note)
-              .please();
+          makeMe.aConversation().from(currentUser.getUser()).forANote(note).please();
       // Create an unrelated conversation
-      makeMe
-          .aConversation()
-          .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-          .please();
+      makeMe.aConversation().from(currentUser.getUser()).please();
 
       List<Conversation> conversations = controller.getConversationsAboutNote(note);
       assertEquals(2, conversations.size());
@@ -460,11 +416,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
     void shouldOnlyReturnAccessibleConversations() {
       // Create a conversation the current user initiated
       Conversation conv1 =
-          makeMe
-              .aConversation()
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .forANote(note)
-              .please();
+          makeMe.aConversation().from(currentUser.getUser()).forANote(note).please();
       // Create a conversation between other users about the same note
       Conversation conv2 = makeMe.aConversation().from(otherUser).forANote(note).please();
 
@@ -530,19 +482,14 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      UserModel noteOwner = makeMe.aUser().toModelPlease();
+      User noteOwner = makeMe.aUser().please();
       note =
           makeMe
               .aNote()
               .creatorAndOwner(noteOwner)
               .titleConstructor("There are 42 prefectures in Japan")
               .please();
-      conversation =
-          makeMe
-              .aConversation()
-              .forANote(note)
-              .from(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
     }
 
     @Test

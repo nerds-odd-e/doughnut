@@ -26,11 +26,7 @@ class SubscriptionControllerTest extends ControllerTestBase {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    topNote =
-        makeMe
-            .aNote()
-            .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-            .please();
+    topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();
     controller = new SubscriptionController(makeMe.modelFactoryService, authorizationService);

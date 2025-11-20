@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.function.Consumer;
@@ -27,7 +26,7 @@ public class NotebookBuilder extends EntityBuilder<Notebook> {
     this.entity = note.getNotebook();
   }
 
-  public NotebookBuilder creatorAndOwner(UserModel user) {
+  public NotebookBuilder creatorAndOwner(com.odde.doughnut.entities.User user) {
     noteBuilder.creatorAndOwner(user);
     return this;
   }

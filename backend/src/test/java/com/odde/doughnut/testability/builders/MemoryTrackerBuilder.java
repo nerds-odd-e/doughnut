@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -11,10 +10,6 @@ public class MemoryTrackerBuilder extends EntityBuilder<MemoryTracker> {
   public MemoryTrackerBuilder(MemoryTracker memoryTracker, MakeMe makeMe) {
     super(makeMe, memoryTracker);
     assimilatedAt(makeMe.aTimestamp().of(0, 0).please());
-  }
-
-  public MemoryTrackerBuilder by(UserModel userModel) {
-    return by(userModel.getEntity());
   }
 
   public MemoryTrackerBuilder by(User user) {

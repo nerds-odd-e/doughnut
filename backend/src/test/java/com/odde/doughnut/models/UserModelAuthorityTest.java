@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.testability.MakeMe;
@@ -22,13 +23,13 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserModelAuthorityTest {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
-  UserModel userModel;
-  UserModel anotherUser;
+  User user;
+  User anotherUser;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-    anotherUser = makeMe.aUser().toModelPlease();
+    user = makeMe.aUser().please();
+    anotherUser = makeMe.aUser().please();
   }
 
   @Nested
@@ -46,13 +47,13 @@ public class UserModelAuthorityTest {
     void userCanNotAccessNotesBelongToCircle() {
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> authorizationService.assertAuthorization(userModel.getEntity(), note));
+          () -> authorizationService.assertAuthorization(user, note));
     }
 
     @Test
     void userCanAccessNotesBelongToCircleIfIsAMember() throws UnexpectedNoAccessRightException {
-      makeMe.theCircle(circle).hasMember(userModel).please();
-      authorizationService.assertAuthorization(userModel.getEntity(), note);
+      makeMe.theCircle(circle).hasMember(user).please();
+      authorizationService.assertAuthorization(user, note);
     }
   }
 
@@ -69,9 +70,7 @@ public class UserModelAuthorityTest {
     void userCanNotAccessNotesBelongToCircle() {
       assertThrows(
           ResponseStatusException.class,
-          () ->
-              authorizationService.assertReadAuthorization(
-                  makeMe.aNullUserModelPlease().getEntity(), note));
+          () -> authorizationService.assertReadAuthorization((User) null, note));
     }
   }
 }

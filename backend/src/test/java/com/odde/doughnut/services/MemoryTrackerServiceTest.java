@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,15 +23,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class MemoryTrackerServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired ModelFactoryService modelFactoryService;
-  UserModel userModel;
+  @Autowired UserService userService;
+  User user;
   Timestamp day1;
   MemoryTrackerService memoryTrackerService;
 
   @BeforeEach
   void setup() {
-    userModel = makeMe.aUser().toModelPlease();
+    user = makeMe.aUser().please();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    memoryTrackerService = new MemoryTrackerService(modelFactoryService);
+    memoryTrackerService = new MemoryTrackerService(modelFactoryService, userService);
   }
 
   @Nested
@@ -39,13 +40,12 @@ public class MemoryTrackerServiceTest {
 
     @Test
     void assimilatingShouldSetBothInitialAndLastReviewAt() {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
       InitialInfo initialInfo = new InitialInfo();
       initialInfo.noteId = note.getId();
       initialInfo.skipMemoryTracking = false;
 
-      var memoryTrackers =
-          memoryTrackerService.assimilate(initialInfo, userModel.getEntity(), day1);
+      var memoryTrackers = memoryTrackerService.assimilate(initialInfo, user, day1);
 
       assertThat(memoryTrackers.get(0).getAssimilatedAt(), equalTo(day1));
       assertThat(memoryTrackers.get(0).getLastRecalledAt(), equalTo(day1));

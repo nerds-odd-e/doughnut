@@ -64,11 +64,7 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      aNote =
-          makeMe
-              .aNote("sanskrit")
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      aNote = makeMe.aNote("sanskrit").creatorAndOwner(currentUser.getUser()).please();
     }
 
     @Test
@@ -139,11 +135,7 @@ class AiControllerTest extends ControllerTestBase {
 
     @BeforeEach
     void setup() {
-      testNote =
-          makeMe
-              .aNote()
-              .creatorAndOwner(makeMe.modelFactoryService.toUserModel(currentUser.getUser()))
-              .please();
+      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");

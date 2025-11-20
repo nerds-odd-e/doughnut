@@ -54,9 +54,10 @@ The codebase already has some services following Spring Boot conventions:
 - ✅ `AuthorizationService`: Already converted to `@Service` bean
 - ✅ `BazaarService`: Already converted to `@Service` bean (BazaarModel converted)
 - ✅ `SubscriptionService`: Already converted to `@Service` bean
-- `RecallService`: Stateless service but takes `UserModel` as parameter (needs refactoring)
-- `AssimilationService`: Takes `UserModel` as parameter (needs refactoring)
-- `MemoryTrackerService`: Creates `UserModel` internally (needs refactoring)
+- ✅ `UserService`: Created as stateless `@Service` bean (UserModel converted)
+- ✅ `RecallService`: Refactored to use `User` entity and `UserService` (COMPLETED)
+- ✅ `AssimilationService`: Refactored to use `User` entity and `UserService` (COMPLETED)
+- ✅ `MemoryTrackerService`: Refactored to use `UserService` (COMPLETED)
 - `NotebookService`: Wraps a `Notebook` entity but not a Spring bean (needs conversion to `@Service`)
 - `ConversationService`, `NoteEmbeddingService`, etc.: Proper `@Service` beans
 
@@ -387,24 +388,29 @@ This aligns tests with the stateless services architecture and makes them simple
 
 ### Models to Convert
 
-- `UserModel` → `UserService`
+- ✅ `UserModel` → `UserService` (COMPLETED)
 - ✅ `BazaarModel` → `BazaarService` (COMPLETED)
 
 ### Supporting Classes
 
 - ✅ `Authorization` record: Converted to `AuthorizationService` as a `@Service` bean (COMPLETED)
 - ✅ `ImageBuilder`: Moved from `models` package to `utils` package (COMPLETED)
-- `ModelFactoryService`: Remove entirely, move all operations to appropriate domain services
-- `CurrentUserFetcherFromRequest`: Update to provide `User` entity instead of `UserModel`
-- Controllers: Update to inject services and receive `User` entity instead of `UserModel`
+- ✅ `UserModel`: Removed - functionality moved to `UserService` (COMPLETED)
+- ✅ `ReviewScope`: Removed - functionality moved to `UserService` (COMPLETED)
+- ✅ `ModelFactoryService.toUserModel()`: Removed (COMPLETED)
+- ✅ `UserBuilder.toModelPlease()`: Removed (COMPLETED)
+- ✅ `MakeMe.aNullUserModelPlease()`: Removed (COMPLETED)
+- ✅ Controllers: Updated to inject `UserService` and receive `User` entity instead of `UserModel` (COMPLETED)
+- `ModelFactoryService`: Partially removed - `toUserModel()` removed, other operations still need migration
+- `CurrentUserFetcherFromRequest`: Still provides `UserModel` - needs update to provide `User` entity (if still used)
 
 ### Services That Need Refactoring
 
 These services currently use models and need to be updated:
 
-- `RecallService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead.
-- `AssimilationService`: Currently takes `UserModel` as constructor parameter. Should take `User` entity and `UserService` instead. (✅ Already uses `SubscriptionService` instead of `SubscriptionModel`)
-- `MemoryTrackerService`: Currently creates `UserModel` internally. Should use `UserService` instead.
+- ✅ `RecallService`: Refactored to take `User` entity and `UserService` instead of `UserModel` (COMPLETED)
+- ✅ `AssimilationService`: Refactored to take `User` entity and `UserService` instead of `UserModel`. `ReviewScope` interface removed. (COMPLETED)
+- ✅ `MemoryTrackerService`: Refactored to use `UserService` instead of creating `UserModel` internally (COMPLETED)
 - `NotebookService`: Currently not a Spring bean, should be converted to `@Service` bean and take `Notebook` entity as parameter.
 
 ### Controllers to Update
