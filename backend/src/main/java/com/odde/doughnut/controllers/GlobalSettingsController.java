@@ -1,13 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.SessionScope;
@@ -24,13 +23,12 @@ public class GlobalSettingsController {
 
   private final AuthorizationService authorizationService;
 
+  @Autowired
   public GlobalSettingsController(
-      GlobalSettingRepository globalSettingRepository,
-      EntityPersister entityPersister,
+      GlobalSettingsService globalSettingsService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {
-    this.globalSettingsService =
-        new GlobalSettingsService(globalSettingRepository, entityPersister);
+    this.globalSettingsService = globalSettingsService;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
   }

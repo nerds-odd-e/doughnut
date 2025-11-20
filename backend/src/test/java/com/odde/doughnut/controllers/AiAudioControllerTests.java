@@ -8,7 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiAudioControllerTests {
   @Autowired MakeMe makeMe;
-  @Autowired GlobalSettingRepository globalSettingRepository;
+  @Autowired GlobalSettingsService globalSettingsService;
   AiAudioController controller;
   @Mock OpenAiApiExtended openAiApi;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -49,9 +49,7 @@ class AiAudioControllerTests {
   }
 
   private void initializeController() {
-    controller =
-        new AiAudioController(
-            new OtherAiServices(openAiApi), globalSettingRepository, makeMe.entityPersister);
+    controller = new AiAudioController(new OtherAiServices(openAiApi), globalSettingsService);
   }
 
   private void setupMocks() {

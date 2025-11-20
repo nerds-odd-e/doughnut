@@ -34,16 +34,16 @@ public class RecallQuestionService {
       ObjectMapper objectMapper,
       AnswerService answerService,
       GlobalSettingsService globalSettingsService,
-      MemoryTrackerService memoryTrackerService) {
+      MemoryTrackerService memoryTrackerService,
+      PredefinedQuestionService predefinedQuestionService) {
     this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
     this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
+    this.predefinedQuestionService = predefinedQuestionService;
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
-    this.predefinedQuestionService =
-        new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {

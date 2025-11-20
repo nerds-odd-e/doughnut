@@ -6,16 +6,20 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
+import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,12 +31,16 @@ import org.springframework.transaction.annotation.Transactional;
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
   @Autowired EntityPersister entityPersister;
+  @Autowired GlobalSettingsService globalSettingsService;
+  @Mock OpenAiApi openAiApi;
   User user;
-  AiQuestionGenerator aiQuestionGenerator = mock(AiQuestionGenerator.class);
+  AiQuestionGenerator aiQuestionGenerator;
 
   @BeforeEach
   void setup() {
+    MockitoAnnotations.openMocks(this);
     user = makeMe.aUser().please();
+    aiQuestionGenerator = mock(AiQuestionGenerator.class);
   }
 
   @Nested
@@ -78,8 +86,7 @@ class PredefinedQuestionTest {
       contestResult.feasibleQuestion = false;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
 
-      PredefinedQuestionService service =
-          new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
+      PredefinedQuestionService service = createPredefinedQuestionService(entityPersister);
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
@@ -94,8 +101,7 @@ class PredefinedQuestionTest {
       when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
           .thenReturn(regeneratedQuestion);
 
-      PredefinedQuestionService service =
-          new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
+      PredefinedQuestionService service = createPredefinedQuestionService(entityPersister);
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
@@ -118,8 +124,7 @@ class PredefinedQuestionTest {
       when(mockEntityPersister.save(questionCaptor.capture())).thenAnswer(i -> i.getArgument(0));
 
       // Execute
-      PredefinedQuestionService service =
-          new PredefinedQuestionService(mockEntityPersister, aiQuestionGenerator);
+      PredefinedQuestionService service = createPredefinedQuestionService(mockEntityPersister);
       PredefinedQuestion result = service.generateAFeasibleQuestion(note);
 
       // Verify
@@ -152,7 +157,11 @@ class PredefinedQuestionTest {
 
   private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
     PredefinedQuestionService predefinedQuestionService =
-        new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
+        createPredefinedQuestionService(entityPersister);
     return predefinedQuestionService.generateAFeasibleQuestion(note);
+  }
+
+  private PredefinedQuestionService createPredefinedQuestionService(EntityPersister persister) {
+    return new PredefinedQuestionService(persister, aiQuestionGenerator);
   }
 }

@@ -3,9 +3,7 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
@@ -20,6 +18,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/predefined-questions")
 class PredefinedQuestionController {
-  private final EntityPersister entityPersister;
   private final PredefinedQuestionService predefinedQuestionService;
   private final SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
 
@@ -39,26 +37,24 @@ class PredefinedQuestionController {
   private final AuthorizationService authorizationService;
   private final GlobalSettingsService globalSettingsService;
 
+  @Autowired
   public PredefinedQuestionController(
       @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      GlobalSettingRepository globalSettingRepository,
-      EntityPersister entityPersister,
+      PredefinedQuestionService predefinedQuestionService,
       SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
-      AuthorizationService authorizationService) {
-    this.entityPersister = entityPersister;
+      AuthorizationService authorizationService,
+      GlobalSettingsService globalSettingsService) {
+    this.predefinedQuestionService = predefinedQuestionService;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.testabilitySettings = testabilitySettings;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
-    this.globalSettingsService =
-        new GlobalSettingsService(globalSettingRepository, entityPersister);
+    this.globalSettingsService = globalSettingsService;
     aiQuestionGenerator =
         new AiQuestionGenerator(
             openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
-    this.predefinedQuestionService =
-        new PredefinedQuestionService(entityPersister, aiQuestionGenerator);
   }
 
   @PostMapping("/generate-question-without-save")

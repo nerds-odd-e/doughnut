@@ -1,8 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.SRTProcessor;
 import com.odde.doughnut.services.ai.OtherAiServices;
@@ -10,6 +8,7 @@ import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -21,16 +20,13 @@ import org.springframework.web.context.annotation.SessionScope;
 class AiAudioController {
 
   OtherAiServices otherAiServices;
-  private final GlobalSettingRepository globalSettingRepository;
-  private final EntityPersister entityPersister;
+  private final GlobalSettingsService globalSettingsService;
 
+  @Autowired
   public AiAudioController(
-      OtherAiServices otherAiServices,
-      GlobalSettingRepository globalSettingRepository,
-      EntityPersister entityPersister) {
+      OtherAiServices otherAiServices, GlobalSettingsService globalSettingsService) {
     this.otherAiServices = otherAiServices;
-    this.globalSettingRepository = globalSettingRepository;
-    this.entityPersister = entityPersister;
+    this.globalSettingsService = globalSettingsService;
   }
 
   @PostMapping(
@@ -49,7 +45,7 @@ class AiAudioController {
 
     return otherAiServices
         .getTextFromAudio(
-            getGlobalSettingsService().globalSettingOthers().getValue(),
+            globalSettingsService.globalSettingOthers().getValue(),
             processedResult.getProcessedSRT(),
             audioFile.getAdditionalProcessingInstructions(),
             audioFile.getPreviousNoteDetailsToAppendTo())
@@ -61,9 +57,5 @@ class AiAudioController {
               textFromAudioWithCallInfo.setRawSRT(processedResult.getProcessedSRT());
               return textFromAudioWithCallInfo;
             });
-  }
-
-  private GlobalSettingsService getGlobalSettingsService() {
-    return new GlobalSettingsService(globalSettingRepository, entityPersister);
   }
 }
