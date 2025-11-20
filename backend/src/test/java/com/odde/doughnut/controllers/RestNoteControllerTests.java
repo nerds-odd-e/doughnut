@@ -5,18 +5,14 @@ import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteMotionService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
-import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.validation.Valid;
@@ -27,32 +23,22 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Transactional
-class NoteControllerTests {
+class NoteControllerTests extends ControllerTestBase {
   @Autowired ModelFactoryService modelFactoryService;
-  @Autowired AuthorizationService authorizationService;
 
-  @Autowired MakeMe makeMe;
   @Mock HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
   @Autowired NoteMotionService noteMotionService;
   @Autowired com.odde.doughnut.services.NoteService noteService;
-  private CurrentUser currentUser;
   NoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
 
     controller =
         new NoteController(
@@ -292,12 +278,11 @@ class NoteControllerTests {
   class SearchTests {
     @BeforeEach
     void setup() {
-      currentUser = new CurrentUser(null);
+      currentUser.setUser(null);
     }
 
     @Test
     void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       SearchTerm searchTerm = new SearchTerm();
       SearchController searchController =
           new SearchController(noteSearchService, authorizationService);
@@ -307,7 +292,6 @@ class NoteControllerTests {
 
     @Test
     void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
       SearchController searchController =
