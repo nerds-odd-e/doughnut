@@ -19,7 +19,6 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -38,6 +37,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -52,7 +52,7 @@ public class ConversationMessageControllerAiReplyTests {
   @Autowired MakeMe makeMe;
   @Autowired AuthorizationService authorizationService;
   ConversationMessageController controller;
-  CurrentUser currentUser;
+  @TestBean CurrentUser currentUser = new CurrentUser(null);
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
   private ConversationService conversationService;
@@ -60,7 +60,7 @@ public class ConversationMessageControllerAiReplyTests {
 
   @BeforeEach
   void setUp() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
+    currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
 
     setupServices();
@@ -76,7 +76,6 @@ public class ConversationMessageControllerAiReplyTests {
         new ChatCompletionConversationService(
             openAiApiHandler, globalSettingsService, objectMapper);
     conversationService = new ConversationService(testabilitySettings, makeMe.modelFactoryService);
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
     controller =
         new ConversationMessageController(
             conversationService, chatCompletionConversationService, authorizationService);

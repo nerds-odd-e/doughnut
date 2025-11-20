@@ -9,10 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.NullGithubService;
 import java.util.ArrayList;
@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,15 +36,17 @@ class FailureReportControllerTest {
   @Autowired AuthorizationService authorizationService;
   private GithubService githubService = new NullGithubService();
 
-  FailureReportController controller(CurrentUser currentUser) {
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+
+  FailureReportController controller(User user) {
+    currentUser.setUser(user);
     return new FailureReportController(
         makeMe.modelFactoryService, githubService, authorizationService);
   }
 
   @Test
   void whenNonAdminAccessTheFailureReport() {
-    CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().please());
+    User nonAdmin = makeMe.aUser().please();
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
         UnexpectedNoAccessRightException.class,
@@ -52,12 +55,13 @@ class FailureReportControllerTest {
 
   @Nested
   class DeleteFailureReportsTest {
-    CurrentUser admin;
+    User admin;
     List<FailureReport> failureReports;
 
     @BeforeEach
     void setup() {
-      admin = new CurrentUser(makeMe.anAdmin().please());
+      admin = makeMe.anAdmin().please();
+      currentUser.setUser(admin);
 
       // Clear all existing failure reports first to ensure test independence
       makeMe.modelFactoryService.failureReportRepository.deleteAll();
@@ -72,8 +76,10 @@ class FailureReportControllerTest {
       List<Integer> idsToDelete =
           failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
 
+      currentUser.setUser(admin);
       controller(admin).deleteFailureReports(idsToDelete);
 
+      currentUser.setUser(admin);
       Iterable<FailureReport> remainingReports = controller(admin).failureReports();
       List<FailureReport> reportList =
           StreamSupport.stream(remainingReports.spliterator(), false).collect(Collectors.toList());
@@ -84,8 +90,10 @@ class FailureReportControllerTest {
     void adminCanDeleteOneFailureReport() throws UnexpectedNoAccessRightException {
       List<Integer> idsToDelete = List.of(failureReports.get(0).getId());
 
+      currentUser.setUser(admin);
       controller(admin).deleteFailureReports(idsToDelete);
 
+      currentUser.setUser(admin);
       Iterable<FailureReport> remainingReports = controller(admin).failureReports();
       List<FailureReport> reportList =
           StreamSupport.stream(remainingReports.spliterator(), false).collect(Collectors.toList());
@@ -95,13 +103,16 @@ class FailureReportControllerTest {
 
     @Test
     void nonAdminCannotDeleteFailureReports() {
-      CurrentUser nonAdmin = new CurrentUser(makeMe.aUser().please());
+      User nonAdmin = makeMe.aUser().please();
       List<Integer> idsToDelete =
           failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller(nonAdmin).deleteFailureReports(idsToDelete));
+          () -> {
+            currentUser.setUser(nonAdmin);
+            controller(nonAdmin).deleteFailureReports(idsToDelete);
+          });
     }
   }
 }

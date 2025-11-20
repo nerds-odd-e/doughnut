@@ -8,10 +8,10 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.BazaarNotebook;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.BazaarService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,8 +34,9 @@ class BazaarControllerTest {
   private com.odde.doughnut.entities.repositories.BazaarNotebookRepository bazaarNotebookRepository;
 
   @Autowired private AuthorizationService authorizationService;
-  private CurrentUser adminUser;
-  private CurrentUser notebookOwner;
+  @TestBean private CurrentUser currentUser = new CurrentUser(null);
+  private User adminUser;
+  private User notebookOwner;
   private BazaarController controller;
   private Note topNote;
   private Notebook notebook;
@@ -42,10 +44,10 @@ class BazaarControllerTest {
 
   @BeforeEach
   void setup() {
-    adminUser = new CurrentUser(makeMe.anAdmin().please());
-    notebookOwner = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, adminUser);
-    topNote = makeMe.aNote().creatorAndOwner(notebookOwner.getUser()).please();
+    adminUser = makeMe.anAdmin().please();
+    notebookOwner = makeMe.aUser().please();
+    currentUser.setUser(adminUser);
+    topNote = makeMe.aNote().creatorAndOwner(notebookOwner).please();
     notebook = topNote.getNotebook();
     bazaarNotebook = makeMe.aBazaarNotebook(notebook).please();
     controller = new BazaarController(bazaarService, authorizationService);
@@ -55,8 +57,7 @@ class BazaarControllerTest {
   class RemoveFromBazaar {
     @Test
     void otherPeopleCannot() {
-      CurrentUser otherUser = new CurrentUser(makeMe.aUser().please());
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, otherUser);
+      currentUser.setUser(makeMe.aUser().please());
       controller = new BazaarController(bazaarService, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
@@ -66,7 +67,7 @@ class BazaarControllerTest {
 
     @Test
     void notebookOwnerCan() throws UnexpectedNoAccessRightException {
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, notebookOwner);
+      currentUser.setUser(notebookOwner);
       controller = new BazaarController(bazaarService, authorizationService);
       controller.removeFromBazaar(bazaarNotebook);
     }

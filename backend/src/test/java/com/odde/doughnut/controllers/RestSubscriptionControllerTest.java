@@ -14,13 +14,13 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,15 +31,14 @@ class SubscriptionControllerTest {
   @Autowired private MakeMe makeMe;
   @Autowired private SubscriptionRepository subscriptionRepository;
   @Autowired private AuthorizationService authorizationService;
-  private CurrentUser currentUser;
+  @TestBean private CurrentUser currentUser = new CurrentUser(null);
   private Note topNote;
   private Notebook notebook;
   private SubscriptionController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     topNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNotebook(topNote.getNotebook()).please();

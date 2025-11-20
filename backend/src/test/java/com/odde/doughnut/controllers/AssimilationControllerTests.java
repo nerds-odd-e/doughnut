@@ -12,7 +12,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
@@ -21,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -34,7 +34,7 @@ class AssimilationControllerTests {
   @Autowired private SubscriptionService subscriptionService;
   @Autowired private AuthorizationService authorizationService;
   @Autowired private UserService userService;
-  private CurrentUser currentUser;
+  @TestBean private CurrentUser currentUser = new CurrentUser(null);
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   private AssimilationController controller;
@@ -42,8 +42,7 @@ class AssimilationControllerTests {
   @BeforeEach
   void setup() {
 
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new AssimilationController(
             modelFactoryService,
@@ -65,7 +64,7 @@ class AssimilationControllerTests {
 
     @Test
     void notLoggedIn() {
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
+      currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.assimilating("Asia/Shanghai"));
     }
   }
@@ -74,7 +73,7 @@ class AssimilationControllerTests {
   class CreateInitialReviewPoint {
     @Test
     void create() {
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
+      currentUser.setUser(null);
       InitialInfo info = new InitialInfo();
       assertThrows(ResponseStatusException.class, () -> controller.assimilate(info));
     }
@@ -116,7 +115,7 @@ class AssimilationControllerTests {
 
     @Test
     void shouldThrowExceptionWhenUserNotLoggedIn() {
-      AuthorizationServiceTestHelper.setCurrentUser(authorizationService, new CurrentUser(null));
+      currentUser.setUser(null);
       assertThrows(
           ResponseStatusException.class, () -> controller.getAssimilationCount("Asia/Shanghai"));
     }

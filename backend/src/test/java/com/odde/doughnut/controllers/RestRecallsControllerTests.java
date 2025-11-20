@@ -11,7 +11,6 @@ import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -23,6 +22,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,23 +36,21 @@ class RecallsControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired UserService userService;
   @Autowired MemoryTrackerRepository memoryTrackerRepository;
-  private CurrentUser currentUser;
+  @TestBean private CurrentUser currentUser = new CurrentUser(null);
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   RecallsController controller;
 
   @BeforeEach
   void setup() {
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new RecallsController(
             testabilitySettings, authorizationService, userService, memoryTrackerRepository);
   }
 
   RecallsController nullUserController() {
-    CurrentUser nullUser = new CurrentUser(null);
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+    currentUser.setUser(null);
     return new RecallsController(
         testabilitySettings, authorizationService, userService, memoryTrackerRepository);
   }

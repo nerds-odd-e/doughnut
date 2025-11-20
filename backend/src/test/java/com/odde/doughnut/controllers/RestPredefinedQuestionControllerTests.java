@@ -17,7 +17,6 @@ import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPoss
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.testability.AuthorizationServiceTestHelper;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -30,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.TestBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +42,7 @@ class PredefinedQuestionControllerTests {
   @Autowired AuthorizationService authorizationService;
   @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
   @Autowired MakeMe makeMe;
-  private CurrentUser currentUser;
+  @TestBean private CurrentUser currentUser = new CurrentUser(null);
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -51,8 +51,7 @@ class PredefinedQuestionControllerTests {
   @BeforeEach
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-    currentUser = new CurrentUser(makeMe.aUser().please());
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, currentUser);
+    currentUser.setUser(makeMe.aUser().please());
     controller =
         new PredefinedQuestionController(
             openAiApi,
@@ -64,8 +63,7 @@ class PredefinedQuestionControllerTests {
   }
 
   PredefinedQuestionController nullUserController() {
-    CurrentUser nullUser = new CurrentUser(null);
-    AuthorizationServiceTestHelper.setCurrentUser(authorizationService, nullUser);
+    currentUser.setUser(null);
     return new PredefinedQuestionController(
         openAiApi,
         modelFactoryService,
