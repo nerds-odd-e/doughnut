@@ -2,9 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.*;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.*;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -12,6 +10,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -25,23 +24,16 @@ class NoteCreationController {
   private final NoteConstructionService noteConstructionService;
   private final AuthorizationService authorizationService;
 
+  @Autowired
   public NoteCreationController(
-      NoteRepository noteRepository,
-      EntityPersister entityPersister,
       HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings,
-      NoteService noteService,
+      NoteConstructionService noteConstructionService,
       AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
-    this.noteConstructionService =
-        new NoteConstructionService(
-            authorizationService.getCurrentUser(),
-            testabilitySettings.getCurrentUTCTimestamp(),
-            noteRepository,
-            entityPersister,
-            noteService);
+    this.noteConstructionService = noteConstructionService;
   }
 
   @PostMapping(value = "/{parentNote}/create")

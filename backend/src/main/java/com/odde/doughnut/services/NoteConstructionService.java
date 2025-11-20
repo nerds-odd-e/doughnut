@@ -9,23 +9,43 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Optional;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 
-public record NoteConstructionService(
-    User user,
-    Timestamp currentUTCTimestamp,
-    NoteRepository noteRepository,
-    EntityPersister entityPersister,
-    NoteService noteService) {
+@Service
+public class NoteConstructionService {
+  private final AuthorizationService authorizationService;
+  private final TestabilitySettings testabilitySettings;
+  private final NoteRepository noteRepository;
+  private final EntityPersister entityPersister;
+  private final NoteService noteService;
+
+  @Autowired
+  public NoteConstructionService(
+      AuthorizationService authorizationService,
+      TestabilitySettings testabilitySettings,
+      NoteRepository noteRepository,
+      EntityPersister entityPersister,
+      NoteService noteService) {
+    this.authorizationService = authorizationService;
+    this.testabilitySettings = testabilitySettings;
+    this.noteRepository = noteRepository;
+    this.entityPersister = entityPersister;
+    this.noteService = noteService;
+  }
 
   public Note createNote(Note parentNote, String topicConstructor) {
     final Note note = new Note();
+    User user = authorizationService.getCurrentUser();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     note.initialize(user, parentNote, currentUTCTimestamp, topicConstructor);
     if (entityPersister != null) {
       entityPersister.save(note);
@@ -50,6 +70,8 @@ public record NoteConstructionService(
   @SneakyThrows
   private void createSubNote(Note parentNote, WikidataIdWithApi subWikidataIdWithApi) {
     Optional<String> optionalTitle = subWikidataIdWithApi.fetchEnglishTitleFromApi();
+    User user = authorizationService.getCurrentUser();
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     optionalTitle.ifPresent(
         subNoteTitle ->
             noteRepository

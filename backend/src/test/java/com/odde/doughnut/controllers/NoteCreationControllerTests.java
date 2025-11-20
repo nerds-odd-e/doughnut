@@ -9,6 +9,7 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
@@ -32,6 +33,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
   @Autowired NoteService noteService;
+  @Autowired NoteConstructionService noteConstructionService;
   @Mock HttpClientAdapter httpClientAdapter;
   NoteCreationController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -41,12 +43,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new NoteCreationController(
-            noteRepository,
-            makeMe.entityPersister,
-            httpClientAdapter,
-            testabilitySettings,
-            noteService,
-            authorizationService);
+            httpClientAdapter, testabilitySettings, noteConstructionService, authorizationService);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)

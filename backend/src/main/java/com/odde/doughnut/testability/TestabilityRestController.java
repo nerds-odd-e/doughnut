@@ -12,7 +12,6 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.CircleService;
 import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
@@ -116,9 +115,8 @@ class TestabilityRestController {
     private String wikidataId;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
-      Note note =
-          new NoteConstructionService(user, currentUTCTimestamp, null, null, null)
-              .createNote(null, title);
+      Note note = new Note();
+      note.initialize(user, null, currentUTCTimestamp, title);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
       note.setTopicConstructor(title);

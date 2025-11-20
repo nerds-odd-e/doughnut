@@ -11,6 +11,7 @@ import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -41,6 +42,7 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
   @MockitoBean NoteSearchService noteSearchService;
   @Autowired WebApplicationContext webApplicationContext;
   @Autowired NoteService noteService;
+  @Autowired NoteConstructionService noteConstructionService;
 
   @BeforeEach
   void setup() {
@@ -50,10 +52,9 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
     noteCreation.setNewTitle("new note");
     controller =
         new McpNoteCreationController(
-            noteRepository,
-            makeMe.entityPersister,
             httpClientAdapter,
             testabilitySettings,
+            noteConstructionService,
             noteSearchService,
             noteService,
             authorizationService);

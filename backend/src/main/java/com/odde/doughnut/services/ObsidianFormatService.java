@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,31 +21,16 @@ public class ObsidianFormatService {
 
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
-  private final AuthorizationService authorizationService;
-  private final TestabilitySettings testabilitySettings;
-  private final NoteService noteService;
+  private final NoteConstructionService noteConstructionService;
   private final Set<String> usedPaths = new HashSet<>();
 
   public ObsidianFormatService(
       NoteRepository noteRepository,
       EntityPersister entityPersister,
-      AuthorizationService authorizationService,
-      TestabilitySettings testabilitySettings,
-      NoteService noteService) {
+      NoteConstructionService noteConstructionService) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
-    this.authorizationService = authorizationService;
-    this.testabilitySettings = testabilitySettings;
-    this.noteService = noteService;
-  }
-
-  private NoteConstructionService getNoteConstructionService() {
-    return new NoteConstructionService(
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp(),
-        noteRepository,
-        entityPersister,
-        noteService);
+    this.noteConstructionService = noteConstructionService;
   }
 
   public byte[] exportToObsidian(Note headNote) throws IOException {
@@ -183,7 +167,7 @@ public class ObsidianFormatService {
       return existingNote;
     }
 
-    Note newNote = getNoteConstructionService().createNote(currentParent, noteName);
+    Note newNote = noteConstructionService.createNote(currentParent, noteName);
     newNote = entityPersister.save(newNote);
 
     // Force a flush to ensure the relationship is persisted

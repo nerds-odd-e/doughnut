@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -22,11 +21,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder(MakeMe makeMe) {
-    super(
-        makeMe,
-        new NoteConstructionService(
-                null, new Timestamp(System.currentTimeMillis()), null, null, null)
-            .createNote(null, ""));
+    super(makeMe, new Note());
+    entity.initialize(null, null, new Timestamp(System.currentTimeMillis()), "");
     if (Strings.isEmpty(entity.getTopicConstructor())) titleConstructor(titleCounter.generate());
     details("descrption");
     updatedAt(entity.getCreatedAt());
