@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 public class EntityPersister {
   @Autowired private EntityManager entityManager;
 
-  public <T extends EntityIdentifiedByIdOnly> T save(T entity) {
-    if (entity.getId() == null) {
-      entityManager.persist(entity);
-      return entity;
+  public <T> T save(T entity) {
+    if (entity instanceof EntityIdentifiedByIdOnly instance) {
+      if (instance.getId() != null) {
+        return entityManager.merge(entity);
+      }
     }
-    return entityManager.merge(entity);
+    entityManager.persist(entity);
+    return entity;
   }
 
   public <T extends EntityIdentifiedByIdOnly> T merge(T entity) {
@@ -38,9 +40,5 @@ public class EntityPersister {
 
   public void refresh(Object entity) {
     entityManager.refresh(entity);
-  }
-
-  public void persist(Object entity) {
-    entityManager.persist(entity);
   }
 }
