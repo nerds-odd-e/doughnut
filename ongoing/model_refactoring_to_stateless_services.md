@@ -10,6 +10,8 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - `UserModel` → `UserService` (stateless `@Service` bean)
 - `BazaarModel` → `BazaarService` (stateless `@Service` bean)
 - `Authorization` record → `AuthorizationService` (stateless `@Service` bean)
+- `NotebookService` → stateless `@Service` bean (takes `Notebook` entity as method parameter)
+- `NotebookCertificateApprovalService` → stateless `@Service` bean (takes `NotebookCertificateApproval` entity as method parameter)
 
 ✅ **Supporting Refactoring:**
 - `ImageBuilder`: Moved from `models` package to `utils` package
@@ -17,7 +19,9 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 - `ModelFactoryService.toUserModel()`: Removed
 - `UserBuilder.toModelPlease()`: Removed
 - `MakeMe.aNullUserModelPlease()`: Removed
+- `ModelFactoryService.notebookService()`: Removed
 - Controllers: Updated to inject `UserService` and receive `User` entity instead of `UserModel`
+- Controllers: Updated to inject `NotebookService` and `NotebookCertificateApprovalService` as stateless beans
 - `CurrentUserFetcherFromRequest`: Now provides `User` entity via `getUser()` method and `CurrentUser` bean
 
 ✅ **Services Refactored:**
@@ -32,43 +36,7 @@ Refactor remaining Rails-inspired model patterns to follow Spring Boot conventio
 
 ## Remaining Work
 
-### 1. NotebookService Conversion
-
-**Current State:**
-- `NotebookService` is not a Spring bean
-- It wraps a `Notebook` entity and takes `ModelFactoryService` as a dependency
-- Created via factory method: `modelFactoryService.notebookService(notebook)`
-
-**Target:**
-- Convert to stateless `@Service` bean
-- Take `Notebook` entity as method parameter instead of wrapping it
-- Inject repositories and `EntityPersister` directly via constructor
-- Remove factory method `ModelFactoryService.notebookService()`
-
-**Example Target Pattern:**
-```java
-@Service
-public class NotebookService {
-    private final NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
-    private final EntityPersister entityPersister;
-    
-    public NotebookService(
-        NotebookCertificateApprovalRepository notebookCertificateApprovalRepository,
-        EntityPersister entityPersister) {
-        this.notebookCertificateApprovalRepository = notebookCertificateApprovalRepository;
-        this.entityPersister = entityPersister;
-    }
-    
-    public NotebookCertificateApprovalService requestNotebookApproval(Notebook notebook) {
-        NotebookCertificateApproval certificateApproval = new NotebookCertificateApproval();
-        certificateApproval.setNotebook(notebook);
-        entityPersister.save(certificateApproval);
-        return new NotebookCertificateApprovalService(certificateApproval, ...);
-    }
-}
-```
-
-### 2. ModelFactoryService Migration
+### ModelFactoryService Migration
 
 `ModelFactoryService` still contains operations that should be moved to appropriate domain services:
 
@@ -103,10 +71,11 @@ public class NotebookService {
 
 ## Success Criteria
 
-- `NotebookService` converted to stateless `@Service` bean
-- All `ModelFactoryService` operations migrated to appropriate domain services
-- Services use `EntityPersister` for persistence operations (instead of `EntityManager` or `ModelFactoryService`)
-- All services use constructor injection instead of field injection
-- `ModelFactoryService` removed entirely
-- All tests updated and passing
-- Code follows Spring Boot conventions consistently
+- ✅ `NotebookService` converted to stateless `@Service` bean
+- ✅ `NotebookCertificateApprovalService` converted to stateless `@Service` bean
+- ✅ Services use `EntityPersister` for persistence operations (instead of `EntityManager` or `ModelFactoryService`)
+- ✅ All services use constructor injection instead of field injection
+- ✅ All tests updated and passing
+- ✅ Code follows Spring Boot conventions consistently
+- ⏳ All `ModelFactoryService` operations migrated to appropriate domain services
+- ⏳ `ModelFactoryService` removed entirely

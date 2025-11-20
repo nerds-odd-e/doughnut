@@ -1,27 +1,22 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.NotebookCertificateApproval;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
+import org.springframework.stereotype.Service;
 
+@Service
 public class NotebookCertificateApprovalService {
-  private final NotebookCertificateApproval certificateApproval;
-  private final ModelFactoryService modelFactoryService;
+  private final EntityPersister entityPersister;
 
-  public NotebookCertificateApprovalService(
-      NotebookCertificateApproval certificateApproval, ModelFactoryService modelFactoryService) {
-
-    this.certificateApproval = certificateApproval;
-    this.modelFactoryService = modelFactoryService;
+  public NotebookCertificateApprovalService(EntityPersister entityPersister) {
+    this.entityPersister = entityPersister;
   }
 
-  public NotebookCertificateApproval approve(Timestamp currentUTCTimestamp) {
+  public NotebookCertificateApproval approve(
+      NotebookCertificateApproval certificateApproval, Timestamp currentUTCTimestamp) {
     certificateApproval.setLastApprovalTime(currentUTCTimestamp);
-    modelFactoryService.save(certificateApproval);
-    return certificateApproval;
-  }
-
-  public NotebookCertificateApproval getApproval() {
+    entityPersister.save(certificateApproval);
     return certificateApproval;
   }
 }

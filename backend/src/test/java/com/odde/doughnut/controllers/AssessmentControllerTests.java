@@ -8,6 +8,8 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AssessmentService;
+import com.odde.doughnut.services.NotebookCertificateApprovalService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
@@ -15,6 +17,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 public class AssessmentControllerTests extends ControllerTestBase {
@@ -22,6 +25,8 @@ public class AssessmentControllerTests extends ControllerTestBase {
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   private AssessmentService assessmentService;
+  @Autowired NotebookService notebookService;
+  @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
 
   @BeforeEach
   void setup() {
@@ -133,11 +138,8 @@ public class AssessmentControllerTests extends ControllerTestBase {
     @Test
     void shouldIncludeTheNotebookCertificateInTheResult() throws UnexpectedNoAccessRightException {
       Notebook notebook = assessmentAttempt.getNotebook();
-      makeMe
-          .modelFactoryService
-          .notebookService(notebook)
-          .requestNotebookApproval()
-          .approve(makeMe.aTimestamp().please());
+      NotebookCertificateApproval approval = notebookService.requestNotebookApproval(notebook);
+      notebookCertificateApprovalService.approve(approval, makeMe.aTimestamp().please());
       makeMe.refresh(notebook);
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);

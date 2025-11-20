@@ -5,9 +5,10 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NotebookCertificateApprovalRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
+import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,7 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
-  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired NotebookService notebookService;
+  @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
+  @Autowired NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
 
   NotebookCertificateApprovalController controller;
   private TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -25,7 +28,11 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     controller =
         new NotebookCertificateApprovalController(
-            modelFactoryService, testabilitySettings, authorizationService);
+            notebookService,
+            notebookCertificateApprovalService,
+            notebookCertificateApprovalRepository,
+            testabilitySettings,
+            authorizationService);
   }
 
   @Nested
@@ -50,7 +57,7 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
     @Test
     void success() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.modelFactoryService.notebookService(note.getNotebook()).requestNotebookApproval();
+      notebookService.requestNotebookApproval(note.getNotebook());
       makeMe.refresh(note.getNotebook());
       NotebookCertificateApproval approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
@@ -82,7 +89,7 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
   @Nested
   class getAllPendingRequestNotebooks {
     private Notebook notebook;
-    private NotebookCertificateApprovalService approval;
+    private NotebookCertificateApproval approval;
 
     @BeforeEach
     void setup() {
@@ -90,8 +97,12 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
       notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
       controller =
           new NotebookCertificateApprovalController(
-              modelFactoryService, testabilitySettings, authorizationService);
-      approval = makeMe.modelFactoryService.notebookService(notebook).requestNotebookApproval();
+              notebookService,
+              notebookCertificateApprovalService,
+              notebookCertificateApprovalRepository,
+              testabilitySettings,
+              authorizationService);
+      approval = notebookService.requestNotebookApproval(notebook);
       makeMe.refresh(notebook);
     }
 
@@ -103,7 +114,7 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
 
     @Test
     void shouldNotReturnApprovedNotebooks() throws UnexpectedNoAccessRightException {
-      approval.approve(makeMe.aTimestamp().please());
+      notebookCertificateApprovalService.approve(approval, makeMe.aTimestamp().please());
       makeMe.refresh(notebook);
       var result = controller.getAllPendingRequest();
       assertThat(result, hasSize(0));
@@ -111,7 +122,7 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
 
     @Test
     void shouldApproveNoteBook() throws UnexpectedNoAccessRightException {
-      Notebook result = controller.approve(approval.getApproval()).getNotebook();
+      Notebook result = controller.approve(approval).getNotebook();
       assertTrue(result.isCertifiable());
     }
   }
