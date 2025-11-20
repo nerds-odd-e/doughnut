@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.BazaarNotebook;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
-import jakarta.persistence.EntityManager;
+import com.odde.doughnut.factoryServices.EntityPersister;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class BazaarService {
   private final BazaarNotebookRepository bazaarNotebookRepository;
-  private final EntityManager entityManager;
+  private final EntityPersister entityPersister;
 
   public BazaarService(
-      BazaarNotebookRepository bazaarNotebookRepository, EntityManager entityManager) {
+      BazaarNotebookRepository bazaarNotebookRepository, EntityPersister entityPersister) {
     this.bazaarNotebookRepository = bazaarNotebookRepository;
-    this.entityManager = entityManager;
+    this.entityPersister = entityPersister;
   }
 
   public List<BazaarNotebook> getAllBazaarNotebooks() {
@@ -29,12 +29,10 @@ public class BazaarService {
   public void shareNotebook(Notebook notebook) {
     BazaarNotebook bazaarNotebook = new BazaarNotebook();
     bazaarNotebook.setNotebook(notebook);
-    entityManager.persist(bazaarNotebook);
+    entityPersister.save(bazaarNotebook);
   }
 
   public void removeFromBazaar(BazaarNotebook bazaarNotebook) {
-    BazaarNotebook merged = entityManager.merge(bazaarNotebook);
-    entityManager.remove(merged);
-    entityManager.flush();
+    entityPersister.remove(bazaarNotebook);
   }
 }
