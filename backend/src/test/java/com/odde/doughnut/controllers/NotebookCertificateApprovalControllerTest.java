@@ -5,11 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NotebookCertificateApprovalRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,20 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
-  @Autowired NotebookCertificateApprovalRepository notebookCertificateApprovalRepository;
-
-  NotebookCertificateApprovalController controller;
-  private TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired NotebookCertificateApprovalController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new NotebookCertificateApprovalController(
-            notebookService,
-            notebookCertificateApprovalService,
-            testabilitySettings,
-            authorizationService);
   }
 
   @Nested
@@ -94,12 +83,6 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
     void setup() {
       currentUser.setUser(makeMe.anAdmin().please());
       notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      controller =
-          new NotebookCertificateApprovalController(
-              notebookService,
-              notebookCertificateApprovalService,
-              testabilitySettings,
-              authorizationService);
       approval = notebookService.requestNotebookApproval(notebook);
       makeMe.refresh(notebook);
     }

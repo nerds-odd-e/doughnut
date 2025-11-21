@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.odde.doughnut.entities.Certificate;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.repositories.CertificateRepository;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,8 +15,6 @@ public class CertificateControllerTests extends ControllerTestBase {
   public static final int oneYearInHours = 8760;
   @Autowired CertificateController controller;
   Timestamp currentTime;
-  TestabilitySettings testabilitySettings = new TestabilitySettings();
-  @Autowired CertificateRepository certificateRepository;
 
   @BeforeEach
   void setup() {

@@ -10,31 +10,28 @@ import com.odde.doughnut.controllers.dto.WikidataSearchEntity;
 import com.odde.doughnut.exceptions.WikidataServiceErrorException;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 
-class WikidataControllerTests {
-  WikidataController controller;
-  @Mock HttpClientAdapter httpClientAdapter;
-  TestabilitySettings testabilitySettings = new TestabilitySettings();
+@SpringBootTest
+@ActiveProfiles("test")
+@Transactional
+class WikidataControllerTests extends ControllerTestBase {
+  @Autowired WikidataController controller;
+  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   MakeMeWithoutDB makeMe = new MakeMeWithoutDB();
-
-  @BeforeEach
-  void Setup() {
-    MockitoAnnotations.openMocks(this);
-    controller = new WikidataController(testabilitySettings, httpClientAdapter);
-  }
 
   @Nested
   class FetchWikidata {
