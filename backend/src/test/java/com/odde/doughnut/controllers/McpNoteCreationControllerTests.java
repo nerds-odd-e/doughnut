@@ -6,8 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.NoteConstructionService;
-import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +22,6 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
   @Autowired McpNoteCreationController controller;
   private NoteCreationDTO noteCreation;
   @MockitoBean HttpClientAdapter httpClientAdapter;
-  @Autowired NoteService noteService;
-  @Autowired NoteConstructionService noteConstructionService;
 
   @BeforeEach
   void setup() {
