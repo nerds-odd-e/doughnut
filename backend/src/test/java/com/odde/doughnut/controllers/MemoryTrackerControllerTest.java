@@ -14,11 +14,7 @@ import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.MemoryTrackerService;
-import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
@@ -29,22 +25,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerControllerTest extends ControllerTestBase {
-  @Autowired MemoryTrackerRepository memoryTrackerRepository;
-  @Autowired UserService userService;
-  @Autowired MemoryTrackerService memoryTrackerService;
-
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-  MemoryTrackerController controller;
+  @Autowired MemoryTrackerController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new MemoryTrackerController(
-            makeMe.entityPersister,
-            testabilitySettings,
-            authorizationService,
-            memoryTrackerService);
   }
 
   @Nested
@@ -74,12 +59,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
-      controller =
-          new MemoryTrackerController(
-              makeMe.entityPersister,
-              testabilitySettings,
-              authorizationService,
-              memoryTrackerService);
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
@@ -226,12 +205,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
-      controller =
-          new MemoryTrackerController(
-              makeMe.entityPersister,
-              testabilitySettings,
-              authorizationService,
-              memoryTrackerService);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
   }
@@ -264,12 +237,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
-      controller =
-          new MemoryTrackerController(
-              makeMe.entityPersister,
-              testabilitySettings,
-              authorizationService,
-              memoryTrackerService);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
     }
   }
@@ -332,12 +299,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
       currentUser.setUser(null);
-      controller =
-          new MemoryTrackerController(
-              makeMe.entityPersister,
-              testabilitySettings,
-              authorizationService,
-              memoryTrackerService);
       assertThrows(
           ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
     }

@@ -9,24 +9,20 @@ import com.odde.doughnut.controllers.dto.NoteUpdateDetailsDTO;
 import com.odde.doughnut.controllers.dto.NoteUpdateTitleDTO;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 class TextContentControllerTests extends ControllerTestBase {
-  TextContentController controller;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired TextContentController controller;
   Note note;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote("new").creatorAndOwner(currentUser.getUser()).please();
-    controller =
-        new TextContentController(
-            makeMe.entityPersister, testabilitySettings, authorizationService);
   }
 
   @Nested
