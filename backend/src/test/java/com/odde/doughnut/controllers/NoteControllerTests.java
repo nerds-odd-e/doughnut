@@ -11,7 +11,6 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.services.search.NoteSearchService;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -22,13 +21,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
-import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired NoteController controller;
   @MockitoBean HttpClientAdapter httpClientAdapter;
-  @Autowired NoteSearchService noteSearchService;
 
   @BeforeEach
   void setup() {
@@ -255,34 +252,6 @@ class NoteControllerTests extends ControllerTestBase {
 
     private static Integer getLevel(Note link) {
       return link.getRecallSetting().getLevel();
-    }
-  }
-
-  @Nested
-  class SearchTests {
-    @BeforeEach
-    void setup() {
-      currentUser.setUser(null);
-    }
-
-    @Test
-    void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
-      SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController =
-          new SearchController(noteSearchService, authorizationService);
-      assertThrows(
-          ResponseStatusException.class, () -> searchController.searchForLinkTarget(searchTerm));
-    }
-
-    @Test
-    void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
-      Note note = makeMe.aNote().please();
-      SearchTerm searchTerm = new SearchTerm();
-      SearchController searchController =
-          new SearchController(noteSearchService, authorizationService);
-      assertThrows(
-          ResponseStatusException.class,
-          () -> searchController.searchForLinkTargetWithin(note, searchTerm));
     }
   }
 

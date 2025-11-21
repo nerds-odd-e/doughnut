@@ -108,6 +108,13 @@ class SearchControllerTests extends ControllerTestBase {
 
       assertThrows(ResponseStatusException.class, () -> controller.searchForLinkTarget(searchTerm));
     }
+
+    @Test
+    void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
+      currentUser.setUser(null);
+      SearchTerm searchTerm = new SearchTerm();
+      assertThrows(ResponseStatusException.class, () -> controller.searchForLinkTarget(searchTerm));
+    }
   }
 
   @Nested
@@ -180,6 +187,16 @@ class SearchControllerTests extends ControllerTestBase {
       assertThrows(
           ResponseStatusException.class,
           () -> controller.searchForLinkTargetWithin(referenceNote, searchTerm));
+    }
+
+    @Test
+    void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
+      currentUser.setUser(null);
+      Note note = makeMe.aNote().please();
+      SearchTerm searchTerm = new SearchTerm();
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.searchForLinkTargetWithin(note, searchTerm));
     }
 
     @Test
