@@ -14,7 +14,6 @@ import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimestampOperations;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -36,7 +35,6 @@ class NoteControllerTests extends ControllerTestBase {
   @Autowired com.odde.doughnut.services.NoteService noteService;
   @Autowired UserService userService;
   NoteController controller;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
   void setup() {

@@ -9,10 +9,6 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.MemoryTrackerService;
-import com.odde.doughnut.services.SubscriptionService;
-import com.odde.doughnut.services.UserService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,24 +19,11 @@ import org.springframework.web.server.ResponseStatusException;
 class AssimilationControllerTests extends ControllerTestBase {
   @Autowired private NoteRepository noteRepository;
   @Autowired private MemoryTrackerRepository memoryTrackerRepository;
-  @Autowired private SubscriptionService subscriptionService;
-  @Autowired private UserService userService;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
-
-  private AssimilationController controller;
-
-  @Autowired private MemoryTrackerService memoryTrackerService;
+  @Autowired AssimilationController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new AssimilationController(
-            memoryTrackerService,
-            subscriptionService,
-            testabilitySettings,
-            authorizationService,
-            userService);
   }
 
   @Nested

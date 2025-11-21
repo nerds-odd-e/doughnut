@@ -7,7 +7,6 @@ import com.odde.doughnut.controllers.dto.GlobalAiModelSettings;
 import com.odde.doughnut.entities.repositories.GlobalSettingRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -15,11 +14,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class GlobalSettingsControllerTest extends ControllerTestBase {
-  GlobalSettingsController controller;
+  @Autowired GlobalSettingsController controller;
 
   Timestamp currentTime;
 
-  TestabilitySettings testabilitySettings = new TestabilitySettings();
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired GlobalSettingRepository globalSettingRepository;
 
@@ -28,9 +26,6 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     currentTime = makeMe.aTimestamp().please();
     testabilitySettings.timeTravelTo(currentTime);
     currentUser.setUser(makeMe.anAdmin().please());
-    controller =
-        new GlobalSettingsController(
-            globalSettingsService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -70,9 +65,6 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     @Test
     void authentication() {
       currentUser.setUser(makeMe.aUser().please());
-      controller =
-          new GlobalSettingsController(
-              globalSettingsService, testabilitySettings, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.setCurrentModelVersions(settings));

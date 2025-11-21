@@ -10,11 +10,8 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.entities.RecallPrompt;
-import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
-import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -38,9 +35,6 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
 
   @Autowired ConversationMessageController controller;
   Note note;
-  TestabilitySettings testabilitySettings = new TestabilitySettings();
-  @Autowired ConversationRepository conversationRepository;
-  @Autowired ConversationMessageRepository conversationMessageRepository;
   Conversation conversation;
 
   @BeforeEach
