@@ -8,9 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.*;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
-import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
@@ -25,11 +23,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -37,19 +35,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiAudioControllerTests {
   @Autowired MakeMe makeMe;
-  @Autowired GlobalSettingsService globalSettingsService;
-  AiAudioController controller;
-  @Mock OpenAiApiExtended openAiApi;
+  @Autowired AiAudioController controller;
+
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApiExtended openAiApi;
+
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void commonSetup() {
-    initializeController();
     setupMocks();
-  }
-
-  private void initializeController() {
-    controller = new AiAudioController(new OtherAiServices(openAiApi), globalSettingsService);
   }
 
   private void setupMocks() {
