@@ -13,12 +13,8 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.PredefinedQuestionService;
-import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,43 +29,18 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   OpenAiApi openAiApi;
 
   @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
-  @Autowired SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService;
-  @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired PredefinedQuestionService predefinedQuestionService;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired PredefinedQuestionController controller;
   OpenAIChatCompletionMock openAIChatCompletionMock;
-
-  PredefinedQuestionController controller;
 
   @BeforeEach
   void setup() {
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new PredefinedQuestionController(
-            openAiApi,
-            predefinedQuestionService,
-            suggestedQuestionForFineTuningService,
-            testabilitySettings,
-            getTestObjectMapper(),
-            authorizationService,
-            globalSettingsService);
   }
 
   PredefinedQuestionController nullUserController() {
     currentUser.setUser(null);
-    return new PredefinedQuestionController(
-        openAiApi,
-        predefinedQuestionService,
-        suggestedQuestionForFineTuningService,
-        testabilitySettings,
-        getTestObjectMapper(),
-        authorizationService,
-        globalSettingsService);
-  }
-
-  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
+    return controller;
   }
 
   @Nested

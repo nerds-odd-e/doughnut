@@ -6,13 +6,9 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
-import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -27,35 +23,23 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class AiControllerTest extends ControllerTestBase {
-  AiController controller;
+  @Autowired AiController controller;
 
   Note note;
-  @Mock OpenAiApi openAiApi;
-  @Autowired GlobalSettingsService globalSettingsService;
-  NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
 
   @BeforeEach
   void Setup() {
-    notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(
-            openAiApi, globalSettingsService, getTestObjectMapper());
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote().please();
-    controller =
-        new AiController(
-            notebookAssistantForNoteServiceFactory,
-            new OtherAiServices(openAiApi),
-            authorizationService);
-  }
-
-  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested
@@ -70,13 +54,8 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void askWithNoteThatCannotAccess() {
       currentUser.setUser(null);
-      AiController aiController =
-          new AiController(
-              notebookAssistantForNoteServiceFactory,
-              new OtherAiServices(openAiApi),
-              authorizationService);
       assertThrows(
-          ResponseStatusException.class, () -> aiController.generateImage("create an image"));
+          ResponseStatusException.class, () -> controller.generateImage("create an image"));
     }
 
     @Test
@@ -172,12 +151,6 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
-      controller =
-          new AiController(
-              notebookAssistantForNoteServiceFactory,
-              new OtherAiServices(openAiApi),
-              authorizationService);
-
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));
     }
   }
