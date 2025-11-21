@@ -56,28 +56,40 @@ export class ConversationAboutNotePage {
   }
 
   expectExportContainsUserMessage(message: string) {
-    cy.get('[data-testid="export-textarea"]').then(($textarea) => {
-      const content = $textarea.val() as string
-      const json = JSON.parse(content)
-      const userMessages = json.messages.filter(
-        (m: { role: string; content?: string }) =>
-          m.role === 'user' && m.content?.includes(message)
-      )
-      expect(userMessages.length).to.be.greaterThan(0)
-    })
+    cy.get('[data-testid="export-textarea"]')
+      .should(($textarea) => {
+        const content = $textarea.val() as string
+        expect(content).to.not.be.empty
+        expect(content.trim()).to.match(/^\{/)
+      })
+      .then(($textarea) => {
+        const content = $textarea.val() as string
+        const json = JSON.parse(content)
+        const userMessages = json.messages.filter(
+          (m: { role: string; content?: string }) =>
+            m.role === 'user' && m.content?.includes(message)
+        )
+        expect(userMessages.length).to.be.greaterThan(0)
+      })
     return this
   }
 
   expectExportContainsAssistantReply(reply: string) {
-    cy.get('[data-testid="export-textarea"]').then(($textarea) => {
-      const content = $textarea.val() as string
-      const json = JSON.parse(content)
-      const assistantMessages = json.messages.filter(
-        (m: { role: string; content?: string }) =>
-          m.role === 'assistant' && m.content?.includes(reply)
-      )
-      expect(assistantMessages.length).to.be.greaterThan(0)
-    })
+    cy.get('[data-testid="export-textarea"]')
+      .should(($textarea) => {
+        const content = $textarea.val() as string
+        expect(content).to.not.be.empty
+        expect(content.trim()).to.match(/^\{/)
+      })
+      .then(($textarea) => {
+        const content = $textarea.val() as string
+        const json = JSON.parse(content)
+        const assistantMessages = json.messages.filter(
+          (m: { role: string; content?: string }) =>
+            m.role === 'assistant' && m.content?.includes(reply)
+        )
+        expect(assistantMessages.length).to.be.greaterThan(0)
+      })
     return this
   }
 
