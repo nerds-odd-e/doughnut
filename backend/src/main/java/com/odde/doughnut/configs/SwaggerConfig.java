@@ -16,7 +16,9 @@ public class SwaggerConfig {
       // To remove the servers field.
       // Since we generate the doc by running the service on random port,
       // it will be different every time.
-      openApi.setServers(List.of(new Server()));
+      Server server = new Server();
+      server.setUrl("");
+      openApi.setServers(List.of(server));
     };
   }
 

@@ -3,7 +3,7 @@ info:
   title: OpenAPI definition
   version: v0
 servers:
-- {}
+- url: ""
 paths:
   /api/user:
     get:
