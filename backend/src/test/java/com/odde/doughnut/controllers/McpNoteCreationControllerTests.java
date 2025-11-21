@@ -2,23 +2,14 @@ package com.odde.doughnut.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.controllers.dto.McpNoteAddDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
-import com.odde.doughnut.controllers.dto.NoteSearchResult;
-import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.services.search.NoteSearchService;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -32,9 +23,7 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
 
   @Autowired McpNoteCreationController controller;
   private NoteCreationDTO noteCreation;
-  @MockitoBean private NoteRepository noteRepository;
   @MockitoBean HttpClientAdapter httpClientAdapter;
-  @MockitoBean NoteSearchService noteSearchService;
   @Autowired NoteService noteService;
   @Autowired NoteConstructionService noteConstructionService;
 
@@ -43,11 +32,6 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     noteCreation = new NoteCreationDTO();
     noteCreation.setNewTitle("new note");
-
-    Note lordOfTheRingsNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-    lordOfTheRingsNote.setTopicConstructor("Lord of the Rings");
-    when(noteRepository.findById(org.mockito.ArgumentMatchers.any()))
-        .thenReturn(java.util.Optional.of(lordOfTheRingsNote));
   }
 
   @Nested
@@ -69,12 +53,7 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
     @Test
     void shouldCreateNoteSuccessfully()
         throws UnexpectedNoAccessRightException, BindException, IOException, InterruptedException {
-      var noteTopology = new NoteTopology();
-      noteTopology.setId(1);
-      var searchResult = new NoteSearchResult();
-      searchResult.setNoteTopology(noteTopology);
-
-      MockNoteSearchServiceReturn(Arrays.asList(searchResult));
+      makeMe.aNote("Lord of the Rings").creatorAndOwner(currentUser.getUser()).please();
 
       var result = controller.createNoteViaMcp(GeneratorMcpNoteAddDTO("Lord of the Rings"));
       assertEquals("new note", result.getCreated().getNote().getTopicConstructor());
@@ -82,19 +61,11 @@ class McpNoteCreationControllerTests extends ControllerTestBase {
 
     @Test
     void whenNotebookNotExistsShouldThrowException() {
-      MockNoteSearchServiceReturn(new ArrayList<>());
-
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> {
             controller.createNoteViaMcp(GeneratorMcpNoteAddDTO("Harry Potter"));
           });
-    }
-
-    private void MockNoteSearchServiceReturn(List<NoteSearchResult> noteSearchResults) {
-      when(noteSearchService.searchForNotes(
-              org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any()))
-          .thenReturn(noteSearchResults);
     }
 
     private McpNoteAddDTO GeneratorMcpNoteAddDTO(String parentNote) {
