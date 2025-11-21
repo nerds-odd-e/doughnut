@@ -9,12 +9,9 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.NoteConstructionService;
-import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.MakeMeWithoutDB;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
@@ -24,26 +21,20 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
 
 class NoteCreationControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
   @Autowired MakeMe makeMe;
-  @Autowired NoteService noteService;
-  @Autowired NoteConstructionService noteConstructionService;
-  @Mock HttpClientAdapter httpClientAdapter;
-  NoteCreationController controller;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired NoteCreationController controller;
+  @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new NoteCreationController(
-            httpClientAdapter, testabilitySettings, noteConstructionService, authorizationService);
   }
 
   private void mockWikidataEntity(String wikidataId, String label)
