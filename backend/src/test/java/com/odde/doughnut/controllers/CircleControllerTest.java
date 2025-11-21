@@ -9,11 +9,8 @@ import com.odde.doughnut.controllers.dto.CircleForUserView;
 import com.odde.doughnut.controllers.dto.CircleJoiningByInvitation;
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.CircleService;
-import com.odde.doughnut.services.NotebookService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,18 +20,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 class CircleControllerTest extends ControllerTestBase {
   @Autowired CircleService circleService;
-  @Autowired NoteRepository noteRepository;
-  @Autowired NotebookService notebookService;
-
-  CircleController controller;
-  private TestabilitySettings testabilitySettings = new TestabilitySettings();
+  @Autowired CircleController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new CircleController(
-            circleService, notebookService, testabilitySettings, authorizationService);
   }
 
   @Nested
@@ -42,9 +32,6 @@ class CircleControllerTest extends ControllerTestBase {
     @Test
     void itShouldNotAllowNonMemberToSeeACircle() {
       currentUser.setUser(null);
-      controller =
-          new CircleController(
-              circleService, notebookService, testabilitySettings, authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {
@@ -71,9 +58,6 @@ class CircleControllerTest extends ControllerTestBase {
     @Test
     void itShouldCircleForUserViewIfAuthorized() throws UnexpectedNoAccessRightException {
       currentUser.setUser(makeMe.aUser().please());
-      controller =
-          new CircleController(
-              circleService, notebookService, testabilitySettings, authorizationService);
 
       Circle circle = makeMe.aCircle().please();
       circle.setName("Some circle");
@@ -96,9 +80,6 @@ class CircleControllerTest extends ControllerTestBase {
     void itShouldAskToLoginOfVisitorIsNotLogin() {
       Circle circle = makeMe.aCircle().please();
       currentUser.setUser(null);
-      controller =
-          new CircleController(
-              circleService, notebookService, testabilitySettings, authorizationService);
       assertThrows(
           ResponseStatusException.class,
           () -> {
