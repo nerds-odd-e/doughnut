@@ -12,6 +12,7 @@ export const loginActions = {
     }).then((response) => {
       expect(response.status).to.equal(204)
     })
+    cy.wrap('').as('currentLoginUser')
     cy.pageIsNotLoading()
     return this
   },
@@ -31,6 +32,7 @@ export const loginActions = {
     OpenAPI.PASSWORD = password
 
     // Call the service directly - it will use cy.request via our custom request function
+    cy.wrap(username).as('currentLoginUser')
     return Services.ping()
       .then(() => {
         // Success

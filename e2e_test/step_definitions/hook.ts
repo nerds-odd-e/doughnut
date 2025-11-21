@@ -9,6 +9,7 @@ import start, { mock_services } from '../start'
 Before(() => {
   start.testability().cleanDBAndResetTestabilitySettings()
   cy.wrap('no').as('firstVisited')
+  cy.wrap('').as('currentLoginUser')
 })
 
 After(() => {

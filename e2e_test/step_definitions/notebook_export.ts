@@ -13,13 +13,17 @@ import start from '../start'
 
 Given('I have a notebook titled {string}', (notebookTitle: string) => {
   // Following the pattern from note.ts where notes are injected
-  start.testability().injectNotes([{ Title: notebookTitle }])
+  cy.get<string>('@currentLoginUser').then((username) => {
+    start.testability().injectNotes([{ Title: notebookTitle }], username)
+  })
 })
 
 Given('the notebook contains the following notes', (notesTable: DataTable) => {
   const notes = notesTable.hashes()
   // Using the injectNotes pattern from note.ts
-  start.testability().injectNotes(notes)
+  cy.get<string>('@currentLoginUser').then((username) => {
+    start.testability().injectNotes(notes, username)
+  })
 })
 
 // Additional steps needed for the feature

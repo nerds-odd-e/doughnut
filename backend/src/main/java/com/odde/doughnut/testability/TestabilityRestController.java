@@ -181,8 +181,10 @@ class TestabilityRestController {
   @PostMapping("/inject_notes")
   @Transactional
   public Map<String, Integer> injectNotes(@RequestBody NotesTestData notesTestData) {
-    final User user =
-        getUserModelByExternalIdentifierOrCurrentUser(notesTestData.externalIdentifier);
+    if (Strings.isEmpty(notesTestData.externalIdentifier)) {
+      throw new RuntimeException("externalIdentifier is required and cannot be empty");
+    }
+    final User user = getUserModelByExternalIdentifier(notesTestData.externalIdentifier);
     Ownership ownership = getOwnership(notesTestData, user);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
@@ -239,17 +241,6 @@ class TestabilityRestController {
     User creator = sourceNote.getCreator();
     noteService.createLink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     return "OK";
-  }
-
-  private User getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
-    if (Strings.isEmpty(externalIdentifier)) {
-      User user = currentUser.getUser();
-      if (user == null) {
-        throw new RuntimeException("There is no current user");
-      }
-      return user;
-    }
-    return getUserModelByExternalIdentifier(externalIdentifier);
   }
 
   @PostMapping("/share_to_bazaar")

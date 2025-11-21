@@ -46,7 +46,7 @@ const testability = () => {
 
     injectNotes(
       noteTestData: NoteTestData[],
-      externalIdentifier = '',
+      externalIdentifier: string,
       circleName: string | null = null
     ) {
       const requestBody: NotesTestData = {
@@ -71,7 +71,7 @@ const testability = () => {
     injectNumberNotes(
       notebook: string,
       numberOfNotes: number,
-      creatorId?: string
+      creatorId: string
     ) {
       const notes: Record<string, string>[] = [
         { Title: notebook },
@@ -118,7 +118,7 @@ const testability = () => {
     injectNumbersNotebookWithQuestions(
       notebook: string,
       numberOfQuestion: number,
-      creatorId?: string,
+      creatorId: string,
       notebookCertifiable?: boolean
     ) {
       this.injectNumberNotes(notebook, numberOfQuestion, creatorId)

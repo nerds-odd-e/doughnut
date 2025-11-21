@@ -27,7 +27,9 @@ Given(
   (notebookTitle: string, data: DataTable) => {
     const notes = data.hashes()
     notes.unshift({ Title: notebookTitle })
-    start.testability().injectNotes(notes)
+    cy.get<string>('@currentLoginUser').then((username) => {
+      start.testability().injectNotes(notes, username)
+    })
   }
 )
 
@@ -37,42 +39,55 @@ Given('there are some notes:', (data: DataTable) => {
       throw new Error('Parent Title is required for all notes')
     }
   })
-  start.testability().injectNotes(data.hashes())
+  cy.get<string>('@currentLoginUser').then((username) => {
+    start.testability().injectNotes(data.hashes(), username)
+  })
 })
 
 Given(
   'I have a notebook with the head note {string}',
   (noteTopology: string) => {
-    start.testability().injectNotes([{ Title: noteTopology }])
+    cy.get<string>('@currentLoginUser').then((username) => {
+      start.testability().injectNotes([{ Title: noteTopology }], username)
+    })
   }
 )
 
 Given(
   'I have a notebook with the head note {string} which skips review',
   (noteTopology: string) => {
-    start
-      .testability()
-      .injectNotes([{ Title: noteTopology, 'Skip Memory Tracking': true }])
+    cy.get<string>('@currentLoginUser').then((username) => {
+      start
+        .testability()
+        .injectNotes(
+          [{ Title: noteTopology, 'Skip Memory Tracking': true }],
+          username
+        )
+    })
   }
 )
 
 Given(
   'I have a notebook with the head note {string} and details {string}',
   (noteTopology: string, details: string) => {
-    start.testability().injectNotes([{ Title: noteTopology, Details: details }])
+    cy.get<string>('@currentLoginUser').then((username) => {
+      start
+        .testability()
+        .injectNotes([{ Title: noteTopology, Details: details }], username)
+    })
   }
 )
 
 Given(
   'there are some notes for existing user {string}',
-  (externalIdentifier: string | undefined, data: DataTable) => {
+  (externalIdentifier: string, data: DataTable) => {
     start.testability().injectNotes(data.hashes(), externalIdentifier)
   }
 )
 
 Given(
   'there is a notebook with head note {string} from user {string} shared to the Bazaar',
-  (noteTopology: string, externalIdentifier: string | undefined) => {
+  (noteTopology: string, externalIdentifier: string) => {
     start
       .testability()
       .injectNotes([{ Title: noteTopology }], externalIdentifier)
@@ -88,7 +103,9 @@ Given(
       .map((_, i) => {
         return { Title: `Note ${i + from}` }
       })
-    start.testability().injectNotes(notes)
+    cy.get<string>('@currentLoginUser').then((username) => {
+      start.testability().injectNotes(notes, username)
+    })
   }
 )
 
