@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
@@ -15,10 +13,6 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ConversationService;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.ChatCompletionConversationService;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -33,48 +27,27 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class ConversationMessageControllerAiReplyTests extends ControllerTestBase {
 
-  @Mock private OpenAiApi openAiApi;
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
 
-  ConversationMessageController controller;
+  @Autowired ConversationMessageController controller;
   Note note;
   TestabilitySettings testabilitySettings = new TestabilitySettings();
-  @Autowired GlobalSettingsService globalSettingsService;
   @Autowired ConversationRepository conversationRepository;
   @Autowired ConversationMessageRepository conversationMessageRepository;
-  private ConversationService conversationService;
   Conversation conversation;
 
   @BeforeEach
   void setUp() {
     currentUser.setUser(makeMe.aUser().please());
     note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-
-    setupServices();
     conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
-  }
-
-  private void setupServices() {
-    ObjectMapper objectMapper = getTestObjectMapper();
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    ChatCompletionConversationService chatCompletionConversationService =
-        new ChatCompletionConversationService(
-            openAiApiHandler, globalSettingsService, objectMapper);
-    conversationService =
-        new ConversationService(
-            testabilitySettings, conversationRepository, conversationMessageRepository);
-    controller =
-        new ConversationMessageController(
-            conversationService, chatCompletionConversationService, authorizationService);
-  }
-
-  private ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

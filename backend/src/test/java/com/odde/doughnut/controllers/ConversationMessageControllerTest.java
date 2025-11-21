@@ -7,16 +7,10 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ConversationService;
-import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.ChatCompletionConversationService;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.theokanning.openai.completion.chat.AssistantMessage;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -33,25 +27,15 @@ import org.springframework.web.server.ResponseStatusException;
 
 class ConversationMessageControllerTest extends ControllerTestBase {
 
-  @Autowired ConversationService conversationService;
-  ConversationMessageController controller;
+  @Autowired ConversationMessageController controller;
 
   @Autowired ConversationRepository conversationRepository;
   @Autowired ConversationMessageRepository conversationMessageRepository;
-  @Autowired GlobalSettingsService globalSettingsService;
   AssessmentQuestionInstance assessmentQuestionInstance;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
-    ChatCompletionConversationService chatCompletionConversationService =
-        new ChatCompletionConversationService(
-            openAiApiHandler, globalSettingsService, objectMapper);
-    controller =
-        new ConversationMessageController(
-            conversationService, chatCompletionConversationService, authorizationService);
     Notebook notebook = makeMe.aNotebook().please();
     AssessmentAttempt assessmentAttempt =
         makeMe.anAssessmentAttempt(notebook.getCreatorEntity()).withOneQuestion().please();
@@ -127,15 +111,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void forLoginUserOnly() {
-      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
-      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
-      ChatCompletionConversationService chatCompletionConversationService =
-          new ChatCompletionConversationService(
-              openAiApiHandler, globalSettingsService, objectMapper);
       currentUser.setUser(null);
-      controller =
-          new ConversationMessageController(
-              conversationService, chatCompletionConversationService, authorizationService);
       ResponseStatusException exception =
           assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
       assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
@@ -424,15 +400,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void shouldRequireLogin() {
-      ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
-      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(null);
-      ChatCompletionConversationService chatCompletionConversationService =
-          new ChatCompletionConversationService(
-              openAiApiHandler, globalSettingsService, objectMapper);
       currentUser.setUser(null);
-      controller =
-          new ConversationMessageController(
-              conversationService, chatCompletionConversationService, authorizationService);
       ResponseStatusException exception =
           assertThrows(
               ResponseStatusException.class, () -> controller.getConversationsAboutNote(note));

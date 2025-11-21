@@ -11,12 +11,10 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.theokanning.openai.client.OpenAiApi;
@@ -36,12 +34,9 @@ class RecallPromptControllerTests extends ControllerTestBase {
   OpenAiApi openAiApi;
 
   @Autowired MakeMe makeMe;
-  @Autowired RecallQuestionService recallQuestionService;
+  @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
-  private final TestabilitySettings testabilitySettings = new TestabilitySettings();
   OpenAIChatCompletionMock openAIChatCompletionMock;
-
-  RecallPromptController controller;
 
   @BeforeEach
   void setup() {
@@ -56,16 +51,11 @@ class RecallPromptControllerTests extends ControllerTestBase {
     evaluation.correctChoices = new int[] {0};
     evaluation.improvementAdvices = "This question needs improvement";
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
-
-    controller =
-        new RecallPromptController(
-            recallQuestionService, testabilitySettings, authorizationService);
   }
 
   RecallPromptController nullUserController() {
     currentUser.setUser(null);
-    return new RecallPromptController(
-        recallQuestionService, testabilitySettings, authorizationService);
+    return controller;
   }
 
   @Nested
@@ -178,12 +168,9 @@ class RecallPromptControllerTests extends ControllerTestBase {
           ResponseStatusException.class,
           () -> {
             currentUser.setUser(null);
-            RecallPromptController restAiController =
-                new RecallPromptController(
-                    recallQuestionService, testabilitySettings, authorizationService);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
-            restAiController.regenerate(recallPrompt, contestResult);
+            controller.regenerate(recallPrompt, contestResult);
           });
     }
 
@@ -260,10 +247,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           ResponseStatusException.class,
           () -> {
             currentUser.setUser(null);
-            RecallPromptController restAiController =
-                new RecallPromptController(
-                    recallQuestionService, testabilitySettings, authorizationService);
-            restAiController.contest(recallPrompt);
+            controller.contest(recallPrompt);
           });
     }
 
