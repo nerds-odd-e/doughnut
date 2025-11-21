@@ -9,8 +9,6 @@ import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.NoteMotionService;
-import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
@@ -21,34 +19,20 @@ import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
-
-  @Mock HttpClientAdapter httpClientAdapter;
+  @Autowired NoteController controller;
+  @MockitoBean HttpClientAdapter httpClientAdapter;
   @Autowired NoteSearchService noteSearchService;
-  @Autowired NoteMotionService noteMotionService;
-  @Autowired com.odde.doughnut.services.NoteService noteService;
-  @Autowired UserService userService;
-  NoteController controller;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-
-    controller =
-        new NoteController(
-            makeMe.entityPersister,
-            httpClientAdapter,
-            testabilitySettings,
-            noteMotionService,
-            noteService,
-            authorizationService,
-            userService);
   }
 
   @Nested
