@@ -8,10 +8,8 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.AssessmentAttemptRepository;
 import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.AssessmentService;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
 import com.odde.doughnut.services.NotebookService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import java.sql.Timestamp;
 import java.util.List;
@@ -22,20 +20,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.server.ResponseStatusException;
 
 public class AssessmentControllerTests extends ControllerTestBase {
-  @Autowired AssessmentService assessmentService;
+  @Autowired AssessmentController controller;
   @Autowired NotebookService notebookService;
   @Autowired NotebookCertificateApprovalService notebookCertificateApprovalService;
   @Autowired AssessmentAttemptRepository assessmentAttemptRepository;
-  @Autowired TestabilitySettings testabilitySettings;
-
-  private AssessmentController controller;
 
   @BeforeEach
   void setup() {
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser.setUser(makeMe.aUser().please());
-    controller =
-        new AssessmentController(testabilitySettings, assessmentService, authorizationService);
   }
 
   @Nested
@@ -50,8 +43,6 @@ public class AssessmentControllerTests extends ControllerTestBase {
     @Test
     void whenNotLogin() {
       currentUser.setUser(null);
-      controller =
-          new AssessmentController(testabilitySettings, assessmentService, authorizationService);
       assertThrows(
           ResponseStatusException.class, () -> controller.generateAssessmentQuestions(notebook));
     }
@@ -99,8 +90,6 @@ public class AssessmentControllerTests extends ControllerTestBase {
     @Test
     void shouldNotBeAbleToAccessNotebookWhenUserHasNoPermission() {
       currentUser.setUser(makeMe.aUser().please());
-      controller =
-          new AssessmentController(testabilitySettings, assessmentService, authorizationService);
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));

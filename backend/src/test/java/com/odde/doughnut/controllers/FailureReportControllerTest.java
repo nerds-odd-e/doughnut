@@ -10,9 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.FailureReportService;
-import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.testability.NullGithubService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,20 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class FailureReportControllerTest extends ControllerTestBase {
   @Autowired FailureReportRepository failureReportRepository;
-  @Autowired FailureReportService failureReportService;
-  private GithubService githubService = new NullGithubService();
-
-  FailureReportController controller() {
-    return new FailureReportController(failureReportService, githubService, authorizationService);
-  }
+  @Autowired FailureReportController controller;
 
   @Test
   void whenNonAdminAccessTheFailureReport() {
     currentUser.setUser(makeMe.aUser().please());
     FailureReport failureReport = makeMe.aFailureReport().please();
     assertThrows(
-        UnexpectedNoAccessRightException.class,
-        () -> controller().showFailureReport(failureReport));
+        UnexpectedNoAccessRightException.class, () -> controller.showFailureReport(failureReport));
   }
 
   @Nested
@@ -61,9 +52,9 @@ class FailureReportControllerTest extends ControllerTestBase {
       List<Integer> idsToDelete =
           failureReports.stream().map(FailureReport::getId).collect(Collectors.toList());
 
-      controller().deleteFailureReports(idsToDelete);
+      controller.deleteFailureReports(idsToDelete);
 
-      Iterable<FailureReport> remainingReports = controller().failureReports();
+      Iterable<FailureReport> remainingReports = controller.failureReports();
       List<FailureReport> reportList =
           StreamSupport.stream(remainingReports.spliterator(), false).collect(Collectors.toList());
       assertThat(reportList, is(empty()));
@@ -73,9 +64,9 @@ class FailureReportControllerTest extends ControllerTestBase {
     void adminCanDeleteOneFailureReport() throws UnexpectedNoAccessRightException {
       List<Integer> idsToDelete = List.of(failureReports.get(0).getId());
 
-      controller().deleteFailureReports(idsToDelete);
+      controller.deleteFailureReports(idsToDelete);
 
-      Iterable<FailureReport> remainingReports = controller().failureReports();
+      Iterable<FailureReport> remainingReports = controller.failureReports();
       List<FailureReport> reportList =
           StreamSupport.stream(remainingReports.spliterator(), false).collect(Collectors.toList());
       assertThat(reportList, hasSize(1));
@@ -90,7 +81,7 @@ class FailureReportControllerTest extends ControllerTestBase {
 
       assertThrows(
           UnexpectedNoAccessRightException.class,
-          () -> controller().deleteFailureReports(idsToDelete));
+          () -> controller.deleteFailureReports(idsToDelete));
     }
   }
 }
