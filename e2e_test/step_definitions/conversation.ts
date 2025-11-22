@@ -36,14 +36,12 @@ Then(
 Then(
   '{string} can see the conversation with {string} for the subject {string} in the message center:',
   (user: string, partner: string, subject: string, data: DataTable) => {
-    const loginResult = start.reloginAndEnsureHomePage(user)
-    cy.wrap(loginResult).then(() => {
-      start
-        .navigateToMessageCenter()
-        .expectConversation(subject, partner)
-        .conversation(subject)
-        .expectMessage(data.hashes()[0]!.message!)
-    })
+    start.reloginAndEnsureHomePage(user)
+    start
+      .navigateToMessageCenter()
+      .expectConversation(subject, partner)
+      .conversation(subject)
+      .expectMessage(data.hashes()[0]!.message!)
   }
 )
 

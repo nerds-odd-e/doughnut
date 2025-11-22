@@ -283,7 +283,6 @@ const testability = () => {
       })
     },
 
-
     setServiceUrl(serviceName: string, serviceUrl: string) {
       const requestBody = { [serviceName]: serviceUrl }
 
