@@ -45,6 +45,7 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.3'
   implementation 'io.github.lambdua:service:0.22.92'
+  implementation 'com.openai:openai-java:4.8.0'
   implementation 'com.squareup.retrofit2:adapter-rxjava3:3.0.0'
   implementation 'com.squareup.retrofit2:converter-jackson:3.0.0'
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
