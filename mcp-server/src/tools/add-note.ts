@@ -63,9 +63,7 @@ Response Format:
 
     // OpenAPI client returns { data, error, request, response } structure by default
     if (response.error) {
-      throw new Error(
-        `API error: ${JSON.stringify(response.error)}`
-      )
+      throw new Error(`API error: ${JSON.stringify(response.error)}`)
     }
 
     const result = response.data as CreateNoteViaMcpResponse
