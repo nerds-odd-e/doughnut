@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
-import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,19 +21,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class MemoryTrackerServiceTest {
   @Autowired MakeMe makeMe;
-  @Autowired EntityPersister entityPersister;
-  @Autowired UserService userService;
-  @Autowired MemoryTrackerRepository memoryTrackerRepository;
+  @Autowired MemoryTrackerService memoryTrackerService;
   User user;
   Timestamp day1;
-  MemoryTrackerService memoryTrackerService;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
     day1 = makeMe.aTimestamp().of(1, 8).fromShanghai().please();
-    memoryTrackerService =
-        new MemoryTrackerService(entityPersister, userService, memoryTrackerRepository);
   }
 
   @Nested
