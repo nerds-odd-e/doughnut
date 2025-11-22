@@ -28,7 +28,17 @@ async function getNoteById(
   noteId: number,
   tokenLimit: number
 ): Promise<ToolResponse> {
-  const graph = await Services.getGraph({ note: noteId, tokenLimit })
+  const response = await Services.getGraph({
+    path: { note: noteId },
+    query: { tokenLimit },
+  })
+  
+  // OpenAPI client returns { data, error, request, response } structure by default
+  if (response.error) {
+    throw new Error(`Graph retrieval error: ${JSON.stringify(response.error)}`)
+  }
+  
+  const graph = response.data
   return jsonResponse(graph)
 }
 

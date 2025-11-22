@@ -65,7 +65,11 @@ describe('get_note_graph tool', () => {
       const mockResponse: GetGraphResponse = {
         focusNote: { id: 1 },
       } as GetGraphResponse
-      mockGetGraph.mockResolvedValue(mockResponse)
+      // OpenAPI client returns { data, error, request, response } structure
+      mockGetGraph.mockResolvedValue({
+        data: mockResponse,
+        error: undefined,
+      } as any)
 
       const result = await getNoteGraphTool.handle(ctx, {
         noteId: 1,
@@ -73,8 +77,8 @@ describe('get_note_graph tool', () => {
       })
 
       expect(mockGetGraph).toHaveBeenCalledWith({
-        note: 1,
-        tokenLimit: 100,
+        path: { note: 1 },
+        query: { tokenLimit: 100 },
       })
       expect(result.content[0].text).toContain('"focusNote"')
     })

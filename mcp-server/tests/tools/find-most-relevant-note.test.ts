@@ -35,9 +35,11 @@ describe('find_most_relevant_note tool', () => {
 
     // Mock the service response
     const mockSearchForLinkTarget = vi.mocked(Services.searchForLinkTarget)
-    mockSearchForLinkTarget.mockResolvedValue(
-      searchResult as SearchForLinkTargetResponse
-    )
+    // OpenAPI client returns { data, error, request, response } structure
+    mockSearchForLinkTarget.mockResolvedValue({
+      data: searchResult as SearchForLinkTargetResponse,
+      error: undefined,
+    } as any)
 
     const ctx = createMockContext()
 
@@ -49,7 +51,7 @@ describe('find_most_relevant_note tool', () => {
 
     // Assert search was called with correct arguments
     expect(mockSearchForLinkTarget).toHaveBeenCalledWith({
-      requestBody: {
+      body: {
         searchKey: expectedSearchKey,
         allMyNotebooksAndSubscriptions: true,
       },

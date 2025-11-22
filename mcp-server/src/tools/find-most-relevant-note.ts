@@ -43,9 +43,16 @@ For broader search results, consider breaking down complex queries into specific
   }
 
   try {
-    const results = await Services.searchForLinkTarget({
-      requestBody: searchTerm,
+    const response = await Services.searchForLinkTarget({
+      body: searchTerm,
     })
+
+    // OpenAPI client returns { data, error, request, response } structure by default
+    if (response.error) {
+      return textResponse(`Search error: ${JSON.stringify(response.error)}`)
+    }
+
+    const results = response.data as NoteSearchResult[]
 
     if (Array.isArray(results) && results.length > 0) {
       const firstResult = results[0] as NoteSearchResult

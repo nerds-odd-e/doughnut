@@ -43,7 +43,11 @@ describe('add_note tool', () => {
         },
       },
     }
-    mockCreateNote.mockResolvedValue(mockResponse)
+    // OpenAPI client returns { data, error, request, response } structure
+    mockCreateNote.mockResolvedValue({
+      data: mockResponse,
+      error: undefined,
+    } as any)
 
     const ctx = createMockContext()
 
@@ -55,7 +59,7 @@ describe('add_note tool', () => {
 
     // Assert API was called with correct arguments
     expect(mockCreateNote).toHaveBeenCalledWith({
-      requestBody: {
+      body: {
         noteCreationDTO: {
           newTitle: 'Test Note',
         },

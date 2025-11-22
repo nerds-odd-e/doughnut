@@ -57,9 +57,18 @@ Response Format:
     noteCreationDTO: noteCreationDTO,
   }
   try {
-    const result: CreateNoteViaMcpResponse = await Services.createNoteViaMcp({
-      requestBody: mcpCreationDto,
+    const response = await Services.createNoteViaMcp({
+      body: mcpCreationDto,
     })
+
+    // OpenAPI client returns { data, error, request, response } structure by default
+    if (response.error) {
+      throw new Error(
+        `API error: ${JSON.stringify(response.error)}`
+      )
+    }
+
+    const result = response.data as CreateNoteViaMcpResponse
 
     if (!(result && result.created && result.created.note)) {
       throw new Error(
