@@ -500,9 +500,22 @@ public class OpenAiApiHandler {
             .build();
     var fineTuningJob = officialClient.fineTuning().jobs().create(params);
     var status = fineTuningJob.status();
-    if (status != null
-        && (status == com.openai.models.finetuning.jobs.FineTuningJob.Status.FAILED
-            || status == com.openai.models.finetuning.jobs.FineTuningJob.Status.CANCELLED)) {
+    // Check if status indicates failure
+    // Handle both enum comparison and string comparison for robustness
+    boolean isFailed = false;
+    if (status != null) {
+      if (status == com.openai.models.finetuning.jobs.FineTuningJob.Status.FAILED
+          || status == com.openai.models.finetuning.jobs.FineTuningJob.Status.CANCELLED) {
+        isFailed = true;
+      } else {
+        // Fallback: check string representation (case-insensitive)
+        String statusStr = status.toString().toUpperCase();
+        if ("FAILED".equals(statusStr) || "CANCELLED".equals(statusStr)) {
+          isFailed = true;
+        }
+      }
+    }
+    if (isFailed) {
       throw new OpenAIServiceErrorException(
           "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
     }

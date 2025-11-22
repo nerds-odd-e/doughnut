@@ -141,17 +141,21 @@ const openAiService = () => {
     },
 
     async stubFineTuningStatus(successful: boolean) {
+      // Official SDK endpoint - base URL already includes /v1, so path is /fine_tuning/jobs
       return await serviceMocker.stubPoster(`/fine_tuning/jobs`, {
         object: 'fine_tuning.job',
         id: 'ftjob-abc123',
         model: 'gpt-3.5-turbo-0613',
         created_at: 1614807352,
-        fine_tuned_model: null,
+        fine_tuned_model: successful ? 'ft:gpt-3.5-turbo-1106:test' : null,
         organization_id: 'org-123',
         result_files: [],
-        status: successful ? 'queued' : 'failed',
+        status: successful ? 'succeeded' : 'failed',
         validation_file: null,
         training_file: 'file-abc123',
+        error: successful ? null : { message: 'Training failed' },
+        finished_at: successful ? 1614807352 : null,
+        hyperparameters: null,
       })
     },
 
