@@ -514,7 +514,20 @@ public class OpenAiApiHandler {
     return fineTuningJob;
   }
 
-  public String getTranscription(RequestBody requestBody) throws IOException {
+  public String getTranscription(String filename, byte[] audioBytes) throws IOException {
+    // Audio transcription API is not yet available in the official SDK 4.8.0
+    // Keep using legacy client for now
+    okhttp3.MediaType mediaType = okhttp3.MediaType.parse("multipart/form-data");
+    RequestBody requestFile = RequestBody.create(mediaType, audioBytes);
+    okhttp3.MultipartBody.Part body =
+        okhttp3.MultipartBody.Part.createFormData("file", filename, requestFile);
+    okhttp3.MultipartBody.Builder builder =
+        new okhttp3.MultipartBody.Builder()
+            .setType(okhttp3.MultipartBody.FORM)
+            .addPart(body)
+            .addFormDataPart("model", "whisper-1")
+            .addFormDataPart("response_format", "srt");
+    RequestBody requestBody = builder.build();
     return blockGet(((OpenAiApiExtended) openAiApi).createTranscriptionSrt(requestBody)).string();
   }
 

@@ -15,6 +15,7 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import io.reactivex.Single;
 import java.io.IOException;
+import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,8 +59,9 @@ class AiAudioControllerTests {
   }
 
   protected void mockTranscriptionSrtResponse(String responseBody) {
+    // Mock the legacy API call that's still used for transcription
     when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
-        .thenReturn(Single.just(ResponseBody.create(null, responseBody)));
+        .thenReturn(Single.just(ResponseBody.create(MediaType.parse("text/plain"), responseBody)));
   }
 
   private MockMultipartFile createMockAudioFile(String filename) {
