@@ -9,20 +9,20 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.controllers.dto.SearchTerm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.embedding.EmbeddingResult;
-import io.reactivex.Single;
+import com.openai.client.OpenAIClient;
+import com.openai.models.embeddings.CreateEmbeddingResponse;
+import com.openai.models.embeddings.EmbeddingCreateParams;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class SearchControllerSemanticTests extends ControllerTestBase {
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
 
   @Autowired SearchController controller;
 
@@ -30,9 +30,18 @@ class SearchControllerSemanticTests extends ControllerTestBase {
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
     // Default: return empty embedding data so semantic search falls back to literal search
-    EmbeddingResult empty = new EmbeddingResult();
-    empty.setData(java.util.List.of());
-    when(openAiApi.createEmbeddings(any(EmbeddingRequest.class))).thenReturn(Single.just(empty));
+    CreateEmbeddingResponse.Usage usage =
+        CreateEmbeddingResponse.Usage.builder().promptTokens(0L).totalTokens(0L).build();
+    CreateEmbeddingResponse empty =
+        CreateEmbeddingResponse.builder()
+            .data(java.util.List.of())
+            .model("text-embedding-3-small")
+            .usage(usage)
+            .build();
+    com.openai.services.blocking.EmbeddingService embeddingService =
+        Mockito.mock(com.openai.services.blocking.EmbeddingService.class);
+    when(officialClient.embeddings()).thenReturn(embeddingService);
+    when(embeddingService.create(any(EmbeddingCreateParams.class))).thenReturn(empty);
   }
 
   @Nested

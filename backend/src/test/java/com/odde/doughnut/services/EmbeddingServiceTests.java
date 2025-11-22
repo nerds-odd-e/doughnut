@@ -8,13 +8,13 @@ import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.embedding.EmbeddingResult;
-import io.reactivex.Single;
+import com.openai.client.OpenAIClient;
+import com.openai.models.embeddings.CreateEmbeddingResponse;
+import com.openai.models.embeddings.Embedding;
+import com.openai.models.embeddings.EmbeddingCreateParams;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -26,11 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class EmbeddingServiceTests {
 
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
-  @Autowired EmbeddingService service;
+  @Autowired com.odde.doughnut.services.EmbeddingService service;
 
   @Test
   void shouldStreamEmbeddingsForNotes() {
@@ -40,27 +40,33 @@ class EmbeddingServiceTests {
     Note note1 = makeMe.aNote().under(parent).titleConstructor("T1").details("D1").please();
     Note note2 = makeMe.aNote().titleConstructor("T2").details("D2").please();
 
-    Embedding embedding1 = new Embedding();
-    embedding1.setEmbedding(List.of(1.0f, 2.0f));
-    Embedding embedding2 = new Embedding();
-    embedding2.setEmbedding(List.of(3.0f, 4.0f));
+    Embedding embedding1 = Embedding.builder().index(0L).embedding(List.of(1.0f, 2.0f)).build();
+    Embedding embedding2 = Embedding.builder().index(1L).embedding(List.of(3.0f, 4.0f)).build();
 
-    EmbeddingResult result = new EmbeddingResult();
-    result.setData(List.of(embedding1, embedding2));
+    CreateEmbeddingResponse.Usage usage =
+        CreateEmbeddingResponse.Usage.builder().promptTokens(0L).totalTokens(0L).build();
+    CreateEmbeddingResponse response =
+        CreateEmbeddingResponse.builder()
+            .data(List.of(embedding1, embedding2))
+            .model("text-embedding-3-small")
+            .usage(usage)
+            .build();
 
-    when(openAiApi.createEmbeddings(any(EmbeddingRequest.class)))
+    com.openai.services.blocking.EmbeddingService embeddingService =
+        Mockito.mock(com.openai.services.blocking.EmbeddingService.class);
+    when(officialClient.embeddings()).thenReturn(embeddingService);
+    when(embeddingService.create(any(EmbeddingCreateParams.class)))
         .thenAnswer(
             invocation -> {
-              EmbeddingRequest req = invocation.getArgument(0);
+              EmbeddingCreateParams params = invocation.getArgument(0);
               // Ensure the input contains our structured fields and the "›" separator
-              Object input = req.getInput();
-              java.util.List<?> list = (java.util.List<?>) input;
-              String first = String.valueOf(list.get(0));
+              List<String> inputs = params.input().arrayOfStrings().orElse(List.of());
+              String first = inputs.get(0);
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Context:"));
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Root \u203A Parent"));
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Title: T1"));
               org.junit.jupiter.api.Assertions.assertTrue(first.contains("Details:"));
-              return Single.just(result);
+              return response;
             });
 
     var streamed = service.streamEmbeddingsForNoteList(List.of(note1, note2)).toList();
@@ -77,10 +83,19 @@ class EmbeddingServiceTests {
     Note note1 = makeMe.aNote().please();
     Note note2 = makeMe.aNote().please();
 
-    EmbeddingResult result = new EmbeddingResult();
-    result.setData(List.of()); // Empty result
+    CreateEmbeddingResponse.Usage usage =
+        CreateEmbeddingResponse.Usage.builder().promptTokens(0L).totalTokens(0L).build();
+    CreateEmbeddingResponse response =
+        CreateEmbeddingResponse.builder()
+            .data(List.of()) // Empty result
+            .model("text-embedding-3-small")
+            .usage(usage)
+            .build();
 
-    when(openAiApi.createEmbeddings(any(EmbeddingRequest.class))).thenReturn(Single.just(result));
+    com.openai.services.blocking.EmbeddingService embeddingService =
+        Mockito.mock(com.openai.services.blocking.EmbeddingService.class);
+    when(officialClient.embeddings()).thenReturn(embeddingService);
+    when(embeddingService.create(any(EmbeddingCreateParams.class))).thenReturn(response);
 
     var streamed = service.streamEmbeddingsForNoteList(List.of(note1, note2)).toList();
 

@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRe
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.testability.MakeMe;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.junit.jupiter.api.Nested;
@@ -29,6 +30,9 @@ class FineTuningServiceTest {
 
   @MockitoBean(name = "testableOpenAiApi")
   private OpenAiApi openAiApi;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  private OpenAIClient officialClient;
 
   @Nested
   class getAllOpenAIChatGPTFineTuningExample {

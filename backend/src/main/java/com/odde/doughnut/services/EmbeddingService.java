@@ -1,12 +1,11 @@
 package com.odde.doughnut.services;
 
-import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
-
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
-import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.embedding.EmbeddingResult;
+import com.openai.client.OpenAIClient;
+import com.openai.models.embeddings.CreateEmbeddingResponse;
+import com.openai.models.embeddings.Embedding;
+import com.openai.models.embeddings.EmbeddingCreateParams;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -21,13 +20,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmbeddingService {
-  private final OpenAiApi openAiApi;
+  private final OpenAIClient officialClient;
   private static final int BATCH_SIZE = 64;
   private static final int MAX_TOKENS_PER_INPUT = 4000; // per-item token cap
   private static final String EMBEDDING_MODEL = "text-embedding-3-small";
 
-  public EmbeddingService(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
-    this.openAiApi = openAiApi;
+  public EmbeddingService(@Qualifier("officialOpenAiClient") OpenAIClient officialClient) {
+    this.officialClient = officialClient;
   }
 
   /**
@@ -65,18 +64,22 @@ public class EmbeddingService {
             List<String> inputs =
                 batch.stream().map(EmbeddingService.this::combineNoteContent).toList();
 
-            EmbeddingRequest request =
-                EmbeddingRequest.builder().model(EMBEDDING_MODEL).input(inputs).build();
+            EmbeddingCreateParams params =
+                EmbeddingCreateParams.builder()
+                    .model(EMBEDDING_MODEL)
+                    .inputOfArrayOfStrings(inputs)
+                    .build();
 
-            EmbeddingResult result = blockGet(openAiApi.createEmbeddings(request));
+            CreateEmbeddingResponse response = officialClient.embeddings().create(params);
 
-            if (result != null
-                && result.getData() != null
-                && result.getData().size() == batch.size()) {
+            if (response != null
+                && response.data() != null
+                && !response.data().isEmpty()
+                && response.data().size() == batch.size()) {
               for (int i = 0; i < batch.size(); i++) {
-                @SuppressWarnings("unchecked")
-                List<Float> embedding = (List<Float>) result.getData().get(i).getEmbedding();
-                buffer.addLast(new EmbeddingForNote(batch.get(i), Optional.of(embedding)));
+                Embedding embedding = response.data().get(i);
+                List<Float> embeddingVector = embedding.embedding();
+                buffer.addLast(new EmbeddingForNote(batch.get(i), Optional.of(embeddingVector)));
               }
             } else {
               // Fallback: emit empty optionals to keep alignment and progress
@@ -101,13 +104,12 @@ public class EmbeddingService {
     String input =
         new CharacterBasedTokenCountingStrategy()
             .truncateByApproxTokens(query == null ? "" : query.trim(), MAX_TOKENS_PER_INPUT);
-    EmbeddingRequest request =
-        EmbeddingRequest.builder().model(EMBEDDING_MODEL).input(List.of(input)).build();
-    EmbeddingResult result = blockGet(openAiApi.createEmbeddings(request));
-    if (result != null && result.getData() != null && !result.getData().isEmpty()) {
-      @SuppressWarnings("unchecked")
-      List<Float> embedding = (List<Float>) result.getData().get(0).getEmbedding();
-      return embedding;
+    EmbeddingCreateParams params =
+        EmbeddingCreateParams.builder().model(EMBEDDING_MODEL).input(input).build();
+    CreateEmbeddingResponse response = officialClient.embeddings().create(params);
+    if (response != null && response.data() != null && !response.data().isEmpty()) {
+      Embedding embedding = response.data().get(0);
+      return embedding.embedding();
     }
     return List.of();
   }

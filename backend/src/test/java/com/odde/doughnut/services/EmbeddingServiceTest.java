@@ -7,28 +7,37 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.entities.Note;
-import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.embedding.Embedding;
-import com.theokanning.openai.embedding.EmbeddingRequest;
-import com.theokanning.openai.embedding.EmbeddingResult;
-import io.reactivex.Single;
+import com.openai.client.OpenAIClient;
+import com.openai.models.embeddings.CreateEmbeddingResponse;
+import com.openai.models.embeddings.Embedding;
+import com.openai.models.embeddings.EmbeddingCreateParams;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 
 class EmbeddingServiceTest {
 
   @Test
   void streamEmbeddingsForNoteList_shouldNotExceedApprox8000TokenBytesPerItem() {
-    OpenAiApi api = org.mockito.Mockito.mock(OpenAiApi.class);
-    EmbeddingResult result = new EmbeddingResult();
-    Embedding emb = new Embedding();
-    emb.setEmbedding(List.of(0.1f));
-    result.setData(List.of(emb));
-    when(api.createEmbeddings(any(EmbeddingRequest.class))).thenReturn(Single.just(result));
+    OpenAIClient officialClient = Mockito.mock(OpenAIClient.class);
+    com.openai.services.blocking.EmbeddingService embeddingService =
+        Mockito.mock(com.openai.services.blocking.EmbeddingService.class);
+    when(officialClient.embeddings()).thenReturn(embeddingService);
 
-    EmbeddingService service = new EmbeddingService(api);
+    Embedding emb = Embedding.builder().index(0L).embedding(List.of(0.1f)).build();
+    CreateEmbeddingResponse.Usage usage =
+        CreateEmbeddingResponse.Usage.builder().promptTokens(0L).totalTokens(0L).build();
+    CreateEmbeddingResponse response =
+        CreateEmbeddingResponse.builder()
+            .data(List.of(emb))
+            .model("text-embedding-3-small")
+            .usage(usage)
+            .build();
+    when(embeddingService.create(any(EmbeddingCreateParams.class))).thenReturn(response);
+
+    EmbeddingService service = new EmbeddingService(officialClient);
 
     Note note = new Note();
     String longChunk = "你".repeat(10000) + "a".repeat(80000);
@@ -38,18 +47,13 @@ class EmbeddingServiceTest {
     // Trigger one batch call
     service.streamEmbeddingsForNoteList(List.of(note)).forEach(e -> {});
 
-    ArgumentCaptor<EmbeddingRequest> captor = ArgumentCaptor.forClass(EmbeddingRequest.class);
-    verify(api).createEmbeddings(captor.capture());
-    EmbeddingRequest req = captor.getValue();
+    ArgumentCaptor<EmbeddingCreateParams> captor =
+        ArgumentCaptor.forClass(EmbeddingCreateParams.class);
+    verify(embeddingService).create(captor.capture());
+    EmbeddingCreateParams req = captor.getValue();
 
-    Object input = req.getInput();
-    String sent;
-    if (input instanceof List<?> list && !list.isEmpty()) {
-      Object first = list.get(0);
-      sent = String.valueOf(first);
-    } else {
-      sent = String.valueOf(input);
-    }
+    List<String> inputs = req.input().arrayOfStrings().orElse(List.of());
+    String sent = inputs.isEmpty() ? "" : inputs.get(0);
 
     int maxBytes = (int) Math.floor(8000 * 3.75);
     int sentBytes = sent.getBytes(StandardCharsets.UTF_8).length;

@@ -11,6 +11,7 @@ import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.reactivex.Flowable;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,10 @@ class ChatCompletionConversationServiceTest {
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @MockitoBean OpenAiApiHandler openAiApiHandler;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired ChatCompletionConversationService service;
   @Mock ConversationService conversationService;
 

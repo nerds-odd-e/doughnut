@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.openai.client.OpenAIClient;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +30,15 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
+@DirtiesContext
 class ObsidianFormatServiceTest {
   @Autowired private MakeMe makeMe;
   @Autowired ObsidianFormatService obsidianFormatService;
   @Autowired TestabilitySettings testabilitySettings;
   @MockitoBean AuthorizationService authorizationService;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
 
   private Note headNote;
   private User user;

@@ -10,6 +10,7 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -37,6 +38,9 @@ class AiOpenAiAssistantFactoryTriggerFineTuningTest {
 
   @MockitoBean(name = "testableOpenAiApi")
   private OpenAiApi openAiApi;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  private OpenAIClient officialClient;
 
   @Autowired OtherAiServices otherAiServices;
 
