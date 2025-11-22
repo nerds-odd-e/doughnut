@@ -11,19 +11,22 @@ import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.client.OpenAIClient;
+import com.openai.models.files.FileCreateParams;
+import com.openai.models.files.FileObject;
+import com.openai.services.blocking.FileService;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import io.reactivex.Single;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okio.Buffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -61,8 +64,9 @@ class AiOpenAiAssistantFactoryTriggerFineTuningTest {
 
     @Test
     void whenOpenAiServiceFailShouldGetFailMessage() {
-      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenThrow(new RuntimeException());
+      FileService fileService = Mockito.mock(FileService.class);
+      when(officialClient.files()).thenReturn(fileService);
+      when(fileService.create(any(FileCreateParams.class))).thenThrow(new RuntimeException());
       var result =
           assertThrows(
               OpenAIServiceErrorException.class,
@@ -78,18 +82,39 @@ class AiOpenAiAssistantFactoryTriggerFineTuningTest {
       private List<String> fileContents = new ArrayList<>();
 
       @BeforeEach
-      void setup() {
-        File fakeResponse = new File();
-        fakeResponse.setId("TestFileId");
-        when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-            .then(
+      void setup() throws IOException {
+        FileService fileService = Mockito.mock(FileService.class);
+        when(officialClient.files()).thenReturn(fileService);
+        // Use the actual FileObject returned from the API call to get the correct purpose type
+        FileObject fakeFileResponse =
+            FileObject.builder()
+                .id("TestFileId")
+                .bytes(0L)
+                .createdAt(System.currentTimeMillis() / 1000)
+                .filename("test.jsonl")
+                .purpose(com.openai.models.files.FileObject.Purpose.FINE_TUNE)
+                .status(com.openai.models.files.FileObject.Status.PROCESSED)
+                .build();
+        ArgumentCaptor<FileCreateParams> paramsCaptor =
+            ArgumentCaptor.forClass(FileCreateParams.class);
+        when(fileService.create(paramsCaptor.capture()))
+            .thenAnswer(
                 invocation -> {
-                  MultipartBody.Part file = invocation.getArgument(1);
-                  fileContents.add(getFileContent(file));
-                  return Single.just(fakeResponse);
+                  FileCreateParams params = invocation.getArgument(0);
+                  // Extract file content from the Path
+                  Object fileParam = params.file();
+                  if (fileParam instanceof Path path) {
+                    fileContents.add(Files.readString(path));
+                  } else if (fileParam instanceof java.io.InputStream inputStream) {
+                    fileContents.add(new String(inputStream.readAllBytes()));
+                  } else if (fileParam instanceof byte[] bytes) {
+                    fileContents.add(new String(bytes));
+                  }
+                  return fakeFileResponse;
                 });
         FineTuningJob fakeFineTuningResponse = new FineTuningJob();
         fakeFineTuningResponse.setStatus("success");
+        fakeFineTuningResponse.setFineTunedModel("ft:gpt-3.5-turbo-1106:test");
         when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
       }
 
@@ -101,20 +126,6 @@ class AiOpenAiAssistantFactoryTriggerFineTuningTest {
         List<String> lines = fileContents.get(0).lines().toList();
         assertThat(lines, hasSize(10));
         assertThat(lines.get(0), containsString("{\"messages\":["));
-      }
-
-      private static String getFileContent(MultipartBody.Part file) {
-        RequestBody requestBody = file.body();
-        String fileContent = "";
-
-        try {
-          Buffer buffer = new Buffer();
-          requestBody.writeTo(buffer);
-          fileContent = buffer.readUtf8();
-        } catch (IOException e) {
-          fail("Failed to read the file content");
-        }
-        return fileContent;
       }
     }
   }

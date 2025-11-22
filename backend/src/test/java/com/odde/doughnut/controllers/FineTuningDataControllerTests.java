@@ -11,16 +11,18 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.openai.client.OpenAIClient;
+import com.openai.models.files.FileCreateParams;
+import com.openai.models.files.FileObject;
+import com.openai.services.blocking.FileService;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.file.File;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import io.reactivex.Single;
 import java.util.List;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
@@ -30,6 +32,9 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
 
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
+
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
 
   @BeforeEach
   void setup() {
@@ -48,12 +53,21 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void shouldSuccessWhen10FeedbackAndUploadFileAndTriggerFineTune() {
       mockFeedback(11);
-      File fakeResponse = new File();
-      fakeResponse.setId("TestFileId");
+      FileService fileService = Mockito.mock(FileService.class);
+      when(officialClient.files()).thenReturn(fileService);
+      FileObject fakeFileResponse =
+          FileObject.builder()
+              .id("TestFileId")
+              .bytes(0L)
+              .createdAt(System.currentTimeMillis() / 1000)
+              .filename("test.jsonl")
+              .purpose(com.openai.models.files.FileObject.Purpose.FINE_TUNE)
+              .status(com.openai.models.files.FileObject.Status.PROCESSED)
+              .build();
+      when(fileService.create(any(FileCreateParams.class))).thenReturn(fakeFileResponse);
       FineTuningJob fakeFineTuningResponse = new FineTuningJob();
       fakeFineTuningResponse.setStatus("success");
-      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenReturn(Single.just(fakeResponse));
+      fakeFineTuningResponse.setFineTunedModel("ft:gpt-3.5-turbo-1106:test");
       when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
       assertDoesNotThrow(() -> controller.uploadAndTriggerFineTuning());
     }
@@ -69,8 +83,9 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
     @Test
     void whenOpenAiServiceFailShouldGetFailMessageAndTriggerFineTune() {
       mockFeedback(10);
-      when(openAiApi.uploadFile(any(RequestBody.class), any(MultipartBody.Part.class)))
-          .thenThrow(new RuntimeException());
+      FileService fileService = Mockito.mock(FileService.class);
+      when(officialClient.files()).thenReturn(fileService);
+      when(fileService.create(any(FileCreateParams.class))).thenThrow(new RuntimeException());
       var result =
           assertThrows(
               OpenAIServiceErrorException.class, () -> controller.uploadAndTriggerFineTuning());

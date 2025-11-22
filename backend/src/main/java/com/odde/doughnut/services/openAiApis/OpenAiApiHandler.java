@@ -23,6 +23,9 @@ import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageToolCall;
 import com.openai.models.chat.completions.ChatCompletionTool;
+import com.openai.models.files.FileCreateParams;
+import com.openai.models.files.FileObject;
+import com.openai.models.files.FilePurpose;
 import com.openai.models.images.Image;
 import com.openai.models.images.ImageGenerateParams;
 import com.openai.models.images.ImagesResponse;
@@ -47,8 +50,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -481,13 +482,13 @@ public class OpenAiApiHandler {
     File tempFile = File.createTempFile(subFileName, suffix);
     try {
       Files.write(tempFile.toPath(), content.getBytes(), StandardOpenOption.WRITE);
-      RequestBody fileRequestBody =
-          RequestBody.create(MediaType.parse("application/octet-stream"), tempFile);
-      MultipartBody.Part filePart =
-          MultipartBody.Part.createFormData("file", tempFile.getName(), fileRequestBody);
-      RequestBody purposeBody = RequestBody.create(MediaType.parse("text/plain"), purpose);
       try {
-        return blockGet(openAiApi.uploadFile(purposeBody, filePart)).getId();
+        FilePurpose filePurpose =
+            "fine-tune".equals(purpose) ? FilePurpose.FINE_TUNE : FilePurpose.ASSISTANTS;
+        FileCreateParams params =
+            FileCreateParams.builder().purpose(filePurpose).file(tempFile.toPath()).build();
+        FileObject fileObject = officialClient.files().create(params);
+        return fileObject.id();
       } catch (Exception e) {
         throw new OpenAIServiceErrorException("Upload failed.", HttpStatus.INTERNAL_SERVER_ERROR);
       }
@@ -497,6 +498,8 @@ public class OpenAiApiHandler {
   }
 
   public FineTuningJob triggerFineTuning(String fileId) {
+    // Fine-tuning API is not yet available in the official SDK 4.8.0
+    // Keep using legacy client for now
     FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
     fineTuningJobRequest.setTrainingFile(fileId);
     fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
