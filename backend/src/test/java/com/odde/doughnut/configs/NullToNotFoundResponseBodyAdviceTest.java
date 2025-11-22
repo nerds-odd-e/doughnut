@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +32,9 @@ class NullToNotFoundResponseBodyAdviceTest {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
 
   @TestBean protected CurrentUser currentUser;
@@ -44,7 +48,7 @@ class NullToNotFoundResponseBodyAdviceTest {
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     // Mock null chat completion to make askAQuestion return null
     openAIChatCompletionMock.mockNullChatCompletion();
   }

@@ -17,8 +17,8 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +33,9 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
   @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
@@ -43,7 +46,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     currentUser.setUser(makeMe.aUser().please());
     testabilitySettings.setRandomization(new Randomization(first, 1));
 
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
     // Mock chat completion for question evaluation
     QuestionEvaluation evaluation = new QuestionEvaluation();
@@ -203,22 +206,23 @@ class RecallPromptControllerTests extends ControllerTestBase {
       controller.regenerate(recallPrompt, contestResult);
 
       // Verify chat completion call contains message with question info and contest result
-      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi, atLeastOnce()).createChatCompletion(requestCaptor.capture());
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService(), atLeastOnce())
+          .create(paramsCaptor.capture());
 
       // Check if any message contains the required contest info
       boolean hasContestInfo =
-          requestCaptor.getValue().getMessages().stream()
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
               .anyMatch(
-                  message -> {
-                    String content = message.toString();
-                    return content.contains("Previously generated non-feasible question")
-                        && content.contains("Improvement advice")
-                        && content.contains("test")
-                        && content.contains(
-                            "Please regenerate or refine the question based on the above advice");
-                  });
+                  content ->
+                      content.contains("Previously generated non-feasible question")
+                          && content.contains("Improvement advice")
+                          && content.contains("test")
+                          && content.contains(
+                              "Please regenerate or refine the question based on the above advice"));
 
       assertThat("A message should contain the contest information", hasContestInfo, is(true));
     }
@@ -271,11 +275,11 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       controller.contest(recallPrompt);
 
-      ArgumentCaptor<com.theokanning.openai.completion.chat.ChatCompletionRequest> argumentCaptor =
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(
-              com.theokanning.openai.completion.chat.ChatCompletionRequest.class);
-      verify(openAiApi).createChatCompletion(argumentCaptor.capture());
-      assertThat(argumentCaptor.getValue().getModel(), equalTo("gpt-new"));
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      assertThat(paramsCaptor.getValue().model().asString(), equalTo("gpt-new"));
     }
 
     @Test

@@ -12,6 +12,7 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.utils.Randomizer;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.Arrays;
 import java.util.List;
@@ -30,6 +31,9 @@ class AiQuestionGeneratorTests {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
@@ -40,7 +44,7 @@ class AiQuestionGeneratorTests {
   @BeforeEach
   void setup() {
     // Initialize chat completion mock
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
   }
 
   @Test

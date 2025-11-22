@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -33,6 +34,9 @@ class NoteQuestionGenerationServiceTests {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
   @Autowired NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
@@ -43,7 +47,7 @@ class NoteQuestionGenerationServiceTests {
   @BeforeEach
   void setup() {
     // Initialize OpenAIChatCompletionMock
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();
@@ -89,15 +93,15 @@ class NoteQuestionGenerationServiceTests {
       service.generateQuestion(null);
 
       // Verify
-      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi).createChatCompletion(requestCaptor.capture());
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
 
-      // Check if any message contains the expected text
       boolean hasQuestionDesignerInstruction =
-          requestCaptor.getValue().getMessages().stream()
-              .anyMatch(
-                  message -> message.toString().contains("Please act as a Question Designer"));
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
+              .anyMatch(msg -> msg.contains("Please act as a Question Designer"));
 
       assertThat(
           "A message should contain the Question Designer instruction",
@@ -121,11 +125,12 @@ class NoteQuestionGenerationServiceTests {
       service.generateQuestion(null);
 
       // Verify
-      ArgumentCaptor<ChatCompletionRequest> requestCaptor =
-          ArgumentCaptor.forClass(ChatCompletionRequest.class);
-      verify(openAiApi).createChatCompletion(requestCaptor.capture());
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
 
-      assertThat(requestCaptor.getValue().getModel(), is("gpt-4o-mini"));
+      assertThat(paramsCaptor.getValue().model().asString(), is("gpt-4o-mini"));
     }
 
     @Test

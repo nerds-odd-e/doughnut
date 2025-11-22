@@ -13,6 +13,7 @@ import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionResult;
 import io.reactivex.Single;
@@ -34,6 +35,9 @@ class NoteAutomationServiceTests {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
@@ -43,7 +47,7 @@ class NoteAutomationServiceTests {
 
   @BeforeEach
   void setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
 
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();

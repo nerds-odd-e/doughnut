@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,7 +12,7 @@ import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
 import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.theokanning.openai.completion.chat.ChatMessage;
+import com.openai.client.OpenAIClient;
 import io.reactivex.Single;
 import java.io.IOException;
 import okhttp3.RequestBody;
@@ -23,6 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -40,6 +40,9 @@ class AiAudioControllerTests {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApiExtended openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
@@ -49,7 +52,7 @@ class AiAudioControllerTests {
 
   private void setupMocks() {
     NoteDetailsCompletion completion = new NoteDetailsCompletion(0, "test123");
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(completion);
     mockTranscriptionSrtResponse("test transcription");
   }
@@ -140,19 +143,15 @@ class AiAudioControllerTests {
       controller.audioToText(audioUploadDTO);
 
       // Verify
-      verify(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request -> {
-                    assertThat(
-                        request.getMessages().stream()
-                            .filter(m -> "system".equals(m.getRole()))
-                            .findFirst()
-                            .map(ChatMessage::getTextContent)
-                            .orElse(""),
-                        containsString("Additional instruction:\nTranslate to Spanish"));
-                    return true;
-                  }));
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      boolean hasInstruction =
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
+              .anyMatch(msg -> msg.contains("Additional instruction:\nTranslate to Spanish"));
+      assertTrue(hasInstruction);
     }
 
     @Test
@@ -161,17 +160,15 @@ class AiAudioControllerTests {
       controller.audioToText(audioUploadDTO);
 
       // Verify
-      verify(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request -> {
-                    boolean hasNoAdditionalInstructions =
-                        request.getMessages().stream()
-                            .filter(m -> "system".equals(m.getRole()))
-                            .noneMatch(m -> m.getTextContent().contains("Additional instruction"));
-                    assertTrue(hasNoAdditionalInstructions);
-                    return true;
-                  }));
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      boolean hasNoAdditionalInstructions =
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
+              .noneMatch(msg -> msg.contains("Additional instruction"));
+      assertTrue(hasNoAdditionalInstructions);
     }
 
     @Test
@@ -184,24 +181,18 @@ class AiAudioControllerTests {
       controller.audioToText(audioUploadDTO);
 
       // Verify
-      verify(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request -> {
-                    String expectedJson =
-                        "{\"previousNoteDetailsToAppendTo\": \"Previous text with trailing space \"}";
-                    assertThat(
-                        request.getMessages().stream()
-                            .filter(m -> "user".equals(m.getRole()))
-                            .map(ChatMessage::getTextContent)
-                            .anyMatch(
-                                content ->
-                                    content.contains(
-                                        "Previous note details (in JSON format):\n"
-                                            + expectedJson)),
-                        equalTo(true));
-                    return true;
-                  }));
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      String expectedJson =
+          "{\"previousNoteDetailsToAppendTo\": \"Previous text with trailing space \"}";
+      boolean hasPreviousContent =
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
+              .anyMatch(
+                  msg -> msg.contains("Previous note details (in JSON format):\n" + expectedJson));
+      assertThat(hasPreviousContent, equalTo(true));
     }
 
     @Test
@@ -210,20 +201,15 @@ class AiAudioControllerTests {
       controller.audioToText(audioUploadDTO);
 
       // Verify
-      verify(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request -> {
-                    boolean hasNoPreviousContent =
-                        request.getMessages().stream()
-                            .filter(m -> "user".equals(m.getRole()))
-                            .noneMatch(
-                                m ->
-                                    m.getTextContent()
-                                        .contains("Previous content (in JSON format):"));
-                    assertTrue(hasNoPreviousContent);
-                    return true;
-                  }));
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      boolean hasNoPreviousContent =
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
+              .noneMatch(msg -> msg.contains("Previous content (in JSON format):"));
+      assertTrue(hasNoPreviousContent);
     }
   }
 }

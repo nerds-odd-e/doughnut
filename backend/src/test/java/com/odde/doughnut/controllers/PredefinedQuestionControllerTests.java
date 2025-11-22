@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -15,11 +14,14 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.quizFacotries.PredefinedQuestionNotPossibleException;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -28,13 +30,16 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
   @MockitoBean(name = "testableOpenAiApi")
   OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   @Autowired PredefinedQuestionController controller;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     currentUser.setUser(makeMe.aUser().please());
   }
 
@@ -216,7 +221,8 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
                   "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),
           "");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
-      verify(openAiApi, Mockito.times(1)).createChatCompletion(any());
+      verify(openAIChatCompletionMock.completionService(), Mockito.times(1))
+          .create(ArgumentMatchers.any(ChatCompletionCreateParams.class));
     }
   }
 

@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
@@ -23,9 +24,11 @@ import com.theokanning.openai.model.Model;
 import io.reactivex.Single;
 import java.util.ArrayList;
 import java.util.List;
+import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -122,7 +125,7 @@ class AiControllerTest extends ControllerTestBase {
     @BeforeEach
     void setup() {
       testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
       openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
@@ -140,19 +143,16 @@ class AiControllerTest extends ControllerTestBase {
     void shouldCallChatCompletionWithRightMessage()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       controller.suggestTitle(testNote);
-      verify(openAiApi)
-          .createChatCompletion(
-              argThat(
-                  request -> {
-                    String userMessage =
-                        request.getMessages().stream()
-                            .filter(m -> "user".equals(m.getRole()))
-                            .findFirst()
-                            .map(m -> m.getTextContent())
-                            .orElse("");
-                    assertThat(userMessage).contains("Please suggest a better title for the note");
-                    return true;
-                  }));
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      boolean hasInstruction =
+          paramsCaptor.getValue().messages().stream()
+              .map(Object::toString)
+              .anyMatch(msg -> msg.contains("Please suggest a better title for the note"));
+      MatcherAssert.assertThat(
+          "A message should contain the Question Designer instruction", hasInstruction, is(true));
     }
 
     @Test

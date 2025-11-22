@@ -11,6 +11,7 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -31,13 +32,16 @@ class AiOpenAiAssistantFactoryWithDBTest {
   @MockitoBean(name = "testableOpenAiApi")
   private OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  private OpenAIClient officialClient;
+
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   private OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
-    openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
   }
 
   @Nested
