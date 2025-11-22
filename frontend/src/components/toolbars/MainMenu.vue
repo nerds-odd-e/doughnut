@@ -216,14 +216,14 @@ const showUserSettingsDialog = () => {
   a[href="https://odd-e.com"] {
     display: none;
   }
+
+  .daisy-dropdown { @apply daisy-dropdown-end; }
 }
 
 @media (max-width: theme('screens.md')) {
   :deep(.label) {
     display: none;
   }
-
-  .daisy-dropdown { @apply daisy-dropdown-end; }
 }
 
 </style>
