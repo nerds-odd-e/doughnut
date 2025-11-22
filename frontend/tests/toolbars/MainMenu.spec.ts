@@ -118,7 +118,9 @@ describe("main menu", () => {
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
-      expect(mockGetCount).toHaveBeenCalledWith({ timezone: timezoneParam() })
+      expect(mockGetCount).toHaveBeenCalledWith({
+        query: { timezone: timezoneParam() },
+      })
     })
   })
 
@@ -168,7 +170,7 @@ describe("main menu", () => {
 
       expect(mockGetOverview).toHaveBeenCalledTimes(2)
       expect(mockGetOverview).toHaveBeenCalledWith({
-        timezone: timezoneParam(),
+        query: { timezone: timezoneParam() },
       })
     })
   })

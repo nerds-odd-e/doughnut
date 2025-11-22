@@ -39,8 +39,8 @@ const emit = defineEmits(["close"])
 
 const updateAiInstructions = async () => {
   await managedApi.services.updateAiAssistant({
-    notebook: props.notebook.id,
-    requestBody: {
+    path: { notebook: props.notebook.id },
+    body: {
       additionalInstructions: additionalInstruction.value,
     },
   })
@@ -48,7 +48,7 @@ const updateAiInstructions = async () => {
 
 const downloadNotebookDump = async () => {
   const notes = await managedApi.services.downloadNotebookDump({
-    notebook: props.notebook.id,
+    path: { notebook: props.notebook.id },
   })
   const blob = new Blob([JSON.stringify(notes, null, 2)], {
     type: "application/json",
@@ -59,7 +59,7 @@ const downloadNotebookDump = async () => {
 const loadCurrentSettings = async () => {
   try {
     const assistant = await managedApi.services.getAiAssistant({
-      notebook: props.notebook.id,
+      path: { notebook: props.notebook.id },
     })
     if (assistant) {
       additionalInstruction.value = assistant.additionalInstructionsToAi || ""

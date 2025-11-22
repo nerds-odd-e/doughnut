@@ -1,15 +1,39 @@
-import { OpenAPI, ApiError, CancelablePromise } from "@generated/backend"
+// Note: The new client throws errors directly, not wrapped in ApiError
+// We'll handle errors generically
+import { client } from "@generated/backend/client.gen"
 import * as Services from "@generated/backend/sdk.gen"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
 
-// Set up OpenAPI config
-OpenAPI.BASE = ""
-OpenAPI.VERSION = "0"
-OpenAPI.WITH_CREDENTIALS = true
-OpenAPI.CREDENTIALS = "include"
+// Set up client config
+// Use current origin for relative URLs (empty string means same origin)
+client.setConfig({
+  baseUrl: typeof window !== "undefined" ? window.location.origin : "",
+  credentials: "include",
+})
+
+// Type helper to unwrap all service functions
+// Functions that return promises with wrapped responses get unwrapped to return just the data
+type UnwrappedServices<T> = {
+  [K in keyof T]: T[K] extends (...args: infer Args) => infer Return
+    ? Return extends Promise<infer R>
+      ? R extends {
+          data: infer D
+          error?: unknown
+          request?: unknown
+          response?: unknown
+        }
+        ? (...args: Args) => Promise<Exclude<D, undefined>>
+        : R extends { data: infer D; error: undefined }
+          ? (...args: Args) => Promise<Exclude<D, undefined>>
+          : R extends { data: infer D }
+            ? (...args: Args) => Promise<Exclude<D, undefined>>
+            : T[K]
+      : T[K]
+    : T[K]
+}
 
 class ManagedApi {
   apiStatus: ApiStatus
@@ -20,7 +44,7 @@ class ManagedApi {
 
   private isSilent: boolean
 
-  public readonly services: typeof Services
+  public readonly services: UnwrappedServices<typeof Services>
 
   constructor(apiStatus: ApiStatus, silent?: boolean) {
     this.apiStatus = apiStatus
@@ -32,7 +56,7 @@ class ManagedApi {
   }
 
   // Helper to wrap Services object for error handling and loading states
-  protected wrapServices(): typeof Services {
+  protected wrapServices(): UnwrappedServices<typeof Services> {
     const self = this
     const wrapped: Record<string, unknown> = {}
 
@@ -41,9 +65,7 @@ class ManagedApi {
       if (Object.hasOwn(Services, key)) {
         const value = (Services as Record<string, unknown>)[key]
         if (typeof value === "function") {
-          const originalFn = value as (
-            ...args: unknown[]
-          ) => CancelablePromise<unknown>
+          const originalFn = value as (...args: unknown[]) => Promise<unknown>
           wrapped[key] = (...args: unknown[]) => {
             return self.wrapServiceCall(() => originalFn(...args))
           }
@@ -53,50 +75,120 @@ class ManagedApi {
       }
     }
 
-    return wrapped as typeof Services
+    return wrapped as UnwrappedServices<typeof Services>
+  }
+
+  // Helper to extract data from response wrapper
+  // The new client returns { data, error, request, response } format by default
+  private extractData<T>(
+    response:
+      | T
+      | { data?: T; error?: unknown; request?: Request; response?: Response }
+  ): T {
+    if (response && typeof response === "object") {
+      // Check if this is the wrapped response format
+      if (
+        "error" in response ||
+        "data" in response ||
+        "request" in response ||
+        "response" in response
+      ) {
+        const wrapped = response as {
+          data?: T
+          error?: unknown
+          request?: Request
+          response?: Response
+        }
+        // If there's an error, throw it
+        if ("error" in wrapped && wrapped.error !== undefined) {
+          const error = wrapped.error
+          const errorObj = new Error(
+            typeof error === "string" ? error : "API Error"
+          ) as Error & {
+            status?: number
+            body?: unknown
+            request?: Request
+            url?: string
+          }
+          if (wrapped.response) {
+            errorObj.status = wrapped.response.status
+            errorObj.url = wrapped.response.url
+          }
+          if (wrapped.request) {
+            errorObj.request = wrapped.request
+          }
+          if (typeof error === "object" && error !== null) {
+            errorObj.body = error
+          } else if (typeof error === "string") {
+            errorObj.body = error
+          }
+          throw errorObj
+        }
+        // If there's data, return it
+        if ("data" in wrapped && wrapped.data !== undefined) {
+          return wrapped.data
+        }
+      }
+    }
+    // If it's not wrapped, return as-is (for backward compatibility)
+    return response as T
   }
 
   // Helper to wrap generated function calls with error handling and loading states
-  // This is used by service instances to handle ApiError and manage loading states
-  wrapServiceCall<T>(fn: () => CancelablePromise<T>): CancelablePromise<T> {
-    return new CancelablePromise<T>(async (resolve, reject, onCancel) => {
+  // This is used by service instances to handle errors and manage loading states
+  wrapServiceCall<T>(
+    fn: () => Promise<T | { data: T; error?: unknown }>
+  ): Promise<T> {
+    return (async () => {
       // Set loading state
       if (!this.isSilent) {
         this.apiStatusHandler.assignLoading(true)
       }
 
       try {
-        const originalPromise = fn()
-        onCancel(() => originalPromise.cancel())
-        const result = await originalPromise
+        const result = await fn()
 
         // Clear loading state on success
         if (!this.isSilent) {
           this.apiStatusHandler.assignLoading(false)
         }
 
-        resolve(result)
+        // Unwrap the response to return just the data
+        const unwrappedData = this.extractData(result)
+        return unwrappedData
       } catch (error) {
         // Clear loading state on error
         if (!this.isSilent) {
           this.apiStatusHandler.assignLoading(false)
         }
 
-        // ApiError is thrown by the generated code when the response is not OK
-        if (error instanceof ApiError) {
-          this.handleApiError(error)
-        }
-        reject(error)
+        // Handle errors - the new client may throw different error types
+        this.handleApiError(
+          error as Error & {
+            status?: number
+            body?: unknown
+            request?: { method?: string; url?: string }
+            url?: string
+          }
+        )
+        throw error
       }
-    })
+    })()
   }
 
-  private handleApiError(error: ApiError) {
+  private handleApiError(
+    error: Error & {
+      status?: number
+      body?: unknown
+      request?: { method?: string; url?: string }
+      url?: string
+    }
+  ) {
     if (this.isSilent) return
 
     if (error.status === 401) {
       if (
-        error.request.method === "GET" ||
+        error.request?.method === "GET" ||
         // eslint-disable-next-line no-alert
         window.confirm(
           "You are logged out. Do you want to log in (and lose the current changes)?"
@@ -117,8 +209,8 @@ class ManagedApi {
 
     // For 404 errors, include endpoint details for better debugging
     if (error.status === 404) {
-      const method = error.request.method || "UNKNOWN"
-      const url = error.url || error.request.url || "UNKNOWN"
+      const method = error.request?.method || "UNKNOWN"
+      const url = error.url || error.request?.url || "UNKNOWN"
       const enhancedMsg = `[404 Not Found] ${method} ${url}\n\n${msg}`
       Object.defineProperty(error, "message", {
         value: enhancedMsg,
@@ -154,4 +246,4 @@ class ManagedApi {
 }
 
 export default ManagedApi
-export type { ApiStatus, ApiError }
+export type { ApiStatus }

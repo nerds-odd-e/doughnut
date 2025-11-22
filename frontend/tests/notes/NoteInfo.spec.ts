@@ -24,7 +24,7 @@ describe("note info", () => {
     await flushPromises()
     expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
     expect(helper.managedApi.services.getNoteInfo).toBeCalledWith({
-      note: 123,
+      path: { note: 123 },
     })
   })
 })

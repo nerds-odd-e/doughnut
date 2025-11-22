@@ -50,7 +50,7 @@ const fetchNotebooks = async () => {
 const approveNoteBook = async (approvalId: number) => {
   if (await popups.confirm(`Are you sure you want to approve this notebook?`)) {
     await managedApi.services.approve({
-      notebookCertificateApproval: approvalId,
+      path: { notebookCertificateApproval: approvalId },
     })
     fetchNotebooks()
   }

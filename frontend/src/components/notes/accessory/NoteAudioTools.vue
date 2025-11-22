@@ -116,7 +116,7 @@ const shouldSuggestTitle = (callCount: number): boolean => {
 
 const updateTopicIfSuggested = async (noteId: number) => {
   const suggestedTopic = await managedApi.services.suggestTitle({
-    note: noteId,
+    path: { note: noteId },
   })
   if (suggestedTopic?.title) {
     await storageAccessor
@@ -148,7 +148,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
     const response = await managedApi.services.audioToText({
-      formData: {
+      body: {
         uploadAudioFile: chunk.data,
         additionalProcessingInstructions: processingInstructions.value,
         isMidSpeech: chunk.isMidSpeech,

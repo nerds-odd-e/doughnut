@@ -1,5 +1,5 @@
 import type { NoteTopology } from "@generated/backend"
-import { LinkCreation } from "@generated/backend"
+// Using string literals for linkType values
 
 interface LinkTypeOption {
   label: NoteTopology["linkType"]
@@ -9,63 +9,63 @@ interface LinkTypeOption {
 const linkTypeOptions = [
   {
     reversedLabel: "no link",
-    label: LinkCreation.linkType.NO_LINK,
+    label: "no link" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "related to",
-    label: LinkCreation.linkType.RELATED_TO,
+    label: "related to" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "a generalization of",
-    label: LinkCreation.linkType.A_SPECIALIZATION_OF,
+    label: "a specialization of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "applied to",
-    label: LinkCreation.linkType.AN_APPLICATION_OF,
+    label: "an application of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "has instances",
-    label: LinkCreation.linkType.AN_INSTANCE_OF,
+    label: "an instance of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "has parts",
-    label: LinkCreation.linkType.A_PART_OF,
+    label: "a part of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "tagging",
-    label: LinkCreation.linkType.TAGGED_BY,
+    label: "tagged by" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "has attributes",
-    label: LinkCreation.linkType.AN_ATTRIBUTE_OF,
+    label: "an attribute of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "the opposite of",
-    label: LinkCreation.linkType.THE_OPPOSITE_OF,
+    label: "the opposite of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "brought by",
-    label: LinkCreation.linkType.AUTHOR_OF,
+    label: "author of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "used by",
-    label: LinkCreation.linkType.USING,
+    label: "using" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "has examples",
-    label: LinkCreation.linkType.AN_EXAMPLE_OF,
+    label: "an example of" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "after",
-    label: LinkCreation.linkType.BEFORE,
+    label: "before" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "similar to",
-    label: LinkCreation.linkType.SIMILAR_TO,
+    label: "similar to" as NoteTopology["linkType"],
   },
   {
     reversedLabel: "confused with",
-    label: LinkCreation.linkType.CONFUSED_WITH,
+    label: "confused with" as NoteTopology["linkType"],
   },
 ] as LinkTypeOption[]
 

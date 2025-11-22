@@ -1,7 +1,6 @@
 import { mainMenu } from '../pageObjects/mainMenu'
 import start from '../index'
 import * as Services from '@generated/backend/sdk.gen'
-import { OpenAPI } from '@generated/backend/core/OpenAPI'
 
 export const loginActions = {
   logout() {
@@ -12,7 +11,7 @@ export const loginActions = {
     }).then((response) => {
       expect(response.status).to.equal(204)
     })
-    cy.wrap('').as('currentLoginUser')
+    cy.wrap(null).as('currentLoginUser')
     cy.pageIsNotLoading()
     return this
   },
@@ -23,24 +22,15 @@ export const loginActions = {
       return start
     }
 
-    const password = 'password'
-
-    // Set Basic auth in OpenAPI config
-    const originalUsername = OpenAPI.USERNAME
-    const originalPassword = OpenAPI.PASSWORD
-    OpenAPI.USERNAME = username
-    OpenAPI.PASSWORD = password
-
     // Call the service directly - it will use cy.request via our custom request function
     cy.wrap(username).as('currentLoginUser')
-    return Services.ping()
+    return Services.ping({
+      headers: {
+        Authorization: `Basic ${btoa(`${username}:password`)}`,
+      },
+    } as Parameters<typeof Services.ping>[0])
       .then(() => {
         // Success
-      })
-      .finally(() => {
-        // Restore original credentials
-        OpenAPI.USERNAME = originalUsername
-        OpenAPI.PASSWORD = originalPassword
       })
       .then(() => start)
   },

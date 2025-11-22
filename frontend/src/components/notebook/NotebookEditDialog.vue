@@ -135,8 +135,8 @@ const showIndexingComplete = ref(false)
 const processForm = () => {
   managedApi.services
     .updateNotebook({
-      notebook: props.notebook.id,
-      requestBody: formData.value,
+      path: { notebook: props.notebook.id },
+      body: formData.value,
     })
     .then(() => {
       router.go(0)
@@ -166,8 +166,8 @@ const handleObsidianImport = async (event: Event) => {
 
   try {
     await managedApi.services.importObsidian({
-      notebook: props.notebook.id,
-      formData: { file },
+      path: { notebook: props.notebook.id },
+      body: { file },
     })
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
@@ -182,7 +182,7 @@ const reindexNotebook = async () => {
   isIndexing.value = true
   try {
     await managedApi.services.resetNotebookIndex({
-      notebook: props.notebook.id,
+      path: { notebook: props.notebook.id },
     })
     showIndexingComplete.value = true
   } catch (error) {
@@ -197,7 +197,7 @@ const updateIndexNotebook = async () => {
   isIndexing.value = true
   try {
     await managedApi.services.updateNotebookIndex({
-      notebook: props.notebook.id,
+      path: { notebook: props.notebook.id },
     })
     showIndexingComplete.value = true
   } catch (error) {

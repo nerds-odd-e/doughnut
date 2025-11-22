@@ -1,7 +1,7 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
 import * as Services from '@generated/backend/sdk.gen'
-import { OpenAPI } from '@generated/backend'
+import { client } from '@generated/backend/client.gen'
 import type { CreateNoteViaMcpResponse } from '@generated/backend'
 
 // Mock the generated services
@@ -13,8 +13,12 @@ describe('add_note tool', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Set up OpenAPI config for tests
-    OpenAPI.BASE = 'http://localhost:8080'
-    OpenAPI.TOKEN = 'test-token'
+    client.setConfig({
+      baseUrl: 'http://localhost:8080',
+      headers: {
+        Authorization: 'Bearer test-token',
+      },
+    })
   })
 
   test('should call API and return success', async () => {

@@ -103,8 +103,8 @@ export default defineComponent({
       if (!validated) return
       const updated =
         await this.managedApi.services.updateSuggestedQuestionForFineTuning({
-          suggestedQuestion: this.modelValue.id,
-          requestBody: validated,
+          path: { suggestedQuestion: this.modelValue.id },
+          body: validated,
         })
       this.$emit("update:modelValue", updated)
     },

@@ -22,7 +22,7 @@
 
 <script lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
-import type { Notebook, SubscriptionDTO } from "@generated/backend"
+import type { Notebook, SubscriptionDto } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -39,7 +39,7 @@ export default defineComponent({
   components: { TextInput },
   data() {
     return {
-      formData: { dailyTargetOfNewNotes: 5 } as SubscriptionDTO,
+      formData: { dailyTargetOfNewNotes: 5 } as SubscriptionDto,
       errors: {},
     }
   },
@@ -48,8 +48,8 @@ export default defineComponent({
     processForm() {
       this.managedApi.services
         .createSubscription({
-          notebook: this.notebook.id,
-          requestBody: this.formData,
+          path: { notebook: this.notebook.id },
+          body: this.formData,
         })
         .then(() => {
           this.$emit("closeDialog")

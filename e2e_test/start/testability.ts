@@ -16,31 +16,44 @@ const hourOfDay = (days: number, hours: number) => {
 }
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
-  Services.resetDbAndTestabilitySettings()
-    .then(() => {
-      // Success
+  return cy
+    .wrap(Services.resetDbAndTestabilitySettings(), {
+      log: false,
     })
-    .catch((error) => {
-      if (countdown > 0) {
-        cleanAndReset(cy, countdown - 1)
-      } else {
-        throw error
+    .then(
+      () => {
+        // Success
+      },
+      (error) => {
+        if (countdown > 0) {
+          return cleanAndReset(cy, countdown - 1)
+        } else {
+          throw error
+        }
       }
-    })
+    )
 }
 
 const injectedNoteIdMapAliasName = 'injectedNoteIdMap'
 
+const unwrapData = <T>(result: T | { data: T } | undefined): T => {
+  if (result && typeof result === 'object' && 'data' in result) {
+    return (result as { data: T }).data
+  }
+  return result as T
+}
+
 const testability = () => {
   return {
     cleanDBAndResetTestabilitySettings() {
-      cleanAndReset(cy, 5)
-      cy.wrap({}).as(injectedNoteIdMapAliasName)
+      return cleanAndReset(cy, 5).then(() =>
+        cy.wrap({}).as(injectedNoteIdMapAliasName)
+      )
     },
 
     featureToggle(enabled: boolean) {
       return Services.enableFeatureToggle({
-        requestBody: { enabled: enabled.toString() },
+        body: { enabled: enabled.toString() },
       })
     },
 
@@ -55,18 +68,28 @@ const testability = () => {
         noteTestData,
       }
 
-      return Services.injectNotes({ requestBody }).then((response) => {
-        const expectedCount = noteTestData.length
-        const actualCount = Object.keys(response).length
-        expect(
-          actualCount,
-          `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
-        ).to.equal(expectedCount)
-        cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
-          const mergedMap = { ...existingMap, ...response }
-          cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
+      return cy
+        .wrap(
+          Services.injectNotes({
+            body: requestBody,
+          }),
+          { log: false }
+        )
+        .then((response) => {
+          const data = unwrapData<Record<string, number>>(response)
+          const expectedCount = noteTestData.length
+          const actualCount = Object.keys(data).length
+          expect(
+            actualCount,
+            `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
+          ).to.equal(expectedCount)
+          return cy
+            .get(`@${injectedNoteIdMapAliasName}`)
+            .then((existingMap) => {
+              const mergedMap = { ...existingMap, ...data }
+              cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
+            })
         })
-      })
     },
     injectNumberNotes(
       notebook: string,
@@ -85,13 +108,19 @@ const testability = () => {
     injectPredefinedQuestionsToNotebook(
       predefinedQuestionsTestData: PredefinedQuestionsTestData
     ) {
-      return Services.injectPredefinedQuestion({
-        requestBody: predefinedQuestionsTestData,
-      }).then((response) => {
-        expect(Object.keys(response).length).to.equal(
-          predefinedQuestionsTestData.predefinedQuestionTestData?.length
+      return cy
+        .wrap(
+          Services.injectPredefinedQuestion({
+            body: predefinedQuestionsTestData,
+          }),
+          { log: false }
         )
-      })
+        .then((response) => {
+          const data = unwrapData<Record<string, unknown>>(response)
+          expect(Object.keys(data).length).to.equal(
+            predefinedQuestionsTestData.predefinedQuestionTestData?.length
+          )
+        })
     },
     injectYesNoQuestionsForNumberNotes(
       notebook: string,
@@ -121,13 +150,15 @@ const testability = () => {
       creatorId: string,
       notebookCertifiable?: boolean
     ) {
-      this.injectNumberNotes(notebook, numberOfQuestion, creatorId)
-      this.injectYesNoQuestionsForNumberNotes(
-        notebook,
-        numberOfQuestion,
-        notebookCertifiable
-      )
-      this.shareToBazaar(notebook)
+      return this.injectNumberNotes(notebook, numberOfQuestion, creatorId)
+        .then(() =>
+          this.injectYesNoQuestionsForNumberNotes(
+            notebook,
+            numberOfQuestion,
+            notebookCertifiable
+          )
+        )
+        .then(() => this.shareToBazaar(notebook))
     },
     injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
       return cy
@@ -144,7 +175,9 @@ const testability = () => {
             target_id: toNoteId.toString(),
           }
 
-          const promise = Services.linkNotes({ requestBody })
+          const promise = Services.linkNotes({
+            body: requestBody,
+          })
           return cy.wrap(promise)
         })
     },
@@ -152,7 +185,7 @@ const testability = () => {
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
       return cy.get<string>('@currentLoginUser').then((username) => {
         const requestBody: SuggestedQuestionsData = { examples, username }
-        const promise = Services.injectSuggestedQuestion({ requestBody })
+        const promise = Services.injectSuggestedQuestion({ body: requestBody })
         return cy.wrap(promise)
       })
     },
@@ -197,7 +230,7 @@ const testability = () => {
     backendTimeTravelToDate(date: Date) {
       const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
 
-      return Services.timeTravel({ requestBody })
+      return Services.timeTravel({ body: requestBody })
     },
 
     backendTimeTravelTo(day: number, hour: number) {
@@ -205,7 +238,7 @@ const testability = () => {
         travel_to: JSON.stringify(hourOfDay(day, hour)),
       }
 
-      return Services.timeTravel({ requestBody })
+      return Services.timeTravel({ body: requestBody })
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
@@ -213,13 +246,15 @@ const testability = () => {
         hours,
       }
 
-      return Services.timeTravelRelativeToNow({ requestBody })
+      return Services.timeTravelRelativeToNow({
+        body: requestBody,
+      })
     },
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
       const requestBody: Randomization = { choose: strategy, seed }
 
-      return Services.randomizer({ requestBody })
+      return Services.randomizer({ body: requestBody })
     },
 
     triggerException() {
@@ -229,27 +264,32 @@ const testability = () => {
     shareToBazaar(noteTopology: string) {
       const requestBody = { noteTopology }
 
-      return Services.shareToBazaar({ requestBody })
+      return Services.shareToBazaar({
+        body: requestBody,
+      })
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      return Services.injectCircle({ requestBody: circleInfo })
+      return Services.injectCircle({ body: circleInfo })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
       return cy.get<string>('@currentLoginUser').then((username) => {
         const promise = Services.testabilityUpdateUser({
-          username,
-          requestBody: hash,
+          query: { username },
+          body: hash,
         })
         return cy.wrap(promise)
       })
     },
 
+
     setServiceUrl(serviceName: string, serviceUrl: string) {
       const requestBody = { [serviceName]: serviceUrl }
 
-      return Services.replaceServiceUrl({ requestBody }).then(() => {
+      return Services.replaceServiceUrl({
+        body: requestBody,
+      }).then(() => {
         // Service call succeeded
       })
     },

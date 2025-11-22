@@ -29,7 +29,7 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
   answeredQuestion.value = await managedApi.services.showQuestion({
-    recallPrompt: recallPromptId,
+    path: { recallPrompt: recallPromptId },
   })
 }
 

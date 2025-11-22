@@ -121,7 +121,7 @@ const fetchConversationMessages = async () => {
 
   currentConversationMessages.value =
     await managedApi.services.getConversationMessages({
-      conversationId: conversation.id,
+      path: { conversationId: conversation.id },
     })
   emit("conversation-fetched", conversation.id)
 }
@@ -131,8 +131,8 @@ const handleSendMessage = async (
   inviteAI: boolean = false
 ) => {
   await managedApi.services.replyToConversation({
-    conversationId: conversation.id,
-    requestBody: message,
+    path: { conversationId: conversation.id },
+    body: message,
   })
   await fetchConversationMessages()
 

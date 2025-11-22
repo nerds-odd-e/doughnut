@@ -25,7 +25,7 @@ const generateAssessmentQuestions = async () => {
   try {
     assessmentAttempt.value =
       await managedApi.services.generateAssessmentQuestions({
-        notebook: props.notebookId,
+        path: { notebook: props.notebookId },
       })
   } catch (err) {
     if (err instanceof Error) {

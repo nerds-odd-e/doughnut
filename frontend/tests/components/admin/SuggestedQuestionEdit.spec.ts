@@ -27,8 +27,8 @@ describe("Edit Suggested Question", () => {
       wrapper.get("button.daisy-btn-success").trigger("click")
       await flushPromises()
       expect(mockUpdate).toHaveBeenCalledWith({
-        suggestedQuestion: 1357,
-        requestBody: expect.anything(),
+        path: { suggestedQuestion: 1357 },
+        body: expect.anything(),
       })
     })
 

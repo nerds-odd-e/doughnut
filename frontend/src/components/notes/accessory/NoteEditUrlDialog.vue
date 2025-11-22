@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteAccessoriesDTO, NoteAccessory } from "@generated/backend"
+import type { NoteAccessoriesDto, NoteAccessory } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { defineComponent } from "vue"
 import UrlFormBody from "./UrlFormBody.vue"
@@ -29,7 +29,7 @@ export default defineComponent({
   data() {
     return {
       noteAccessory: undefined as NoteAccessory | undefined,
-      formData: {} as NoteAccessoriesDTO,
+      formData: {} as NoteAccessoriesDto,
       noteFormErrors: {},
     }
   },
@@ -38,13 +38,16 @@ export default defineComponent({
     async fetchData() {
       this.noteAccessory =
         (await this.managedApi.services.showNoteAccessory({
-          note: this.noteId,
+          path: { note: this.noteId },
         })) || {}
       this.formData = { ...this.noteAccessory }
     },
     processForm() {
       this.managedApi.services
-        .updateNoteAccessories({ note: this.noteId, formData: this.formData })
+        .updateNoteAccessories({
+          path: { note: this.noteId },
+          body: this.formData,
+        })
         .then((na) => this.$emit("closeDialog", na))
         .catch((error) => {
           this.noteFormErrors = error

@@ -14,7 +14,6 @@
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader"
 import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import { ApiError } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 
@@ -41,7 +40,7 @@ export default {
         await this.managedApi.services.uploadAndTriggerFineTuning()
         this.fineTuningDataResultMsg = "Training initiated."
       } catch (error) {
-        const errorInstance = error as ApiError
+        const errorInstance = error as Error & { body?: unknown }
         const msg =
           errorInstance.body &&
           typeof errorInstance.body === "object" &&

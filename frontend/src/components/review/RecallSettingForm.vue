@@ -65,8 +65,8 @@ export default defineComponent({
       }
       managedApi.services
         .updateRecallSetting({
-          note: props.noteId,
-          requestBody: formData.value,
+          path: { note: props.noteId },
+          body: formData.value,
         })
         .then(() => {
           if (newValue.level !== undefined) {

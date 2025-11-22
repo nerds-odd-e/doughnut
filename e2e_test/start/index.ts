@@ -1,3 +1,4 @@
+import './clientConfig'
 import mock_services from './mock_services/index'
 import { questionGenerationService } from './questionGenerationService'
 import testability from './testability'

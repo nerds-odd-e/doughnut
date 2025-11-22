@@ -158,7 +158,7 @@ const fetchSearchResults = async () => {
   hasSearched.value = true
   try {
     searchResults.value = await managedApi.services.searchWikidata({
-      search: searchKeyRef.value,
+      query: { search: searchKeyRef.value },
     })
   } finally {
     loading.value = false
@@ -227,7 +227,7 @@ defineExpose({
 const getWikidataItem = async (wikidataId: string) => {
   return (
     await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId,
+      path: { wikidataId },
     })
   ).WikipediaEnglishUrl
 }

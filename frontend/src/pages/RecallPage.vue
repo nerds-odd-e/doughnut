@@ -67,7 +67,7 @@ import Quiz from "@/components/review/Quiz.vue"
 import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
-import type { AnsweredQuestion, SpellingResultDTO } from "@generated/backend"
+import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import getEnvironment from "@/managedApi/window/getEnvironment"
@@ -78,7 +78,7 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
-export type SpellingResult = SpellingResultDTO & { type: "spelling" }
+export type SpellingResult = SpellingResultDto & { type: "spelling" }
 
 export type QuestionResult = {
   type: "question"
@@ -135,8 +135,10 @@ const viewLastResult = (cursor: number | undefined) => {
 
 const loadMore = async (dueInDays?: number) => {
   const response = await managedApi.services.recalling({
-    timezone: timezoneParam(),
-    dueindays: dueInDays,
+    query: {
+      timezone: timezoneParam(),
+      dueindays: dueInDays,
+    },
   })
   toRepeat.value = response.toRepeat
   currentIndex.value = 0
@@ -161,7 +163,7 @@ const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
   decrementToRepeatCount()
 }
 
-const onAnsweredSpelling = (answerResult: SpellingResultDTO) => {
+const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
   currentIndex.value += 1
   previousResults.value.push({
     type: "spelling",

@@ -94,7 +94,9 @@ describe("WikidataAssociationForNoteDialog", () => {
         const wrapper = await inputWikidataIdAndSave(note, wikidataId)
         await flushPromises()
 
-        expect(mockedFetchWikidataEntity).toHaveBeenCalledWith({ wikidataId })
+        expect(mockedFetchWikidataEntity).toHaveBeenCalledWith({
+          path: { wikidataId },
+        })
 
         if (needsTitleAction) {
           const replaceLabel = getModal()?.querySelector(
@@ -143,7 +145,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       expect(mockedFetchWikidataEntity).toHaveBeenCalledWith({
-        wikidataId: "Q11399",
+        path: { wikidataId: "Q11399" },
       })
       expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
       expect(wrapper.emitted("closeDialog")).toBeTruthy()
@@ -196,7 +198,9 @@ describe("WikidataAssociationForNoteDialog", () => {
       mountDialog(note)
       await flushPromises()
 
-      expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: "dog" })
+      expect(mockedWikidataSearch).toHaveBeenCalledWith({
+        query: { search: "dog" },
+      })
     })
 
     it("replaces title immediately when Replace title is selected", async () => {
@@ -231,15 +235,15 @@ describe("WikidataAssociationForNoteDialog", () => {
 
       // Verify title is replaced
       expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           newTitle: "Dog",
         },
       })
       // Verify wikidata ID is saved
       expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           wikidataId: "Q11399",
         },
       })
@@ -279,15 +283,15 @@ describe("WikidataAssociationForNoteDialog", () => {
 
       // Verify title is appended with / separator
       expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           newTitle: "Canine / Dog",
         },
       })
       // Verify wikidata ID is saved
       expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           wikidataId: "Q11399",
         },
       })
@@ -327,15 +331,15 @@ describe("WikidataAssociationForNoteDialog", () => {
 
       // Verify title is set to the entity label when current title is empty
       expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           newTitle: "Dog",
         },
       })
       // Verify wikidata ID is saved
       expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           wikidataId: "Q11399",
         },
       })
@@ -374,8 +378,8 @@ describe("WikidataAssociationForNoteDialog", () => {
       expect(mockedUpdateNoteTitle).not.toHaveBeenCalled()
       // Verify wikidata ID is saved
       expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           wikidataId: "Q11399",
         },
       })

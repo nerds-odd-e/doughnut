@@ -131,7 +131,7 @@ const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
 
 const fetchDueCount = async () => {
   const count = await managedApi.services.getAssimilationCount({
-    timezone: timezoneParam(),
+    query: { timezone: timezoneParam() },
   })
   setDueCount(count.dueCount)
   setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
@@ -140,7 +140,7 @@ const fetchDueCount = async () => {
 
 const fetchRecallCount = async () => {
   const overview = await managedApi.services.overview({
-    timezone: timezoneParam(),
+    query: { timezone: timezoneParam() },
   })
   setToRepeatCount(overview.toRepeatCount)
   setRecallWindowEndAt(overview.recallWindowEndAt)

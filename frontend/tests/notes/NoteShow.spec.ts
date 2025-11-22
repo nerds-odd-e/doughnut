@@ -56,7 +56,7 @@ describe("note wth children", () => {
   it("should call the api", async () => {
     render(note)
     expect(helper.managedApi.services.showNote).toBeCalledWith({
-      note: note.id,
+      path: { note: note.id },
     })
   })
 

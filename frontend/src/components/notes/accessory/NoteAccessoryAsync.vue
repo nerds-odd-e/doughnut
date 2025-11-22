@@ -35,7 +35,7 @@ watch(
 
 const fetchData = async () => {
   noteAccessory.value = await managedApi.services.showNoteAccessory({
-    note: noteId,
+    path: { note: noteId },
   })
 }
 

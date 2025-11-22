@@ -38,7 +38,7 @@ describe("NoteExportDialog", () => {
     })
     // Should call API once
     expect(helper.managedApi.services.getDescendants).toHaveBeenCalledWith({
-      note: note.id,
+      path: { note: note.id },
     })
   })
 
@@ -110,8 +110,8 @@ describe("NoteExportDialog", () => {
     })
     // Should call API once
     expect(helper.managedApi.services.getGraph).toHaveBeenCalledWith({
-      note: note.id,
-      tokenLimit: 5000,
+      path: { note: note.id },
+      query: { tokenLimit: 5000 },
     })
   })
 
@@ -186,8 +186,8 @@ describe("NoteExportDialog", () => {
     await fireEvent.click(getByTestId("refresh-graph-btn"))
     await waitFor(() => {
       expect(getGraphMock).toHaveBeenLastCalledWith({
-        note: note.id,
-        tokenLimit: 1234,
+        path: { note: note.id },
+        query: { tokenLimit: 1234 },
       })
       const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
       expect(textarea.value).toContain('"token": 1234')

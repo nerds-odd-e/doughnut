@@ -46,7 +46,7 @@ describe("repeat page", () => {
       "Congratulations! You've achieved your daily assimilation goal!"
     )
     expect(mockedInitialReviewCall).toBeCalledWith({
-      timezone: "Europe/Amsterdam",
+      query: { timezone: "Europe/Amsterdam" },
     })
   })
 

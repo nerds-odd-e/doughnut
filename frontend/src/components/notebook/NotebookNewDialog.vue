@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import NoteFormTitleOnly from "@/components/notes/NoteFormTitleOnly.vue"
-import type { Circle, NoteCreationDTO } from "@generated/backend"
+import type { Circle, NoteCreationDto } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 
@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      noteFormData: { newTitle: "" } as NoteCreationDTO,
+      noteFormData: { newTitle: "" } as NoteCreationDto,
       errors: { newTitle: undefined as undefined | string },
     }
   },
@@ -32,12 +32,12 @@ export default {
     createNotebook() {
       if (this.circle) {
         return this.managedApi.services.createNotebookInCircle({
-          circle: this.circle.id,
-          requestBody: this.noteFormData,
+          path: { circle: this.circle.id },
+          body: this.noteFormData,
         })
       }
       return this.managedApi.services.createNotebook({
-        requestBody: this.noteFormData,
+        body: this.noteFormData,
       })
     },
     processForm() {

@@ -74,7 +74,7 @@ export default defineComponent({
       }
 
       this.managedApi.services
-        .deleteFailureReports({ requestBody: this.selectedFailureReports })
+        .deleteFailureReports({ body: this.selectedFailureReports })
         .then(() => {
           this.fetchData()
           this.selectedFailureReports = []

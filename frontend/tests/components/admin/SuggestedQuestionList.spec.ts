@@ -55,7 +55,7 @@ describe("Edit Suggested Question", () => {
         usePopups().popups.done(true)
         await flushPromises()
         expect(mockDelete).toHaveBeenCalledWith({
-          suggestedQuestion: suggestedQuestion.id,
+          path: { suggestedQuestion: suggestedQuestion.id },
         })
       })
     })

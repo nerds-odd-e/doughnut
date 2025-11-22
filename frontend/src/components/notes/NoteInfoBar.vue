@@ -24,9 +24,11 @@ const { managedApi } = useLoadingApi()
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
 const fetchData = () => {
-  managedApi.services.getNoteInfo({ note: props.noteId }).then((articles) => {
-    noteInfo.value = articles
-  })
+  managedApi.services
+    .getNoteInfo({ path: { note: props.noteId } })
+    .then((articles) => {
+      noteInfo.value = articles
+    })
 }
 
 onMounted(() => {

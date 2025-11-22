@@ -11,6 +11,11 @@ class ConversationBuilder extends Builder<Conversation> {
     subject: {},
   }
 
+  withId(id: number) {
+    this.data.id = id
+    return this
+  }
+
   forANote(note: Note) {
     this.data.subject!.note = note
     return this

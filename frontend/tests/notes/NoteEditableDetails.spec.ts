@@ -66,22 +66,24 @@ describe("NoteEditableDetails", () => {
     // Should NOT have saved the first note's edited content to the second note
     const savedOldContentToSecondNote = calls.some(
       (call) =>
-        call[0].note === secondNoteId &&
-        call[0].requestBody.details === "Edited details from first note"
+        call[0].path?.note === secondNoteId &&
+        call[0].body.details === "Edited details from first note"
     )
     expect(savedOldContentToSecondNote).toBe(false)
 
     // Should NOT have saved the first note's edited content to the first note either
     // (because navigation cancelled the pending save)
-    const savedToFirstNote = calls.some((call) => call[0].note === firstNoteId)
+    const savedToFirstNote = calls.some(
+      (call) => call[0].path?.note === firstNoteId
+    )
     expect(savedToFirstNote).toBe(false)
 
     // Should have saved the new content to the second note
     if (calls.length > 0) {
       const savedNewContentToSecondNote = calls.some(
         (call) =>
-          call[0].note === secondNoteId &&
-          call[0].requestBody.details === "New edits on second note"
+          call[0].path?.note === secondNoteId &&
+          call[0].body.details === "New edits on second note"
       )
       expect(savedNewContentToSecondNote).toBe(true)
     }
@@ -160,8 +162,8 @@ describe("NoteEditableDetails", () => {
     await flushPromises()
 
     expect(mockedUpdateDetailsCall).toHaveBeenCalledWith({
-      note: noteId,
-      requestBody: { details: "Edited details" },
+      path: { note: noteId },
+      body: { details: "Edited details" },
     })
   })
 
@@ -193,8 +195,8 @@ describe("NoteEditableDetails", () => {
 
     // Should have saved to the first note
     expect(mockedUpdateDetailsCall).toHaveBeenCalledWith({
-      note: firstNoteId,
-      requestBody: { details: "Edited details" },
+      path: { note: firstNoteId },
+      body: { details: "Edited details" },
     })
   })
 
@@ -233,8 +235,8 @@ describe("NoteEditableDetails", () => {
 
     // Should have auto-saved
     expect(mockedUpdateDetailsCall).toHaveBeenCalledWith({
-      note: noteId,
-      requestBody: { details: "Edited details" },
+      path: { note: noteId },
+      body: { details: "Edited details" },
     })
 
     // Dirty indicator should be gone after save completes

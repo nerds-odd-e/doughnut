@@ -30,8 +30,8 @@ describe("SuggestQuestion", () => {
       expect(
         helper.managedApi.services.suggestQuestionForFineTuning
       ).toBeCalledWith({
-        predefinedQuestion: predefinedQuestion.id,
-        requestBody: {
+        path: { predefinedQuestion: predefinedQuestion.id },
+        body: {
           comment: "",
           isPositiveFeedback: false,
         },

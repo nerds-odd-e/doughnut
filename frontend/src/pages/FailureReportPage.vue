@@ -39,7 +39,7 @@ const githubIssueUrl = ref<string | undefined>(undefined)
 
 const fetchData = async () => {
   const res = await managedApi.services.showFailureReport({
-    failureReport: props.failureReportId,
+    path: { failureReport: props.failureReportId },
   })
   failureReport.value = res.failureReport
   githubIssueUrl.value = res.githubIssueUrl

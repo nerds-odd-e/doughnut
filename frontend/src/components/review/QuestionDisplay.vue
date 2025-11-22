@@ -16,7 +16,7 @@
 import type { PropType } from "vue"
 import type {
   Answer,
-  AnswerDTO,
+  AnswerDto,
   MultipleChoicesQuestion,
 } from "@generated/backend"
 import QuestionChoices from "./QuestionChoices.vue"
@@ -34,7 +34,7 @@ defineProps({
 
 const emits = defineEmits(["answer"])
 
-const submitAnswer = async (answerData: AnswerDTO) => {
+const submitAnswer = async (answerData: AnswerDto) => {
   emits("answer", answerData)
 }
 </script>

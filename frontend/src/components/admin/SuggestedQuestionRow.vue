@@ -66,7 +66,7 @@ export default {
   methods: {
     async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
       const duplicated = await this.managedApi.services.duplicate({
-        suggestedQuestion: suggested.id,
+        path: { suggestedQuestion: suggested.id },
       })
       this.$emit("duplicated", duplicated)
     },
@@ -80,7 +80,7 @@ export default {
         )
       ) {
         await this.managedApi.services.delete_({
-          suggestedQuestion: suggested.id,
+          path: { suggestedQuestion: suggested.id },
         })
       }
     },

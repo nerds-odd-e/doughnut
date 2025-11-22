@@ -357,7 +357,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
-        { note: note.id, requestBody: { details: testCompletion } }
+        { path: { note: note.id }, body: { details: testCompletion } }
       )
 
       // Tool calls are executed inline with Chat Completion API
@@ -426,7 +426,7 @@ describe("ConversationInner", () => {
 
       // Should delete "world" and add "friends!"
       expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
-        { note: note.id, requestBody: { details: "Hello friends!" } }
+        { path: { note: note.id }, body: { details: "Hello friends!" } }
       )
     })
 
@@ -447,7 +447,7 @@ describe("ConversationInner", () => {
 
       // Should delete everything and add new text
       expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
-        { note: note.id, requestBody: { details: "Completely new text" } }
+        { path: { note: note.id }, body: { details: "Completely new text" } }
       )
     })
 
@@ -508,8 +508,8 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       expect(helper.managedApi.services.updateNoteTitle).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: { newTitle: testTitle },
+        path: { note: note.id },
+        body: { newTitle: testTitle },
       })
 
       // Tool calls are executed inline with Chat Completion API

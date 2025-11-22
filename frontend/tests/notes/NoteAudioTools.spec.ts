@@ -617,7 +617,7 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(new Blob())
 
       expect(helper.managedApi.services.audioToText).toHaveBeenLastCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
       })
@@ -626,7 +626,7 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(new Blob())
 
       expect(helper.managedApi.services.audioToText).toHaveBeenLastCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
       })
@@ -655,7 +655,7 @@ describe("NoteAudioTools", () => {
       const lastCall = audioToTextMock.mock.calls.pop()
       expect(lastCall).toBeDefined()
       expect(lastCall![0]).toMatchObject({
-        formData: {
+        body: {
           previousNoteDetailsToAppendTo: note.details,
         },
       })
@@ -700,7 +700,7 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(testBlob)
 
       expect(helper.managedApi.services.audioToText).toHaveBeenCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
         }),
@@ -725,13 +725,13 @@ describe("NoteAudioTools", () => {
       const calls = audioToTextMock.mock.calls
       expect(calls.length).toBeGreaterThanOrEqual(2)
       expect(calls[0]?.[0]).toMatchObject({
-        formData: {
+        body: {
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
         },
       })
       expect(calls[1]?.[0]).toMatchObject({
-        formData: {
+        body: {
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
         },
@@ -764,7 +764,7 @@ describe("NoteAudioTools", () => {
       await flushPromises()
 
       expect(audioToTextMock).toHaveBeenCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           isMidSpeech: true,
           previousNoteDetailsToAppendTo: note.details,
         }),
@@ -792,7 +792,7 @@ describe("NoteAudioTools", () => {
 
     // Verify API call was made with correct parameters
     expect(helper.managedApi.services.audioToText).toHaveBeenCalledWith({
-      formData: expect.objectContaining({
+      body: expect.objectContaining({
         isMidSpeech: true,
         previousNoteDetailsToAppendTo: note.details,
       }),
@@ -882,7 +882,7 @@ describe("NoteAudioTools", () => {
       })
 
       expect(audioToTextMock).toHaveBeenCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           previousNoteDetailsToAppendTo: shortContent,
         }),
       })
@@ -903,7 +903,7 @@ describe("NoteAudioTools", () => {
 
       const expectedContent = `...${"a".repeat(500)}`
       expect(audioToTextMock).toHaveBeenCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           previousNoteDetailsToAppendTo: expectedContent,
         }),
       })
@@ -922,7 +922,7 @@ describe("NoteAudioTools", () => {
       })
 
       expect(audioToTextMock).toHaveBeenCalledWith({
-        formData: expect.objectContaining({
+        body: expect.objectContaining({
           previousNoteDetailsToAppendTo: "",
         }),
       })

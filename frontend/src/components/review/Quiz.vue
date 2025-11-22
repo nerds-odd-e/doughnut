@@ -65,8 +65,8 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   AnsweredQuestion,
   RecallPrompt,
-  AnswerSpellingDTO,
-  SpellingResultDTO,
+  AnswerSpellingDto,
+  SpellingResultDto,
   MemoryTrackerLite,
 } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
@@ -89,7 +89,7 @@ const props = defineProps<QuizProps>()
 // Emits definition
 const emit = defineEmits<{
   (e: "answered-question", result: AnsweredQuestion): void
-  (e: "answered-spelling", result: SpellingResultDTO): void
+  (e: "answered-spelling", result: SpellingResultDto): void
   (e: "just-reviewed", result: AnsweredQuestion | undefined): void
   (e: "moveToEnd", currentIndex: number): void
 }>()
@@ -115,7 +115,7 @@ const useQuestionFetching = (props: QuizProps) => {
 
       try {
         const question = await managedApi.silent.services.askAQuestion({
-          memoryTracker: memoryTrackerId,
+          path: { memoryTracker: memoryTrackerId },
         })
         recallPromptCache.value[memoryTrackerId] = question
       } catch (e) {
@@ -167,14 +167,14 @@ const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined => {
   return props.memoryTrackers?.[index]
 }
 
-const onSpellingAnswer = async (answerData: AnswerSpellingDTO) => {
+const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
   if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
     return
 
   try {
     const answerResult = await managedApi.services.answerSpelling({
-      memoryTracker: currentMemoryTrackerId.value,
-      requestBody: { spellingAnswer: answerData.spellingAnswer },
+      path: { memoryTracker: currentMemoryTrackerId.value },
+      body: { spellingAnswer: answerData.spellingAnswer },
     })
     emit("answered-spelling", answerResult)
   } catch (e) {

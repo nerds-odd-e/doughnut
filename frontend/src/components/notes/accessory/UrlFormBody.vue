@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import type { NoteAccessoriesDTO } from "@generated/backend"
+import type { NoteAccessoriesDto } from "@generated/backend"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import TextInput from "../../form/TextInput.vue"
@@ -19,7 +19,7 @@ import TextInput from "../../form/TextInput.vue"
 export default defineComponent({
   props: {
     modelValue: {
-      type: Object as PropType<NoteAccessoriesDTO>,
+      type: Object as PropType<NoteAccessoriesDto>,
       required: true,
     },
     errors: {

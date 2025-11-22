@@ -112,7 +112,7 @@ const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {
   questions.value = await managedApi.services.getAllQuestionByNote({
-    note: props.note.id,
+    path: { note: props.note.id },
   })
 }
 const questionAdded = (newQuestion: PredefinedQuestion) => {
@@ -123,7 +123,9 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
-    await managedApi.services.toggleApproval({ predefinedQuestion: questionId })
+    await managedApi.services.toggleApproval({
+      path: { predefinedQuestion: questionId },
+    })
   }
 }
 onMounted(() => {

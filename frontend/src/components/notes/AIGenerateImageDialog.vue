@@ -51,7 +51,7 @@ export default defineComponent({
       try {
         this.b64Json = (
           await this.managedApi.services.generateImage({
-            requestBody: this.prompt,
+            body: this.prompt,
           })
         ).b64encoded
       } catch (_) {

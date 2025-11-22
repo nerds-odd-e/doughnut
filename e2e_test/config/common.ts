@@ -33,29 +33,7 @@ const commonConfig = {
       on(
         'file:preprocessor',
         createBundler({
-          plugins: [
-            createEsbuildPlugin(config),
-            {
-              name: 'redirect-request-module',
-              setup(build) {
-                // Intercept imports of './core/request' from sdk.gen.ts
-                // and redirect to our cypressRequest wrapper
-                build.onResolve({ filter: /^\.\/core\/request$/ }, (args) => {
-                  // Only redirect if the importer is sdk.gen.ts
-                  if (args.importer?.includes('sdk.gen.ts')) {
-                    return {
-                      path: path.resolve(
-                        __dirname,
-                        '../start/utils/cypressRequest.ts'
-                      ),
-                    }
-                  }
-                  // Otherwise, let esbuild resolve normally
-                  return undefined
-                })
-              },
-            },
-          ],
+          plugins: [createEsbuildPlugin(config)],
         })
       )
 

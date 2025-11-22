@@ -85,8 +85,8 @@ describe("adding new note", () => {
 
     // Search should be called when user edits back to "Untitled"
     expect(mockedSearchWithin).toHaveBeenCalledWith({
-      note: note.id,
-      requestBody: expect.objectContaining({ searchKey: "Untitled" }),
+      path: { note: note.id },
+      body: expect.objectContaining({ searchKey: "Untitled" }),
     })
   })
 
@@ -105,8 +105,8 @@ describe("adding new note", () => {
 
     expect(wrapper.text()).toContain("mythical")
     expect(mockedSearchWithin).toHaveBeenCalledWith({
-      note: note.id,
-      requestBody: expect.objectContaining({ searchKey: "myth" }),
+      path: { note: note.id },
+      body: expect.objectContaining({ searchKey: "myth" }),
     })
   })
 
@@ -125,8 +125,8 @@ describe("adding new note", () => {
     it("call the api", async () => {
       await wrapper.find("form").trigger("submit")
       expect(mockedCreateNote).toHaveBeenCalledWith({
-        parentNote: note.id,
-        requestBody: expect.anything(),
+        path: { parentNote: note.id },
+        body: expect.anything(),
       })
     })
 
@@ -235,7 +235,9 @@ describe("adding new note", () => {
       const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
       mockedWikidataSearch.mockResolvedValue([searchResult])
       await openWikidataDialog("dog")
-      expect(mockedWikidataSearch).toHaveBeenCalledWith({ search: "dog" })
+      expect(mockedWikidataSearch).toHaveBeenCalledWith({
+        query: { search: "dog" },
+      })
       const dialog = document.querySelector(".modal-container")
       expect(dialog).toBeTruthy()
     })
@@ -306,7 +308,7 @@ describe("adding new note", () => {
         await waitForDialogToClose()
 
         expect(mockedWikidataSearch).toHaveBeenCalledWith({
-          search: searchTitle,
+          query: { search: searchTitle },
         })
         expect((<HTMLInputElement>titleInput().element).value).toBe(
           expectedTitle

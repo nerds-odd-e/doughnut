@@ -234,8 +234,8 @@ describe("ConversationInner", () => {
       expect(
         helper.managedApi.services.replyToConversation
       ).toHaveBeenCalledWith({
-        conversationId: reviewConversation.id,
-        requestBody: "Why is my answer wrong?",
+        path: { conversationId: reviewConversation.id },
+        body: "Why is my answer wrong?",
       })
     })
   })

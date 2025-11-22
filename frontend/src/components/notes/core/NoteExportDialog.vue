@@ -89,7 +89,7 @@ watch(
   async (val) => {
     if (val && !jsonDescendants.value) {
       const result = await managedApi.services.getDescendants({
-        note: props.note.id,
+        path: { note: props.note.id },
       })
       jsonDescendants.value = JSON.stringify(result, null, 2)
     }
@@ -109,8 +109,8 @@ async function fetchGraph() {
   loadingGraph.value = true
   try {
     const result = await managedApi.services.getGraph({
-      note: props.note.id,
-      tokenLimit: tokenLimit.value,
+      path: { note: props.note.id },
+      query: { tokenLimit: tokenLimit.value },
     })
     jsonGraph.value = JSON.stringify(result, null, 2)
   } finally {

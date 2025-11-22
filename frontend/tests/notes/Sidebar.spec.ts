@@ -197,9 +197,11 @@ describe("Sidebar", () => {
       await fireEvent.drop(dropTarget)
 
       expect(helper.managedApi.services.moveAfter).toHaveBeenCalledWith({
-        note: firstGeneration.id,
-        targetNote: firstGenerationSibling.id,
-        asFirstChild: "false",
+        path: {
+          note: firstGeneration.id,
+          targetNote: firstGenerationSibling.id,
+          asFirstChild: "false",
+        },
       })
     })
 
@@ -465,9 +467,11 @@ describe("Sidebar", () => {
       await fireEvent.drop(dropTarget)
 
       expect(helper.managedApi.services.moveAfter).toHaveBeenCalledWith({
-        note: firstGeneration.id,
-        targetNote: firstGenerationSibling.id,
-        asFirstChild: "true",
+        path: {
+          note: firstGeneration.id,
+          targetNote: firstGenerationSibling.id,
+          asFirstChild: "true",
+        },
       })
     })
 
@@ -496,9 +500,11 @@ describe("Sidebar", () => {
       await fireEvent.drop(firstGenNote)
 
       expect(helper.managedApi.services.moveAfter).toHaveBeenCalledWith({
-        note: firstGeneration.id,
-        targetNote: firstGenerationSibling.id,
-        asFirstChild: "true",
+        path: {
+          note: firstGeneration.id,
+          targetNote: firstGenerationSibling.id,
+          asFirstChild: "true",
+        },
       })
     })
   })

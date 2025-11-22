@@ -22,7 +22,7 @@ describe("storedApiCollection", () => {
     it("should call the api", async () => {
       await sa.deleteNote(router, note.id)
       expect(deleteNote).toHaveBeenCalledTimes(1)
-      expect(deleteNote).toHaveBeenCalledWith({ note: note.id })
+      expect(deleteNote).toHaveBeenCalledWith({ path: { note: note.id } })
       expect(routerReplace).toHaveBeenCalledTimes(1)
     })
   })
@@ -56,8 +56,8 @@ describe("storedApiCollection", () => {
       })
 
       expect(updateNoteDetails).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           details: "Hello world!",
         },
       })
@@ -72,8 +72,8 @@ describe("storedApiCollection", () => {
       })
 
       expect(updateNoteDetails).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           details: "Hello !",
         },
       })
@@ -87,10 +87,10 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 0,
       })
 
-      expect(showNote).toHaveBeenCalledWith({ note: note.id })
+      expect(showNote).toHaveBeenCalledWith({ path: { note: note.id } })
       expect(updateNoteDetails).toHaveBeenCalledWith({
-        note: note.id,
-        requestBody: {
+        path: { note: note.id },
+        body: {
           details: "<p>Desc</p>world!",
         },
       })

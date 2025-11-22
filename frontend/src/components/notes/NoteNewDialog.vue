@@ -42,7 +42,7 @@
 import type {
   WikidataSearchEntity,
   Note,
-  NoteCreationDTO,
+  NoteCreationDto,
 } from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import type { StorageAccessor } from "../../store/createNoteStorage"
@@ -68,7 +68,7 @@ const emit = defineEmits<{
 }>()
 
 // Reactive state
-const creationData = ref<NoteCreationDTO>({
+const creationData = ref<NoteCreationDto>({
   newTitle: "Untitled",
   wikidataId: "",
 })

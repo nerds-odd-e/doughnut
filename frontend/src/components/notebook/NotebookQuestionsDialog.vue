@@ -22,7 +22,7 @@ const managedApi = useLoadingApi().managedApi
 const notes = ref<Note[] | undefined>(undefined)
 const fetchData = async () => {
   notes.value = await managedApi.services.getNotes({
-    notebook: props.notebook.id,
+    path: { notebook: props.notebook.id },
   })
 }
 onMounted(() => {

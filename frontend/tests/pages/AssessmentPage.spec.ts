@@ -106,7 +106,7 @@ describe("assessment page", () => {
       await flushPromises()
 
       expect(helper.managedApi.services.submitAssessmentResult).toBeCalledWith({
-        assessmentAttempt: assessmentAttempt.id,
+        path: { assessmentAttempt: assessmentAttempt.id },
       })
     })
 

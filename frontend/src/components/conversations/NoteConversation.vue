@@ -65,11 +65,13 @@ onMounted(async () => {
   try {
     const fetchedConversations =
       await managedApi.services.getConversationsAboutNote({
-        note: props.noteId,
+        path: { note: props.noteId },
       })
-    conversations.value = fetchedConversations
-    conversation.value =
-      fetchedConversations.length > 0 ? fetchedConversations[0] : undefined
+    if (fetchedConversations) {
+      conversations.value = fetchedConversations
+      conversation.value =
+        fetchedConversations.length > 0 ? fetchedConversations[0] : undefined
+    }
   } finally {
     isLoading.value = false
   }
@@ -82,8 +84,8 @@ const handleConversationChange = (conversationId: number) => {
 async function startConversationWithMessage(message: string) {
   initialAiReply.value = false
   conversation.value = await managedApi.services.startConversationAboutNote({
-    note: props.noteId,
-    requestBody: message,
+    path: { note: props.noteId },
+    body: message,
   })
   emit("submitted")
 }
@@ -91,8 +93,8 @@ async function startConversationWithMessage(message: string) {
 async function startConversationWithMessageAndAI(message: string) {
   initialAiReply.value = true
   conversation.value = await managedApi.services.startConversationAboutNote({
-    note: props.noteId,
-    requestBody: message,
+    path: { note: props.noteId },
+    body: message,
   })
   emit("submitted")
 }

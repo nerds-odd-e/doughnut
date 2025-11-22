@@ -34,8 +34,8 @@ const emit = defineEmits(["submitted"])
 
 async function submitFeedback() {
   await managedApi.services.startConversationAboutAssessmentQuestion({
-    assessmentQuestion: props.question.id,
-    requestBody: feedback.value,
+    path: { assessmentQuestion: props.question.id },
+    body: feedback.value,
   })
 
   emit("submitted")

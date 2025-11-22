@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
-import type { Subscription, SubscriptionDTO } from "@generated/backend"
+import type { Subscription, SubscriptionDto } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "../form/TextInput.vue"
 
@@ -31,7 +31,7 @@ export default defineComponent({
   data() {
     const { dailyTargetOfNewNotes } = this.subscription
     return {
-      formData: { dailyTargetOfNewNotes } as SubscriptionDTO,
+      formData: { dailyTargetOfNewNotes } as SubscriptionDto,
       errors: {} as Record<string, string>,
     }
   },
@@ -40,8 +40,8 @@ export default defineComponent({
     processForm() {
       this.managedApi.services
         .updateSubscription({
-          subscription: this.subscription.id,
-          requestBody: this.formData,
+          path: { subscription: this.subscription.id },
+          body: this.formData,
         })
         .then(() => {
           this.$router.push({ name: "notebooks" })

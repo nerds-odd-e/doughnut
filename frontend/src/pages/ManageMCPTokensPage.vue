@@ -93,7 +93,7 @@ const generateToken = async () => {
   loading.value = true
   try {
     const res = await managedApi.services.generateToken({
-      requestBody: {
+      body: {
         label: tokenFormData.value.label,
       },
     })
@@ -113,7 +113,7 @@ const generateToken = async () => {
 
 const deleteToken = async (id: number) => {
   try {
-    await managedApi.services.deleteToken({ tokenId: id })
+    await managedApi.services.deleteToken({ path: { tokenId: id } })
     tokens.value = tokens.value.filter((token) => token.id !== id)
   } catch (error) {
     console.error("Error deleting token:", error)

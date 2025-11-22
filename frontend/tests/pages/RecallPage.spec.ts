@@ -6,7 +6,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import type { SpellingResultDTO, MemoryTrackerLite } from "@generated/backend"
+import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -69,8 +69,10 @@ describe("repeat page", () => {
     mockedRepeatCall.mockResolvedValue(repetition)
     await mountPage()
     expect(mockedRepeatCall).toHaveBeenCalledWith({
-      timezone: "Asia/Shanghai",
-      dueindays: 0,
+      query: {
+        timezone: "Asia/Shanghai",
+        dueindays: 0,
+      },
     })
   })
 
@@ -105,7 +107,7 @@ describe("repeat page", () => {
       await mountPage()
       expect(teleportTarget.textContent).toContain("0/3")
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
-        memoryTracker: firstMemoryTrackerId,
+        path: { memoryTracker: firstMemoryTrackerId },
       })
     })
 
@@ -124,13 +126,13 @@ describe("repeat page", () => {
       await flushPromises()
       await wrapper.find("button.daisy-btn-primary").trigger("click")
       expect(mockedMarkAsRepeatedCall).toHaveBeenCalledWith({
-        memoryTracker: firstMemoryTrackerId,
-        successful: true,
+        path: { memoryTracker: firstMemoryTrackerId },
+        query: { successful: true },
       })
       await flushPromises()
       expect(teleportTarget.textContent).toContain("1/3")
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
-        memoryTracker: secondMemoryTrackerId,
+        path: { memoryTracker: secondMemoryTrackerId },
       })
     })
 
@@ -188,7 +190,7 @@ describe("repeat page", () => {
     it("should handle spelling questions correctly", async () => {
       const note = makeMe.aNote.please()
       note.id = 42
-      const answerResult: SpellingResultDTO = {
+      const answerResult: SpellingResultDto = {
         note,
         answer: "test answer",
         isCorrect: false,

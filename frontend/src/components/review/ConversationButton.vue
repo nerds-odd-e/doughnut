@@ -34,7 +34,7 @@ const { managedApi } = useLoadingApi()
 const startConversation = async () => {
   const conversation =
     await managedApi.services.startConversationAboutRecallPrompt({
-      recallPrompt: props.recallPromptId,
+      path: { recallPrompt: props.recallPromptId },
     })
 
   router.push({

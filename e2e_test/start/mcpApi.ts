@@ -1,8 +1,6 @@
-import type { McpNoteAddDTO } from '@generated/backend'
-import type { NoteCreationDTO } from '@generated/backend'
+import type { McpNoteAddDto } from '@generated/backend'
+import type { NoteCreationDto } from '@generated/backend'
 import * as Services from '@generated/backend/sdk.gen'
-import { OpenAPI } from '@generated/backend/core/OpenAPI'
-import { ApiError } from '@generated/backend/core/ApiError'
 
 type ApiResponse = {
   status: number
@@ -11,35 +9,29 @@ type ApiResponse = {
 
 const mcpApi = () => {
   return {
-    createNote: (parentNote: string, noteCreationDTO: NoteCreationDTO) => {
+    createNote: (parentNote: string, noteCreationDto: NoteCreationDto) => {
       const makeRequest = () => {
-        const requestBody: McpNoteAddDTO = {
+        const requestBody: McpNoteAddDto = {
           parentNote,
-          noteCreationDTO,
+          noteCreationDTO: noteCreationDto,
         }
 
         return cy.get('@savedMcpToken').then((token) => {
-          // Set token in OpenAPI config for this request
-          const originalToken = OpenAPI.TOKEN
-          OpenAPI.TOKEN = typeof token === 'string' ? token : String(token)
-
-          // Call the service - it will use cy.request via our custom request function
+          // Call the service with token in headers for this request
           // The CancelablePromise wraps cy.then() internally, so we need to wrap it
-          const promise = Services.createNoteViaMcp({ requestBody })
+          const authToken = typeof token === 'string' ? token : String(token)
+          const promise = Services.createNoteViaMcp({
+            body: requestBody,
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          } as Parameters<typeof Services.createNoteViaMcp>[0])
             .then(() => {
               // Success - return 200 status
               return { status: 200, body: {} }
             })
             .catch((error) => {
-              // Extract status from ApiError
-              if (error instanceof ApiError) {
-                return { status: error.status, body: error.body || {} }
-              }
-              throw error
-            })
-            .finally(() => {
-              // Restore original token
-              OpenAPI.TOKEN = originalToken
+              return { status: error?.status ?? 500, body: error?.body ?? {} }
             })
 
           // Wrap the promise to make it part of the Cypress chain

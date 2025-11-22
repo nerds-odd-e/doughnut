@@ -1,5 +1,5 @@
 import type { Note, NoteTopology as NoteTopologyType } from "@generated/backend"
-import { LinkCreation } from "@generated/backend"
+// Using string literals for linkType values
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 
@@ -8,7 +8,7 @@ class LinkBuilder extends Builder<Note> {
 
   targetNoteBuilder = new NoteBuilder()
 
-  internalType: NoteTopologyType["linkType"] = LinkCreation.linkType.RELATED_TO
+  internalType: NoteTopologyType["linkType"] = "related to"
 
   from(note: Note): LinkBuilder {
     this.sourceNoteBuilder.data = note

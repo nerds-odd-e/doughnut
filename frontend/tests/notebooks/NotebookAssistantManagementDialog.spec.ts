@@ -54,8 +54,8 @@ describe("NotebookAssistantManagementDialog.vue", () => {
       await wrapper.find("form").trigger("submit")
 
       expect(mockedUpdateAiAssistant).toHaveBeenCalledWith({
-        notebook: notebook.id,
-        requestBody: {
+        path: { notebook: notebook.id },
+        body: {
           additionalInstructions: instructions,
         },
       })

@@ -72,7 +72,7 @@ describe("NoteConversation", () => {
 
     expect(
       helper.managedApi.services.startConversationAboutNote
-    ).toHaveBeenCalledWith({ note: note.id, requestBody: "Hello" })
+    ).toHaveBeenCalledWith({ path: { note: note.id }, body: "Hello" })
 
     // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -189,8 +189,8 @@ describe("NoteConversation", () => {
     expect(
       helper.managedApi.services.startConversationAboutNote
     ).toHaveBeenCalledWith({
-      note: note.id,
-      requestBody: "New conversation message",
+      path: { note: note.id },
+      body: "New conversation message",
     })
 
     // Verify we're back to showing ConversationInner
@@ -217,7 +217,7 @@ describe("NoteConversation", () => {
     // Verify conversation was started
     expect(
       helper.managedApi.services.startConversationAboutNote
-    ).toHaveBeenCalledWith({ note: note.id, requestBody: "Hello AI" })
+    ).toHaveBeenCalledWith({ path: { note: note.id }, body: "Hello AI" })
 
     // Verify AI reply was requested
     expect(mockStart).toHaveBeenCalled()
@@ -251,7 +251,7 @@ describe("NoteConversation", () => {
 
     // Verify message was sent
     expect(helper.managedApi.services.replyToConversation).toHaveBeenCalledWith(
-      { conversationId: conversation.id, requestBody: "Hello AI" }
+      { path: { conversationId: conversation.id }, body: "Hello AI" }
     )
 
     // Verify AI reply was requested

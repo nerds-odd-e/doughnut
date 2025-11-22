@@ -90,8 +90,8 @@ describe("in place edit on title", () => {
     titleEl.dispatchEvent(new Event("input"))
     wrapper.unmount()
     expect(mockedUpdateTitleCall).toBeCalledWith({
-      note: note.id,
-      requestBody: { newTitle: "updated" },
+      path: { note: note.id },
+      body: { newTitle: "updated" },
     })
   })
 
@@ -120,8 +120,8 @@ describe("in place edit on title", () => {
     const titleEl = wrapper.find('[role="title"]').element as HTMLElement
     titleEl.dispatchEvent(new Event("blur"))
     expect(mockedUpdateTitleCall).toBeCalledWith({
-      note: note.id,
-      requestBody: { newTitle: "updated" },
+      path: { note: note.id },
+      body: { newTitle: "updated" },
     })
   })
 
@@ -155,8 +155,8 @@ describe("in place edit on title", () => {
 
     // API call should have been made
     expect(mockedUpdateTitleCall).toHaveBeenCalledWith({
-      note: note.id,
-      requestBody: {
+      path: { note: note.id },
+      body: {
         newTitle: "ABC",
       },
     })

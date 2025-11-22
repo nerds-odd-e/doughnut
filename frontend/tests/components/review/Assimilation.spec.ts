@@ -86,7 +86,7 @@ describe("Assimilation component", () => {
       await flushPromises()
 
       expect(mockedAssimilateCall).toHaveBeenCalledWith({
-        requestBody: {
+        body: {
           noteId: note.id,
           skipMemoryTracking: false,
         },

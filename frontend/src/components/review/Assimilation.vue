@@ -64,7 +64,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
   }
 
   const memoryTrackers = await managedApi.services.assimilate({
-    requestBody: {
+    body: {
       noteId: note.id,
       skipMemoryTracking,
     },

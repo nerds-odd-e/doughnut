@@ -126,8 +126,8 @@ const removeChoice = () => {
 const submitQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
   const response = await managedApi.services.addQuestionManually({
-    note: props.note.id,
-    requestBody: recallPrompt,
+    path: { note: props.note.id },
+    body: recallPrompt,
   })
   emit("close-dialog", response)
 }
@@ -135,15 +135,15 @@ const submitQuestion = async () => {
 const refineQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
   predefinedQuestion.value = await managedApi.services.refineQuestion({
-    note: props.note.id,
-    requestBody: recallPrompt,
+    path: { note: props.note.id },
+    body: recallPrompt,
   })
 }
 
 const generateQuestionByAI = async () => {
   predefinedQuestion.value =
     await managedApi.services.generateQuestionWithoutSave({
-      note: props.note.id,
+      query: { note: props.note.id },
     })
 }
 </script>

@@ -23,15 +23,15 @@ describe("answered question page", () => {
     beforeEach(async () => {
       vitest.resetAllMocks()
       vi.spyOn(helper.managedApi.services, "showQuestion").mockResolvedValue(
-        answeredQuestion as never
+        answeredQuestion
       )
       vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
-        makeMe.aNoteRealm.please() as never
+        makeMe.aNoteRealm.please()
       )
       vi.spyOn(
         helper.managedApi.services,
         "startConversationAboutRecallPrompt"
-      ).mockResolvedValue({ id: 123 } as never)
+      ).mockResolvedValue(makeMe.aConversation.withId(123).please())
     })
 
     it("click on note when doing review", async () => {
@@ -44,7 +44,7 @@ describe("answered question page", () => {
       wrapper.find(".note-under-question").trigger("click")
       await flushPromises()
       expect(helper.managedApi.services.showQuestion).toHaveBeenCalledWith({
-        recallPrompt: REVIEW_QUESTION_ID,
+        path: { recallPrompt: REVIEW_QUESTION_ID },
       })
     })
 
@@ -67,7 +67,7 @@ describe("answered question page", () => {
 
         expect(
           helper.managedApi.services.startConversationAboutRecallPrompt
-        ).toHaveBeenCalledWith({ recallPrompt: REVIEW_QUESTION_ID })
+        ).toHaveBeenCalledWith({ path: { recallPrompt: REVIEW_QUESTION_ID } })
         expect(mockedPush).toHaveBeenCalledWith({
           name: "messageCenter",
           params: { conversationId: 123 },

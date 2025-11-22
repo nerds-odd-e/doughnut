@@ -69,7 +69,7 @@ const checkIfQuizComplete = async () => {
   ) {
     localAssessmentAttempt.value =
       await managedApi.services.submitAssessmentResult({
-        assessmentAttempt: props.assessmentAttempt.id,
+        path: { assessmentAttempt: props.assessmentAttempt.id },
       })
   }
 }

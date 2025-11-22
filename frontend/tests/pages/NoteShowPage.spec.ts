@@ -33,7 +33,7 @@ describe("all in note show page", () => {
         .render()
       await screen.findByText(noteRealm.note.noteTopology.titleOrPredicate)
       expect(helper.managedApi.services.showNote).toBeCalledWith({
-        note: noteRealm.id,
+        path: { note: noteRealm.id },
       })
     })
   })

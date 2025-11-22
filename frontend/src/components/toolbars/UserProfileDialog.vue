@@ -52,7 +52,7 @@ const fetchData = async () => {
 const processForm = async () => {
   if (!formData.value) return
   const updated = await managedApi.services
-    .updateUser({ user: formData.value.id, requestBody: formData.value })
+    .updateUser({ path: { user: formData.value.id }, body: formData.value })
     .catch((err) => {
       errors.value = err as Record<string, string>
       return undefined

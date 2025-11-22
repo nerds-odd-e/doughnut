@@ -46,7 +46,7 @@ const exportContent = ref("")
 onMounted(async () => {
   try {
     const response = (await managedApi.services.exportQuestionGeneration({
-      note: props.noteId,
+      path: { note: props.noteId },
     })) as unknown
     exportContent.value = JSON.stringify(response, null, 2)
   } catch (error) {

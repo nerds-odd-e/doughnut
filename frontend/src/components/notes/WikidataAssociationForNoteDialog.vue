@@ -104,7 +104,7 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
   isProcessing.value = true
   try {
     const res = await managedApi.services.fetchWikidataEntityDataById({
-      wikidataId,
+      path: { wikidataId },
     })
 
     const noteTitleUpper =

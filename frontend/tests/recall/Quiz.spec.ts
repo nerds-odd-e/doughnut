@@ -57,15 +57,21 @@ describe("repeat page", () => {
     it("fetch the first 1 question when mount", async () => {
       await mountPage([1, 2, 3], 1)
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
-        memoryTracker: 1,
+        path: { memoryTracker: 1 },
       })
     })
 
     it("fetch the first 3 question when mount", async () => {
       await mountPage([111, 222, 333, 444], 3)
-      expect(mockedRandomQuestionCall).nthCalledWith(1, { memoryTracker: 111 })
-      expect(mockedRandomQuestionCall).nthCalledWith(2, { memoryTracker: 222 })
-      expect(mockedRandomQuestionCall).nthCalledWith(3, { memoryTracker: 333 })
+      expect(mockedRandomQuestionCall).nthCalledWith(1, {
+        path: { memoryTracker: 111 },
+      })
+      expect(mockedRandomQuestionCall).nthCalledWith(2, {
+        path: { memoryTracker: 222 },
+      })
+      expect(mockedRandomQuestionCall).nthCalledWith(3, {
+        path: { memoryTracker: 333 },
+      })
     })
 
     it("does not fetch question 2 again after prefetched", async () => {
@@ -73,7 +79,7 @@ describe("repeat page", () => {
       expect(mockedRandomQuestionCall).toBeCalledTimes(2)
       await wrapper.setProps({ currentIndex: 1 })
       expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
-        memoryTracker: 3,
+        path: { memoryTracker: 3 },
       })
     })
   })
@@ -116,8 +122,8 @@ describe("repeat page", () => {
       await flushPromises()
 
       expect(helper.managedApi.services.answerSpelling).toHaveBeenCalledWith({
-        memoryTracker: 1,
-        requestBody: {
+        path: { memoryTracker: 1 },
+        body: {
           spellingAnswer: "cat",
         },
       })

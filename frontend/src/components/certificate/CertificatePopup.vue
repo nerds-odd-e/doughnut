@@ -67,7 +67,7 @@ const formatDate = (date: Date): string => {
 
 const fetchData = async () => {
   certificate.value = await managedApi.services.getCertificate({
-    notebook: props.notebookId,
+    path: { notebook: props.notebookId },
   })
 }
 

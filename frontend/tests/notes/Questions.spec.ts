@@ -73,7 +73,7 @@ describe("Questions", () => {
     expect(
       helper.managedApi.services.exportQuestionGeneration
     ).toHaveBeenCalledWith({
-      note: note.id,
+      path: { note: note.id },
     })
   })
 })

@@ -49,7 +49,7 @@ const fetchSpellingQuestion = async () => {
   try {
     loading.value = true
     spellingQuestion.value = await managedApi.services.getSpellingQuestion({
-      memoryTracker: props.memoryTrackerId,
+      path: { memoryTracker: props.memoryTrackerId },
     })
   } catch (e) {
     // Error handling is already done by managedApi

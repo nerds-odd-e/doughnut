@@ -25,7 +25,7 @@ describe("circle show page", () => {
       .withStorageProps({ circleId: circleNote.id })
       .render()
     expect(helper.managedApi.services.showCircle).toBeCalledWith({
-      circle: circleNote.id,
+      path: { circle: circleNote.id },
     })
   })
 

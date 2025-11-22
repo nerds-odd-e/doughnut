@@ -64,7 +64,7 @@ export default defineComponent({
   methods: {
     updateRandomSelector() {
       this.managedApi.services.randomizer({
-        requestBody: {
+        body: {
           choose: this.randomSelector,
           seed: this.seed,
         },
@@ -72,7 +72,7 @@ export default defineComponent({
     },
     updateFeatureToggle(value) {
       this.managedApi.services.enableFeatureToggle({
-        requestBody: {
+        body: {
           enabled: value,
         },
       })

@@ -43,7 +43,7 @@ export default defineComponent({
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
         this.managedApi.services
-          .destroySubscription({ subscription: this.subscription.id })
+          .destroySubscription({ path: { subscription: this.subscription.id } })
           .then(() => {
             this.$emit("updated")
           })

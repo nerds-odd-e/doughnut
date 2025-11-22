@@ -35,7 +35,7 @@ const emits = defineEmits(["updateUser"])
 const processForm = async () => {
   try {
     const user = await managedApi.services.createUser({
-      requestBody: formData.value,
+      body: formData.value,
     })
     emits("updateUser", user)
   } catch (err: unknown) {

@@ -43,7 +43,7 @@ const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
     )
   ) {
     notebooks.value = await managedApi.services.removeFromBazaar({
-      bazaarNotebook: bazaarNotebook.id!,
+      path: { bazaarNotebook: bazaarNotebook.id! },
     })
   }
 }

@@ -61,7 +61,9 @@ const props = defineProps<{
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
-    await managedApi.services.shareNotebook({ notebook: props.notebook.id })
+    await managedApi.services.shareNotebook({
+      path: { notebook: props.notebook.id },
+    })
     router.push({ name: "notebooks" })
   }
 }

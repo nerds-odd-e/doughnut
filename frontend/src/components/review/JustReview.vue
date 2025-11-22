@@ -42,8 +42,8 @@ export default defineComponent({
         return
       }
       await this.managedApi.services.markAsRepeated({
-        memoryTracker: this.memoryTrackerId,
-        successful,
+        path: { memoryTracker: this.memoryTrackerId },
+        query: { successful },
       })
       this.$emit("reviewed")
     },

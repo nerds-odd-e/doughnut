@@ -34,7 +34,7 @@
 
 
 <script lang="ts">
-import type { AnswerDTO } from "@generated/backend"
+import type { AnswerDto } from "@generated/backend"
 import { defineComponent } from "vue"
 import markdownizer from "../form/markdownizer"
 
@@ -67,7 +67,7 @@ export default defineComponent({
     isOptionCorrect(index: number) {
       return index === this.correctChoiceIndex
     },
-    async submitAnswer(answerData: AnswerDTO) {
+    async submitAnswer(answerData: AnswerDto) {
       this.$emit("answer", answerData)
 
       // This ensures that any tapped button is blurred

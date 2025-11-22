@@ -82,7 +82,7 @@ const contest = async () => {
   contesting.value = true
   try {
     const contestResult = await managedApi.services.contest({
-      recallPrompt: currentQuestion.value.id,
+      path: { recallPrompt: currentQuestion.value.id },
     })
 
     if (!contestResult.rejected) {
@@ -93,8 +93,8 @@ const contest = async () => {
       })
       try {
         currentQuestion.value = await managedApi.services.regenerate({
-          recallPrompt: currentQuestion.value.id,
-          requestBody: contestResult,
+          path: { recallPrompt: currentQuestion.value.id },
+          body: contestResult,
         })
       } finally {
         regenerating.value = false

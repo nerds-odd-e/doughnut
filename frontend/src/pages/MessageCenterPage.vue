@@ -90,7 +90,7 @@ watch(
   async (newId) => {
     if (newId) {
       currentConversation.value = await managedApi.services.getConversation({
-        conversationId: newId,
+        path: { conversationId: newId },
       })
       return
     }
@@ -111,7 +111,9 @@ const fetchData = async () => {
 
 const handleConversationFetched = async (conversationId: number) => {
   messageCenterConversations.unreadConversations =
-    await managedApi.services.markConversationAsRead({ conversationId })
+    await managedApi.services.markConversationAsRead({
+      path: { conversationId },
+    })
 }
 
 onMounted(() => {

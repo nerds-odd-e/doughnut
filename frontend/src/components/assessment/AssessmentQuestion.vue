@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import type { AnswerDTO, AssessmentQuestionInstance } from "@generated/backend"
+import type { AnswerDto, AssessmentQuestionInstance } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../review/QuestionDisplay.vue"
@@ -55,12 +55,14 @@ const formSubmitted = ref(false)
 
 const emits = defineEmits(["advance"])
 
-const submitAnswer = async (answerData: AnswerDTO) => {
+const submitAnswer = async (answerData: AnswerDto) => {
   try {
     localAssessmentQuestionInstance.value =
       await managedApi.services.answerQuestion({
-        assessmentQuestionInstance: props.assessmentQuestionInstance.id,
-        requestBody: answerData,
+        path: {
+          assessmentQuestionInstance: props.assessmentQuestionInstance.id,
+        },
+        body: answerData,
       })
 
     if (localAssessmentQuestionInstance.value.answer?.correct) {

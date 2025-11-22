@@ -61,8 +61,8 @@ const { predefinedQuestion } = props
 
 async function suggestQuestionForFineTuning() {
   await managedApi.services.suggestQuestionForFineTuning({
-    predefinedQuestion: predefinedQuestion.id,
-    requestBody: params.value,
+    path: { predefinedQuestion: predefinedQuestion.id },
+    body: params.value,
   })
   emit("closeDialog")
 }
