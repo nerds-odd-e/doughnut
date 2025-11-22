@@ -261,7 +261,13 @@ const testability = () => {
     },
 
     triggerException() {
-      return cy.wrap(Services.triggerException(), { log: false })
+      return cy.wrap(
+        Services.triggerException().catch(() => {
+          // Expected: the exception triggers a 500 error which is caught and logged
+          return Promise.resolve()
+        }),
+        { log: false }
+      )
     },
 
     shareToBazaar(noteTopology: string) {
