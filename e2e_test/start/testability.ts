@@ -52,9 +52,12 @@ const testability = () => {
     },
 
     featureToggle(enabled: boolean) {
-      return Services.enableFeatureToggle({
-        body: { enabled: enabled.toString() },
-      })
+      return cy.wrap(
+        Services.enableFeatureToggle({
+          body: { enabled: enabled.toString() },
+        }),
+        { log: false }
+      )
     },
 
     injectNotes(
@@ -175,7 +178,7 @@ const testability = () => {
           const promise = Services.linkNotes({
             body: requestBody,
           })
-          return cy.wrap(promise)
+          return cy.wrap(promise, { log: false })
         })
     },
 
@@ -183,7 +186,7 @@ const testability = () => {
       return cy.get<string>('@currentLoginUser').then((username) => {
         const requestBody: SuggestedQuestionsData = { examples, username }
         const promise = Services.injectSuggestedQuestion({ body: requestBody })
-        return cy.wrap(promise)
+        return cy.wrap(promise, { log: false })
       })
     },
 
@@ -227,7 +230,7 @@ const testability = () => {
     backendTimeTravelToDate(date: Date) {
       const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
 
-      return Services.timeTravel({ body: requestBody })
+      return cy.wrap(Services.timeTravel({ body: requestBody }), { log: false })
     },
 
     backendTimeTravelTo(day: number, hour: number) {
@@ -235,7 +238,7 @@ const testability = () => {
         travel_to: JSON.stringify(hourOfDay(day, hour)),
       }
 
-      return Services.timeTravel({ body: requestBody })
+      return cy.wrap(Services.timeTravel({ body: requestBody }), { log: false })
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
@@ -243,31 +246,39 @@ const testability = () => {
         hours,
       }
 
-      return Services.timeTravelRelativeToNow({
-        body: requestBody,
-      })
+      return cy.wrap(
+        Services.timeTravelRelativeToNow({
+          body: requestBody,
+        }),
+        { log: false }
+      )
     },
 
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
       const requestBody: Randomization = { choose: strategy, seed }
 
-      return Services.randomizer({ body: requestBody })
+      return cy.wrap(Services.randomizer({ body: requestBody }), { log: false })
     },
 
     triggerException() {
-      return Services.triggerException()
+      return cy.wrap(Services.triggerException(), { log: false })
     },
 
     shareToBazaar(noteTopology: string) {
       const requestBody = { noteTopology }
 
-      return Services.shareToBazaar({
-        body: requestBody,
-      })
+      return cy.wrap(
+        Services.shareToBazaar({
+          body: requestBody,
+        }),
+        { log: false }
+      )
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      return Services.injectCircle({ body: circleInfo })
+      return cy.wrap(Services.injectCircle({ body: circleInfo }), {
+        log: false,
+      })
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
@@ -276,18 +287,19 @@ const testability = () => {
           query: { username },
           body: hash,
         })
-        return cy.wrap(promise)
+        return cy.wrap(promise, { log: false })
       })
     },
 
     setServiceUrl(serviceName: string, serviceUrl: string) {
       const requestBody = { [serviceName]: serviceUrl }
 
-      return Services.replaceServiceUrl({
-        body: requestBody,
-      }).then(() => {
-        // Service call succeeded
-      })
+      return cy.wrap(
+        Services.replaceServiceUrl({
+          body: requestBody,
+        }),
+        { log: false }
+      )
     },
     mockBrowserTime() {
       //

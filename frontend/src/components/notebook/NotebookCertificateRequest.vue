@@ -24,9 +24,10 @@ const loaded = ref(false)
 const approval = ref<NotebookCertificateApproval | undefined>()
 
 onMounted(async () => {
-  approval.value = await managedApi.services.getApprovalForNotebook({
+  const dto = await managedApi.services.getApprovalForNotebook({
     path: { notebook: props.notebook.id },
   })
+  approval.value = dto.approval
   loaded.value = true
 })
 
