@@ -16,7 +16,6 @@ import com.openai.models.files.FileObject;
 import com.openai.models.finetuning.jobs.FineTuningJob;
 import com.openai.models.finetuning.jobs.JobCreateParams;
 import com.openai.services.blocking.FileService;
-import com.theokanning.openai.client.OpenAiApi;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,9 +37,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiOpenAiAssistantFactoryTriggerFineTuningTest {
   @Autowired MakeMe makeMe;
-
-  @MockitoBean(name = "testableOpenAiApi")
-  private OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   private OpenAIClient officialClient;

@@ -17,7 +17,6 @@ import com.openai.models.files.FileObject;
 import com.openai.models.finetuning.jobs.FineTuningJob;
 import com.openai.models.finetuning.jobs.JobCreateParams;
 import com.openai.services.blocking.FileService;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -29,9 +28,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 public class FineTuningDataControllerTests extends ControllerTestBase {
   @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   @Autowired FineTuningDataController controller;
-
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;

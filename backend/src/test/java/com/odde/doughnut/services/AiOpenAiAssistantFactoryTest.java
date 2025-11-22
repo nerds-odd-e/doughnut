@@ -14,7 +14,6 @@ import com.openai.models.images.Image;
 import com.openai.models.images.ImageGenerateParams;
 import com.openai.models.images.ImagesResponse;
 import com.openai.services.blocking.ImageService;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
@@ -28,9 +27,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest
 @ActiveProfiles("test")
 class AiOpenAiAssistantFactoryTest {
-
-  @MockitoBean(name = "testableOpenAiApi")
-  private OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   private OpenAIClient officialClient;

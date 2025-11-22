@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class NullToNotFoundResponseBodyAdviceTest {
   @Autowired private MockMvc mockMvc;
-
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;

@@ -12,7 +12,6 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,9 +22,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 public class ConversationMessageControllerAiReplyTests extends ControllerTestBase {
-
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;

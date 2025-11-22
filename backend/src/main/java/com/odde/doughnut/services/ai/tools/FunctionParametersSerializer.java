@@ -1,19 +1,22 @@
 package com.odde.doughnut.services.ai.tools;
 
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.kjetland.jackson.jsonSchema.JsonSchemaConfig;
 import com.kjetland.jackson.jsonSchema.JsonSchemaGenerator;
-import com.theokanning.openai.utils.JsonUtil;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import java.io.IOException;
 
 public class FunctionParametersSerializer extends JsonSerializer<FunctionDefinition> {
   private final JsonSchemaConfig config = JsonSchemaConfig.vanillaJsonSchemaDraft4();
+  private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
 
   private final JsonSchemaGenerator jsonSchemaGenerator =
-      new JsonSchemaGenerator(JsonUtil.getInstance(), config);
+      new JsonSchemaGenerator(objectMapper, config);
 
   @Override
   public void serialize(FunctionDefinition value, JsonGenerator gen, SerializerProvider serializers)
@@ -34,17 +37,20 @@ public class FunctionParametersSerializer extends JsonSerializer<FunctionDefinit
       if (Boolean.TRUE == value.getStrict()) {
         parameterSchema.put("additionalProperties", Boolean.FALSE);
       }
-      gen.writeRawValue(JsonUtil.writeValueAsString(parameterSchema));
+      gen.writeRawValue(objectMapper.writeValueAsString(parameterSchema));
     } else {
       gen.writeFieldName("parameters");
       Object parametersDefinition = value.getParametersDefinition();
-      if (parametersDefinition instanceof String
-          && JsonUtil.isValidJson((String) parametersDefinition)) {
-        String prettyString =
-            JsonUtil.getInstance().readTree((String) parametersDefinition).toPrettyString();
-        gen.writeRawValue(prettyString);
+      if (parametersDefinition instanceof String) {
+        try {
+          JsonNode jsonNode = objectMapper.readTree((String) parametersDefinition);
+          gen.writeRawValue(jsonNode.toPrettyString());
+        } catch (Exception e) {
+          // Not valid JSON, write as string
+          gen.writeRawValue(objectMapper.writeValueAsString(parametersDefinition));
+        }
       } else {
-        gen.writeRawValue(JsonUtil.writeValueAsString(parametersDefinition));
+        gen.writeRawValue(objectMapper.writeValueAsString(parametersDefinition));
       }
     }
     gen.writeEndObject();

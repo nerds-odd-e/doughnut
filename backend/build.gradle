@@ -44,11 +44,10 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.3'
-  implementation 'io.github.lambdua:service:0.22.92'
   implementation 'com.openai:openai-java:4.8.0'
-  // Retrofit dependencies are provided transitively by io.github.lambdua:service
-  // Explicit converter-jackson declaration ensures version 3.0.0 compatibility
-  implementation 'com.squareup.retrofit2:converter-jackson:3.0.0'
+  // Legacy SDK dependency kept only for DTO types (ChatMessage, ChatTool, etc.)
+  // The API client itself is no longer used - all API calls use the official SDK
+  implementation 'io.github.lambdua:service:0.22.92'
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
   compileOnly 'org.projectlombok:lombok:1.18.42'
   annotationProcessor 'org.projectlombok:lombok:1.18.42'

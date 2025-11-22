@@ -14,14 +14,8 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.completion.chat.ChatCompletionResult;
-import io.reactivex.Single;
-import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @ActiveProfiles("test")
 @Transactional
 class NoteAutomationServiceTests {
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
@@ -64,15 +56,8 @@ class NoteAutomationServiceTests {
   @Test
   void shouldHandleNoToolCallWhenSuggestingTitle() throws JsonProcessingException {
     // Mock chat completion with no tool calls (empty response with tools)
-    // Note: mockNullChatCompletion only works for requests without tools
-    // For requests with tools, we need to return an empty result
-    ChatCompletionResult emptyResult = new ChatCompletionResult();
-    emptyResult.setChoices(new ArrayList<>());
-    Mockito.doReturn(Single.just(emptyResult))
-        .when(openAiApi)
-        .createChatCompletion(
-            ArgumentMatchers.argThat(
-                request -> request.getTools() != null && !request.getTools().isEmpty()));
+    // Use OpenAIChatCompletionMock to return an empty response
+    openAIChatCompletionMock.mockNullChatCompletion();
 
     String result = service.suggestTitle();
 

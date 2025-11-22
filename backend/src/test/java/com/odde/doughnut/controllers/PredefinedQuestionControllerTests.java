@@ -16,7 +16,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -27,8 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 class PredefinedQuestionControllerTests extends ControllerTestBase {
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;

@@ -18,7 +18,6 @@ import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,8 +29,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class RecallPromptControllerTests extends ControllerTestBase {
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;

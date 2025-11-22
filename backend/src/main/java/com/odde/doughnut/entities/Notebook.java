@@ -1,10 +1,10 @@
 package com.odde.doughnut.entities;
 
 import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SERVICE_ERROR;
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.ApiException;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.utils.Randomizer;
@@ -106,7 +106,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public String getNotebookDump() {
     List<BareNote> noteBriefs = getNoteBriefs();
-    return defaultObjectMapper().valueToTree(noteBriefs).toPrettyString();
+    return new ObjectMapperConfig().objectMapper().valueToTree(noteBriefs).toPrettyString();
   }
 
   @JsonIgnore

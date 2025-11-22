@@ -27,7 +27,6 @@ import com.openai.models.files.FilePurpose;
 import com.openai.models.images.Image;
 import com.openai.models.images.ImageGenerateParams;
 import com.openai.models.images.ImagesResponse;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.AssistantMessage;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
@@ -51,16 +50,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class OpenAiApiHandler {
-  private final OpenAiApi
-      openAiApi; // Legacy client - still needed for fine-tuning and transcription
-  private final OpenAIClient officialClient; // Official SDK - used for most APIs
+  private final OpenAIClient officialClient; // Official SDK
   private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
 
   @Autowired
-  public OpenAiApiHandler(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      @Qualifier("officialOpenAiClient") OpenAIClient officialClient) {
-    this.openAiApi = openAiApi;
+  public OpenAiApiHandler(@Qualifier("officialOpenAiClient") OpenAIClient officialClient) {
     this.officialClient = officialClient;
   }
 

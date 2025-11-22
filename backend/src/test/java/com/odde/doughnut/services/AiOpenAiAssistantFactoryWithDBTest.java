@@ -12,7 +12,6 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 class AiOpenAiAssistantFactoryWithDBTest {
 
   @Autowired AiQuestionGenerator aiQuestionGenerator;
-
-  @MockitoBean(name = "testableOpenAiApi")
-  private OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   private OpenAIClient officialClient;

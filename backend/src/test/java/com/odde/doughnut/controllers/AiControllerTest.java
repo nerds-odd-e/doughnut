@@ -20,7 +20,6 @@ import com.openai.models.images.ImagesResponse;
 import com.openai.models.models.ModelListPage;
 import com.openai.services.blocking.ImageService;
 import com.openai.services.blocking.ModelService;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,9 +35,6 @@ class AiControllerTest extends ControllerTestBase {
   @Autowired AiController controller;
 
   Note note;
-
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApi openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;

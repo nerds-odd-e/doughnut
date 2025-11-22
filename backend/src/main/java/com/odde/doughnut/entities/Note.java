@@ -1,7 +1,5 @@
 package com.odde.doughnut.entities;
 
-import static com.theokanning.openai.service.OpenAiService.defaultObjectMapper;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -11,6 +9,7 @@ import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.services.GraphRAGService;
@@ -325,7 +324,10 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public String getNoteDescription() {
     String prettyString =
-        defaultObjectMapper().valueToTree(BareNote.fromNoteWithoutTruncate(this)).toPrettyString();
+        new ObjectMapperConfig()
+            .objectMapper()
+            .valueToTree(BareNote.fromNoteWithoutTruncate(this))
+            .toPrettyString();
     return """
         The %s (in JSON format):
         %s
