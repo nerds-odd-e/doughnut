@@ -4,7 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
@@ -14,10 +14,10 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.openai.client.OpenAIClient;
 import com.openai.models.files.FileCreateParams;
 import com.openai.models.files.FileObject;
+import com.openai.models.finetuning.jobs.FineTuningJob;
+import com.openai.models.finetuning.jobs.JobCreateParams;
 import com.openai.services.blocking.FileService;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.fine_tuning.FineTuningJob;
-import io.reactivex.Single;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -65,10 +65,18 @@ public class FineTuningDataControllerTests extends ControllerTestBase {
               .status(com.openai.models.files.FileObject.Status.PROCESSED)
               .build();
       when(fileService.create(any(FileCreateParams.class))).thenReturn(fakeFileResponse);
-      FineTuningJob fakeFineTuningResponse = new FineTuningJob();
-      fakeFineTuningResponse.setStatus("success");
-      fakeFineTuningResponse.setFineTunedModel("ft:gpt-3.5-turbo-1106:test");
-      when(openAiApi.createFineTuningJob(any())).thenReturn(Single.just(fakeFineTuningResponse));
+      // Mock official SDK fine-tuning API
+      var fineTuningService =
+          Mockito.mock(
+              com.openai.services.blocking.FineTuningService.class, Mockito.RETURNS_DEEP_STUBS);
+      when(officialClient.fineTuning()).thenReturn(fineTuningService);
+      FineTuningJob fakeFineTuningResponse =
+          Mockito.mock(FineTuningJob.class, Mockito.RETURNS_DEEP_STUBS);
+      when(fakeFineTuningResponse.status()).thenReturn(FineTuningJob.Status.SUCCEEDED);
+      when(fakeFineTuningResponse.fineTunedModel())
+          .thenReturn(java.util.Optional.of("ft:gpt-3.5-turbo-1106:test"));
+      when(fineTuningService.jobs().create(any(JobCreateParams.class)))
+          .thenReturn(fakeFineTuningResponse);
       assertDoesNotThrow(() -> controller.uploadAndTriggerFineTuning());
     }
 

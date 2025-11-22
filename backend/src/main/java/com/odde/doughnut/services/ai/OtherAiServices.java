@@ -47,7 +47,7 @@ public final class OtherAiServices {
     String fileId =
         openAiApiHandler.uploadTextFile(
             question, fineTuningExamples.toJsonL(), "fine-tune", ".jsonl");
-    return openAiApiHandler.triggerFineTuning(fileId).getFineTunedModel();
+    return openAiApiHandler.triggerFineTuning(fileId).fineTunedModel().orElse(null);
   }
 
   public Optional<NoteDetailsCompletion> getTextFromAudio(

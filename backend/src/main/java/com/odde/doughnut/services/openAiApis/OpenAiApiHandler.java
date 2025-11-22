@@ -39,9 +39,6 @@ import com.theokanning.openai.completion.chat.ChatTool;
 import com.theokanning.openai.completion.chat.ChatToolCall;
 import com.theokanning.openai.completion.chat.SystemMessage;
 import com.theokanning.openai.completion.chat.UserMessage;
-import com.theokanning.openai.fine_tuning.FineTuningJob;
-import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
-import com.theokanning.openai.fine_tuning.Hyperparameters;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import java.io.File;
@@ -497,17 +494,18 @@ public class OpenAiApiHandler {
     }
   }
 
-  public FineTuningJob triggerFineTuning(String fileId) {
-    // Fine-tuning API is not yet available in the official SDK 4.8.0
-    // Keep using legacy client for now
-    FineTuningJobRequest fineTuningJobRequest = new FineTuningJobRequest();
-    fineTuningJobRequest.setTrainingFile(fileId);
-    fineTuningJobRequest.setModel("gpt-3.5-turbo-1106");
-    fineTuningJobRequest.setHyperparameters(
-        new Hyperparameters()); // not sure what should be the nEpochs value
-
-    FineTuningJob fineTuningJob = blockGet(openAiApi.createFineTuningJob(fineTuningJobRequest));
-    if (List.of("failed", "cancelled").contains(fineTuningJob.getStatus())) {
+  public com.openai.models.finetuning.jobs.FineTuningJob triggerFineTuning(String fileId) {
+    // Use official SDK fine-tuning API
+    var params =
+        com.openai.models.finetuning.jobs.JobCreateParams.builder()
+            .trainingFile(fileId)
+            .model("gpt-3.5-turbo-1106")
+            .build();
+    var fineTuningJob = officialClient.fineTuning().jobs().create(params);
+    var status = fineTuningJob.status();
+    if (status != null
+        && (status == com.openai.models.finetuning.jobs.FineTuningJob.Status.FAILED
+            || status == com.openai.models.finetuning.jobs.FineTuningJob.Status.CANCELLED)) {
       throw new OpenAIServiceErrorException(
           "Trigger Fine-Tuning Failed: " + fineTuningJob, HttpStatus.BAD_REQUEST);
     }
