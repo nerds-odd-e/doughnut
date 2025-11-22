@@ -27,6 +27,7 @@ import java.util.*;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 public class OpenAiApiHandler {
   private final OpenAiApi openAiApi;
 
+  @Autowired
   public OpenAiApiHandler(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
     this.openAiApi = openAiApi;
   }

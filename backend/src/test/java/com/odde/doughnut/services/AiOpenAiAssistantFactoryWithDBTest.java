@@ -10,6 +10,7 @@ import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.utils.randomizers.NonRandomizer;
@@ -38,9 +39,14 @@ class AiOpenAiAssistantFactoryWithDBTest {
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
+    var objectMapper = getTestObjectMapper();
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    NotebookAssistantForNoteServiceFactory factory =
+        new NotebookAssistantForNoteServiceFactory(
+            globalSettingsService, openAiApiHandler, objectMapper);
     aiQuestionGenerator =
         new AiQuestionGenerator(
-            openAiApi, globalSettingsService, new NonRandomizer(), getTestObjectMapper());
+            factory, globalSettingsService, new NonRandomizer(), objectMapper, openAiApiHandler);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
   }
 

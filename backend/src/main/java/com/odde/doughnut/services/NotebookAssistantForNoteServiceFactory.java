@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.client.OpenAiApi;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,11 +13,11 @@ public final class NotebookAssistantForNoteServiceFactory {
   private final ObjectMapper objectMapper;
 
   public NotebookAssistantForNoteServiceFactory(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       GlobalSettingsService globalSettingsService,
+      OpenAiApiHandler openAiApiHandler,
       ObjectMapper objectMapper) {
     this.globalSettingsService = globalSettingsService;
-    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
   }
 

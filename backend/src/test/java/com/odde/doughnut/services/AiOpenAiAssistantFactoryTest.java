@@ -8,6 +8,7 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
@@ -37,7 +38,8 @@ class AiOpenAiAssistantFactoryTest {
       image.setB64Json("https://image.com");
       result.setData(List.of(image));
       Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
-      assertEquals("https://image.com", new OtherAiServices(openAiApi).getTimage("prompt"));
+      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+      assertEquals("https://image.com", new OtherAiServices(openAiApiHandler).getTimage("prompt"));
     }
   }
 

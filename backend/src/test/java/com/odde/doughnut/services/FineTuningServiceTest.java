@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
@@ -31,7 +32,9 @@ class FineTuningServiceTest {
 
   @BeforeEach
   void setup() {
-    fineTuningService = new FineTuningService(questionSuggestionForFineTuningRepository, openAiApi);
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    fineTuningService =
+        new FineTuningService(questionSuggestionForFineTuningRepository, openAiApiHandler);
   }
 
   @Nested

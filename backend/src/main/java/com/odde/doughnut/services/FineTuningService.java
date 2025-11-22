@@ -4,10 +4,8 @@ import com.odde.doughnut.entities.SuggestedQuestionForFineTuning;
 import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,9 +16,9 @@ public class FineTuningService {
 
   public FineTuningService(
       QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository,
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+      OpenAiApiHandler openAiApiHandler) {
     this.questionSuggestionForFineTuningRepository = questionSuggestionForFineTuningRepository;
-    this.openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    this.openAiApiHandler = openAiApiHandler;
   }
 
   public List<SuggestedQuestionForFineTuning> getSuggestedQuestionForFineTunings() {

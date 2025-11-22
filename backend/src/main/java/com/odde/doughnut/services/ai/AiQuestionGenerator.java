@@ -13,47 +13,48 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.Randomizer;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AiQuestionGenerator {
-  private final OpenAiApi openAiApi;
+  private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final GlobalSettingsService globalSettingsService;
   private final Randomizer randomizer;
   private final ObjectMapper objectMapper;
+  private final OpenAiApiHandler openAiApiHandler;
 
   @Autowired
   public AiQuestionGenerator(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       GlobalSettingsService globalSettingsService,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper) {
-    this.openAiApi = openAiApi;
+      ObjectMapper objectMapper,
+      OpenAiApiHandler openAiApiHandler) {
+    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = testabilitySettings.getRandomizer();
     this.objectMapper = objectMapper;
+    this.openAiApiHandler = openAiApiHandler;
   }
 
   // Test-only constructor for injecting Randomizer directly
   public AiQuestionGenerator(
-      OpenAiApi openAiApi,
+      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
       GlobalSettingsService globalSettingsService,
       Randomizer randomizer,
-      ObjectMapper objectMapper) {
-    this.openAiApi = openAiApi;
+      ObjectMapper objectMapper,
+      OpenAiApiHandler openAiApiHandler) {
+    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = randomizer;
     this.objectMapper = objectMapper;
+    this.openAiApiHandler = openAiApiHandler;
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, MessageRequest additionalMessage) {
-    NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService, objectMapper);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
@@ -86,8 +87,6 @@ public class AiQuestionGenerator {
   }
 
   public QuestionEvaluation getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
-    NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(openAiApi, globalSettingsService, objectMapper);
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
@@ -101,8 +100,7 @@ public class AiQuestionGenerator {
   private AiQuestionGeneratorForNote forNote(Note note, String modelName1) {
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName1, note);
-    return new AiQuestionGeneratorForNote(
-        new OpenAiApiHandler(openAiApi), chatAboutNoteRequestBuilder);
+    return new AiQuestionGeneratorForNote(openAiApiHandler, chatAboutNoteRequestBuilder);
   }
 
   public MCQWithAnswer regenerateQuestion(

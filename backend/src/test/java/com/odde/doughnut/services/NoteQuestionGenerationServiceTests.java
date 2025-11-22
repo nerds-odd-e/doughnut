@@ -9,6 +9,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -49,9 +50,10 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
     notebookAssistantForNoteServiceFactory =
         new NotebookAssistantForNoteServiceFactory(
-            openAiApi, globalSettingsService, getTestObjectMapper());
+            globalSettingsService, openAiApiHandler, getTestObjectMapper());
     service = notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
   }
 

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
@@ -39,7 +40,8 @@ class AiOpenAiAssistantFactoryTriggerFineTuningTest {
 
   @BeforeEach
   void setup() {
-    otherAiServices = new OtherAiServices(openAiApi);
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    otherAiServices = new OtherAiServices(openAiApiHandler);
   }
 
   @Nested

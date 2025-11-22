@@ -7,6 +7,8 @@ import static org.mockito.Mockito.*;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
+import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.utils.Randomizer;
@@ -35,9 +37,13 @@ class AiQuestionGeneratorTests {
   @BeforeEach
   void setup() {
     var objectMapper = new ObjectMapperConfig().objectMapper();
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    NotebookAssistantForNoteServiceFactory factory =
+        new NotebookAssistantForNoteServiceFactory(
+            globalSettingsService, openAiApiHandler, objectMapper);
     aiQuestionGenerator =
         new AiQuestionGenerator(
-            openAiApi, globalSettingsService, new RealRandomizer(), objectMapper);
+            factory, globalSettingsService, new RealRandomizer(), objectMapper, openAiApiHandler);
 
     // Initialize chat completion mock
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
@@ -108,8 +114,13 @@ class AiQuestionGeneratorTests {
     // Setup a mocked randomizer
     Randomizer mockedRandomizer = mock(Randomizer.class);
     var objectMapper = new ObjectMapperConfig().objectMapper();
+    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
+    NotebookAssistantForNoteServiceFactory factory =
+        new NotebookAssistantForNoteServiceFactory(
+            globalSettingsService, openAiApiHandler, objectMapper);
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
-        new AiQuestionGenerator(openAiApi, globalSettingsService, mockedRandomizer, objectMapper);
+        new AiQuestionGenerator(
+            factory, globalSettingsService, mockedRandomizer, objectMapper, openAiApiHandler);
 
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
