@@ -2,20 +2,24 @@ package com.odde.doughnut.services;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
+import com.openai.client.OpenAIClient;
+import com.openai.models.images.Image;
+import com.openai.models.images.ImageGenerateParams;
+import com.openai.models.images.ImagesResponse;
+import com.openai.services.blocking.ImageService;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.image.Image;
-import com.theokanning.openai.image.ImageResult;
-import io.reactivex.Single;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -28,18 +32,21 @@ class AiOpenAiAssistantFactoryTest {
   @MockitoBean(name = "testableOpenAiApi")
   private OpenAiApi openAiApi;
 
+  @MockitoBean(name = "officialOpenAiClient")
+  private OpenAIClient officialClient;
+
   @Autowired OtherAiServices otherAiServices;
 
   @Nested
   class GetImage {
     @Test
     void getImageBasedOnPrompt() {
-      ImageResult result = new ImageResult();
-      Image image = new Image();
-      image.setB64Json("https://image.com");
-      result.setData(List.of(image));
-      org.mockito.Mockito.when(openAiApi.createImage(org.mockito.Mockito.any()))
-          .thenReturn(Single.just(result));
+      ImageService imageService = Mockito.mock(ImageService.class);
+      when(officialClient.images()).thenReturn(imageService);
+      Image image = Image.builder().b64Json("https://image.com").build();
+      ImagesResponse response =
+          ImagesResponse.builder().created(1234567890L).data(List.of(image)).build();
+      when(imageService.generate(Mockito.any(ImageGenerateParams.class))).thenReturn(response);
       assertEquals("https://image.com", otherAiServices.getTimage("prompt"));
     }
   }

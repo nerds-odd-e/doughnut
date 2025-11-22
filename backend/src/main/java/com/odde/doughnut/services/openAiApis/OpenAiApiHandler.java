@@ -10,13 +10,14 @@ import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.openai.client.OpenAIClient;
+import com.openai.models.images.Image;
+import com.openai.models.images.ImageGenerateParams;
+import com.openai.models.images.ImagesResponse;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
-import com.theokanning.openai.image.CreateImageRequest;
-import com.theokanning.openai.image.ImageResult;
 import com.theokanning.openai.model.Model;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -52,11 +53,26 @@ public class OpenAiApiHandler {
   }
 
   public String getOpenAiImage(String prompt) {
-    CreateImageRequest completionRequest =
-        CreateImageRequest.builder().prompt(prompt).responseFormat("b64_json").build();
-    ImageResult choices = blockGet(openAiApi.createImage(completionRequest));
-
-    return choices.getData().get(0).getB64Json();
+    ImageGenerateParams params =
+        ImageGenerateParams.builder()
+            .prompt(prompt)
+            .responseFormat(ImageGenerateParams.ResponseFormat.B64_JSON)
+            .build();
+    ImagesResponse response = officialClient.images().generate(params);
+    Image image =
+        response
+            .data()
+            .orElseThrow(
+                () ->
+                    new OpenAIServiceErrorException(
+                        "Image generation returned no data", HttpStatus.INTERNAL_SERVER_ERROR))
+            .get(0);
+    return image
+        .b64Json()
+        .orElseThrow(
+            () ->
+                new OpenAIServiceErrorException(
+                    "Image generation did not return b64_json", HttpStatus.INTERNAL_SERVER_ERROR));
   }
 
   public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
