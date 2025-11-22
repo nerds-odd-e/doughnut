@@ -1,6 +1,6 @@
 package com.odde.doughnut.services.ai;
 
-import com.theokanning.openai.completion.chat.ChatFunctionCall;
+import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -10,8 +10,8 @@ public class ChatFunctionCallForFineTuning {
   private String name;
   private String arguments;
 
-  public static ChatFunctionCallForFineTuning from(ChatFunctionCall function) {
-    return new ChatFunctionCallForFineTuning(
-        function.getName(), function.getArguments().toString());
+  public static ChatFunctionCallForFineTuning from(
+      ChatCompletionMessageFunctionToolCall.Function function) {
+    return new ChatFunctionCallForFineTuning(function.name(), function.arguments());
   }
 }

@@ -7,8 +7,8 @@ import com.odde.doughnut.services.ai.*;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
-import com.theokanning.openai.completion.chat.AssistantMessage;
-import com.theokanning.openai.completion.chat.ChatMessage;
+import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -97,12 +97,14 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
             .addSystemMessage(preservedNoteContent)
             .responseJsonSchema(tool);
 
-    List<ChatMessage> messages = builder.buildMessages();
+    List<ChatCompletionMessageParam> messages = builder.buildMessages();
 
     // Add the expected response as an assistant message
-    AssistantMessage assistantMessage =
-        new AssistantMessage(
-            new ObjectMapperConfig().objectMapper().valueToTree(argument).toString());
+    ChatCompletionMessageParam assistantMessage =
+        ChatCompletionMessageParam.ofAssistant(
+            ChatCompletionAssistantMessageParam.builder()
+                .content(new ObjectMapperConfig().objectMapper().valueToTree(argument).toString())
+                .build());
     messages.add(assistantMessage);
 
     return OpenAIChatGPTFineTuningExample.from(messages);

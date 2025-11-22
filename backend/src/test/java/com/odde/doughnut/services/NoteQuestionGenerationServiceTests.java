@@ -12,9 +12,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.SystemMessage;
-import com.theokanning.openai.completion.chat.UserMessage;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -147,13 +144,14 @@ class NoteQuestionGenerationServiceTests {
   class BuildQuestionGenerationRequest {
     @Test
     void shouldBuildRequestWithNoteDescription() {
-      ChatCompletionRequest request = service.buildQuestionGenerationRequest(null);
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(null);
 
       assertThat(request, is(notNullValue()));
-      assertThat(request.getModel(), is("gpt-4o-mini"));
+      assertThat(request.model().toString(), is("gpt-4o-mini"));
       boolean hasNoteDescription =
-          request.getMessages().stream()
-              .filter(message -> message instanceof SystemMessage)
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message ->
                       message.toString().contains("Focus Note and the notes related to it:"));
@@ -162,11 +160,12 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldBuildRequestWithQuestionGenerationInstruction() {
-      ChatCompletionRequest request = service.buildQuestionGenerationRequest(null);
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(null);
 
       boolean hasQuestionDesignerInstruction =
-          request.getMessages().stream()
-              .filter(message -> message instanceof UserMessage)
+          request.messages().stream()
+              .filter(message -> message.user().isPresent())
               .anyMatch(
                   message -> message.toString().contains("Please act as a Question Designer"));
 
@@ -189,11 +188,12 @@ class NoteQuestionGenerationServiceTests {
       service =
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
 
-      ChatCompletionRequest request = service.buildQuestionGenerationRequest(null);
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(null);
 
       boolean hasNotebookInstructions =
-          request.getMessages().stream()
-              .filter(message -> message instanceof SystemMessage)
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
               .anyMatch(message -> message.toString().contains("Custom notebook instructions"));
 
       assertThat(
@@ -207,11 +207,12 @@ class NoteQuestionGenerationServiceTests {
       MessageRequest additionalMessage = new MessageRequest();
       additionalMessage.setContent("Generate a question about the capital city");
 
-      ChatCompletionRequest request = service.buildQuestionGenerationRequest(additionalMessage);
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(additionalMessage);
 
       boolean hasAdditionalMessage =
-          request.getMessages().stream()
-              .filter(message -> message instanceof UserMessage)
+          request.messages().stream()
+              .filter(message -> message.user().isPresent())
               .anyMatch(
                   message ->
                       message.toString().contains("Generate a question about the capital city"));
@@ -222,12 +223,11 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
       // No NotebookAiAssistant created, so instructions should be null/empty
-      ChatCompletionRequest request = service.buildQuestionGenerationRequest(null);
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(null);
 
       long systemMessageCount =
-          request.getMessages().stream()
-              .filter(message -> message instanceof SystemMessage)
-              .count();
+          request.messages().stream().filter(message -> message.system().isPresent()).count();
 
       assertThat(
           "Request should have only one system message (note description)",

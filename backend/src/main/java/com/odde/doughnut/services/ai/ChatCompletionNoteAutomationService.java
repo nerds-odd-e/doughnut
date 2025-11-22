@@ -8,7 +8,13 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.completion.chat.*;
+import com.openai.models.ChatModel;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
+import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
+import com.theokanning.openai.completion.chat.AssistantMessage;
+import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,41 +40,43 @@ public class ChatCompletionNoteAutomationService {
         "Please suggest a better title for the note by calling the function. Don't change it if it's already good enough.";
 
     // Build messages with note context
-    List<ChatMessage> messages = buildMessages(instructions);
+    List<ChatCompletionMessageParam> messages = buildMessages(instructions);
 
     // Get the suggest title tool
     AiTool tool = AiToolFactory.suggestNoteTitle();
-    ChatTool chatTool = tool.getChatTool();
 
     // Create chat completion request
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    ChatCompletionRequest request =
-        ChatCompletionRequest.builder()
-            .model(modelName)
+    ChatCompletionCreateParams request =
+        ChatCompletionCreateParams.builder()
+            .model(ChatModel.of(modelName))
             .messages(messages)
-            .tools(List.of(chatTool))
+            .addTool(tool.getParameterClass())
             .build();
 
     // Make non-streaming call
     try {
       return openAiApiHandler
           .chatCompletion(request)
-          .map(ChatCompletionChoice::getMessage)
-          .map(AssistantMessage::getToolCalls)
-          .filter(toolCalls -> toolCalls != null && !toolCalls.isEmpty())
-          .map(toolCalls -> toolCalls.get(0))
-          .map(ChatToolCall::getFunction)
-          .map(ChatFunctionCall::getArguments)
           .map(
-              args -> {
-                try {
-                  return parseArguments(args);
-                } catch (JsonProcessingException e) {
-                  throw new RuntimeException(e);
+              choice -> {
+                AssistantMessage message = choice.getMessage();
+                if (message.getToolCalls() != null && !message.getToolCalls().isEmpty()) {
+                  com.theokanning.openai.completion.chat.ChatToolCall toolCall =
+                      message.getToolCalls().get(0);
+                  if (toolCall.getFunction() != null) {
+                    ChatFunctionCall functionCall = toolCall.getFunction();
+                    Object arguments = functionCall.getArguments();
+                    try {
+                      JsonNode argNode = parseArguments(arguments);
+                      return argNode.get("newTitle").asText();
+                    } catch (JsonProcessingException e) {
+                      throw new RuntimeException(e);
+                    }
+                  }
                 }
+                return null;
               })
-          .map(argNode -> argNode.get("newTitle"))
-          .map(JsonNode::asText)
           .orElse(null);
     } catch (RuntimeException e) {
       if (e.getCause() instanceof JsonProcessingException) {
@@ -78,16 +86,21 @@ public class ChatCompletionNoteAutomationService {
     }
   }
 
-  private List<ChatMessage> buildMessages(String instructions) {
-    List<ChatMessage> messages = new ArrayList<>();
+  private List<ChatCompletionMessageParam> buildMessages(String instructions) {
+    List<ChatCompletionMessageParam> messages = new ArrayList<>();
 
     // Add note context as system message
     String noteDescription = note.getGraphRAGDescription(objectMapper);
     messages.add(
-        new SystemMessage(noteDescription + "\n\n" + note.getNotebookAssistantInstructions()));
+        ChatCompletionMessageParam.ofSystem(
+            ChatCompletionSystemMessageParam.builder()
+                .content(noteDescription + "\n\n" + note.getNotebookAssistantInstructions())
+                .build()));
 
     // Add user instruction
-    messages.add(new UserMessage(instructions));
+    messages.add(
+        ChatCompletionMessageParam.ofUser(
+            ChatCompletionUserMessageParam.builder().content(instructions).build()));
 
     return messages;
   }

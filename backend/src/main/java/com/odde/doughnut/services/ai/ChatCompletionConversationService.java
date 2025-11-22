@@ -8,9 +8,9 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatTool;
+import com.openai.models.ChatModel;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import io.reactivex.Flowable;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,28 +29,33 @@ public class ChatCompletionConversationService {
   private final GlobalSettingsService globalSettingsService;
   private final ObjectMapper objectMapper;
 
-  public ChatCompletionRequest buildChatCompletionRequest(Conversation conversation) {
+  public ChatCompletionCreateParams buildChatCompletionRequest(Conversation conversation) {
     // Build conversation history from database
     ConversationHistoryBuilder historyBuilder = new ConversationHistoryBuilder(objectMapper);
-    List<ChatMessage> history = historyBuilder.buildHistory(conversation);
+    List<ChatCompletionMessageParam> history = historyBuilder.buildHistory(conversation);
 
     // Get available tools for conversation
     List<AiTool> availableTools = AiToolFactory.getAllAssistantTools();
-    List<ChatTool> chatTools = availableTools.stream().map(AiTool::getChatTool).toList();
 
     // Create chat completion request with tools
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    return ChatCompletionRequest.builder()
-        .model(modelName)
-        .messages(history)
-        .tools(chatTools)
-        .build();
+    ChatCompletionCreateParams.Builder builder =
+        ChatCompletionCreateParams.builder().model(ChatModel.of(modelName)).messages(history);
+
+    // Add tools using the builder's addTool(Class) method which generates schema automatically
+    for (AiTool tool : availableTools) {
+      @SuppressWarnings("unchecked")
+      Class<Object> paramClass = (Class<Object>) tool.parameterClass();
+      builder.addTool(paramClass);
+    }
+
+    return builder.build();
   }
 
   public SseEmitter getReplyStream(
       Conversation conversation, ConversationService conversationService)
       throws OpenAiUnauthorizedException {
-    ChatCompletionRequest request = buildChatCompletionRequest(conversation);
+    ChatCompletionCreateParams request = buildChatCompletionRequest(conversation);
 
     // Stream the response
     Flowable<String> stream = openAiApiHandler.streamChatCompletion(request);

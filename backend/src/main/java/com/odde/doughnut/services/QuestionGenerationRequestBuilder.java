@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 
 public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
@@ -17,7 +17,7 @@ public class QuestionGenerationRequestBuilder {
     this.objectMapper = objectMapper;
   }
 
-  public ChatCompletionRequest buildQuestionGenerationRequest(
+  public ChatCompletionCreateParams buildQuestionGenerationRequest(
       Note note, MessageRequest additionalMessage) {
     OpenAIChatRequestBuilder chatRequestBuilder = getChatRequestBuilder(note);
 

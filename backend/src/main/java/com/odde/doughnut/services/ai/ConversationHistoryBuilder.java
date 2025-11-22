@@ -4,10 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
-import com.theokanning.openai.completion.chat.AssistantMessage;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.SystemMessage;
-import com.theokanning.openai.completion.chat.UserMessage;
+import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
+import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +18,8 @@ public class ConversationHistoryBuilder {
     this.objectMapper = objectMapper;
   }
 
-  public List<ChatMessage> buildHistory(Conversation conversation) {
-    List<ChatMessage> messages = new ArrayList<>();
+  public List<ChatCompletionMessageParam> buildHistory(Conversation conversation) {
+    List<ChatCompletionMessageParam> messages = new ArrayList<>();
 
     // Add note context as first system message
     addNoteContext(messages, conversation);
@@ -28,17 +28,22 @@ public class ConversationHistoryBuilder {
     for (ConversationMessage msg : conversation.getConversationMessages()) {
       if (msg.getSender() == null) {
         // AI message
-        messages.add(new AssistantMessage(msg.getMessage()));
+        messages.add(
+            ChatCompletionMessageParam.ofAssistant(
+                ChatCompletionAssistantMessageParam.builder().content(msg.getMessage()).build()));
       } else {
         // User message
-        messages.add(new UserMessage(msg.getMessage()));
+        messages.add(
+            ChatCompletionMessageParam.ofUser(
+                ChatCompletionUserMessageParam.builder().content(msg.getMessage()).build()));
       }
     }
 
     return messages;
   }
 
-  private void addNoteContext(List<ChatMessage> messages, Conversation conversation) {
+  private void addNoteContext(
+      List<ChatCompletionMessageParam> messages, Conversation conversation) {
     Note note = conversation.getSubjectNote();
     if (note != null) {
       String noteDescription = note.getGraphRAGDescription(objectMapper);
@@ -50,18 +55,25 @@ public class ConversationHistoryBuilder {
         systemMessageContent += "\n\n" + notebookInstructions;
       }
 
-      messages.add(new SystemMessage(systemMessageContent));
+      messages.add(
+          ChatCompletionMessageParam.ofSystem(
+              ChatCompletionSystemMessageParam.builder().content(systemMessageContent).build()));
 
       // Add additional context for recall prompts
       String additionalContext = conversation.getAdditionalContextForSubject();
       if (additionalContext != null) {
-        messages.add(new SystemMessage(additionalContext));
+        messages.add(
+            ChatCompletionMessageParam.ofSystem(
+                ChatCompletionSystemMessageParam.builder().content(additionalContext).build()));
       }
 
       // Add conversation instructions
       messages.add(
-          new SystemMessage(
-              "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly."));
+          ChatCompletionMessageParam.ofSystem(
+              ChatCompletionSystemMessageParam.builder()
+                  .content(
+                      "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
+                  .build()));
     }
   }
 }

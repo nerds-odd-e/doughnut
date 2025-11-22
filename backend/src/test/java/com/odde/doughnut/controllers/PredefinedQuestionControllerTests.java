@@ -286,10 +286,10 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     @Test
     void shouldExportQuestionGenerationWithChatCompletionRequest()
         throws UnexpectedNoAccessRightException {
-      com.theokanning.openai.completion.chat.ChatCompletionRequest request =
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
           controller.exportQuestionGeneration(note);
-      assertThat(request.getModel(), notNullValue());
-      assertThat(request.getMessages(), notNullValue());
+      assertThat(request.model(), notNullValue());
+      assertThat(request.messages(), notNullValue());
     }
   }
 }

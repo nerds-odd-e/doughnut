@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.*;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import org.junit.jupiter.api.Test;
 
 class OpenAIChatAboutNoteRequestBuilderBaseTest {
@@ -39,8 +39,8 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   }
 
   private static String getNoteOfFocusDescription(Note note) {
-    ChatCompletionRequest request =
+    ChatCompletionCreateParams request =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note).build();
-    return request.getMessages().get(1).getTextContent();
+    return request.messages().get(1).system().get().content().toString();
   }
 }

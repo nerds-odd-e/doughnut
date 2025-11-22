@@ -9,8 +9,8 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.theokanning.openai.assistants.message.MessageRequest;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import java.util.Optional;
 
 public class NoteQuestionGenerationService {
@@ -37,7 +37,8 @@ public class NoteQuestionGenerationService {
     return generateQuestionWithChatCompletion(additionalMessage);
   }
 
-  public ChatCompletionRequest buildQuestionGenerationRequest(MessageRequest additionalMessage) {
+  public ChatCompletionCreateParams buildQuestionGenerationRequest(
+      MessageRequest additionalMessage) {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
   }
 

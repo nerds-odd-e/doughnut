@@ -9,9 +9,8 @@ import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.SystemMessage;
-import com.theokanning.openai.completion.chat.UserMessage;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -45,14 +44,14 @@ class ConversationHistoryBuilderTest {
 
       // When building history
       ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
-      List<ChatMessage> history = builder.buildHistory(conversation);
+      List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then first message should be system message with note context
       assertFalse(history.isEmpty());
-      ChatMessage firstMessage = history.get(0);
-      assertInstanceOf(SystemMessage.class, firstMessage);
-      SystemMessage systemMessage = (SystemMessage) firstMessage;
-      assertTrue(systemMessage.getContent().contains(note.getTopicConstructor()));
+      ChatCompletionMessageParam firstMessage = history.get(0);
+      assertTrue(firstMessage.system().isPresent());
+      ChatCompletionSystemMessageParam systemMessage = firstMessage.system().get();
+      assertTrue(systemMessage.content().toString().contains(note.getTopicConstructor()));
     }
 
     @Test
@@ -75,16 +74,16 @@ class ConversationHistoryBuilderTest {
 
       // When building history
       ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
-      List<ChatMessage> history = builder.buildHistory(conversation);
+      List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions) + 3
       // conversation messages
       assertEquals(5, history.size());
-      assertInstanceOf(SystemMessage.class, history.get(0)); // Note context
-      assertInstanceOf(SystemMessage.class, history.get(1)); // Conversation instructions
-      assertInstanceOf(UserMessage.class, history.get(2));
-      // AI messages will be AssistantMessage
-      assertInstanceOf(UserMessage.class, history.get(4));
+      assertTrue(history.get(0).system().isPresent()); // Note context
+      assertTrue(history.get(1).system().isPresent()); // Conversation instructions
+      assertTrue(history.get(2).user().isPresent());
+      // AI messages will be assistant
+      assertTrue(history.get(4).user().isPresent());
     }
 
     @Test
@@ -95,12 +94,12 @@ class ConversationHistoryBuilderTest {
 
       // When building history
       ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
-      List<ChatMessage> history = builder.buildHistory(conversation);
+      List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions)
       assertEquals(2, history.size());
-      assertInstanceOf(SystemMessage.class, history.get(0)); // Note context
-      assertInstanceOf(SystemMessage.class, history.get(1)); // Conversation instructions
+      assertTrue(history.get(0).system().isPresent()); // Note context
+      assertTrue(history.get(1).system().isPresent()); // Conversation instructions
     }
   }
 }

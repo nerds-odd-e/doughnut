@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
-import com.theokanning.openai.completion.chat.ChatMessage;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ import lombok.Getter;
 public class OpenAIChatGPTFineTuningExample {
   private @Getter List<ChatMessageForFineTuning> messages;
 
-  public static OpenAIChatGPTFineTuningExample from(List<ChatMessage> messages) {
+  public static OpenAIChatGPTFineTuningExample from(List<ChatCompletionMessageParam> messages) {
     return new OpenAIChatGPTFineTuningExample(
         messages.stream().map(ChatMessageForFineTuning::from).toList());
   }

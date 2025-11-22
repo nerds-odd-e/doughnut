@@ -12,7 +12,7 @@ import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -116,7 +116,7 @@ class PredefinedQuestionController {
   }
 
   @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")
-  public ChatCompletionRequest exportQuestionGeneration(
+  public ChatCompletionCreateParams exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);

@@ -11,14 +11,11 @@ import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.openai.client.OpenAIClient;
 import com.openai.core.http.StreamResponse;
-import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletion;
-import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
 import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
 import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
-import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageToolCall;
 import com.openai.models.chat.completions.ChatCompletionTool;
 import com.openai.models.files.FileCreateParams;
@@ -29,13 +26,8 @@ import com.openai.models.images.ImageGenerateParams;
 import com.openai.models.images.ImagesResponse;
 import com.theokanning.openai.completion.chat.AssistantMessage;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatFunctionCall;
-import com.theokanning.openai.completion.chat.ChatMessage;
-import com.theokanning.openai.completion.chat.ChatTool;
 import com.theokanning.openai.completion.chat.ChatToolCall;
-import com.theokanning.openai.completion.chat.SystemMessage;
-import com.theokanning.openai.completion.chat.UserMessage;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import java.io.File;
@@ -81,8 +73,7 @@ public class OpenAiApiHandler {
                     "Image generation did not return b64_json", HttpStatus.INTERNAL_SERVER_ERROR));
   }
 
-  public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionRequest request) {
-    ChatCompletionCreateParams params = buildChatCompletionParams(request);
+  public Optional<ChatCompletionChoice> chatCompletion(ChatCompletionCreateParams params) {
     ChatCompletion response = officialClient.chat().completions().create(params);
     if (response == null || response.choices() == null || response.choices().isEmpty()) {
       return Optional.empty();
@@ -90,167 +81,7 @@ public class OpenAiApiHandler {
     return Optional.of(convertChoice(response.choices().get(0)));
   }
 
-  private ChatCompletionCreateParams buildChatCompletionParams(ChatCompletionRequest request) {
-    ChatCompletionCreateParams.Builder builder =
-        ChatCompletionCreateParams.builder().model(ChatModel.of(request.getModel()));
-    applyMessages(request.getMessages(), builder);
-    applyOptionalSettings(request, builder);
-    applyTools(request.getTools(), builder);
-    applyResponseFormat(request.getResponseFormat(), builder);
-    return builder.build();
-  }
-
-  private void applyMessages(
-      List<ChatMessage> messages, ChatCompletionCreateParams.Builder builder) {
-    if (messages == null) {
-      return;
-    }
-    for (ChatMessage message : messages) {
-      if (message instanceof SystemMessage systemMessage) {
-        builder.addSystemMessage(systemMessage.getContent());
-      } else if (message instanceof UserMessage userMessage) {
-        String text = userMessage.getTextContent();
-        if (text == null && userMessage.getContent() != null) {
-          text = userMessage.getContent().toString();
-        }
-        builder.addUserMessage(text);
-      } else if (message instanceof AssistantMessage assistantMessage) {
-        builder.addMessage(
-            ChatCompletionMessageParam.ofAssistant(buildAssistantParam(assistantMessage)));
-      }
-    }
-  }
-
-  private ChatCompletionAssistantMessageParam buildAssistantParam(
-      AssistantMessage assistantMessage) {
-    ChatCompletionAssistantMessageParam.Builder builder =
-        ChatCompletionAssistantMessageParam.builder();
-    if (assistantMessage.getContent() != null) {
-      builder.content(assistantMessage.getContent());
-    }
-    if (assistantMessage.getName() != null) {
-      builder.name(assistantMessage.getName());
-    }
-    if (assistantMessage.getToolCalls() != null && !assistantMessage.getToolCalls().isEmpty()) {
-      List<ChatCompletionMessageToolCall> toolCalls = new ArrayList<>();
-      for (ChatToolCall toolCall : assistantMessage.getToolCalls()) {
-        ChatCompletionMessageToolCall converted = convertToolDefinition(toolCall);
-        if (converted != null) {
-          toolCalls.add(converted);
-        }
-      }
-      builder.toolCalls(toolCalls);
-    }
-    if (assistantMessage.getFunctionCall() != null) {
-      builder.functionCall(
-          ChatCompletionAssistantMessageParam.FunctionCall.builder()
-              .name(assistantMessage.getFunctionCall().getName())
-              .arguments(
-                  assistantMessage.getFunctionCall().getArguments() != null
-                      ? assistantMessage.getFunctionCall().getArguments().toString()
-                      : null)
-              .build());
-    }
-    return builder.build();
-  }
-
-  private void applyOptionalSettings(
-      ChatCompletionRequest request, ChatCompletionCreateParams.Builder builder) {
-    if (request.getMaxTokens() != null) {
-      builder.maxCompletionTokens(request.getMaxTokens().longValue());
-    }
-    if (request.getTemperature() != null) {
-      builder.temperature(request.getTemperature());
-    }
-    if (request.getTopP() != null) {
-      builder.topP(request.getTopP());
-    }
-    if (request.getPresencePenalty() != null) {
-      builder.presencePenalty(request.getPresencePenalty());
-    }
-    if (request.getFrequencyPenalty() != null) {
-      builder.frequencyPenalty(request.getFrequencyPenalty());
-    }
-    if (request.getStop() != null && !request.getStop().isEmpty()) {
-      builder.stopOfStrings(request.getStop());
-    }
-    if (request.getUser() != null) {
-      builder.user(request.getUser());
-    }
-    if (request.getN() != null) {
-      builder.n(request.getN().longValue());
-    }
-  }
-
-  private void applyTools(List<ChatTool> tools, ChatCompletionCreateParams.Builder builder) {
-    if (tools == null || tools.isEmpty()) {
-      return;
-    }
-    for (ChatTool tool : tools) {
-      Object function = tool.getFunction();
-      if (function instanceof FunctionDefinition legacyDefinition) {
-        // If parametersDefinitionClass is set, use the official library's addTool(Class) method
-        if (legacyDefinition.getParametersDefinitionClass() != null) {
-          @SuppressWarnings("unchecked")
-          Class<Object> paramClass =
-              (Class<Object>) legacyDefinition.getParametersDefinitionClass();
-          builder.addTool(paramClass);
-        } else {
-          // Try to convert the tool with object-based parameters
-          ChatCompletionTool converted = convertTool(tool);
-          if (converted != null) {
-            builder.addTool(converted);
-          }
-        }
-      } else {
-        // Fallback: try to convert the tool
-        ChatCompletionTool converted = convertTool(tool);
-        if (converted != null) {
-          builder.addTool(converted);
-        }
-      }
-    }
-  }
-
-  private void applyResponseFormat(
-      com.theokanning.openai.completion.chat.ChatResponseFormat responseFormat,
-      ChatCompletionCreateParams.Builder builder) {
-    if (responseFormat == null) {
-      return;
-    }
-    try {
-      String type = responseFormat.getType();
-      if ("json_schema".equals(type)) {
-        com.theokanning.openai.completion.chat.ResponseJsonSchema legacySchema =
-            responseFormat.getJsonSchema();
-        if (legacySchema != null) {
-          // Convert ResponseJsonSchema to official library's format
-          // The official library uses responseFormat(Class) for structured output
-          Class<?> schemaClass = legacySchema.getSchemaClass();
-          if (schemaClass != null) {
-            @SuppressWarnings("unchecked")
-            Class<Object> paramClass = (Class<Object>) schemaClass;
-            builder.responseFormat(paramClass);
-          } else {
-            // If no schema class, try to convert the schema definition
-            throw new OpenAIServiceErrorException(
-                "Response format requires schema class", HttpStatus.INTERNAL_SERVER_ERROR);
-          }
-        }
-      } else if ("json_object".equals(type)) {
-        builder.responseFormat(com.openai.models.ResponseFormatJsonObject.builder().build());
-      } else if ("text".equals(type)) {
-        builder.responseFormat(com.openai.models.ResponseFormatText.builder().build());
-      }
-      // "auto" type doesn't need to be set explicitly
-    } catch (Exception ex) {
-      throw new OpenAIServiceErrorException(
-          "Failed to convert response format: " + ex.getMessage(),
-          HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-  }
-
-  private ChatCompletionTool convertTool(ChatTool tool) {
+  private ChatCompletionTool convertTool(com.theokanning.openai.completion.chat.ChatTool tool) {
     Object function = tool.getFunction();
     if (function instanceof FunctionDefinition legacyDefinition) {
       try {
@@ -390,15 +221,7 @@ public class OpenAiApiHandler {
     return legacyFunction;
   }
 
-  public Flowable<String> streamChatCompletion(ChatCompletionRequest request) {
-    // Build params for streaming using the official client
-    ChatCompletionCreateParams.Builder builder =
-        ChatCompletionCreateParams.builder().model(ChatModel.of(request.getModel()));
-    applyMessages(request.getMessages(), builder);
-    applyOptionalSettings(request, builder);
-    applyTools(request.getTools(), builder);
-    applyResponseFormat(request.getResponseFormat(), builder);
-    ChatCompletionCreateParams params = builder.build();
+  public Flowable<String> streamChatCompletion(ChatCompletionCreateParams params) {
 
     return Flowable.create(
         emitter -> {
@@ -532,7 +355,8 @@ public class OpenAiApiHandler {
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(
       InstructionAndSchema tool, OpenAIChatRequestBuilder openAIChatRequestBuilder) {
-    ChatCompletionRequest chatRequest = openAIChatRequestBuilder.responseJsonSchema(tool).build();
+    ChatCompletionCreateParams chatRequest =
+        openAIChatRequestBuilder.responseJsonSchema(tool).build();
 
     try {
       Optional<ChatCompletionChoice> choiceOpt = chatCompletion(chatRequest);

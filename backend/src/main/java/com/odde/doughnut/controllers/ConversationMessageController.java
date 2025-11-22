@@ -10,7 +10,9 @@ import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.ai.ChatCompletionConversationService;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import org.apache.coyote.BadRequestException;
@@ -126,11 +128,44 @@ public class ConversationMessageController {
   }
 
   @GetMapping(value = "/{conversationId}/export", produces = "application/json")
-  public ChatCompletionRequest exportConversation(
+  @org.springframework.web.bind.annotation.ResponseBody
+  public java.util.Map<String, Object> exportConversation(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(conversation);
-    return chatCompletionConversationService.buildChatCompletionRequest(conversation);
+    ChatCompletionCreateParams params =
+        chatCompletionConversationService.buildChatCompletionRequest(conversation);
+    // Manually construct Map for proper JSON serialization
+    java.util.Map<String, Object> result = new java.util.HashMap<>();
+    result.put("model", params.model().toString());
+    java.util.List<java.util.Map<String, Object>> messagesList = new java.util.ArrayList<>();
+    for (ChatCompletionMessageParam messageParam : params.messages()) {
+      java.util.Map<String, Object> messageMap = new java.util.HashMap<>();
+      if (messageParam.system().isPresent()) {
+        messageMap.put("role", "system");
+        messageMap.put(
+            "content",
+            ChatMessageForFineTuning.extractContentString(messageParam.system().get().content()));
+      } else if (messageParam.user().isPresent()) {
+        messageMap.put("role", "user");
+        messageMap.put(
+            "content",
+            ChatMessageForFineTuning.extractContentString(messageParam.user().get().content()));
+      } else if (messageParam.assistant().isPresent()) {
+        messageMap.put("role", "assistant");
+        messageMap.put(
+            "content",
+            messageParam
+                .assistant()
+                .get()
+                .content()
+                .map(ChatMessageForFineTuning::extractContentString)
+                .orElse(null));
+      }
+      messagesList.add(messageMap);
+    }
+    result.put("messages", messagesList);
+    return result;
   }
 
   @GetMapping("/note/{note}")

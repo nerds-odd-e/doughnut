@@ -65,10 +65,25 @@ export class ConversationAboutNotePage {
       .then(($textarea) => {
         const content = $textarea.val() as string
         const json = JSON.parse(content)
-        const userMessages = json.messages.filter(
-          (m: { role: string; content?: string }) =>
-            m.role === 'user' && m.content?.includes(message)
-        )
+        // Handle both old structure (messages array) and new structure (messages array with different format)
+        const messages = json.messages || (Array.isArray(json) ? json : [])
+        if (!messages || messages.length === 0) {
+          throw new Error(
+            `No messages found in export. JSON structure: ${JSON.stringify(json, null, 2)}`
+          )
+        }
+        const userMessages = messages.filter((m: any) => {
+          // Check if message has user field (new structure) or role field (old structure)
+          const isUser = m.user !== undefined || m.role === 'user'
+          if (!isUser) return false
+          // Extract content from new structure (user.content) or old structure (content)
+          const messageContent = m.user?.content || m.content || ''
+          const contentStr =
+            typeof messageContent === 'string'
+              ? messageContent
+              : JSON.stringify(messageContent)
+          return contentStr.includes(message)
+        })
         expect(userMessages.length).to.be.greaterThan(0)
       })
     return this
@@ -84,10 +99,26 @@ export class ConversationAboutNotePage {
       .then(($textarea) => {
         const content = $textarea.val() as string
         const json = JSON.parse(content)
-        const assistantMessages = json.messages.filter(
-          (m: { role: string; content?: string }) =>
-            m.role === 'assistant' && m.content?.includes(reply)
-        )
+        // Handle both old structure (messages array) and new structure (messages array with different format)
+        const messages = json.messages || (Array.isArray(json) ? json : [])
+        if (!messages || messages.length === 0) {
+          throw new Error(
+            `No messages found in export. JSON structure: ${JSON.stringify(json, null, 2)}`
+          )
+        }
+        const assistantMessages = messages.filter((m: any) => {
+          // Check if message has assistant field (new structure) or role field (old structure)
+          const isAssistant =
+            m.assistant !== undefined || m.role === 'assistant'
+          if (!isAssistant) return false
+          // Extract content from new structure (assistant.content) or old structure (content)
+          const messageContent = m.assistant?.content || m.content || ''
+          const contentStr =
+            typeof messageContent === 'string'
+              ? messageContent
+              : JSON.stringify(messageContent)
+          return contentStr.includes(reply)
+        })
         expect(assistantMessages.length).to.be.greaterThan(0)
       })
     return this

@@ -12,7 +12,7 @@ import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.completion.chat.ChatCompletionRequest;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import io.reactivex.Flowable;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -47,7 +47,7 @@ class ChatCompletionConversationServiceTest {
     makeMe.aConversationMessage(conversation).sender(user).message("Tell me more").please();
 
     // Mock the streaming response
-    when(openAiApiHandler.streamChatCompletion(any(ChatCompletionRequest.class)))
+    when(openAiApiHandler.streamChatCompletion(any(ChatCompletionCreateParams.class)))
         .thenReturn(Flowable.empty());
 
     // When generating a reply
@@ -55,6 +55,6 @@ class ChatCompletionConversationServiceTest {
 
     // Then should return an emitter
     assertNotNull(result);
-    verify(openAiApiHandler).streamChatCompletion(any(ChatCompletionRequest.class));
+    verify(openAiApiHandler).streamChatCompletion(any(ChatCompletionCreateParams.class));
   }
 }

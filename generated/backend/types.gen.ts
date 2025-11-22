@@ -476,152 +476,6 @@ export type RecallStatus = {
     recallWindowEndAt?: string;
 };
 
-export type AssistantMessage = ChatMessage & {
-    role?: 'AssistantMessage';
-} & {
-    content?: string;
-    refusal?: string;
-    audio?: AssistantMessageAudio;
-    reasoning_content?: string;
-    tool_calls?: Array<ChatToolCall>;
-    /**
-     * @deprecated
-     */
-    function_call?: ChatFunctionCall;
-};
-
-export type AssistantMessageAudio = {
-    id?: string;
-    transcript?: string;
-    data?: string;
-    expires_at?: number;
-};
-
-export type Audio = {
-    voice?: string;
-    format?: string;
-};
-
-export type ChatCompletionRequest = {
-    model?: string;
-    messages?: Array<AssistantMessage | FunctionMessage | SystemMessage | ToolMessage | UserMessage>;
-    temperature?: number;
-    n?: number;
-    stream?: boolean;
-    stop?: Array<string>;
-    user?: string;
-    /**
-     * @deprecated
-     */
-    functions?: Array<unknown>;
-    seed?: number;
-    logprobs?: boolean;
-    tools?: Array<ChatTool>;
-    modalities?: Array<string>;
-    audio?: Audio;
-    response_format?: ChatResponseFormat;
-    top_p?: number;
-    stream_options?: StreamOption;
-    max_tokens?: number;
-    presence_penalty?: number;
-    frequency_penalty?: number;
-    logit_bias?: {
-        [key: string]: number;
-    };
-    /**
-     * @deprecated
-     */
-    function_call?: ChatCompletionRequestFunctionCall;
-    top_logprobs?: number;
-    tool_choice?: ToolChoice;
-    parallel_tool_calls?: boolean;
-};
-
-export type ChatCompletionRequestFunctionCall = {
-    name?: string;
-};
-
-export type ChatFunctionCall = {
-    name?: string;
-    arguments?: JsonNode;
-};
-
-export type ChatMessage = {
-    role?: string;
-    textContent?: string;
-    name?: string;
-};
-
-export type ChatResponseFormat = {
-    type?: string;
-    jsonSchema?: ResponseJsonSchema;
-};
-
-export type ChatTool = {
-    type?: string;
-    function?: {
-        [key: string]: unknown;
-    };
-};
-
-export type ChatToolCall = {
-    id?: string;
-    type?: string;
-    function?: ChatFunctionCall;
-};
-
-export type _Function = {
-    name?: string;
-};
-
-export type FunctionMessage = ChatMessage & {
-    role?: 'FunctionMessage';
-} & {
-    content?: string;
-};
-
-export type JsonNode = {
-    [key: string]: unknown;
-};
-
-export type ResponseJsonSchema = {
-    name?: string;
-    strict?: boolean;
-    schema?: {
-        [key: string]: unknown;
-    };
-};
-
-export type StreamOption = {
-    include_usage?: boolean;
-};
-
-export type SystemMessage = ChatMessage & {
-    role?: 'SystemMessage';
-} & {
-    content?: string;
-};
-
-export type ToolChoice = {
-    function?: _Function;
-    type?: string;
-};
-
-export type ToolMessage = ChatMessage & {
-    role?: 'ToolMessage';
-} & {
-    content?: string;
-    tool_call_id?: string;
-};
-
-export type UserMessage = ChatMessage & {
-    role?: 'UserMessage';
-} & {
-    content?: {
-        [key: string]: unknown;
-    };
-};
-
 export type NoteInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     note: NoteRealm;
@@ -731,6 +585,11 @@ export type Attachment = {
     file_id?: string;
 };
 
+export type ChatResponseFormat = {
+    type?: string;
+    jsonSchema?: ResponseJsonSchema;
+};
+
 export type CodeInterpreterResources = {
     file_ids?: Array<string>;
 };
@@ -817,6 +676,10 @@ export type FileSearchTool = Tool & {
     file_search?: FileSearch;
 };
 
+export type _Function = {
+    name?: string;
+};
+
 export type FunctionTool = Tool & {
     type?: 'FunctionTool';
 } & {
@@ -837,6 +700,10 @@ export type ImageUrl = {
 
 export type IncompleteDetails = {
     reason?: string;
+};
+
+export type JsonNode = {
+    [key: string]: unknown;
 };
 
 export type LastError = {
@@ -888,6 +755,14 @@ export type PromptTokensDetails = {
 export type RequiredAction = {
     type?: string;
     submit_tool_outputs?: SubmitToolOutputs;
+};
+
+export type ResponseJsonSchema = {
+    name?: string;
+    strict?: boolean;
+    schema?: {
+        [key: string]: unknown;
+    };
 };
 
 export type Run = {
@@ -1019,6 +894,11 @@ export type ToolCallFunction = {
     output?: string;
 };
 
+export type ToolChoice = {
+    function?: _Function;
+    type?: string;
+};
+
 export type ToolResources = {
     code_interpreter?: CodeInterpreterResources;
     file_search?: FileSearchResources;
@@ -1082,48 +962,6 @@ export type SubscriptionWritable = {
     user?: User;
     notebook?: Notebook;
     fromDTO?: SubscriptionDto;
-};
-
-export type ChatCompletionRequestWritable = {
-    model?: string;
-    messages?: Array<AssistantMessage | FunctionMessage | SystemMessage | ToolMessage | UserMessage>;
-    temperature?: number;
-    n?: number;
-    stream?: boolean;
-    stop?: Array<string>;
-    user?: string;
-    /**
-     * @deprecated
-     */
-    functions?: Array<unknown>;
-    seed?: number;
-    logprobs?: boolean;
-    tools?: Array<ChatTool>;
-    modalities?: Array<string>;
-    audio?: Audio;
-    response_format?: ChatResponseFormat;
-    top_p?: number;
-    stream_options?: StreamOption;
-    max_tokens?: number;
-    presence_penalty?: number;
-    frequency_penalty?: number;
-    logit_bias?: {
-        [key: string]: number;
-    };
-    /**
-     * @deprecated
-     */
-    function_call?: ChatCompletionRequestFunctionCall;
-    top_logprobs?: number;
-    tool_choice?: ToolChoice;
-    parallel_tool_calls?: boolean;
-};
-
-export type ChatToolCallWritable = {
-    index?: number;
-    id?: string;
-    type?: string;
-    function?: ChatFunctionCall;
 };
 
 export type GetUserProfileData = {
@@ -3920,10 +3758,8 @@ export type ExportQuestionGenerationResponses = {
     /**
      * OK
      */
-    200: ChatCompletionRequest;
+    200: unknown;
 };
-
-export type ExportQuestionGenerationResponse = ExportQuestionGenerationResponses[keyof ExportQuestionGenerationResponses];
 
 export type GetNoteInfoData = {
     body?: never;
@@ -4502,10 +4338,8 @@ export type ExportConversationResponses = {
     /**
      * OK
      */
-    200: ChatCompletionRequest;
+    200: unknown;
 };
-
-export type ExportConversationResponse = ExportConversationResponses[keyof ExportConversationResponses];
 
 export type GetUnreadConversationsData = {
     body?: never;

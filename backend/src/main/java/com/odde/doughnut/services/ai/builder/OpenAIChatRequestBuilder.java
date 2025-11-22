@@ -3,16 +3,19 @@ package com.odde.doughnut.services.ai.builder;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
-import com.theokanning.openai.completion.chat.*;
+import com.openai.models.ChatModel;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
+import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OpenAIChatRequestBuilder {
   public static final String systemInstruction =
       "This is a PKM system using hierarchical notes, each with a title and details, to capture atomic concepts.";
-  public final List<ChatMessage> messages = new ArrayList<>();
-  private final List<ChatTool> chatTools = new ArrayList<>();
-  ChatCompletionRequest.ChatCompletionRequestBuilder builder = ChatCompletionRequest.builder();
+  public final List<ChatCompletionMessageParam> messages = new ArrayList<>();
+  ChatCompletionCreateParams.Builder builder = ChatCompletionCreateParams.builder();
 
   public static OpenAIChatRequestBuilder chatAboutNoteRequestBuilder(String modelName, Note note) {
     return new OpenAIChatRequestBuilder()
@@ -22,7 +25,7 @@ public class OpenAIChatRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder model(String modelName) {
-    builder.model(modelName);
+    builder.model(ChatModel.of(modelName));
     return this;
   }
 
@@ -34,38 +37,35 @@ public class OpenAIChatRequestBuilder {
   public OpenAIChatRequestBuilder responseJsonSchema(InstructionAndSchema tool) {
     addUserMessage(tool.getMessageBody());
     FunctionDefinition schemaDefinition = tool.getFunctionDefinition();
-    ResponseJsonSchema jsonSchema =
-        ResponseJsonSchema.builder()
-            .name(schemaDefinition.getName())
-            .schemaDefinition(schemaDefinition.getParametersDefinition())
-            .schemaClass((Class<Object>) schemaDefinition.getParametersDefinitionClass())
-            .strict(true)
-            .build();
-    ChatResponseFormat respFormat = ChatResponseFormat.jsonSchema(jsonSchema);
-    builder.responseFormat(respFormat);
+    // Use official SDK's responseFormat with schema class
+    if (schemaDefinition.getParametersDefinitionClass() != null) {
+      @SuppressWarnings("unchecked")
+      Class<Object> schemaClass = (Class<Object>) schemaDefinition.getParametersDefinitionClass();
+      builder.responseFormat(schemaClass);
+    }
     return this;
   }
 
-  public List<ChatMessage> buildMessages() {
+  public List<ChatCompletionMessageParam> buildMessages() {
     return messages;
   }
 
-  public ChatCompletionRequest build() {
-    ChatCompletionRequest.ChatCompletionRequestBuilder requestBuilder =
-        builder.messages(messages).stream(false).n(1);
-    if (!chatTools.isEmpty()) {
-      requestBuilder.tools(chatTools);
-    }
+  public ChatCompletionCreateParams build() {
+    ChatCompletionCreateParams.Builder requestBuilder = builder.messages(messages).n(1L);
     return requestBuilder.build();
   }
 
   public OpenAIChatRequestBuilder addSystemMessage(String message) {
-    messages.add(new SystemMessage(message));
+    messages.add(
+        ChatCompletionMessageParam.ofSystem(
+            ChatCompletionSystemMessageParam.builder().content(message).build()));
     return this;
   }
 
   public OpenAIChatRequestBuilder addUserMessage(String message) {
-    messages.add(new UserMessage(message));
+    messages.add(
+        ChatCompletionMessageParam.ofUser(
+            ChatCompletionUserMessageParam.builder().content(message).build()));
     return this;
   }
 }
