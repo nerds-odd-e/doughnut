@@ -9,6 +9,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
+import com.openai.client.OpenAIClient;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.*;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
@@ -40,10 +41,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class OpenAiApiHandler {
   private final OpenAiApi openAiApi;
+  private final OpenAIClient officialClient;
 
   @Autowired
-  public OpenAiApiHandler(@Qualifier("testableOpenAiApi") OpenAiApi openAiApi) {
+  public OpenAiApiHandler(
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      @Qualifier("officialOpenAiClient") OpenAIClient officialClient) {
     this.openAiApi = openAiApi;
+    this.officialClient = officialClient;
   }
 
   public String getOpenAiImage(String prompt) {
