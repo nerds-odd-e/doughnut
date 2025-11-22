@@ -1153,14 +1153,6 @@ export type GenerateTokenResponse = (UserToken);
 
 export type CloseAllGithubIssuesResponse = (string);
 
-export type UpdateCurrentUserData = {
-    requestBody: {
-        [key: string]: string;
-    };
-};
-
-export type UpdateCurrentUserResponse = (string);
-
 export type TriggerExceptionResponse = (string);
 
 export type TimeTravelRelativeToNowData = {
@@ -1178,6 +1170,15 @@ export type TimeTravelData = {
 export type TimeTravelResponse = (Array<{
     [key: string]: unknown;
 }>);
+
+export type TestabilityUpdateUserData = {
+    requestBody: {
+        [key: string]: string;
+    };
+    username: string;
+};
+
+export type TestabilityUpdateUserResponse = (string);
 
 export type ShareToBazaarData = {
     requestBody: {

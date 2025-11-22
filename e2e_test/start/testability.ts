@@ -235,7 +235,13 @@ const testability = () => {
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
-      return Services.updateCurrentUser({ requestBody: hash })
+      return cy.get<string>('@currentLoginUser').then((username) => {
+        const promise = Services.testabilityUpdateUser({
+          username,
+          requestBody: hash,
+        })
+        return cy.wrap(promise)
+      })
     },
 
     setServiceUrl(serviceName: string, serviceUrl: string) {

@@ -88,32 +88,6 @@ paths:
             '*/*':
               schema:
                 type: string
-  /api/testability/update_current_user:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: updateCurrentUser
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/trigger_exception:
     post:
       tags:
@@ -184,6 +158,38 @@ paths:
                 type: array
                 items:
                   type: object
+  /api/testability/testability_update_user:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: testabilityUpdateUser
+      parameters:
+      - name: username
+        in: query
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/share_to_bazaar:
     post:
       tags:

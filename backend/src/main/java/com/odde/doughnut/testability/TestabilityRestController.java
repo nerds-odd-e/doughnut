@@ -251,15 +251,17 @@ class TestabilityRestController {
     return "OK";
   }
 
-  @PostMapping("/update_current_user")
+  @PostMapping("/testability_update_user")
   @Transactional
-  public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
+  public String testabilityUpdateUser(
+      @RequestParam String username, @RequestBody HashMap<String, String> userInfo) {
+    User user = getUserModelByExternalIdentifier(username);
     if (userInfo.containsKey("daily_assimilation_count")) {
       userService.setDailyAssimilationCount(
-          currentUser.getUser(), Integer.valueOf(userInfo.get("daily_assimilation_count")));
+          user, Integer.valueOf(userInfo.get("daily_assimilation_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      userService.setSpaceIntervals(currentUser.getUser(), userInfo.get("space_intervals"));
+      userService.setSpaceIntervals(user, userInfo.get("space_intervals"));
     }
     return "OK";
   }
