@@ -42,7 +42,6 @@ import com.theokanning.openai.completion.chat.UserMessage;
 import com.theokanning.openai.fine_tuning.FineTuningJob;
 import com.theokanning.openai.fine_tuning.FineTuningJobRequest;
 import com.theokanning.openai.fine_tuning.Hyperparameters;
-import com.theokanning.openai.model.Model;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import java.io.File;
@@ -56,20 +55,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-/**
- * Handler for OpenAI API calls, supporting Chat Completion API.
- *
- * <p>Chat Completion API methods: {@link #chatCompletion}, {@link #streamChatCompletion}
- *
- * <p>Migration Status:
- *
- * <ul>
- *   <li>✅ Migrated to official SDK: Chat completions (streaming and non-streaming), embeddings,
- *       image generation, file upload
- *   <li>⚠️ Still using legacy client: Fine-tuning jobs (API not available in official SDK 4.8.0),
- *       audio transcription (API not available in official SDK 4.8.0), model listing (not critical)
- * </ul>
- */
 @Service
 public class OpenAiApiHandler {
   private final OpenAiApi
@@ -483,8 +468,13 @@ public class OpenAiApiHandler {
         BackpressureStrategy.BUFFER);
   }
 
-  public List<Model> getModels() {
-    return blockGet(openAiApi.listModels()).data;
+  public List<com.openai.models.models.Model> getModels() {
+    // Use official SDK models API
+    var modelsResponse = officialClient.models().list();
+    if (modelsResponse != null && modelsResponse.data() != null) {
+      return modelsResponse.data();
+    }
+    return new ArrayList<>();
   }
 
   public String uploadTextFile(String subFileName, String content, String purpose, String suffix)

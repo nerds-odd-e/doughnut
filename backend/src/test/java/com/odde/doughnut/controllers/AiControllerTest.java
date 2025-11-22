@@ -17,12 +17,10 @@ import com.openai.client.OpenAIClient;
 import com.openai.models.images.Image;
 import com.openai.models.images.ImageGenerateParams;
 import com.openai.models.images.ImagesResponse;
+import com.openai.models.models.ModelListPage;
 import com.openai.services.blocking.ImageService;
-import com.theokanning.openai.OpenAiResponse;
+import com.openai.services.blocking.ModelService;
 import com.theokanning.openai.client.OpenAiApi;
-import com.theokanning.openai.model.Model;
-import io.reactivex.Single;
-import java.util.ArrayList;
 import java.util.List;
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.BeforeEach;
@@ -102,17 +100,31 @@ class AiControllerTest extends ControllerTestBase {
 
     @Test
     void shouldGetModelVersionsCorrectly() {
-      List<Model> fakeModels = new ArrayList<>();
-      Model model1 = new Model();
-      model1.setId("gpt-4");
-      fakeModels.add(model1);
-      Model model2 = new Model();
-      model2.setId("any-model");
-      fakeModels.add(model2);
-      OpenAiResponse<Model> fakeResponse = new OpenAiResponse<>();
-      fakeResponse.setData(fakeModels);
+      // Mock the official SDK models API
+      ModelService modelService = Mockito.mock(ModelService.class);
+      when(officialClient.models()).thenReturn(modelService);
 
-      when(openAiApi.listModels()).thenReturn(Single.just(fakeResponse));
+      com.openai.models.models.Model officialModel1 =
+          com.openai.models.models.Model.builder()
+              .id("gpt-4")
+              .created(System.currentTimeMillis() / 1000)
+              .ownedBy("openai")
+              .build();
+      com.openai.models.models.Model officialModel2 =
+          com.openai.models.models.Model.builder()
+              .id("any-model")
+              .created(System.currentTimeMillis() / 1000)
+              .ownedBy("openai")
+              .build();
+
+      // Mock the models list response
+      // officialClient.models() returns ModelService, list() returns ModelListPage, data() returns
+      // List<Model>
+      var modelsList = List.of(officialModel1, officialModel2);
+      ModelListPage mockListPage = Mockito.mock(ModelListPage.class);
+      when(modelService.list()).thenReturn(mockListPage);
+      when(mockListPage.data()).thenReturn(modelsList);
+
       assertThat(controller.getAvailableGptModels()).contains("gpt-4");
     }
   }

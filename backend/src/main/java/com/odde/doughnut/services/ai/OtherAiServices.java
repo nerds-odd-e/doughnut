@@ -32,8 +32,8 @@ public final class OtherAiServices {
         .getModels()
         .forEach(
             (e) -> {
-              if (e.id.startsWith("ft:") || e.id.startsWith("gpt")) {
-                modelVersionOptions.add(e.id);
+              if (e.id().startsWith("ft:") || e.id().startsWith("gpt")) {
+                modelVersionOptions.add(e.id());
               }
             });
 
