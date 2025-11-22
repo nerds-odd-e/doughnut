@@ -69,7 +69,7 @@ describe('get_note_graph tool', () => {
       mockGetGraph.mockResolvedValue({
         data: mockResponse,
         error: undefined,
-      } as any)
+      } as Awaited<ReturnType<typeof Services.getGraph>>)
 
       const result = await getNoteGraphTool.handle(ctx, {
         noteId: 1,

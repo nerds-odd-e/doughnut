@@ -47,7 +47,7 @@ describe('add_note tool', () => {
     mockCreateNote.mockResolvedValue({
       data: mockResponse,
       error: undefined,
-    } as any)
+    } as Awaited<ReturnType<typeof Services.createNoteViaMcp>>)
 
     const ctx = createMockContext()
 

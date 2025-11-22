@@ -39,7 +39,7 @@ describe('find_most_relevant_note tool', () => {
     mockSearchForLinkTarget.mockResolvedValue({
       data: searchResult as SearchForLinkTargetResponse,
       error: undefined,
-    } as any)
+    } as Awaited<ReturnType<typeof Services.searchForLinkTarget>>)
 
     const ctx = createMockContext()
 
