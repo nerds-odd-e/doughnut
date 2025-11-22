@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
-import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
@@ -24,19 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class ConversationMessageServiceTest {
   @Autowired MakeMe makeMe;
-  @Autowired GlobalSettingsService globalSettingsService;
-  @Autowired ConversationRepository conversationRepository;
-  @Autowired ConversationMessageRepository conversationMessageRepository;
   @Autowired AssessmentService assessmentService;
   @Autowired TestabilitySettings testabilitySettings;
-  private ConversationService conversationService;
+  @Autowired ConversationService conversationService;
   private CurrentUser currentUser;
 
   @BeforeEach
   void setup() {
-    conversationService =
-        new ConversationService(
-            testabilitySettings, conversationRepository, conversationMessageRepository);
     testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
     currentUser = new CurrentUser(makeMe.aUser().please());
   }

@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import com.odde.doughnut.factoryServices.EntityPersister;
-import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
@@ -20,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -28,14 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
   @Autowired EntityPersister entityPersister;
-  @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired PredefinedQuestionService predefinedQuestionService;
+  @MockitoBean AiQuestionGenerator aiQuestionGenerator;
   User user;
-  AiQuestionGenerator aiQuestionGenerator;
 
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    aiQuestionGenerator = mock(AiQuestionGenerator.class);
   }
 
   @Nested
@@ -81,8 +80,7 @@ class PredefinedQuestionTest {
       contestResult.feasibleQuestion = false;
       when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(contestResult);
 
-      PredefinedQuestionService service = createPredefinedQuestionService(entityPersister);
-      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
+      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
     }
@@ -96,8 +94,7 @@ class PredefinedQuestionTest {
       when(aiQuestionGenerator.regenerateQuestion(any(), any(), any()))
           .thenReturn(regeneratedQuestion);
 
-      PredefinedQuestionService service = createPredefinedQuestionService(entityPersister);
-      PredefinedQuestion result = service.generateAFeasibleQuestion(note);
+      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
 
       assertThat(result.getMcqWithAnswer(), equalTo(regeneratedQuestion));
     }
@@ -151,8 +148,6 @@ class PredefinedQuestionTest {
   }
 
   private PredefinedQuestion generateQuizQuestionEntity(@NotNull Note note) {
-    PredefinedQuestionService predefinedQuestionService =
-        createPredefinedQuestionService(entityPersister);
     return predefinedQuestionService.generateAFeasibleQuestion(note);
   }
 

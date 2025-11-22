@@ -14,12 +14,11 @@ import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
 import io.reactivex.Single;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -27,15 +26,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class EmbeddingServiceTests {
 
-  @Mock OpenAiApi openAiApi;
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
+
   @Autowired MakeMe makeMe;
-
-  EmbeddingService service;
-
-  @BeforeEach
-  void setup() {
-    service = new EmbeddingService(openAiApi);
-  }
+  @Autowired EmbeddingService service;
 
   @Test
   void shouldStreamEmbeddingsForNotes() {
