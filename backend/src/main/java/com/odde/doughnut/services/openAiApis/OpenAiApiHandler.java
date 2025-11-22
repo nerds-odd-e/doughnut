@@ -12,9 +12,11 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.openai.client.OpenAIClient;
+import com.openai.core.http.StreamResponse;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
+import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
 import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
@@ -405,20 +407,68 @@ public class OpenAiApiHandler {
   }
 
   public Flowable<String> streamChatCompletion(ChatCompletionRequest request) {
-    // Rebuild the request with streaming enabled
-    ChatCompletionRequest streamingRequest =
-        ChatCompletionRequest.builder()
-            .model(request.getModel())
-            .messages(request.getMessages())
-            .stream(true)
-            .tools(request.getTools())
-            .build();
+    // Build params for streaming using the official client
+    ChatCompletionCreateParams.Builder builder =
+        ChatCompletionCreateParams.builder().model(ChatModel.of(request.getModel()));
+    applyMessages(request.getMessages(), builder);
+    applyOptionalSettings(request, builder);
+    applyTools(request.getTools(), builder);
+    applyResponseFormat(request.getResponseFormat(), builder);
+    ChatCompletionCreateParams params = builder.build();
 
     return Flowable.create(
-        emitter ->
-            openAiApi
-                .createChatCompletionStream(streamingRequest)
-                .enqueue(new ChatCompletionResponseBodyCallback(emitter)),
+        emitter -> {
+          StreamResponse<ChatCompletionChunk> streamResponse = null;
+          try {
+            streamResponse = officialClient.chat().completions().createStreaming(params);
+            final StreamResponse<ChatCompletionChunk> finalStreamResponse = streamResponse;
+
+            // Register cleanup when emitter is cancelled
+            emitter.setCancellable(
+                () -> {
+                  if (finalStreamResponse != null) {
+                    try {
+                      finalStreamResponse.close();
+                    } catch (Exception e) {
+                      // Ignore errors during cleanup
+                    }
+                  }
+                });
+
+            streamResponse.stream()
+                .forEach(
+                    chunk -> {
+                      try {
+                        // Convert ChatCompletionChunk back to JSON string to preserve delta field
+                        // structure expected by frontend
+                        String jsonString = objectMapper.writeValueAsString(chunk);
+                        emitter.onNext(jsonString);
+                      } catch (JsonProcessingException e) {
+                        emitter.onError(
+                            new RuntimeException("Failed to serialize chunk to JSON", e));
+                      }
+                    });
+            emitter.onComplete();
+          } catch (Exception e) {
+            // Handle unauthorized errors
+            if (e.getMessage() != null
+                && (e.getMessage().contains("401") || e.getMessage().contains("Unauthorized"))) {
+              emitter.onError(
+                  new com.odde.doughnut.exceptions.OpenAiUnauthorizedException(
+                      "Unauthorized: " + e.getMessage()));
+            } else {
+              emitter.onError(e);
+            }
+          } finally {
+            if (streamResponse != null) {
+              try {
+                streamResponse.close();
+              } catch (Exception e) {
+                // Ignore errors during cleanup
+              }
+            }
+          }
+        },
         BackpressureStrategy.BUFFER);
   }
 

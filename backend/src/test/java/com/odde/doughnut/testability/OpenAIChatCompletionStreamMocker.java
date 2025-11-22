@@ -1,21 +1,25 @@
 package com.odde.doughnut.testability;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import com.theokanning.openai.client.OpenAiApi;
+import com.openai.client.OpenAIClient;
+import com.openai.core.http.StreamResponse;
+import com.openai.models.chat.completions.ChatCompletionChunk;
+import com.openai.models.chat.completions.ChatCompletionChunk.Choice;
+import com.openai.models.chat.completions.ChatCompletionChunk.Choice.Delta;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.ArrayList;
 import java.util.List;
-import okhttp3.MediaType;
-import okhttp3.ResponseBody;
-import retrofit2.Call;
+import java.util.Optional;
 
 public class OpenAIChatCompletionStreamMocker {
-  private final OpenAiApi openAiApi;
+  private final OpenAIClient officialClient;
   private final List<String> messageDeltas = new ArrayList<>();
 
-  public OpenAIChatCompletionStreamMocker(OpenAiApi openAiApi) {
-    this.openAiApi = openAiApi;
+  public OpenAIChatCompletionStreamMocker(OpenAIClient officialClient) {
+    this.officialClient = officialClient;
   }
 
   public OpenAIChatCompletionStreamMocker withMessage(String message) {
@@ -25,37 +29,65 @@ public class OpenAIChatCompletionStreamMocker {
   }
 
   public void mockStreamResponse() {
-    // Build SSE response
-    StringBuilder sseResponse = new StringBuilder();
+    // Build list of ChatCompletionChunk objects
+    List<ChatCompletionChunk> chunks = new ArrayList<>();
 
     // Add chunks for each message
     for (String message : messageDeltas) {
-      // Send a simple delta chunk
-      String chunkJson =
-          String.format(
-              "{\"choices\":[{\"index\":0,\"delta\":{\"content\":\"%s\",\"role\":\"assistant\"},\"finish_reason\":null}]}",
-              escapeJson(message));
-      sseResponse.append("data: ").append(chunkJson).append("\n\n");
+      Delta delta =
+          Delta.builder()
+              .content(message)
+              .role(ChatCompletionChunk.Choice.Delta.Role.ASSISTANT)
+              .build();
+      Choice choice =
+          Choice.builder()
+              .index(0L)
+              .delta(delta)
+              .finishReason(Optional.empty())
+              .logprobs(Optional.empty())
+              .build();
+      ChatCompletionChunk chunk =
+          ChatCompletionChunk.builder()
+              .id("chatcmpl-mock")
+              .created(System.currentTimeMillis() / 1000L)
+              .model("gpt-4o-mini")
+              .choices(List.of(choice))
+              .build();
+      chunks.add(chunk);
     }
 
-    // Send final done chunk
-    sseResponse.append(
-        "data: {\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}]}\n\n");
-    sseResponse.append("data: [DONE]\n\n");
+    // Add final chunk with finish reason
+    Delta finalDelta = Delta.builder().build();
+    Choice finalChoice =
+        Choice.builder()
+            .index(0L)
+            .delta(finalDelta)
+            .finishReason(Optional.of(ChatCompletionChunk.Choice.FinishReason.STOP))
+            .logprobs(Optional.empty())
+            .build();
+    ChatCompletionChunk finalChunk =
+        ChatCompletionChunk.builder()
+            .id("chatcmpl-mock")
+            .created(System.currentTimeMillis() / 1000L)
+            .model("gpt-4o-mini")
+            .choices(List.of(finalChoice))
+            .build();
+    chunks.add(finalChunk);
 
-    ResponseBody responseBody =
-        ResponseBody.create(MediaType.parse("text/event-stream"), sseResponse.toString());
-    Call<ResponseBody> call = new ResponseBodyCallStub(responseBody);
+    // Mock the streaming response
+    @SuppressWarnings("unchecked")
+    StreamResponse<ChatCompletionChunk> streamResponse = mock(StreamResponse.class);
+    when(streamResponse.stream()).thenReturn(chunks.stream());
 
-    doReturn(call).when(openAiApi).createChatCompletionStream(any());
-  }
+    com.openai.services.blocking.chat.ChatCompletionService completionService =
+        mock(com.openai.services.blocking.chat.ChatCompletionService.class);
+    when(completionService.createStreaming(any(ChatCompletionCreateParams.class)))
+        .thenReturn(streamResponse);
 
-  private String escapeJson(String message) {
-    return message
-        .replace("\\", "\\\\")
-        .replace("\"", "\\\"")
-        .replace("\n", "\\n")
-        .replace("\r", "\\r")
-        .replace("\t", "\\t");
+    com.openai.services.blocking.ChatService chatService =
+        mock(com.openai.services.blocking.ChatService.class);
+    when(chatService.completions()).thenReturn(completionService);
+
+    when(officialClient.chat()).thenReturn(chatService);
   }
 }
