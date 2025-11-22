@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.openAiApis;
 
-import static com.odde.doughnut.services.openAiApis.ApiExecutor.blockGet;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,7 +44,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
-import okhttp3.RequestBody;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -513,20 +510,17 @@ public class OpenAiApiHandler {
   }
 
   public String getTranscription(String filename, byte[] audioBytes) throws IOException {
-    // Audio transcription API is not yet available in the official SDK 4.8.0
-    // Keep using legacy client for now
-    okhttp3.MediaType mediaType = okhttp3.MediaType.parse("multipart/form-data");
-    RequestBody requestFile = RequestBody.create(mediaType, audioBytes);
-    okhttp3.MultipartBody.Part body =
-        okhttp3.MultipartBody.Part.createFormData("file", filename, requestFile);
-    okhttp3.MultipartBody.Builder builder =
-        new okhttp3.MultipartBody.Builder()
-            .setType(okhttp3.MultipartBody.FORM)
-            .addPart(body)
-            .addFormDataPart("model", "whisper-1")
-            .addFormDataPart("response_format", "srt");
-    RequestBody requestBody = builder.build();
-    return blockGet(((OpenAiApiExtended) openAiApi).createTranscriptionSrt(requestBody)).string();
+    // Use official SDK audio transcription API
+    var params =
+        com.openai.models.audio.transcriptions.TranscriptionCreateParams.builder()
+            .file(audioBytes)
+            .model("whisper-1")
+            .responseFormat(com.openai.models.audio.AudioResponseFormat.SRT)
+            .build();
+    var transcription = officialClient.audio().transcriptions().create(params);
+    // For SRT format, TranscriptionCreateResponse contains the transcription text
+    // The response object's toString() should return the transcription text for SRT format
+    return transcription.toString();
   }
 
   public Optional<JsonNode> requestAndGetJsonSchemaResult(

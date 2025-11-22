@@ -9,21 +9,18 @@ import static org.mockito.Mockito.*;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.services.ai.NoteDetailsCompletion;
 import com.odde.doughnut.services.ai.TextFromAudioWithCallInfo;
-import com.odde.doughnut.services.openAiApis.OpenAiApiExtended;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import io.reactivex.Single;
+import com.openai.models.audio.transcriptions.TranscriptionCreateParams;
 import java.io.IOException;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
@@ -37,9 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 class AiAudioControllerTests {
   @Autowired MakeMe makeMe;
   @Autowired AiAudioController controller;
-
-  @MockitoBean(name = "testableOpenAiApi")
-  OpenAiApiExtended openAiApi;
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
@@ -59,9 +53,17 @@ class AiAudioControllerTests {
   }
 
   protected void mockTranscriptionSrtResponse(String responseBody) {
-    // Mock the legacy API call that's still used for transcription
-    when(openAiApi.createTranscriptionSrt(any(RequestBody.class)))
-        .thenReturn(Single.just(ResponseBody.create(MediaType.parse("text/plain"), responseBody)));
+    // Mock the official SDK audio transcription API
+    var audioService =
+        Mockito.mock(com.openai.services.blocking.AudioService.class, Mockito.RETURNS_DEEP_STUBS);
+    when(officialClient.audio()).thenReturn(audioService);
+    var transcriptionResponse =
+        Mockito.mock(
+            com.openai.models.audio.transcriptions.TranscriptionCreateResponse.class,
+            Mockito.RETURNS_DEEP_STUBS);
+    when(transcriptionResponse.toString()).thenReturn(responseBody);
+    when(audioService.transcriptions().create(any(TranscriptionCreateParams.class)))
+        .thenReturn(transcriptionResponse);
   }
 
   private MockMultipartFile createMockAudioFile(String filename) {
