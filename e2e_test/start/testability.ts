@@ -68,28 +68,25 @@ const testability = () => {
         noteTestData,
       }
 
-      return cy
-        .wrap(
-          Services.injectNotes({
-            body: requestBody,
-          }),
-          { log: false }
-        )
-        .then((response) => {
-          const data = unwrapData<Record<string, number>>(response)
-          const expectedCount = noteTestData.length
-          const actualCount = Object.keys(data).length
-          expect(
-            actualCount,
-            `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
-          ).to.equal(expectedCount)
-          return cy
-            .get(`@${injectedNoteIdMapAliasName}`)
-            .then((existingMap) => {
-              const mergedMap = { ...existingMap, ...data }
-              cy.wrap(mergedMap).as(injectedNoteIdMapAliasName)
-            })
-        })
+      return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
+        return cy
+          .wrap(
+            Services.injectNotes({
+              body: requestBody,
+            }).then((response) => {
+              const data = unwrapData<Record<string, number>>(response)
+              const expectedCount = noteTestData.length
+              const actualCount = Object.keys(data).length
+              expect(
+                actualCount,
+                `Expected ${expectedCount} notes to be created, but backend only created ${actualCount} notes`
+              ).to.equal(expectedCount)
+              return { ...existingMap, ...data }
+            }),
+            { log: false }
+          )
+          .as(injectedNoteIdMapAliasName)
+      })
     },
     injectNumberNotes(
       notebook: string,

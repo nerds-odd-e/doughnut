@@ -91,7 +91,9 @@ Given(
     start
       .testability()
       .injectNotes([{ Title: noteTopology }], externalIdentifier)
-    start.testability().shareToBazaar(noteTopology)
+      .then(() => {
+        return start.testability().shareToBazaar(noteTopology)
+      })
   }
 )
 

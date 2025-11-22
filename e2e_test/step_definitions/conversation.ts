@@ -58,10 +58,8 @@ Then(
 Then(
   'there should be no unread message for the user {string}',
   (user: string) => {
-    const loginResult = start.reloginAndEnsureHomePage(user)
-    cy.wrap(loginResult).then(() => {
-      start.messageCenterIndicator().expectNoCount()
-    })
+    start.reloginAndEnsureHomePage(user)
+    start.messageCenterIndicator().expectNoCount()
   }
 )
 
@@ -72,20 +70,16 @@ Then('I should have no unread messages', () => {
 Then(
   '{string} should have {int} unread messages',
   (user: string, unreadMessageCount: number) => {
-    const loginResult = start.reloginAndEnsureHomePage(user)
-    cy.wrap(loginResult).then(() => {
-      start.messageCenterIndicator().expectCount(unreadMessageCount)
-    })
+    start.reloginAndEnsureHomePage(user)
+    start.messageCenterIndicator().expectCount(unreadMessageCount)
   }
 )
 
 When(
   '{string} start a conversation about the note {string} with a message {string}',
   (externalIdentifier: string, note: string, conversation: string) => {
-    const loginResult = start.reloginAndEnsureHomePage(externalIdentifier)
-    cy.wrap(loginResult).then(() => {
-      start.jumpToNotePage(note).sendMessageToNoteOwner(conversation)
-    })
+    start.reloginAndEnsureHomePage(externalIdentifier)
+    start.jumpToNotePage(note).sendMessageToNoteOwner(conversation)
   }
 )
 
