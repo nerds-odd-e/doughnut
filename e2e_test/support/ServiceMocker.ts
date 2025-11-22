@@ -22,10 +22,6 @@ class ServiceMocker {
     this.serviceName = serviceName
   }
 
-  get savedServiceUrlName() {
-    return `saved${this.serviceName}Url`
-  }
-
   private get stubsName() {
     return `${this.serviceName}Stubs`
   }

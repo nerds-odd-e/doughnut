@@ -268,9 +268,7 @@ const testability = () => {
       ])
     },
     mockService(serviceMocker: ServiceMocker) {
-      cy.wrap(
-        this.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl)
-      ).as(serviceMocker.savedServiceUrlName)
+      this.setServiceUrl(serviceMocker.serviceName, serviceMocker.serviceUrl)
       serviceMocker.install()
     },
 
