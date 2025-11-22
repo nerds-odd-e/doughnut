@@ -626,6 +626,10 @@ export type NotebookCertificateApproval = {
     lastApprovalTime?: string;
 };
 
+export type NotebookCertificateApprovalDTO = {
+    approval?: NotebookCertificateApproval;
+};
+
 export type NotebookSettings = {
     skipMemoryTrackingEntirely?: boolean;
     numberOfQuestionsInAssessment?: number;
@@ -1844,7 +1848,7 @@ export type GetApprovalForNotebookData = {
     notebook: number;
 };
 
-export type GetApprovalForNotebookResponse = (NotebookCertificateApproval);
+export type GetApprovalForNotebookResponse = (NotebookCertificateApprovalDTO);
 
 export type ShowMemoryTrackerData = {
     memoryTracker: number;

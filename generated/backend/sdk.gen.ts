@@ -2198,7 +2198,7 @@ export const getAllPendingRequest = (): CancelablePromise<GetAllPendingRequestRe
 /**
  * @param data The data for the request.
  * @param data.notebook
- * @returns NotebookCertificateApproval OK
+ * @returns NotebookCertificateApprovalDTO OK
  * @throws ApiError
  */
 export const getApprovalForNotebook = (data: GetApprovalForNotebookData): CancelablePromise<GetApprovalForNotebookResponse> => {

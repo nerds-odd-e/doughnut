@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.NotebookCertificateApprovalDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -33,11 +34,11 @@ class NotebookCertificateApprovalController {
   }
 
   @GetMapping("/for-notebook/{notebook}")
-  public NotebookCertificateApproval getApprovalForNotebook(
+  public NotebookCertificateApprovalDTO getApprovalForNotebook(
       @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(notebook);
-    return notebook.getNotebookCertificateApproval();
+    return new NotebookCertificateApprovalDTO(notebook.getNotebookCertificateApproval());
   }
 
   @PostMapping(value = "/request-approval/{notebook}")

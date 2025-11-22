@@ -24,14 +24,15 @@ const loaded = ref(false)
 const approval = ref<NotebookCertificateApproval | undefined>()
 
 onMounted(async () => {
-  approval.value = await managedApi.services.getApprovalForNotebook({
+  const approvalDTO = await managedApi.services.getApprovalForNotebook({
     notebook: props.notebook.id,
   })
+  approval.value = approvalDTO.approval
   loaded.value = true
 })
 
 const approvalButtonText = computed(() => {
-  if (approval.value === undefined) {
+  if (approval.value === undefined || approval.value === null) {
     return "Send Request"
   }
   if (approval.value.lastApprovalTime) {
@@ -43,15 +44,17 @@ const approvalButtonText = computed(() => {
 const approvalButtonClasses = computed(() => {
   return {
     "daisy-btn": true,
-    "daisy-btn-primary": approval.value === undefined,
-    "daisy-btn-disabled": approval.value !== undefined,
+    "daisy-btn-primary":
+      approval.value === undefined || approval.value === null,
+    "daisy-btn-disabled":
+      approval.value !== undefined && approval.value !== null,
     "daisy-mt-2": true,
     display: "block",
   }
 })
 
 const isApprovalButtonDisabled = computed(() => {
-  return approval.value !== undefined
+  return approval.value !== undefined && approval.value !== null
 })
 const requestNotebookApproval = async () => {
   approval.value = await managedApi.services.requestApprovalForNotebook({

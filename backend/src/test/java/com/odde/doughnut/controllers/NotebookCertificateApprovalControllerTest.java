@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.NotebookCertificateApprovalDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.NotebookCertificateApprovalService;
@@ -37,9 +38,9 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
     @Test
     void approvalStatusShouldBeNullIfNotExist() throws UnexpectedNoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      NotebookCertificateApproval approvalForNotebook =
+      NotebookCertificateApprovalDTO approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
-      assertThat(approvalForNotebook, nullValue());
+      assertThat(approvalForNotebook.getApproval(), nullValue());
     }
 
     @Test
@@ -47,9 +48,9 @@ class NotebookCertificateApprovalControllerTest extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       notebookService.requestNotebookApproval(note.getNotebook());
       makeMe.refresh(note.getNotebook());
-      NotebookCertificateApproval approvalForNotebook =
+      NotebookCertificateApprovalDTO approvalForNotebook =
           controller.getApprovalForNotebook(note.getNotebook());
-      assertThat(approvalForNotebook.getNotebook(), equalTo(note.getNotebook()));
+      assertThat(approvalForNotebook.getApproval().getNotebook(), equalTo(note.getNotebook()));
     }
   }
 

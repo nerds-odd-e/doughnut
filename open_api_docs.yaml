@@ -2965,7 +2965,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NotebookCertificateApproval"
+                $ref: "#/components/schemas/NotebookCertificateApprovalDTO"
   /api/memory-trackers/{memoryTracker}:
     get:
       tags:
@@ -4840,6 +4840,11 @@ components:
             $ref: "#/components/schemas/Subscription"
       required:
       - notebooks
+    NotebookCertificateApprovalDTO:
+      type: object
+      properties:
+        approval:
+          $ref: "#/components/schemas/NotebookCertificateApproval"
     SpellingQuestion:
       type: object
       properties:
