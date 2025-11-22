@@ -26,9 +26,6 @@ public class SwaggerConfig {
   public OpenApiCustomizer chatMessageSchemaOrderCustomizer() {
     return openApi -> {
       // Fix the property order for ChatMessage to ensure deterministic OpenAPI generation.
-      // The ChatMessage class is from a library
-      // (com.theokanning.openai.completion.chat.ChatMessage)
-      // and its property order can be non-deterministic when reflected.
       var schemas = openApi.getComponents().getSchemas();
       if (schemas != null && schemas.containsKey("ChatMessage")) {
         var chatMessageSchema = (Schema<?>) schemas.get("ChatMessage");

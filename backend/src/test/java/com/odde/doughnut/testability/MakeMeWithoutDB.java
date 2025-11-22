@@ -35,10 +35,6 @@ public class MakeMeWithoutDB {
     return new WikidataClaimJsonBuilder(wikidataId);
   }
 
-  public OpenAICompletionResultBuilder openAiCompletionResult() {
-    return new OpenAICompletionResultBuilder();
-  }
-
   public MCQWithAnswerBuilder aMCQWithAnswer() {
     return new MCQWithAnswerBuilder();
   }
