@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionParams;
 import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
@@ -42,7 +41,6 @@ class TestabilityRestController {
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
-  @Autowired CurrentUser currentUser;
   @Autowired CircleRepository circleRepository;
   @Autowired EntityPersister entityPersister;
   @Autowired CircleService circleService;
