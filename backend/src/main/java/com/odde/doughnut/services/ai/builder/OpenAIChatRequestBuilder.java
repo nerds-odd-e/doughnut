@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.ai.builder;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
@@ -36,11 +35,10 @@ public class OpenAIChatRequestBuilder {
 
   public OpenAIChatRequestBuilder responseJsonSchema(InstructionAndSchema tool) {
     addUserMessage(tool.getMessageBody());
-    FunctionDefinition schemaDefinition = tool.getFunctionDefinition();
     // Use official SDK's responseFormat with schema class
-    if (schemaDefinition.getParametersDefinitionClass() != null) {
+    if (tool.getParameterClass() != null) {
       @SuppressWarnings("unchecked")
-      Class<Object> schemaClass = (Class<Object>) schemaDefinition.getParametersDefinitionClass();
+      Class<Object> schemaClass = (Class<Object>) tool.getParameterClass();
       builder.responseFormat(schemaClass);
     }
     return this;

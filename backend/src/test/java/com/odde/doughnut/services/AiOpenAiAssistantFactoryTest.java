@@ -8,7 +8,6 @@ import com.odde.doughnut.services.ai.OtherAiServices;
 import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
-import com.odde.doughnut.services.ai.tools.FunctionDefinition;
 import com.openai.client.OpenAIClient;
 import com.openai.models.images.Image;
 import com.openai.models.images.ImageGenerateParams;
@@ -67,7 +66,7 @@ class AiOpenAiAssistantFactoryTest {
     }
 
     @Test
-    void shouldHaveStrictToolForGeneratingTitle() {
+    void shouldHaveParameterClassForGeneratingTitle() {
       List<AiTool> tools = AiToolFactory.getAllAssistantTools();
 
       Optional<AiTool> topicTitleTool =
@@ -75,8 +74,9 @@ class AiOpenAiAssistantFactoryTest {
               .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TITLE.getValue()))
               .findFirst();
 
-      FunctionDefinition fun = topicTitleTool.get().getFunctionDefinition();
-      assertTrue(fun.getStrict());
+      assertTrue(topicTitleTool.isPresent());
+      // Verify the tool has a parameter class (used for structured outputs)
+      assertTrue(topicTitleTool.get().getParameterClass() != null);
     }
 
     @Test
