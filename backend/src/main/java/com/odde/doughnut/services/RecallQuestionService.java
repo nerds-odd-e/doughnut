@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
@@ -8,12 +7,9 @@ import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,23 +23,18 @@ public class RecallQuestionService {
 
   @Autowired
   public RecallQuestionService(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       RecallPromptRepository recallPromptRepository,
       EntityPersister entityPersister,
-      TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper,
       AnswerService answerService,
-      GlobalSettingsService globalSettingsService,
       MemoryTrackerService memoryTrackerService,
-      PredefinedQuestionService predefinedQuestionService) {
+      PredefinedQuestionService predefinedQuestionService,
+      AiQuestionGenerator aiQuestionGenerator) {
     this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
     this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
     this.predefinedQuestionService = predefinedQuestionService;
-    aiQuestionGenerator =
-        new AiQuestionGenerator(
-            openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
+    this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {

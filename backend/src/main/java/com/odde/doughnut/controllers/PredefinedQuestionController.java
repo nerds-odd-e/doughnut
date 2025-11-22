@@ -12,13 +12,11 @@ import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,22 +35,20 @@ class PredefinedQuestionController {
 
   @Autowired
   public PredefinedQuestionController(
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
       PredefinedQuestionService predefinedQuestionService,
       SuggestedQuestionForFineTuningService suggestedQuestionForFineTuningService,
       TestabilitySettings testabilitySettings,
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
-      GlobalSettingsService globalSettingsService) {
+      GlobalSettingsService globalSettingsService,
+      AiQuestionGenerator aiQuestionGenerator) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.testabilitySettings = testabilitySettings;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.globalSettingsService = globalSettingsService;
-    aiQuestionGenerator =
-        new AiQuestionGenerator(
-            openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
+    this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
   @PostMapping("/generate-question-without-save")

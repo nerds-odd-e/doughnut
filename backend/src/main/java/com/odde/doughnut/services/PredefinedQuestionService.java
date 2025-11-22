@@ -1,17 +1,13 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.testability.TestabilitySettings;
-import com.theokanning.openai.client.OpenAiApi;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,19 +16,6 @@ public class PredefinedQuestionService {
   private final AiQuestionGenerator aiQuestionGenerator;
 
   @Autowired
-  public PredefinedQuestionService(
-      EntityPersister entityPersister,
-      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
-      GlobalSettingsService globalSettingsService,
-      TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper) {
-    this.entityPersister = entityPersister;
-    this.aiQuestionGenerator =
-        new AiQuestionGenerator(
-            openAiApi, globalSettingsService, testabilitySettings.getRandomizer(), objectMapper);
-  }
-
-  // Test-only constructor for injecting mocked AiQuestionGenerator
   public PredefinedQuestionService(
       EntityPersister entityPersister, AiQuestionGenerator aiQuestionGenerator) {
     this.entityPersister = entityPersister;

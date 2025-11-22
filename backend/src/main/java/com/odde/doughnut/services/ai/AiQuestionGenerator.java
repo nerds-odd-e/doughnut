@@ -10,16 +10,46 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.utils.Randomizer;
 import com.theokanning.openai.assistants.message.MessageRequest;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
-public record AiQuestionGenerator(
-    OpenAiApi openAiApi,
-    GlobalSettingsService globalSettingsService,
-    com.odde.doughnut.utils.Randomizer randomizer,
-    ObjectMapper objectMapper) {
+@Service
+public class AiQuestionGenerator {
+  private final OpenAiApi openAiApi;
+  private final GlobalSettingsService globalSettingsService;
+  private final Randomizer randomizer;
+  private final ObjectMapper objectMapper;
+
+  @Autowired
+  public AiQuestionGenerator(
+      @Qualifier("testableOpenAiApi") OpenAiApi openAiApi,
+      GlobalSettingsService globalSettingsService,
+      TestabilitySettings testabilitySettings,
+      ObjectMapper objectMapper) {
+    this.openAiApi = openAiApi;
+    this.globalSettingsService = globalSettingsService;
+    this.randomizer = testabilitySettings.getRandomizer();
+    this.objectMapper = objectMapper;
+  }
+
+  // Test-only constructor for injecting Randomizer directly
+  public AiQuestionGenerator(
+      OpenAiApi openAiApi,
+      GlobalSettingsService globalSettingsService,
+      Randomizer randomizer,
+      ObjectMapper objectMapper) {
+    this.openAiApi = openAiApi;
+    this.globalSettingsService = globalSettingsService;
+    this.randomizer = randomizer;
+    this.objectMapper = objectMapper;
+  }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, MessageRequest additionalMessage) {
     NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory =
