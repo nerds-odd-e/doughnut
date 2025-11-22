@@ -5,11 +5,9 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.theokanning.openai.assistants.message.MessageRequest;
@@ -22,20 +20,22 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 class NoteQuestionGenerationServiceTests {
-  @Mock OpenAiApi openAiApi;
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
+
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
-  NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+  @Autowired NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
   private NoteQuestionGenerationService service;
@@ -50,15 +50,7 @@ class NoteQuestionGenerationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    notebookAssistantForNoteServiceFactory =
-        new NotebookAssistantForNoteServiceFactory(
-            globalSettingsService, openAiApiHandler, getTestObjectMapper());
     service = notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
-  }
-
-  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

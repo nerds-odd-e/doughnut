@@ -8,26 +8,27 @@ import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.ai.tools.FunctionDefinition;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.image.Image;
 import com.theokanning.openai.image.ImageResult;
 import io.reactivex.Single;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+@SpringBootTest
+@ActiveProfiles("test")
 class AiOpenAiAssistantFactoryTest {
 
-  @Mock private OpenAiApi openAiApi;
+  @MockitoBean(name = "testableOpenAiApi")
+  private OpenAiApi openAiApi;
 
-  @BeforeEach
-  void Setup() {
-    MockitoAnnotations.openMocks(this);
-  }
+  @Autowired OtherAiServices otherAiServices;
 
   @Nested
   class GetImage {
@@ -37,9 +38,9 @@ class AiOpenAiAssistantFactoryTest {
       Image image = new Image();
       image.setB64Json("https://image.com");
       result.setData(List.of(image));
-      Mockito.when(openAiApi.createImage(Mockito.any())).thenReturn(Single.just(result));
-      OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-      assertEquals("https://image.com", new OtherAiServices(openAiApiHandler).getTimage("prompt"));
+      org.mockito.Mockito.when(openAiApi.createImage(org.mockito.Mockito.any()))
+          .thenReturn(Single.just(result));
+      assertEquals("https://image.com", otherAiServices.getTimage("prompt"));
     }
   }
 

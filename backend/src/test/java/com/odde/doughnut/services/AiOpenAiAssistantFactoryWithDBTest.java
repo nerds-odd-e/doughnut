@@ -3,26 +3,22 @@ package com.odde.doughnut.services;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.utils.randomizers.NonRandomizer;
 import com.theokanning.openai.client.OpenAiApi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -30,28 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiOpenAiAssistantFactoryWithDBTest {
 
-  private AiQuestionGenerator aiQuestionGenerator;
-  @Mock private OpenAiApi openAiApi;
+  @Autowired AiQuestionGenerator aiQuestionGenerator;
+
+  @MockitoBean(name = "testableOpenAiApi")
+  private OpenAiApi openAiApi;
+
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   private OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void Setup() {
-    MockitoAnnotations.openMocks(this);
-    var objectMapper = getTestObjectMapper();
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    NotebookAssistantForNoteServiceFactory factory =
-        new NotebookAssistantForNoteServiceFactory(
-            globalSettingsService, openAiApiHandler, objectMapper);
-    aiQuestionGenerator =
-        new AiQuestionGenerator(
-            factory, globalSettingsService, new NonRandomizer(), objectMapper, openAiApiHandler);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
-  }
-
-  private com.fasterxml.jackson.databind.ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
   }
 
   @Nested

@@ -4,8 +4,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -15,13 +13,12 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import io.reactivex.Flowable;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -32,21 +29,9 @@ class ChatCompletionConversationServiceTest {
 
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
-  @Mock OpenAiApiHandler openAiApiHandler;
+  @MockitoBean OpenAiApiHandler openAiApiHandler;
+  @Autowired ChatCompletionConversationService service;
   @Mock ConversationService conversationService;
-
-  private ObjectMapper objectMapper;
-  private ChatCompletionConversationService service;
-
-  @BeforeEach
-  void setup() {
-    MockitoAnnotations.openMocks(this);
-    objectMapper = new ObjectMapperConfig().objectMapper();
-
-    service =
-        new ChatCompletionConversationService(
-            openAiApiHandler, globalSettingsService, objectMapper);
-  }
 
   @Test
   void shouldGenerateStreamingResponseForConversation() {

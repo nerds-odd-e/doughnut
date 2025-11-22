@@ -12,14 +12,11 @@ import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
-import com.theokanning.openai.client.OpenAiApi;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,13 +29,11 @@ class PredefinedQuestionTest {
   @Autowired MakeMe makeMe;
   @Autowired EntityPersister entityPersister;
   @Autowired GlobalSettingsService globalSettingsService;
-  @Mock OpenAiApi openAiApi;
   User user;
   AiQuestionGenerator aiQuestionGenerator;
 
   @BeforeEach
   void setup() {
-    MockitoAnnotations.openMocks(this);
     user = makeMe.aUser().please();
     aiQuestionGenerator = mock(AiQuestionGenerator.class);
   }

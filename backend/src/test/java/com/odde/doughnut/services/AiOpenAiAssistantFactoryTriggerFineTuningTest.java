@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import com.odde.doughnut.exceptions.OpenAIServiceErrorException;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import com.theokanning.openai.file.File;
@@ -24,10 +23,10 @@ import okio.Buffer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -35,14 +34,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class AiOpenAiAssistantFactoryTriggerFineTuningTest {
   @Autowired MakeMe makeMe;
-  @Mock private OpenAiApi openAiApi;
-  private OtherAiServices otherAiServices;
 
-  @BeforeEach
-  void setup() {
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    otherAiServices = new OtherAiServices(openAiApiHandler);
-  }
+  @MockitoBean(name = "testableOpenAiApi")
+  private OpenAiApi openAiApi;
+
+  @Autowired OtherAiServices otherAiServices;
 
   @Nested
   class UploadAndTriggerFineTuning {

@@ -12,39 +12,33 @@ import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.odde.doughnut.utils.Randomizer;
-import com.odde.doughnut.utils.randomizers.RealRandomizer;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 class AiQuestionGeneratorTests {
-  @Mock OpenAiApi openAiApi;
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
+
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired OpenAiApiHandler openAiApiHandler;
+  @Autowired NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+  @Autowired AiQuestionGenerator aiQuestionGenerator;
   OpenAIChatCompletionMock openAIChatCompletionMock;
-  AiQuestionGenerator aiQuestionGenerator;
 
   @BeforeEach
   void setup() {
-    var objectMapper = new ObjectMapperConfig().objectMapper();
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    NotebookAssistantForNoteServiceFactory factory =
-        new NotebookAssistantForNoteServiceFactory(
-            globalSettingsService, openAiApiHandler, objectMapper);
-    aiQuestionGenerator =
-        new AiQuestionGenerator(
-            factory, globalSettingsService, new RealRandomizer(), objectMapper, openAiApiHandler);
-
     // Initialize chat completion mock
     openAIChatCompletionMock = new OpenAIChatCompletionMock(openAiApi);
   }
@@ -114,13 +108,13 @@ class AiQuestionGeneratorTests {
     // Setup a mocked randomizer
     Randomizer mockedRandomizer = mock(Randomizer.class);
     var objectMapper = new ObjectMapperConfig().objectMapper();
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    NotebookAssistantForNoteServiceFactory factory =
-        new NotebookAssistantForNoteServiceFactory(
-            globalSettingsService, openAiApiHandler, objectMapper);
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
         new AiQuestionGenerator(
-            factory, globalSettingsService, mockedRandomizer, objectMapper, openAiApiHandler);
+            notebookAssistantForNoteServiceFactory,
+            globalSettingsService,
+            mockedRandomizer,
+            objectMapper,
+            openAiApiHandler);
 
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();

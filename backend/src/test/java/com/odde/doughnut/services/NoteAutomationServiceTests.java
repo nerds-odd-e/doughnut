@@ -20,20 +20,23 @@ import java.util.ArrayList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 class NoteAutomationServiceTests {
-  @Mock OpenAiApi openAiApi;
+  @MockitoBean(name = "testableOpenAiApi")
+  OpenAiApi openAiApi;
+
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
+  @Autowired OpenAiApiHandler openAiApiHandler;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
   private NoteAutomationService service;
@@ -47,7 +50,6 @@ class NoteAutomationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
     ObjectMapper objectMapper = getTestObjectMapper();
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
         new ChatCompletionNoteAutomationService(

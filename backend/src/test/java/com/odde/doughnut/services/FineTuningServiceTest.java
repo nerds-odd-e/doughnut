@@ -8,17 +8,15 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.QuestionSuggestionForFineTuningRepository;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.OpenAIChatGPTFineTuningExample;
-import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.theokanning.openai.client.OpenAiApi;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
@@ -27,15 +25,10 @@ import org.springframework.transaction.annotation.Transactional;
 class FineTuningServiceTest {
   @Autowired QuestionSuggestionForFineTuningRepository questionSuggestionForFineTuningRepository;
   @Autowired MakeMe makeMe;
-  private FineTuningService fineTuningService;
-  @Mock private OpenAiApi openAiApi;
+  @Autowired FineTuningService fineTuningService;
 
-  @BeforeEach
-  void setup() {
-    OpenAiApiHandler openAiApiHandler = new OpenAiApiHandler(openAiApi);
-    fineTuningService =
-        new FineTuningService(questionSuggestionForFineTuningRepository, openAiApiHandler);
-  }
+  @MockitoBean(name = "testableOpenAiApi")
+  private OpenAiApi openAiApi;
 
   @Nested
   class getAllOpenAIChatGPTFineTuningExample {
