@@ -113,7 +113,7 @@ class NoteController {
   public NoteAccessory showNoteAccessory(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
-    return note.getNoteAccessory();
+    return note.getOrInitializeNoteAccessory();
   }
 
   @GetMapping("/{note}/note-info")
