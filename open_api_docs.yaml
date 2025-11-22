@@ -3610,6 +3610,9 @@ components:
           items:
             $ref: "#/components/schemas/QuestionSuggestionParams"
           writeOnly: true
+        username:
+          type: string
+          writeOnly: true
     NoteTestData:
       type: object
       properties:

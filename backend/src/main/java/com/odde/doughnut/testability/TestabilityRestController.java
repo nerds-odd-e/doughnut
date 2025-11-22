@@ -283,15 +283,20 @@ class TestabilityRestController {
 
   static class SuggestedQuestionsData {
     @Setter private List<QuestionSuggestionParams> examples;
+    @Setter private String username;
   }
 
   @PostMapping("/inject_suggested_questions")
   @Transactional
   public String injectSuggestedQuestion(@RequestBody SuggestedQuestionsData testData) {
+    if (Strings.isEmpty(testData.username)) {
+      throw new RuntimeException("username is required and cannot be empty");
+    }
+    User user = getUserModelByExternalIdentifier(testData.username);
     testData.examples.forEach(
         example -> {
           SuggestedQuestionForFineTuning suggestion = new SuggestedQuestionForFineTuning();
-          suggestion.setUser(currentUser.getUser());
+          suggestion.setUser(user);
           suggestedQuestionForFineTuningService.update(suggestion, example);
         });
     return "OK";

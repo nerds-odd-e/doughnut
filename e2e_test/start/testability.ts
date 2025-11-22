@@ -150,9 +150,11 @@ const testability = () => {
     },
 
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
-      const requestBody: SuggestedQuestionsData = { examples }
-
-      return Services.injectSuggestedQuestion({ requestBody })
+      return cy.get<string>('@currentLoginUser').then((username) => {
+        const requestBody: SuggestedQuestionsData = { examples, username }
+        const promise = Services.injectSuggestedQuestion({ requestBody })
+        return cy.wrap(promise)
+      })
     },
 
     injectSuggestedQuestion(questionStem: string, positiveFeedback: boolean) {

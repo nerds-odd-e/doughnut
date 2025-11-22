@@ -956,6 +956,7 @@ export type SuggestedQuestionForFineTuning = {
 
 export type SuggestedQuestionsData = {
     examples?: Array<QuestionSuggestionParams>;
+    username?: string;
 };
 
 export type SuggestedTitleDTO = {
