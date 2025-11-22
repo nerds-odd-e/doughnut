@@ -60,11 +60,21 @@ import org.springframework.stereotype.Service;
  * Handler for OpenAI API calls, supporting Chat Completion API.
  *
  * <p>Chat Completion API methods: {@link #chatCompletion}, {@link #streamChatCompletion}
+ *
+ * <p>Migration Status:
+ *
+ * <ul>
+ *   <li>✅ Migrated to official SDK: Chat completions (streaming and non-streaming), embeddings,
+ *       image generation, file upload
+ *   <li>⚠️ Still using legacy client: Fine-tuning jobs (API not available in official SDK 4.8.0),
+ *       audio transcription (API not available in official SDK 4.8.0), model listing (not critical)
+ * </ul>
  */
 @Service
 public class OpenAiApiHandler {
-  private final OpenAiApi openAiApi;
-  private final OpenAIClient officialClient;
+  private final OpenAiApi
+      openAiApi; // Legacy client - still needed for fine-tuning and transcription
+  private final OpenAIClient officialClient; // Official SDK - used for most APIs
   private final ObjectMapper objectMapper = new ObjectMapperConfig().objectMapper();
 
   @Autowired
