@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.services.ai.*;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.List;
 
 public class AiToolFactory {
@@ -157,7 +156,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         QuestionEvaluation.class);
   }
 
-  public static MessageRequest buildRegenerateQuestionMessage(
+  public static String buildRegenerateQuestionMessage(
       QuestionContestResult contestResult, MCQWithAnswer mcqWithAnswer) {
     String mcq = null;
     try {
@@ -169,10 +168,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
-    return MessageRequest.builder()
-        .role("user")
-        .textMessage(
-            """
+    return """
                 Previously generated non-feasible question:
 
                 %s
@@ -182,7 +178,6 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
                 %s
 
                 Please regenerate or refine the question based on the above advice."""
-                .formatted(mcq, contestResult.advice))
-        .build();
+        .formatted(mcq, contestResult.advice);
   }
 }

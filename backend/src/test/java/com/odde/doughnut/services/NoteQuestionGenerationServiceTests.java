@@ -11,7 +11,6 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -204,8 +203,7 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldIncludeAdditionalMessageWhenProvided() {
-      MessageRequest additionalMessage = new MessageRequest();
-      additionalMessage.setContent("Generate a question about the capital city");
+      String additionalMessage = "Generate a question about the capital city";
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(additionalMessage);

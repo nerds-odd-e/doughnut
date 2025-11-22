@@ -12,7 +12,6 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.Randomizer;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class AiQuestionGenerator {
     this.openAiApiHandler = openAiApiHandler;
   }
 
-  public MCQWithAnswer getAiGeneratedQuestion(Note note, MessageRequest additionalMessage) {
+  public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage) {
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
@@ -105,7 +104,7 @@ public class AiQuestionGenerator {
 
   public MCQWithAnswer regenerateQuestion(
       QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer) {
-    MessageRequest additionalMessage =
+    String additionalMessage =
         AiToolFactory.buildRegenerateQuestionMessage(contestResult, mcqWithAnswer);
     return getAiGeneratedQuestion(note, additionalMessage);
   }

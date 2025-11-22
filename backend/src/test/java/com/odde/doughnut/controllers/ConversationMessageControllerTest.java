@@ -13,8 +13,6 @@ import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.testability.builders.RecallPromptBuilder;
-import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -459,27 +457,23 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           () -> controller.exportConversation(otherConversation));
     }
 
-    private String formatExportResponse(ChatCompletionCreateParams request) {
+    private String formatExportResponse(java.util.Map<String, Object> request) {
       StringBuilder export = new StringBuilder();
       export.append("## Context\n\n");
-      for (ChatCompletionMessageParam message : request.messages()) {
-        if (message.system().isPresent()) {
-          export.append(extractContentString(message.system().get().content())).append("\n\n");
+      java.util.List<java.util.Map<String, Object>> messages =
+          (java.util.List<java.util.Map<String, Object>>) request.get("messages");
+      for (java.util.Map<String, Object> message : messages) {
+        if ("system".equals(message.get("role"))) {
+          export.append(formatMessage((String) message.get("content"))).append("\n\n");
         }
       }
       export.append("## Conversation History\n\n");
-      for (ChatCompletionMessageParam message : request.messages()) {
-        if (message.user().isPresent()) {
-          String content = extractContentString(message.user().get().content());
+      for (java.util.Map<String, Object> message : messages) {
+        if ("user".equals(message.get("role"))) {
+          String content = (String) message.get("content");
           export.append("**User**: ").append(formatMessage(content)).append("\n");
-        } else if (message.assistant().isPresent()) {
-          String content =
-              message
-                  .assistant()
-                  .get()
-                  .content()
-                  .map(ChatMessageForFineTuning::extractContentString)
-                  .orElse("");
+        } else if ("assistant".equals(message.get("role"))) {
+          String content = (String) message.get("content");
           export.append("**Assistant**: ").append(formatMessage(content)).append("\n");
         }
       }
@@ -496,9 +490,9 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void shouldExportConversationWithRequest() throws UnexpectedNoAccessRightException {
-      ChatCompletionCreateParams request = controller.exportConversation(conversation);
+      java.util.Map<String, Object> request = controller.exportConversation(conversation);
       assertThat(request).isNotNull();
-      assertThat(request.messages().size()).isGreaterThan(0);
+      assertThat(((java.util.List<?>) request.get("messages")).size()).isGreaterThan(0);
     }
 
     @Test
@@ -510,7 +504,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .please();
       makeMe.aConversationMessage(conversation).sender(null).message("No. It is not.").please();
 
-      ChatCompletionCreateParams request = controller.exportConversation(conversation);
+      java.util.Map<String, Object> request = controller.exportConversation(conversation);
       String export = formatExportResponse(request);
 
       assertThat(export).contains("**User**: Is Naba one of them?");
@@ -519,7 +513,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
 
     @Test
     void shouldExportConversationWithContext() throws UnexpectedNoAccessRightException {
-      ChatCompletionCreateParams request = controller.exportConversation(conversation);
+      java.util.Map<String, Object> request = controller.exportConversation(conversation);
       String export = formatExportResponse(request);
       assertThat(export).contains("## Context");
       assertThat(export).contains("Focus Note and the notes related to it:");
@@ -537,7 +531,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           .message("Is Naba one of them?")
           .please();
 
-      ChatCompletionCreateParams request = controller.exportConversation(conversation);
+      java.util.Map<String, Object> request = controller.exportConversation(conversation);
       String export = formatExportResponse(request);
       assertThat(export).contains("## Conversation History");
     }

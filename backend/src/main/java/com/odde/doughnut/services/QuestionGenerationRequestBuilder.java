@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.theokanning.openai.assistants.message.MessageRequest;
 
 public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
@@ -18,7 +17,7 @@ public class QuestionGenerationRequestBuilder {
   }
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
-      Note note, MessageRequest additionalMessage) {
+      Note note, String additionalMessage) {
     OpenAIChatRequestBuilder chatRequestBuilder = getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();
@@ -30,7 +29,7 @@ public class QuestionGenerationRequestBuilder {
     chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool());
     // Add any additional message if provided (after the question generation instruction)
     if (additionalMessage != null) {
-      chatRequestBuilder.addUserMessage(additionalMessage.getContent().toString());
+      chatRequestBuilder.addUserMessage(additionalMessage);
     }
     return chatRequestBuilder.build();
   }

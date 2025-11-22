@@ -1,7 +1,6 @@
 package com.odde.doughnut.services.commands;
 
 import com.odde.doughnut.entities.*;
-import com.theokanning.openai.assistants.message.Message;
 import java.util.List;
 
 public class GetAiStreamHelper {
@@ -14,13 +13,5 @@ public class GetAiStreamHelper {
       combined.append("\n\n");
     }
     return combined.toString();
-  }
-
-  public static String extractMessageContent(Message message) {
-    return message.getContent().stream()
-        .filter(c -> "text".equals(c.getType()))
-        .map(c -> c.getText().getValue())
-        .findFirst()
-        .orElse("");
   }
 }

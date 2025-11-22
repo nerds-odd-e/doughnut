@@ -10,13 +10,15 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.ChatModel;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.models.chat.completions.ChatCompletionMessage;
+import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
+import com.openai.models.chat.completions.ChatCompletionMessageToolCall;
 import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import com.openai.models.chat.completions.ChatCompletionUserMessageParam;
-import com.theokanning.openai.completion.chat.AssistantMessage;
-import com.theokanning.openai.completion.chat.ChatFunctionCall;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ChatCompletionNoteAutomationService {
   private final OpenAiApiHandler openAiApiHandler;
@@ -60,13 +62,13 @@ public class ChatCompletionNoteAutomationService {
           .chatCompletion(request)
           .map(
               choice -> {
-                AssistantMessage message = choice.getMessage();
-                if (message.getToolCalls() != null && !message.getToolCalls().isEmpty()) {
-                  com.theokanning.openai.completion.chat.ChatToolCall toolCall =
-                      message.getToolCalls().get(0);
-                  if (toolCall.getFunction() != null) {
-                    ChatFunctionCall functionCall = toolCall.getFunction();
-                    Object arguments = functionCall.getArguments();
+                ChatCompletionMessage message = choice.message();
+                Optional<List<ChatCompletionMessageToolCall>> toolCallsOpt = message.toolCalls();
+                if (toolCallsOpt.isPresent() && !toolCallsOpt.get().isEmpty()) {
+                  ChatCompletionMessageToolCall toolCall = toolCallsOpt.get().get(0);
+                  if (toolCall.function().isPresent()) {
+                    ChatCompletionMessageFunctionToolCall functionToolCall = toolCall.asFunction();
+                    String arguments = functionToolCall.function().arguments();
                     try {
                       JsonNode argNode = parseArguments(arguments);
                       return argNode.get("newTitle").asText();
@@ -105,13 +107,7 @@ public class ChatCompletionNoteAutomationService {
     return messages;
   }
 
-  private JsonNode parseArguments(Object arguments) throws JsonProcessingException {
-    if (arguments instanceof String) {
-      return objectMapper.readTree((String) arguments);
-    } else if (arguments instanceof JsonNode) {
-      return (JsonNode) arguments;
-    } else {
-      return objectMapper.valueToTree(arguments);
-    }
+  private JsonNode parseArguments(String arguments) throws JsonProcessingException {
+    return objectMapper.readTree(arguments != null ? arguments : "{}");
   }
 }

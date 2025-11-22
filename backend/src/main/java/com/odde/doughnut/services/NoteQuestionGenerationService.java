@@ -10,7 +10,6 @@ import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
-import com.theokanning.openai.assistants.message.MessageRequest;
 import java.util.Optional;
 
 public class NoteQuestionGenerationService {
@@ -32,17 +31,15 @@ public class NoteQuestionGenerationService {
     this.requestBuilder = new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
   }
 
-  public MCQWithAnswer generateQuestion(MessageRequest additionalMessage)
-      throws JsonProcessingException {
+  public MCQWithAnswer generateQuestion(String additionalMessage) throws JsonProcessingException {
     return generateQuestionWithChatCompletion(additionalMessage);
   }
 
-  public ChatCompletionCreateParams buildQuestionGenerationRequest(
-      MessageRequest additionalMessage) {
+  public ChatCompletionCreateParams buildQuestionGenerationRequest(String additionalMessage) {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
   }
 
-  private MCQWithAnswer generateQuestionWithChatCompletion(MessageRequest additionalMessage) {
+  private MCQWithAnswer generateQuestionWithChatCompletion(String additionalMessage) {
     OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();
@@ -53,7 +50,7 @@ public class NoteQuestionGenerationService {
     // Add any additional message if provided (before the question generation instruction)
     // Note: responseJsonSchema will add the question generation instruction
     if (additionalMessage != null) {
-      chatRequestBuilder.addUserMessage(additionalMessage.getContent().toString());
+      chatRequestBuilder.addUserMessage(additionalMessage);
     }
 
     chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool());
