@@ -56,12 +56,27 @@ Response Format:
     parentNote: parentTitle,
     noteCreationDTO: noteCreationDTO,
   }
-  const result: CreateNoteViaMcpResponse = await Services.createNoteViaMcp({
-    requestBody: mcpCreationDto,
-  })
+  try {
+    const result: CreateNoteViaMcpResponse = await Services.createNoteViaMcp({
+      requestBody: mcpCreationDto,
+    })
 
-  return jsonResponse({
-    title: result.created.note.noteTopology.titleOrPredicate,
-    message: `Added "${result.created.note.noteTopology.titleOrPredicate}" to parent "${result.parent.note.noteTopology.titleOrPredicate}"`,
-  })
+    if (!(result && result.created && result.created.note)) {
+      throw new Error(
+        `Failed to create note: API returned invalid response structure. Response: ${JSON.stringify(result)}`
+      )
+    }
+
+    return jsonResponse({
+      title: result.created.note.noteTopology.titleOrPredicate,
+      message: `Added "${result.created.note.noteTopology.titleOrPredicate}" to parent "${result.parent.note.noteTopology.titleOrPredicate}"`,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to create note under "${parentTitle}": ${error.message}`
+      )
+    }
+    throw error
+  }
 })

@@ -252,10 +252,9 @@ Then(
 Then(
   'I should see {notepath} with these children',
   (notePath: NotePath, data: DataTable) => {
-    start
-      .routerToNotebooksPage()
-      .navigateToPath(notePath)
-      .expectChildren(data.hashes())
+    const notePage = start.routerToNotebooksPage().navigateToPath(notePath)
+    cy.pageIsNotLoading()
+    notePage.expectChildren(data.hashes())
   }
 )
 

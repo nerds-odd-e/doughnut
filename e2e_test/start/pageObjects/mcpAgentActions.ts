@@ -75,10 +75,8 @@ export const mcpAgentActions = () => {
 
     // Response validation methods
     expectResponseContains(expectedText: string) {
-      cy.get('@MCPApiResponse').then((response) => {
-        const responseString = JSON.stringify(response)
-        const foundInString = responseString.includes(expectedText)
-        expect(foundInString).to.be.true
+      getResponseText('@MCPApiResponse').then((responseText) => {
+        expect(responseText).to.contain(expectedText)
       })
       return this
     },
