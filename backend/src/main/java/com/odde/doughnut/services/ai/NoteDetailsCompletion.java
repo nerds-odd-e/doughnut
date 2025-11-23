@@ -1,10 +1,12 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+@JsonClassDescription("Text completion for the details of the note of focus")
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoteDetailsCompletion {

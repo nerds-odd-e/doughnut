@@ -106,7 +106,8 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
             .formatted(new ObjectMapperConfig().objectMapper().valueToTree(mcq).toString());
 
     return new InstructionAndSchema(
-        messageBody, new AiTool("refine_question", "refine the question", MCQWithAnswer.class));
+        messageBody,
+        new AiTool("refine_question", "refine the question", MCQWithAnswerForRefinement.class));
   }
 
   public static InstructionAndSchema transcriptionToTextAiTool(String transcriptionFromAudio) {

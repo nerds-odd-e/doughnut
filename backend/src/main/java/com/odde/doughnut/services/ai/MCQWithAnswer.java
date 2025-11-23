@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -8,6 +9,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+@JsonClassDescription("Ask a single-answer multiple-choice question to the user")
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor

@@ -18,10 +18,12 @@ public record AiQuestionGeneratorForNote(
         .flatMap(
             jsonNode -> {
               try {
-                return Optional.of(
+                // MCQWithAnswerForRefinement extends MCQWithAnswer, so we can return it directly
+                MCQWithAnswerForRefinement refined =
                     new ObjectMapperConfig()
                         .objectMapper()
-                        .treeToValue(jsonNode, MCQWithAnswer.class));
+                        .treeToValue(jsonNode, MCQWithAnswerForRefinement.class);
+                return Optional.of(refined);
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }

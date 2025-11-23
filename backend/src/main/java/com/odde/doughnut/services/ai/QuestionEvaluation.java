@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
@@ -7,6 +8,7 @@ import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@JsonClassDescription("answer and evaluate the question to check its quality")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class QuestionEvaluation {
   @JsonPropertyDescription("Indices of the correct choices. 0-based.")
