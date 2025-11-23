@@ -5,7 +5,12 @@ import type {
   WikidataAssociationCreation,
 } from "@generated/backend"
 import type { LinkCreation, NoteCreationDto } from "@generated/backend"
-import { deleteNote, updateWikidataId } from "@generated/backend/sdk.gen"
+import {
+  deleteNote,
+  linkNoteFinalize,
+  updateLink,
+  updateWikidataId,
+} from "@generated/backend/sdk.gen"
 import ManagedApi from "@/managedApi/ManagedApi"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
@@ -210,24 +215,28 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: LinkCreation
   ) {
-    this.refreshNoteRealms(
-      await this.managedApi.services.linkNoteFinalize({
-        path: {
-          sourceNote: sourceId,
-          targetNote: targetId,
-        },
-        body: data,
-      })
-    )
+    const { data: noteRealms, error } = await linkNoteFinalize({
+      path: {
+        sourceNote: sourceId,
+        targetNote: targetId,
+      },
+      body: data,
+    })
+    if (error || !noteRealms) {
+      throw new Error(error || "Failed to create link")
+    }
+    this.refreshNoteRealms(noteRealms)
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
-    this.refreshNoteRealms(
-      await this.managedApi.services.updateLink({
-        path: { link: linkId },
-        body: data,
-      })
-    )
+    const { data: noteRealms, error } = await updateLink({
+      path: { link: linkId },
+      body: data,
+    })
+    if (error || !noteRealms) {
+      throw new Error(error || "Failed to update link")
+    }
+    this.refreshNoteRealms(noteRealms)
   }
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
