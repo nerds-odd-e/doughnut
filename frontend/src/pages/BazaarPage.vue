@@ -18,19 +18,20 @@
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue"
 import type { BazaarNotebook, User } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { bazaar } from "@generated/backend/sdk.gen"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 
-const { managedApi } = useLoadingApi()
 const bazaarNotebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
-const fetchData = () => {
-  managedApi.services.bazaar().then((res) => {
-    bazaarNotebooks.value = res
-  })
+const fetchData = async () => {
+  const { data: notebooks, error } = await bazaar()
+  if (!error) {
+    // notebooks is guaranteed to be BazaarNotebook[] when error is undefined
+    bazaarNotebooks.value = notebooks!
+  }
 }
 
 onMounted(() => {
