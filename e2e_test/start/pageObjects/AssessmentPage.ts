@@ -50,7 +50,12 @@ const assumeQuestionSection = () => {
       })
     },
     answer(answer: string) {
-      cy.findByText(answer).click().pageIsNotLoading()
+      this.getQuestionSection()
+        .should('be.visible')
+        .within(() => {
+          cy.findByText(answer).should('be.visible').click()
+        })
+      cy.pageIsNotLoading()
       return this
     },
     answerIncorrectAndContinue(answer: string) {
@@ -113,13 +118,14 @@ export const assumeAssessmentPage = (notebook?: string) => {
     },
     expectEndOfAssessment(expectedScore?: string) {
       if (expectedScore) {
-        cy.contains('Your score:').then(($scoreElement) => {
-          const actualScore = $scoreElement.text().trim()
-          expect(
-            actualScore,
-            `Expected assessment score to be "${expectedScore}", but found "${actualScore}"`
-          ).to.equal(expectedScore)
-        })
+        cy.contains('Your score:')
+          .invoke('text')
+          .then((actualScore) => {
+            expect(
+              actualScore.trim(),
+              `Expected assessment score to be "${expectedScore}", but found "${actualScore.trim()}"`
+            ).to.equal(expectedScore)
+          })
       }
       return endOfAssessment()
     },
