@@ -2,6 +2,7 @@ import { expect, vi } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -26,10 +27,12 @@ describe("ConversationComponent", () => {
 
   beforeEach(() => {
     mockedPush.mockClear()
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     wrapper = helper
       .component(ConversationComponent)
       .withStorageProps({
