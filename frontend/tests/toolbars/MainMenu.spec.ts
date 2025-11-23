@@ -5,6 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import timezoneParam from "@/managedApi/window/timezoneParam"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const useRouteValue = { name: "" }
 vitest.mock("vue-router", () => ({
@@ -62,10 +63,34 @@ describe("main menu", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockResolvedValue({ dueCount: 5 } as never)
+      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
+        data: {
+          dueCount: 5,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "overview").mockResolvedValue({
+        data: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -76,10 +101,34 @@ describe("main menu", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockResolvedValue({ dueCount: 0 } as never)
+      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
+        data: {
+          dueCount: 0,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "overview").mockResolvedValue({
+        data: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -89,11 +138,35 @@ describe("main menu", () => {
     })
 
     it("fetches due count when user changes", async () => {
-      const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockImplementation(mockGetCount)
+      const mockGetCount = vitest.fn().mockResolvedValue({
+        data: {
+          dueCount: 3,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "getAssimilationCount").mockImplementation(mockGetCount)
+
+      vi.spyOn(sdk, "overview").mockResolvedValue({
+        data: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const { rerender } = helper
         .component(MainMenu)
@@ -109,11 +182,35 @@ describe("main menu", () => {
     })
 
     it("calls getAssimilationCount with the correct timezone", async () => {
-      const mockGetCount = vitest.fn().mockResolvedValue({ dueCount: 3 })
-      vi.spyOn(
-        helper.managedApi.services,
-        "getAssimilationCount"
-      ).mockImplementation(mockGetCount)
+      const mockGetCount = vitest.fn().mockResolvedValue({
+        data: {
+          dueCount: 3,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "getAssimilationCount").mockImplementation(mockGetCount)
+
+      vi.spyOn(sdk, "overview").mockResolvedValue({
+        data: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -126,9 +223,34 @@ describe("main menu", () => {
 
   describe("recall count", () => {
     it("shows recall count when there are items to repeat", async () => {
-      vi.spyOn(helper.managedApi.services, "overview").mockResolvedValue({
-        toRepeatCount: 789,
-      } as never)
+      vi.spyOn(sdk, "overview").mockResolvedValue({
+        data: {
+          toRepeatCount: 789,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
+        data: {
+          dueCount: 0,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -139,9 +261,34 @@ describe("main menu", () => {
     })
 
     it("does not show recall count when there are no items to repeat", async () => {
-      vi.spyOn(helper.managedApi.services, "overview").mockResolvedValue({
-        toRepeatCount: 0,
-      } as never)
+      vi.spyOn(sdk, "overview").mockResolvedValue({
+        data: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
+        data: {
+          dueCount: 0,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -151,12 +298,35 @@ describe("main menu", () => {
     })
 
     it("fetches recall count when user changes", async () => {
-      const mockGetOverview = vitest
-        .fn()
-        .mockResolvedValue({ toRepeatCount: 3 })
-      vi.spyOn(helper.managedApi.services, "overview").mockImplementation(
-        mockGetOverview
-      )
+      const mockGetOverview = vitest.fn().mockResolvedValue({
+        data: {
+          toRepeatCount: 3,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "overview").mockImplementation(mockGetOverview)
+
+      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
+        data: {
+          dueCount: 0,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const { rerender } = helper
         .component(MainMenu)

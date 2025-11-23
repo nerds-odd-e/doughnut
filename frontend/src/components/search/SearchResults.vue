@@ -107,7 +107,13 @@ import type { SearchTerm } from "@generated/backend"
 import type { NoteTopology } from "@generated/backend"
 import type { NoteSearchResult } from "@generated/backend"
 import type { NoteRealm } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  searchForLinkTargetWithin,
+  searchForLinkTarget,
+  semanticSearchWithin,
+  semanticSearch,
+  getRecentNotes,
+} from "@generated/backend/sdk.gen"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -125,8 +131,6 @@ const props = defineProps({
 defineSlots<{
   button: (props: { noteTopology: NoteTopology }) => void
 }>()
-
-const { managedApi } = useLoadingApi()
 
 // Data properties
 const searchTerm = ref<SearchTerm>({
@@ -214,27 +218,33 @@ const resultTitle = computed(() => {
 const relativeSearch = async (
   noteId: undefined | Doughnut.ID,
   searchTerm: SearchTerm
-) => {
+): Promise<NoteSearchResult[]> => {
   if (noteId) {
-    return managedApi.services.searchForLinkTargetWithin({
+    const { data: results, error } = await searchForLinkTargetWithin({
       path: { note: noteId },
       body: searchTerm,
     })
+    return error ? [] : results || []
   }
-  return managedApi.services.searchForLinkTarget({ body: searchTerm })
+  const { data: results, error } = await searchForLinkTarget({
+    body: searchTerm,
+  })
+  return error ? [] : results || []
 }
 
 const semanticRelativeSearch = async (
   noteId: undefined | Doughnut.ID,
   searchTerm: SearchTerm
-) => {
+): Promise<NoteSearchResult[]> => {
   if (noteId) {
-    return managedApi.services.semanticSearchWithin({
+    const { data: results, error } = await semanticSearchWithin({
       path: { note: noteId },
       body: searchTerm,
     })
+    return error ? [] : results || []
   }
-  return managedApi.services.semanticSearch({ body: searchTerm })
+  const { data: results, error } = await semanticSearch({ body: searchTerm })
+  return error ? [] : results || []
 }
 
 const debounced = debounce((callback) => callback(), 1000)
@@ -272,9 +282,10 @@ const fetchRecentNotes = async () => {
     searchTerm.value.allMyNotebooksAndSubscriptions &&
     recentNotes.value.length === 0
   ) {
-    try {
-      recentNotes.value = await managedApi.services.getRecentNotes()
-    } catch (error) {
+    const { data: notes, error } = await getRecentNotes()
+    if (!error && notes) {
+      recentNotes.value = notes
+    } else {
       // Silently fail - recent notes are optional
       recentNotes.value = []
     }

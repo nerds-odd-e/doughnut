@@ -34,7 +34,7 @@
 <script lang="ts">
 import type { User } from "@generated/backend"
 import type { Randomization } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { randomizer, enableFeatureToggle } from "@generated/backend/sdk.gen"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -42,9 +42,6 @@ import TextInput from "../form/TextInput.vue"
 import PopButton from "./Popups/PopButton.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   props: {
     featureToggle: Boolean,
     user: Object as PropType<User>,
@@ -62,16 +59,16 @@ export default defineComponent({
     }
   },
   methods: {
-    updateRandomSelector() {
-      this.managedApi.services.randomizer({
+    async updateRandomSelector() {
+      await randomizer({
         body: {
           choose: this.randomSelector,
           seed: this.seed,
         },
       })
     },
-    updateFeatureToggle(value) {
-      this.managedApi.services.enableFeatureToggle({
+    async updateFeatureToggle(value) {
+      await enableFeatureToggle({
         body: {
           enabled: value,
         },

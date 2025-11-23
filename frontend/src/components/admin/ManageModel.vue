@@ -9,28 +9,38 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import type { GlobalAiModelSettings } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  getAvailableGptModels,
+  getCurrentModelVersions,
+  setCurrentModelVersions,
+} from "@generated/backend/sdk.gen"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ManageModelInner from "./ManageModelInner.vue"
 
-const { managedApi } = useLoadingApi()
 const modelList = ref<string[] | undefined>(undefined)
 const selectedModels = ref<GlobalAiModelSettings | undefined>(undefined)
 
-onMounted(() => {
-  Promise.all([
-    managedApi.services.getAvailableGptModels(),
-    managedApi.services.getCurrentModelVersions(),
-  ]).then((results) => {
-    const [modelListRes, selectedModelRes] = results
-    modelList.value = modelListRes
-    selectedModels.value = selectedModelRes
-  })
+onMounted(async () => {
+  const [modelListRes, selectedModelRes] = await Promise.all([
+    getAvailableGptModels(),
+    getCurrentModelVersions(),
+  ])
+  const { data: models, error: modelsError } = modelListRes
+  const { data: modelsSettings, error: settingsError } = selectedModelRes
+  if (!modelsError && models) {
+    modelList.value = models
+  }
+  if (!settingsError && modelsSettings) {
+    selectedModels.value = modelsSettings
+  }
 })
 
 const save = async (settings: GlobalAiModelSettings) => {
-  selectedModels.value = await managedApi.services.setCurrentModelVersions({
+  const { data: updatedSettings, error } = await setCurrentModelVersions({
     body: settings,
   })
+  if (!error && updatedSettings) {
+    selectedModels.value = updatedSettings
+  }
 }
 </script>

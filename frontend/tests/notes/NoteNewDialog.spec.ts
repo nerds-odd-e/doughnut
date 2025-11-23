@@ -6,6 +6,7 @@ import type { ComponentPublicInstance } from "vue"
 import { nextTick } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -26,14 +27,40 @@ describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockImplementation(mockedSearch)
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTargetWithin"
-    ).mockImplementation(mockedSearchWithin)
+    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
+      mockedSearch(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
+      mockedSearchWithin(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     mockedCreateNote = vi
       .spyOn(helper.managedApi.services, "createNoteUnderParent")
       .mockResolvedValue({} as never)

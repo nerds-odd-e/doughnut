@@ -100,8 +100,12 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import { useRoute } from "vue-router"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-import { watch, computed, ref } from "vue"
+import {
+  getAssimilationCount,
+  overview,
+  getUnreadConversations,
+} from "@generated/backend/sdk.gen"
+import { watch, computed, ref, inject } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
@@ -109,6 +113,7 @@ import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { messageCenterConversations } from "@/store/messageStore"
 import Modal from "@/components/commons/Modal.vue"
+import type ManagedApi from "@/managedApi/ManagedApi"
 
 const props = defineProps({
   user: { type: Object as PropType<User>, required: false },
@@ -125,31 +130,38 @@ const showUserSettings = ref(false)
 
 const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
   useAssimilationCount()
-const { managedApi } = useLoadingApi()
 const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
+const managedApi = inject<ManagedApi>("managedApi")
+
 const fetchDueCount = async () => {
-  const count = await managedApi.services.getAssimilationCount({
+  const { data: count, error } = await getAssimilationCount({
     query: { timezone: timezoneParam() },
   })
-  setDueCount(count.dueCount)
-  setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
-  setTotalUnassimilatedCount(count.totalUnassimilatedCount)
+  if (!error && count) {
+    setDueCount(count.dueCount)
+    setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
+    setTotalUnassimilatedCount(count.totalUnassimilatedCount)
+  }
 }
 
 const fetchRecallCount = async () => {
-  const overview = await managedApi.services.overview({
+  const { data: overviewData, error } = await overview({
     query: { timezone: timezoneParam() },
   })
-  setToRepeatCount(overview.toRepeatCount)
-  setRecallWindowEndAt(overview.recallWindowEndAt)
-  setTotalAssimilatedCount(overview.totalAssimilatedCount)
+  if (!error && overviewData) {
+    setToRepeatCount(overviewData.toRepeatCount)
+    setRecallWindowEndAt(overviewData.recallWindowEndAt)
+    setTotalAssimilatedCount(overviewData.totalAssimilatedCount)
+  }
 }
 
 const fetchUnreadMessageCount = async () => {
-  messageCenterConversations.unreadConversations =
-    await managedApi.services.getUnreadConversations()
+  const { data: unreadConversations, error } = await getUnreadConversations()
+  if (!error && unreadConversations !== undefined) {
+    messageCenterConversations.unreadConversations = unreadConversations
+  }
 }
 
 watch(
@@ -165,7 +177,9 @@ watch(
 )
 
 const logout = async () => {
-  await managedApi.logout()
+  if (managedApi) {
+    await managedApi.logout()
+  }
   window.location.href = "/d/bazaar"
 }
 

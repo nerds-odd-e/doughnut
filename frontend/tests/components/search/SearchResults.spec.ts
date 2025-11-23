@@ -2,6 +2,8 @@ import SearchResults from "@/components/search/SearchResults.vue"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
+import * as sdk from "@generated/backend/sdk.gen"
+import type { NoteRealm, NoteSearchResult } from "@generated/backend"
 
 describe("SearchResults.vue", () => {
   it("shows 'Searching ...' before results arrive", async () => {
@@ -11,12 +13,14 @@ describe("SearchResults.vue", () => {
       setTimeout(() => resolve([]), 1)
     )
 
-    vi.spyOn(helper.managedApi.services, "searchForLinkTarget").mockReturnValue(
-      delayed as never
-    )
-    vi.spyOn(helper.managedApi.services, "semanticSearch").mockReturnValue(
-      delayed as never
-    )
+    vi.spyOn(sdk, "searchForLinkTarget").mockReturnValue(delayed as never)
+    vi.spyOn(sdk, "semanticSearch").mockReturnValue(delayed as never)
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = helper
       .component(SearchResults)
@@ -34,14 +38,25 @@ describe("SearchResults.vue", () => {
   it("shows 'No matching notes found.' when results are empty in dropdown mode after search", async () => {
     vi.useFakeTimers()
 
-    const empty: Array<unknown> = []
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockResolvedValue(empty as never)
-    vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
-      empty as never
-    )
+    const empty: NoteSearchResult[] = []
+    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      data: empty,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      data: empty,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = helper
       .component(SearchResults)
@@ -85,14 +100,25 @@ describe("SearchResults.vue", () => {
   it("shows 'No matching notes found.' when results are empty in non-dropdown mode", async () => {
     vi.useFakeTimers()
 
-    const empty: Array<unknown> = []
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockResolvedValue(empty as never)
-    vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
-      empty as never
-    )
+    const empty: NoteSearchResult[] = []
+    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      data: empty,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      data: empty,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = helper
       .component(SearchResults)
@@ -118,21 +144,44 @@ describe("SearchResults.vue", () => {
     const withinSpy = vitest.fn().mockResolvedValue(result)
     const semanticSpy = vitest.fn().mockResolvedValue([])
     const semanticWithinSpy = vitest.fn().mockResolvedValue([])
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockImplementation(firstSpy)
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTargetWithin"
-    ).mockImplementation(withinSpy)
-    vi.spyOn(helper.managedApi.services, "semanticSearch").mockImplementation(
-      semanticSpy
+    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
+      firstSpy(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
     )
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearchWithin"
-    ).mockImplementation(semanticWithinSpy)
+    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
+      withinSpy(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "semanticSearch").mockImplementation((...args) =>
+      semanticSpy(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "semanticSearchWithin").mockImplementation((...args) =>
+      semanticWithinSpy(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = helper
       .component(SearchResults)
@@ -178,21 +227,44 @@ describe("SearchResults.vue", () => {
     const mockSemanticTop = vitest.fn().mockResolvedValueOnce([])
     const mockSemanticWithin = vitest.fn().mockResolvedValueOnce([])
 
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTarget"
-    ).mockImplementation(mockTop)
-    vi.spyOn(
-      helper.managedApi.services,
-      "searchForLinkTargetWithin"
-    ).mockImplementation(mockWithin)
-    vi.spyOn(helper.managedApi.services, "semanticSearch").mockImplementation(
-      mockSemanticTop
+    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
+      mockTop(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
     )
-    vi.spyOn(
-      helper.managedApi.services,
-      "semanticSearchWithin"
-    ).mockImplementation(mockSemanticWithin)
+    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
+      mockWithin(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "semanticSearch").mockImplementation((...args) =>
+      mockSemanticTop(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "semanticSearchWithin").mockImplementation((...args) =>
+      mockSemanticWithin(...args).then((data) => ({
+        data,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }))
+    )
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = helper
       .component(SearchResults)
@@ -255,12 +327,27 @@ describe("SearchResults.vue", () => {
           updatedAt: new Date().toISOString(),
         },
       },
-    ] as unknown[]
+    ] as NoteRealm[]
 
     it("shows recently updated notes when search key is empty and searching globally", async () => {
-      vi.spyOn(helper.managedApi.services, "getRecentNotes").mockResolvedValue(
-        recentNotes as never
-      )
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(SearchResults)
@@ -270,7 +357,7 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(helper.managedApi.services.getRecentNotes).toHaveBeenCalled()
+      expect(sdk.getRecentNotes).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).toContain("Recent Note 2")
@@ -279,7 +366,7 @@ describe("SearchResults.vue", () => {
     it("shows 'Search result' title when search results are back (even if empty)", async () => {
       vi.useFakeTimers()
 
-      const empty: Array<unknown> = []
+      const empty: NoteSearchResult[] = []
       vi.spyOn(
         helper.managedApi.services,
         "searchForLinkTarget"
@@ -307,17 +394,28 @@ describe("SearchResults.vue", () => {
     it("shows 'Search result' title when search results are back with results", async () => {
       vi.useFakeTimers()
 
-      const searchResults = [
+      const searchResults: NoteSearchResult[] = [
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
-      ] as unknown[]
+      ]
 
-      vi.spyOn(
-        helper.managedApi.services,
-        "searchForLinkTarget"
-      ).mockResolvedValue(searchResults as never)
-      vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
-        [] as never
-      )
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: searchResults,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(SearchResults)
@@ -349,9 +447,24 @@ describe("SearchResults.vue", () => {
       vi.spyOn(helper.managedApi.services, "semanticSearch").mockReturnValue(
         delayed as never
       )
-      vi.spyOn(helper.managedApi.services, "getRecentNotes").mockResolvedValue(
-        recentNotes as never
-      )
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(SearchResults)
@@ -373,20 +486,28 @@ describe("SearchResults.vue", () => {
     it("shows 'Search result' title when search results arrive", async () => {
       vi.useFakeTimers()
 
-      const searchResults = [
+      const searchResults: NoteSearchResult[] = [
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
-      ] as unknown[]
+      ]
 
-      vi.spyOn(
-        helper.managedApi.services,
-        "searchForLinkTarget"
-      ).mockResolvedValue(searchResults as never)
-      vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
-        [] as never
-      )
-      vi.spyOn(helper.managedApi.services, "getRecentNotes").mockResolvedValue(
-        recentNotes as never
-      )
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: searchResults,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(SearchResults)
@@ -406,9 +527,24 @@ describe("SearchResults.vue", () => {
     })
 
     it("does not show recent notes when allMyNotebooksAndSubscriptions is false", async () => {
-      vi.spyOn(helper.managedApi.services, "getRecentNotes").mockResolvedValue(
-        recentNotes as never
-      )
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(SearchResults)
