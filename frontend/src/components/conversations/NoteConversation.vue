@@ -38,21 +38,22 @@
 </template>
 
 <script setup lang="ts">
-import useLoadingApi from "@/managedApi/useLoadingApi.ts"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import ConversationInner from "./ConversationInner.vue"
 import { inject, ref, type Ref, onMounted } from "vue"
 import type { Conversation, User } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
-import { getConversationsAboutNote } from "@generated/backend/sdk.gen"
+import {
+  getConversationsAboutNote,
+  startConversationAboutNote,
+} from "@generated/backend/sdk.gen"
 
 const conversation = ref<Conversation | undefined>()
 const user = inject<Ref<User | undefined>>("currentUser")
 const isLoading = ref(true)
 const conversations = ref<Conversation[]>([])
 
-const { managedApi } = useLoadingApi()
 const props = defineProps<{
   noteId: number
   storageAccessor: StorageAccessor
@@ -84,20 +85,26 @@ const handleConversationChange = (conversationId: number) => {
 
 async function startConversationWithMessage(message: string) {
   initialAiReply.value = false
-  conversation.value = await managedApi.services.startConversationAboutNote({
+  const { data: newConversation, error } = await startConversationAboutNote({
     path: { note: props.noteId },
     body: message,
   })
-  emit("submitted")
+  if (!error) {
+    conversation.value = newConversation!
+    emit("submitted")
+  }
 }
 
 async function startConversationWithMessageAndAI(message: string) {
   initialAiReply.value = true
-  conversation.value = await managedApi.services.startConversationAboutNote({
+  const { data: newConversation, error } = await startConversationAboutNote({
     path: { note: props.noteId },
     body: message,
   })
-  emit("submitted")
+  if (!error) {
+    conversation.value = newConversation!
+    emit("submitted")
+  }
 }
 
 const handleNewConversation = () => {
