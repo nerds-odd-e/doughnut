@@ -29,3 +29,13 @@ Feature: link note
     When I link top level note "Sedition" as "similar to" note "Sedation"
     And I link top level note "Sedition" as "similar to" note "Sedative"
     Then I should see "Sedition" has link "similar to" "Sedation, Sedative"
+
+  @mockBrowserTime
+  Scenario: Show recently updated notes before search results
+    Given I have a notebook with the head note "Recent Note" and details "Recently added"
+    When I am creating a linking note under note "Sedition"
+    Then I should see "Recently updated notes" section
+    And I should see "Recent Note" in the recently updated notes
+    When I search for "Sed" in all my notebooks
+    Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks "Sed"
+    And I should not see "Recently updated notes" section
