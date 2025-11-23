@@ -6,11 +6,12 @@ import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
 
 // Create silent client instance (no interceptors, no loading/error UI)
+// Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
 export const globalClientSilent = createClient({
   baseUrl: typeof window !== "undefined" ? window.location.origin : "",
   credentials: "include",
-  responseStyle: "data",
-  throwOnError: true,
+  responseStyle: "fields",
+  throwOnError: false,
 })
 
 // Global apiStatusHandler instance (set by setupGlobalClient)
@@ -24,11 +25,12 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   apiStatusHandler = new ApiStatusHandler(apiStatus, false)
 
   // Configure global client
+  // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
   globalClient.setConfig({
     baseUrl: typeof window !== "undefined" ? window.location.origin : "",
     credentials: "include",
-    responseStyle: "data",
-    throwOnError: true,
+    responseStyle: "fields",
+    throwOnError: false,
   })
 
   // Request interceptor: Set loading state
@@ -37,50 +39,54 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     return request
   })
 
-  // Response interceptor: Clear loading state on success
+  // Response interceptor: Clear loading state and handle errors
+  // Note: With throwOnError: false, errors are returned in the response object, not thrown
   globalClient.interceptors.response.use(async (response) => {
     apiStatusHandler?.assignLoading(false)
+
+    // Check if response has an error field (when throwOnError is false)
+    // Response type: { data, error, request, response }
+    if (
+      response &&
+      typeof response === "object" &&
+      "error" in response &&
+      response.error
+    ) {
+      const responseObj = response as {
+        error: unknown
+        request?: Request
+        response?: Response
+      }
+
+      const errorObj = responseObj.error as Error & {
+        status?: number
+        body?: unknown
+        request?: { method?: string; url?: string }
+        url?: string
+      }
+
+      // Extract status and body from response if available
+      if (responseObj.response) {
+        if (!errorObj.status) {
+          errorObj.status = responseObj.response.status
+        }
+      }
+      if (responseObj.request) {
+        if (!errorObj.url) {
+          errorObj.url = responseObj.request.url
+        }
+        if (!errorObj.request) {
+          errorObj.request = {
+            method: responseObj.request.method || "UNKNOWN",
+            url: responseObj.request.url || "UNKNOWN",
+          }
+        }
+      }
+
+      handleApiError(errorObj)
+    }
+
     return response
-  })
-
-  // Error interceptor: Clear loading state and handle errors
-  globalClient.interceptors.error.use(async (error, response, request) => {
-    apiStatusHandler?.assignLoading(false)
-
-    // Convert error to the format expected by handleApiError
-    const errorObj = error as Error & {
-      status?: number
-      body?: unknown
-      request?: { method?: string; url?: string }
-      url?: string
-    }
-
-    // Extract status and body from response if error doesn't have them
-    if (!errorObj.status && response) {
-      errorObj.status = response.status
-    }
-    if (!errorObj.url && request) {
-      errorObj.url = request.url
-    }
-    if (!errorObj.request && request) {
-      errorObj.request = {
-        method: request.method,
-        url: request.url,
-      }
-    }
-    if (!errorObj.body && error) {
-      // Try to extract body from error
-      if (typeof error === "object" && error !== null) {
-        errorObj.body = error
-      } else if (typeof error === "string") {
-        errorObj.body = error
-      }
-    }
-
-    handleApiError(errorObj)
-
-    // Return error to be thrown (since throwOnError is true)
-    return error
   })
 }
 

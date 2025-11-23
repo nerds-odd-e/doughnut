@@ -55,12 +55,14 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  deleteToken as deleteTokenApi,
+  generateToken as generateTokenApi,
+  getTokens,
+} from "@generated/backend/sdk.gen"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
-
-const { managedApi } = useLoadingApi()
 
 const popbutton = ref<InstanceType<typeof PopButton> | null>(null)
 
@@ -76,14 +78,12 @@ const token = ref<string | null>(null)
 const loading = ref(false)
 
 const loadTokens = async () => {
-  try {
-    const res = await managedApi.services.getTokens()
-    tokens.value = res.map((t) => ({
+  const { data, error } = await getTokens()
+  if (!error && data && Array.isArray(data)) {
+    tokens.value = data.map((t) => ({
       id: t.id,
       label: t.label,
     }))
-  } catch (error) {
-    console.error("Error loading tokens:", error)
   }
 }
 
@@ -91,32 +91,27 @@ loadTokens()
 
 const generateToken = async () => {
   loading.value = true
-  try {
-    const res = await managedApi.services.generateToken({
-      body: {
-        label: tokenFormData.value.label,
-      },
-    })
-    token.value = res.token
+  const { data, error } = await generateTokenApi({
+    body: {
+      label: tokenFormData.value.label,
+    },
+  })
+  if (!error && data) {
+    token.value = data.token
     tokens.value.push({
-      id: res.id,
-      label: res.label,
+      id: data.id,
+      label: data.label,
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
-  } catch (error) {
-    console.error("Error generating token:", error)
-  } finally {
-    loading.value = false
   }
+  loading.value = false
 }
 
 const deleteToken = async (id: number) => {
-  try {
-    await managedApi.services.deleteToken({ path: { tokenId: id } })
+  const { error } = await deleteTokenApi({ path: { tokenId: id } })
+  if (!error) {
     tokens.value = tokens.value.filter((token) => token.id !== id)
-  } catch (error) {
-    console.error("Error deleting token:", error)
   }
 }
 </script>

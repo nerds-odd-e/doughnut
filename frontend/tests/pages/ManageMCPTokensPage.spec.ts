@@ -4,6 +4,7 @@ import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
 import helper from "@tests/helpers"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("ManageMCPTokensPage", () => {
   let router: ReturnType<typeof createRouter>
@@ -13,15 +14,25 @@ describe("ManageMCPTokensPage", () => {
       history: createWebHistory(),
       routes,
     })
+    vi.clearAllMocks()
   })
 
   it('displays "No Label" when token label is empty', async () => {
-    vi.spyOn(helper.managedApi.services, "generateToken").mockResolvedValue({
-      token: "mocked-token",
-      label: "",
+    vi.spyOn(sdk, "generateToken").mockResolvedValue({
+      data: {
+        token: "mocked-token",
+        label: "",
+        id: 1,
+      },
+      request: new Request("http://localhost"),
+      response: new Response(),
     } as never)
 
-    vi.spyOn(helper.managedApi.services, "getTokens").mockResolvedValue([])
+    vi.spyOn(sdk, "getTokens").mockResolvedValue({
+      data: [],
+      request: new Request("http://localhost"),
+      response: new Response(),
+    } as never)
 
     const { findByText } = helper
       .component(ManageMCPTokensPage)
