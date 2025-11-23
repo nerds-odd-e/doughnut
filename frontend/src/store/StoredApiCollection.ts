@@ -224,7 +224,24 @@ export default class StoredApiCollection implements StoredApi {
       body: data,
     })
     if (error || !nrwp) {
-      throw new Error(error || "Failed to create note")
+      const errorObj = toOpenApiError(error)
+      const apiError = new Error(
+        errorObj.message || "Failed to create note"
+      ) as Error & {
+        body?: unknown
+        status?: number
+        [key: string]: unknown
+      }
+      // Preserve the error structure so assignBadRequestProperties can process it
+      if (errorObj.errors) {
+        apiError.body = { errors: errorObj.errors }
+        apiError.status = 400
+        // Manually call assignBadRequestProperties since the error interceptor won't run
+        assignBadRequestProperties(apiError, { errors: errorObj.errors })
+      } else if (error) {
+        apiError.body = error
+      }
+      throw apiError
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
@@ -242,7 +259,24 @@ export default class StoredApiCollection implements StoredApi {
       body: data,
     })
     if (error || !nrwp) {
-      throw new Error(error || "Failed to create note after")
+      const errorObj = toOpenApiError(error)
+      const apiError = new Error(
+        errorObj.message || "Failed to create note after"
+      ) as Error & {
+        body?: unknown
+        status?: number
+        [key: string]: unknown
+      }
+      // Preserve the error structure so assignBadRequestProperties can process it
+      if (errorObj.errors) {
+        apiError.body = { errors: errorObj.errors }
+        apiError.status = 400
+        // Manually call assignBadRequestProperties since the error interceptor won't run
+        assignBadRequestProperties(apiError, { errors: errorObj.errors })
+      } else if (error) {
+        apiError.body = error
+      }
+      throw apiError
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
