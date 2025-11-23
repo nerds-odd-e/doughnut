@@ -84,6 +84,7 @@ import type { StorageAccessor } from "../../../store/createNoteStorage"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/backend"
+import { audioToText } from "@generated/backend/sdk.gen"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
@@ -147,7 +148,7 @@ const getLastContentChunk = (
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
-    const response = await managedApi.services.audioToText({
+    const { data: response, error } = await audioToText({
       body: {
         uploadAudioFile: chunk.data,
         additionalProcessingInstructions: processingInstructions.value,
@@ -156,7 +157,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       },
     })
 
-    if (!response) {
+    if (error || !response) {
       throw new Error("Failed to process audio")
     }
 
