@@ -108,20 +108,17 @@ When('I search for {string} in all my notebooks', (searchKey: string) => {
   start.assumeNoteTargetSearchDialog().findTarget(searchKey)
 })
 
-Then('I should see {string} section', (sectionName: string) => {
-  cy.findByText(sectionName).should('be.visible')
-})
-
 Then(
-  'I should see {string} in the recently updated notes',
+  'I should see {string} in the recently updated notes section',
   (noteTitle: string) => {
-    cy.findByText('Recently updated notes').should('be.visible')
-    cy.findByText(noteTitle).should('be.visible')
+    start
+      .assumeNoteTargetSearchDialog()
+      .expectNoteInRecentlyUpdatedSection(noteTitle)
   }
 )
 
-Then('I should not see {string} section', (sectionName: string) => {
-  cy.findByText(sectionName).should('not.exist')
+Then('I should not see the recently updated notes section', () => {
+  start.assumeNoteTargetSearchDialog().expectRecentlyUpdatedSectionNotVisible()
 })
 
 Then(
