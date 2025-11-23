@@ -25,7 +25,8 @@
 
 <script lang="ts">
 import type { RecallSetting } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { updateRecallSetting } from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropType } from "vue"
 import { defineComponent, computed, ref } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -42,8 +43,6 @@ export default defineComponent({
   },
   emits: ["levelChanged"],
   setup(props, { emit }) {
-    const { managedApi } = useLoadingApi()
-
     const formData = ref<RecallSetting>(props.recallSetting || {})
     const errors = ref<Partial<Record<keyof RecallSetting, string>>>({})
 
@@ -58,24 +57,25 @@ export default defineComponent({
       label: level.toString(),
     }))
 
-    const updateModelValue = (newValue: Partial<RecallSetting>) => {
+    const updateModelValue = async (newValue: Partial<RecallSetting>) => {
       formData.value = {
         ...formData.value,
         ...newValue,
       }
-      managedApi.services
-        .updateRecallSetting({
-          path: { note: props.noteId },
-          body: formData.value,
-        })
-        .then(() => {
-          if (newValue.level !== undefined) {
-            emit("levelChanged", newValue.level)
-          }
-        })
-        .catch((error) => {
-          errors.value = error
-        })
+      const { error } = await updateRecallSetting({
+        path: { note: props.noteId },
+        body: formData.value,
+      })
+      if (!error) {
+        if (newValue.level !== undefined) {
+          emit("levelChanged", newValue.level)
+        }
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract field-level errors if available (for 400 validation errors)
+        const errorObj = toOpenApiError(error)
+        errors.value = errorObj.errors || {}
+      }
     }
 
     const updateLevel = (value: string) => {

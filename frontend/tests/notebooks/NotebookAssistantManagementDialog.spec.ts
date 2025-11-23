@@ -4,6 +4,7 @@ import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAss
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import type { NotebookAiAssistant } from "@generated/backend"
+import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("file-saver", () => ({ saveAs: vitest.fn() }))
 
@@ -19,18 +20,23 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   beforeEach(() => {
     global.URL.createObjectURL = vitest.fn()
     global.URL.revokeObjectURL = vitest.fn()
-    vi.spyOn(
-      helper.managedApi.services,
-      "downloadNotebookDump"
-    ).mockImplementation(mockedDump)
-    vi.spyOn(
-      helper.managedApi.services,
-      "updateAiAssistant"
-    ).mockImplementation(mockedUpdateAiAssistant)
-    vi.spyOn(helper.managedApi.services, "getAiAssistant").mockImplementation(
-      mockedGetAiAssistant
+    vi.spyOn(sdk, "downloadNotebookDump").mockImplementation(mockedDump)
+    vi.spyOn(sdk, "updateAiAssistant").mockImplementation(
+      mockedUpdateAiAssistant
     )
-    mockedGetAiAssistant.mockResolvedValue(null) // default to no existing settings
+    vi.spyOn(sdk, "getAiAssistant").mockImplementation(mockedGetAiAssistant)
+    mockedGetAiAssistant.mockResolvedValue({
+      data: undefined,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    }) // default to no existing settings
+    mockedDump.mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     wrapper = helper
       .component(NotebookAssistantManagementDialog)
       .withProps({
@@ -47,11 +53,18 @@ describe("NotebookAssistantManagementDialog.vue", () => {
 
   describe("AI Instructions Form", () => {
     it("updates AI instructions when form is submitted", async () => {
+      mockedUpdateAiAssistant.mockResolvedValue({
+        data: undefined,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       const instructions = "Please use simple English."
       await wrapper
         .find('input[name="additionalInstruction"]')
         .setValue(instructions)
       await wrapper.find("form").trigger("submit")
+      await flushPromises()
 
       expect(mockedUpdateAiAssistant).toHaveBeenCalledWith({
         path: { notebook: notebook.id },
@@ -71,7 +84,12 @@ describe("NotebookAssistantManagementDialog.vue", () => {
 
     it("downloads notebook dump when button is clicked", async () => {
       const noteBriefs = [{ id: 1, title: "Note 1", details: "Test content" }]
-      mockedDump.mockResolvedValue(noteBriefs)
+      mockedDump.mockResolvedValue({
+        data: noteBriefs,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       await wrapper.findAll("button")[1].trigger("click")
       await flushPromises()
@@ -87,7 +105,12 @@ describe("NotebookAssistantManagementDialog.vue", () => {
 
   describe("Component Initialization", () => {
     it("loads empty settings when no assistant exists", async () => {
-      mockedGetAiAssistant.mockResolvedValue(null)
+      mockedGetAiAssistant.mockResolvedValue({
+        data: undefined,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       wrapper = helper
         .component(NotebookAssistantManagementDialog)
         .withProps({ notebook })
@@ -106,7 +129,12 @@ describe("NotebookAssistantManagementDialog.vue", () => {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
-      mockedGetAiAssistant.mockResolvedValue(mockAssistant)
+      mockedGetAiAssistant.mockResolvedValue({
+        data: mockAssistant as NotebookAiAssistant,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       wrapper = helper
         .component(NotebookAssistantManagementDialog)

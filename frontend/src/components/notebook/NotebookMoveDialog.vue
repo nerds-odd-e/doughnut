@@ -18,10 +18,9 @@
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
 import type { Circle, Notebook } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { index, moveToCircle } from "@generated/backend/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 
-const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 const props = defineProps({
@@ -34,12 +33,15 @@ const props = defineProps({
 const circles = ref<Circle[]>([])
 
 onMounted(async () => {
-  circles.value = (await managedApi.services.index()) || []
+  const { data: circlesList, error } = await index()
+  if (!error) {
+    circles.value = circlesList || []
+  }
 })
 
 const move = async (circle: Circle) => {
   if (await popups.confirm(`Move notebook to ${circle.name}?`)) {
-    await managedApi.services.moveToCircle({
+    await moveToCircle({
       path: {
         notebook: props.notebook.id,
         circle: circle.id,

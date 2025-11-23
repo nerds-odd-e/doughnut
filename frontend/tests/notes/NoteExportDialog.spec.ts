@@ -4,6 +4,7 @@ import makeMe from "../fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
 import { saveAs } from "file-saver"
+import * as sdk from "@generated/backend/sdk.gen"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
@@ -18,9 +19,12 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(helper.managedApi.services, "getDescendants").mockResolvedValue(
-      descendantsData
-    )
+    vi.spyOn(sdk, "getDescendants").mockResolvedValue({
+      data: descendantsData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -37,7 +41,7 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(helper.managedApi.services.getDescendants).toHaveBeenCalledWith({
+    expect(sdk.getDescendants).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })
@@ -48,9 +52,12 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(helper.managedApi.services, "getDescendants").mockResolvedValue(
-      descendantsData
-    )
+    vi.spyOn(sdk, "getDescendants").mockResolvedValue({
+      data: descendantsData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -68,8 +75,13 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getDescendantsMock = vi
-      .spyOn(helper.managedApi.services, "getDescendants")
-      .mockResolvedValue(descendantsData)
+      .spyOn(sdk, "getDescendants")
+      .mockResolvedValue({
+        data: descendantsData,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -92,9 +104,12 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(helper.managedApi.services, "getGraph").mockResolvedValue(
-      graphData
-    )
+    vi.spyOn(sdk, "getGraph").mockResolvedValue({
+      data: graphData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -109,7 +124,7 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(helper.managedApi.services.getGraph).toHaveBeenCalledWith({
+    expect(sdk.getGraph).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 5000 },
     })
@@ -121,9 +136,12 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(helper.managedApi.services, "getGraph").mockResolvedValue(
-      graphData
-    )
+    vi.spyOn(sdk, "getGraph").mockResolvedValue({
+      data: graphData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -140,23 +158,26 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    const getGraphMock = vi
-      .spyOn(helper.managedApi.services, "getGraph")
-      .mockResolvedValue(graphData)
+    const getGraphMock = vi.spyOn(sdk, "getGraph").mockResolvedValue({
+      data: graphData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
       .render()
-    // Clear any calls from initial render
-    getGraphMock.mockClear()
     await fireEvent.click(getByText("Export Note Graph (JSON)"))
     await waitFor(() => getByTestId("graph-json-textarea"))
-    expect(getGraphMock).toHaveBeenCalledTimes(1)
+    // Clear calls from initial render
+    getGraphMock.mockClear()
     // Close and reopen
     await fireEvent.click(getByText("Export Note Graph (JSON)"))
     await fireEvent.click(getByText("Export Note Graph (JSON)"))
     await waitFor(() => getByTestId("graph-json-textarea"))
-    expect(getGraphMock).toHaveBeenCalledTimes(1)
+    // Should not call again since data is already loaded
+    expect(getGraphMock).toHaveBeenCalledTimes(0)
   })
 
   it("allows customizing token limit and refreshes graph", async () => {
@@ -170,9 +191,19 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getGraphMock = vi
-      .spyOn(helper.managedApi.services, "getGraph")
-      .mockResolvedValueOnce(graphData1)
-      .mockResolvedValueOnce(graphData2)
+      .spyOn(sdk, "getGraph")
+      .mockResolvedValueOnce({
+        data: graphData1,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      .mockResolvedValueOnce({
+        data: graphData2,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })

@@ -71,11 +71,10 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import type { Note } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getDescendants, getGraph } from "@generated/backend/sdk.gen"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
-const { managedApi } = useLoadingApi()
 
 const expandedDescendants = ref(false)
 const expandedGraph = ref(false)
@@ -88,10 +87,12 @@ watch(
   () => expandedDescendants.value,
   async (val) => {
     if (val && !jsonDescendants.value) {
-      const result = await managedApi.services.getDescendants({
+      const { data: descendants, error } = await getDescendants({
         path: { note: props.note.id },
       })
-      jsonDescendants.value = JSON.stringify(result, null, 2)
+      if (!error && descendants) {
+        jsonDescendants.value = JSON.stringify(descendants, null, 2)
+      }
     }
   }
 )
@@ -107,15 +108,14 @@ watch(
 
 async function fetchGraph() {
   loadingGraph.value = true
-  try {
-    const result = await managedApi.services.getGraph({
-      path: { note: props.note.id },
-      query: { tokenLimit: tokenLimit.value },
-    })
-    jsonGraph.value = JSON.stringify(result, null, 2)
-  } finally {
-    loadingGraph.value = false
+  const { data: graph, error } = await getGraph({
+    path: { note: props.note.id },
+    query: { tokenLimit: tokenLimit.value },
+  })
+  if (!error && graph) {
+    jsonGraph.value = JSON.stringify(graph, null, 2)
   }
+  loadingGraph.value = false
 }
 
 function refreshGraph() {

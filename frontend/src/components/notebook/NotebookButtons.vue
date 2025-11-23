@@ -44,13 +44,12 @@ import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
 import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import type { Notebook, User } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { shareNotebook as shareNotebookApi } from "@generated/backend/sdk.gen"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 
-const { managedApi } = useLoadingApi()
 const router = useRouter()
 const { popups } = usePopups()
 
@@ -61,10 +60,12 @@ const props = defineProps<{
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
-    await managedApi.services.shareNotebook({
+    const { error } = await shareNotebookApi({
       path: { notebook: props.notebook.id },
     })
-    router.push({ name: "notebooks" })
+    if (!error) {
+      router.push({ name: "notebooks" })
+    }
   }
 }
 </script>

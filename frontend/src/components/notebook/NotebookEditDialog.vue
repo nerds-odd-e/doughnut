@@ -95,13 +95,18 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import type { Notebook, User } from "@generated/backend"
+import {
+  updateNotebook,
+  importObsidian,
+  resetNotebookIndex,
+  updateNotebookIndex,
+} from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import CheckInput from "@/components/form/CheckInput.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import TextInput from "../form/TextInput.vue"
 import NotebookCertificateRequest from "./NotebookCertificateRequest.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
 
-const { managedApi } = useLoadingApi()
 const router = useRouter()
 
 const props = defineProps({
@@ -132,22 +137,19 @@ const errors = ref({
 const isIndexing = ref(false)
 const showIndexingComplete = ref(false)
 
-const processForm = () => {
-  managedApi.services
-    .updateNotebook({
-      path: { notebook: props.notebook.id },
-      body: formData.value,
-    })
-    .then(() => {
-      router.go(0)
-    })
-    .catch((err) => {
-      if (typeof err === "object" && err !== null) {
-        errors.value = err as typeof errors.value
-      } else {
-        console.error("Unexpected error format:", err)
-      }
-    })
+const processForm = async () => {
+  const { error } = await updateNotebook({
+    path: { notebook: props.notebook.id },
+    body: formData.value,
+  })
+  if (!error) {
+    router.go(0)
+  } else {
+    // Error is handled by global interceptor (toast notification)
+    // Extract field-level errors if available (for 400 validation errors)
+    const errorObj = toOpenApiError(error)
+    errors.value = { ...errors.value, ...(errorObj.errors || {}) }
+  }
 }
 
 const exportForObsidian = () => {
@@ -164,48 +166,46 @@ const handleObsidianImport = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
 
-  try {
-    await managedApi.services.importObsidian({
-      path: { notebook: props.notebook.id },
-      body: { file },
-    })
+  const { error } = await importObsidian({
+    path: { notebook: props.notebook.id },
+    body: { file },
+  })
+  if (!error) {
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
     router.go(0) // Refresh page to show imported notes
-  } catch (error) {
+  } else {
+    // Error is handled by global interceptor (toast notification)
     alert("Failed to import file")
-    console.error("Import error:", error)
   }
 }
 
 const reindexNotebook = async () => {
   isIndexing.value = true
-  try {
-    await managedApi.services.resetNotebookIndex({
-      path: { notebook: props.notebook.id },
-    })
+  const { error } = await resetNotebookIndex({
+    path: { notebook: props.notebook.id },
+  })
+  if (!error) {
     showIndexingComplete.value = true
-  } catch (error) {
-    console.error("Reset index error:", error)
+  } else {
+    // Error is handled by global interceptor (toast notification)
     alert("Failed to reset notebook index")
-  } finally {
-    isIndexing.value = false
   }
+  isIndexing.value = false
 }
 
 const updateIndexNotebook = async () => {
   isIndexing.value = true
-  try {
-    await managedApi.services.updateNotebookIndex({
-      path: { notebook: props.notebook.id },
-    })
+  const { error } = await updateNotebookIndex({
+    path: { notebook: props.notebook.id },
+  })
+  if (!error) {
     showIndexingComplete.value = true
-  } catch (error) {
-    console.error("Update index error:", error)
+  } else {
+    // Error is handled by global interceptor (toast notification)
     alert("Failed to update notebook index")
-  } finally {
-    isIndexing.value = false
   }
+  isIndexing.value = false
 }
 
 const closeIndexingComplete = () => {
