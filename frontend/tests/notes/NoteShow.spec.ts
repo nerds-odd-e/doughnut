@@ -3,11 +3,15 @@ import type { NoteRealm } from "@generated/backend"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockShowNoteAccessory } from "@tests/helpers"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf())
+  })
+
+  beforeEach(() => {
+    mockShowNoteAccessory()
   })
 
   it.each([
@@ -38,6 +42,10 @@ describe("new/updated pink banner", () => {
 
 describe("note wth children", () => {
   const note = makeMe.aNoteRealm.please()
+
+  beforeEach(() => {
+    mockShowNoteAccessory()
+  })
 
   const render = (n: NoteRealm) => {
     vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(

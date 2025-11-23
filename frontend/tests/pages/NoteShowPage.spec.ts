@@ -1,7 +1,7 @@
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockShowNoteAccessory } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
@@ -14,6 +14,7 @@ describe("all in note show page", () => {
       history: createWebHistory(),
       routes,
     })
+    mockShowNoteAccessory()
   })
 
   describe("note show", () => {

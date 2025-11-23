@@ -2,7 +2,7 @@ import AssimilationPage from "@/pages/AssimilationPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockShowNoteAccessory } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import * as sdk from "@generated/backend/sdk.gen"
@@ -40,6 +40,7 @@ beforeEach(() => {
   vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
     mockedGetNoteCall
   )
+  mockShowNoteAccessory()
   renderer = helper.component(AssimilationPage).withStorageProps({})
 })
 

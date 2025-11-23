@@ -2,7 +2,7 @@ import Assimilation from "@/components/review/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockShowNoteAccessory } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -65,6 +65,7 @@ beforeEach(() => {
     setTotalUnassimilatedCount: vi.fn(),
   })
 
+  mockShowNoteAccessory()
   renderer = helper.component(Assimilation)
 })
 
