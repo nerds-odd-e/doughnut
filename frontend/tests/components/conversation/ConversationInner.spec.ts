@@ -80,10 +80,12 @@ describe("ConversationInner", () => {
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.spyOn(
-      helper.managedApi.services,
-      "replyToConversation"
-    ).mockResolvedValue({} as never)
+    vi.spyOn(sdk, "replyToConversation").mockResolvedValue({
+      data: undefined as never,
+      error: undefined as never,
+      request: {} as Request,
+      response: {} as Response,
+    })
     vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
       data: [],
       error: undefined,
@@ -136,14 +138,12 @@ describe("ConversationInner", () => {
 
     it("prevents form submission for empty messages", async () => {
       await submitMessage(wrapper, "   ")
-      expect(
-        helper.managedApi.services.replyToConversation
-      ).not.toHaveBeenCalled()
+      expect(sdk.replyToConversation).not.toHaveBeenCalled()
     })
 
     it("allows form submission for non-empty messages", async () => {
       await submitMessage(wrapper, "Hello")
-      expect(helper.managedApi.services.replyToConversation).toHaveBeenCalled()
+      expect(sdk.replyToConversation).toHaveBeenCalled()
     })
   })
 
@@ -238,9 +238,7 @@ describe("ConversationInner", () => {
       const firstButton = wrapper.find(".default-message-button")
       await firstButton.trigger("click")
 
-      expect(
-        helper.managedApi.services.replyToConversation
-      ).toHaveBeenCalledWith({
+      expect(sdk.replyToConversation).toHaveBeenCalledWith({
         path: { conversationId: reviewConversation.id },
         body: "Why is my answer wrong?",
       })

@@ -59,8 +59,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-import { getConversationMessages } from "@generated/backend/sdk.gen"
+import {
+  getConversationMessages,
+  replyToConversation,
+} from "@generated/backend/sdk.gen"
 import type {
   User,
   ConversationMessage,
@@ -91,8 +93,6 @@ const emit = defineEmits<{
   (e: "new-conversation"): void
   (e: "toggle-maximize"): void
 }>()
-
-const { managedApi } = useLoadingApi()
 
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
@@ -133,14 +133,16 @@ const handleSendMessage = async (
   message: string,
   inviteAI: boolean = false
 ) => {
-  await managedApi.services.replyToConversation({
+  const { error } = await replyToConversation({
     path: { conversationId: conversation.id },
     body: message,
   })
-  await fetchConversationMessages()
+  if (!error) {
+    await fetchConversationMessages()
 
-  if (inviteAI) {
-    aiReplyTrigger.value++
+    if (inviteAI) {
+      aiReplyTrigger.value++
+    }
   }
 }
 
