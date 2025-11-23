@@ -6,10 +6,13 @@ import type {
 } from "@generated/backend"
 import type { LinkCreation, NoteCreationDto } from "@generated/backend"
 import {
+  createNoteAfter,
+  createNoteUnderParent,
   deleteNote,
   linkNoteFinalize,
   moveAfter,
   moveNote,
+  undoDeleteNote,
   updateLink,
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
@@ -206,10 +209,13 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const nrwp = await this.managedApi.services.createNoteUnderParent({
+    const { data: nrwp, error } = await createNoteUnderParent({
       path: { parentNote: parentId },
       body: data,
     })
+    if (error || !nrwp) {
+      throw new Error(error || "Failed to create note")
+    }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
@@ -221,10 +227,13 @@ export default class StoredApiCollection implements StoredApi {
     referenceId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const nrwp = await this.managedApi.services.createNoteAfter({
+    const { data: nrwp, error } = await createNoteAfter({
       path: { referenceNote: referenceId },
       body: data,
     })
+    if (error || !nrwp) {
+      throw new Error(error || "Failed to create note after")
+    }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
@@ -331,9 +340,13 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!
       )
     }
-    return this.managedApi.services.undoDeleteNote({
+    const { data: noteRealm, error } = await undoDeleteNote({
       path: { note: undone.noteId },
     })
+    if (error || !noteRealm) {
+      throw new Error(error || "Failed to undo delete note")
+    }
+    return noteRealm
   }
 
   async undo(router: Router) {

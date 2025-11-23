@@ -61,9 +61,23 @@ describe("adding new note", () => {
       request: {} as Request,
       response: {} as Response,
     })
+    const createNoteResult = {
+      created: makeMe.aNoteRealm.please(),
+      parent: makeMe.aNoteRealm.please(),
+    }
     mockedCreateNote = vi
-      .spyOn(helper.managedApi.services, "createNoteUnderParent")
-      .mockResolvedValue({} as never)
+      .spyOn(sdk, "createNoteUnderParent")
+      .mockImplementation(async (options) => {
+        const result = await vi.fn().mockResolvedValue(createNoteResult)(
+          options
+        )
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      })
   })
 
   afterEach(() => {
