@@ -2,6 +2,7 @@ import WikidataAssociationForNoteDialog from "@/components/notes/WikidataAssocia
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -21,10 +22,17 @@ describe("WikidataAssociationForNoteDialog", () => {
     vi.spyOn(helper.managedApi.services, "searchWikidata").mockImplementation(
       mockedWikidataSearch
     )
-    vi.spyOn(
-      helper.managedApi.services,
-      "fetchWikidataEntityDataById"
-    ).mockImplementation(mockedFetchWikidataEntity)
+    vi
+      .spyOn(sdk, "fetchWikidataEntityDataById")
+      .mockImplementation(async (options) => {
+        const result = await mockedFetchWikidataEntity(options)
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      }) as never
     vi.spyOn(helper.managedApi.services, "updateWikidataId").mockImplementation(
       mockedUpdateWikidataId
     )
@@ -94,9 +102,11 @@ describe("WikidataAssociationForNoteDialog", () => {
         const wrapper = await inputWikidataIdAndSave(note, wikidataId)
         await flushPromises()
 
-        expect(mockedFetchWikidataEntity).toHaveBeenCalledWith({
-          path: { wikidataId },
-        })
+        expect(vi.mocked(sdk.fetchWikidataEntityDataById)).toHaveBeenCalledWith(
+          {
+            path: { wikidataId },
+          }
+        )
 
         if (needsTitleAction) {
           const replaceLabel = getModal()?.querySelector(
@@ -144,7 +154,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       saveButton.click()
       await flushPromises()
 
-      expect(mockedFetchWikidataEntity).toHaveBeenCalledWith({
+      expect(vi.mocked(sdk.fetchWikidataEntityDataById)).toHaveBeenCalledWith({
         path: { wikidataId: "Q11399" },
       })
       expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
@@ -153,10 +163,15 @@ describe("WikidataAssociationForNoteDialog", () => {
 
     it("shows error when fetchWikidataEntityDataById fails", async () => {
       const note = makeMe.aNote.topicConstructor("dog").please()
-      const error = new Error("Not found")
-      // @ts-expect-error - mocking error structure
-      error.body = { message: "The wikidata service is not available" }
-      mockedFetchWikidataEntity.mockRejectedValue(error)
+      const error = {
+        message: "The wikidata service is not available",
+      }
+      vi.spyOn(sdk, "fetchWikidataEntityDataById").mockResolvedValue({
+        data: undefined as never,
+        error: error as never,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = await inputWikidataIdAndSave(note, wikidataId)
       await flushPromises()
