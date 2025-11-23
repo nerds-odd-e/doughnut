@@ -533,9 +533,12 @@ describe("NoteAudioTools", () => {
     beforeEach(() => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
-      vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockResolvedValue(
-        {} as never
-      )
+      vi.spyOn(sdk, "updateNoteTitle").mockResolvedValue({
+        data: {} as never,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       vi.spyOn(sdk, "audioToText").mockResolvedValue({
         data: {
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
@@ -568,9 +571,7 @@ describe("NoteAudioTools", () => {
 
       // Should call suggestTitle 4 times (on calls 1, 2, 4, and 8)
       expect(sdk.suggestTitle).toHaveBeenCalledTimes(4)
-      expect(helper.managedApi.services.updateNoteTitle).toHaveBeenCalledTimes(
-        4
-      )
+      expect(sdk.updateNoteTitle).toHaveBeenCalledTimes(4)
     })
 
     it("does not update title when suggestion is empty", async () => {
@@ -590,7 +591,7 @@ describe("NoteAudioTools", () => {
       await wrapper.vm.processAudio(new Blob())
 
       expect(sdk.suggestTitle).toHaveBeenCalled()
-      expect(helper.managedApi.services.updateNoteTitle).not.toHaveBeenCalled()
+      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
     })
   })
 

@@ -5,6 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
+import * as sdk from "@generated/backend/sdk.gen"
 import {
   getLastInstance,
   resetInstance,
@@ -491,9 +492,12 @@ describe("ConversationInner", () => {
     const testTitle = "Generated Title"
 
     beforeEach(async () => {
-      vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockResolvedValue(
-        {} as never
-      )
+      vi.spyOn(sdk, "updateNoteTitle").mockResolvedValue({
+        data: {} as never,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -507,7 +511,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(helper.managedApi.services.updateNoteTitle).toHaveBeenCalledWith({
+      expect(sdk.updateNoteTitle).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { newTitle: testTitle },
       })
@@ -525,7 +529,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(helper.managedApi.services.updateNoteTitle).not.toHaveBeenCalled()
+      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -541,7 +545,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(helper.managedApi.services.updateNoteTitle).not.toHaveBeenCalled()
+      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
