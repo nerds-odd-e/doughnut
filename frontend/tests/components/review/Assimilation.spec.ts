@@ -25,9 +25,15 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  vi.spyOn(helper.managedApi.services, "assimilate").mockImplementation(
-    mockedAssimilateCall
-  )
+  vi.spyOn(sdk, "assimilate").mockImplementation(async (options) => {
+    const result = await mockedAssimilateCall(options)
+    return {
+      data: result,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    }
+  })
   vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
     mockedGetNoteCall
   )

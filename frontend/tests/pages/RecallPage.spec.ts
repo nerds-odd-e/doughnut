@@ -40,9 +40,15 @@ beforeEach(() => {
   vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
     makeMe.aNote.please() as never
   )
-  vi.spyOn(helper.managedApi.services, "recalling").mockImplementation(
-    mockedRepeatCall
-  )
+  vi.spyOn(sdk, "recalling").mockImplementation(async (options) => {
+    const result = await mockedRepeatCall(options)
+    return {
+      data: result,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    }
+  })
   vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
     data: { stem: "Spell the word 'cat'" } as never,
     error: undefined,
@@ -75,7 +81,7 @@ describe("repeat page", () => {
     const repetition = makeMe.aDueMemoryTrackersList.please()
     mockedRepeatCall.mockResolvedValue(repetition)
     await mountPage()
-    expect(mockedRepeatCall).toHaveBeenCalledWith({
+    expect(vi.spyOn(sdk, "recalling")).toHaveBeenCalledWith({
       query: {
         timezone: "Asia/Shanghai",
         dueindays: 0,
@@ -125,8 +131,13 @@ describe("repeat page", () => {
         .answerCorrect(false)
         .please()
       const mockedMarkAsRepeatedCall = vi
-        .spyOn(helper.managedApi.services, "markAsRepeated")
-        .mockResolvedValue(answerResult as never)
+        .spyOn(sdk, "markAsRepeated")
+        .mockResolvedValue({
+          data: answerResult as never,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
       const recallPrompt = makeMe.aRecallPrompt.please()
       mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
       vi.runOnlyPendingTimers()

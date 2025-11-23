@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { assimilate } from "@generated/backend/sdk.gen"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
@@ -43,7 +43,6 @@ const emit = defineEmits<{
 }>()
 
 // Composables
-const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 const { totalAssimilatedCount } = useRecallData()
 
@@ -63,25 +62,27 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
-  const memoryTrackers = await managedApi.services.assimilate({
+  const { data: memoryTrackers, error } = await assimilate({
     body: {
       noteId: note.id,
       skipMemoryTracking,
     },
   })
 
-  const newTrackerCount = memoryTrackers.filter(
-    (t) => !t.removedFromTracking
-  ).length
-  if (totalAssimilatedCount.value !== undefined) {
-    totalAssimilatedCount.value += newTrackerCount
-  }
-  incrementAssimilatedCount(newTrackerCount)
+  if (!error && memoryTrackers) {
+    const newTrackerCount = memoryTrackers.filter(
+      (t) => !t.removedFromTracking
+    ).length
+    if (totalAssimilatedCount.value !== undefined) {
+      totalAssimilatedCount.value += newTrackerCount
+    }
+    incrementAssimilatedCount(newTrackerCount)
 
-  if (skipMemoryTracking) {
-    emit("reloadNeeded")
-  } else {
-    emit("initialReviewDone")
+    if (skipMemoryTracking) {
+      emit("reloadNeeded")
+    } else {
+      emit("initialReviewDone")
+    }
   }
 }
 </script>

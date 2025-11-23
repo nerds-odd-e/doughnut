@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { markAsRepeated } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -21,9 +21,6 @@ import MemoryTrackerAsync from "./MemoryTrackerAsync.vue"
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
 
 export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() }
-  },
   props: {
     memoryTrackerId: Number,
     storageAccessor: {
@@ -41,11 +38,13 @@ export default defineComponent({
       if (this.memoryTrackerId === undefined) {
         return
       }
-      await this.managedApi.services.markAsRepeated({
+      const { error } = await markAsRepeated({
         path: { memoryTracker: this.memoryTrackerId },
         query: { successful },
       })
-      this.$emit("reviewed")
+      if (!error) {
+        this.$emit("reviewed")
+      }
     },
   },
 })

@@ -31,7 +31,7 @@
         id="try-again"
         v-if="currentQuestion"
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-        @click="contest"
+        @click="contestQuestion"
       >
         <SvgContest />
       </a>
@@ -41,15 +41,13 @@
 
 <script setup lang="ts">
 import type { AnsweredQuestion, RecallPrompt } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { contest, regenerate } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref } from "vue"
 import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
-
-const { managedApi } = useLoadingApi()
 const props = defineProps({
   recallPrompt: {
     type: Object as PropType<RecallPrompt>,
@@ -77,29 +75,33 @@ const scrollToBottom = () => {
   emit("need-scroll")
 }
 
-const contest = async () => {
+const contestQuestion = async () => {
   currentQuestionLegitMessage.value = ""
   contesting.value = true
   try {
-    const contestResult = await managedApi.services.contest({
+    const { data: contestResult, error: contestError } = await contest({
       path: { recallPrompt: currentQuestion.value.id },
     })
 
-    if (!contestResult.rejected) {
+    if (!contestError && contestResult && !contestResult.rejected) {
       regenerating.value = true
       prevQuestions.value.push({
         quizeQuestion: currentQuestion.value,
         badQuestionReason: contestResult.advice,
       })
       try {
-        currentQuestion.value = await managedApi.services.regenerate({
-          path: { recallPrompt: currentQuestion.value.id },
-          body: contestResult,
-        })
+        const { data: regeneratedQuestion, error: regenerateError } =
+          await regenerate({
+            path: { recallPrompt: currentQuestion.value.id },
+            body: contestResult,
+          })
+        if (!regenerateError && regeneratedQuestion) {
+          currentQuestion.value = regeneratedQuestion
+        }
       } finally {
         regenerating.value = false
       }
-    } else {
+    } else if (contestResult) {
       currentQuestionLegitMessage.value = contestResult.advice
     }
   } finally {

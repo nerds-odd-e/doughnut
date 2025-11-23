@@ -69,7 +69,7 @@ import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionCompo
 import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
 import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { recalling } from "@generated/backend/sdk.gen"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -86,8 +86,6 @@ export type QuestionResult = {
 }
 
 type RecallResult = QuestionResult | SpellingResult
-
-const { managedApi } = useLoadingApi()
 const {
   setToRepeatCount,
   decrementToRepeatCount,
@@ -134,21 +132,24 @@ const viewLastResult = (cursor: number | undefined) => {
 }
 
 const loadMore = async (dueInDays?: number) => {
-  const response = await managedApi.services.recalling({
+  const { data: response, error } = await recalling({
     query: {
       timezone: timezoneParam(),
       dueindays: dueInDays,
     },
   })
-  toRepeat.value = response.toRepeat
-  currentIndex.value = 0
-  if (toRepeat.value?.length === 0) {
+  if (!error && response) {
+    toRepeat.value = response.toRepeat
+    currentIndex.value = 0
+    if (toRepeat.value?.length === 0) {
+      return response
+    }
+    if (getEnvironment() !== "testing" && toRepeat.value) {
+      toRepeat.value = shuffle(toRepeat.value)
+    }
     return response
   }
-  if (getEnvironment() !== "testing" && toRepeat.value) {
-    toRepeat.value = shuffle(toRepeat.value)
-  }
-  return response
+  return undefined
 }
 
 const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
@@ -197,8 +198,10 @@ const moveMemoryTrackerToEnd = (index: number) => {
 const loadCurrentDueRecalls = async () => {
   toRepeat.value = undefined
   const response = await loadMore(0)
-  setToRepeatCount(response.toRepeatCount)
-  setRecallWindowEndAt(response.recallWindowEndAt)
+  if (response) {
+    setToRepeatCount(response.toRepeatCount)
+    setRecallWindowEndAt(response.recallWindowEndAt)
+  }
 }
 
 onMounted(() => {

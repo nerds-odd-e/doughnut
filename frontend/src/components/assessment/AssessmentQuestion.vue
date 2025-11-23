@@ -36,11 +36,10 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import type { AnswerDto, AssessmentQuestionInstance } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { answerQuestion } from "@generated/backend/sdk.gen"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../review/QuestionDisplay.vue"
 
-const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 const props = defineProps({
@@ -56,19 +55,19 @@ const formSubmitted = ref(false)
 const emits = defineEmits(["advance"])
 
 const submitAnswer = async (answerData: AnswerDto) => {
-  try {
-    localAssessmentQuestionInstance.value =
-      await managedApi.services.answerQuestion({
-        path: {
-          assessmentQuestionInstance: props.assessmentQuestionInstance.id,
-        },
-        body: answerData,
-      })
+  const { data: answeredInstance, error } = await answerQuestion({
+    path: {
+      assessmentQuestionInstance: props.assessmentQuestionInstance.id,
+    },
+    body: answerData,
+  })
 
-    if (localAssessmentQuestionInstance.value.answer?.correct) {
+  if (!error && answeredInstance) {
+    localAssessmentQuestionInstance.value = answeredInstance
+    if (answeredInstance.answer?.correct) {
       emits("advance")
     }
-  } catch (_e) {
+  } else {
     await popups.alert(
       "This memory tracker doesn't exist any more or is being skipped now. Moving on to the next memory tracker..."
     )

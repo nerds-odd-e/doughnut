@@ -88,13 +88,25 @@ describe("assessment page", () => {
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(helper.managedApi.services, "answerQuestion")
-        .mockResolvedValueOnce(answerResult1 as never)
-        .mockResolvedValueOnce(answerResult2 as never)
-      vi.spyOn(
-        helper.managedApi.services,
-        "submitAssessmentResult"
-      ).mockResolvedValue(assessmentAttempt as never)
+      vi.spyOn(sdk, "answerQuestion")
+        .mockResolvedValueOnce({
+          data: answerResult1,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+        .mockResolvedValueOnce({
+          data: answerResult2,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+      vi.spyOn(sdk, "submitAssessmentResult").mockResolvedValue({
+        data: assessmentAttempt,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     it("should submit assessment result when answer all questions", async () => {
@@ -108,7 +120,7 @@ describe("assessment page", () => {
       ;(await wrapper.findByRole("button", { name: "answer3" })).click()
       await flushPromises()
 
-      expect(helper.managedApi.services.submitAssessmentResult).toBeCalledWith({
+      expect(sdk.submitAssessmentResult).toBeCalledWith({
         path: { assessmentAttempt: assessmentAttempt.id },
       })
     })

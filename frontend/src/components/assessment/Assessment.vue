@@ -30,12 +30,10 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { submitAssessmentResult } from "@generated/backend/sdk.gen"
 import type { AssessmentAttempt } from "@generated/backend"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
 import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
-
-const { managedApi } = useLoadingApi()
 const props = defineProps({
   assessmentAttempt: {
     type: Object as PropType<AssessmentAttempt>,
@@ -67,10 +65,12 @@ const checkIfQuizComplete = async () => {
     currentQuestion.value >= assessmentQuestionInstance.value.length &&
     assessmentQuestionInstance.value.length > 0
   ) {
-    localAssessmentAttempt.value =
-      await managedApi.services.submitAssessmentResult({
-        path: { assessmentAttempt: props.assessmentAttempt.id },
-      })
+    const { data: submittedAttempt, error } = await submitAssessmentResult({
+      path: { assessmentAttempt: props.assessmentAttempt.id },
+    })
+    if (!error && submittedAttempt) {
+      localAssessmentAttempt.value = submittedAttempt
+    }
   }
 }
 </script>
