@@ -16,14 +16,30 @@ export const assumeNoteTargetSearchDialog = () => {
     },
     expectExactLinkTargets: (targets: string[]) => {
       if (targets.length === 0) {
+        cy.findByText('Search result', { selector: '.result-title' }).should(
+          'be.visible'
+        )
         cy.findByText('No matching notes found.').should('be.visible')
         return
       }
+      cy.findByText('Search result', { selector: '.result-title' }).should(
+        'be.visible'
+      )
       cy.get('.search-result .daisy-card-title')
         .then((elms) => Cypress._.map(elms, 'innerText'))
         .should('deep.equal', targets)
     },
     expectExactDropdownTargets: (targets: string[]) => {
+      if (targets.length === 0) {
+        cy.findByText('Search result', { selector: '.result-title' }).should(
+          'be.visible'
+        )
+        cy.findByText('No matching notes found.').should('be.visible')
+        return
+      }
+      cy.findByText('Search result', { selector: '.result-title' }).should(
+        'be.visible'
+      )
       cy.get('.dropdown-list a')
         .then((elms) => Cypress._.map(elms, 'innerText'))
         .should('deep.equal', targets)
@@ -42,13 +58,17 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'OK' }).click()
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
-      cy.findByText('Recently updated notes').should('be.visible')
-      // Note can be in dropdown list or in cards, so search within the recent notes section
-      cy.contains('.recent-notes-section', noteTitle).should('be.visible')
+      cy.findByText('Recently updated notes', {
+        selector: '.result-title',
+      }).should('be.visible')
+      // Note can be in dropdown list or in cards, so search within the result section
+      cy.contains('.result-section', noteTitle).should('be.visible')
       return this
     },
     expectRecentlyUpdatedSectionNotVisible() {
-      cy.findByText('Recently updated notes').should('not.exist')
+      cy.findByText('Recently updated notes', {
+        selector: '.result-title',
+      }).should('not.exist')
       return this
     },
   }

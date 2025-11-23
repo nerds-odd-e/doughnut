@@ -16,8 +16,8 @@
 
     <div v-if="searchResult === undefined && trimmedSearchKey !== ''">
       <em>Searching ...</em>
-      <div v-if="shouldShowRecentNotes && recentNotes.length > 0" class="recent-notes-section">
-        <div class="recent-notes-label">Recently updated notes</div>
+      <div v-if="shouldShowRecentNotes && recentNotes.length > 0" class="result-section">
+        <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
         <div v-if="isDropdown" class="dropdown-list">
           <NoteTitleWithLink
             v-for="note in recentNotes"
@@ -39,17 +39,19 @@
     </div>
 
     <div v-else-if="searchResult !== undefined && searchResult.length === 0 && isDropdown" class="dropdown-list">
+      <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <em v-if="trimmedSearchKey === ''">Similar notes within the same notebook</em>
       <em v-else>No matching notes found.</em>
     </div>
 
     <div v-else-if="searchResult !== undefined && searchResult.length === 0">
+      <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <em>No matching notes found.</em>
     </div>
 
-    <div v-else-if="shouldShowRecentNotes && recentNotes.length > 0 && trimmedSearchKey === '' && !props.noteId">
-      <div class="recent-notes-section">
-        <div class="recent-notes-label">Recently updated notes</div>
+    <div v-else-if="shouldShowRecentNotes && recentNotes.length > 0 && trimmedSearchKey === ''">
+      <div class="result-section">
+        <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
         <div v-if="isDropdown" class="dropdown-list">
           <NoteTitleWithLink
             v-for="note in recentNotes"
@@ -71,6 +73,7 @@
     </div>
 
     <div v-else-if="searchResult !== undefined && isDropdown" class="dropdown-list">
+      <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <NoteTitleWithLink
         v-for="noteTopology in searchResult"
         :key="noteTopology.id"
@@ -78,22 +81,24 @@
       />
     </div>
 
-    <Cards
-      v-else-if="searchResult !== undefined"
-      class="search-result"
-      :noteTopologies="searchResult"
-      :columns="3"
-    >
-      <template #button="{ noteTopology }">
-        <slot name="button" :note-topology="noteTopology" />
-        <small
-          v-if="distanceById[String(noteTopology.id)] != null"
-          class="similarity-distance"
-        >
-          {{ Number(distanceById[String(noteTopology.id)]).toFixed(3) }}
-        </small>
-      </template>
-    </Cards>
+    <div v-else-if="searchResult !== undefined">
+      <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
+      <Cards
+        class="search-result"
+        :noteTopologies="searchResult"
+        :columns="3"
+      >
+        <template #button="{ noteTopology }">
+          <slot name="button" :note-topology="noteTopology" />
+          <small
+            v-if="distanceById[String(noteTopology.id)] != null"
+            class="similarity-distance"
+          >
+            {{ Number(distanceById[String(noteTopology.id)]).toFixed(3) }}
+          </small>
+        </template>
+      </Cards>
+    </div>
   </div>
 </template>
 
@@ -184,14 +189,25 @@ const distanceById = computed<Record<string, number>>(() => {
 })
 
 const shouldShowRecentNotes = computed(() => {
-  // Only show recent notes when searching globally (not within a notebook)
+  // Show recent notes when searching globally (allMyNotebooksAndSubscriptions is true)
   // Show when: search key is empty, or we're waiting for search results (searchResult is undefined)
   // Hide when: we have search results (searchResult is defined and not empty)
   return (
-    !props.noteId &&
     searchTerm.value.allMyNotebooksAndSubscriptions &&
     (trimmedSearchKey.value === "" || searchResult.value === undefined)
   )
+})
+
+const resultTitle = computed(() => {
+  // When search results are back (could be empty), show "Search result"
+  // Otherwise, show "Recently updated notes" when showing recent notes
+  if (searchResult.value !== undefined) {
+    return "Search result"
+  }
+  if (shouldShowRecentNotes.value) {
+    return "Recently updated notes"
+  }
+  return null
 })
 
 // Methods
@@ -251,9 +267,8 @@ const mergeUniqueAndSortByDistance = (
 }
 
 const fetchRecentNotes = async () => {
-  // Only fetch if we're searching globally (not within a notebook) and haven't fetched yet
+  // Only fetch if we're searching globally and haven't fetched yet
   if (
-    !props.noteId &&
     searchTerm.value.allMyNotebooksAndSubscriptions &&
     recentNotes.value.length === 0
   ) {
@@ -272,9 +287,8 @@ const search = () => {
   if (!cachedSearches.value[originalTrimmedKey]) {
     recentResult.value = undefined
     // Fetch recent notes to show while waiting for search results
-    // Only fetch if searching globally (not within a notebook)
+    // Only fetch if searching globally
     if (
-      !props.noteId &&
       searchTerm.value.allMyNotebooksAndSubscriptions &&
       recentNotes.value.length === 0
     ) {
@@ -314,7 +328,6 @@ watch(
     if (searchTerm.value.searchKey.trim() !== "") {
       search()
     } else if (
-      !props.noteId &&
       searchTerm.value.allMyNotebooksAndSubscriptions &&
       searchTerm.value.searchKey.trim() === ""
     ) {
@@ -339,7 +352,6 @@ watch(
     ) {
       recentResult.value = []
     } else if (
-      !props.noteId &&
       searchTerm.value.allMyNotebooksAndSubscriptions &&
       props.inputSearchKey.trim() === ""
     ) {
@@ -350,9 +362,8 @@ watch(
 
 // Lifecycle hooks
 onMounted(async () => {
-  if (!props.noteId) {
-    searchTerm.value.allMyNotebooksAndSubscriptions = true
-  }
+  // Check "All My Notebooks And Subscriptions" by default to show recent notes
+  searchTerm.value.allMyNotebooksAndSubscriptions = true
   searchTerm.value.searchKey = props.inputSearchKey
   // When search key is empty and we have a noteId (dropdown mode in notebook context),
   // set recentResult to empty array to show "Similar notes within the same notebook"
@@ -360,7 +371,6 @@ onMounted(async () => {
   if (props.inputSearchKey.trim() === "" && props.noteId && props.isDropdown) {
     recentResult.value = []
   } else if (
-    !props.noteId &&
     searchTerm.value.allMyNotebooksAndSubscriptions &&
     props.inputSearchKey.trim() === ""
   ) {
@@ -421,11 +431,11 @@ onBeforeUnmount(() => {
   background-color: #f8f9fa;
 }
 
-.recent-notes-section {
+.result-section {
   margin-top: 1rem;
 }
 
-.recent-notes-label {
+.result-title {
   font-weight: bold;
   margin-bottom: 0.5rem;
   padding: 0.5rem;

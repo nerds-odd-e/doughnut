@@ -276,6 +276,65 @@ describe("SearchResults.vue", () => {
       expect(wrapper.text()).toContain("Recent Note 2")
     })
 
+    it("shows 'Search result' title when search results are back (even if empty)", async () => {
+      vi.useFakeTimers()
+
+      const empty: Array<unknown> = []
+      vi.spyOn(
+        helper.managedApi.services,
+        "searchForLinkTarget"
+      ).mockResolvedValue(empty as never)
+      vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
+        empty as never
+      )
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "test", isDropdown: false })
+        .mount()
+
+      await nextTick()
+      vi.advanceTimersByTime(1100)
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).toContain("No matching notes found.")
+      expect(wrapper.text()).not.toContain("Recently updated notes")
+
+      vi.useRealTimers()
+    })
+
+    it("shows 'Search result' title when search results are back with results", async () => {
+      vi.useFakeTimers()
+
+      const searchResults = [
+        { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
+      ] as unknown[]
+
+      vi.spyOn(
+        helper.managedApi.services,
+        "searchForLinkTarget"
+      ).mockResolvedValue(searchResults as never)
+      vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
+        [] as never
+      )
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "test", isDropdown: false })
+        .mount()
+
+      await nextTick()
+      vi.advanceTimersByTime(1100)
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).toContain("Search Result")
+      expect(wrapper.text()).not.toContain("Recently updated notes")
+
+      vi.useRealTimers()
+    })
+
     it("shows recently updated notes while waiting for search results", async () => {
       vi.useFakeTimers()
 
@@ -306,11 +365,12 @@ describe("SearchResults.vue", () => {
       expect(wrapper.text()).toContain("Searching ...")
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
+      expect(wrapper.text()).not.toContain("Search result")
 
       vi.useRealTimers()
     })
 
-    it("hides recently updated notes when search results arrive", async () => {
+    it("shows 'Search result' title when search results arrive", async () => {
       vi.useFakeTimers()
 
       const searchResults = [
@@ -338,34 +398,11 @@ describe("SearchResults.vue", () => {
       vi.advanceTimersByTime(1100)
       await flushPromises()
 
+      expect(wrapper.text()).toContain("Search result")
       expect(wrapper.text()).not.toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Search Result")
 
       vi.useRealTimers()
-    })
-
-    it("does not show recent notes when searching within a notebook", async () => {
-      // Clear any previous mocks
-      vi.clearAllMocks()
-
-      const getRecentNotesSpy = vi
-        .spyOn(helper.managedApi.services, "getRecentNotes")
-        .mockResolvedValue(recentNotes as never)
-
-      const wrapper = helper
-        .component(SearchResults)
-        .withProps({ inputSearchKey: "", noteId: 1, isDropdown: false })
-        .mount()
-
-      await nextTick()
-      await flushPromises()
-
-      // Wait a bit more to ensure all watchers have settled
-      await new Promise((resolve) => setTimeout(resolve, 100))
-      await flushPromises()
-
-      expect(getRecentNotesSpy).not.toHaveBeenCalled()
-      expect(wrapper.text()).not.toContain("Recently updated notes")
     })
 
     it("does not show recent notes when allMyNotebooksAndSubscriptions is false", async () => {
