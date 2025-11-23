@@ -14,13 +14,14 @@
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader"
 import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  getAllSuggestedQuestions,
+  uploadAndTriggerFineTuning,
+} from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 
 export default {
-  setup() {
-    return useLoadingApi()
-  },
   data() {
     return {
       suggestedQuestions: undefined as
@@ -36,19 +37,15 @@ export default {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated]
     },
     async triggerFineTuning() {
-      try {
-        await this.managedApi.services.uploadAndTriggerFineTuning()
+      const { error } = await uploadAndTriggerFineTuning()
+      if (!error) {
         this.fineTuningDataResultMsg = "Training initiated."
-      } catch (error) {
-        const errorInstance = error as Error & { body?: unknown }
-        const msg =
-          errorInstance.body &&
-          typeof errorInstance.body === "object" &&
-          "message" in errorInstance.body &&
-          typeof errorInstance.body.message === "string"
-            ? errorInstance.body.message
-            : errorInstance.message
-        this.fineTuningDataResultMsg = msg
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract error message for display
+        const errorObj = toOpenApiError(error)
+        this.fineTuningDataResultMsg =
+          errorObj.message || "Failed to trigger fine tuning"
       }
       this.showAlert = true
     },
@@ -56,8 +53,10 @@ export default {
 
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
-    this.suggestedQuestions =
-      await this.managedApi.services.getAllSuggestedQuestions()
+    const { data: questions, error } = await getAllSuggestedQuestions()
+    if (!error && questions) {
+      this.suggestedQuestions = questions
+    }
   },
 }
 </script>

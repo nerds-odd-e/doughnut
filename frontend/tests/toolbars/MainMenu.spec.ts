@@ -6,6 +6,7 @@ import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import * as sdk from "@generated/backend/sdk.gen"
+import { beforeEach, vi } from "vitest"
 
 const useRouteValue = { name: "" }
 vitest.mock("vue-router", () => ({
@@ -16,6 +17,34 @@ describe("main menu", () => {
   let user: User
 
   beforeEach(() => {
+    vi.clearAllMocks()
+    // Default mocks for all tests (can be overridden in individual tests)
+    vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
+      data: {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
+      },
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "overview").mockResolvedValue({
+      data: {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
+      },
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     user = makeMe.aUser.please()
   })
 

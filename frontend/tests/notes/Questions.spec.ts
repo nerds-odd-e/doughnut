@@ -5,6 +5,7 @@ import makeMe from "../fixtures/makeMe"
 import Questions from "@/components/notes/Questions.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
 import { reactive } from "vue"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
 vitest.mock("vue-router", () => ({
@@ -26,10 +27,12 @@ describe("Questions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.spyOn(
-      helper.managedApi.services,
-      "getAllQuestionByNote"
-    ).mockResolvedValue(questions as never)
+    vi.spyOn(sdk, "getAllQuestionByNote").mockResolvedValue({
+      data: questions as never,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it("renders questions table when questions exist", async () => {
@@ -51,10 +54,12 @@ describe("Questions", () => {
       },
       title: "Test Note",
     } as never
-    vi.spyOn(
-      helper.managedApi.services,
-      "exportQuestionGeneration"
-    ).mockResolvedValue(exportData)
+    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+      data: exportData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const { getByLabelText, getByTestId } = helper
       .component(Questions)
@@ -70,9 +75,7 @@ describe("Questions", () => {
       expect(getByTestId("export-textarea")).toBeTruthy()
     })
 
-    expect(
-      helper.managedApi.services.exportQuestionGeneration
-    ).toHaveBeenCalledWith({
+    expect(sdk.exportQuestionGeneration).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })

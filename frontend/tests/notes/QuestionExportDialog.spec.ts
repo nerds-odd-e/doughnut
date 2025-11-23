@@ -4,6 +4,7 @@ import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { waitFor } from "@testing-library/vue"
 import { reactive } from "vue"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
 vitest.mock("vue-router", () => ({
@@ -16,9 +17,6 @@ vitest.mock("vue-router", () => ({
 describe("QuestionExportDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.spyOn(console, "error").mockImplementation(() => {
-      // Suppress console.error in tests
-    })
   })
 
   it("fetches and displays export content", async () => {
@@ -30,10 +28,12 @@ describe("QuestionExportDialog", () => {
       },
       title: "Test Note",
     } as never
-    vi.spyOn(
-      helper.managedApi.services,
-      "exportQuestionGeneration"
-    ).mockResolvedValue(exportData)
+    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+      data: exportData,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const { getByTestId } = helper
       .component(QuestionExportDialog)
@@ -47,19 +47,19 @@ describe("QuestionExportDialog", () => {
       expect(textarea.value).toContain('"title"')
     })
 
-    expect(
-      helper.managedApi.services.exportQuestionGeneration
-    ).toHaveBeenCalledWith({
+    expect(sdk.exportQuestionGeneration).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })
 
   it("displays error message when API call fails", async () => {
     const note = makeMe.aNote.please()
-    vi.spyOn(
-      helper.managedApi.services,
-      "exportQuestionGeneration"
-    ).mockRejectedValue(new Error("API Error"))
+    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+      data: undefined,
+      error: "API Error",
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const { getByTestId } = helper
       .component(QuestionExportDialog)

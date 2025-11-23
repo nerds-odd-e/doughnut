@@ -61,7 +61,7 @@ import type {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
 } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { updateSuggestedQuestionForFineTuning } from "@generated/backend/sdk.gen"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
@@ -74,9 +74,6 @@ const validateRealCorrectAnswers = (answers: string) => {
 
 export default defineComponent({
   inheritAttrs: false,
-  setup() {
-    return { ...useLoadingApi() }
-  },
   props: {
     modelValue: {
       type: Object as PropType<SuggestedQuestionForFineTuning>,
@@ -101,12 +98,14 @@ export default defineComponent({
     async suggestQuestionForFineTuning() {
       const validated = this.validateSuggestedQuestion(this.suggestionParams)
       if (!validated) return
-      const updated =
-        await this.managedApi.services.updateSuggestedQuestionForFineTuning({
+      const { data: updated, error } =
+        await updateSuggestedQuestionForFineTuning({
           path: { suggestedQuestion: this.modelValue.id },
           body: validated,
         })
-      this.$emit("update:modelValue", updated)
+      if (!error && updated) {
+        this.$emit("update:modelValue", updated)
+      }
     },
     validateSuggestedQuestion(
       params: QuestionSuggestionParams

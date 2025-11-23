@@ -29,12 +29,12 @@
 <script lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
 import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { duplicate, delete_ } from "@generated/backend/sdk.gen"
 import type { PropType } from "vue"
 
 export default {
   setup() {
-    return { ...useLoadingApi(), ...usePopups() }
+    return { ...usePopups() }
   },
   props: {
     suggestedQuestion: {
@@ -65,10 +65,12 @@ export default {
   },
   methods: {
     async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
-      const duplicated = await this.managedApi.services.duplicate({
+      const { data: duplicated, error } = await duplicate({
         path: { suggestedQuestion: suggested.id },
       })
-      this.$emit("duplicated", duplicated)
+      if (!error && duplicated) {
+        this.$emit("duplicated", duplicated)
+      }
     },
     chatStarter() {
       this.popups.alert(this.chatStarterMessage)
@@ -79,7 +81,7 @@ export default {
           `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.stem})?`
         )
       ) {
-        await this.managedApi.services.delete_({
+        await delete_({
           path: { suggestedQuestion: suggested.id },
         })
       }

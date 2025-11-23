@@ -63,13 +63,15 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { Note, PredefinedQuestion } from "@generated/backend"
+import {
+  addQuestionManually,
+  refineQuestion as refineQuestionApi,
+  generateQuestionWithoutSave,
+} from "@generated/backend/sdk.gen"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
-
-const { managedApi } = useLoadingApi()
 
 const props = defineProps({
   note: {
@@ -125,25 +127,32 @@ const removeChoice = () => {
 
 const submitQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
-  const response = await managedApi.services.addQuestionManually({
+  const { data: response, error } = await addQuestionManually({
     path: { note: props.note.id },
     body: recallPrompt,
   })
-  emit("close-dialog", response)
+  if (!error && response) {
+    emit("close-dialog", response)
+  }
 }
 
 const refineQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
-  predefinedQuestion.value = await managedApi.services.refineQuestion({
+  const { data: refined, error } = await refineQuestionApi({
     path: { note: props.note.id },
     body: recallPrompt,
   })
+  if (!error && refined) {
+    predefinedQuestion.value = refined
+  }
 }
 
 const generateQuestionByAI = async () => {
-  predefinedQuestion.value =
-    await managedApi.services.generateQuestionWithoutSave({
-      query: { note: props.note.id },
-    })
+  const { data: generated, error } = await generateQuestionWithoutSave({
+    query: { note: props.note.id },
+  })
+  if (!error && generated) {
+    predefinedQuestion.value = generated
+  }
 }
 </script>

@@ -1,8 +1,9 @@
 import SuggestedQuestionEdit from "@/components/admin/SuggestedQuestionEdit.vue"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {
@@ -19,11 +20,13 @@ describe("Edit Suggested Question", () => {
 
     it("call the api to make update", async () => {
       const mockUpdate = vi
-        .spyOn(
-          helper.managedApi.services,
-          "updateSuggestedQuestionForFineTuning"
-        )
-        .mockResolvedValue({} as never)
+        .spyOn(sdk, "updateSuggestedQuestionForFineTuning")
+        .mockResolvedValue({
+          data: {} as never,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
       wrapper.get("button.daisy-btn-success").trigger("click")
       await flushPromises()
       expect(mockUpdate).toHaveBeenCalledWith({

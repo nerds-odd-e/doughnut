@@ -92,14 +92,16 @@
 import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  getAllQuestionByNote,
+  toggleApproval as toggleApprovalApi,
+} from "@generated/backend/sdk.gen"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import SvgExport from "../svgs/SvgExport.vue"
 
-const { managedApi } = useLoadingApi()
 const props = defineProps({
   note: {
     type: Object as PropType<Note>,
@@ -111,9 +113,12 @@ const openedQuestion = ref<PredefinedQuestion | undefined>()
 const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {
-  questions.value = await managedApi.services.getAllQuestionByNote({
+  const { data: allQuestions, error } = await getAllQuestionByNote({
     path: { note: props.note.id },
   })
+  if (!error && allQuestions) {
+    questions.value = allQuestions
+  }
 }
 const questionAdded = (newQuestion: PredefinedQuestion) => {
   if (newQuestion == null) {
@@ -123,7 +128,7 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
-    await managedApi.services.toggleApproval({
+    await toggleApprovalApi({
       path: { predefinedQuestion: questionId },
     })
   }

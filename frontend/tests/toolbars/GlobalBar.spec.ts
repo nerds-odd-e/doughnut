@@ -7,6 +7,8 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
+import { beforeEach, vi } from "vitest"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -22,6 +24,38 @@ describe("global bar", () => {
   let user: User
 
   beforeEach(() => {
+    vi.clearAllMocks()
+    // Mock services used by SearchResults (used by LinkNoteDialog in GlobalBar)
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "searchForLinkTargetWithin").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     user = makeMe.aUser.please()
     noteEditingHistory = new NoteEditingHistory()
     histories = createNoteStorage(
