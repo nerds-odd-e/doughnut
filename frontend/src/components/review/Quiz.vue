@@ -69,8 +69,8 @@ import type {
   SpellingResultDto,
   MemoryTrackerLite,
 } from "@generated/backend"
-import { answerSpelling } from "@generated/backend/sdk.gen"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { answerSpelling, askAQuestion } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
@@ -100,7 +100,6 @@ const useQuestionFetching = (props: QuizProps) => {
   const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
-  const { managedApi } = useLoadingApi()
 
   const fetchNextQuestion = async () => {
     for (
@@ -114,12 +113,13 @@ const useQuestionFetching = (props: QuizProps) => {
 
       if (memoryTrackerId in recallPromptCache.value) continue
 
-      try {
-        const question = await managedApi.silent.services.askAQuestion({
-          path: { memoryTracker: memoryTrackerId },
-        })
-        recallPromptCache.value[memoryTrackerId] = question
-      } catch (e) {
+      const { data: question, error } = await askAQuestion({
+        path: { memoryTracker: memoryTrackerId },
+        client: globalClientSilent,
+      })
+      if (!error) {
+        recallPromptCache.value[memoryTrackerId] = question!
+      } else {
         recallPromptCache.value[memoryTrackerId] = undefined
       }
     }
