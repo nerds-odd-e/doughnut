@@ -37,6 +37,12 @@ beforeEach(() => {
     request: {} as Request,
     response: {} as Response,
   })
+  vi.spyOn(sdk, "showNoteAccessory").mockResolvedValue({
+    data: undefined as never,
+    error: undefined,
+    request: {} as Request,
+    response: {} as Response,
+  })
   vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
     mockedGetNoteCall
   )
