@@ -1,6 +1,6 @@
 import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
-import helper from "@tests/helpers"
+import helper, { mockShowNote } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { type ConversationMessage } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
@@ -80,6 +80,7 @@ describe("ConversationInner", () => {
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
+    mockShowNote()
     vi.spyOn(sdk, "replyToConversation").mockResolvedValue({
       data: undefined as never,
       error: undefined as never,

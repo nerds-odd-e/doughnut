@@ -53,7 +53,15 @@ describe("storedApiCollection", () => {
           response: {} as Response,
         }
       })
-      vi.spyOn(managedApi.services, "showNote").mockImplementation(showNote)
+      vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
+        const result = await showNote(options)
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      })
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 
