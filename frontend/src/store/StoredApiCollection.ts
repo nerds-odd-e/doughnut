@@ -14,6 +14,7 @@ import {
   moveNote,
   undoDeleteNote,
   updateLink,
+  updateNoteDetails,
   updateNoteTitle,
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
@@ -146,12 +147,16 @@ export default class StoredApiCollection implements StoredApi {
       }
       return data
     }
-    return this.managedApi.services.updateNoteDetails({
+    const { data, error } = await updateNoteDetails({
       path: { note: noteId },
       body: {
         details: content,
       },
     })
+    if (error || !data) {
+      throw new Error(error || "Failed to update note details")
+    }
+    return data
   }
 
   async updateWikidataId(

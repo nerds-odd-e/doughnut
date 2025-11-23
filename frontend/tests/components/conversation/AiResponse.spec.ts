@@ -276,10 +276,12 @@ describe("ConversationInner", () => {
     const renderedCompletion = "bold completion"
 
     beforeEach(async () => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "updateNoteDetails"
-      ).mockResolvedValue({} as never)
+      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+        data: {} as never,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -357,9 +359,10 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
-        { path: { note: note.id }, body: { details: testCompletion } }
-      )
+      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { details: testCompletion },
+      })
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -375,9 +378,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(
-        helper.managedApi.services.updateNoteDetails
-      ).not.toHaveBeenCalled()
+      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -394,9 +395,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(
-        helper.managedApi.services.updateNoteDetails
-      ).not.toHaveBeenCalled()
+      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -426,9 +425,10 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete "world" and add "friends!"
-      expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
-        { path: { note: note.id }, body: { details: "Hello friends!" } }
-      )
+      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { details: "Hello friends!" },
+      })
     })
 
     it("handles over-deletion by removing all content", async () => {
@@ -447,17 +447,20 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete everything and add new text
-      expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
-        { path: { note: note.id }, body: { details: "Completely new text" } }
-      )
+      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+        path: { note: note.id },
+        body: { details: "Completely new text" },
+      })
     })
 
     describe("Note Access", () => {
       beforeEach(async () => {
-        vi.spyOn(
-          helper.managedApi.services,
-          "updateNoteDetails"
-        ).mockResolvedValue({} as never)
+        vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+          data: {} as never,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
       })
 
       it("fails to handle completion when note is in answeredQuestion but not in subject", async () => {
@@ -483,7 +486,7 @@ describe("ConversationInner", () => {
         await wrapper.find('button[class*="btn-primary"]').trigger("click")
         await flushPromises()
 
-        expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalled()
+        expect(sdk.updateNoteDetails).toHaveBeenCalled()
       })
     })
   })

@@ -563,6 +563,12 @@ describe("NoteAudioTools", () => {
         request: {} as Request,
         response: {} as Response,
       })
+      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+        data: makeMe.aNoteRealm.please() as never,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -583,6 +589,12 @@ describe("NoteAudioTools", () => {
 
       vi.spyOn(sdk, "suggestTitle").mockResolvedValue({
         data: { title: "" },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+        data: makeMe.aNoteRealm.please() as never,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
@@ -827,6 +839,12 @@ describe("NoteAudioTools", () => {
 
     vi.spyOn(sdk, "audioToText").mockResolvedValue({
       data: mockResponse,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+      data: makeMe.aNoteRealm.please() as never,
       error: undefined,
       request: {} as Request,
       response: {} as Response,
