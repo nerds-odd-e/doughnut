@@ -192,7 +192,7 @@ describe("ConversationInner", () => {
   let storageAccessor
 
   beforeEach(() => {
-    storageAccessor = createNoteStorage(helper.managedApi)
+    storageAccessor = createNoteStorage()
     resetInstance()
     mockShowNote()
 

@@ -367,13 +367,18 @@ describe("SearchResults.vue", () => {
       vi.useFakeTimers()
 
       const empty: NoteSearchResult[] = []
-      vi.spyOn(
-        helper.managedApi.services,
-        "searchForLinkTarget"
-      ).mockResolvedValue(empty as never)
-      vi.spyOn(helper.managedApi.services, "semanticSearch").mockResolvedValue(
-        empty as never
-      )
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: empty,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: empty,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(SearchResults)
@@ -440,12 +445,21 @@ describe("SearchResults.vue", () => {
         setTimeout(() => resolve([]), 1)
       )
 
-      vi.spyOn(
-        helper.managedApi.services,
-        "searchForLinkTarget"
-      ).mockReturnValue(delayed as never)
-      vi.spyOn(helper.managedApi.services, "semanticSearch").mockReturnValue(
-        delayed as never
+      vi.spyOn(sdk, "searchForLinkTarget").mockReturnValue(
+        delayed.then((data) => ({
+          data,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })) as never
+      )
+      vi.spyOn(sdk, "semanticSearch").mockReturnValue(
+        delayed.then((data) => ({
+          data,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })) as never
       )
       vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
         data: recentNotes,

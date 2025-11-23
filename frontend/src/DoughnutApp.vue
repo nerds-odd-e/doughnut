@@ -6,8 +6,7 @@ import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import createNoteStorage from "./store/createNoteStorage"
-import type { ApiStatus } from "./managedApi/ManagedApi"
-import ManagedApi from "./managedApi/ManagedApi"
+import type { ApiStatus } from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "./managedApi/clientSetup"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/backend"
@@ -26,12 +25,10 @@ const apiStatus: Ref<ApiStatus> = ref({
 })
 // Initialize global client with interceptors for direct service imports
 setupGlobalClient(apiStatus.value)
-const managedApi = new ManagedApi(apiStatus.value)
-provide("managedApi", managedApi)
 const user = ref<User | undefined>()
 provide("currentUser", user)
 
-const storageAccessor = ref(createNoteStorage(managedApi))
+const storageAccessor = ref(createNoteStorage())
 const $route = useRoute()
 const externalIdentifier = ref<string | undefined>()
 const featureToggle = ref(false)

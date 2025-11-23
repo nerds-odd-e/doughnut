@@ -1,4 +1,3 @@
-import ManagedApi from "@/managedApi/ManagedApi"
 import RenderingHelper from "./RenderingHelper"
 import matchByText from "./matchByText"
 import { vi } from "vitest"
@@ -6,10 +5,8 @@ import * as sdk from "@generated/backend/sdk.gen"
 import type { NoteRealm } from "@generated/backend"
 
 class StoredComponentTestHelper {
-  public managedApi = new ManagedApi({ states: [], errors: [] })
-
   component<T>(comp: T) {
-    return new RenderingHelper(comp, this.managedApi)
+    return new RenderingHelper(comp)
   }
 }
 

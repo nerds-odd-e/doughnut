@@ -37,9 +37,12 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
-    makeMe.aNote.please() as never
-  )
+  vi.spyOn(sdk, "showNote").mockResolvedValue({
+    data: makeMe.aNoteRealm.please(),
+    error: undefined,
+    request: {} as Request,
+    response: {} as Response,
+  })
   vi.spyOn(sdk, "recalling").mockImplementation(async (options) => {
     const result = await mockedRepeatCall(options)
     return {

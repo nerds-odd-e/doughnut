@@ -13,9 +13,12 @@ describe("repeat page", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
-      makeMe.aNote.please() as never
-    )
+    vi.spyOn(sdk, "showNote").mockResolvedValue({
+      data: makeMe.aNoteRealm.please(),
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
       data: makeMe.aMemoryTracker.please(),
       error: undefined,

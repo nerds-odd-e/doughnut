@@ -1,5 +1,5 @@
 import "vitest-fetch-mock"
-import type { ApiStatus } from "@/managedApi/ManagedApi"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { globalClientSilent, setupGlobalClient } from "@/managedApi/clientSetup"
 import { client as globalClient } from "@generated/backend/client.gen"
 import { getUserProfile } from "@generated/backend/sdk.gen"

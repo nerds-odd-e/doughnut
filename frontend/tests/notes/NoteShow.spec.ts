@@ -52,9 +52,12 @@ describe("note wth children", () => {
   })
 
   const render = (n: NoteRealm) => {
-    vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
-      n as never
-    )
+    vi.spyOn(sdk, "showNote").mockResolvedValue({
+      data: n,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     helper
       .component(NoteShow)
       .withRouter()
