@@ -1,18 +1,12 @@
 // Note: The new client throws errors directly, not wrapped in ApiError
 // We'll handle errors generically
-import { client } from "@generated/backend/client.gen"
+import { createClient } from "@generated/backend/client"
 import * as Services from "@generated/backend/sdk.gen"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
+import { globalClientSilent } from "./clientSetup"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
-
-// Set up client config
-// Use current origin for relative URLs (empty string means same origin)
-client.setConfig({
-  baseUrl: typeof window !== "undefined" ? window.location.origin : "",
-  credentials: "include",
-})
 
 // Type helper to unwrap all service functions
 // Functions that return promises with wrapped responses get unwrapped to return just the data
@@ -44,6 +38,17 @@ class ManagedApi {
 
   private isSilent: boolean
 
+  // Separate client instance for ManagedApi (no interceptors to prevent duplication)
+  private managedApiClient = createClient({
+    baseUrl: typeof window !== "undefined" ? window.location.origin : "",
+    credentials: "include",
+    responseStyle: "fields",
+    throwOnError: false,
+  })
+
+  // Reuse silent client for silent mode
+  private managedApiClientSilent = globalClientSilent
+
   public readonly services: UnwrappedServices<typeof Services>
 
   constructor(apiStatus: ApiStatus, silent?: boolean) {
@@ -67,7 +72,14 @@ class ManagedApi {
         if (typeof value === "function") {
           const originalFn = value as (...args: unknown[]) => Promise<unknown>
           wrapped[key] = (...args: unknown[]) => {
-            return self.wrapServiceCall(() => originalFn(...args))
+            // Pass the appropriate client to prevent duplicate interceptors
+            const options = (args[0] as Record<string, unknown>) || {}
+            const clientToUse = self.isSilent
+              ? self.managedApiClientSilent
+              : self.managedApiClient
+            return self.wrapServiceCall(() =>
+              originalFn({ ...options, client: clientToUse } as never)
+            )
           }
         } else {
           wrapped[key] = value
