@@ -112,56 +112,45 @@
 
 ---
 
-## Step 6: Migrate Components Using StorageAccessor (Keep ManagedApi for Storage)
+## Step 6: Migrate StoredApiCollection Internal Implementation
 
-**Goal:** Migrate components that use storageAccessor but don't need ManagedApi directly.
+**Goal:** Update StoredApiCollection's internal implementation to use direct services instead of ManagedApi, while keeping the component API unchanged.
 
-**Strategy:** These components use `storageAccessor.storedApi()` which still uses ManagedApi internally. We can migrate the component's direct API calls while keeping storageAccessor unchanged.
-
-**Changes per component:**
-
-- Migrate direct `managedApi.services.*` calls to direct imports
-- Keep `storageAccessor` usage unchanged (it still uses ManagedApi internally)
-- Example: Components that fetch data directly but also use storageAccessor for note operations
-- Update component tests (build test helpers as needed)
-
-**Verification:** After each component migration, run frontend unit tests. All must pass.
-
-**Components to Migrate:**
-- `NoteConversation.vue` - uses `managedApi.services.getConversationsAboutNote`, `startConversationAboutNote`
-- `NoteAudioTools.vue` - uses `managedApi.services.suggestTitle`, `audioToText`
-- `ConversationInner.vue` - uses `managedApi.services.getConversationMessages`, `replyToConversation`
-- `ConversationComponent.vue` - uses `managedApi.services.getConversationsAboutNote`
-
----
-
-## Step 7: Migrate StoredApiCollection to Use Direct Services
-
-**Goal:** Update StoredApiCollection to use direct services instead of ManagedApi.
+**Important Notes:**
+- All `managedApi.services.*` usage in components has already been replaced with direct service imports (completed in Steps 4-5)
+- Components using `storageAccessor.storedApi()` will continue to work unchanged - only the internal implementation changes
+- The `StoredApi` interface and component usage patterns remain the same
 
 **Changes:**
 
-- Update `frontend/src/store/StoredApiCollection.ts`:
-- Remove `managedApi: ManagedApi` property
-- Import services directly from `@generated/backend/sdk.gen`
-- Replace all `this.managedApi.services.*` calls with direct service calls
-- Update constructor to remove `managedApi` parameter
-- Update `frontend/src/store/createNoteStorage.ts`:
-- Remove `managedApi: ManagedApi` parameter and property
-- Update `StoredApiCollection` instantiation to not pass managedApi
-- Update `frontend/src/DoughnutApp.vue`:
-- Update `createNoteStorage(managedApi)` call to `createNoteStorage()`
-- Update all test files that create `StoredApiCollection` or `createNoteStorage`:
-- Remove `managedApi` parameter from constructors/calls
-- Build test helpers as needed
+1. **Update `frontend/src/store/StoredApiCollection.ts`:**
+   - Remove `managedApi: ManagedApi` property
+   - Import services directly from `@generated/backend/sdk.gen`
+   - Replace all `this.managedApi.services.*` calls with direct service calls
+   - Use the global client (already configured with interceptors) for all service calls
+   - Update constructor to remove `managedApi` parameter
 
-**Verification:** All frontend unit tests pass. Storage operations work correctly.
+2. **Update `frontend/src/store/createNoteStorage.ts`:**
+   - Remove `managedApi: ManagedApi` parameter and property
+   - Update `StoredApiCollection` instantiation to not pass `managedApi`
+   - The function signature changes from `createNoteStorage(managedApi)` to `createNoteStorage()`
+
+3. **Update `frontend/src/DoughnutApp.vue`:**
+   - Update `createNoteStorage(managedApi)` call to `createNoteStorage()`
+   - Remove `managedApi` parameter from the call
+
+4. **Update all test files that create `StoredApiCollection` or `createNoteStorage`:**
+   - Remove `managedApi` parameter from constructors/calls
+   - Update mocks to use direct SDK services instead of `managedApi.services`
+   - Build test helpers as needed
+
+**Verification:** All frontend unit tests pass. Storage operations work correctly. Components using `storageAccessor` continue to work without changes.
 
 ---
 
-## Step 8: Migrate Remaining Components
+## Step 7: Migrate Remaining Components
 
-**Goal:** Migrate all remaining components that still use ManagedApi.
+**Goal:** Migrate any remaining components that still use ManagedApi directly (not through storageAccessor).
 
 **Changes:**
 
@@ -174,7 +163,7 @@
 
 ---
 
-## Step 9: Remove ManagedApi (Final Cleanup)
+## Step 8: Remove ManagedApi (Final Cleanup)
 
 **Goal:** Remove ManagedApi entirely once all usages are migrated.
 
@@ -197,7 +186,7 @@
 
 ---
 
-## Step 10: Update Documentation
+## Step 9: Update Documentation
 
 **Goal:** Update all documentation to reflect the new direct service import pattern.
 
@@ -219,11 +208,11 @@
 ## Migration Order Summary
 
 1. Infrastructure setup (Steps 1-3): ✅ Complete
-2. Component migration (Steps 4-6): Step 4 ✅ Complete, Step 5 ✅ Complete, Step 6 pending
-3. Storage migration (Step 7): Pending
-4. Remaining migration (Step 8): Pending
-5. Cleanup (Step 9): Pending
-6. Documentation (Step 10): Pending
+2. Component migration (Steps 4-5): ✅ Complete
+3. Storage internal migration (Step 6): Pending - Migrate StoredApiCollection internal implementation
+4. Remaining component migration (Step 7): Pending - Migrate any remaining components using ManagedApi directly
+5. Cleanup (Step 8): Pending - Remove ManagedApi entirely
+6. Documentation (Step 9): Pending - Update all documentation
 
 Each step maintains backward compatibility until the final cleanup. Test helpers are built incrementally as components are migrated.
 
