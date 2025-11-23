@@ -8,6 +8,7 @@ import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import createNoteStorage from "./store/createNoteStorage"
 import type { ApiStatus } from "./managedApi/ManagedApi"
 import ManagedApi from "./managedApi/ManagedApi"
+import { setupGlobalClient } from "./managedApi/clientSetup"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/backend"
 import getEnvironment from "./managedApi/window/getEnvironment"
@@ -22,6 +23,8 @@ const apiStatus: Ref<ApiStatus> = ref({
   states: [],
   errors: [],
 })
+// Initialize global client with interceptors for direct service imports
+setupGlobalClient(apiStatus.value)
 const managedApi = new ManagedApi(apiStatus.value)
 provide("managedApi", managedApi)
 const user = ref<User | undefined>()
