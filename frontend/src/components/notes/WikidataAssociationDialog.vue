@@ -108,6 +108,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick, computed } from "vue"
 import type { WikidataSearchEntity } from "@generated/backend"
+import { searchWikidata } from "@generated/backend/sdk.gen"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
@@ -157,9 +158,12 @@ const fetchSearchResults = async () => {
   loading.value = true
   hasSearched.value = true
   try {
-    searchResults.value = await managedApi.services.searchWikidata({
+    const { data: results, error } = await searchWikidata({
       query: { search: searchKeyRef.value },
     })
+    if (!error) {
+      searchResults.value = results!
+    }
   } finally {
     loading.value = false
   }
