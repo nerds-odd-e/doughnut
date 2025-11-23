@@ -4,10 +4,20 @@ import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = vi.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf())
+  })
+
+  beforeEach(() => {
+    vi.spyOn(sdk, "showNoteAccessory").mockResolvedValue({
+      data: undefined as never,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it.each([

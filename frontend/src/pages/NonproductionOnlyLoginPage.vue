@@ -39,12 +39,8 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   data() {
     return {
       username: "",

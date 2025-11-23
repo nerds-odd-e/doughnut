@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { suggestTitle, audioToText } from "@generated/backend/sdk.gen"
 import { ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
@@ -88,8 +88,6 @@ import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
-
-const { managedApi } = useLoadingApi()
 const { note, storageAccessor } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
   storageAccessor: {
@@ -115,10 +113,10 @@ const shouldSuggestTitle = (callCount: number): boolean => {
 }
 
 const updateTopicIfSuggested = async (noteId: number) => {
-  const suggestedTopic = await managedApi.services.suggestTitle({
+  const { data: suggestedTopic, error } = await suggestTitle({
     path: { note: noteId },
   })
-  if (suggestedTopic?.title) {
+  if (!error && suggestedTopic?.title) {
     await storageAccessor
       .storedApi()
       .updateTextField(noteId, "edit title", suggestedTopic.title)
@@ -147,7 +145,7 @@ const getLastContentChunk = (
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
-    const response = await managedApi.services.audioToText({
+    const { data: response, error } = await audioToText({
       body: {
         uploadAudioFile: chunk.data,
         additionalProcessingInstructions: processingInstructions.value,
@@ -156,20 +154,20 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       },
     })
 
-    if (!response) {
+    if (!error && response) {
+      await storageAccessor
+        .storedApi()
+        .completeDetails(note.id, response.completionFromAudio)
+
+      callCount.value++
+      if (shouldSuggestTitle(callCount.value)) {
+        updateTopicIfSuggested(note.id)
+      }
+
+      return response.endTimestamp
+    } else {
       throw new Error("Failed to process audio")
     }
-
-    await storageAccessor
-      .storedApi()
-      .completeDetails(note.id, response.completionFromAudio)
-
-    callCount.value++
-    if (shouldSuggestTitle(callCount.value)) {
-      updateTopicIfSuggested(note.id)
-    }
-
-    return response.endTimestamp
   } catch (error) {
     errors.value = error as Record<string, string | undefined>
     return undefined
