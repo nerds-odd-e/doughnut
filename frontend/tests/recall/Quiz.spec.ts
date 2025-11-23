@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { MemoryTrackerLite } from "@generated/backend"
+import type { MemoryTrackerLite, SpellingResultDto } from "@generated/backend"
 import * as sdk from "@generated/backend/sdk.gen"
 
 describe("repeat page", () => {
@@ -117,12 +117,17 @@ describe("repeat page", () => {
         .please()
       mockedRandomQuestionCall.mockResolvedValue(recallPromptWithoutChoices)
 
-      const answerResult = makeMe.anAnsweredQuestion
-        .answerCorrect(true)
-        .please()
-      vi.spyOn(helper.managedApi.services, "answerSpelling").mockResolvedValue(
-        answerResult as never
-      )
+      const answerResult: SpellingResultDto = {
+        note: makeMe.aNote.please(),
+        answer: "cat",
+        isCorrect: true,
+      }
+      vi.spyOn(sdk, "answerSpelling").mockResolvedValue({
+        data: answerResult,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = await mountPage([1], 1, true)
 
@@ -131,7 +136,7 @@ describe("repeat page", () => {
         .vm.$emit("answer", { spellingAnswer: "cat" })
       await flushPromises()
 
-      expect(helper.managedApi.services.answerSpelling).toHaveBeenCalledWith({
+      expect(sdk.answerSpelling).toHaveBeenCalledWith({
         path: { memoryTracker: 1 },
         body: {
           spellingAnswer: "cat",
