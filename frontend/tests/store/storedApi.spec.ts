@@ -44,9 +44,15 @@ describe("storedApiCollection", () => {
     beforeEach(() => {
       updateNoteDetails = vi.fn().mockResolvedValue(note)
       showNote = vi.fn().mockResolvedValue(note)
-      vi.spyOn(managedApi.services, "updateNoteDetails").mockImplementation(
-        updateNoteDetails
-      )
+      vi.spyOn(sdk, "updateNoteDetails").mockImplementation(async (options) => {
+        const result = await updateNoteDetails(options)
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      })
       vi.spyOn(managedApi.services, "showNote").mockImplementation(showNote)
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
