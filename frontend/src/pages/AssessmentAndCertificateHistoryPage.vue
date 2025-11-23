@@ -52,10 +52,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getMyAssessments } from "@generated/backend/sdk.gen"
 import ContainerPage from "./commons/ContainerPage.vue"
-
-const { managedApi } = useLoadingApi()
 
 const filterByCertificate = ref(false)
 const assessmentHistories = ref<undefined | AssessmentAttempt[]>(undefined)
@@ -83,7 +81,10 @@ const filteredAssessmentHistories = computed(() => {
 })
 
 onMounted(async () => {
-  assessmentHistories.value = await managedApi.services.getMyAssessments()
+  const { data: assessments, error } = await getMyAssessments()
+  if (!error) {
+    assessmentHistories.value = assessments!
+  }
 })
 </script>
 

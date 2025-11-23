@@ -23,14 +23,12 @@
 <script lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
 import type { Notebook, SubscriptionDto } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { createSubscription } from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 
 export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() }
-  },
   props: {
     notebook: { type: Object as PropType<Notebook>, required: true },
     loggedIn: Boolean,
@@ -40,22 +38,25 @@ export default defineComponent({
   data() {
     return {
       formData: { dailyTargetOfNewNotes: 5 } as SubscriptionDto,
-      errors: {},
+      errors: {} as Record<string, string>,
     }
   },
 
   methods: {
-    processForm() {
-      this.managedApi.services
-        .createSubscription({
-          path: { notebook: this.notebook.id },
-          body: this.formData,
-        })
-        .then(() => {
-          this.$emit("closeDialog")
-          this.$router.push({ name: "notebooks" })
-        })
-        .catch((res) => (this.errors = res))
+    async processForm() {
+      const { error } = await createSubscription({
+        path: { notebook: this.notebook.id },
+        body: this.formData,
+      })
+      if (!error) {
+        this.$emit("closeDialog")
+        this.$router.push({ name: "notebooks" })
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract field-level errors if available (for 400 validation errors)
+        const errorObj = toOpenApiError(error)
+        this.errors = errorObj.errors || {}
+      }
     },
   },
 })

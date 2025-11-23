@@ -22,18 +22,23 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  bazaar,
+  removeFromBazaar as removeFromBazaarApi,
+} from "@generated/backend/sdk.gen"
 import type { BazaarNotebook } from "@generated/backend"
 import NotebookLink from "../notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 
-const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 const notebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  notebooks.value = await managedApi.services.bazaar()
+  const { data: bazaarNotebooks, error } = await bazaar()
+  if (!error) {
+    notebooks.value = bazaarNotebooks!
+  }
 }
 
 const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
@@ -42,9 +47,12 @@ const removeFromBazaar = async (bazaarNotebook: BazaarNotebook) => {
       `Are you sure you want to remove "${bazaarNotebook.notebook.title}" from the bazaar?`
     )
   ) {
-    notebooks.value = await managedApi.services.removeFromBazaar({
+    const { data: updatedNotebooks, error } = await removeFromBazaarApi({
       path: { bazaarNotebook: bazaarNotebook.id! },
     })
+    if (!error) {
+      notebooks.value = updatedNotebooks!
+    }
   }
 }
 

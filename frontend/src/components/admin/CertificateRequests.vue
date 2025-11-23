@@ -33,26 +33,30 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getAllPendingRequest, approve } from "@generated/backend/sdk.gen"
 import type { NotebookCertificateApproval } from "@generated/backend"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
 
 const { popups } = usePopups()
-const { managedApi } = useLoadingApi()
 
 const approvals = ref<NotebookCertificateApproval[] | undefined>(undefined)
 
 const fetchNotebooks = async () => {
-  approvals.value = await managedApi.services.getAllPendingRequest()
+  const { data: pendingRequests, error } = await getAllPendingRequest()
+  if (!error) {
+    approvals.value = pendingRequests!
+  }
 }
 
 const approveNoteBook = async (approvalId: number) => {
   if (await popups.confirm(`Are you sure you want to approve this notebook?`)) {
-    await managedApi.services.approve({
+    const { error } = await approve({
       path: { notebookCertificateApproval: approvalId },
     })
-    fetchNotebooks()
+    if (!error) {
+      fetchNotebooks()
+    }
   }
 }
 onMounted(() => {

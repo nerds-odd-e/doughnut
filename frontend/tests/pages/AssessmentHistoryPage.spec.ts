@@ -1,9 +1,10 @@
-import { describe, it } from "vitest"
+import { describe, it, beforeEach, vi } from "vitest"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("assessment and certificate history page", () => {
   const user = makeMe.aUser.please()
@@ -15,10 +16,12 @@ describe("assessment and certificate history page", () => {
   let wrapper
 
   beforeEach(() => {
-    vi.spyOn(helper.managedApi.services, "getMyAssessments").mockResolvedValue([
-      assessmentForArt,
-      assessmentForTech,
-    ])
+    vi.spyOn(sdk, "getMyAssessments").mockResolvedValue({
+      data: [assessmentForArt, assessmentForTech],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     wrapper = helper
       .component(AssessmentAndCertificateHistoryPage)
       .withCurrentUser(user)
@@ -26,7 +29,7 @@ describe("assessment and certificate history page", () => {
   })
 
   it("calls API ONCE on mount", async () => {
-    expect(helper.managedApi.services.getMyAssessments).toBeCalledTimes(1)
+    expect(sdk.getMyAssessments).toBeCalledTimes(1)
   })
 
   it("should have two items in the list", async () => {

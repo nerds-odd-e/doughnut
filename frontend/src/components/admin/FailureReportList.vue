@@ -39,13 +39,14 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import type { FailureReport } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  failureReports,
+  deleteFailureReports,
+} from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   components: { ContainerPage },
   data() {
     return {
@@ -55,36 +56,48 @@ export default defineComponent({
     }
   },
   methods: {
-    fetchData() {
-      this.managedApi.services
-        .failureReports()
-        .then((res) => {
-          this.failureReports = res as unknown as FailureReport[]
-        })
-        .catch((err: { status?: number }) => {
-          if (err.status === 401) {
-            throw err
-          }
-          this.errorMessage = "It seems you cannot access this page."
-        })
+    async fetchData() {
+      const { data: reports, error } = await failureReports()
+      if (!error) {
+        this.failureReports = reports as unknown as FailureReport[]
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract error message for display
+        const errorObj = toOpenApiError(error)
+        const errorMessage =
+          errorObj.message || "It seems you cannot access this page."
+        // Check if it's a 401 error (handled by global interceptor)
+        const errorWithStatus = error as unknown as { status?: number }
+        if (errorWithStatus?.status === 401) {
+          throw error
+        }
+        this.errorMessage = errorMessage
+      }
     },
-    deleteSelected() {
+    async deleteSelected() {
       if (this.selectedFailureReports.length === 0) {
         return
       }
 
-      this.managedApi.services
-        .deleteFailureReports({ body: this.selectedFailureReports })
-        .then(() => {
-          this.fetchData()
-          this.selectedFailureReports = []
-        })
-        .catch((err: { status?: number }) => {
-          if (err.status === 401) {
-            throw err
-          }
-          this.errorMessage = "Error deleting failure reports."
-        })
+      const { error } = await deleteFailureReports({
+        body: this.selectedFailureReports,
+      })
+      if (!error) {
+        this.fetchData()
+        this.selectedFailureReports = []
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract error message for display
+        const errorObj = toOpenApiError(error)
+        const errorMessage =
+          errorObj.message || "Error deleting failure reports."
+        // Check if it's a 401 error (handled by global interceptor)
+        const errorWithStatus = error as unknown as { status?: number }
+        if (errorWithStatus?.status === 401) {
+          throw error
+        }
+        this.errorMessage = errorMessage
+      }
     },
   },
   mounted() {
