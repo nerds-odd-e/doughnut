@@ -5,7 +5,7 @@ import type {
   WikidataAssociationCreation,
 } from "@generated/backend"
 import type { LinkCreation, NoteCreationDto } from "@generated/backend"
-import { deleteNote } from "@generated/backend/sdk.gen"
+import { deleteNote, updateWikidataId } from "@generated/backend/sdk.gen"
 import ManagedApi from "@/managedApi/ManagedApi"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
@@ -141,12 +141,14 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Doughnut.ID,
     data: WikidataAssociationCreation
   ): Promise<NoteRealm> {
-    return this.storage.refreshNoteRealm(
-      await this.managedApi.services.updateWikidataId({
-        path: { note: noteId },
-        body: data,
-      })
-    )
+    const { data: noteRealm, error } = await updateWikidataId({
+      path: { note: noteId },
+      body: data,
+    })
+    if (error || !noteRealm) {
+      throw new Error(error || "Failed to update Wikidata ID")
+    }
+    return this.storage.refreshNoteRealm(noteRealm)
   }
 
   private async loadNote(noteId: Doughnut.ID) {
