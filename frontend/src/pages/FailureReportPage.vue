@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { showFailureReport } from "@generated/backend/sdk.gen"
 import ContainerPage from "./commons/ContainerPage.vue"
 import type { FailureReport } from "@generated/backend"
 
@@ -32,17 +32,19 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const { managedApi } = useLoadingApi()
 
 const failureReport = ref<FailureReport | undefined>(undefined)
 const githubIssueUrl = ref<string | undefined>(undefined)
 
 const fetchData = async () => {
-  const res = await managedApi.services.showFailureReport({
+  const { data: reportData, error } = await showFailureReport({
     path: { failureReport: props.failureReportId },
   })
-  failureReport.value = res.failureReport
-  githubIssueUrl.value = res.githubIssueUrl
+  if (!error) {
+    // reportData is guaranteed to be FailureReportForView when error is undefined
+    failureReport.value = reportData!.failureReport
+    githubIssueUrl.value = reportData!.githubIssueUrl
+  }
 }
 
 onMounted(() => {

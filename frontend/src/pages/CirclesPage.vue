@@ -30,19 +30,20 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type { Circle } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { index } from "@generated/backend/sdk.gen"
 import CircleNewDialog from "@/components/circles/CircleNewDialog.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
-const { managedApi } = useLoadingApi()
 const circles = ref<Circle[] | undefined>(undefined)
 
-const fetchData = () => {
-  managedApi.services.index().then((res) => {
-    circles.value = res
-  })
+const fetchData = async () => {
+  const { data: circlesList, error } = await index()
+  if (!error) {
+    // circlesList is guaranteed to be Circle[] when error is undefined
+    circles.value = circlesList!
+  }
 }
 
 onMounted(() => {
