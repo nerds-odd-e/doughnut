@@ -32,10 +32,12 @@ describe("answered question page", () => {
       vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         makeMe.aNoteRealm.please()
       )
-      vi.spyOn(
-        helper.managedApi.services,
-        "startConversationAboutRecallPrompt"
-      ).mockResolvedValue(makeMe.aConversation.withId(123).please())
+      vi.spyOn(sdk, "startConversationAboutRecallPrompt").mockResolvedValue({
+        data: makeMe.aConversation.withId(123).please(),
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     it("click on note when doing review", async () => {
@@ -69,9 +71,9 @@ describe("answered question page", () => {
         await button.trigger("click")
         await flushPromises()
 
-        expect(
-          helper.managedApi.services.startConversationAboutRecallPrompt
-        ).toHaveBeenCalledWith({ path: { recallPrompt: REVIEW_QUESTION_ID } })
+        expect(sdk.startConversationAboutRecallPrompt).toHaveBeenCalledWith({
+          path: { recallPrompt: REVIEW_QUESTION_ID },
+        })
         expect(mockedPush).toHaveBeenCalledWith({
           name: "messageCenter",
           params: { conversationId: 123 },

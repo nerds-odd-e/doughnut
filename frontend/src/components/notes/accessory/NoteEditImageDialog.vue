@@ -11,14 +11,15 @@
 
 <script lang="ts">
 import type { NoteAccessoriesDto, NoteAccessory } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  showNoteAccessory,
+  updateNoteAccessories,
+} from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"
 import ImageFormBody from "./ImageFormBody.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   components: {
     ImageFormBody,
   },
@@ -30,28 +31,31 @@ export default defineComponent({
     return {
       noteAccessory: undefined as NoteAccessory | undefined,
       formData: {} as NoteAccessoriesDto,
-      noteFormErrors: {},
+      noteFormErrors: {} as Record<string, string>,
     }
   },
 
   methods: {
     async fetchData() {
-      this.noteAccessory =
-        (await this.managedApi.services.showNoteAccessory({
-          path: { note: this.noteId },
-        })) || {}
-      this.formData = { ...this.noteAccessory }
+      const { data: accessory, error } = await showNoteAccessory({
+        path: { note: this.noteId },
+      })
+      if (!error) {
+        this.noteAccessory = accessory!
+        this.formData = { ...this.noteAccessory }
+      }
     },
-    processForm() {
-      this.managedApi.services
-        .updateNoteAccessories({
-          path: { note: this.noteId },
-          body: this.formData,
-        })
-        .then((na) => this.$emit("closeDialog", na))
-        .catch((error) => {
-          this.noteFormErrors = error
-        })
+    async processForm() {
+      const { data: updatedAccessory, error } = await updateNoteAccessories({
+        path: { note: this.noteId },
+        body: this.formData,
+      })
+      if (error) {
+        const errorObj = toOpenApiError(error)
+        this.noteFormErrors = errorObj.errors || {}
+      } else {
+        this.$emit("closeDialog", updatedAccessory)
+      }
     },
   },
   mounted() {

@@ -22,25 +22,25 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { startConversationAboutRecallPrompt } from "@generated/backend/sdk.gen"
 
 const props = defineProps<{
   recallPromptId: number
 }>()
 
 const router = useRouter()
-const { managedApi } = useLoadingApi()
 
 const startConversation = async () => {
-  const conversation =
-    await managedApi.services.startConversationAboutRecallPrompt({
+  const { data: conversation, error } =
+    await startConversationAboutRecallPrompt({
       path: { recallPrompt: props.recallPromptId },
     })
-
-  router.push({
-    name: "messageCenter",
-    params: { conversationId: conversation.id },
-  })
+  if (!error) {
+    router.push({
+      name: "messageCenter",
+      params: { conversationId: conversation!.id },
+    })
+  }
 }
 </script>
 

@@ -11,19 +11,21 @@ import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, Notebook } from "@generated/backend"
 import Questions from "../notes/Questions.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getNotes } from "@generated/backend/sdk.gen"
 const props = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
     required: true,
   },
 })
-const managedApi = useLoadingApi().managedApi
 const notes = ref<Note[] | undefined>(undefined)
 const fetchData = async () => {
-  notes.value = await managedApi.services.getNotes({
+  const { data: notesList, error } = await getNotes({
     path: { notebook: props.notebook.id },
   })
+  if (!error) {
+    notes.value = notesList!
+  }
 }
 onMounted(() => {
   fetchData()

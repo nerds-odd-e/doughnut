@@ -21,9 +21,8 @@
 <script setup lang="ts">
 import type { AssessmentQuestionInstance } from "@generated/backend"
 import { ref } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi.ts"
+import { startConversationAboutAssessmentQuestion } from "@generated/backend/sdk.gen"
 
-const { managedApi } = useLoadingApi()
 const props = defineProps<{
   question: AssessmentQuestionInstance
 }>()
@@ -33,11 +32,12 @@ const feedback = ref<string>("")
 const emit = defineEmits(["submitted"])
 
 async function submitFeedback() {
-  await managedApi.services.startConversationAboutAssessmentQuestion({
+  const { error } = await startConversationAboutAssessmentQuestion({
     path: { assessmentQuestion: props.question.id },
     body: feedback.value,
   })
-
-  emit("submitted")
+  if (!error) {
+    emit("submitted")
+  }
 }
 </script>
