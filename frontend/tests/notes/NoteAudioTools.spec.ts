@@ -554,9 +554,12 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      vi.spyOn(helper.managedApi.services, "suggestTitle").mockResolvedValue({
-        title: "Suggested Title",
-      } as never)
+      vi.spyOn(sdk, "suggestTitle").mockResolvedValue({
+        data: { title: "Suggested Title" },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -564,7 +567,7 @@ describe("NoteAudioTools", () => {
       }
 
       // Should call suggestTitle 4 times (on calls 1, 2, 4, and 8)
-      expect(helper.managedApi.services.suggestTitle).toHaveBeenCalledTimes(4)
+      expect(sdk.suggestTitle).toHaveBeenCalledTimes(4)
       expect(helper.managedApi.services.updateNoteTitle).toHaveBeenCalledTimes(
         4
       )
@@ -577,13 +580,16 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      vi.spyOn(helper.managedApi.services, "suggestTitle").mockResolvedValue({
-        title: "",
-      } as never)
+      vi.spyOn(sdk, "suggestTitle").mockResolvedValue({
+        data: { title: "" },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       await wrapper.vm.processAudio(new Blob())
 
-      expect(helper.managedApi.services.suggestTitle).toHaveBeenCalled()
+      expect(sdk.suggestTitle).toHaveBeenCalled()
       expect(helper.managedApi.services.updateNoteTitle).not.toHaveBeenCalled()
     })
   })

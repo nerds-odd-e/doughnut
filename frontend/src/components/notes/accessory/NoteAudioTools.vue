@@ -78,19 +78,17 @@
 </template>
 
 <script setup lang="ts">
-import useLoadingApi from "@/managedApi/useLoadingApi"
 import { ref, type PropType } from "vue"
 import type { StorageAccessor } from "../../../store/createNoteStorage"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/backend"
-import { audioToText } from "@generated/backend/sdk.gen"
+import { audioToText, suggestTitle } from "@generated/backend/sdk.gen"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
 
-const { managedApi } = useLoadingApi()
 const { note, storageAccessor } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
   storageAccessor: {
@@ -116,10 +114,10 @@ const shouldSuggestTitle = (callCount: number): boolean => {
 }
 
 const updateTopicIfSuggested = async (noteId: number) => {
-  const suggestedTopic = await managedApi.services.suggestTitle({
+  const { data: suggestedTopic, error } = await suggestTitle({
     path: { note: noteId },
   })
-  if (suggestedTopic?.title) {
+  if (!error && suggestedTopic?.title) {
     await storageAccessor
       .storedApi()
       .updateTextField(noteId, "edit title", suggestedTopic.title)
