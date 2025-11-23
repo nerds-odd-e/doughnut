@@ -16,9 +16,12 @@ describe("repeat page", () => {
     vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
       makeMe.aNote.please() as never
     )
-    vi.spyOn(helper.managedApi.services, "showMemoryTracker").mockResolvedValue(
-      makeMe.aMemoryTracker.please() as never
-    )
+    vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
+      data: makeMe.aMemoryTracker.please(),
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     vi.spyOn(
       helper.managedApi.silent.services,
       "askAQuestion"
