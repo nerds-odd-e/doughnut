@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.ChatModel;
@@ -45,15 +44,17 @@ public class ChatCompletionNoteAutomationService {
     List<ChatCompletionMessageParam> messages = buildMessages(instructions);
 
     // Get the suggest title tool
-    AiTool tool = AiToolFactory.suggestNoteTitle();
+    Class<?> toolClass = AiToolFactory.suggestNoteTitle();
 
     // Create chat completion request
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
+    @SuppressWarnings("unchecked")
+    Class<Object> paramClass = (Class<Object>) toolClass;
     ChatCompletionCreateParams request =
         ChatCompletionCreateParams.builder()
             .model(ChatModel.of(modelName))
             .messages(messages)
-            .addTool(tool.getParameterClass())
+            .addTool(paramClass)
             .build();
 
     // Make non-streaming call

@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ConversationService;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.ai.tools.AiTool;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.ChatModel;
@@ -35,7 +34,7 @@ public class ChatCompletionConversationService {
     List<ChatCompletionMessageParam> history = historyBuilder.buildHistory(conversation);
 
     // Get available tools for conversation
-    List<AiTool> availableTools = AiToolFactory.getAllAssistantTools();
+    List<Class<?>> availableTools = AiToolFactory.getAllAssistantTools();
 
     // Create chat completion request with tools
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
@@ -43,9 +42,9 @@ public class ChatCompletionConversationService {
         ChatCompletionCreateParams.builder().model(ChatModel.of(modelName)).messages(history);
 
     // Add tools using the builder's addTool(Class) method which generates schema automatically
-    for (AiTool tool : availableTools) {
+    for (Class<?> toolClass : availableTools) {
       @SuppressWarnings("unchecked")
-      Class<Object> paramClass = (Class<Object>) tool.parameterClass();
+      Class<Object> paramClass = (Class<Object>) toolClass;
       builder.addTool(paramClass);
     }
 

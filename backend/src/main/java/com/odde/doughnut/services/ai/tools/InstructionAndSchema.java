@@ -6,8 +6,8 @@ public class InstructionAndSchema {
   @Getter private final Class<?> parameterClass;
   @Getter private String messageBody;
 
-  public InstructionAndSchema(String message, AiTool aiTool) {
+  public InstructionAndSchema(String message, Class<?> parameterClass) {
     this.messageBody = message;
-    this.parameterClass = aiTool.getParameterClass();
+    this.parameterClass = parameterClass;
   }
 }

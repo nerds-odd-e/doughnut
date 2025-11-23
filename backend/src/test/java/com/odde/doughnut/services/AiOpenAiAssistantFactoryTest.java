@@ -4,10 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import com.fasterxml.jackson.annotation.JsonClassDescription;
+import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.OtherAiServices;
-import com.odde.doughnut.services.ai.tools.AiTool;
+import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
-import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.openai.client.OpenAIClient;
 import com.openai.models.images.Image;
 import com.openai.models.images.ImageGenerateParams;
@@ -50,48 +51,39 @@ class AiOpenAiAssistantFactoryTest {
   class AiToolsTest {
     @Test
     void shouldHaveToolForGeneratingTitle() {
-      List<AiTool> tools = AiToolFactory.getAllAssistantTools();
+      List<Class<?>> tools = AiToolFactory.getAllAssistantTools();
 
-      Optional<AiTool> topicTitleTool =
-          tools.stream()
-              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TITLE.getValue()))
-              .findFirst();
+      Optional<Class<?>> titleTool =
+          tools.stream().filter(t -> t == TitleReplacement.class).findFirst();
 
-      assertTrue(topicTitleTool.isPresent());
-      assertTrue(
-          topicTitleTool
-              .get()
-              .description()
-              .contains("Generate a concise and accurate note title"));
+      assertTrue(titleTool.isPresent());
+      // Verify the class has @JsonClassDescription annotation
+      JsonClassDescription annotation =
+          TitleReplacement.class.getAnnotation(JsonClassDescription.class);
+      assertTrue(annotation != null);
+      assertTrue(annotation.value().contains("Generate a concise and accurate note title"));
     }
 
     @Test
     void shouldHaveParameterClassForGeneratingTitle() {
-      List<AiTool> tools = AiToolFactory.getAllAssistantTools();
+      List<Class<?>> tools = AiToolFactory.getAllAssistantTools();
 
-      Optional<AiTool> topicTitleTool =
-          tools.stream()
-              .filter(t -> t.name().equals(AiToolName.SUGGEST_NOTE_TITLE.getValue()))
-              .findFirst();
+      Optional<Class<?>> titleTool =
+          tools.stream().filter(t -> t == TitleReplacement.class).findFirst();
 
-      assertTrue(topicTitleTool.isPresent());
+      assertTrue(titleTool.isPresent());
       // Verify the tool has a parameter class (used for structured outputs)
-      assertTrue(topicTitleTool.get().getParameterClass() != null);
+      assertTrue(titleTool.get() != null);
     }
 
     @Test
     void shouldHaveQuestionGenerationTool() {
-      List<AiTool> tools = AiToolFactory.getAllAssistantTools();
+      List<Class<?>> tools = AiToolFactory.getAllAssistantTools();
 
-      Optional<AiTool> topicTitleTool =
-          tools.stream()
-              .filter(
-                  t ->
-                      t.name()
-                          .equals(AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()))
-              .findFirst();
+      Optional<Class<?>> questionTool =
+          tools.stream().filter(t -> t == MCQWithAnswer.class).findFirst();
 
-      assertTrue(topicTitleTool.isPresent());
+      assertTrue(questionTool.isPresent());
     }
   }
 }

@@ -11,11 +11,8 @@ import java.util.List;
 
 public class AiToolFactory {
 
-  public static AiTool askSingleAnswerMultipleChoiceQuestion() {
-    return new AiTool(
-        ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue(),
-        "Ask a single-answer multiple-choice question to the user",
-        MCQWithAnswer.class);
+  public static Class<?> askSingleAnswerMultipleChoiceQuestion() {
+    return MCQWithAnswer.class;
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
@@ -96,12 +93,7 @@ public class AiToolFactory {
         """
             .formatted(new ObjectMapperConfig().objectMapper().valueToTree(mcq).toString());
 
-    return new InstructionAndSchema(
-        messageBody,
-        new AiTool(
-            "evaluate_question",
-            "answer and evaluate the feasibility of the question",
-            QuestionEvaluation.class));
+    return new InstructionAndSchema(messageBody, QuestionEvaluation.class);
   }
 
   public static InstructionAndSchema questionRefineAiTool(MCQWithAnswer question) {
@@ -123,9 +115,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 """
             .formatted(new ObjectMapperConfig().objectMapper().valueToTree(mcq).toString());
 
-    return new InstructionAndSchema(
-        messageBody,
-        new AiTool("refine_question", "refine the question", MCQWithAnswerForRefinement.class));
+    return new InstructionAndSchema(messageBody, MCQWithAnswerForRefinement.class);
   }
 
   public static InstructionAndSchema transcriptionToTextAiTool(String transcriptionFromAudio) {
@@ -146,7 +136,7 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         completeNoteDetails());
   }
 
-  public static List<AiTool> getAllAssistantTools() {
+  public static List<Class<?>> getAllAssistantTools() {
     return List.of(
         completeNoteDetails(),
         suggestNoteTitle(),
@@ -154,25 +144,16 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         evaluateQuestion());
   }
 
-  public static AiTool suggestNoteTitle() {
-    return new AiTool(
-        AiToolName.SUGGEST_NOTE_TITLE.getValue(),
-        "Generate a concise and accurate note title based on the note content and pass it to the function for the use to update their note. The title should be a single word, a phrase or at most a single sentence that captures the atomic concept of the note. It should be specific within the note's contextual path and do not need to include general information that's already in the contextual path. Keep the existing title if it's already correct and concise.",
-        TitleReplacement.class);
+  public static Class<?> suggestNoteTitle() {
+    return TitleReplacement.class;
   }
 
-  public static AiTool completeNoteDetails() {
-    return new AiTool(
-        AiToolName.COMPLETE_NOTE_DETAILS.getValue(),
-        "Text completion for the details of the note of focus",
-        NoteDetailsCompletion.class);
+  public static Class<?> completeNoteDetails() {
+    return NoteDetailsCompletion.class;
   }
 
-  public static AiTool evaluateQuestion() {
-    return new AiTool(
-        "evaluate_question",
-        "answer and evaluate the question to check its quality",
-        QuestionEvaluation.class);
+  public static Class<?> evaluateQuestion() {
+    return QuestionEvaluation.class;
   }
 
   public static String buildRegenerateQuestionMessage(
