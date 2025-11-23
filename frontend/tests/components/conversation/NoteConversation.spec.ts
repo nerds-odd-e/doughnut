@@ -241,10 +241,12 @@ describe("NoteConversation", () => {
       helper.managedApi.services,
       "getConversationsAboutNote"
     ).mockResolvedValue([conversation] as never)
-    vi.spyOn(
-      helper.managedApi.services,
-      "replyToConversation"
-    ).mockResolvedValue({} as never)
+    vi.spyOn(sdk, "replyToConversation").mockResolvedValue({
+      data: undefined as never,
+      error: undefined as never,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const mockStart = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
       mockStart
@@ -257,9 +259,10 @@ describe("NoteConversation", () => {
     await flushPromises()
 
     // Verify message was sent
-    expect(helper.managedApi.services.replyToConversation).toHaveBeenCalledWith(
-      { path: { conversationId: conversation.id }, body: "Hello AI" }
-    )
+    expect(sdk.replyToConversation).toHaveBeenCalledWith({
+      path: { conversationId: conversation.id },
+      body: "Hello AI",
+    })
 
     // Verify AI reply was requested
     expect(mockStart).toHaveBeenCalled()
