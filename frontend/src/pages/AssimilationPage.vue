@@ -62,15 +62,13 @@
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Note } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { assimilating } from "@generated/backend/sdk.gen"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContainerPage from "./commons/ContainerPage.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
-
-const { managedApi } = useLoadingApi()
 
 defineProps({
   storageAccessor: {
@@ -106,13 +104,14 @@ const initialReviewDone = () => {
   setDueCount(notes.value?.length)
 }
 
-const loadInitialReview = () => {
-  managedApi.services
-    .assimilating({ query: { timezone: timezoneParam() } })
-    .then((resp) => {
-      notes.value = resp
-      setDueCount(resp.length)
-    })
+const loadInitialReview = async () => {
+  const { data: assimilatingNotes, error } = await assimilating({
+    query: { timezone: timezoneParam() },
+  })
+  if (!error) {
+    notes.value = assimilatingNotes!
+    setDueCount(assimilatingNotes!.length)
+  }
 }
 
 onMounted(() => {

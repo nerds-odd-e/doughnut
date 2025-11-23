@@ -15,13 +15,11 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import type { Circle, CircleJoiningByInvitation } from "@generated/backend"
+import { joinCircle } from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import TextInput from "@/components/form/TextInput.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   components: { TextInput },
   props: {
     invitationCode: Number,
@@ -38,16 +36,21 @@ export default defineComponent({
   },
 
   methods: {
-    processForm() {
-      this.managedApi.services
-        .joinCircle({ body: this.formData })
-        .then((res) => {
-          this.$router.push({
-            name: "circleShow",
-            params: { circleId: res.id },
-          })
+    async processForm() {
+      const { data: joinedCircle, error } = await joinCircle({
+        body: this.formData,
+      })
+      if (!error) {
+        this.$router.push({
+          name: "circleShow",
+          params: { circleId: joinedCircle!.id },
         })
-        .catch((err) => (this.errors = err as Record<string, string>))
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract field-level errors if available (for 400 validation errors)
+        const errorObj = toOpenApiError(error)
+        this.errors = errorObj.errors || {}
+      }
     },
   },
 })

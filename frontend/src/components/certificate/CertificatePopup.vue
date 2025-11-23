@@ -31,12 +31,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getCertificate } from "@generated/backend/sdk.gen"
 import type { Certificate } from "@generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
-const { managedApi } = useLoadingApi()
 const certificate = ref<Certificate | undefined>(undefined)
 
 const issueDate = computed(() =>
@@ -66,9 +65,12 @@ const formatDate = (date: Date): string => {
 }
 
 const fetchData = async () => {
-  certificate.value = await managedApi.services.getCertificate({
+  const { data: cert, error } = await getCertificate({
     path: { notebook: props.notebookId },
   })
+  if (!error) {
+    certificate.value = cert!
+  }
 }
 
 onMounted(() => {

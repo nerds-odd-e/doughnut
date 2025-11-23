@@ -16,7 +16,6 @@ vitest.mock("vue-router", () => ({
 }))
 
 let renderer: RenderingHelper<typeof AssimilationPage>
-const mockedInitialReviewCall = vi.fn()
 const mockedGetNoteCall = vi.fn()
 
 afterEach(() => {
@@ -26,9 +25,12 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  vi.spyOn(helper.managedApi.services, "assimilating").mockImplementation(
-    mockedInitialReviewCall
-  )
+  vi.spyOn(sdk, "assimilating").mockResolvedValue({
+    data: [],
+    error: undefined,
+    request: {} as Request,
+    response: {} as Response,
+  })
   vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
     data: {} as never,
     error: undefined,
@@ -43,13 +45,18 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   it("shows completion message when nothing to review", async () => {
-    mockedInitialReviewCall.mockResolvedValue([])
+    vi.spyOn(sdk, "assimilating").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
     await flushPromises()
     expect(wrapper.text()).toContain(
       "Congratulations! You've achieved your daily assimilation goal!"
     )
-    expect(mockedInitialReviewCall).toBeCalledWith({
+    expect(vi.mocked(sdk.assimilating)).toBeCalledWith({
       query: { timezone: "Europe/Amsterdam" },
     })
   })
@@ -60,7 +67,12 @@ describe("repeat page", () => {
     const { note } = memoryTracker
 
     beforeEach(() => {
-      mockedInitialReviewCall.mockResolvedValue([note, note])
+      vi.spyOn(sdk, "assimilating").mockResolvedValue({
+        data: [note, note],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       mockedGetNoteCall.mockResolvedValue(noteRealm)
     })
 

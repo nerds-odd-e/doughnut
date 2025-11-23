@@ -21,28 +21,28 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { User } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { createUser } from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import TextInput from "@/components/form/TextInput.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-const { managedApi } = useLoadingApi()
-
 const formData = ref({ name: undefined as undefined | string } as User)
-const errors = ref({ name: undefined as undefined | string })
+const errors = ref<Record<string, string>>({})
 
 const emits = defineEmits(["updateUser"])
 
 const processForm = async () => {
-  try {
-    const user = await managedApi.services.createUser({
-      body: formData.value,
-    })
-    emits("updateUser", user)
-  } catch (err: unknown) {
-    if (err instanceof Error) {
-      errors.value = { name: err.message }
-    } else {
-      errors.value = { name: String(err) }
+  const { data: newUser, error } = await createUser({
+    body: formData.value,
+  })
+  if (!error) {
+    emits("updateUser", newUser!)
+  } else {
+    // Error is handled by global interceptor (toast notification)
+    // Extract field-level errors if available (for 400 validation errors)
+    const errorObj = toOpenApiError(error)
+    errors.value = errorObj.errors || {
+      name: errorObj.message || "Failed to create user",
     }
   }
 }

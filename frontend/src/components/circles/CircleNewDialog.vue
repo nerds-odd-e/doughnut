@@ -13,14 +13,12 @@
 
 <script lang="ts">
 import type { Circle } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { createCircle } from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
-  setup() {
-    return { ...useLoadingApi() }
-  },
   emits: ["closeDialog"],
   components: { TextInput },
   data() {
@@ -31,17 +29,22 @@ export default defineComponent({
   },
 
   methods: {
-    processForm() {
-      this.managedApi.services
-        .createCircle({ body: this.formData })
-        .then((res) => {
-          this.$emit("closeDialog")
-          this.$router.push({
-            name: "circleShow",
-            params: { circleId: res.id },
-          })
+    async processForm() {
+      const { data: newCircle, error } = await createCircle({
+        body: this.formData,
+      })
+      if (!error) {
+        this.$emit("closeDialog")
+        this.$router.push({
+          name: "circleShow",
+          params: { circleId: newCircle!.id },
         })
-        .catch((err) => (this.errors = err))
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract field-level errors if available (for 400 validation errors)
+        const errorObj = toOpenApiError(error)
+        this.errors = errorObj.errors || {}
+      }
     },
   },
 })
