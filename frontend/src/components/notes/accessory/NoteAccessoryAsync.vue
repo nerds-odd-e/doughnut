@@ -9,10 +9,12 @@
 
 <script setup lang="ts">
 import type { NoteAccessory } from "@generated/backend"
-import { showNoteAccessory } from "@generated/backend/sdk.gen"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { PropType } from "vue"
 import { onMounted, ref, watch } from "vue"
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue"
+
+const { managedApi } = useLoadingApi()
 
 const { noteId, updatedNoteAccessory } = defineProps({
   noteId: { type: Number, required: true },
@@ -32,12 +34,9 @@ watch(
 )
 
 const fetchData = async () => {
-  const { data: accessory, error } = await showNoteAccessory({
+  noteAccessory.value = await managedApi.services.showNoteAccessory({
     path: { note: noteId },
   })
-  if (!error) {
-    noteAccessory.value = accessory!
-  }
 }
 
 onMounted(fetchData)

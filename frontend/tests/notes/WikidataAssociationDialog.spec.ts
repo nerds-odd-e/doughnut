@@ -2,7 +2,6 @@ import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDia
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -18,10 +17,13 @@ describe("WikidataAssociationDialog", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    vi.spyOn(sdk, "searchWikidata").mockImplementation(mockedWikidataSearch)
-    vi.spyOn(sdk, "fetchWikidataEntityDataById").mockImplementation(
-      mockedFetchWikidataEntity
+    vi.spyOn(helper.managedApi.services, "searchWikidata").mockImplementation(
+      mockedWikidataSearch
     )
+    vi.spyOn(
+      helper.managedApi.services,
+      "fetchWikidataEntityDataById"
+    ).mockImplementation(mockedFetchWikidataEntity)
     vi.spyOn(helper.managedApi.services, "updateWikidataId").mockImplementation(
       mockedUpdateWikidataId
     )
@@ -75,12 +77,7 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("emits close when close button is clicked", async () => {
-      mockedWikidataSearch.mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([])
       const wrapper = mountDialog("test")
       await flushPromises()
       const closeButton = getModal()?.querySelector(
@@ -106,12 +103,7 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("shows not found message when results are empty and searchKey provided", async () => {
-      mockedWikidataSearch.mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([])
       mountDialog("nonexistent")
       await flushPromises()
       expect(getModal()?.textContent).toContain(
@@ -120,12 +112,7 @@ describe("WikidataAssociationDialog", () => {
     })
 
     it("shows not found message when searchKey is provided but no results", async () => {
-      mockedWikidataSearch.mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([])
       mountDialog("test")
       await flushPromises()
       expect(getModal()?.textContent).toContain("No Wikidata entries found")
@@ -136,12 +123,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       mountDialog("dog")
       await flushPromises()
       expect(getSelect()).toBeTruthy()
@@ -180,12 +162,7 @@ describe("WikidataAssociationDialog", () => {
         .label("dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog")
       await flushPromises()
 
@@ -205,12 +182,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("DOG")
       await flushPromises()
 
@@ -229,12 +201,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Canine")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       mountDialog("dog")
       await flushPromises()
 
@@ -253,12 +220,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Canine")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog")
       await flushPromises()
 
@@ -283,12 +245,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Canine")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog")
       await flushPromises()
 
@@ -343,10 +300,7 @@ describe("WikidataAssociationDialog", () => {
     it("opens Wikipedia URL when available", async () => {
       const wikipediaUrl = "https://en.wikipedia.org/wiki/Test"
       mockedFetchWikidataEntity.mockResolvedValue({
-        data: { WikipediaEnglishUrl: wikipediaUrl } as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+        WikipediaEnglishUrl: wikipediaUrl,
       })
 
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => {
@@ -375,10 +329,7 @@ describe("WikidataAssociationDialog", () => {
 
     it("opens Wikidata URL when Wikipedia URL is not available", async () => {
       mockedFetchWikidataEntity.mockResolvedValue({
-        data: { WikipediaEnglishUrl: "" } as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+        WikipediaEnglishUrl: "",
       })
 
       const windowOpenSpy = vi.spyOn(window, "open").mockImplementation(() => {
@@ -417,12 +368,7 @@ describe("WikidataAssociationDialog", () => {
         .label("dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
@@ -445,12 +391,7 @@ describe("WikidataAssociationDialog", () => {
         .label("dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
@@ -474,12 +415,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Canine")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
@@ -499,12 +435,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Canine")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
@@ -533,12 +464,7 @@ describe("WikidataAssociationDialog", () => {
         .label("Canine")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue({
-        data: [searchResult],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockedWikidataSearch.mockResolvedValue([searchResult])
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 

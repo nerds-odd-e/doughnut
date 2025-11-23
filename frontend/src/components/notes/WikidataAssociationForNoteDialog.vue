@@ -19,9 +19,9 @@ import type {
   WikidataSearchEntity,
   WikidataAssociationCreation,
 } from "@generated/backend"
-import { fetchWikidataEntityDataById } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 
 interface WikidataError {
@@ -42,6 +42,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   closeDialog: []
 }>()
+
+const { managedApi } = useLoadingApi()
 
 const localWikidataId = ref(props.note.wikidataId || "")
 const wikidataIdError = ref<string | undefined>(undefined)
@@ -101,30 +103,29 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
   if (isProcessing.value) return
   isProcessing.value = true
   try {
-    const { data: entityData, error } = await fetchWikidataEntityDataById({
+    const res = await managedApi.services.fetchWikidataEntityDataById({
       path: { wikidataId },
     })
-    if (!error && entityData) {
-      const noteTitleUpper =
-        props.note.noteTopology.titleOrPredicate.toUpperCase()
-      const wikidataTitleUpper = entityData.WikidataTitleInEnglish.toUpperCase()
 
-      if (
-        wikidataTitleUpper === noteTitleUpper ||
-        entityData.WikidataTitleInEnglish === ""
-      ) {
-        await saveWikidataId(wikidataId)
-        // isProcessing will be reset in saveWikidataId on error, or dialog closes on success
-      } else {
-        // Show title options using the dialog's exposed method
-        isProcessing.value = false
-        const entity: WikidataSearchEntity = {
-          id: wikidataId,
-          label: entityData.WikidataTitleInEnglish,
-          description: "",
-        }
-        dialogRef.value?.showTitleOptionsForEntity(entity)
+    const noteTitleUpper =
+      props.note.noteTopology.titleOrPredicate.toUpperCase()
+    const wikidataTitleUpper = res.WikidataTitleInEnglish.toUpperCase()
+
+    if (
+      wikidataTitleUpper === noteTitleUpper ||
+      res.WikidataTitleInEnglish === ""
+    ) {
+      await saveWikidataId(wikidataId)
+      // isProcessing will be reset in saveWikidataId on error, or dialog closes on success
+    } else {
+      // Show title options using the dialog's exposed method
+      isProcessing.value = false
+      const entity: WikidataSearchEntity = {
+        id: wikidataId,
+        label: res.WikidataTitleInEnglish,
+        description: "",
       }
+      dialogRef.value?.showTitleOptionsForEntity(entity)
     }
   } catch (e: unknown) {
     handleError(e)

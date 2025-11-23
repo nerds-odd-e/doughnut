@@ -15,7 +15,7 @@
 import { ref, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { MemoryTracker } from "@generated/backend"
-import { showMemoryTracker } from "@generated/backend/sdk.gen"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "../notes/NoteShow.vue"
 
@@ -25,17 +25,15 @@ const props = defineProps<{
   storageAccessor: StorageAccessor
 }>()
 
-// Setup state
+// Setup API and state
+const { managedApi } = useLoadingApi()
 const memoryTracker = ref<MemoryTracker>()
 
 // Methods
 const fetchData = async () => {
-  const { data: tracker, error } = await showMemoryTracker({
+  memoryTracker.value = await managedApi.services.showMemoryTracker({
     path: { memoryTracker: props.memoryTrackerId },
   })
-  if (!error) {
-    memoryTracker.value = tracker!
-  }
 }
 
 // Watchers and lifecycle hooks
