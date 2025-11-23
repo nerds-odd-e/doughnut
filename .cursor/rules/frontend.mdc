@@ -104,6 +104,60 @@ onMounted(() => {
 - Use proper error handling with try/catch
 - Follow the API types from generated code
 
+### API Return Value Usage Pattern
+
+The global client is configured with `responseStyle: "fields"` and `throwOnError: false`, which means services return a wrapped response: `{ data, error, request, response }`.
+
+**Usage Pattern:**
+
+```typescript
+// Import services directly from generated SDK
+import { getTokens, generateToken } from "@generated/backend/sdk.gen"
+
+// Destructure the response
+const { data, error } = await getTokens()
+
+// Check for errors before using data
+if (!error && data) {
+  // TypeScript guarantees data is the correct type (e.g., UserToken[])
+  // Use data directly
+  tokens.value = data.map((t) => ({
+    id: t.id,
+    label: t.label,
+  }))
+}
+```
+
+**Key Points:**
+
+1. Always destructure: `const { data, error } = await serviceCall()`
+2. Check `!error && data` before using data
+3. TypeScript types are guaranteed: when `!error && data` is true, `data` has the correct type
+4. No need for runtime property checks: if the type says `token: string`, it's always present
+5. Errors are handled in the response interceptor: the global client's interceptor handles error display (toasts, loading states, etc.)
+
+**Example:**
+
+```typescript
+const generateToken = async () => {
+  loading.value = true
+  const { data, error } = await generateTokenApi({
+    body: { label: tokenFormData.value.label },
+  })
+  if (!error && data) {
+    // data is guaranteed to be UserToken type
+    token.value = data.token
+    tokens.value.push({
+      id: data.id,
+      label: data.label,
+    })
+  }
+  loading.value = false
+}
+```
+
+This pattern matches ManagedApi's behavior and provides type safety.
+
 ### CSS/Styling Rules
 
 - Use DaisyUI classes with `daisy-` prefix (e.g., `daisy-btn`, `daisy-alert`)
