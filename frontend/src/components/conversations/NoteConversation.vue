@@ -45,6 +45,7 @@ import { inject, ref, type Ref, onMounted } from "vue"
 import type { Conversation, User } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
+import { getConversationsAboutNote } from "@generated/backend/sdk.gen"
 
 const conversation = ref<Conversation | undefined>()
 const user = inject<Ref<User | undefined>>("currentUser")
@@ -63,11 +64,11 @@ const initialAiReply = ref(false)
 
 onMounted(async () => {
   try {
-    const fetchedConversations =
-      await managedApi.services.getConversationsAboutNote({
+    const { data: fetchedConversations, error } =
+      await getConversationsAboutNote({
         path: { note: props.noteId },
       })
-    if (fetchedConversations) {
+    if (!error && fetchedConversations) {
       conversations.value = fetchedConversations
       conversation.value =
         fetchedConversations.length > 0 ? fetchedConversations[0] : undefined

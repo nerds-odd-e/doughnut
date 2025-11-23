@@ -68,10 +68,12 @@ describe("NoteConversation", () => {
   })
 
   it("calls api to start conversation and shows ConversationInner when successful", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const wrapper = await mount()
     await wrapper.find("textarea").setValue("Hello")
     await wrapper.find("button.send-button[type='button']").trigger("click")
@@ -88,10 +90,12 @@ describe("NoteConversation", () => {
   })
 
   it("shows the first conversation if conversation exists", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([conversation])
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [conversation],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const wrapper = await mount()
     const conversationInner = wrapper.findComponent(ConversationInner)
 
@@ -100,10 +104,12 @@ describe("NoteConversation", () => {
   })
 
   it("shows ConversationTemplate when no conversation exists", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const wrapper = await mount()
     const conversationTemplate = wrapper.findComponent(ConversationTemplate)
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -128,10 +134,12 @@ describe("NoteConversation", () => {
       },
     ]
 
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue(conversations as never)
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: conversations,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = await mount()
 
@@ -151,10 +159,12 @@ describe("NoteConversation", () => {
   })
 
   it("shows conversation selector only when multiple conversations exist", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([conversation] as never)
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [conversation],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = await mount()
 
@@ -170,10 +180,12 @@ describe("NoteConversation", () => {
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-01T00:00:00Z",
     }
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([existingConversation] as never)
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [existingConversation],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const wrapper = await mount()
 
@@ -205,10 +217,12 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when starting new conversation with AI invite", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([])
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     const mockStart = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
       mockStart
@@ -237,10 +251,12 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when sending message with AI invite in existing conversation", async () => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getConversationsAboutNote"
-    ).mockResolvedValue([conversation] as never)
+    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+      data: [conversation],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     vi.spyOn(sdk, "replyToConversation").mockResolvedValue({
       data: undefined as never,
       error: undefined as never,
