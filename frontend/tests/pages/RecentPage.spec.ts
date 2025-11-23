@@ -11,6 +11,18 @@ describe("RecentPage.vue", () => {
       request: {} as Request,
       response: {} as Response,
     })
+    vi.spyOn(sdk, "getRecentMemoryTrackers").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+    vi.spyOn(sdk, "getRecentlyReviewed").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
   describe("Tab Navigation", () => {
     it("shows Recently Added/Updated tab by default", async () => {

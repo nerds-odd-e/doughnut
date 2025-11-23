@@ -46,14 +46,12 @@ import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithBut
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import type { CircleForUserView, User } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { showCircle } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType, Ref } from "vue"
 import { computed, inject, onMounted, ref } from "vue"
 import { useRouter } from "vue-router"
 import ContainerPage from "./commons/ContainerPage.vue"
-
-const { managedApi } = useLoadingApi()
 
 const router = useRouter()
 
@@ -69,9 +67,12 @@ const user = inject<Ref<User | undefined>>("currentUser")
 const circle = ref<CircleForUserView | undefined>(undefined)
 
 const fetchData = async () => {
-  circle.value = await managedApi.services.showCircle({
+  const { data: circleData, error } = await showCircle({
     path: { circle: circleId },
   })
+  if (!error) {
+    circle.value = circleData!
+  }
 }
 
 const invitationUrl = computed(() => {

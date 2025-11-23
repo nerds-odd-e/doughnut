@@ -2,6 +2,7 @@ import RecentlyReviewedNotes from "@/components/recent/RecentlyReviewedNotes.vue
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("RecentlyReviewedNotes", () => {
   const mockMemoryTrackers = [
@@ -22,10 +23,12 @@ describe("RecentlyReviewedNotes", () => {
   ]
 
   beforeEach(() => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getRecentlyReviewed"
-    ).mockResolvedValue(mockMemoryTrackers)
+    vi.spyOn(sdk, "getRecentlyReviewed").mockResolvedValue({
+      data: mockMemoryTrackers,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it("fetches and displays recently reviewed points", async () => {
@@ -34,7 +37,7 @@ describe("RecentlyReviewedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(helper.managedApi.services.getRecentlyReviewed).toBeCalled()
+    expect(sdk.getRecentlyReviewed).toBeCalled()
 
     // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")

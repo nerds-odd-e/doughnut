@@ -33,15 +33,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type { MemoryTracker } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getRecentlyReviewed } from "@generated/backend/sdk.gen"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 
-const { managedApi } = useLoadingApi()
 const memoryTrackers = ref<MemoryTracker[] | undefined>(undefined)
 
 const fetchData = async () => {
-  memoryTrackers.value = await managedApi.services.getRecentlyReviewed()
+  const { data: trackers, error } = await getRecentlyReviewed()
+  if (!error) {
+    memoryTrackers.value = trackers!
+  }
 }
 
 onMounted(() => {

@@ -59,7 +59,11 @@ import {
   inject,
   type Ref,
 } from "vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  getConversation,
+  getConversationsOfCurrentUser,
+  markConversationAsRead,
+} from "@generated/backend/sdk.gen"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
@@ -67,8 +71,6 @@ import type { Conversation, User } from "@generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
-
-const { managedApi } = useLoadingApi()
 
 const props = defineProps({
   storageAccessor: {
@@ -89,9 +91,12 @@ watch(
   () => props.conversationId,
   async (newId) => {
     if (newId) {
-      currentConversation.value = await managedApi.services.getConversation({
+      const { data: conversation, error } = await getConversation({
         path: { conversationId: newId },
       })
+      if (!error) {
+        currentConversation.value = conversation!
+      }
       return
     }
     currentConversation.value = null
@@ -99,21 +104,27 @@ watch(
 )
 
 const fetchData = async () => {
-  conversations.value =
-    await managedApi.services.getConversationsOfCurrentUser()
+  const { data: userConversations, error } =
+    await getConversationsOfCurrentUser()
+  if (!error) {
+    conversations.value = userConversations!
 
-  if (props.conversationId && conversations.value) {
-    currentConversation.value =
-      conversations.value.find((c) => c.id === Number(props.conversationId)) ||
-      null
+    if (props.conversationId && conversations.value) {
+      currentConversation.value =
+        conversations.value.find(
+          (c) => c.id === Number(props.conversationId)
+        ) || null
+    }
   }
 }
 
 const handleConversationFetched = async (conversationId: number) => {
-  messageCenterConversations.unreadConversations =
-    await managedApi.services.markConversationAsRead({
-      path: { conversationId },
-    })
+  const { data: unreadConversations, error } = await markConversationAsRead({
+    path: { conversationId },
+  })
+  if (!error) {
+    messageCenterConversations.unreadConversations = unreadConversations!
+  }
 }
 
 onMounted(() => {

@@ -4,6 +4,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("circle show page", () => {
   const currentUser = makeMe.aUser.please()
@@ -13,9 +14,12 @@ describe("circle show page", () => {
   const circleNote = makeMe.aCircleNote.notebooks(notebook).please()
 
   beforeEach(() => {
-    vi.spyOn(helper.managedApi.services, "showCircle").mockResolvedValue(
-      circleNote as never
-    )
+    vi.spyOn(sdk, "showCircle").mockResolvedValue({
+      data: circleNote,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it("fetch API to be called ONCE on mount", async () => {
@@ -24,7 +28,7 @@ describe("circle show page", () => {
       .withRouter()
       .withStorageProps({ circleId: circleNote.id })
       .render()
-    expect(helper.managedApi.services.showCircle).toBeCalledWith({
+    expect(sdk.showCircle).toBeCalledWith({
       path: { circle: circleNote.id },
     })
   })

@@ -2,6 +2,7 @@ import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("RecentlyLearnedNotes", () => {
   const mockMemoryTrackers = [
@@ -16,10 +17,12 @@ describe("RecentlyLearnedNotes", () => {
   ]
 
   beforeEach(() => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "getRecentMemoryTrackers"
-    ).mockResolvedValue(mockMemoryTrackers)
+    vi.spyOn(sdk, "getRecentMemoryTrackers").mockResolvedValue({
+      data: mockMemoryTrackers,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it("fetches and displays recent memory trackers", async () => {
@@ -28,7 +31,7 @@ describe("RecentlyLearnedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(helper.managedApi.services.getRecentMemoryTrackers).toBeCalled()
+    expect(sdk.getRecentMemoryTrackers).toBeCalled()
 
     // Verify memory trackers are displayed
     const rows = wrapper.findAll("tbody tr")
