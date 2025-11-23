@@ -14,6 +14,7 @@ import {
   moveNote,
   undoDeleteNote,
   updateLink,
+  updateNoteTitle,
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
 import ManagedApi from "@/managedApi/ManagedApi"
@@ -134,12 +135,16 @@ export default class StoredApiCollection implements StoredApi {
     content: string
   ) {
     if (field === "edit title") {
-      return this.managedApi.services.updateNoteTitle({
+      const { data, error } = await updateNoteTitle({
         path: { note: noteId },
         body: {
           newTitle: content,
         },
       })
+      if (error || !data) {
+        throw new Error(error || "Failed to update note title")
+      }
+      return data
     }
     return this.managedApi.services.updateNoteDetails({
       path: { note: noteId },

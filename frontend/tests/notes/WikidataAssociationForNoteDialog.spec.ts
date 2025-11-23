@@ -48,9 +48,15 @@ describe("WikidataAssociationForNoteDialog", () => {
         response: {} as Response,
       }
     })
-    vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockImplementation(
-      mockedUpdateNoteTitle
-    )
+    vi.spyOn(sdk, "updateNoteTitle").mockImplementation(async (options) => {
+      const result = await mockedUpdateNoteTitle(options)
+      return {
+        data: result,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }
+    })
   })
 
   const mountDialog = (note: ReturnType<typeof makeMe.aNote.please>) => {
@@ -109,7 +115,12 @@ describe("WikidataAssociationForNoteDialog", () => {
           .please()
 
         mockedFetchWikidataEntity.mockResolvedValue(wikidata as never)
-        mockedUpdateWikidataId.mockResolvedValue({} as never)
+        mockedUpdateWikidataId.mockResolvedValue(
+          makeMe.aNoteRealm.please() as never
+        )
+        mockedUpdateNoteTitle.mockResolvedValue(
+          makeMe.aNoteRealm.please() as never
+        )
 
         const wrapper = await inputWikidataIdAndSave(note, wikidataId)
         await flushPromises()
@@ -127,14 +138,15 @@ describe("WikidataAssociationForNoteDialog", () => {
           expect(replaceLabel).toBeTruthy()
           replaceLabel.click()
           await flushPromises()
+          await flushPromises() // Wait for async operations in handleSelectedForEdit
 
-          const saveButton = getSaveButton()
-          expect(saveButton).toBeTruthy()
-          saveButton.click()
-          await flushPromises()
+          // When title action is selected, both updateNoteTitle and updateWikidataId are called
+          expect(mockedUpdateNoteTitle).toHaveBeenCalledTimes(1)
+          expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
+        } else {
+          // When no title action is needed, only updateWikidataId is called
+          expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
         }
-
-        expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
         expect(wrapper.emitted("closeDialog")).toBeTruthy()
       }
     )
