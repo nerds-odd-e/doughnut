@@ -8,6 +8,8 @@ import type { LinkCreation, NoteCreationDto } from "@generated/backend"
 import {
   deleteNote,
   linkNoteFinalize,
+  moveAfter,
+  moveNote,
   updateLink,
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
@@ -248,13 +250,16 @@ export default class StoredApiCollection implements StoredApi {
     targetNoteId: number,
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]> {
-    const updatedNotes = await this.managedApi.services.moveAfter({
+    const { data: updatedNotes, error } = await moveAfter({
       path: {
         note: noteId,
         targetNote: targetNoteId,
         asFirstChild: dropMode === "asFirstChild" ? "true" : "false",
       },
     })
+    if (error || !updatedNotes) {
+      throw new Error(error || "Failed to move note")
+    }
     this.refreshNoteRealms(updatedNotes)
     return updatedNotes
   }
@@ -343,14 +348,16 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDto
   ) {
-    this.refreshNoteRealms(
-      await this.managedApi.services.moveNote({
-        path: {
-          sourceNote: sourceId,
-          targetNote: targetId,
-        },
-        body: data,
-      })
-    )
+    const { data: noteRealms, error } = await moveNote({
+      path: {
+        sourceNote: sourceId,
+        targetNote: targetId,
+      },
+      body: data,
+    })
+    if (error || !noteRealms) {
+      throw new Error(error || "Failed to move note")
+    }
+    this.refreshNoteRealms(noteRealms)
   }
 }
