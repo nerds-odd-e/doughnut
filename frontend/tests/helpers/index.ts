@@ -3,6 +3,7 @@ import RenderingHelper from "./RenderingHelper"
 import matchByText from "./matchByText"
 import { vi } from "vitest"
 import * as sdk from "@generated/backend/sdk.gen"
+import type { NoteRealm } from "@generated/backend"
 
 class StoredComponentTestHelper {
   public managedApi = new ManagedApi({ states: [], errors: [] })
@@ -20,6 +21,26 @@ export function mockShowNoteAccessory() {
   return vi.spyOn(sdk, "showNoteAccessory").mockResolvedValue({
     data: undefined as never,
     error: undefined as never,
+    request: {} as Request,
+    response: {} as Response,
+  })
+}
+
+/**
+ * Mocks showNote service to prevent unhandled promise rejections
+ * in tests that use StoredApiCollection.loadNote (via storageAccessor).
+ */
+export function mockShowNote(noteRealm?: NoteRealm) {
+  const defaultNote =
+    noteRealm ||
+    ({
+      id: 1,
+      note: { id: 1 },
+      children: [],
+    } as unknown as NoteRealm)
+  return vi.spyOn(sdk, "showNote").mockResolvedValue({
+    data: defaultNote,
+    error: undefined,
     request: {} as Request,
     response: {} as Response,
   })

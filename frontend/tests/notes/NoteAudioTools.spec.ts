@@ -2,7 +2,7 @@ import FullScreen from "@/components/common/FullScreen.vue"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockShowNote } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 import * as sdk from "@generated/backend/sdk.gen"
@@ -147,6 +147,7 @@ describe("NoteAudioTools", () => {
 
   beforeEach(() => {
     vi.useFakeTimers()
+    mockShowNote()
     // Mock the canvas element
     const mockContext = {
       drawImage: vi.fn(),
