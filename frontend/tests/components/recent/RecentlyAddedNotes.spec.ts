@@ -2,6 +2,7 @@ import RecentlyAddedNotes from "@/components/recent/RecentlyAddedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("RecentlyAddedNotes", () => {
   const mockNotes = [
@@ -18,9 +19,12 @@ describe("RecentlyAddedNotes", () => {
   ]
 
   beforeEach(() => {
-    vi.spyOn(helper.managedApi.services, "getRecentNotes").mockResolvedValue(
-      mockNotes
-    )
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: mockNotes,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it("fetches and displays recent notes", async () => {
@@ -29,7 +33,7 @@ describe("RecentlyAddedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(helper.managedApi.services.getRecentNotes).toBeCalled()
+    expect(sdk.getRecentNotes).toBeCalled()
 
     // Verify notes are displayed
     const rows = wrapper.findAll("tbody tr")

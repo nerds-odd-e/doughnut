@@ -2,6 +2,7 @@ import { flushPromises } from "@vue/test-utils"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -22,9 +23,12 @@ describe("answered question page", () => {
 
     beforeEach(async () => {
       vitest.resetAllMocks()
-      vi.spyOn(helper.managedApi.services, "showQuestion").mockResolvedValue(
-        answeredQuestion
-      )
+      vi.spyOn(sdk, "showQuestion").mockResolvedValue({
+        data: answeredQuestion,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         makeMe.aNoteRealm.please()
       )
@@ -43,7 +47,7 @@ describe("answered question page", () => {
       await flushPromises()
       wrapper.find(".note-under-question").trigger("click")
       await flushPromises()
-      expect(helper.managedApi.services.showQuestion).toHaveBeenCalledWith({
+      expect(sdk.showQuestion).toHaveBeenCalledWith({
         path: { recallPrompt: REVIEW_QUESTION_ID },
       })
     })

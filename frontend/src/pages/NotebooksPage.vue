@@ -26,23 +26,23 @@
 <script setup lang="ts">
 import { inject, onMounted, ref, type Ref } from "vue"
 import type { Notebook, Subscription, User } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { myNotebooks } from "@generated/backend/sdk.gen"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
-const { managedApi } = useLoadingApi()
-
 const user = inject<Ref<User | undefined>>("currentUser")
 const subscriptions = ref<Subscription[] | undefined>(undefined)
 const notebooks = ref<Notebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const res = await managedApi.services.myNotebooks()
-  notebooks.value = res.notebooks
-  subscriptions.value = res.subscriptions
+  const { data: result, error } = await myNotebooks()
+  if (!error) {
+    notebooks.value = result!.notebooks
+    subscriptions.value = result!.subscriptions
+  }
 }
 onMounted(() => {
   fetchData()

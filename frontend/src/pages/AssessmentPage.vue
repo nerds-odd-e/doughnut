@@ -9,10 +9,10 @@
 import { onMounted, ref } from "vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import Assessment from "@/components/assessment/Assessment.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { generateAssessmentQuestions as generateAssessmentQuestionsApi } from "@generated/backend/sdk.gen"
 import type { AssessmentAttempt } from "@generated/backend"
+import { toOpenApiError } from "@/managedApi/openApiError"
 
-const { managedApi } = useLoadingApi()
 const props = defineProps({
   notebookId: { type: Number, required: true },
 })
@@ -22,17 +22,16 @@ const assessmentAttempt = ref<AssessmentAttempt | undefined>()
 const errors = ref("")
 
 const generateAssessmentQuestions = async () => {
-  try {
-    assessmentAttempt.value =
-      await managedApi.services.generateAssessmentQuestions({
-        path: { notebook: props.notebookId },
-      })
-  } catch (err) {
-    if (err instanceof Error) {
-      errors.value = err.message
-    } else {
-      errors.value = String(err)
-    }
+  const { data: attempt, error } = await generateAssessmentQuestionsApi({
+    path: { notebook: props.notebookId },
+  })
+  if (!error) {
+    assessmentAttempt.value = attempt!
+  } else {
+    // Error is handled by global interceptor (toast notification)
+    // Extract error message for display
+    const errorObj = toOpenApiError(error)
+    errors.value = errorObj.message || "Failed to generate assessment questions"
   }
   loaded.value = true
 }

@@ -5,6 +5,7 @@ import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import type { AssessmentQuestionInstance } from "@generated/backend"
+import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -24,10 +25,12 @@ describe("assessment page", () => {
       .withQuestions([assessmentQuestionInstance])
       .please()
     beforeEach(() => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "generateAssessmentQuestions"
-      ).mockResolvedValue(assessmentAttempt as never)
+      vi.spyOn(sdk, "generateAssessmentQuestions").mockResolvedValue({
+        data: assessmentAttempt,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     it("calls API ONCE on mount", async () => {
@@ -35,9 +38,7 @@ describe("assessment page", () => {
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
         .render()
-      expect(
-        helper.managedApi.services.generateAssessmentQuestions
-      ).toBeCalledTimes(1)
+      expect(sdk.generateAssessmentQuestions).toBeCalledTimes(1)
     })
 
     it("renders the questions", async () => {
@@ -81,10 +82,12 @@ describe("assessment page", () => {
       .withQuestions([quizQuestion_1, quizQuestion_2])
       .please()
     beforeEach(() => {
-      vi.spyOn(
-        helper.managedApi.services,
-        "generateAssessmentQuestions"
-      ).mockResolvedValue(assessmentAttempt as never)
+      vi.spyOn(sdk, "generateAssessmentQuestions").mockResolvedValue({
+        data: assessmentAttempt,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       vi.spyOn(helper.managedApi.services, "answerQuestion")
         .mockResolvedValueOnce(answerResult1 as never)
         .mockResolvedValueOnce(answerResult2 as never)

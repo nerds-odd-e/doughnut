@@ -12,11 +12,9 @@
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import type { AnsweredQuestion } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { showQuestion } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { onMounted, ref, watch, type PropType } from "vue"
-
-const { managedApi } = useLoadingApi()
 
 const { recallPromptId } = defineProps({
   recallPromptId: { type: Number, required: true },
@@ -28,9 +26,12 @@ const { recallPromptId } = defineProps({
 const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
-  answeredQuestion.value = await managedApi.services.showQuestion({
+  const { data: question, error } = await showQuestion({
     path: { recallPrompt: recallPromptId },
   })
+  if (!error) {
+    answeredQuestion.value = question!
+  }
 }
 
 watch(() => recallPromptId, fetchData, { immediate: true })

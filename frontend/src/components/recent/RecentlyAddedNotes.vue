@@ -29,16 +29,18 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type { NoteRealm } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getRecentNotes } from "@generated/backend/sdk.gen"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
 
-const { managedApi } = useLoadingApi()
 const notes = ref<NoteRealm[] | undefined>(undefined)
 
 const fetchData = async () => {
-  notes.value = await managedApi.services.getRecentNotes()
+  const { data: recentNotes, error } = await getRecentNotes()
+  if (!error) {
+    notes.value = recentNotes!
+  }
 }
 
 onMounted(() => {
