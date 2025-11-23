@@ -2,6 +2,7 @@ import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { vi } from "vitest"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("LinkNoteFinalize", () => {
   it("going back", async () => {
@@ -23,12 +24,24 @@ describe("LinkNoteFinalize", () => {
       linkNoteFinalize: vi.fn().mockResolvedValue(undefined),
       moveNote: vi.fn().mockResolvedValue(undefined),
     }
-    vi.spyOn(helper.managedApi.services, "linkNoteFinalize").mockImplementation(
-      storedApi.linkNoteFinalize
-    )
-    vi.spyOn(helper.managedApi.services, "moveNote").mockImplementation(
-      storedApi.moveNote
-    )
+    vi.spyOn(sdk, "linkNoteFinalize").mockImplementation(async (options) => {
+      const result = await storedApi.linkNoteFinalize(options)
+      return {
+        data: result,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }
+    })
+    vi.spyOn(sdk, "moveNote").mockImplementation(async (options) => {
+      const result = await storedApi.moveNote(options)
+      return {
+        data: result,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }
+    })
     const wrapper = helper
       .component(LinkNoteFinalize)
       .withStorageProps({
