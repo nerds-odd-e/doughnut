@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import type { NoteInfo } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getNoteInfo } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, onMounted } from "vue"
 
@@ -20,15 +20,15 @@ defineEmits<{
   (e: "levelChanged", value: unknown): void
 }>()
 
-const { managedApi } = useLoadingApi()
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
-const fetchData = () => {
-  managedApi.services
-    .getNoteInfo({ path: { note: props.noteId } })
-    .then((articles) => {
-      noteInfo.value = articles
-    })
+const fetchData = async () => {
+  const { data: noteInfoData, error } = await getNoteInfo({
+    path: { note: props.noteId },
+  })
+  if (!error) {
+    noteInfo.value = noteInfoData!
+  }
 }
 
 onMounted(() => {

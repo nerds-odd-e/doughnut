@@ -23,11 +23,10 @@
 import { ref } from "vue"
 import type { PropType } from "vue"
 import type { AnswerDto, RecallPrompt } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { answerQuiz } from "@generated/backend/sdk.gen"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"
 
-const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 const isLoading = ref(false)
@@ -55,16 +54,15 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
   isLoading.value = true
   error.value = ""
 
-  try {
-    const answerResult = await managedApi.services.answerQuiz({
-      path: { recallPrompt: props.recallPrompt.id },
-      body: answerData,
-    })
-    emits("answered", answerResult)
-  } catch (e) {
+  const { data: answerResult, error: apiError } = await answerQuiz({
+    path: { recallPrompt: props.recallPrompt.id },
+    body: answerData,
+  })
+  if (!apiError) {
+    emits("answered", answerResult!)
+  } else {
     await handleError()
-  } finally {
-    isLoading.value = false
   }
+  isLoading.value = false
 }
 </script>

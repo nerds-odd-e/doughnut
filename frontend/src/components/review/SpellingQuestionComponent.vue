@@ -27,10 +27,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type { SpellingQuestion } from "@generated/backend"
+import { getSpellingQuestion } from "@generated/backend/sdk.gen"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"
-import useLoadingApi from "@/managedApi/useLoadingApi"
 
 const props = defineProps({
   memoryTrackerId: {
@@ -43,19 +43,16 @@ const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
 const spellingQuestion = ref<SpellingQuestion>()
 const loading = ref(true)
-const { managedApi } = useLoadingApi()
 
 const fetchSpellingQuestion = async () => {
-  try {
-    loading.value = true
-    spellingQuestion.value = await managedApi.services.getSpellingQuestion({
-      path: { memoryTracker: props.memoryTrackerId },
-    })
-  } catch (e) {
-    // Error handling is already done by managedApi
-  } finally {
-    loading.value = false
+  loading.value = true
+  const { data: question, error } = await getSpellingQuestion({
+    path: { memoryTracker: props.memoryTrackerId },
+  })
+  if (!error) {
+    spellingQuestion.value = question!
   }
+  loading.value = false
 }
 
 const submitAnswer = () => {

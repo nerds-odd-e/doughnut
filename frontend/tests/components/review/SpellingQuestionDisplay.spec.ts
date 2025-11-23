@@ -1,22 +1,19 @@
-import { describe, it, expect, vi } from "vitest"
+import { describe, it, expect, vi, beforeEach } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
-
-// Mock the API
-vi.mock("@/managedApi/useLoadingApi", () => ({
-  default: () => ({
-    managedApi: {
-      restMemoryTrackerController: {
-        getSpellingQuestion: vi
-          .fn()
-          .mockResolvedValue({ stem: "Spell the word 'cat'" }),
-      },
-    },
-  }),
-}))
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("SpellingQuestionDisplay", () => {
+  beforeEach(() => {
+    vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
+      data: { stem: "Spell the word 'cat'" } as never,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+  })
+
   it("renders spelling question input form", async () => {
     const wrapper = helper
       .component(SpellingQuestionComponent)

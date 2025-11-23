@@ -5,6 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 
@@ -28,9 +29,12 @@ beforeEach(() => {
   vi.spyOn(helper.managedApi.services, "assimilating").mockImplementation(
     mockedInitialReviewCall
   )
-  vi.spyOn(helper.managedApi.services, "getNoteInfo").mockResolvedValue(
-    {} as never
-  )
+  vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
+    data: {} as never,
+    error: undefined,
+    request: {} as Request,
+    response: {} as Response,
+  })
   vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
     mockedGetNoteCall
   )

@@ -7,6 +7,7 @@ import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
+import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -42,6 +43,12 @@ beforeEach(() => {
   vi.spyOn(helper.managedApi.services, "recalling").mockImplementation(
     mockedRepeatCall
   )
+  vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
+    data: { stem: "Spell the word 'cat'" } as never,
+    error: undefined,
+    request: {} as Request,
+    response: {} as Response,
+  })
   renderer = helper
     .component(RecallPage)
     .withStorageProps({ eagerFetchCount: 1 })

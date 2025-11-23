@@ -4,6 +4,7 @@ import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import type { MemoryTrackerLite } from "@generated/backend"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
@@ -22,6 +23,12 @@ describe("repeat page", () => {
       helper.managedApi.silent.services,
       "askAQuestion"
     ).mockImplementation(mockedRandomQuestionCall)
+    vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
+      data: { stem: "Spell the word 'cat'" } as never,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   const createMemoryTrackerLite = (
