@@ -6,6 +6,7 @@
 export type OpenApiError = {
   errors?: Record<string, string>
   message?: string
+  status?: number
 }
 
 /**
@@ -27,6 +28,7 @@ export function toOpenApiError(error: unknown): OpenApiError {
     return {
       message:
         typeof errorObj.message === "string" ? errorObj.message : undefined,
+      status: typeof errorObj.status === "number" ? errorObj.status : undefined,
       errors:
         typeof errorObj.errors === "object" &&
         errorObj.errors !== null &&

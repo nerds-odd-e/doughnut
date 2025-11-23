@@ -85,18 +85,6 @@ export default defineComponent({
       if (!error) {
         this.fetchData()
         this.selectedFailureReports = []
-      } else {
-        // Error is handled by global interceptor (toast notification)
-        // Extract error message for display
-        const errorObj = toOpenApiError(error)
-        const errorMessage =
-          errorObj.message || "Error deleting failure reports."
-        // Check if it's a 401 error (handled by global interceptor)
-        const errorWithStatus = error as unknown as { status?: number }
-        if (errorWithStatus?.status === 401) {
-          throw error
-        }
-        this.errorMessage = errorMessage
       }
     },
   },
