@@ -5,6 +5,7 @@ import type {
   WikidataAssociationCreation,
 } from "@generated/backend"
 import type { LinkCreation, NoteCreationDto } from "@generated/backend"
+import { deleteNote } from "@generated/backend/sdk.gen"
 import ManagedApi from "@/managedApi/ManagedApi"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
@@ -310,9 +311,12 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const res = await this.managedApi.services.deleteNote({
+    const { data: res, error } = await deleteNote({
       path: { note: noteId },
     })
+    if (error || !res) {
+      throw new Error(error || "Failed to delete note")
+    }
     this.noteEditingHistory.deleteNote(noteId)
     if (res.length === 0) {
       this.routerReplaceFocus(router)

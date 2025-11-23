@@ -2,6 +2,7 @@ import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
@@ -15,8 +16,16 @@ describe("storedApiCollection", () => {
     let deleteNote
 
     beforeEach(() => {
-      deleteNote = vi.fn().mockResolvedValue(note)
-      vi.spyOn(managedApi.services, "deleteNote").mockImplementation(deleteNote)
+      deleteNote = vi.fn().mockResolvedValue([note])
+      vi.spyOn(sdk, "deleteNote").mockImplementation(async (options) => {
+        const result = await deleteNote(options)
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      })
     })
 
     it("should call the api", async () => {
