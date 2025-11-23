@@ -219,8 +219,13 @@ describe("repeat page", () => {
       }
 
       const mockedAnswerSpellingCall = vi
-        .spyOn(helper.managedApi.services, "answerSpelling")
-        .mockResolvedValue(answerResult as never)
+        .spyOn(sdk, "answerSpelling")
+        .mockResolvedValue({
+          data: answerResult,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
 
       const wrapper = await mountPage()
       await flushPromises()

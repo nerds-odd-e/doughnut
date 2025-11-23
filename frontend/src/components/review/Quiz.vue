@@ -69,6 +69,7 @@ import type {
   SpellingResultDto,
   MemoryTrackerLite,
 } from "@generated/backend"
+import { answerSpelling } from "@generated/backend/sdk.gen"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
@@ -145,7 +146,6 @@ const useQuestionFetching = (props: QuizProps) => {
 
 // Use the composable
 const { recallPromptCache, fetchQuestion } = useQuestionFetching(props)
-const { managedApi } = useLoadingApi()
 
 // Computed properties with better naming
 const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
@@ -174,14 +174,12 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
   if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
     return
 
-  try {
-    const answerResult = await managedApi.services.answerSpelling({
-      path: { memoryTracker: currentMemoryTrackerId.value },
-      body: { spellingAnswer: answerData.spellingAnswer },
-    })
-    emit("answered-spelling", answerResult)
-  } catch (e) {
-    // Error handling is already done in the component
+  const { data: answerResult, error } = await answerSpelling({
+    path: { memoryTracker: currentMemoryTrackerId.value },
+    body: { spellingAnswer: answerData.spellingAnswer },
+  })
+  if (!error) {
+    emit("answered-spelling", answerResult!)
   }
 }
 
