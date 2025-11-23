@@ -14,6 +14,8 @@ import {
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
 import ManagedApi from "@/managedApi/ManagedApi"
+import { toOpenApiError } from "@/managedApi/openApiError"
+import assignBadRequestProperties from "@/managedApi/window/assignBadRequestProperties"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -153,7 +155,24 @@ export default class StoredApiCollection implements StoredApi {
       body: data,
     })
     if (error || !noteRealm) {
-      throw new Error(error || "Failed to update Wikidata ID")
+      const errorObj = toOpenApiError(error)
+      const apiError = new Error(
+        errorObj.message || "Failed to update Wikidata ID"
+      ) as Error & {
+        body?: unknown
+        status?: number
+        [key: string]: unknown
+      }
+      // Preserve the error structure so assignBadRequestProperties can process it
+      if (errorObj.errors) {
+        apiError.body = { errors: errorObj.errors }
+        apiError.status = 400
+        // Manually call assignBadRequestProperties since the error interceptor won't run
+        assignBadRequestProperties(apiError, { errors: errorObj.errors })
+      } else if (error) {
+        apiError.body = error
+      }
+      throw apiError
     }
     return this.storage.refreshNoteRealm(noteRealm)
   }
