@@ -11,13 +11,14 @@
 <script lang="ts">
 import NoteFormTitleOnly from "@/components/notes/NoteFormTitleOnly.vue"
 import type { Circle, NoteCreationDto } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import {
+  createNotebookInCircle,
+  createNotebook,
+} from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropType } from "vue"
 
 export default {
-  setup() {
-    return useLoadingApi()
-  },
   props: { circle: { type: Object as PropType<Circle> } },
   components: {
     NoteFormTitleOnly,
@@ -25,30 +26,33 @@ export default {
   data() {
     return {
       noteFormData: { newTitle: "" } as NoteCreationDto,
-      errors: { newTitle: undefined as undefined | string },
+      errors: { newTitle: undefined as undefined | string } as Record<
+        string,
+        string | undefined
+      >,
     }
   },
   methods: {
-    createNotebook() {
-      if (this.circle) {
-        return this.managedApi.services.createNotebookInCircle({
-          path: { circle: this.circle.id },
-          body: this.noteFormData,
-        })
-      }
-      return this.managedApi.services.createNotebook({
-        body: this.noteFormData,
-      })
-    },
-    processForm() {
-      this.createNotebook()
-        .then((res) =>
-          this.$router.push({
-            name: "noteShow",
-            params: { noteId: res.noteId },
+    async processForm() {
+      const { data: result, error } = this.circle
+        ? await createNotebookInCircle({
+            path: { circle: this.circle.id },
+            body: this.noteFormData,
           })
-        )
-        .catch((err) => (this.errors = err))
+        : await createNotebook({
+            body: this.noteFormData,
+          })
+      if (!error) {
+        this.$router.push({
+          name: "noteShow",
+          params: { noteId: result!.noteId },
+        })
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract field-level errors if available (for 400 validation errors)
+        const errorObj = toOpenApiError(error)
+        this.errors = { ...this.errors, ...(errorObj.errors || {}) }
+      }
     },
   },
 }

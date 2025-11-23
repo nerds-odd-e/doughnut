@@ -11,16 +11,13 @@
 
 <script lang="ts">
 import type { Note } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { generateImage } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   props: {
     note: { type: Object as PropType<Note>, required: true },
     storageAccessor: {
@@ -48,13 +45,14 @@ export default defineComponent({
   },
   methods: {
     async askForImage() {
-      try {
-        this.b64Json = (
-          await this.managedApi.services.generateImage({
-            body: this.prompt,
-          })
-        ).b64encoded
-      } catch (_) {
+      const { data: imageResult, error } = await generateImage({
+        body: this.prompt,
+      })
+      if (!error) {
+        this.b64Json = imageResult!.b64encoded
+        this.promptError = undefined
+      } else {
+        // Error is handled by global interceptor (toast notification)
         this.promptError = "There is a problem"
       }
     },

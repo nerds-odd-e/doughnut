@@ -17,7 +17,7 @@
       <button
         class="btn"
         name="sad"
-        @click="selfEvaluate(-5)"
+        @click="selfEvaluateHandler(-5)"
         title="reduce next repeat interval (days) by half"
       >
         <SvgSad />
@@ -25,7 +25,7 @@
       <button
         class="btn"
         name="happy"
-        @click="selfEvaluate(5)"
+        @click="selfEvaluateHandler(5)"
         title="add to next repeat interval (days) by half"
       >
         <SvgHappy />
@@ -45,7 +45,7 @@
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
 import type { MemoryTracker } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { selfEvaluate, removeFromRepeating } from "@generated/backend/sdk.gen"
 import usePopups from "../commons/Popups/usePopups"
 import SvgNoReview from "../svgs/SvgNoReview.vue"
 import SvgSad from "../svgs/SvgSad.vue"
@@ -61,7 +61,6 @@ const props = defineProps({
 const emit = defineEmits(["update:modelValue"])
 
 const localMemoryTracker = ref<MemoryTracker>(props.modelValue)
-const { managedApi } = useLoadingApi()
 const { popups } = usePopups()
 
 watch(
@@ -72,15 +71,17 @@ watch(
   { immediate: true }
 )
 
-const selfEvaluate = async (adjustment: number) => {
-  const memoryTracker = await managedApi.services.selfEvaluate({
+const selfEvaluateHandler = async (adjustment: number) => {
+  const { data: memoryTracker, error } = await selfEvaluate({
     path: { memoryTracker: localMemoryTracker.value.id },
     body: {
       adjustment,
     },
   })
-  localMemoryTracker.value = memoryTracker
-  emit("update:modelValue", memoryTracker)
+  if (!error) {
+    localMemoryTracker.value = memoryTracker!
+    emit("update:modelValue", memoryTracker!)
+  }
 }
 
 const removeFromReview = async () => {
@@ -91,10 +92,12 @@ const removeFromReview = async () => {
   ) {
     return
   }
-  const memoryTracker = await managedApi.services.removeFromRepeating({
+  const { data: memoryTracker, error } = await removeFromRepeating({
     path: { memoryTracker: localMemoryTracker.value.id },
   })
-  localMemoryTracker.value = memoryTracker
-  emit("update:modelValue", memoryTracker)
+  if (!error) {
+    localMemoryTracker.value = memoryTracker!
+    emit("update:modelValue", memoryTracker!)
+  }
 }
 </script>

@@ -2,18 +2,29 @@ import type { Notebook } from "@generated/backend"
 import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import * as sdk from "@generated/backend/sdk.gen"
+import { vi, beforeEach } from "vitest"
 
 describe("NotebookEditDialog.spec", () => {
+  beforeEach(() => {
+    vi.spyOn(sdk, "getApprovalForNotebook").mockResolvedValue({
+      data: { approval: undefined },
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+  })
+
   const notebook: Notebook = {
     ...makeMe.aNotebook.please(),
   }
-  const wrapper = helper
-    .component(NotebookEditDialog)
-    .withRouter()
-    .withProps({ notebook })
-    .mount()
 
   it("Renders the default certificate expiry", async () => {
+    const wrapper = helper
+      .component(NotebookEditDialog)
+      .withRouter()
+      .withProps({ notebook })
+      .mount()
     expect(wrapper.find("[name='certificateExpiry']").exists()).toBe(true)
     expect(
       (wrapper.find("[name='certificateExpiry']").element as HTMLInputElement)
@@ -21,6 +32,11 @@ describe("NotebookEditDialog.spec", () => {
     ).toBe("1y")
   })
   it("The certificate expiry field is editable", async () => {
+    const wrapper = helper
+      .component(NotebookEditDialog)
+      .withRouter()
+      .withProps({ notebook })
+      .mount()
     expect(
       (wrapper.find("[name='certificateExpiry']").element as HTMLInputElement)
         .value

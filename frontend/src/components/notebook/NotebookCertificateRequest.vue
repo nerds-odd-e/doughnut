@@ -12,9 +12,10 @@
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Notebook, NotebookCertificateApproval } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
-
-const { managedApi } = useLoadingApi()
+import {
+  getApprovalForNotebook,
+  requestApprovalForNotebook,
+} from "@generated/backend/sdk.gen"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -24,11 +25,13 @@ const loaded = ref(false)
 const approval = ref<NotebookCertificateApproval | undefined>()
 
 onMounted(async () => {
-  const dto = await managedApi.services.getApprovalForNotebook({
+  const { data: dto, error } = await getApprovalForNotebook({
     path: { notebook: props.notebook.id },
   })
-  approval.value = dto.approval
-  loaded.value = true
+  if (!error) {
+    approval.value = dto!.approval
+    loaded.value = true
+  }
 })
 
 const approvalButtonText = computed(() => {
@@ -57,9 +60,12 @@ const isApprovalButtonDisabled = computed(() => {
   return approval.value !== undefined && approval.value !== null
 })
 const requestNotebookApproval = async () => {
-  approval.value = await managedApi.services.requestApprovalForNotebook({
+  const { data: newApproval, error } = await requestApprovalForNotebook({
     path: { notebook: props.notebook.id },
   })
+  if (!error) {
+    approval.value = newApproval!
+  }
 }
 </script>
 

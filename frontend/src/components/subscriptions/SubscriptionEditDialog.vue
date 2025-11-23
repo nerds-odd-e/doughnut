@@ -14,13 +14,11 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 import type { Subscription, SubscriptionDto } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { updateSubscription } from "@generated/backend/sdk.gen"
+import { toOpenApiError } from "@/managedApi/openApiError"
 import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi()
-  },
   props: {
     subscription: {
       type: Object as PropType<Subscription>,
@@ -37,16 +35,19 @@ export default defineComponent({
   },
 
   methods: {
-    processForm() {
-      this.managedApi.services
-        .updateSubscription({
-          path: { subscription: this.subscription.id },
-          body: this.formData,
-        })
-        .then(() => {
-          this.$router.push({ name: "notebooks" })
-        })
-        .catch((err) => (this.errors = err as Record<string, string>))
+    async processForm() {
+      const { error } = await updateSubscription({
+        path: { subscription: this.subscription.id },
+        body: this.formData,
+      })
+      if (!error) {
+        this.$router.push({ name: "notebooks" })
+      } else {
+        // Error is handled by global interceptor (toast notification)
+        // Extract field-level errors if available (for 400 validation errors)
+        const errorObj = toOpenApiError(error)
+        this.errors = errorObj.errors || {}
+      }
     },
   },
 })

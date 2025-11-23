@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 import type { Subscription } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { destroySubscription } from "@generated/backend/sdk.gen"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
 import SvgEdit from "../svgs/SvgEdit.vue"
@@ -27,7 +27,7 @@ import SubscriptionEditDialog from "./SubscriptionEditDialog.vue"
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi(), ...usePopups() }
+    return usePopups()
   },
   props: {
     subscription: {
@@ -42,11 +42,12 @@ export default defineComponent({
       if (
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        this.managedApi.services
-          .destroySubscription({ path: { subscription: this.subscription.id } })
-          .then(() => {
-            this.$emit("updated")
-          })
+        const { error } = await destroySubscription({
+          path: { subscription: this.subscription.id },
+        })
+        if (!error) {
+          this.$emit("updated")
+        }
       }
     },
     doneHandler() {
