@@ -96,12 +96,10 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please() as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(
+        helper.managedApi.services,
+        "showMemoryTracker"
+      ).mockResolvedValue(makeMe.aMemoryTracker.please() as never)
       vi.spyOn(
         helper.managedApi.silent.services,
         "askAQuestion"
@@ -191,12 +189,10 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please() as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(
+        helper.managedApi.services,
+        "showMemoryTracker"
+      ).mockResolvedValue(makeMe.aMemoryTracker.please() as never)
       vi.spyOn(
         helper.managedApi.silent.services,
         "askAQuestion"
