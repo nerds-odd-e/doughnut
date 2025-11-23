@@ -29,18 +29,31 @@ export const notebookList = () => {
       })
     },
     navigateToChild(notebook: string) {
-      cy.findByText(notebook, { selector: '.notebook-card *' }).click()
+      cy.pageIsNotLoading()
+      cy.get('.notebook-card').should('be.visible')
+      cy.findByText(notebook, {
+        selector: '.notebook-card .daisy-card-title',
+      })
+        .should('be.visible')
+        .parents('.notebook-card')
+        .click()
       return assumeNotePage()
     },
   }
 }
 
 export const findNotebookCardButton = (notebook: string, name: string) => {
-  const finder = () =>
-    cy
-      .findByText(notebook, { selector: '.notebook-card *' })
+  const finder = () => {
+    cy.pageIsNotLoading()
+    cy.get('.notebook-card').should('be.visible')
+    return cy
+      .findByText(notebook, {
+        selector: '.notebook-card .daisy-card-title',
+      })
+      .should('be.visible')
       .parents('.daisy-card')
       .findByRole('button', { name: name })
+  }
 
   return {
     click() {
