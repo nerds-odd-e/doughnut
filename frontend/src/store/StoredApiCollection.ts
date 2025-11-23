@@ -12,6 +12,7 @@ import {
   linkNoteFinalize,
   moveAfter,
   moveNote,
+  showNote,
   undoDeleteNote,
   updateLink,
   updateNoteDetails,
@@ -190,9 +191,12 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const noteRealm = await this.managedApi.services.showNote({
+    const { data: noteRealm, error } = await showNote({
       path: { note: noteId },
     })
+    if (error || !noteRealm) {
+      throw new Error(error || "Failed to load note")
+    }
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
