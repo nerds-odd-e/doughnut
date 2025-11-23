@@ -207,6 +207,25 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentMemoryTrackers());
     }
+
+    @Test
+    void shouldExcludeMemoryTrackersForDeletedNotes() {
+      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker activeTracker =
+          makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
+      MemoryTracker deletedTracker =
+          makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
+
+      deletedNote.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+      makeMe.entityPersister.merge(deletedNote);
+
+      List<MemoryTracker> memoryTrackers = controller.getRecentMemoryTrackers();
+
+      assertThat(memoryTrackers, hasSize(1));
+      assertThat(memoryTrackers, contains(activeTracker));
+      assertThat(memoryTrackers, not(hasItem(deletedTracker)));
+    }
   }
 
   @Nested
@@ -238,6 +257,28 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getRecentlyReviewed());
+    }
+
+    @Test
+    void shouldExcludeMemoryTrackersForDeletedNotes() {
+      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker activeTracker =
+          makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
+      MemoryTracker deletedTracker =
+          makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
+
+      controller.markAsRepeated(activeTracker, true);
+      controller.markAsRepeated(deletedTracker, true);
+
+      deletedNote.setDeletedAt(testabilitySettings.getCurrentUTCTimestamp());
+      makeMe.entityPersister.merge(deletedNote);
+
+      List<MemoryTracker> memoryTrackers = controller.getRecentlyReviewed();
+
+      assertThat(memoryTrackers, hasSize(1));
+      assertThat(memoryTrackers, contains(activeTracker));
+      assertThat(memoryTrackers, not(hasItem(deletedTracker)));
     }
   }
 

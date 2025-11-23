@@ -59,7 +59,7 @@ public class UserService {
   }
 
   public List<MemoryTracker> getRecentMemoryTrackers(User user, Timestamp since) {
-    return memoryTrackerRepository.findAllByUserAndAssimilatedAtGreaterThan(user, since);
+    return memoryTrackerRepository.findAllByUserAndAssimilatedAtGreaterThan(user.getId(), since);
   }
 
   public Stream<MemoryTracker> getMemoryTrackersNeedToRepeat(

@@ -111,4 +111,9 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
       reviewFailed(currentUTCTimestamp);
     }
   }
+
+  @JsonIgnore
+  public boolean isActive() {
+    return !Boolean.TRUE.equals(removedFromTracking) && note.getDeletedAt() == null;
+  }
 }

@@ -7,8 +7,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.RecallService;
+import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -24,7 +28,11 @@ import org.springframework.validation.BindException;
 
 class NoteControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
+  @Autowired MemoryTrackerRepository memoryTrackerRepository;
   @Autowired NoteController controller;
+  @Autowired RecallService recallService;
+  @Autowired MemoryTrackerService memoryTrackerService;
+  @Autowired UserService userService;
   @MockitoBean HttpClientAdapter httpClientAdapter;
 
   @BeforeEach
@@ -156,6 +164,106 @@ class NoteControllerTests extends ControllerTestBase {
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(1));
       assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
+    }
+
+    @Nested
+    class MemoryTrackerExclusionWhenNoteDeleted {
+      @Test
+      void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists()
+          throws UnexpectedNoAccessRightException {
+        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+        testabilitySettings.timeTravelTo(makeMe.aTimestamp().please());
+
+        controller.deleteNote(subject);
+
+        Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
+        int toRecallCount =
+            recallService.getToRecallCount(
+                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"));
+        assertThat(toRecallCount, is(1));
+      }
+
+      @Test
+      void shouldExcludeMemoryTrackersForDeletedNotesFromRecentLists()
+          throws UnexpectedNoAccessRightException {
+        MemoryTracker deletedTracker =
+            makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+        MemoryTracker activeTracker =
+            makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+
+        controller.deleteNote(subject);
+
+        assertThat(
+            memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()), hasSize(1));
+        assertThat(
+            memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()),
+            contains(activeTracker));
+        assertThat(
+            memoryTrackerService.findLast100ByUser(currentUser.getUser().getId()),
+            not(hasItem(deletedTracker)));
+      }
+
+      @Test
+      void shouldExcludeMemoryTrackersForDeletedNotesFromRecentlyReviewed()
+          throws UnexpectedNoAccessRightException {
+        MemoryTracker deletedTracker =
+            makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+        MemoryTracker activeTracker =
+            makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+
+        controller.deleteNote(subject);
+
+        assertThat(
+            memoryTrackerService.findLast100ReviewedByUser(currentUser.getUser().getId()),
+            not(hasItem(deletedTracker)));
+      }
+
+      @Test
+      void shouldExcludeMemoryTrackersForDeletedNotesFromTotalAssimilatedCount()
+          throws UnexpectedNoAccessRightException {
+        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+
+        controller.deleteNote(subject);
+
+        Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
+        RecallStatus status =
+            recallService.getRecallStatus(
+                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"));
+        assertThat(status.totalAssimilatedCount, is(1));
+      }
+
+      @Test
+      void shouldExcludeMemoryTrackersForDeletedNotesFromGetMemoryTrackersFor()
+          throws UnexpectedNoAccessRightException {
+        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+
+        controller.deleteNote(subject);
+
+        assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(0));
+      }
+
+      @Test
+      void shouldRestoreMemoryTrackersWhenNoteIsRestored() throws UnexpectedNoAccessRightException {
+        makeMe.aMemoryTrackerFor(subject).by(currentUser.getUser()).please();
+        Note otherNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+        makeMe.aMemoryTrackerFor(otherNote).by(currentUser.getUser()).please();
+
+        controller.deleteNote(subject);
+        controller.undoDeleteNote(subject);
+
+        assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));
+        Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
+        RecallStatus status =
+            recallService.getRecallStatus(
+                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"));
+        assertThat(status.totalAssimilatedCount, is(2));
+      }
     }
 
     @Nested

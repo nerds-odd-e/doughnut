@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.RecallStatus;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,6 +98,50 @@ class RecallsControllerTests extends ControllerTestBase {
       assertEquals(
           TimestampOperations.addHoursToTimestamp(currentTime, 24),
           dueMemoryTrackers.getRecallWindowEndAt());
+    }
+
+    @Test
+    void shouldExcludeMemoryTrackersForDeletedNotesFromRecallLists() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      makeMe
+          .aMemoryTrackerFor(activeNote)
+          .by(currentUser.getUser())
+          .nextRecallAt(currentTime)
+          .please();
+      makeMe
+          .aMemoryTrackerFor(deletedNote)
+          .by(currentUser.getUser())
+          .nextRecallAt(currentTime)
+          .please();
+
+      deletedNote.setDeletedAt(currentTime);
+      makeMe.entityPersister.merge(deletedNote);
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      assertEquals(1, dueMemoryTrackers.toRepeatCount);
+      assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
+      assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
+    }
+
+    @Test
+    void shouldExcludeMemoryTrackersForDeletedNotesFromOverview() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
+
+      deletedNote.setDeletedAt(currentTime);
+      makeMe.entityPersister.merge(deletedNote);
+
+      RecallStatus status = controller.overview("Asia/Shanghai");
+
+      assertEquals(1, status.totalAssimilatedCount);
     }
   }
 }
