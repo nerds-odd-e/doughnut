@@ -2726,7 +2726,12 @@ paths:
                 type: string
         "200":
           description: OK
-          content: {}
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: object
   /api/notes/{note}/note-info:
     get:
       tags:

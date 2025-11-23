@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionSuggestionCreationParams;
 import com.odde.doughnut.entities.*;
@@ -15,7 +16,9 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -116,12 +119,28 @@ class PredefinedQuestionController {
   }
 
   @GetMapping(value = "/{note}/export-question-generation", produces = "application/json")
-  public ChatCompletionCreateParams exportQuestionGeneration(
+  public Map<String, Object> exportQuestionGeneration(
       @PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     QuestionGenerationRequestBuilder requestBuilder =
         new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
-    return requestBuilder.buildQuestionGenerationRequest(note, null);
+    ChatCompletionCreateParams params = requestBuilder.buildQuestionGenerationRequest(note, null);
+    return serializeChatCompletionCreateParams(params);
+  }
+
+  private Map<String, Object> serializeChatCompletionCreateParams(
+      ChatCompletionCreateParams params) {
+    try {
+      // Access the SDK's _body() method to get the Body class
+      Method bodyMethod = params.getClass().getMethod("_body");
+      Object body = bodyMethod.invoke(params);
+      // Serialize the Body using ObjectMapper, which handles JsonField properly
+      String jsonString = objectMapper.writeValueAsString(body);
+      // Convert back to Map to ensure all non-empty fields are included
+      return objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+    } catch (Exception e) {
+      throw new RuntimeException("Failed to serialize ChatCompletionCreateParams", e);
+    }
   }
 }

@@ -284,12 +284,24 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldExportQuestionGenerationWithChatCompletionRequest()
-        throws UnexpectedNoAccessRightException {
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          controller.exportQuestionGeneration(note);
-      assertThat(request.model(), notNullValue());
-      assertThat(request.messages(), notNullValue());
+    void shouldExportQuestionGenerationWithAllNonEmptyFields()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      java.util.Map<String, Object> request = controller.exportQuestionGeneration(note);
+      assertThat(request, notNullValue());
+      assertThat(request.containsKey("model"), is(true));
+      assertThat(request.get("model"), notNullValue());
+      assertThat(request.containsKey("messages"), is(true));
+      assertThat(request.get("messages"), notNullValue());
+      assertThat(request.containsKey("n"), is(true));
+      assertThat(request.get("n"), notNullValue());
+      // Verify response_format is included if present
+      if (request.containsKey("response_format")) {
+        assertThat(request.get("response_format"), notNullValue());
+      }
+      // Verify the JSON is not empty
+      String jsonString = new ObjectMapperConfig().objectMapper().writeValueAsString(request);
+      assertThat(jsonString, not(equalTo("{}")));
+      assertThat(jsonString.length(), greaterThan(10));
     }
   }
 }

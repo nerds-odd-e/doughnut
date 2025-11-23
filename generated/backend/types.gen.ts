@@ -3405,8 +3405,14 @@ export type ExportQuestionGenerationResponses = {
     /**
      * OK
      */
-    200: unknown;
+    200: {
+        [key: string]: {
+            [key: string]: unknown;
+        };
+    };
 };
+
+export type ExportQuestionGenerationResponse = ExportQuestionGenerationResponses[keyof ExportQuestionGenerationResponses];
 
 export type GetNoteInfoData = {
     body?: never;
