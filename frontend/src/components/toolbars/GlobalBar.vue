@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import type { User } from "@generated/backend"
-import { type ApiStatus } from "@/managedApi/ManagedApi"
+import { type ApiStatus } from "@/managedApi/ApiStatusHandler"
 import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"

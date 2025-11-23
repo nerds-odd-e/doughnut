@@ -16,7 +16,7 @@ function isBefore(node1: Node, node2: Node) {
 }
 
 describe("Sidebar", () => {
-  const storageAccessor = createNoteStorage(helper.managedApi)
+  const storageAccessor = createNoteStorage()
   const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please()
   const firstGeneration = makeMe.aNoteRealm
     .topicConstructor("first gen")

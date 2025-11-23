@@ -29,9 +29,12 @@ describe("answered question page", () => {
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
-        makeMe.aNoteRealm.please()
-      )
+      vi.spyOn(sdk, "showNote").mockResolvedValue({
+        data: makeMe.aNoteRealm.please(),
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       vi.spyOn(sdk, "startConversationAboutRecallPrompt").mockResolvedValue({
         data: makeMe.aConversation.withId(123).please(),
         error: undefined,

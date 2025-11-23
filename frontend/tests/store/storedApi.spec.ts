@@ -1,13 +1,11 @@
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
 import * as sdk from "@generated/backend/sdk.gen"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
-  const managedApi = helper.managedApi
-  const storageAccessor = createNoteStorage(managedApi)
+  const storageAccessor = createNoteStorage()
   const routerReplace = vitest.fn()
   const router = { replace: routerReplace } as unknown as Router
   const sa = storageAccessor.storedApi()

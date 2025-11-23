@@ -8,7 +8,10 @@ import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThi
 // Create silent client instance (no interceptors, no loading/error UI)
 // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
 export const globalClientSilent = createClient({
-  baseUrl: typeof window !== "undefined" ? window.location.origin : "",
+  baseUrl:
+    typeof window !== "undefined" && window.location.origin
+      ? window.location.origin
+      : "http://localhost:9081",
   credentials: "include",
   responseStyle: "fields",
   throwOnError: false,
@@ -27,7 +30,10 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   // Configure global client
   // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
   globalClient.setConfig({
-    baseUrl: typeof window !== "undefined" ? window.location.origin : "",
+    baseUrl:
+      typeof window !== "undefined" && window.location.origin
+        ? window.location.origin
+        : "http://localhost:9081",
     credentials: "include",
     responseStyle: "fields",
     throwOnError: false,

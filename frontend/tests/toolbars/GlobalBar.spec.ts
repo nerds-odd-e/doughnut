@@ -1,6 +1,5 @@
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/backend"
-import ManagedApi from "@/managedApi/ManagedApi"
 import NoteEditingHistory from "@/store/NoteEditingHistory"
 import createNoteStorage from "@/store/createNoteStorage"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -58,10 +57,7 @@ describe("global bar", () => {
     })
     user = makeMe.aUser.please()
     noteEditingHistory = new NoteEditingHistory()
-    histories = createNoteStorage(
-      new ManagedApi({ states: [], errors: [] }),
-      noteEditingHistory
-    )
+    histories = createNoteStorage(noteEditingHistory)
   })
 
   it("fetch API to be called ONCE", async () => {

@@ -38,9 +38,15 @@ describe("WikidataAssociationDialog", () => {
         }
       }
     )
-    vi.spyOn(helper.managedApi.services, "updateWikidataId").mockImplementation(
-      mockedUpdateWikidataId
-    )
+    vi.spyOn(sdk, "updateWikidataId").mockImplementation(async (options) => {
+      const result = await mockedUpdateWikidataId(options)
+      return {
+        data: result,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }
+    })
   })
 
   const mountDialog = (

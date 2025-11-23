@@ -19,7 +19,6 @@ import {
   updateNoteTitle,
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
-import ManagedApi from "@/managedApi/ManagedApi"
 import {
   toOpenApiError,
   setErrorObjectForFieldErrors,
@@ -98,16 +97,9 @@ export interface StoredApi {
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
 
-  managedApi: ManagedApi
-
   storage: NoteStorage
 
-  constructor(
-    managedApi: ManagedApi,
-    undoHistory: NoteEditingHistory,
-    storage: NoteStorage
-  ) {
-    this.managedApi = managedApi
+  constructor(undoHistory: NoteEditingHistory, storage: NoteStorage) {
     this.noteEditingHistory = undoHistory
     this.storage = storage
   }
