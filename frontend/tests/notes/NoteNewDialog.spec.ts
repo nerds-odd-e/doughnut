@@ -171,9 +171,15 @@ describe("adding new note", () => {
 
     beforeEach(() => {
       mockedSearchWithin.mockResolvedValue([])
-      vi.spyOn(helper.managedApi.services, "searchWikidata").mockImplementation(
-        mockedWikidataSearch
-      )
+      vi.spyOn(sdk, "searchWikidata").mockImplementation(async (...args) => {
+        const result = await mockedWikidataSearch(...args)
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      })
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ referenceNote: note, insertMode: "as-child" })

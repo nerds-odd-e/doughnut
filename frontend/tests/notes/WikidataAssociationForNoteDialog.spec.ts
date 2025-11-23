@@ -19,9 +19,15 @@ describe("WikidataAssociationForNoteDialog", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    vi.spyOn(helper.managedApi.services, "searchWikidata").mockImplementation(
-      mockedWikidataSearch
-    )
+    vi.spyOn(sdk, "searchWikidata").mockImplementation(async (...args) => {
+      const result = await mockedWikidataSearch(...args)
+      return {
+        data: result,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      }
+    })
     vi
       .spyOn(sdk, "fetchWikidataEntityDataById")
       .mockImplementation(async (options) => {
