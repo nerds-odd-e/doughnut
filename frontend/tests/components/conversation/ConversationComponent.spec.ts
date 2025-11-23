@@ -33,6 +33,12 @@ describe("ConversationComponent", () => {
       request: {} as Request,
       response: {} as Response,
     })
+    vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     wrapper = helper
       .component(ConversationComponent)
       .withStorageProps({
@@ -58,6 +64,12 @@ describe("ConversationComponent", () => {
       const conversation = makeMe.aConversation.forANote(note).please()
       const user = makeMe.aUser.please()
 
+      vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
       const wrapper = helper
         .component(ConversationComponent)
         .withStorageProps({

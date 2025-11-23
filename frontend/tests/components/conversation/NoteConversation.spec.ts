@@ -55,10 +55,12 @@ describe("NoteConversation", () => {
   })
 
   beforeEach(() => {
-    vi.spyOn(
-      helper.managedApi.services,
-      "startConversationAboutNote"
-    ).mockResolvedValue(conversation as never)
+    vi.spyOn(sdk, "startConversationAboutNote").mockResolvedValue({
+      data: conversation,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
       data: [],
       error: undefined,
@@ -79,9 +81,10 @@ describe("NoteConversation", () => {
     await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
 
-    expect(
-      helper.managedApi.services.startConversationAboutNote
-    ).toHaveBeenCalledWith({ path: { note: note.id }, body: "Hello" })
+    expect(sdk.startConversationAboutNote).toHaveBeenCalledWith({
+      path: { note: note.id },
+      body: "Hello",
+    })
 
     // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -205,9 +208,7 @@ describe("NoteConversation", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(
-      helper.managedApi.services.startConversationAboutNote
-    ).toHaveBeenCalledWith({
+    expect(sdk.startConversationAboutNote).toHaveBeenCalledWith({
       path: { note: note.id },
       body: "New conversation message",
     })
@@ -236,9 +237,10 @@ describe("NoteConversation", () => {
     await flushPromises()
 
     // Verify conversation was started
-    expect(
-      helper.managedApi.services.startConversationAboutNote
-    ).toHaveBeenCalledWith({ path: { note: note.id }, body: "Hello AI" })
+    expect(sdk.startConversationAboutNote).toHaveBeenCalledWith({
+      path: { note: note.id },
+      body: "Hello AI",
+    })
 
     // Verify AI reply was requested
     expect(mockStart).toHaveBeenCalled()

@@ -5,6 +5,7 @@ import helper, { mockShowNoteAccessory } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
+import * as sdk from "@generated/backend/sdk.gen"
 
 describe("all in note show page", () => {
   let router: ReturnType<typeof createRouter>
@@ -45,10 +46,12 @@ describe("all in note show page", () => {
       vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         note as never
       )
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsAboutNote"
-      ).mockResolvedValue([])
+      vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(NoteShowPage)
@@ -81,10 +84,12 @@ describe("all in note show page", () => {
       vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         note as never
       )
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsAboutNote"
-      ).mockResolvedValue([])
+      vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       const wrapper = helper
         .component(NoteShowPage)
@@ -125,10 +130,12 @@ describe("all in note show page", () => {
       vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
         note as never
       )
-      vi.spyOn(
-        helper.managedApi.services,
-        "getConversationsAboutNote"
-      ).mockResolvedValue([])
+      vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
 
       // Start with conversation in URL
       router.push({
