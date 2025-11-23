@@ -48,6 +48,9 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   // Error interceptor: Handle errors (toasts, 401 redirects, etc.)
   // This runs when there's an error response, before it's returned
   globalClient.interceptors.error.use(async (error, response, request) => {
+    // Clear loading state first (error interceptor runs instead of response interceptor)
+    apiStatusHandler?.assignLoading(false)
+
     // Construct error object for handleApiError
     // The error parameter is the parsed response body (object or string)
     const errorBody = error

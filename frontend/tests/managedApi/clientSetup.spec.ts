@@ -75,6 +75,23 @@ describe("clientSetup", () => {
       expect(loadingStateDuringCall).toBe(true)
       expect(apiStatus.states.length).toBe(0)
     })
+
+    it("clears loading state when an error occurs", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      // Before the call, loading state should be empty
+      expect(apiStatus.states.length).toBe(0)
+
+      // Make the API call that will fail
+      await getUserProfile({ client: globalClient })
+
+      // After the error, loading state should be cleared (not stuck)
+      // This is critical for e2e tests - loading spinner must disappear even on errors
+      expect(apiStatus.states.length).toBe(0)
+    })
   })
 
   describe("globalClient (non-silent) - error handling", () => {
