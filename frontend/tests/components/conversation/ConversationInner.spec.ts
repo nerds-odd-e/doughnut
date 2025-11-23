@@ -7,6 +7,7 @@ import { flushPromises } from "@vue/test-utils"
 import { simulateAiResponse } from "./AiResponse.spec"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
+import * as sdk from "@generated/backend/sdk.gen"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -83,6 +84,12 @@ describe("ConversationInner", () => {
       helper.managedApi.services,
       "replyToConversation"
     ).mockResolvedValue({} as never)
+    vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
     resetInstance()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
 
