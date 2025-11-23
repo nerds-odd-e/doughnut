@@ -27,10 +27,17 @@ describe("WikidataAssociationDialog", () => {
         response: {} as Response,
       }
     })
-    vi.spyOn(
-      helper.managedApi.services,
-      "fetchWikidataEntityDataById"
-    ).mockImplementation(mockedFetchWikidataEntity)
+    vi.spyOn(sdk, "fetchWikidataEntityDataById").mockImplementation(
+      async (...args) => {
+        const result = await mockedFetchWikidataEntity(...args)
+        return {
+          data: result,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        }
+      }
+    )
     vi.spyOn(helper.managedApi.services, "updateWikidataId").mockImplementation(
       mockedUpdateWikidataId
     )
