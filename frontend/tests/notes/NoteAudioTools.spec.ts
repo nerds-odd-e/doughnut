@@ -5,6 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -460,7 +461,7 @@ describe("NoteAudioTools", () => {
     const processPromise = new Promise<AudioResponse>((resolve) => {
       resolveProcess = resolve
     })
-    vi.spyOn(helper.managedApi.services, "audioToText").mockImplementation(
+    vi.spyOn(sdk, "audioToText").mockImplementation(
       // biome-ignore lint/suspicious/noExplicitAny: Mock function type compatibility for Promise
       () => processPromise as any
     )
@@ -535,9 +536,14 @@ describe("NoteAudioTools", () => {
       vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockResolvedValue(
         {} as never
       )
-      vi.spyOn(helper.managedApi.services, "audioToText").mockResolvedValue({
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-        endTimestamp: "00:00:00,000",
+      vi.spyOn(sdk, "audioToText").mockResolvedValue({
+        data: {
+          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+          endTimestamp: "00:00:00,000",
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
       })
     })
 
@@ -586,12 +592,15 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi
-        .spyOn(helper.managedApi.services, "audioToText")
-        .mockResolvedValue({
+      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
+        data: {
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
-        })
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     afterEach(() => {
@@ -610,13 +619,23 @@ describe("NoteAudioTools", () => {
       }
 
       audioToTextMock
-        .mockResolvedValueOnce(mockResponse1)
-        .mockResolvedValueOnce(mockResponse2)
+        .mockResolvedValueOnce({
+          data: mockResponse1,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+        .mockResolvedValueOnce({
+          data: mockResponse2,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
 
       // First call
       await wrapper.vm.processAudio(new Blob())
 
-      expect(helper.managedApi.services.audioToText).toHaveBeenLastCalledWith({
+      expect(sdk.audioToText).toHaveBeenLastCalledWith({
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
@@ -625,7 +644,7 @@ describe("NoteAudioTools", () => {
       // Second call should include previous thread context
       await wrapper.vm.processAudio(new Blob())
 
-      expect(helper.managedApi.services.audioToText).toHaveBeenLastCalledWith({
+      expect(sdk.audioToText).toHaveBeenLastCalledWith({
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
@@ -639,9 +658,24 @@ describe("NoteAudioTools", () => {
       }
 
       audioToTextMock
-        .mockResolvedValueOnce(mockResponse)
-        .mockRejectedValueOnce(new Error("API Error"))
-        .mockResolvedValueOnce(mockResponse)
+        .mockResolvedValueOnce({
+          data: mockResponse,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+        .mockResolvedValueOnce({
+          data: undefined,
+          error: "API Error",
+          request: {} as Request,
+          response: {} as Response,
+        })
+        .mockResolvedValueOnce({
+          data: mockResponse,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
 
       // First successful call
       await wrapper.vm.processAudio(new Blob())
@@ -666,12 +700,15 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi
-        .spyOn(helper.managedApi.services, "audioToText")
-        .mockResolvedValue({
+      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
+        data: {
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
-        })
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     afterEach(() => {
@@ -699,7 +736,7 @@ describe("NoteAudioTools", () => {
       const testBlob = new Blob(["test"])
       await wrapper.vm.processAudio(testBlob)
 
-      expect(helper.managedApi.services.audioToText).toHaveBeenCalledWith({
+      expect(sdk.audioToText).toHaveBeenCalledWith({
         body: expect.objectContaining({
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
@@ -743,12 +780,15 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi
-        .spyOn(helper.managedApi.services, "audioToText")
-        .mockResolvedValue({
+      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
+        data: {
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
-        })
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     afterEach(() => {
@@ -778,9 +818,12 @@ describe("NoteAudioTools", () => {
       endTimestamp: "00:00:37,270",
     }
 
-    vi.spyOn(helper.managedApi.services, "audioToText").mockResolvedValue(
-      mockResponse
-    )
+    vi.spyOn(sdk, "audioToText").mockResolvedValue({
+      data: mockResponse,
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
 
     const testBlob = new Blob(["test"])
     const result = await wrapper.vm.processAudio({
@@ -791,7 +834,7 @@ describe("NoteAudioTools", () => {
     expect(result).toBe("00:00:37,270")
 
     // Verify API call was made with correct parameters
-    expect(helper.managedApi.services.audioToText).toHaveBeenCalledWith({
+    expect(sdk.audioToText).toHaveBeenCalledWith({
       body: expect.objectContaining({
         isMidSpeech: true,
         previousNoteDetailsToAppendTo: note.details,
@@ -856,12 +899,15 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi
-        .spyOn(helper.managedApi.services, "audioToText")
-        .mockResolvedValue({
+      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
+        data: {
           completionFromAudio: { completion: "text", deleteFromEnd: 0 },
           endTimestamp: "00:00:37,270",
-        })
+        },
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
     })
 
     afterEach(() => {
