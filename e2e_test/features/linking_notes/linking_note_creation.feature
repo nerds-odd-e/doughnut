@@ -34,8 +34,7 @@ Feature: link note
   Scenario: Show recently updated notes before search results
     Given I have a notebook with the head note "Recent Note" and details "Recently added"
     When I am creating a linking note under note "Sedition"
-    Then I should see "Recently updated notes" section
-    And I should see "Recent Note" in the recently updated notes
+    Then I should see "Recent Note" in the recently updated notes section
     When I search for "Sed" in all my notebooks
     Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks "Sed"
-    And I should not see "Recently updated notes" section
+    And I should not see the recently updated notes section

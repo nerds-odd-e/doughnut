@@ -41,5 +41,15 @@ export const assumeNoteTargetSearchDialog = () => {
       this.linkToTargetAs(toNoteTopic, linkType)
       cy.findByRole('button', { name: 'OK' }).click()
     },
+    expectNoteInRecentlyUpdatedSection(noteTitle: string) {
+      cy.findByText('Recently updated notes').should('be.visible')
+      // Note can be in dropdown list or in cards, so search within the recent notes section
+      cy.contains('.recent-notes-section', noteTitle).should('be.visible')
+      return this
+    },
+    expectRecentlyUpdatedSectionNotVisible() {
+      cy.findByText('Recently updated notes').should('not.exist')
+      return this
+    },
   }
 }
