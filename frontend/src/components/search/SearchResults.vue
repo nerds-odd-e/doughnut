@@ -16,6 +16,26 @@
 
     <div v-if="searchResult === undefined && trimmedSearchKey !== ''">
       <em>Searching ...</em>
+      <div v-if="shouldShowRecentNotes && recentNotes.length > 0" class="recent-notes-section">
+        <div class="recent-notes-label">Recently updated notes</div>
+        <div v-if="isDropdown" class="dropdown-list">
+          <NoteTitleWithLink
+            v-for="note in recentNotes"
+            :key="note.id"
+            :noteTopology="note.note.noteTopology"
+          />
+        </div>
+        <Cards
+          v-else
+          class="search-result"
+          :noteTopologies="recentNotes.map((n) => n.note.noteTopology)"
+          :columns="3"
+        >
+          <template #button="{ noteTopology }">
+            <slot name="button" :note-topology="noteTopology" />
+          </template>
+        </Cards>
+      </div>
     </div>
 
     <div v-else-if="searchResult !== undefined && searchResult.length === 0 && isDropdown" class="dropdown-list">
@@ -25,6 +45,29 @@
 
     <div v-else-if="searchResult !== undefined && searchResult.length === 0">
       <em>No matching notes found.</em>
+    </div>
+
+    <div v-else-if="shouldShowRecentNotes && recentNotes.length > 0 && trimmedSearchKey === '' && !props.noteId">
+      <div class="recent-notes-section">
+        <div class="recent-notes-label">Recently updated notes</div>
+        <div v-if="isDropdown" class="dropdown-list">
+          <NoteTitleWithLink
+            v-for="note in recentNotes"
+            :key="note.id"
+            :noteTopology="note.note.noteTopology"
+          />
+        </div>
+        <Cards
+          v-else
+          class="search-result"
+          :noteTopologies="recentNotes.map((n) => n.note.noteTopology)"
+          :columns="3"
+        >
+          <template #button="{ noteTopology }">
+            <slot name="button" :note-topology="noteTopology" />
+          </template>
+        </Cards>
+      </div>
     </div>
 
     <div v-else-if="searchResult !== undefined && isDropdown" class="dropdown-list">
@@ -58,6 +101,7 @@
 import type { SearchTerm } from "@generated/backend"
 import type { NoteTopology } from "@generated/backend"
 import type { NoteSearchResult } from "@generated/backend"
+import type { NoteRealm } from "@generated/backend"
 import useLoadingApi from "@/managedApi/useLoadingApi"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
@@ -101,6 +145,7 @@ const cache = ref<{
 })
 
 const recentResult = ref<NoteSearchResult[] | undefined>()
+const recentNotes = ref<NoteRealm[]>([])
 const timeoutId = ref<ReturnType<typeof setTimeout>>()
 
 // Computed properties
@@ -136,6 +181,17 @@ const distanceById = computed<Record<string, number>>(() => {
     if (d != null) map[id] = d
   })
   return map
+})
+
+const shouldShowRecentNotes = computed(() => {
+  // Only show recent notes when searching globally (not within a notebook)
+  // Show when: search key is empty, or we're waiting for search results (searchResult is undefined)
+  // Hide when: we have search results (searchResult is defined and not empty)
+  return (
+    !props.noteId &&
+    searchTerm.value.allMyNotebooksAndSubscriptions &&
+    (trimmedSearchKey.value === "" || searchResult.value === undefined)
+  )
 })
 
 // Methods
@@ -194,11 +250,36 @@ const mergeUniqueAndSortByDistance = (
   )
 }
 
+const fetchRecentNotes = async () => {
+  // Only fetch if we're searching globally (not within a notebook) and haven't fetched yet
+  if (
+    !props.noteId &&
+    searchTerm.value.allMyNotebooksAndSubscriptions &&
+    recentNotes.value.length === 0
+  ) {
+    try {
+      recentNotes.value = await managedApi.services.getRecentNotes()
+    } catch (error) {
+      // Silently fail - recent notes are optional
+      recentNotes.value = []
+    }
+  }
+}
+
 const search = () => {
   const originalTrimmedKey = trimmedSearchKey.value
   // If there's no cached result, set recentResult to undefined to show "Searching ..."
   if (!cachedSearches.value[originalTrimmedKey]) {
     recentResult.value = undefined
+    // Fetch recent notes to show while waiting for search results
+    // Only fetch if searching globally (not within a notebook)
+    if (
+      !props.noteId &&
+      searchTerm.value.allMyNotebooksAndSubscriptions &&
+      recentNotes.value.length === 0
+    ) {
+      fetchRecentNotes()
+    }
   }
   timeoutId.value = debounced(async () => {
     const trimmedKey = trimmedSearchKey.value
@@ -232,6 +313,12 @@ watch(
     }
     if (searchTerm.value.searchKey.trim() !== "") {
       search()
+    } else if (
+      !props.noteId &&
+      searchTerm.value.allMyNotebooksAndSubscriptions &&
+      searchTerm.value.searchKey.trim() === ""
+    ) {
+      fetchRecentNotes()
     }
     oldSearchTerm.value = { ...searchTerm.value }
   },
@@ -251,12 +338,18 @@ watch(
       props.isDropdown
     ) {
       recentResult.value = []
+    } else if (
+      !props.noteId &&
+      searchTerm.value.allMyNotebooksAndSubscriptions &&
+      props.inputSearchKey.trim() === ""
+    ) {
+      fetchRecentNotes()
     }
   }
 )
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted(async () => {
   if (!props.noteId) {
     searchTerm.value.allMyNotebooksAndSubscriptions = true
   }
@@ -266,6 +359,12 @@ onMounted(() => {
   // instead of "Searching ..."
   if (props.inputSearchKey.trim() === "" && props.noteId && props.isDropdown) {
     recentResult.value = []
+  } else if (
+    !props.noteId &&
+    searchTerm.value.allMyNotebooksAndSubscriptions &&
+    props.inputSearchKey.trim() === ""
+  ) {
+    await fetchRecentNotes()
   }
 })
 
@@ -320,5 +419,15 @@ onBeforeUnmount(() => {
 
 .dropdown-list :deep(a:hover) {
   background-color: #f8f9fa;
+}
+
+.recent-notes-section {
+  margin-top: 1rem;
+}
+
+.recent-notes-label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
 }
 </style>
