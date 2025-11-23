@@ -35,29 +35,38 @@
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
 import type { User } from "@generated/backend"
-import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getUserProfile, updateUser } from "@generated/backend/sdk.gen"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { onMounted, ref } from "vue"
+import { toOpenApiError } from "@/managedApi/openApiError"
 
-const { managedApi } = useLoadingApi()
 const emits = defineEmits(["user-updated"])
 
 const formData = ref<User | undefined>()
 const errors = ref<Record<string, string>>({})
 
 const fetchData = async () => {
-  formData.value = await managedApi.services.getUserProfile()
+  const { data, error } = await getUserProfile()
+  if (!error && data) {
+    formData.value = data
+  }
 }
 
 const processForm = async () => {
   if (!formData.value) return
-  const updated = await managedApi.services
-    .updateUser({ path: { user: formData.value.id }, body: formData.value })
-    .catch((err) => {
-      errors.value = err as Record<string, string>
-      return undefined
-    })
-  emits("user-updated", updated)
+  const { data: updatedUser, error } = await updateUser({
+    path: { user: formData.value.id },
+    body: formData.value,
+  })
+  if (error) {
+    // Error is handled by global interceptor (toast notification)
+    // Extract field-level errors if available (for 400 validation errors)
+    const errorObj = toOpenApiError(error)
+    errors.value = errorObj.errors || {}
+  } else {
+    errors.value = {}
+    emits("user-updated", updatedUser)
+  }
 }
 
 onMounted(() => fetchData())

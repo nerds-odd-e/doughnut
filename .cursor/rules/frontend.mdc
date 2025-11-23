@@ -114,14 +114,14 @@ The global client is configured with `responseStyle: "fields"` and `throwOnError
 // Import services directly from generated SDK
 import { getTokens, generateToken } from "@generated/backend/sdk.gen"
 
-// Destructure the response
-const { data, error } = await getTokens()
+// Destructure the response with meaningful variable names
+const { data: tokens, error } = await getTokens()
 
 // Check for errors before using data
-if (!error && data) {
+if (!error) {
   // TypeScript guarantees data is the correct type (e.g., UserToken[])
-  // Use data directly
-  tokens.value = data.map((t) => ({
+  // When error is undefined, data is always the correct type
+  tokens.value = tokens.map((t) => ({
     id: t.id,
     label: t.label,
   }))
@@ -130,26 +130,27 @@ if (!error && data) {
 
 **Key Points:**
 
-1. Always destructure: `const { data, error } = await serviceCall()`
-2. Check `!error && data` before using data
-3. TypeScript types are guaranteed: when `!error && data` is true, `data` has the correct type
+1. Always destructure with meaningful variable names: `const { data: updatedUser, error } = await updateUser(...)`
+2. Check `!error` before using data (no need to check `data` separately)
+3. TypeScript types are guaranteed: when `error` is undefined, `data` is always the correct type
 4. No need for runtime property checks: if the type says `token: string`, it's always present
-5. Errors are handled in the response interceptor: the global client's interceptor handles error display (toasts, loading states, etc.)
+5. No need for `else if (data)` check: when `error` is undefined, `data` is always defined and has the correct type
+6. Errors are handled in the response interceptor: the global client's interceptor handles error display (toasts, loading states, etc.)
 
 **Example:**
 
 ```typescript
 const generateToken = async () => {
   loading.value = true
-  const { data, error } = await generateTokenApi({
+  const { data: newToken, error } = await generateTokenApi({
     body: { label: tokenFormData.value.label },
   })
-  if (!error && data) {
-    // data is guaranteed to be UserToken type
-    token.value = data.token
+  if (!error) {
+    // newToken is guaranteed to be UserToken type when error is undefined
+    token.value = newToken.token
     tokens.value.push({
-      id: data.id,
-      label: data.label,
+      id: newToken.id,
+      label: newToken.label,
     })
   }
   loading.value = false
@@ -157,6 +158,58 @@ const generateToken = async () => {
 ```
 
 This pattern matches ManagedApi's behavior and provides type safety.
+
+### Handling Validation Errors (400 Bad Request)
+
+When handling 400 Bad Request errors with validation errors, use the `toOpenApiError` helper to extract field-level errors. The `error` field in API responses is typed as `string` but can be an object at runtime (parsed JSON).
+
+**Usage Pattern:**
+
+```typescript
+import { toOpenApiError } from "@/managedApi/openApiError"
+
+// In your component
+const errors = ref<Record<string, string>>({})
+
+const processForm = async () => {
+  const { data, error } = await updateUser({
+    path: { user: formData.value.id },
+    body: formData.value,
+  })
+  if (error) {
+    // Error is handled by global interceptor (toast notification)
+    // Extract field-level errors if available (for 400 validation errors)
+    const errorObj = toOpenApiError(error)
+    errors.value = errorObj.errors || {}
+  } else if (data) {
+    errors.value = {}
+    // Handle success
+  }
+}
+```
+
+**Key Points:**
+
+1. Use `toOpenApiError(error)` to convert the error (typed as `string` but can be an object) to `OpenApiError`
+2. `OpenApiError` type: `{ errors?: Record<string, string>; message?: string }`
+3. The helper safely handles both string and object errors
+4. Extract `errors` field for field-level validation errors (typically from 400 responses)
+5. Global interceptor already handles error display (toasts), so you only need to extract field-level errors for form validation
+
+**Example:**
+
+```typescript
+const { data: updatedUser, error } = await updateUser({ path: { user: id }, body: formData })
+if (error) {
+  const errorObj = toOpenApiError(error)
+  // errorObj.errors contains field-level validation errors
+  // e.g., { "name": "Name is required", "email": "Invalid email format" }
+  errors.value = errorObj.errors || {}
+} else {
+  // updatedUser is guaranteed to be User type when error is undefined
+  // Handle success case
+}
+```
 
 ### CSS/Styling Rules
 

@@ -39,53 +39,54 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     return request
   })
 
-  // Response interceptor: Clear loading state and handle errors
-  // Note: With throwOnError: false, errors are returned in the response object, not thrown
-  globalClient.interceptors.response.use(async (response) => {
-    apiStatusHandler?.assignLoading(false)
-
-    // Check if response has an error field (when throwOnError is false)
-    // Response type: { data, error, request, response }
-    if (
-      response &&
-      typeof response === "object" &&
-      "error" in response &&
-      response.error
-    ) {
-      const responseObj = response as {
-        error: unknown
-        request?: Request
-        response?: Response
-      }
-
-      const errorObj = responseObj.error as Error & {
-        status?: number
-        body?: unknown
-        request?: { method?: string; url?: string }
-        url?: string
-      }
-
-      // Extract status and body from response if available
-      if (responseObj.response) {
-        if (!errorObj.status) {
-          errorObj.status = responseObj.response.status
-        }
-      }
-      if (responseObj.request) {
-        if (!errorObj.url) {
-          errorObj.url = responseObj.request.url
-        }
-        if (!errorObj.request) {
-          errorObj.request = {
-            method: responseObj.request.method || "UNKNOWN",
-            url: responseObj.request.url || "UNKNOWN",
-          }
-        }
-      }
-
-      handleApiError(errorObj)
+  // Error interceptor: Handle errors (toasts, 401 redirects, etc.)
+  // This runs when there's an error response, before it's returned
+  globalClient.interceptors.error.use(async (error, response, request) => {
+    // Construct error object for handleApiError
+    // The error parameter is the parsed response body (object or string)
+    const errorBody = error
+    const errorObj = new Error(
+      typeof errorBody === "string"
+        ? errorBody
+        : typeof errorBody === "object" &&
+            errorBody !== null &&
+            "message" in errorBody &&
+            typeof errorBody.message === "string"
+          ? errorBody.message
+          : "API Error"
+    ) as Error & {
+      status?: number
+      body?: unknown
+      request?: { method?: string; url?: string }
+      url?: string
     }
 
+    // Set status from response
+    if (response) {
+      errorObj.status = response.status
+      errorObj.url = response.url
+    }
+
+    // Set request info
+    if (request) {
+      errorObj.request = {
+        method: request.method || "UNKNOWN",
+        url: request.url || "UNKNOWN",
+      }
+    }
+
+    // Set body - the error parameter IS the body
+    errorObj.body = errorBody
+
+    handleApiError(errorObj)
+
+    // Return the error as-is (don't transform it)
+    return error
+  })
+
+  // Response interceptor: Clear loading state
+  globalClient.interceptors.response.use(async (response) => {
+    apiStatusHandler?.assignLoading(false)
     return response
   })
 }

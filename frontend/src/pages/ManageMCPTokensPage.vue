@@ -78,9 +78,10 @@ const token = ref<string | null>(null)
 const loading = ref(false)
 
 const loadTokens = async () => {
-  const { data, error } = await getTokens()
-  if (!error && data && Array.isArray(data)) {
-    tokens.value = data.map((t) => ({
+  const { data: tokensList, error } = await getTokens()
+  if (!error) {
+    // tokensList is guaranteed to be UserToken[] when error is undefined
+    tokens.value = tokensList!.map((t) => ({
       id: t.id,
       label: t.label,
     }))
@@ -91,16 +92,17 @@ loadTokens()
 
 const generateToken = async () => {
   loading.value = true
-  const { data, error } = await generateTokenApi({
+  const { data: newToken, error } = await generateTokenApi({
     body: {
       label: tokenFormData.value.label,
     },
   })
-  if (!error && data) {
-    token.value = data.token
+  if (!error) {
+    // newToken is guaranteed to be UserToken when error is undefined
+    token.value = newToken!.token
     tokens.value.push({
-      id: data.id,
-      label: data.label,
+      id: newToken!.id,
+      label: newToken!.label,
     })
     tokenFormData.value.label = ""
     popbutton.value?.closeDialog()
