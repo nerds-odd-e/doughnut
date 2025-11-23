@@ -6,6 +6,7 @@ import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi } from "vitest"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
+import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -58,6 +59,12 @@ describe("NoteConversation", () => {
       helper.managedApi.services,
       "startConversationAboutNote"
     ).mockResolvedValue(conversation as never)
+    vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
   })
 
   it("calls api to start conversation and shows ConversationInner when successful", async () => {

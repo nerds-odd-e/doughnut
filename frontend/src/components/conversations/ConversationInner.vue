@@ -60,6 +60,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
 import useLoadingApi from "@/managedApi/useLoadingApi"
+import { getConversationMessages } from "@generated/backend/sdk.gen"
 import type {
   User,
   ConversationMessage,
@@ -119,10 +120,12 @@ const isCurrentUser = (id: number): boolean => {
 const fetchConversationMessages = async () => {
   if (!conversation.id) return
 
-  currentConversationMessages.value =
-    await managedApi.services.getConversationMessages({
-      path: { conversationId: conversation.id },
-    })
+  const { data: messages, error } = await getConversationMessages({
+    path: { conversationId: conversation.id },
+  })
+  if (!error) {
+    currentConversationMessages.value = messages!
+  }
   emit("conversation-fetched", conversation.id)
 }
 
