@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -26,7 +27,9 @@ public class QuestionGenerationRequestBuilder {
     }
 
     // Add the question generation instruction (this also sets up JSON schema response format)
-    chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool());
+    // Include link type specific instructions if the note is a linking note
+    LinkType linkType = note.isLink() ? note.getLinkType() : null;
+    chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool(linkType));
     // Add any additional message if provided (after the question generation instruction)
     if (additionalMessage != null) {
       chatRequestBuilder.addUserMessage(additionalMessage);

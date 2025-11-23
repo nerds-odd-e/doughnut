@@ -5,6 +5,7 @@ import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_M
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
 
@@ -18,7 +19,12 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return new InstructionAndSchema(
+    return mcqWithAnswerAiTool(null);
+  }
+
+  public static InstructionAndSchema mcqWithAnswerAiTool(LinkType linkType) {
+    String linkTypeInstruction = getLinkTypeInstruction(linkType);
+    String baseInstruction =
         """
         Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
         My notes are atomic pieces of knowledge organized hierarchically and can include reifications to form lateral links.
@@ -27,7 +33,7 @@ public class AiToolFactory {
         1. **Focus on the Focus Note**: Formulate one question EXCLUSIVELY around the focus note (its title / subject-predicate-object and details).
         2. **Leverage the Extended Graph**:
            - Use other focus note info and related notes to enrich the question formulation.
-           - Avoid accidental bias by ensuring the focus note isn’t falsely assumed to be the sole specialization of a general concept.
+           - Avoid accidental bias by ensuring the focus note isn't falsely assumed to be the sole specialization of a general concept.
            - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
         3. **Context Visibility**:
            - Avoid explicitly mentioning the focus note title in stem
@@ -40,7 +46,7 @@ public class AiToolFactory {
            - Ensure the question provides all necessary context within the stem and choices.
            - Avoid vague phrasing like "this X" or "the following X" unless the X is explicitly defined in the stem or choices.
            - IMPORTANT: Avoid using "this note"!!! User won't know which note you are referring to.
-        7. **Empty Stems When Necessary**: Leave the question stem empty if there’s insufficient information to create a meaningful question.
+        7. **Empty Stems When Necessary**: Leave the question stem empty if there's insufficient information to create a meaningful question.
         8. **Make sure correct choice index is accurate**:
            - The correct choice is also exclusive, and plausible.
            - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
@@ -48,9 +54,21 @@ public class AiToolFactory {
            - MUST provide the question via the function `%s`. If question generation fails, still output using this function.
            - Create only one question and make only one call to the function.
 
-      """
-            .formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),
+      """;
+    String fullInstruction =
+        linkTypeInstruction != null
+            ? baseInstruction + "\n" + linkTypeInstruction
+            : baseInstruction;
+    return new InstructionAndSchema(
+        fullInstruction.formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),
         askSingleAnswerMultipleChoiceQuestion());
+  }
+
+  private static String getLinkTypeInstruction(LinkType linkType) {
+    if (linkType == null) {
+      return null;
+    }
+    return linkType.getQuestionGenerationInstruction();
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {
