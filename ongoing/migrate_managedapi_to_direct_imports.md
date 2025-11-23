@@ -92,7 +92,7 @@
 
 ---
 
-## Step 5: Migrate Silent Service Calls
+## Step 5: Migrate Silent Service Calls ✅
 
 **Goal:** Migrate components that use `managedApi.silent.services.*` to direct imports with silent client.
 
@@ -107,8 +107,8 @@
 
 **Verification:** After each component migration, run frontend unit tests. All must pass.
 
-**Components to Migrate:**
-- `Quiz.vue` - uses `managedApi.silent.services.askAQuestion`
+**Migrated Components:**
+- ✅ `Quiz.vue` - migrated from `managedApi.silent.services.askAQuestion` to `askAQuestion({ client: globalClientSilent })`
 
 ---
 
@@ -219,7 +219,7 @@
 ## Migration Order Summary
 
 1. Infrastructure setup (Steps 1-3): ✅ Complete
-2. Component migration (Steps 4-6): Step 4 ✅ Complete, Steps 5-6 pending
+2. Component migration (Steps 4-6): Step 4 ✅ Complete, Step 5 ✅ Complete, Step 6 pending
 3. Storage migration (Step 7): Pending
 4. Remaining migration (Step 8): Pending
 5. Cleanup (Step 9): Pending
