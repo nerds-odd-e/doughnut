@@ -4,12 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
 import com.odde.doughnut.services.ai.TitleReplacement;
-import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -46,10 +43,8 @@ class NoteAutomationServiceTests {
     makeMe.aNote().under(testNote).please();
 
     // Initialize common services
-    ObjectMapper objectMapper = getTestObjectMapper();
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
-        new ChatCompletionNoteAutomationService(
-            openAiApiHandler, globalSettingsService, objectMapper, testNote);
+        new ChatCompletionNoteAutomationService(openAiApiHandler, globalSettingsService, testNote);
     service = new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 
@@ -66,18 +61,13 @@ class NoteAutomationServiceTests {
 
   @Test
   void shouldReturnSuggestedTitle() throws JsonProcessingException {
-    // Mock chat completion with tool call
+    // Mock chat completion with JSON schema response
     TitleReplacement titleReplacement = new TitleReplacement();
     titleReplacement.setNewTitle("Suggested Title");
-    openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
-        titleReplacement, AiToolName.SUGGEST_NOTE_TITLE.getValue());
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(titleReplacement);
 
     String result = service.suggestTitle();
 
     assertThat(result, is("Suggested Title"));
-  }
-
-  private ObjectMapper getTestObjectMapper() {
-    return new ObjectMapperConfig().objectMapper();
   }
 }

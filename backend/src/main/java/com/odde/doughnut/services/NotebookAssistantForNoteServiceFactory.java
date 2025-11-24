@@ -23,8 +23,7 @@ public final class NotebookAssistantForNoteServiceFactory {
 
   public NoteAutomationService createNoteAutomationService(Note note) {
     ChatCompletionNoteAutomationService chatCompletionNoteAutomationService =
-        new ChatCompletionNoteAutomationService(
-            openAiApiHandler, globalSettingsService, objectMapper, note);
+        new ChatCompletionNoteAutomationService(openAiApiHandler, globalSettingsService, note);
     return new NoteAutomationService(chatCompletionNoteAutomationService);
   }
 

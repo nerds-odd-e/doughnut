@@ -136,6 +136,12 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         completeNoteDetails());
   }
 
+  public static InstructionAndSchema suggestNoteTitleAiTool() {
+    return new InstructionAndSchema(
+        "Please suggest a better title for the note. Don't change it if it's already good enough.",
+        suggestNoteTitle());
+  }
+
   public static List<Class<?>> getAllAssistantTools() {
     return List.of(
         completeNoteDetails(),

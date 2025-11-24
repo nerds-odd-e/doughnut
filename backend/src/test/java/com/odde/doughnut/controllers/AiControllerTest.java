@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.TitleReplacement;
-import com.odde.doughnut.services.ai.tools.AiToolName;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.images.Image;
@@ -136,8 +135,7 @@ class AiControllerTest extends ControllerTestBase {
       openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
       TitleReplacement suggestedTopic = new TitleReplacement();
       suggestedTopic.setNewTitle("Suggested Title");
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCall(
-          suggestedTopic, AiToolName.SUGGEST_NOTE_TITLE.getValue());
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(suggestedTopic);
     }
 
     @Test
@@ -155,12 +153,22 @@ class AiControllerTest extends ControllerTestBase {
           ArgumentCaptor.forClass(
               com.openai.models.chat.completions.ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      com.openai.models.chat.completions.ChatCompletionCreateParams params =
+          paramsCaptor.getValue();
       boolean hasInstruction =
-          paramsCaptor.getValue().messages().stream()
+          params.messages().stream()
               .map(Object::toString)
               .anyMatch(msg -> msg.contains("Please suggest a better title for the note"));
       MatcherAssert.assertThat(
-          "A message should contain the Question Designer instruction", hasInstruction, is(true));
+          "A message should contain the instruction", hasInstruction, is(true));
+      MatcherAssert.assertThat(
+          "Should use responseFormat instead of tools",
+          params.responseFormat().isPresent(),
+          is(true));
+      MatcherAssert.assertThat(
+          "Should not have tools",
+          params.tools().map(list -> list.isEmpty()).orElse(true),
+          is(true));
     }
 
     @Test
