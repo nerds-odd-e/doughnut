@@ -143,6 +143,9 @@ export const assumeNotePage = (noteTopology?: string) => {
     toolbarButton: (btnTextOrTitle: string) => {
       return privateToolbarButton(btnTextOrTitle)
     },
+    undo(undoType: string) {
+      this.toolbarButton(`undo ${undoType}`).click()
+    },
     editTextContent: (noteAttributes: Record<string, string>) => {
       for (const propName in noteAttributes) {
         const value = noteAttributes[propName]

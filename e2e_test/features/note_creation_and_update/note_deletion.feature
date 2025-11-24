@@ -24,11 +24,11 @@ Feature: Note deletion
   Scenario: Delete a note then delete its parent and undo
     Given I delete note "TDD" at 13:00
     And I delete note "tech" at 14:00
-    When I undo "delete note"
+    When I undo delete note to recover note "tech"
     And I should see "LeSS in Action/tech" with these children
       | note-title |
       | CI System  |
-    When I undo "delete note" again
+    When I undo delete note to recover note "TDD" again
     And I should see "LeSS in Action/tech" with these children
       | note-title |
       | CI System  |

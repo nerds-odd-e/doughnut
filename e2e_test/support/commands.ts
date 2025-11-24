@@ -276,11 +276,6 @@ Cypress.Commands.add('failure', () => {
   throw new Error('Deliberate CYPRESS test Failure!!!')
 })
 
-Cypress.Commands.add('undoLast', (undoType: string) => {
-  cy.findByTitle(`undo ${undoType}`).click()
-  cy.pageIsNotLoading()
-})
-
 Cypress.Commands.add('noteByTitle', (noteTopology: string) => {
   return cy
     .findCardTitle(noteTopology)

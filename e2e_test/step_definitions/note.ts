@@ -385,12 +385,25 @@ Then(
 )
 
 When('I undo {string}', (undoType: string) => {
-  cy.undoLast(undoType)
+  start.assumeNotePage().undo(undoType)
 })
 
 When('I undo {string} again', (undoType: string) => {
-  cy.undoLast(undoType)
+  start.assumeNotePage().undo(undoType)
 })
+
+When('I undo delete note to recover note {string}', (noteTitle: string) => {
+  start.assumeNotePage().undo('delete note')
+  start.assumeNotePage(noteTitle)
+})
+
+When(
+  'I undo delete note to recover note {string} again',
+  (noteTitle: string) => {
+    start.assumeNotePage().undo('delete note')
+    start.assumeNotePage(noteTitle)
+  }
+)
 
 Then(
   'the deleted notebook with title {string} should be restored',
