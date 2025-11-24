@@ -4716,7 +4716,6 @@ components:
           enum:
           - complete_note_details
           - suggest_note_title
-          - ask_single_answer_multiple_choice_question
     TitleReplacement:
       type: object
       properties:

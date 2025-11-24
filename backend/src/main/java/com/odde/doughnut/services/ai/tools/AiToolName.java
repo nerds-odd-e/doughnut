@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AiToolName {
   COMPLETE_NOTE_DETAILS("complete_note_details"),
-  SUGGEST_NOTE_TITLE("suggest_note_title"),
-  ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION("ask_single_answer_multiple_choice_question");
+  SUGGEST_NOTE_TITLE("suggest_note_title");
 
   private final String value;
 

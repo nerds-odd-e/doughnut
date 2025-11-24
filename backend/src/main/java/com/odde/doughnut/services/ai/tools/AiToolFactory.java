@@ -1,7 +1,5 @@
 package com.odde.doughnut.services.ai.tools;
 
-import static com.odde.doughnut.services.ai.tools.AiToolName.ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
@@ -48,7 +46,6 @@ public class AiToolFactory {
            - The correct choice is also exclusive, and plausible.
            - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
         9. **Output Handling**:
-           - MUST provide the question via the function `%s`. If question generation fails, still output using this function.
            - Create only one question and make only one call to the function.
 
       """;
@@ -56,9 +53,7 @@ public class AiToolFactory {
         linkTypeInstruction != null
             ? baseInstruction + "\n" + linkTypeInstruction
             : baseInstruction;
-    return new InstructionAndSchema(
-        fullInstruction.formatted(ASK_SINGLE_ANSWER_MULTIPLE_CHOICE_QUESTION.getValue()),
-        askSingleAnswerMultipleChoiceQuestion());
+    return new InstructionAndSchema(fullInstruction, askSingleAnswerMultipleChoiceQuestion());
   }
 
   private static String getLinkTypeInstruction(LinkType linkType) {
