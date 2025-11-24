@@ -4,7 +4,6 @@ import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockShowNoteAccessory } from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -22,12 +21,9 @@ describe("new/updated pink banner", () => {
     [new Date(Date.UTC(2016, 1, 12)), "rgb(150,150,150)"],
   ])("should show fresher color if recently updated", async (updatedAt, expectedColor) => {
     const note = makeMe.aNoteRealm.updatedAtDate(updatedAt).please()
-    vi.spyOn(sdk, "showNote").mockResolvedValue({
-      data: note,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
+      note as never
+    )
 
     const wrapper = helper
       .component(NoteShow)
@@ -52,12 +48,9 @@ describe("note wth children", () => {
   })
 
   const render = (n: NoteRealm) => {
-    vi.spyOn(sdk, "showNote").mockResolvedValue({
-      data: n,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
+      n as never
+    )
     helper
       .component(NoteShow)
       .withRouter()
@@ -70,7 +63,7 @@ describe("note wth children", () => {
 
   it("should call the api", async () => {
     render(note)
-    expect(sdk.showNote).toHaveBeenCalledWith({
+    expect(helper.managedApi.services.showNote).toBeCalledWith({
       path: { note: note.id },
     })
   })

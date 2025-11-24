@@ -37,15 +37,9 @@ beforeEach(() => {
     request: {} as Request,
     response: {} as Response,
   })
-  vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
-    const result = await mockedGetNoteCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
+  vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
+    mockedGetNoteCall
+  )
   mockShowNoteAccessory()
   renderer = helper.component(AssimilationPage).withStorageProps({})
 })

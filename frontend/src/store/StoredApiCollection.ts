@@ -12,13 +12,13 @@ import {
   linkNoteFinalize,
   moveAfter,
   moveNote,
-  showNote,
   undoDeleteNote,
   updateLink,
   updateNoteDetails,
   updateNoteTitle,
   updateWikidataId,
 } from "@generated/backend/sdk.gen"
+import ManagedApi from "@/managedApi/ManagedApi"
 import {
   toOpenApiError,
   setErrorObjectForFieldErrors,
@@ -97,9 +97,16 @@ export interface StoredApi {
 export default class StoredApiCollection implements StoredApi {
   noteEditingHistory: NoteEditingHistory
 
+  managedApi: ManagedApi
+
   storage: NoteStorage
 
-  constructor(undoHistory: NoteEditingHistory, storage: NoteStorage) {
+  constructor(
+    managedApi: ManagedApi,
+    undoHistory: NoteEditingHistory,
+    storage: NoteStorage
+  ) {
+    this.managedApi = managedApi
     this.noteEditingHistory = undoHistory
     this.storage = storage
   }
@@ -183,12 +190,9 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const { data: noteRealm, error } = await showNote({
+    const noteRealm = await this.managedApi.services.showNote({
       path: { note: noteId },
     })
-    if (error || !noteRealm) {
-      return undefined
-    }
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
@@ -349,9 +353,7 @@ export default class StoredApiCollection implements StoredApi {
 
     let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (!currentNote) {
-      const noteRealm = await this.loadNote(noteId)
-      if (!noteRealm) return
-      currentNote = noteRealm.note
+      currentNote = (await this.loadNote(noteId)).note
     }
 
     const old = currentNote?.details ?? ""

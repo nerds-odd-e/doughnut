@@ -8,7 +8,6 @@ export {
   urlSearchParamsBodySerializer,
 } from '../core/bodySerializer.gen';
 export { buildClientParams } from '../core/params.gen';
-export { serializeQueryKeyValue } from '../core/queryKeySerializer.gen';
 export { createClient } from './client.gen';
 export type {
   Client,
@@ -16,6 +15,7 @@ export type {
   Config,
   CreateClientConfig,
   Options,
+  OptionsLegacyParser,
   RequestOptions,
   RequestResult,
   ResolvedRequestOptions,

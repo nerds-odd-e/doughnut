@@ -18,676 +18,1198 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
     meta?: Record<string, unknown>;
 };
 
-export const getUserProfile = <ThrowOnError extends boolean = false>(options?: Options<GetUserProfileData, ThrowOnError>) => (options?.client ?? client).get<GetUserProfileResponses, GetUserProfileErrors, ThrowOnError>({ url: '/api/user', ...options });
+export const getUserProfile = <ThrowOnError extends boolean = false>(options?: Options<GetUserProfileData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetUserProfileResponses, GetUserProfileErrors, ThrowOnError>({
+        url: '/api/user',
+        ...options
+    });
+};
 
-export const createUser = <ThrowOnError extends boolean = false>(options: Options<CreateUserData, ThrowOnError>) => (options.client ?? client).post<CreateUserResponses, CreateUserErrors, ThrowOnError>({
-    url: '/api/user',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const createUser = <ThrowOnError extends boolean = false>(options: Options<CreateUserData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateUserResponses, CreateUserErrors, ThrowOnError>({
+        url: '/api/user',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const generateToken = <ThrowOnError extends boolean = false>(options: Options<GenerateTokenData, ThrowOnError>) => (options.client ?? client).post<GenerateTokenResponses, GenerateTokenErrors, ThrowOnError>({
-    url: '/api/user/generate-token',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const generateToken = <ThrowOnError extends boolean = false>(options: Options<GenerateTokenData, ThrowOnError>) => {
+    return (options.client ?? client).post<GenerateTokenResponses, GenerateTokenErrors, ThrowOnError>({
+        url: '/api/user/generate-token',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const closeAllGithubIssues = <ThrowOnError extends boolean = false>(options?: Options<CloseAllGithubIssuesData, ThrowOnError>) => (options?.client ?? client).post<CloseAllGithubIssuesResponses, CloseAllGithubIssuesErrors, ThrowOnError>({ url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues', ...options });
+export const closeAllGithubIssues = <ThrowOnError extends boolean = false>(options?: Options<CloseAllGithubIssuesData, ThrowOnError>) => {
+    return (options?.client ?? client).post<CloseAllGithubIssuesResponses, CloseAllGithubIssuesErrors, ThrowOnError>({
+        url: '/api/testability/use_real_sandbox_github_and_close_all_github_issues',
+        ...options
+    });
+};
 
-export const triggerException = <ThrowOnError extends boolean = false>(options?: Options<TriggerExceptionData, ThrowOnError>) => (options?.client ?? client).post<TriggerExceptionResponses, TriggerExceptionErrors, ThrowOnError>({ url: '/api/testability/trigger_exception', ...options });
+export const triggerException = <ThrowOnError extends boolean = false>(options?: Options<TriggerExceptionData, ThrowOnError>) => {
+    return (options?.client ?? client).post<TriggerExceptionResponses, TriggerExceptionErrors, ThrowOnError>({
+        url: '/api/testability/trigger_exception',
+        ...options
+    });
+};
 
-export const timeTravelRelativeToNow = <ThrowOnError extends boolean = false>(options: Options<TimeTravelRelativeToNowData, ThrowOnError>) => (options.client ?? client).post<TimeTravelRelativeToNowResponses, TimeTravelRelativeToNowErrors, ThrowOnError>({
-    url: '/api/testability/time_travel_relative_to_now',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const timeTravelRelativeToNow = <ThrowOnError extends boolean = false>(options: Options<TimeTravelRelativeToNowData, ThrowOnError>) => {
+    return (options.client ?? client).post<TimeTravelRelativeToNowResponses, TimeTravelRelativeToNowErrors, ThrowOnError>({
+        url: '/api/testability/time_travel_relative_to_now',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const timeTravel = <ThrowOnError extends boolean = false>(options: Options<TimeTravelData, ThrowOnError>) => (options.client ?? client).post<TimeTravelResponses, TimeTravelErrors, ThrowOnError>({
-    url: '/api/testability/time_travel',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const timeTravel = <ThrowOnError extends boolean = false>(options: Options<TimeTravelData, ThrowOnError>) => {
+    return (options.client ?? client).post<TimeTravelResponses, TimeTravelErrors, ThrowOnError>({
+        url: '/api/testability/time_travel',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const testabilityUpdateUser = <ThrowOnError extends boolean = false>(options: Options<TestabilityUpdateUserData, ThrowOnError>) => (options.client ?? client).post<TestabilityUpdateUserResponses, TestabilityUpdateUserErrors, ThrowOnError>({
-    url: '/api/testability/testability_update_user',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const testabilityUpdateUser = <ThrowOnError extends boolean = false>(options: Options<TestabilityUpdateUserData, ThrowOnError>) => {
+    return (options.client ?? client).post<TestabilityUpdateUserResponses, TestabilityUpdateUserErrors, ThrowOnError>({
+        url: '/api/testability/testability_update_user',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const shareToBazaar = <ThrowOnError extends boolean = false>(options: Options<ShareToBazaarData, ThrowOnError>) => (options.client ?? client).post<ShareToBazaarResponses, ShareToBazaarErrors, ThrowOnError>({
-    url: '/api/testability/share_to_bazaar',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const shareToBazaar = <ThrowOnError extends boolean = false>(options: Options<ShareToBazaarData, ThrowOnError>) => {
+    return (options.client ?? client).post<ShareToBazaarResponses, ShareToBazaarErrors, ThrowOnError>({
+        url: '/api/testability/share_to_bazaar',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const replaceServiceUrl = <ThrowOnError extends boolean = false>(options: Options<ReplaceServiceUrlData, ThrowOnError>) => (options.client ?? client).post<ReplaceServiceUrlResponses, ReplaceServiceUrlErrors, ThrowOnError>({
-    url: '/api/testability/replace_service_url',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const replaceServiceUrl = <ThrowOnError extends boolean = false>(options: Options<ReplaceServiceUrlData, ThrowOnError>) => {
+    return (options.client ?? client).post<ReplaceServiceUrlResponses, ReplaceServiceUrlErrors, ThrowOnError>({
+        url: '/api/testability/replace_service_url',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const randomizer = <ThrowOnError extends boolean = false>(options: Options<RandomizerData, ThrowOnError>) => (options.client ?? client).post<RandomizerResponses, RandomizerErrors, ThrowOnError>({
-    url: '/api/testability/randomizer',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const randomizer = <ThrowOnError extends boolean = false>(options: Options<RandomizerData, ThrowOnError>) => {
+    return (options.client ?? client).post<RandomizerResponses, RandomizerErrors, ThrowOnError>({
+        url: '/api/testability/randomizer',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const linkNotes = <ThrowOnError extends boolean = false>(options: Options<LinkNotesData, ThrowOnError>) => (options.client ?? client).post<LinkNotesResponses, LinkNotesErrors, ThrowOnError>({
-    url: '/api/testability/link_notes',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const linkNotes = <ThrowOnError extends boolean = false>(options: Options<LinkNotesData, ThrowOnError>) => {
+    return (options.client ?? client).post<LinkNotesResponses, LinkNotesErrors, ThrowOnError>({
+        url: '/api/testability/link_notes',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const injectSuggestedQuestion = <ThrowOnError extends boolean = false>(options: Options<InjectSuggestedQuestionData, ThrowOnError>) => (options.client ?? client).post<InjectSuggestedQuestionResponses, InjectSuggestedQuestionErrors, ThrowOnError>({
-    url: '/api/testability/inject_suggested_questions',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const injectSuggestedQuestion = <ThrowOnError extends boolean = false>(options: Options<InjectSuggestedQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).post<InjectSuggestedQuestionResponses, InjectSuggestedQuestionErrors, ThrowOnError>({
+        url: '/api/testability/inject_suggested_questions',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const injectNotes = <ThrowOnError extends boolean = false>(options: Options<InjectNotesData, ThrowOnError>) => (options.client ?? client).post<InjectNotesResponses, InjectNotesErrors, ThrowOnError>({
-    url: '/api/testability/inject_notes',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const injectNotes = <ThrowOnError extends boolean = false>(options: Options<InjectNotesData, ThrowOnError>) => {
+    return (options.client ?? client).post<InjectNotesResponses, InjectNotesErrors, ThrowOnError>({
+        url: '/api/testability/inject_notes',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const injectCircle = <ThrowOnError extends boolean = false>(options: Options<InjectCircleData, ThrowOnError>) => (options.client ?? client).post<InjectCircleResponses, InjectCircleErrors, ThrowOnError>({
-    url: '/api/testability/inject_circle',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const injectCircle = <ThrowOnError extends boolean = false>(options: Options<InjectCircleData, ThrowOnError>) => {
+    return (options.client ?? client).post<InjectCircleResponses, InjectCircleErrors, ThrowOnError>({
+        url: '/api/testability/inject_circle',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const injectPredefinedQuestion = <ThrowOnError extends boolean = false>(options: Options<InjectPredefinedQuestionData, ThrowOnError>) => (options.client ?? client).post<InjectPredefinedQuestionResponses, InjectPredefinedQuestionErrors, ThrowOnError>({
-    url: '/api/testability/inject-predefined-questions',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const injectPredefinedQuestion = <ThrowOnError extends boolean = false>(options: Options<InjectPredefinedQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).post<InjectPredefinedQuestionResponses, InjectPredefinedQuestionErrors, ThrowOnError>({
+        url: '/api/testability/inject-predefined-questions',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const getFeatureToggle = <ThrowOnError extends boolean = false>(options?: Options<GetFeatureToggleData, ThrowOnError>) => (options?.client ?? client).get<GetFeatureToggleResponses, GetFeatureToggleErrors, ThrowOnError>({ url: '/api/testability/feature_toggle', ...options });
+export const getFeatureToggle = <ThrowOnError extends boolean = false>(options?: Options<GetFeatureToggleData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetFeatureToggleResponses, GetFeatureToggleErrors, ThrowOnError>({
+        url: '/api/testability/feature_toggle',
+        ...options
+    });
+};
 
-export const enableFeatureToggle = <ThrowOnError extends boolean = false>(options: Options<EnableFeatureToggleData, ThrowOnError>) => (options.client ?? client).post<EnableFeatureToggleResponses, EnableFeatureToggleErrors, ThrowOnError>({
-    url: '/api/testability/feature_toggle',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const enableFeatureToggle = <ThrowOnError extends boolean = false>(options: Options<EnableFeatureToggleData, ThrowOnError>) => {
+    return (options.client ?? client).post<EnableFeatureToggleResponses, EnableFeatureToggleErrors, ThrowOnError>({
+        url: '/api/testability/feature_toggle',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const resetDbAndTestabilitySettings = <ThrowOnError extends boolean = false>(options?: Options<ResetDbAndTestabilitySettingsData, ThrowOnError>) => (options?.client ?? client).post<ResetDbAndTestabilitySettingsResponses, ResetDbAndTestabilitySettingsErrors, ThrowOnError>({ url: '/api/testability/clean_db_and_reset_testability_settings', ...options });
+export const resetDbAndTestabilitySettings = <ThrowOnError extends boolean = false>(options?: Options<ResetDbAndTestabilitySettingsData, ThrowOnError>) => {
+    return (options?.client ?? client).post<ResetDbAndTestabilitySettingsResponses, ResetDbAndTestabilitySettingsErrors, ThrowOnError>({
+        url: '/api/testability/clean_db_and_reset_testability_settings',
+        ...options
+    });
+};
 
-export const updateSubscription = <ThrowOnError extends boolean = false>(options: Options<UpdateSubscriptionData, ThrowOnError>) => (options.client ?? client).post<UpdateSubscriptionResponses, UpdateSubscriptionErrors, ThrowOnError>({
-    url: '/api/subscriptions/{subscription}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const updateSubscription = <ThrowOnError extends boolean = false>(options: Options<UpdateSubscriptionData, ThrowOnError>) => {
+    return (options.client ?? client).post<UpdateSubscriptionResponses, UpdateSubscriptionErrors, ThrowOnError>({
+        url: '/api/subscriptions/{subscription}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const destroySubscription = <ThrowOnError extends boolean = false>(options: Options<DestroySubscriptionData, ThrowOnError>) => (options.client ?? client).post<DestroySubscriptionResponses, DestroySubscriptionErrors, ThrowOnError>({ url: '/api/subscriptions/{subscription}/delete', ...options });
+export const destroySubscription = <ThrowOnError extends boolean = false>(options: Options<DestroySubscriptionData, ThrowOnError>) => {
+    return (options.client ?? client).post<DestroySubscriptionResponses, DestroySubscriptionErrors, ThrowOnError>({
+        url: '/api/subscriptions/{subscription}/delete',
+        ...options
+    });
+};
 
-export const createSubscription = <ThrowOnError extends boolean = false>(options: Options<CreateSubscriptionData, ThrowOnError>) => (options.client ?? client).post<CreateSubscriptionResponses, CreateSubscriptionErrors, ThrowOnError>({
-    url: '/api/subscriptions/notebooks/{notebook}/subscribe',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const createSubscription = <ThrowOnError extends boolean = false>(options: Options<CreateSubscriptionData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateSubscriptionResponses, CreateSubscriptionErrors, ThrowOnError>({
+        url: '/api/subscriptions/notebooks/{notebook}/subscribe',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const getCurrentModelVersions = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentModelVersionsData, ThrowOnError>) => (options?.client ?? client).get<GetCurrentModelVersionsResponses, GetCurrentModelVersionsErrors, ThrowOnError>({ url: '/api/settings/current-model-version', ...options });
+export const getCurrentModelVersions = <ThrowOnError extends boolean = false>(options?: Options<GetCurrentModelVersionsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetCurrentModelVersionsResponses, GetCurrentModelVersionsErrors, ThrowOnError>({
+        url: '/api/settings/current-model-version',
+        ...options
+    });
+};
 
-export const setCurrentModelVersions = <ThrowOnError extends boolean = false>(options: Options<SetCurrentModelVersionsData, ThrowOnError>) => (options.client ?? client).post<SetCurrentModelVersionsResponses, SetCurrentModelVersionsErrors, ThrowOnError>({
-    url: '/api/settings/current-model-version',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const setCurrentModelVersions = <ThrowOnError extends boolean = false>(options: Options<SetCurrentModelVersionsData, ThrowOnError>) => {
+    return (options.client ?? client).post<SetCurrentModelVersionsResponses, SetCurrentModelVersionsErrors, ThrowOnError>({
+        url: '/api/settings/current-model-version',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const regenerate = <ThrowOnError extends boolean = false>(options: Options<RegenerateData, ThrowOnError>) => (options.client ?? client).post<RegenerateResponses, RegenerateErrors, ThrowOnError>({
-    url: '/api/recall-prompts/{recallPrompt}/regenerate',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const regenerate = <ThrowOnError extends boolean = false>(options: Options<RegenerateData, ThrowOnError>) => {
+    return (options.client ?? client).post<RegenerateResponses, RegenerateErrors, ThrowOnError>({
+        url: '/api/recall-prompts/{recallPrompt}/regenerate',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const contest = <ThrowOnError extends boolean = false>(options: Options<ContestData, ThrowOnError>) => (options.client ?? client).post<ContestResponses, ContestErrors, ThrowOnError>({ url: '/api/recall-prompts/{recallPrompt}/contest', ...options });
+export const contest = <ThrowOnError extends boolean = false>(options: Options<ContestData, ThrowOnError>) => {
+    return (options.client ?? client).post<ContestResponses, ContestErrors, ThrowOnError>({
+        url: '/api/recall-prompts/{recallPrompt}/contest',
+        ...options
+    });
+};
 
-export const answerQuiz = <ThrowOnError extends boolean = false>(options: Options<AnswerQuizData, ThrowOnError>) => (options.client ?? client).post<AnswerQuizResponses, AnswerQuizErrors, ThrowOnError>({
-    url: '/api/recall-prompts/{recallPrompt}/answer',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const answerQuiz = <ThrowOnError extends boolean = false>(options: Options<AnswerQuizData, ThrowOnError>) => {
+    return (options.client ?? client).post<AnswerQuizResponses, AnswerQuizErrors, ThrowOnError>({
+        url: '/api/recall-prompts/{recallPrompt}/answer',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const toggleApproval = <ThrowOnError extends boolean = false>(options: Options<ToggleApprovalData, ThrowOnError>) => (options.client ?? client).post<ToggleApprovalResponses, ToggleApprovalErrors, ThrowOnError>({ url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval', ...options });
+export const toggleApproval = <ThrowOnError extends boolean = false>(options: Options<ToggleApprovalData, ThrowOnError>) => {
+    return (options.client ?? client).post<ToggleApprovalResponses, ToggleApprovalErrors, ThrowOnError>({
+        url: '/api/predefined-questions/{predefinedQuestion}/toggle-approval',
+        ...options
+    });
+};
 
-export const suggestQuestionForFineTuning = <ThrowOnError extends boolean = false>(options: Options<SuggestQuestionForFineTuningData, ThrowOnError>) => (options.client ?? client).post<SuggestQuestionForFineTuningResponses, SuggestQuestionForFineTuningErrors, ThrowOnError>({
-    url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const suggestQuestionForFineTuning = <ThrowOnError extends boolean = false>(options: Options<SuggestQuestionForFineTuningData, ThrowOnError>) => {
+    return (options.client ?? client).post<SuggestQuestionForFineTuningResponses, SuggestQuestionForFineTuningErrors, ThrowOnError>({
+        url: '/api/predefined-questions/{predefinedQuestion}/suggest-fine-tuning',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const refineQuestion = <ThrowOnError extends boolean = false>(options: Options<RefineQuestionData, ThrowOnError>) => (options.client ?? client).post<RefineQuestionResponses, RefineQuestionErrors, ThrowOnError>({
-    url: '/api/predefined-questions/{note}/refine-question',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const refineQuestion = <ThrowOnError extends boolean = false>(options: Options<RefineQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).post<RefineQuestionResponses, RefineQuestionErrors, ThrowOnError>({
+        url: '/api/predefined-questions/{note}/refine-question',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const getAllQuestionByNote = <ThrowOnError extends boolean = false>(options: Options<GetAllQuestionByNoteData, ThrowOnError>) => (options.client ?? client).get<GetAllQuestionByNoteResponses, GetAllQuestionByNoteErrors, ThrowOnError>({ url: '/api/predefined-questions/{note}/note-questions', ...options });
+export const getAllQuestionByNote = <ThrowOnError extends boolean = false>(options: Options<GetAllQuestionByNoteData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetAllQuestionByNoteResponses, GetAllQuestionByNoteErrors, ThrowOnError>({
+        url: '/api/predefined-questions/{note}/note-questions',
+        ...options
+    });
+};
 
-export const addQuestionManually = <ThrowOnError extends boolean = false>(options: Options<AddQuestionManuallyData, ThrowOnError>) => (options.client ?? client).post<AddQuestionManuallyResponses, AddQuestionManuallyErrors, ThrowOnError>({
-    url: '/api/predefined-questions/{note}/note-questions',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const addQuestionManually = <ThrowOnError extends boolean = false>(options: Options<AddQuestionManuallyData, ThrowOnError>) => {
+    return (options.client ?? client).post<AddQuestionManuallyResponses, AddQuestionManuallyErrors, ThrowOnError>({
+        url: '/api/predefined-questions/{note}/note-questions',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const generateQuestionWithoutSave = <ThrowOnError extends boolean = false>(options: Options<GenerateQuestionWithoutSaveData, ThrowOnError>) => (options.client ?? client).post<GenerateQuestionWithoutSaveResponses, GenerateQuestionWithoutSaveErrors, ThrowOnError>({ url: '/api/predefined-questions/generate-question-without-save', ...options });
+export const generateQuestionWithoutSave = <ThrowOnError extends boolean = false>(options: Options<GenerateQuestionWithoutSaveData, ThrowOnError>) => {
+    return (options.client ?? client).post<GenerateQuestionWithoutSaveResponses, GenerateQuestionWithoutSaveErrors, ThrowOnError>({
+        url: '/api/predefined-questions/generate-question-without-save',
+        ...options
+    });
+};
 
-export const createNoteAfter = <ThrowOnError extends boolean = false>(options: Options<CreateNoteAfterData, ThrowOnError>) => (options.client ?? client).post<CreateNoteAfterResponses, CreateNoteAfterErrors, ThrowOnError>({
-    url: '/api/notes/{referenceNote}/create-after',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const createNoteAfter = <ThrowOnError extends boolean = false>(options: Options<CreateNoteAfterData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateNoteAfterResponses, CreateNoteAfterErrors, ThrowOnError>({
+        url: '/api/notes/{referenceNote}/create-after',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const createNoteUnderParent = <ThrowOnError extends boolean = false>(options: Options<CreateNoteUnderParentData, ThrowOnError>) => (options.client ?? client).post<CreateNoteUnderParentResponses, CreateNoteUnderParentErrors, ThrowOnError>({
-    url: '/api/notes/{parentNote}/create',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const createNoteUnderParent = <ThrowOnError extends boolean = false>(options: Options<CreateNoteUnderParentData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateNoteUnderParentResponses, CreateNoteUnderParentErrors, ThrowOnError>({
+        url: '/api/notes/{parentNote}/create',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const updateWikidataId = <ThrowOnError extends boolean = false>(options: Options<UpdateWikidataIdData, ThrowOnError>) => (options.client ?? client).post<UpdateWikidataIdResponses, UpdateWikidataIdErrors, ThrowOnError>({
-    url: '/api/notes/{note}/updateWikidataId',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const updateWikidataId = <ThrowOnError extends boolean = false>(options: Options<UpdateWikidataIdData, ThrowOnError>) => {
+    return (options.client ?? client).post<UpdateWikidataIdResponses, UpdateWikidataIdErrors, ThrowOnError>({
+        url: '/api/notes/{note}/updateWikidataId',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const semanticSearchWithin = <ThrowOnError extends boolean = false>(options: Options<SemanticSearchWithinData, ThrowOnError>) => (options.client ?? client).post<SemanticSearchWithinResponses, SemanticSearchWithinErrors, ThrowOnError>({
-    url: '/api/notes/{note}/semantic-search',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const semanticSearchWithin = <ThrowOnError extends boolean = false>(options: Options<SemanticSearchWithinData, ThrowOnError>) => {
+    return (options.client ?? client).post<SemanticSearchWithinResponses, SemanticSearchWithinErrors, ThrowOnError>({
+        url: '/api/notes/{note}/semantic-search',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const searchForLinkTargetWithin = <ThrowOnError extends boolean = false>(options: Options<SearchForLinkTargetWithinData, ThrowOnError>) => (options.client ?? client).post<SearchForLinkTargetWithinResponses, SearchForLinkTargetWithinErrors, ThrowOnError>({
-    url: '/api/notes/{note}/search',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const searchForLinkTargetWithin = <ThrowOnError extends boolean = false>(options: Options<SearchForLinkTargetWithinData, ThrowOnError>) => {
+    return (options.client ?? client).post<SearchForLinkTargetWithinResponses, SearchForLinkTargetWithinErrors, ThrowOnError>({
+        url: '/api/notes/{note}/search',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const updateRecallSetting = <ThrowOnError extends boolean = false>(options: Options<UpdateRecallSettingData, ThrowOnError>) => (options.client ?? client).post<UpdateRecallSettingResponses, UpdateRecallSettingErrors, ThrowOnError>({
-    url: '/api/notes/{note}/review-setting',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const updateRecallSetting = <ThrowOnError extends boolean = false>(options: Options<UpdateRecallSettingData, ThrowOnError>) => {
+    return (options.client ?? client).post<UpdateRecallSettingResponses, UpdateRecallSettingErrors, ThrowOnError>({
+        url: '/api/notes/{note}/review-setting',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const deleteNote = <ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>) => (options.client ?? client).post<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError>({ url: '/api/notes/{note}/delete', ...options });
+export const deleteNote = <ThrowOnError extends boolean = false>(options: Options<DeleteNoteData, ThrowOnError>) => {
+    return (options.client ?? client).post<DeleteNoteResponses, DeleteNoteErrors, ThrowOnError>({
+        url: '/api/notes/{note}/delete',
+        ...options
+    });
+};
 
-export const semanticSearch = <ThrowOnError extends boolean = false>(options: Options<SemanticSearchData, ThrowOnError>) => (options.client ?? client).post<SemanticSearchResponses, SemanticSearchErrors, ThrowOnError>({
-    url: '/api/notes/semantic-search',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const semanticSearch = <ThrowOnError extends boolean = false>(options: Options<SemanticSearchData, ThrowOnError>) => {
+    return (options.client ?? client).post<SemanticSearchResponses, SemanticSearchErrors, ThrowOnError>({
+        url: '/api/notes/semantic-search',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const searchForLinkTarget = <ThrowOnError extends boolean = false>(options: Options<SearchForLinkTargetData, ThrowOnError>) => (options.client ?? client).post<SearchForLinkTargetResponses, SearchForLinkTargetErrors, ThrowOnError>({
-    url: '/api/notes/search',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const searchForLinkTarget = <ThrowOnError extends boolean = false>(options: Options<SearchForLinkTargetData, ThrowOnError>) => {
+    return (options.client ?? client).post<SearchForLinkTargetResponses, SearchForLinkTargetErrors, ThrowOnError>({
+        url: '/api/notes/search',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const moveAfter = <ThrowOnError extends boolean = false>(options: Options<MoveAfterData, ThrowOnError>) => (options.client ?? client).post<MoveAfterResponses, MoveAfterErrors, ThrowOnError>({ url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}', ...options });
+export const moveAfter = <ThrowOnError extends boolean = false>(options: Options<MoveAfterData, ThrowOnError>) => {
+    return (options.client ?? client).post<MoveAfterResponses, MoveAfterErrors, ThrowOnError>({
+        url: '/api/notes/move_after/{note}/{targetNote}/{asFirstChild}',
+        ...options
+    });
+};
 
-export const get = <ThrowOnError extends boolean = false>(options: Options<GetData, ThrowOnError>) => (options.client ?? client).get<GetResponses, GetErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}', ...options });
+export const get = <ThrowOnError extends boolean = false>(options: Options<GetData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetResponses, GetErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}',
+        ...options
+    });
+};
 
-export const updateNotebook = <ThrowOnError extends boolean = false>(options: Options<UpdateNotebookData, ThrowOnError>) => (options.client ?? client).post<UpdateNotebookResponses, UpdateNotebookErrors, ThrowOnError>({
-    url: '/api/notebooks/{notebook}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const updateNotebook = <ThrowOnError extends boolean = false>(options: Options<UpdateNotebookData, ThrowOnError>) => {
+    return (options.client ?? client).post<UpdateNotebookResponses, UpdateNotebookErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
 
-export const updateNotebookIndex = <ThrowOnError extends boolean = false>(options: Options<UpdateNotebookIndexData, ThrowOnError>) => (options.client ?? client).post<UpdateNotebookIndexResponses, UpdateNotebookIndexErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/update-index', ...options });
+export const updateNotebookIndex = <ThrowOnError extends boolean = false>(options: Options<UpdateNotebookIndexData, ThrowOnError>) => {
+    return (options.client ?? client).post<UpdateNotebookIndexResponses, UpdateNotebookIndexErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/update-index',
+        ...options
+    });
+};
 
-export const shareNotebook = <ThrowOnError extends boolean = false>(options: Options<ShareNotebookData, ThrowOnError>) => (options.client ?? client).post<ShareNotebookResponses, ShareNotebookErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/share', ...options });
+export const shareNotebook = <ThrowOnError extends boolean = false>(options: Options<ShareNotebookData, ThrowOnError>) => {
+    return (options.client ?? client).post<ShareNotebookResponses, ShareNotebookErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/share',
+        ...options
+    });
+};
 
-export const resetNotebookIndex = <ThrowOnError extends boolean = false>(options: Options<ResetNotebookIndexData, ThrowOnError>) => (options.client ?? client).post<ResetNotebookIndexResponses, ResetNotebookIndexErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/reset-index', ...options });
+export const resetNotebookIndex = <ThrowOnError extends boolean = false>(options: Options<ResetNotebookIndexData, ThrowOnError>) => {
+    return (options.client ?? client).post<ResetNotebookIndexResponses, ResetNotebookIndexErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/reset-index',
+        ...options
+    });
+};
 
-export const downloadNotebookForObsidian = <ThrowOnError extends boolean = false>(options: Options<DownloadNotebookForObsidianData, ThrowOnError>) => (options.client ?? client).get<DownloadNotebookForObsidianResponses, DownloadNotebookForObsidianErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/obsidian', ...options });
+export const downloadNotebookForObsidian = <ThrowOnError extends boolean = false>(options: Options<DownloadNotebookForObsidianData, ThrowOnError>) => {
+    return (options.client ?? client).get<DownloadNotebookForObsidianResponses, DownloadNotebookForObsidianErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/obsidian',
+        ...options
+    });
+};
 
 /**
  * Import Obsidian file
  */
-export const importObsidian = <ThrowOnError extends boolean = false>(options: Options<ImportObsidianData, ThrowOnError>) => (options.client ?? client).post<ImportObsidianResponses, ImportObsidianErrors, ThrowOnError>({
-    ...formDataBodySerializer,
-    url: '/api/notebooks/{notebook}/obsidian',
-    ...options,
-    headers: {
-        'Content-Type': null,
-        ...options.headers
-    }
-});
-
-export const createNotebook = <ThrowOnError extends boolean = false>(options: Options<CreateNotebookData, ThrowOnError>) => (options.client ?? client).post<CreateNotebookResponses, CreateNotebookErrors, ThrowOnError>({
-    url: '/api/notebooks/create',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const approve = <ThrowOnError extends boolean = false>(options: Options<ApproveData, ThrowOnError>) => (options.client ?? client).post<ApproveResponses, ApproveErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve', ...options });
-
-export const requestApprovalForNotebook = <ThrowOnError extends boolean = false>(options: Options<RequestApprovalForNotebookData, ThrowOnError>) => (options.client ?? client).post<RequestApprovalForNotebookResponses, RequestApprovalForNotebookErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/request-approval/{notebook}', ...options });
-
-export const selfEvaluate = <ThrowOnError extends boolean = false>(options: Options<SelfEvaluateData, ThrowOnError>) => (options.client ?? client).post<SelfEvaluateResponses, SelfEvaluateErrors, ThrowOnError>({
-    url: '/api/memory-trackers/{memoryTracker}/self-evaluate',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const removeFromRepeating = <ThrowOnError extends boolean = false>(options: Options<RemoveFromRepeatingData, ThrowOnError>) => (options.client ?? client).post<RemoveFromRepeatingResponses, RemoveFromRepeatingErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/remove', ...options });
-
-export const answerSpelling = <ThrowOnError extends boolean = false>(options: Options<AnswerSpellingData, ThrowOnError>) => (options.client ?? client).post<AnswerSpellingResponses, AnswerSpellingErrors, ThrowOnError>({
-    url: '/api/memory-trackers/{memoryTracker}/answer-spelling',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const createNoteViaMcp = <ThrowOnError extends boolean = false>(options: Options<CreateNoteViaMcpData, ThrowOnError>) => (options.client ?? client).post<CreateNoteViaMcpResponses, CreateNoteViaMcpErrors, ThrowOnError>({
-    url: '/api/mcp/notes/create',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const updateLink = <ThrowOnError extends boolean = false>(options: Options<UpdateLinkData, ThrowOnError>) => (options.client ?? client).post<UpdateLinkResponses, UpdateLinkErrors, ThrowOnError>({
-    url: '/api/links/{link}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const moveNote = <ThrowOnError extends boolean = false>(options: Options<MoveNoteData, ThrowOnError>) => (options.client ?? client).post<MoveNoteResponses, MoveNoteErrors, ThrowOnError>({
-    url: '/api/links/move/{sourceNote}/{targetNote}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const linkNoteFinalize = <ThrowOnError extends boolean = false>(options: Options<LinkNoteFinalizeData, ThrowOnError>) => (options.client ?? client).post<LinkNoteFinalizeResponses, LinkNoteFinalizeErrors, ThrowOnError>({
-    url: '/api/links/create/{sourceNote}/{targetNote}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const duplicate = <ThrowOnError extends boolean = false>(options: Options<DuplicateData, ThrowOnError>) => (options.client ?? client).post<DuplicateResponses, DuplicateErrors, ThrowOnError>({ url: '/api/fine-tuning/{suggestedQuestion}/duplicate', ...options });
-
-export const delete_ = <ThrowOnError extends boolean = false>(options: Options<DeleteData, ThrowOnError>) => (options.client ?? client).post<DeleteResponses, DeleteErrors, ThrowOnError>({ url: '/api/fine-tuning/{suggestedQuestion}/delete', ...options });
-
-export const uploadAndTriggerFineTuning = <ThrowOnError extends boolean = false>(options?: Options<UploadAndTriggerFineTuningData, ThrowOnError>) => (options?.client ?? client).post<UploadAndTriggerFineTuningResponses, UploadAndTriggerFineTuningErrors, ThrowOnError>({ url: '/api/fine-tuning/upload-and-trigger-fine-tuning', ...options });
-
-export const replyToConversation = <ThrowOnError extends boolean = false>(options: Options<ReplyToConversationData, ThrowOnError>) => (options.client ?? client).post<ReplyToConversationResponses, ReplyToConversationErrors, ThrowOnError>({
-    url: '/api/conversation/{conversationId}/send',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const getAiReply = <ThrowOnError extends boolean = false>(options: Options<GetAiReplyData, ThrowOnError>) => (options.client ?? client).post<GetAiReplyResponses, GetAiReplyErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/ai-reply', ...options });
-
-export const startConversationAboutRecallPrompt = <ThrowOnError extends boolean = false>(options: Options<StartConversationAboutRecallPromptData, ThrowOnError>) => (options.client ?? client).post<StartConversationAboutRecallPromptResponses, StartConversationAboutRecallPromptErrors, ThrowOnError>({ url: '/api/conversation/recall-prompt/{recallPrompt}', ...options });
-
-export const getConversationsAboutNote = <ThrowOnError extends boolean = false>(options: Options<GetConversationsAboutNoteData, ThrowOnError>) => (options.client ?? client).get<GetConversationsAboutNoteResponses, GetConversationsAboutNoteErrors, ThrowOnError>({ url: '/api/conversation/note/{note}', ...options });
-
-export const startConversationAboutNote = <ThrowOnError extends boolean = false>(options: Options<StartConversationAboutNoteData, ThrowOnError>) => (options.client ?? client).post<StartConversationAboutNoteResponses, StartConversationAboutNoteErrors, ThrowOnError>({
-    url: '/api/conversation/note/{note}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const startConversationAboutAssessmentQuestion = <ThrowOnError extends boolean = false>(options: Options<StartConversationAboutAssessmentQuestionData, ThrowOnError>) => (options.client ?? client).post<StartConversationAboutAssessmentQuestionResponses, StartConversationAboutAssessmentQuestionErrors, ThrowOnError>({
-    url: '/api/conversation/assessment-question/{assessmentQuestion}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const index = <ThrowOnError extends boolean = false>(options?: Options<IndexData, ThrowOnError>) => (options?.client ?? client).get<IndexResponses, IndexErrors, ThrowOnError>({ url: '/api/circles', ...options });
-
-export const createCircle = <ThrowOnError extends boolean = false>(options: Options<CreateCircleData, ThrowOnError>) => (options.client ?? client).post<CreateCircleResponses, CreateCircleErrors, ThrowOnError>({
-    url: '/api/circles',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const createNotebookInCircle = <ThrowOnError extends boolean = false>(options: Options<CreateNotebookInCircleData, ThrowOnError>) => (options.client ?? client).post<CreateNotebookInCircleResponses, CreateNotebookInCircleErrors, ThrowOnError>({
-    url: '/api/circles/{circle}/notebooks',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const joinCircle = <ThrowOnError extends boolean = false>(options: Options<JoinCircleData, ThrowOnError>) => (options.client ?? client).post<JoinCircleResponses, JoinCircleErrors, ThrowOnError>({
-    url: '/api/circles/join',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const getCertificate = <ThrowOnError extends boolean = false>(options: Options<GetCertificateData, ThrowOnError>) => (options.client ?? client).get<GetCertificateResponses, GetCertificateErrors, ThrowOnError>({ url: '/api/certificate/{notebook}', ...options });
-
-export const claimCertificate = <ThrowOnError extends boolean = false>(options: Options<ClaimCertificateData, ThrowOnError>) => (options.client ?? client).post<ClaimCertificateResponses, ClaimCertificateErrors, ThrowOnError>({ url: '/api/certificate/{notebook}', ...options });
-
-export const removeFromBazaar = <ThrowOnError extends boolean = false>(options: Options<RemoveFromBazaarData, ThrowOnError>) => (options.client ?? client).post<RemoveFromBazaarResponses, RemoveFromBazaarErrors, ThrowOnError>({ url: '/api/bazaar/{bazaarNotebook}/remove', ...options });
-
-export const audioToText = <ThrowOnError extends boolean = false>(options?: Options<AudioToTextData, ThrowOnError>) => (options?.client ?? client).post<AudioToTextResponses, AudioToTextErrors, ThrowOnError>({
-    ...formDataBodySerializer,
-    url: '/api/audio/audio-to-text',
-    ...options,
-    headers: {
-        'Content-Type': null,
-        ...options?.headers
-    }
-});
-
-export const assimilate = <ThrowOnError extends boolean = false>(options: Options<AssimilateData, ThrowOnError>) => (options.client ?? client).post<AssimilateResponses, AssimilateErrors, ThrowOnError>({
-    url: '/api/assimilation',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const answerQuestion = <ThrowOnError extends boolean = false>(options: Options<AnswerQuestionData, ThrowOnError>) => (options.client ?? client).post<AnswerQuestionResponses, AnswerQuestionErrors, ThrowOnError>({
-    url: '/api/assessment/{assessmentQuestionInstance}/answer',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const submitAssessmentResult = <ThrowOnError extends boolean = false>(options: Options<SubmitAssessmentResultData, ThrowOnError>) => (options.client ?? client).post<SubmitAssessmentResultResponses, SubmitAssessmentResultErrors, ThrowOnError>({ url: '/api/assessment/{assessmentAttempt}', ...options });
-
-export const generateAssessmentQuestions = <ThrowOnError extends boolean = false>(options: Options<GenerateAssessmentQuestionsData, ThrowOnError>) => (options.client ?? client).post<GenerateAssessmentQuestionsResponses, GenerateAssessmentQuestionsErrors, ThrowOnError>({ url: '/api/assessment/questions/{notebook}', ...options });
-
-export const suggestTitle = <ThrowOnError extends boolean = false>(options: Options<SuggestTitleData, ThrowOnError>) => (options.client ?? client).post<SuggestTitleResponses, SuggestTitleErrors, ThrowOnError>({ url: '/api/ai/suggest-title/{note}', ...options });
-
-export const generateImage = <ThrowOnError extends boolean = false>(options: Options<GenerateImageData, ThrowOnError>) => (options.client ?? client).post<GenerateImageResponses, GenerateImageErrors, ThrowOnError>({
-    url: '/api/ai/generate-image',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>) => (options.client ?? client).patch<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
-    url: '/api/user/{user}',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const updateNoteTitle = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteTitleData, ThrowOnError>) => (options.client ?? client).patch<UpdateNoteTitleResponses, UpdateNoteTitleErrors, ThrowOnError>({
-    url: '/api/text_content/{note}/title',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const updateNoteDetails = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteDetailsData, ThrowOnError>) => (options.client ?? client).patch<UpdateNoteDetailsResponses, UpdateNoteDetailsErrors, ThrowOnError>({
-    url: '/api/text_content/{note}/details',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const showNote = <ThrowOnError extends boolean = false>(options: Options<ShowNoteData, ThrowOnError>) => (options.client ?? client).get<ShowNoteResponses, ShowNoteErrors, ThrowOnError>({ url: '/api/notes/{note}', ...options });
-
-export const updateNoteAccessories = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteAccessoriesData, ThrowOnError>) => (options.client ?? client).patch<UpdateNoteAccessoriesResponses, UpdateNoteAccessoriesErrors, ThrowOnError>({
-    ...formDataBodySerializer,
-    url: '/api/notes/{note}',
-    ...options,
-    headers: {
-        'Content-Type': null,
-        ...options.headers
-    }
-});
-
-export const undoDeleteNote = <ThrowOnError extends boolean = false>(options: Options<UndoDeleteNoteData, ThrowOnError>) => (options.client ?? client).patch<UndoDeleteNoteResponses, UndoDeleteNoteErrors, ThrowOnError>({ url: '/api/notes/{note}/undo-delete', ...options });
-
-export const moveToCircle = <ThrowOnError extends boolean = false>(options: Options<MoveToCircleData, ThrowOnError>) => (options.client ?? client).patch<MoveToCircleResponses, MoveToCircleErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/move-to-circle/{circle}', ...options });
-
-export const getAiAssistant = <ThrowOnError extends boolean = false>(options: Options<GetAiAssistantData, ThrowOnError>) => (options.client ?? client).get<GetAiAssistantResponses, GetAiAssistantErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/ai-assistant', ...options });
-
-export const updateAiAssistant = <ThrowOnError extends boolean = false>(options: Options<UpdateAiAssistantData, ThrowOnError>) => (options.client ?? client).patch<UpdateAiAssistantResponses, UpdateAiAssistantErrors, ThrowOnError>({
-    url: '/api/notebooks/{notebook}/ai-assistant',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const markAsRepeated = <ThrowOnError extends boolean = false>(options: Options<MarkAsRepeatedData, ThrowOnError>) => (options.client ?? client).patch<MarkAsRepeatedResponses, MarkAsRepeatedErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/mark-as-repeated', ...options });
-
-export const updateSuggestedQuestionForFineTuning = <ThrowOnError extends boolean = false>(options: Options<UpdateSuggestedQuestionForFineTuningData, ThrowOnError>) => (options.client ?? client).patch<UpdateSuggestedQuestionForFineTuningResponses, UpdateSuggestedQuestionForFineTuningErrors, ThrowOnError>({
-    url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-export const markConversationAsRead = <ThrowOnError extends boolean = false>(options: Options<MarkConversationAsReadData, ThrowOnError>) => (options.client ?? client).patch<MarkConversationAsReadResponses, MarkConversationAsReadErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/read', ...options });
-
-export const searchWikidata = <ThrowOnError extends boolean = false>(options: Options<SearchWikidataData, ThrowOnError>) => (options.client ?? client).get<SearchWikidataResponses, SearchWikidataErrors, ThrowOnError>({ url: '/api/wikidata/search', ...options });
-
-export const fetchWikidataEntityDataById = <ThrowOnError extends boolean = false>(options: Options<FetchWikidataEntityDataByIdData, ThrowOnError>) => (options.client ?? client).get<FetchWikidataEntityDataByIdResponses, FetchWikidataEntityDataByIdErrors, ThrowOnError>({ url: '/api/wikidata/entity-data/{wikidataId}', ...options });
-
-export const getTokens = <ThrowOnError extends boolean = false>(options?: Options<GetTokensData, ThrowOnError>) => (options?.client ?? client).get<GetTokensResponses, GetTokensErrors, ThrowOnError>({ url: '/api/user/get-tokens', ...options });
-
-export const currentUserInfo = <ThrowOnError extends boolean = false>(options?: Options<CurrentUserInfoData, ThrowOnError>) => (options?.client ?? client).get<CurrentUserInfoResponses, CurrentUserInfoErrors, ThrowOnError>({ url: '/api/user/current-user-info', ...options });
-
-export const githubIssues = <ThrowOnError extends boolean = false>(options?: Options<GithubIssuesData, ThrowOnError>) => (options?.client ?? client).get<GithubIssuesResponses, GithubIssuesErrors, ThrowOnError>({ url: '/api/testability/github_issues', ...options });
-
-export const recalling = <ThrowOnError extends boolean = false>(options: Options<RecallingData, ThrowOnError>) => (options.client ?? client).get<RecallingResponses, RecallingErrors, ThrowOnError>({ url: '/api/recalls/recalling', ...options });
-
-export const overview = <ThrowOnError extends boolean = false>(options: Options<OverviewData, ThrowOnError>) => (options.client ?? client).get<OverviewResponses, OverviewErrors, ThrowOnError>({ url: '/api/recalls/overview', ...options });
-
-export const showQuestion = <ThrowOnError extends boolean = false>(options: Options<ShowQuestionData, ThrowOnError>) => (options.client ?? client).get<ShowQuestionResponses, ShowQuestionErrors, ThrowOnError>({ url: '/api/recall-prompts/{recallPrompt}', ...options });
-
-export const askAQuestion = <ThrowOnError extends boolean = false>(options: Options<AskAQuestionData, ThrowOnError>) => (options.client ?? client).get<AskAQuestionResponses, AskAQuestionErrors, ThrowOnError>({ url: '/api/recall-prompts/{memoryTracker}/question', ...options });
-
-export const exportQuestionGeneration = <ThrowOnError extends boolean = false>(options: Options<ExportQuestionGenerationData, ThrowOnError>) => (options.client ?? client).get<ExportQuestionGenerationResponses, ExportQuestionGenerationErrors, ThrowOnError>({ url: '/api/predefined-questions/{note}/export-question-generation', ...options });
-
-export const getNoteInfo = <ThrowOnError extends boolean = false>(options: Options<GetNoteInfoData, ThrowOnError>) => (options.client ?? client).get<GetNoteInfoResponses, GetNoteInfoErrors, ThrowOnError>({ url: '/api/notes/{note}/note-info', ...options });
-
-export const getGraph = <ThrowOnError extends boolean = false>(options: Options<GetGraphData, ThrowOnError>) => (options.client ?? client).get<GetGraphResponses, GetGraphErrors, ThrowOnError>({ url: '/api/notes/{note}/graph', ...options });
-
-export const getDescendants = <ThrowOnError extends boolean = false>(options: Options<GetDescendantsData, ThrowOnError>) => (options.client ?? client).get<GetDescendantsResponses, GetDescendantsErrors, ThrowOnError>({ url: '/api/notes/{note}/descendants', ...options });
-
-export const showNoteAccessory = <ThrowOnError extends boolean = false>(options: Options<ShowNoteAccessoryData, ThrowOnError>) => (options.client ?? client).get<ShowNoteAccessoryResponses, ShowNoteAccessoryErrors, ThrowOnError>({ url: '/api/notes/{note}/accessory', ...options });
-
-export const getRecentNotes = <ThrowOnError extends boolean = false>(options?: Options<GetRecentNotesData, ThrowOnError>) => (options?.client ?? client).get<GetRecentNotesResponses, GetRecentNotesErrors, ThrowOnError>({ url: '/api/notes/recent', ...options });
-
-export const myNotebooks = <ThrowOnError extends boolean = false>(options?: Options<MyNotebooksData, ThrowOnError>) => (options?.client ?? client).get<MyNotebooksResponses, MyNotebooksErrors, ThrowOnError>({ url: '/api/notebooks', ...options });
-
-export const getNotes = <ThrowOnError extends boolean = false>(options: Options<GetNotesData, ThrowOnError>) => (options.client ?? client).get<GetNotesResponses, GetNotesErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/notes', ...options });
-
-export const downloadNotebookDump = <ThrowOnError extends boolean = false>(options: Options<DownloadNotebookDumpData, ThrowOnError>) => (options.client ?? client).get<DownloadNotebookDumpResponses, DownloadNotebookDumpErrors, ThrowOnError>({ url: '/api/notebooks/{notebook}/dump', ...options });
-
-export const getAllPendingRequest = <ThrowOnError extends boolean = false>(options?: Options<GetAllPendingRequestData, ThrowOnError>) => (options?.client ?? client).get<GetAllPendingRequestResponses, GetAllPendingRequestErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/get-all-pending-request', ...options });
-
-export const getApprovalForNotebook = <ThrowOnError extends boolean = false>(options: Options<GetApprovalForNotebookData, ThrowOnError>) => (options.client ?? client).get<GetApprovalForNotebookResponses, GetApprovalForNotebookErrors, ThrowOnError>({ url: '/api/notebook_certificate_approvals/for-notebook/{notebook}', ...options });
-
-export const showMemoryTracker = <ThrowOnError extends boolean = false>(options: Options<ShowMemoryTrackerData, ThrowOnError>) => (options.client ?? client).get<ShowMemoryTrackerResponses, ShowMemoryTrackerErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}', ...options });
-
-export const getSpellingQuestion = <ThrowOnError extends boolean = false>(options: Options<GetSpellingQuestionData, ThrowOnError>) => (options.client ?? client).get<GetSpellingQuestionResponses, GetSpellingQuestionErrors, ThrowOnError>({ url: '/api/memory-trackers/{memoryTracker}/spelling-question', ...options });
-
-export const getRecentlyReviewed = <ThrowOnError extends boolean = false>(options?: Options<GetRecentlyReviewedData, ThrowOnError>) => (options?.client ?? client).get<GetRecentlyReviewedResponses, GetRecentlyReviewedErrors, ThrowOnError>({ url: '/api/memory-trackers/recently-reviewed', ...options });
-
-export const getRecentMemoryTrackers = <ThrowOnError extends boolean = false>(options?: Options<GetRecentMemoryTrackersData, ThrowOnError>) => (options?.client ?? client).get<GetRecentMemoryTrackersResponses, GetRecentMemoryTrackersErrors, ThrowOnError>({ url: '/api/memory-trackers/recent', ...options });
-
-export const ping = <ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) => (options?.client ?? client).get<PingResponses, PingErrors, ThrowOnError>({ url: '/api/healthcheck', ...options });
-
-export const getAllSuggestedQuestions = <ThrowOnError extends boolean = false>(options?: Options<GetAllSuggestedQuestionsData, ThrowOnError>) => (options?.client ?? client).get<GetAllSuggestedQuestionsResponses, GetAllSuggestedQuestionsErrors, ThrowOnError>({ url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning', ...options });
-
-export const failureReports = <ThrowOnError extends boolean = false>(options?: Options<FailureReportsData, ThrowOnError>) => (options?.client ?? client).get<FailureReportsResponses, FailureReportsErrors, ThrowOnError>({ url: '/api/failure-reports', ...options });
-
-export const showFailureReport = <ThrowOnError extends boolean = false>(options: Options<ShowFailureReportData, ThrowOnError>) => (options.client ?? client).get<ShowFailureReportResponses, ShowFailureReportErrors, ThrowOnError>({ url: '/api/failure-reports/{failureReport}', ...options });
-
-export const dataUpgrade = <ThrowOnError extends boolean = false>(options?: Options<DataUpgradeData, ThrowOnError>) => (options?.client ?? client).get<DataUpgradeResponses, DataUpgradeErrors, ThrowOnError>({ url: '/api/data_upgrade', ...options });
-
-export const getConversation = <ThrowOnError extends boolean = false>(options: Options<GetConversationData, ThrowOnError>) => (options.client ?? client).get<GetConversationResponses, GetConversationErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}', ...options });
-
-export const getConversationMessages = <ThrowOnError extends boolean = false>(options: Options<GetConversationMessagesData, ThrowOnError>) => (options.client ?? client).get<GetConversationMessagesResponses, GetConversationMessagesErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/messages', ...options });
-
-export const exportConversation = <ThrowOnError extends boolean = false>(options: Options<ExportConversationData, ThrowOnError>) => (options.client ?? client).get<ExportConversationResponses, ExportConversationErrors, ThrowOnError>({ url: '/api/conversation/{conversationId}/export', ...options });
-
-export const getUnreadConversations = <ThrowOnError extends boolean = false>(options?: Options<GetUnreadConversationsData, ThrowOnError>) => (options?.client ?? client).get<GetUnreadConversationsResponses, GetUnreadConversationsErrors, ThrowOnError>({ url: '/api/conversation/unread', ...options });
-
-export const getConversationsOfCurrentUser = <ThrowOnError extends boolean = false>(options?: Options<GetConversationsOfCurrentUserData, ThrowOnError>) => (options?.client ?? client).get<GetConversationsOfCurrentUserResponses, GetConversationsOfCurrentUserErrors, ThrowOnError>({ url: '/api/conversation/all', ...options });
-
-export const showCircle = <ThrowOnError extends boolean = false>(options: Options<ShowCircleData, ThrowOnError>) => (options.client ?? client).get<ShowCircleResponses, ShowCircleErrors, ThrowOnError>({ url: '/api/circles/{circle}', ...options });
-
-export const bazaar = <ThrowOnError extends boolean = false>(options?: Options<BazaarData, ThrowOnError>) => (options?.client ?? client).get<BazaarResponses, BazaarErrors, ThrowOnError>({ url: '/api/bazaar', ...options });
-
-export const getAssimilationCount = <ThrowOnError extends boolean = false>(options: Options<GetAssimilationCountData, ThrowOnError>) => (options.client ?? client).get<GetAssimilationCountResponses, GetAssimilationCountErrors, ThrowOnError>({ url: '/api/assimilation/count', ...options });
-
-export const assimilating = <ThrowOnError extends boolean = false>(options: Options<AssimilatingData, ThrowOnError>) => (options.client ?? client).get<AssimilatingResponses, AssimilatingErrors, ThrowOnError>({ url: '/api/assimilation/assimilating', ...options });
-
-export const getMyAssessments = <ThrowOnError extends boolean = false>(options?: Options<GetMyAssessmentsData, ThrowOnError>) => (options?.client ?? client).get<GetMyAssessmentsResponses, GetMyAssessmentsErrors, ThrowOnError>({ url: '/api/assessment', ...options });
-
-export const dummyEntryToGenerateDataTypesThatAreRequiredInEventStream = <ThrowOnError extends boolean = false>(options?: Options<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData, ThrowOnError>) => (options?.client ?? client).get<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors, ThrowOnError>({ url: '/api/ai/dummy', ...options });
-
-export const getAvailableGptModels = <ThrowOnError extends boolean = false>(options?: Options<GetAvailableGptModelsData, ThrowOnError>) => (options?.client ?? client).get<GetAvailableGptModelsResponses, GetAvailableGptModelsErrors, ThrowOnError>({ url: '/api/ai/available-gpt-models', ...options });
-
-export const deleteToken = <ThrowOnError extends boolean = false>(options: Options<DeleteTokenData, ThrowOnError>) => (options.client ?? client).delete<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError>({ url: '/api/user/token/{tokenId}', ...options });
-
-export const deleteFailureReports = <ThrowOnError extends boolean = false>(options: Options<DeleteFailureReportsData, ThrowOnError>) => (options.client ?? client).delete<DeleteFailureReportsResponses, DeleteFailureReportsErrors, ThrowOnError>({
-    url: '/api/failure-reports/delete',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
+export const importObsidian = <ThrowOnError extends boolean = false>(options: Options<ImportObsidianData, ThrowOnError>) => {
+    return (options.client ?? client).post<ImportObsidianResponses, ImportObsidianErrors, ThrowOnError>({
+        ...formDataBodySerializer,
+        url: '/api/notebooks/{notebook}/obsidian',
+        ...options,
+        headers: {
+            'Content-Type': null,
+            ...options.headers
+        }
+    });
+};
+
+export const createNotebook = <ThrowOnError extends boolean = false>(options: Options<CreateNotebookData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateNotebookResponses, CreateNotebookErrors, ThrowOnError>({
+        url: '/api/notebooks/create',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const approve = <ThrowOnError extends boolean = false>(options: Options<ApproveData, ThrowOnError>) => {
+    return (options.client ?? client).post<ApproveResponses, ApproveErrors, ThrowOnError>({
+        url: '/api/notebook_certificate_approvals/{notebookCertificateApproval}/approve',
+        ...options
+    });
+};
+
+export const requestApprovalForNotebook = <ThrowOnError extends boolean = false>(options: Options<RequestApprovalForNotebookData, ThrowOnError>) => {
+    return (options.client ?? client).post<RequestApprovalForNotebookResponses, RequestApprovalForNotebookErrors, ThrowOnError>({
+        url: '/api/notebook_certificate_approvals/request-approval/{notebook}',
+        ...options
+    });
+};
+
+export const selfEvaluate = <ThrowOnError extends boolean = false>(options: Options<SelfEvaluateData, ThrowOnError>) => {
+    return (options.client ?? client).post<SelfEvaluateResponses, SelfEvaluateErrors, ThrowOnError>({
+        url: '/api/memory-trackers/{memoryTracker}/self-evaluate',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const removeFromRepeating = <ThrowOnError extends boolean = false>(options: Options<RemoveFromRepeatingData, ThrowOnError>) => {
+    return (options.client ?? client).post<RemoveFromRepeatingResponses, RemoveFromRepeatingErrors, ThrowOnError>({
+        url: '/api/memory-trackers/{memoryTracker}/remove',
+        ...options
+    });
+};
+
+export const answerSpelling = <ThrowOnError extends boolean = false>(options: Options<AnswerSpellingData, ThrowOnError>) => {
+    return (options.client ?? client).post<AnswerSpellingResponses, AnswerSpellingErrors, ThrowOnError>({
+        url: '/api/memory-trackers/{memoryTracker}/answer-spelling',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const createNoteViaMcp = <ThrowOnError extends boolean = false>(options: Options<CreateNoteViaMcpData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateNoteViaMcpResponses, CreateNoteViaMcpErrors, ThrowOnError>({
+        url: '/api/mcp/notes/create',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const updateLink = <ThrowOnError extends boolean = false>(options: Options<UpdateLinkData, ThrowOnError>) => {
+    return (options.client ?? client).post<UpdateLinkResponses, UpdateLinkErrors, ThrowOnError>({
+        url: '/api/links/{link}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const moveNote = <ThrowOnError extends boolean = false>(options: Options<MoveNoteData, ThrowOnError>) => {
+    return (options.client ?? client).post<MoveNoteResponses, MoveNoteErrors, ThrowOnError>({
+        url: '/api/links/move/{sourceNote}/{targetNote}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const linkNoteFinalize = <ThrowOnError extends boolean = false>(options: Options<LinkNoteFinalizeData, ThrowOnError>) => {
+    return (options.client ?? client).post<LinkNoteFinalizeResponses, LinkNoteFinalizeErrors, ThrowOnError>({
+        url: '/api/links/create/{sourceNote}/{targetNote}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const duplicate = <ThrowOnError extends boolean = false>(options: Options<DuplicateData, ThrowOnError>) => {
+    return (options.client ?? client).post<DuplicateResponses, DuplicateErrors, ThrowOnError>({
+        url: '/api/fine-tuning/{suggestedQuestion}/duplicate',
+        ...options
+    });
+};
+
+export const delete_ = <ThrowOnError extends boolean = false>(options: Options<DeleteData, ThrowOnError>) => {
+    return (options.client ?? client).post<DeleteResponses, DeleteErrors, ThrowOnError>({
+        url: '/api/fine-tuning/{suggestedQuestion}/delete',
+        ...options
+    });
+};
+
+export const uploadAndTriggerFineTuning = <ThrowOnError extends boolean = false>(options?: Options<UploadAndTriggerFineTuningData, ThrowOnError>) => {
+    return (options?.client ?? client).post<UploadAndTriggerFineTuningResponses, UploadAndTriggerFineTuningErrors, ThrowOnError>({
+        url: '/api/fine-tuning/upload-and-trigger-fine-tuning',
+        ...options
+    });
+};
+
+export const replyToConversation = <ThrowOnError extends boolean = false>(options: Options<ReplyToConversationData, ThrowOnError>) => {
+    return (options.client ?? client).post<ReplyToConversationResponses, ReplyToConversationErrors, ThrowOnError>({
+        url: '/api/conversation/{conversationId}/send',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const getAiReply = <ThrowOnError extends boolean = false>(options: Options<GetAiReplyData, ThrowOnError>) => {
+    return (options.client ?? client).post<GetAiReplyResponses, GetAiReplyErrors, ThrowOnError>({
+        url: '/api/conversation/{conversationId}/ai-reply',
+        ...options
+    });
+};
+
+export const startConversationAboutRecallPrompt = <ThrowOnError extends boolean = false>(options: Options<StartConversationAboutRecallPromptData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartConversationAboutRecallPromptResponses, StartConversationAboutRecallPromptErrors, ThrowOnError>({
+        url: '/api/conversation/recall-prompt/{recallPrompt}',
+        ...options
+    });
+};
+
+export const getConversationsAboutNote = <ThrowOnError extends boolean = false>(options: Options<GetConversationsAboutNoteData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetConversationsAboutNoteResponses, GetConversationsAboutNoteErrors, ThrowOnError>({
+        url: '/api/conversation/note/{note}',
+        ...options
+    });
+};
+
+export const startConversationAboutNote = <ThrowOnError extends boolean = false>(options: Options<StartConversationAboutNoteData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartConversationAboutNoteResponses, StartConversationAboutNoteErrors, ThrowOnError>({
+        url: '/api/conversation/note/{note}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const startConversationAboutAssessmentQuestion = <ThrowOnError extends boolean = false>(options: Options<StartConversationAboutAssessmentQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).post<StartConversationAboutAssessmentQuestionResponses, StartConversationAboutAssessmentQuestionErrors, ThrowOnError>({
+        url: '/api/conversation/assessment-question/{assessmentQuestion}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const index = <ThrowOnError extends boolean = false>(options?: Options<IndexData, ThrowOnError>) => {
+    return (options?.client ?? client).get<IndexResponses, IndexErrors, ThrowOnError>({
+        url: '/api/circles',
+        ...options
+    });
+};
+
+export const createCircle = <ThrowOnError extends boolean = false>(options: Options<CreateCircleData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateCircleResponses, CreateCircleErrors, ThrowOnError>({
+        url: '/api/circles',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const createNotebookInCircle = <ThrowOnError extends boolean = false>(options: Options<CreateNotebookInCircleData, ThrowOnError>) => {
+    return (options.client ?? client).post<CreateNotebookInCircleResponses, CreateNotebookInCircleErrors, ThrowOnError>({
+        url: '/api/circles/{circle}/notebooks',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const joinCircle = <ThrowOnError extends boolean = false>(options: Options<JoinCircleData, ThrowOnError>) => {
+    return (options.client ?? client).post<JoinCircleResponses, JoinCircleErrors, ThrowOnError>({
+        url: '/api/circles/join',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const getCertificate = <ThrowOnError extends boolean = false>(options: Options<GetCertificateData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetCertificateResponses, GetCertificateErrors, ThrowOnError>({
+        url: '/api/certificate/{notebook}',
+        ...options
+    });
+};
+
+export const claimCertificate = <ThrowOnError extends boolean = false>(options: Options<ClaimCertificateData, ThrowOnError>) => {
+    return (options.client ?? client).post<ClaimCertificateResponses, ClaimCertificateErrors, ThrowOnError>({
+        url: '/api/certificate/{notebook}',
+        ...options
+    });
+};
+
+export const removeFromBazaar = <ThrowOnError extends boolean = false>(options: Options<RemoveFromBazaarData, ThrowOnError>) => {
+    return (options.client ?? client).post<RemoveFromBazaarResponses, RemoveFromBazaarErrors, ThrowOnError>({
+        url: '/api/bazaar/{bazaarNotebook}/remove',
+        ...options
+    });
+};
+
+export const audioToText = <ThrowOnError extends boolean = false>(options?: Options<AudioToTextData, ThrowOnError>) => {
+    return (options?.client ?? client).post<AudioToTextResponses, AudioToTextErrors, ThrowOnError>({
+        ...formDataBodySerializer,
+        url: '/api/audio/audio-to-text',
+        ...options,
+        headers: {
+            'Content-Type': null,
+            ...options?.headers
+        }
+    });
+};
+
+export const assimilate = <ThrowOnError extends boolean = false>(options: Options<AssimilateData, ThrowOnError>) => {
+    return (options.client ?? client).post<AssimilateResponses, AssimilateErrors, ThrowOnError>({
+        url: '/api/assimilation',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const answerQuestion = <ThrowOnError extends boolean = false>(options: Options<AnswerQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).post<AnswerQuestionResponses, AnswerQuestionErrors, ThrowOnError>({
+        url: '/api/assessment/{assessmentQuestionInstance}/answer',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const submitAssessmentResult = <ThrowOnError extends boolean = false>(options: Options<SubmitAssessmentResultData, ThrowOnError>) => {
+    return (options.client ?? client).post<SubmitAssessmentResultResponses, SubmitAssessmentResultErrors, ThrowOnError>({
+        url: '/api/assessment/{assessmentAttempt}',
+        ...options
+    });
+};
+
+export const generateAssessmentQuestions = <ThrowOnError extends boolean = false>(options: Options<GenerateAssessmentQuestionsData, ThrowOnError>) => {
+    return (options.client ?? client).post<GenerateAssessmentQuestionsResponses, GenerateAssessmentQuestionsErrors, ThrowOnError>({
+        url: '/api/assessment/questions/{notebook}',
+        ...options
+    });
+};
+
+export const suggestTitle = <ThrowOnError extends boolean = false>(options: Options<SuggestTitleData, ThrowOnError>) => {
+    return (options.client ?? client).post<SuggestTitleResponses, SuggestTitleErrors, ThrowOnError>({
+        url: '/api/ai/suggest-title/{note}',
+        ...options
+    });
+};
+
+export const generateImage = <ThrowOnError extends boolean = false>(options: Options<GenerateImageData, ThrowOnError>) => {
+    return (options.client ?? client).post<GenerateImageResponses, GenerateImageErrors, ThrowOnError>({
+        url: '/api/ai/generate-image',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
+        url: '/api/user/{user}',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const updateNoteTitle = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteTitleData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateNoteTitleResponses, UpdateNoteTitleErrors, ThrowOnError>({
+        url: '/api/text_content/{note}/title',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const updateNoteDetails = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteDetailsData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateNoteDetailsResponses, UpdateNoteDetailsErrors, ThrowOnError>({
+        url: '/api/text_content/{note}/details',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const showNote = <ThrowOnError extends boolean = false>(options: Options<ShowNoteData, ThrowOnError>) => {
+    return (options.client ?? client).get<ShowNoteResponses, ShowNoteErrors, ThrowOnError>({
+        url: '/api/notes/{note}',
+        ...options
+    });
+};
+
+export const updateNoteAccessories = <ThrowOnError extends boolean = false>(options: Options<UpdateNoteAccessoriesData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateNoteAccessoriesResponses, UpdateNoteAccessoriesErrors, ThrowOnError>({
+        ...formDataBodySerializer,
+        url: '/api/notes/{note}',
+        ...options,
+        headers: {
+            'Content-Type': null,
+            ...options.headers
+        }
+    });
+};
+
+export const undoDeleteNote = <ThrowOnError extends boolean = false>(options: Options<UndoDeleteNoteData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UndoDeleteNoteResponses, UndoDeleteNoteErrors, ThrowOnError>({
+        url: '/api/notes/{note}/undo-delete',
+        ...options
+    });
+};
+
+export const moveToCircle = <ThrowOnError extends boolean = false>(options: Options<MoveToCircleData, ThrowOnError>) => {
+    return (options.client ?? client).patch<MoveToCircleResponses, MoveToCircleErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/move-to-circle/{circle}',
+        ...options
+    });
+};
+
+export const getAiAssistant = <ThrowOnError extends boolean = false>(options: Options<GetAiAssistantData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetAiAssistantResponses, GetAiAssistantErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/ai-assistant',
+        ...options
+    });
+};
+
+export const updateAiAssistant = <ThrowOnError extends boolean = false>(options: Options<UpdateAiAssistantData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateAiAssistantResponses, UpdateAiAssistantErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/ai-assistant',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const markAsRepeated = <ThrowOnError extends boolean = false>(options: Options<MarkAsRepeatedData, ThrowOnError>) => {
+    return (options.client ?? client).patch<MarkAsRepeatedResponses, MarkAsRepeatedErrors, ThrowOnError>({
+        url: '/api/memory-trackers/{memoryTracker}/mark-as-repeated',
+        ...options
+    });
+};
+
+export const updateSuggestedQuestionForFineTuning = <ThrowOnError extends boolean = false>(options: Options<UpdateSuggestedQuestionForFineTuningData, ThrowOnError>) => {
+    return (options.client ?? client).patch<UpdateSuggestedQuestionForFineTuningResponses, UpdateSuggestedQuestionForFineTuningErrors, ThrowOnError>({
+        url: '/api/fine-tuning/{suggestedQuestion}/update-suggested-question-for-fine-tuning',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+export const markConversationAsRead = <ThrowOnError extends boolean = false>(options: Options<MarkConversationAsReadData, ThrowOnError>) => {
+    return (options.client ?? client).patch<MarkConversationAsReadResponses, MarkConversationAsReadErrors, ThrowOnError>({
+        url: '/api/conversation/{conversationId}/read',
+        ...options
+    });
+};
+
+export const searchWikidata = <ThrowOnError extends boolean = false>(options: Options<SearchWikidataData, ThrowOnError>) => {
+    return (options.client ?? client).get<SearchWikidataResponses, SearchWikidataErrors, ThrowOnError>({
+        url: '/api/wikidata/search',
+        ...options
+    });
+};
+
+export const fetchWikidataEntityDataById = <ThrowOnError extends boolean = false>(options: Options<FetchWikidataEntityDataByIdData, ThrowOnError>) => {
+    return (options.client ?? client).get<FetchWikidataEntityDataByIdResponses, FetchWikidataEntityDataByIdErrors, ThrowOnError>({
+        url: '/api/wikidata/entity-data/{wikidataId}',
+        ...options
+    });
+};
+
+export const getTokens = <ThrowOnError extends boolean = false>(options?: Options<GetTokensData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetTokensResponses, GetTokensErrors, ThrowOnError>({
+        url: '/api/user/get-tokens',
+        ...options
+    });
+};
+
+export const currentUserInfo = <ThrowOnError extends boolean = false>(options?: Options<CurrentUserInfoData, ThrowOnError>) => {
+    return (options?.client ?? client).get<CurrentUserInfoResponses, CurrentUserInfoErrors, ThrowOnError>({
+        url: '/api/user/current-user-info',
+        ...options
+    });
+};
+
+export const githubIssues = <ThrowOnError extends boolean = false>(options?: Options<GithubIssuesData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GithubIssuesResponses, GithubIssuesErrors, ThrowOnError>({
+        url: '/api/testability/github_issues',
+        ...options
+    });
+};
+
+export const recalling = <ThrowOnError extends boolean = false>(options: Options<RecallingData, ThrowOnError>) => {
+    return (options.client ?? client).get<RecallingResponses, RecallingErrors, ThrowOnError>({
+        url: '/api/recalls/recalling',
+        ...options
+    });
+};
+
+export const overview = <ThrowOnError extends boolean = false>(options: Options<OverviewData, ThrowOnError>) => {
+    return (options.client ?? client).get<OverviewResponses, OverviewErrors, ThrowOnError>({
+        url: '/api/recalls/overview',
+        ...options
+    });
+};
+
+export const showQuestion = <ThrowOnError extends boolean = false>(options: Options<ShowQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).get<ShowQuestionResponses, ShowQuestionErrors, ThrowOnError>({
+        url: '/api/recall-prompts/{recallPrompt}',
+        ...options
+    });
+};
+
+export const askAQuestion = <ThrowOnError extends boolean = false>(options: Options<AskAQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).get<AskAQuestionResponses, AskAQuestionErrors, ThrowOnError>({
+        url: '/api/recall-prompts/{memoryTracker}/question',
+        ...options
+    });
+};
+
+export const exportQuestionGeneration = <ThrowOnError extends boolean = false>(options: Options<ExportQuestionGenerationData, ThrowOnError>) => {
+    return (options.client ?? client).get<ExportQuestionGenerationResponses, ExportQuestionGenerationErrors, ThrowOnError>({
+        url: '/api/predefined-questions/{note}/export-question-generation',
+        ...options
+    });
+};
+
+export const getNoteInfo = <ThrowOnError extends boolean = false>(options: Options<GetNoteInfoData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetNoteInfoResponses, GetNoteInfoErrors, ThrowOnError>({
+        url: '/api/notes/{note}/note-info',
+        ...options
+    });
+};
+
+export const getGraph = <ThrowOnError extends boolean = false>(options: Options<GetGraphData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetGraphResponses, GetGraphErrors, ThrowOnError>({
+        url: '/api/notes/{note}/graph',
+        ...options
+    });
+};
+
+export const getDescendants = <ThrowOnError extends boolean = false>(options: Options<GetDescendantsData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetDescendantsResponses, GetDescendantsErrors, ThrowOnError>({
+        url: '/api/notes/{note}/descendants',
+        ...options
+    });
+};
+
+export const showNoteAccessory = <ThrowOnError extends boolean = false>(options: Options<ShowNoteAccessoryData, ThrowOnError>) => {
+    return (options.client ?? client).get<ShowNoteAccessoryResponses, ShowNoteAccessoryErrors, ThrowOnError>({
+        url: '/api/notes/{note}/accessory',
+        ...options
+    });
+};
+
+export const getRecentNotes = <ThrowOnError extends boolean = false>(options?: Options<GetRecentNotesData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetRecentNotesResponses, GetRecentNotesErrors, ThrowOnError>({
+        url: '/api/notes/recent',
+        ...options
+    });
+};
+
+export const myNotebooks = <ThrowOnError extends boolean = false>(options?: Options<MyNotebooksData, ThrowOnError>) => {
+    return (options?.client ?? client).get<MyNotebooksResponses, MyNotebooksErrors, ThrowOnError>({
+        url: '/api/notebooks',
+        ...options
+    });
+};
+
+export const getNotes = <ThrowOnError extends boolean = false>(options: Options<GetNotesData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetNotesResponses, GetNotesErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/notes',
+        ...options
+    });
+};
+
+export const downloadNotebookDump = <ThrowOnError extends boolean = false>(options: Options<DownloadNotebookDumpData, ThrowOnError>) => {
+    return (options.client ?? client).get<DownloadNotebookDumpResponses, DownloadNotebookDumpErrors, ThrowOnError>({
+        url: '/api/notebooks/{notebook}/dump',
+        ...options
+    });
+};
+
+export const getAllPendingRequest = <ThrowOnError extends boolean = false>(options?: Options<GetAllPendingRequestData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllPendingRequestResponses, GetAllPendingRequestErrors, ThrowOnError>({
+        url: '/api/notebook_certificate_approvals/get-all-pending-request',
+        ...options
+    });
+};
+
+export const getApprovalForNotebook = <ThrowOnError extends boolean = false>(options: Options<GetApprovalForNotebookData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetApprovalForNotebookResponses, GetApprovalForNotebookErrors, ThrowOnError>({
+        url: '/api/notebook_certificate_approvals/for-notebook/{notebook}',
+        ...options
+    });
+};
+
+export const showMemoryTracker = <ThrowOnError extends boolean = false>(options: Options<ShowMemoryTrackerData, ThrowOnError>) => {
+    return (options.client ?? client).get<ShowMemoryTrackerResponses, ShowMemoryTrackerErrors, ThrowOnError>({
+        url: '/api/memory-trackers/{memoryTracker}',
+        ...options
+    });
+};
+
+export const getSpellingQuestion = <ThrowOnError extends boolean = false>(options: Options<GetSpellingQuestionData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetSpellingQuestionResponses, GetSpellingQuestionErrors, ThrowOnError>({
+        url: '/api/memory-trackers/{memoryTracker}/spelling-question',
+        ...options
+    });
+};
+
+export const getRecentlyReviewed = <ThrowOnError extends boolean = false>(options?: Options<GetRecentlyReviewedData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetRecentlyReviewedResponses, GetRecentlyReviewedErrors, ThrowOnError>({
+        url: '/api/memory-trackers/recently-reviewed',
+        ...options
+    });
+};
+
+export const getRecentMemoryTrackers = <ThrowOnError extends boolean = false>(options?: Options<GetRecentMemoryTrackersData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetRecentMemoryTrackersResponses, GetRecentMemoryTrackersErrors, ThrowOnError>({
+        url: '/api/memory-trackers/recent',
+        ...options
+    });
+};
+
+export const ping = <ThrowOnError extends boolean = false>(options?: Options<PingData, ThrowOnError>) => {
+    return (options?.client ?? client).get<PingResponses, PingErrors, ThrowOnError>({
+        url: '/api/healthcheck',
+        ...options
+    });
+};
+
+export const getAllSuggestedQuestions = <ThrowOnError extends boolean = false>(options?: Options<GetAllSuggestedQuestionsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAllSuggestedQuestionsResponses, GetAllSuggestedQuestionsErrors, ThrowOnError>({
+        url: '/api/fine-tuning/all-suggested-questions-for-fine-tuning',
+        ...options
+    });
+};
+
+export const failureReports = <ThrowOnError extends boolean = false>(options?: Options<FailureReportsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<FailureReportsResponses, FailureReportsErrors, ThrowOnError>({
+        url: '/api/failure-reports',
+        ...options
+    });
+};
+
+export const showFailureReport = <ThrowOnError extends boolean = false>(options: Options<ShowFailureReportData, ThrowOnError>) => {
+    return (options.client ?? client).get<ShowFailureReportResponses, ShowFailureReportErrors, ThrowOnError>({
+        url: '/api/failure-reports/{failureReport}',
+        ...options
+    });
+};
+
+export const dataUpgrade = <ThrowOnError extends boolean = false>(options?: Options<DataUpgradeData, ThrowOnError>) => {
+    return (options?.client ?? client).get<DataUpgradeResponses, DataUpgradeErrors, ThrowOnError>({
+        url: '/api/data_upgrade',
+        ...options
+    });
+};
+
+export const getConversation = <ThrowOnError extends boolean = false>(options: Options<GetConversationData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetConversationResponses, GetConversationErrors, ThrowOnError>({
+        url: '/api/conversation/{conversationId}',
+        ...options
+    });
+};
+
+export const getConversationMessages = <ThrowOnError extends boolean = false>(options: Options<GetConversationMessagesData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetConversationMessagesResponses, GetConversationMessagesErrors, ThrowOnError>({
+        url: '/api/conversation/{conversationId}/messages',
+        ...options
+    });
+};
+
+export const exportConversation = <ThrowOnError extends boolean = false>(options: Options<ExportConversationData, ThrowOnError>) => {
+    return (options.client ?? client).get<ExportConversationResponses, ExportConversationErrors, ThrowOnError>({
+        url: '/api/conversation/{conversationId}/export',
+        ...options
+    });
+};
+
+export const getUnreadConversations = <ThrowOnError extends boolean = false>(options?: Options<GetUnreadConversationsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetUnreadConversationsResponses, GetUnreadConversationsErrors, ThrowOnError>({
+        url: '/api/conversation/unread',
+        ...options
+    });
+};
+
+export const getConversationsOfCurrentUser = <ThrowOnError extends boolean = false>(options?: Options<GetConversationsOfCurrentUserData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetConversationsOfCurrentUserResponses, GetConversationsOfCurrentUserErrors, ThrowOnError>({
+        url: '/api/conversation/all',
+        ...options
+    });
+};
+
+export const showCircle = <ThrowOnError extends boolean = false>(options: Options<ShowCircleData, ThrowOnError>) => {
+    return (options.client ?? client).get<ShowCircleResponses, ShowCircleErrors, ThrowOnError>({
+        url: '/api/circles/{circle}',
+        ...options
+    });
+};
+
+export const bazaar = <ThrowOnError extends boolean = false>(options?: Options<BazaarData, ThrowOnError>) => {
+    return (options?.client ?? client).get<BazaarResponses, BazaarErrors, ThrowOnError>({
+        url: '/api/bazaar',
+        ...options
+    });
+};
+
+export const getAssimilationCount = <ThrowOnError extends boolean = false>(options: Options<GetAssimilationCountData, ThrowOnError>) => {
+    return (options.client ?? client).get<GetAssimilationCountResponses, GetAssimilationCountErrors, ThrowOnError>({
+        url: '/api/assimilation/count',
+        ...options
+    });
+};
+
+export const assimilating = <ThrowOnError extends boolean = false>(options: Options<AssimilatingData, ThrowOnError>) => {
+    return (options.client ?? client).get<AssimilatingResponses, AssimilatingErrors, ThrowOnError>({
+        url: '/api/assimilation/assimilating',
+        ...options
+    });
+};
+
+export const getMyAssessments = <ThrowOnError extends boolean = false>(options?: Options<GetMyAssessmentsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetMyAssessmentsResponses, GetMyAssessmentsErrors, ThrowOnError>({
+        url: '/api/assessment',
+        ...options
+    });
+};
+
+export const dummyEntryToGenerateDataTypesThatAreRequiredInEventStream = <ThrowOnError extends boolean = false>(options?: Options<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamData, ThrowOnError>) => {
+    return (options?.client ?? client).get<DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamResponses, DummyEntryToGenerateDataTypesThatAreRequiredInEventStreamErrors, ThrowOnError>({
+        url: '/api/ai/dummy',
+        ...options
+    });
+};
+
+export const getAvailableGptModels = <ThrowOnError extends boolean = false>(options?: Options<GetAvailableGptModelsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetAvailableGptModelsResponses, GetAvailableGptModelsErrors, ThrowOnError>({
+        url: '/api/ai/available-gpt-models',
+        ...options
+    });
+};
+
+export const deleteToken = <ThrowOnError extends boolean = false>(options: Options<DeleteTokenData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteTokenResponses, DeleteTokenErrors, ThrowOnError>({
+        url: '/api/user/token/{tokenId}',
+        ...options
+    });
+};
+
+export const deleteFailureReports = <ThrowOnError extends boolean = false>(options: Options<DeleteFailureReportsData, ThrowOnError>) => {
+    return (options.client ?? client).delete<DeleteFailureReportsResponses, DeleteFailureReportsErrors, ThrowOnError>({
+        url: '/api/failure-reports/delete',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};

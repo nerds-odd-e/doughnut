@@ -8,10 +8,7 @@ import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThi
 // Create silent client instance (no interceptors, no loading/error UI)
 // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
 export const globalClientSilent = createClient({
-  baseUrl:
-    typeof window !== "undefined" && window.location.origin
-      ? window.location.origin
-      : "http://localhost:9081",
+  baseUrl: typeof window !== "undefined" ? window.location.origin : "",
   credentials: "include",
   responseStyle: "fields",
   throwOnError: false,
@@ -30,10 +27,7 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   // Configure global client
   // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
   globalClient.setConfig({
-    baseUrl:
-      typeof window !== "undefined" && window.location.origin
-        ? window.location.origin
-        : "http://localhost:9081",
+    baseUrl: typeof window !== "undefined" ? window.location.origin : "",
     credentials: "include",
     responseStyle: "fields",
     throwOnError: false,
@@ -48,9 +42,6 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   // Error interceptor: Handle errors (toasts, 401 redirects, etc.)
   // This runs when there's an error response, before it's returned
   globalClient.interceptors.error.use(async (error, response, request) => {
-    // Clear loading state first (error interceptor runs instead of response interceptor)
-    apiStatusHandler?.assignLoading(false)
-
     // Construct error object for handleApiError
     // The error parameter is the parsed response body (object or string)
     const errorBody = error
@@ -93,14 +84,9 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     return error
   })
 
-  // Response interceptor: Clear loading state only for successful responses
-  // (Error responses are handled by error interceptor to avoid double-clearing)
+  // Response interceptor: Clear loading state
   globalClient.interceptors.response.use(async (response) => {
-    // Only clear loading for successful responses
-    // Error responses (status >= 400) will be handled by error interceptor
-    if (response.ok) {
-      apiStatusHandler?.assignLoading(false)
-    }
+    apiStatusHandler?.assignLoading(false)
     return response
   })
 }

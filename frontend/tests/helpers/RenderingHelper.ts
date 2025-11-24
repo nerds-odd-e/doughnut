@@ -1,3 +1,4 @@
+import ManagedApi from "@/managedApi/ManagedApi"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
@@ -18,10 +19,13 @@ class RenderingHelper<T = DefineComponent> {
 
   private route = {}
 
+  private managedApi
+
   private global
 
-  constructor(comp: T) {
+  constructor(comp: T, managedApi: ManagedApi) {
     this.comp = comp
+    this.managedApi = managedApi
     this.global = {
       plugins: [],
       directives: {
@@ -31,6 +35,7 @@ class RenderingHelper<T = DefineComponent> {
         },
       },
       provide: {
+        managedApi: this.managedApi,
         currentUser: ref<User | undefined>(),
       },
       stubs: {
@@ -46,7 +51,7 @@ class RenderingHelper<T = DefineComponent> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   withStorageProps(props: Partial<NoteStorageProps>) {
     return this.withProps({
-      storageAccessor: createNoteStorage(),
+      storageAccessor: createNoteStorage(this.managedApi),
       ...props,
     })
   }

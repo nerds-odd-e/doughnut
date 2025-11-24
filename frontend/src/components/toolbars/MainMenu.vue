@@ -105,7 +105,7 @@ import {
   overview,
   getUnreadConversations,
 } from "@generated/backend/sdk.gen"
-import { watch, computed, ref } from "vue"
+import { watch, computed, ref, inject } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { useRecallData } from "@/composables/useRecallData"
@@ -113,6 +113,7 @@ import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import { messageCenterConversations } from "@/store/messageStore"
 import Modal from "@/components/commons/Modal.vue"
+import type ManagedApi from "@/managedApi/ManagedApi"
 
 const props = defineProps({
   user: { type: Object as PropType<User>, required: false },
@@ -131,6 +132,8 @@ const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
   useAssimilationCount()
 const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
+
+const managedApi = inject<ManagedApi>("managedApi")
 
 const fetchDueCount = async () => {
   const { data: count, error } = await getAssimilationCount({
@@ -174,9 +177,9 @@ watch(
 )
 
 const logout = async () => {
-  await fetch("/logout", {
-    method: "POST",
-  })
+  if (managedApi) {
+    await managedApi.logout()
+  }
   window.location.href = "/d/bazaar"
 }
 

@@ -1,6 +1,6 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
 import { expect, vi } from "vitest"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
@@ -192,9 +192,8 @@ describe("ConversationInner", () => {
   let storageAccessor
 
   beforeEach(() => {
-    storageAccessor = createNoteStorage()
+    storageAccessor = createNoteStorage(helper.managedApi)
     resetInstance()
-    mockShowNote()
 
     const testData = setupTestData()
     note = testData.note

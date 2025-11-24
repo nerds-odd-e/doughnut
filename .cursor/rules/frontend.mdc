@@ -68,8 +68,7 @@ const emit = defineEmits<{
 }>()
 
 // composables/setup
-// Import services directly from generated SDK
-import { getUserProfile } from "@generated/backend/sdk.gen"
+const { managedApi } = useLoadingApi()
 
 // refs/reactive state
 const loading = ref(false)
@@ -100,20 +99,10 @@ onMounted(() => {
 ```
 ### API Integration
 
-- Import services directly from `@generated/backend/sdk.gen`
-- The global client is automatically configured with interceptors for loading states and error handling (set up in `DoughnutApp.vue`)
-- Use the wrapped response pattern: `{ data, error, request, response }`
+- Use `managedApi` from `useLoadingApi()` for API calls
+- Handle loading states appropriately
+- Use proper error handling with try/catch
 - Follow the API types from generated code
-- For silent calls (no loading indicators or error toasts), use `globalClientSilent` from `@/managedApi/clientSetup`:
-  ```typescript
-  import { askAQuestion } from "@generated/backend/sdk.gen"
-  import { globalClientSilent } from "@/managedApi/clientSetup"
-  
-  const { data, error } = await askAQuestion({
-    path: { memoryTracker: trackerId },
-    client: globalClientSilent, // Use silent client for background calls
-  })
-  ```
 
 ### API Return Value Usage Pattern
 
@@ -168,7 +157,7 @@ const generateToken = async () => {
 }
 ```
 
-This pattern provides type safety and consistent error handling through the global client interceptors.
+This pattern matches ManagedApi's behavior and provides type safety.
 
 ### Handling Validation Errors (400 Bad Request)
 
@@ -240,17 +229,7 @@ if (error) {
 2. Minimal Mocking
    - Mock only external dependencies (API calls)
    - Use real component instances when possible
-   - Mock services directly from `@generated/backend/sdk.gen`:
-   ```typescript
-   import * as sdk from "@generated/backend/sdk.gen"
-   
-   vi.spyOn(sdk, "getUserProfile").mockResolvedValue({
-     data: makeMe.aUser.please(),
-     error: undefined,
-     request: {} as Request,
-     response: {} as Response,
-   })
-   ```
+   - Use helper.managedApi for API mocks
 
 2. **Component Props**
    - Use `helper.component(ComponentName).withStorageProps` if the component requires a prop `storageAccessor`. Do not need to pass a `storageAccessor` any more because the helper will add it to the props

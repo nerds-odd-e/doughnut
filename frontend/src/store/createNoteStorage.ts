@@ -1,3 +1,4 @@
+import ManagedApi from "@/managedApi/ManagedApi"
 import type { HistoryRecord } from "./NoteEditingHistory"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
@@ -16,8 +17,11 @@ class AccessorImplementation
 {
   noteEditingHistory: NoteEditingHistory
 
-  constructor(noteEditingHistory?: NoteEditingHistory) {
+  managedApi: ManagedApi
+
+  constructor(managedApi: ManagedApi, noteEditingHistory?: NoteEditingHistory) {
     super()
+    this.managedApi = managedApi
     if (noteEditingHistory) {
       this.noteEditingHistory = noteEditingHistory
     } else {
@@ -30,14 +34,19 @@ class AccessorImplementation
   }
 
   storedApi(): StoredApi {
-    return new StoredApiCollection(this.noteEditingHistory, this)
+    return new StoredApiCollection(
+      this.managedApi,
+      this.noteEditingHistory,
+      this
+    )
   }
 }
 
 function createNoteStorage(
+  managedApi: ManagedApi,
   noteEditingHistory?: NoteEditingHistory
 ): StorageAccessor {
-  return new AccessorImplementation(noteEditingHistory)
+  return new AccessorImplementation(managedApi, noteEditingHistory)
 }
 
 export default createNoteStorage

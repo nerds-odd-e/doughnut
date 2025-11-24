@@ -1,11 +1,13 @@
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
+import helper from "@tests/helpers"
 import * as sdk from "@generated/backend/sdk.gen"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
-  const storageAccessor = createNoteStorage()
+  const managedApi = helper.managedApi
+  const storageAccessor = createNoteStorage(managedApi)
   const routerReplace = vitest.fn()
   const router = { replace: routerReplace } as unknown as Router
   const sa = storageAccessor.storedApi()
@@ -51,15 +53,7 @@ describe("storedApiCollection", () => {
           response: {} as Response,
         }
       })
-      vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
-        const result = await showNote(options)
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      })
+      vi.spyOn(managedApi.services, "showNote").mockImplementation(showNote)
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 

@@ -39,13 +39,6 @@ describe("ConversationComponent", () => {
       request: {} as Request,
       response: {} as Response,
     })
-    // Mock showNote to prevent real API calls from StoredApiCollection
-    vi.spyOn(sdk, "showNote").mockResolvedValue({
-      data: makeMe.aNoteRealm.please(),
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
     wrapper = helper
       .component(ConversationComponent)
       .withStorageProps({
