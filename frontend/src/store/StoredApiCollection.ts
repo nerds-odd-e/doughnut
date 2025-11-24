@@ -384,7 +384,7 @@ export default class StoredApiCollection implements StoredApi {
 
   async undo(router: Router) {
     const noteRealm = await this.undoInner()
-    router.push({
+    await router.push({
       name: "noteShow",
       params: { noteId: noteRealm.id },
     })
