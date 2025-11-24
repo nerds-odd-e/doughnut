@@ -45,7 +45,6 @@
           zulu24
           nodejs_22
           corepack_22
-          git
           git-secret
           gitleaks
           jq
@@ -57,8 +56,6 @@
           yamllint
           nixfmt-classic
           hclfmt
-          fzf
-          act
         ];
 
         darwinPackages = with pkgs; lib.optionals stdenv.isDarwin [ sequelpro ];
