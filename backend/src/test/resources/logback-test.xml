@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
+  <conversionRule conversionWord="truncatedEx" converterClass="com.odde.doughnut.configs.TruncatedStackTraceConverter" />
   <include resource="org/springframework/boot/logging/logback/base.xml" />
   <logger name="org.springframework" level="OFF"/>
 </configuration>
