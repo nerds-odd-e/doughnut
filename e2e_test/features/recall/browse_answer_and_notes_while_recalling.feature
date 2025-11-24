@@ -1,5 +1,5 @@
 @mockBrowserTime
-@usingMockedOpenAiService
+@disableOpenAiService
 Feature: Browse answers and notes while recalling
   As a learner, I want to browse answers and notes while recalling
   so that I can pause recalling to review my answers and notes
@@ -13,7 +13,6 @@ Feature: Browse answers and notes while recalling
       | sedition | Sedition means incite violence | false                | English      |
       | sedation | Put to sleep is sedation       | false                | English      |
       | medical  |                                | true                 | English      |
-    And the OpenAI service is unavailable due to invalid system token
     And I am assimilating new note on day 1
     And I assimilate with the option of remembering spelling
 

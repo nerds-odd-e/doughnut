@@ -24,6 +24,7 @@ public class AiQuestionGenerator {
   private final Randomizer randomizer;
   private final ObjectMapper objectMapper;
   private final OpenAiApiHandler openAiApiHandler;
+  private final TestabilitySettings testabilitySettings;
 
   @Autowired
   public AiQuestionGenerator(
@@ -37,6 +38,7 @@ public class AiQuestionGenerator {
     this.randomizer = testabilitySettings.getRandomizer();
     this.objectMapper = objectMapper;
     this.openAiApiHandler = openAiApiHandler;
+    this.testabilitySettings = testabilitySettings;
   }
 
   // Test-only constructor for injecting Randomizer directly
@@ -45,15 +47,20 @@ public class AiQuestionGenerator {
       GlobalSettingsService globalSettingsService,
       Randomizer randomizer,
       ObjectMapper objectMapper,
-      OpenAiApiHandler openAiApiHandler) {
+      OpenAiApiHandler openAiApiHandler,
+      TestabilitySettings testabilitySettings) {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = randomizer;
     this.objectMapper = objectMapper;
     this.openAiApiHandler = openAiApiHandler;
+    this.testabilitySettings = testabilitySettings;
   }
 
   public MCQWithAnswer getAiGeneratedQuestion(Note note, String additionalMessage) {
+    if (testabilitySettings.isOpenAiDisabled()) {
+      return null;
+    }
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
@@ -80,12 +87,18 @@ public class AiQuestionGenerator {
   }
 
   public MCQWithAnswer getAiGeneratedRefineQuestion(Note note, MCQWithAnswer mcqWithAnswer) {
+    if (testabilitySettings.isOpenAiDisabled()) {
+      return null;
+    }
     return forNote(note, globalSettingsService.globalSettingQuestionGeneration().getValue())
         .refineQuestion(mcqWithAnswer)
         .orElse(null);
   }
 
   public QuestionEvaluation getQuestionContestResult(Note note, MCQWithAnswer mcqWithAnswer) {
+    if (testabilitySettings.isOpenAiDisabled()) {
+      return null;
+    }
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {

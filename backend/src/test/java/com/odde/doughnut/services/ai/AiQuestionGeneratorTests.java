@@ -11,10 +11,13 @@ import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.Randomizer;
 import com.openai.client.OpenAIClient;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +39,21 @@ class AiQuestionGeneratorTests {
   @Autowired OpenAiApiHandler openAiApiHandler;
   @Autowired NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   @Autowired AiQuestionGenerator aiQuestionGenerator;
+  @Autowired TestabilitySettings testabilitySettings;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void setup() {
     // Initialize chat completion mock
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    // Ensure OpenAI URL is reset to default before each test
+    testabilitySettings.replaceServiceUrls(Map.of("openAi", "https://api.openai.com/v1/"));
+  }
+
+  @AfterEach
+  void cleanup() {
+    // Reset OpenAI URL to default after each test
+    testabilitySettings.replaceServiceUrls(Map.of("openAi", "https://api.openai.com/v1/"));
   }
 
   @Test
@@ -115,7 +127,8 @@ class AiQuestionGeneratorTests {
             globalSettingsService,
             mockedRandomizer,
             objectMapper,
-            openAiApiHandler);
+            openAiApiHandler,
+            testabilitySettings);
 
     // Setup a note with enough content for question generation
     Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
@@ -170,5 +183,21 @@ class AiQuestionGeneratorTests {
 
     // Assert
     assertThat(result, equalTo(null)); // Question should be rejected
+  }
+
+  @Test
+  void shouldReturnNullWhenOpenAiIsDisabled() {
+    // Setup a note with enough content for question generation
+    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    makeMe.aNote().under(note).please();
+
+    // Disable OpenAI using the disable method
+    testabilitySettings.disableOpenAi();
+
+    // Act
+    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+
+    // Assert
+    assertThat(result, equalTo(null)); // Question generation should be skipped
   }
 }

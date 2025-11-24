@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.ApplicationScope;
@@ -24,6 +23,7 @@ public class TestabilitySettings {
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
 
+  private static final String DISABLED_SENTINEL = "__DISABLED__";
   private final Map<String, String> replacedServiceUrls = new HashMap<>();
   private final Map<String, String> defaultServiceUrls =
       Map.of("wikidata", "https://www.wikidata.org", "openAi", "https://api.openai.com/v1/");
@@ -76,14 +76,20 @@ public class TestabilitySettings {
   }
 
   private String getServiceUrl(String serviceName) {
-    return this.replacedServiceUrls.getOrDefault(
-        serviceName, this.defaultServiceUrls.get(serviceName));
+    if (this.replacedServiceUrls.containsKey(serviceName)) {
+      String url = this.replacedServiceUrls.get(serviceName);
+      if (DISABLED_SENTINEL.equals(url)) {
+        return "";
+      }
+      return url;
+    }
+    return this.defaultServiceUrls.get(serviceName);
   }
 
   public void replaceServiceUrls(Map<String, String> setWikidataService) {
     setWikidataService.forEach(
         (key, value) -> {
-          if (Strings.isBlank(value)) {
+          if (value == null || value.isEmpty()) {
             this.replacedServiceUrls.remove(key);
             return;
           }
@@ -93,6 +99,15 @@ public class TestabilitySettings {
 
   public String getOpenAiApiUrl() {
     return getServiceUrl("openAi");
+  }
+
+  public void disableOpenAi() {
+    this.replacedServiceUrls.put("openAi", DISABLED_SENTINEL);
+  }
+
+  public boolean isOpenAiDisabled() {
+    String url = getServiceUrl("openAi");
+    return DISABLED_SENTINEL.equals(url);
   }
 
   void init() {
