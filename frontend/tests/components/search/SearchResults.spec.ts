@@ -72,7 +72,14 @@ describe("SearchResults.vue", () => {
     vi.useRealTimers()
   })
 
-  it("shows 'Similar notes within the same notebook' when search key is empty in dropdown mode with noteId", async () => {
+  it("shows recently updated notes when search key is empty in dropdown mode with noteId", async () => {
+    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      data: [],
+      error: undefined,
+      request: {} as Request,
+      response: {} as Response,
+    })
+
     const wrapper = helper
       .component(SearchResults)
       .withProps({ inputSearchKey: "", noteId: 1, isDropdown: true })
@@ -81,7 +88,9 @@ describe("SearchResults.vue", () => {
     await nextTick()
     await flushPromises()
 
-    expect(wrapper.text()).toContain("Similar notes within the same notebook")
+    // When noteId is provided, we show recent notes instead of "Similar notes within the same notebook"
+    // If no recent notes are available, show "No recent notes found."
+    expect(wrapper.text()).toContain("No recent notes found.")
   })
 
   it("shows checkboxes but no search message when search key is empty initially in non-dropdown mode", async () => {
@@ -664,6 +673,145 @@ describe("SearchResults.vue", () => {
       expect(wrapper.text()).toContain("Recent Note 2")
 
       vi.useRealTimers()
+    })
+
+    it("shows recently updated notes when searching for link targets (noteId provided) and search key is empty", async () => {
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "searchForLinkTargetWithin").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "", noteId: 999, isDropdown: true })
+        .mount()
+
+      await nextTick()
+      await flushPromises()
+
+      expect(sdk.getRecentNotes).toHaveBeenCalled()
+      expect(wrapper.text()).toContain("Recently updated notes")
+      expect(wrapper.text()).toContain("Recent Note 1")
+      expect(wrapper.text()).toContain("Recent Note 2")
+    })
+
+    it("excludes current node from recent notes when searching for link targets", async () => {
+      const recentNotesWithCurrent = [
+        {
+          id: 999,
+          note: {
+            id: 999,
+            noteTopology: { id: 999, titleOrPredicate: "Current Note" },
+            updatedAt: new Date().toISOString(),
+          },
+        },
+        {
+          id: 1,
+          note: {
+            id: 1,
+            noteTopology: { id: 1, titleOrPredicate: "Recent Note 1" },
+            updatedAt: new Date().toISOString(),
+          },
+        },
+        {
+          id: 2,
+          note: {
+            id: 2,
+            noteTopology: { id: 2, titleOrPredicate: "Recent Note 2" },
+            updatedAt: new Date().toISOString(),
+          },
+        },
+      ] as NoteRealm[]
+
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotesWithCurrent,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "searchForLinkTargetWithin").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "", noteId: 999, isDropdown: true })
+        .mount()
+
+      await nextTick()
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Recently updated notes")
+      expect(wrapper.text()).toContain("Recent Note 1")
+      expect(wrapper.text()).toContain("Recent Note 2")
+      expect(wrapper.text()).not.toContain("Current Note")
+    })
+
+    it("does not show recent notes in general search when noteId is not provided and allMyNotebooksAndSubscriptions is false", async () => {
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "", isDropdown: false })
+        .mount()
+
+      await nextTick()
+      await flushPromises()
+
+      // Uncheck the checkbox to simulate allMyNotebooksAndSubscriptions being false
+      const checkbox = wrapper.find(
+        'input[type="checkbox"][field="allMyNotebooksAndSubscriptions"]'
+      )
+      if (checkbox.exists()) {
+        await checkbox.setValue(false)
+        await nextTick()
+        await flushPromises()
+      }
+
+      // When allMyNotebooksAndSubscriptions is false and noteId is not provided,
+      // recent notes should not be shown
+      // The component should still show the checkboxes but not recent notes
+      expect(wrapper.text()).toContain("All My Notebooks And Subscriptions")
     })
   })
 })

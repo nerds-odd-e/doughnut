@@ -16,11 +16,11 @@
 
     <div v-if="searchResult === undefined && trimmedSearchKey !== ''">
       <em>Searching ...</em>
-      <div v-if="shouldShowRecentNotes && recentNotes.length > 0" class="result-section">
+      <div v-if="shouldShowRecentNotes && filteredRecentNotes.length > 0" class="result-section">
         <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
         <div v-if="isDropdown" class="dropdown-list">
           <NoteTitleWithLink
-            v-for="note in recentNotes"
+            v-for="note in filteredRecentNotes"
             :key="note.id"
             :noteTopology="note.note.noteTopology"
           />
@@ -28,7 +28,7 @@
         <Cards
           v-else
           class="search-result"
-          :noteTopologies="recentNotes.map((n) => n.note.noteTopology)"
+          :noteTopologies="filteredRecentNotes.map((n) => n.note.noteTopology)"
           :columns="3"
         >
           <template #button="{ noteTopology }">
@@ -38,9 +38,15 @@
       </div>
     </div>
 
+    <div v-else-if="searchResult === undefined && trimmedSearchKey === '' && isDropdown && props.noteId && filteredRecentNotes.length === 0" class="dropdown-list">
+      <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
+      <em>No recent notes found.</em>
+    </div>
+
     <div v-else-if="searchResult !== undefined && searchResult.length === 0 && isDropdown" class="dropdown-list">
       <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
-      <em v-if="trimmedSearchKey === ''">Similar notes within the same notebook</em>
+      <em v-if="trimmedSearchKey === '' && !props.noteId">Similar notes within the same notebook</em>
+      <em v-else-if="trimmedSearchKey === '' && props.noteId && filteredRecentNotes.length === 0">No recent notes found.</em>
       <em v-else>No matching notes found.</em>
     </div>
 
@@ -49,12 +55,12 @@
       <em>No matching notes found.</em>
     </div>
 
-    <div v-else-if="shouldShowRecentNotes && recentNotes.length > 0 && trimmedSearchKey === ''">
+    <div v-else-if="shouldShowRecentNotes && filteredRecentNotes.length > 0 && trimmedSearchKey === ''">
       <div class="result-section">
         <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
         <div v-if="isDropdown" class="dropdown-list">
           <NoteTitleWithLink
-            v-for="note in recentNotes"
+            v-for="note in filteredRecentNotes"
             :key="note.id"
             :noteTopology="note.note.noteTopology"
           />
@@ -62,7 +68,7 @@
         <Cards
           v-else
           class="search-result"
-          :noteTopologies="recentNotes.map((n) => n.note.noteTopology)"
+          :noteTopologies="filteredRecentNotes.map((n) => n.note.noteTopology)"
           :columns="3"
         >
           <template #button="{ noteTopology }">
@@ -193,11 +199,13 @@ const distanceById = computed<Record<string, number>>(() => {
 })
 
 const shouldShowRecentNotes = computed(() => {
-  // Show recent notes when searching globally (allMyNotebooksAndSubscriptions is true)
+  // Show recent notes when:
+  // 1. Searching globally (allMyNotebooksAndSubscriptions is true), OR
+  // 2. Searching for link targets (noteId is provided)
   // Show when: search key is empty, or we're waiting for search results (searchResult is undefined)
   // Hide when: we have search results (searchResult is defined and not empty)
   return (
-    searchTerm.value.allMyNotebooksAndSubscriptions &&
+    (searchTerm.value.allMyNotebooksAndSubscriptions || props.noteId) &&
     (trimmedSearchKey.value === "" || searchResult.value === undefined)
   )
 })
@@ -212,6 +220,14 @@ const resultTitle = computed(() => {
     return "Recently updated notes"
   }
   return null
+})
+
+const filteredRecentNotes = computed(() => {
+  // Filter out the current node when searching for link targets
+  if (props.noteId) {
+    return recentNotes.value.filter((note) => note.id !== props.noteId)
+  }
+  return recentNotes.value
 })
 
 // Methods
@@ -277,9 +293,12 @@ const mergeUniqueAndSortByDistance = (
 }
 
 const fetchRecentNotes = async () => {
-  // Only fetch if we're searching globally and haven't fetched yet
+  // Fetch if:
+  // 1. Searching globally (allMyNotebooksAndSubscriptions is true), OR
+  // 2. Searching for link targets (noteId is provided)
+  // Only fetch if we haven't fetched yet
   if (
-    searchTerm.value.allMyNotebooksAndSubscriptions &&
+    (searchTerm.value.allMyNotebooksAndSubscriptions || props.noteId) &&
     recentNotes.value.length === 0
   ) {
     const { data: notes, error } = await getRecentNotes()
@@ -298,9 +317,9 @@ const search = () => {
   if (!cachedSearches.value[originalTrimmedKey]) {
     recentResult.value = undefined
     // Fetch recent notes to show while waiting for search results
-    // Only fetch if searching globally
+    // Fetch if searching globally or for link targets
     if (
-      searchTerm.value.allMyNotebooksAndSubscriptions &&
+      (searchTerm.value.allMyNotebooksAndSubscriptions || props.noteId) &&
       recentNotes.value.length === 0
     ) {
       fetchRecentNotes()
@@ -339,7 +358,7 @@ watch(
     if (searchTerm.value.searchKey.trim() !== "") {
       search()
     } else if (
-      searchTerm.value.allMyNotebooksAndSubscriptions &&
+      (searchTerm.value.allMyNotebooksAndSubscriptions || props.noteId) &&
       searchTerm.value.searchKey.trim() === ""
     ) {
       fetchRecentNotes()
@@ -354,16 +373,16 @@ watch(
   () => {
     searchTerm.value.searchKey = props.inputSearchKey
     // When search key is empty and we have a noteId (dropdown mode in notebook context),
-    // set recentResult to empty array to show "Similar notes within the same notebook"
-    // instead of "Searching ..."
+    // fetch recent notes to show them
     if (
       props.inputSearchKey.trim() === "" &&
       props.noteId &&
       props.isDropdown
     ) {
-      recentResult.value = []
+      recentResult.value = undefined
+      fetchRecentNotes()
     } else if (
-      searchTerm.value.allMyNotebooksAndSubscriptions &&
+      (searchTerm.value.allMyNotebooksAndSubscriptions || props.noteId) &&
       props.inputSearchKey.trim() === ""
     ) {
       // Clear recentResult to show "Recently updated notes" title instead of "Search result"
@@ -379,10 +398,10 @@ onMounted(async () => {
   searchTerm.value.allMyNotebooksAndSubscriptions = true
   searchTerm.value.searchKey = props.inputSearchKey
   // When search key is empty and we have a noteId (dropdown mode in notebook context),
-  // set recentResult to empty array to show "Similar notes within the same notebook"
-  // instead of "Searching ..."
+  // fetch recent notes to show them instead of "Similar notes within the same notebook"
   if (props.inputSearchKey.trim() === "" && props.noteId && props.isDropdown) {
-    recentResult.value = []
+    recentResult.value = undefined
+    fetchRecentNotes()
   }
   // Note: fetchRecentNotes() will be called by the watcher when allMyNotebooksAndSubscriptions is set to true
 })
