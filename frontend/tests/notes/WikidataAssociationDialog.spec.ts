@@ -76,8 +76,13 @@ describe("WikidataAssociationDialog", () => {
       '[data-testid="wikidata-search-results"]'
     ) as HTMLElement
   const getSelectItem = (wikidataId: string) =>
-    Array.from(getModal()?.querySelectorAll('[data-testid="wikidata-search-result-item"]') || [])
-      .find((item) => item.getAttribute('data-wikidata-id') === wikidataId) as HTMLElement
+    Array.from(
+      getModal()?.querySelectorAll(
+        '[data-testid="wikidata-search-result-item"]'
+      ) || []
+    ).find(
+      (item) => item.getAttribute("data-wikidata-id") === wikidataId
+    ) as HTMLElement
 
   describe("basic functionality", () => {
     it("shows the current wikidata ID in the input field", async () => {

@@ -23,7 +23,7 @@ export const assumeAssociateWikidataDialog = () => {
     },
     selectResult(wikidataID: string) {
       withinModalContainer(() => {
-        cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+        cy.get(`[data-wikidata-id="${wikidataID}"]`).click()
       })
       return this
     },
