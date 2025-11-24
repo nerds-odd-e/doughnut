@@ -61,23 +61,9 @@ describe("adding new note", () => {
       request: {} as Request,
       response: {} as Response,
     })
-    const createNoteResult = {
-      created: makeMe.aNoteRealm.please(),
-      parent: makeMe.aNoteRealm.please(),
-    }
     mockedCreateNote = vi
-      .spyOn(sdk, "createNoteUnderParent")
-      .mockImplementation(async (options) => {
-        const result = await vi.fn().mockResolvedValue(createNoteResult)(
-          options
-        )
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      })
+      .spyOn(helper.managedApi.services, "createNoteUnderParent")
+      .mockResolvedValue({} as never)
   })
 
   afterEach(() => {
@@ -185,15 +171,9 @@ describe("adding new note", () => {
 
     beforeEach(() => {
       mockedSearchWithin.mockResolvedValue([])
-      vi.spyOn(sdk, "searchWikidata").mockImplementation(async (...args) => {
-        const result = await mockedWikidataSearch(...args)
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      })
+      vi.spyOn(helper.managedApi.services, "searchWikidata").mockImplementation(
+        mockedWikidataSearch
+      )
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ referenceNote: note, insertMode: "as-child" })

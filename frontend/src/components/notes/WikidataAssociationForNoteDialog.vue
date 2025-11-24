@@ -21,9 +21,14 @@ import type {
 } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
-import { fetchWikidataEntityDataById } from "@generated/backend/sdk.gen"
-import { toOpenApiError } from "@/managedApi/openApiError"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+
+interface WikidataError {
+  body: {
+    message: string
+  }
+}
 
 interface WikidataIdError {
   wikidataId: string
@@ -37,6 +42,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   closeDialog: []
 }>()
+
+const { managedApi } = useLoadingApi()
 
 const localWikidataId = ref(props.note.wikidataId || "")
 const wikidataIdError = ref<string | undefined>(undefined)
@@ -66,8 +73,17 @@ const saveWikidataId = async (wikidataId: string) => {
 }
 
 const handleError = (e: unknown) => {
-  const errorObj = toOpenApiError(e)
-  wikidataIdError.value = errorObj.message || "An unknown error occurred"
+  if (
+    e instanceof Error &&
+    "body" in e &&
+    typeof e.body === "object" &&
+    e.body &&
+    "message" in e.body
+  ) {
+    wikidataIdError.value = (e as WikidataError).body.message
+  } else {
+    wikidataIdError.value = "An unknown error occurred"
+  }
 }
 
 const dialogRef = ref<InstanceType<typeof WikidataAssociationDialog> | null>(
@@ -87,24 +103,17 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
   if (isProcessing.value) return
   isProcessing.value = true
   try {
-    const { data: entityData, error } = await fetchWikidataEntityDataById({
+    const res = await managedApi.services.fetchWikidataEntityDataById({
       path: { wikidataId },
     })
 
-    if (error) {
-      const errorObj = toOpenApiError(error)
-      wikidataIdError.value = errorObj.message || "An unknown error occurred"
-      isProcessing.value = false
-      return
-    }
-
     const noteTitleUpper =
       props.note.noteTopology.titleOrPredicate.toUpperCase()
-    const wikidataTitleUpper = entityData!.WikidataTitleInEnglish.toUpperCase()
+    const wikidataTitleUpper = res.WikidataTitleInEnglish.toUpperCase()
 
     if (
       wikidataTitleUpper === noteTitleUpper ||
-      entityData!.WikidataTitleInEnglish === ""
+      res.WikidataTitleInEnglish === ""
     ) {
       await saveWikidataId(wikidataId)
       // isProcessing will be reset in saveWikidataId on error, or dialog closes on success
@@ -113,7 +122,7 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
       isProcessing.value = false
       const entity: WikidataSearchEntity = {
         id: wikidataId,
-        label: entityData!.WikidataTitleInEnglish,
+        label: res.WikidataTitleInEnglish,
         description: "",
       }
       dialogRef.value?.showTitleOptionsForEntity(entity)

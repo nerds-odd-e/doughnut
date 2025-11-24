@@ -2,22 +2,16 @@ import NoteEditableDetails from "@/components/notes/core/NoteEditableDetails.vue
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedUpdateDetailsCall = vi.fn()
 
 describe("NoteEditableDetails", () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.spyOn(sdk, "updateNoteDetails").mockImplementation(async (options) => {
-      const result = await mockedUpdateDetailsCall(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
-    })
+    vi.spyOn(
+      helper.managedApi.services,
+      "updateNoteDetails"
+    ).mockImplementation(mockedUpdateDetailsCall)
   })
 
   it("should not save previous note's details to the new note when navigating", async () => {

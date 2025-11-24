@@ -96,30 +96,14 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
-        try {
-          const result = await mockedRandomQuestionCall(options)
-          return {
-            data: result,
-            error: undefined,
-            request: {} as Request,
-            response: {} as Response,
-          }
-        } catch (error) {
-          return {
-            data: undefined,
-            error: error instanceof Error ? error.message : String(error),
-            request: {} as Request,
-            response: {} as Response,
-          }
-        }
-      })
+      vi.spyOn(
+        helper.managedApi.services,
+        "showMemoryTracker"
+      ).mockResolvedValue(makeMe.aMemoryTracker.please() as never)
+      vi.spyOn(
+        helper.managedApi.silent.services,
+        "askAQuestion"
+      ).mockImplementation(mockedRandomQuestionCall)
       mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.anApiError.please())
       mockedRepeatCall.mockResolvedValue(
         makeMe.aDueMemoryTrackersList
@@ -135,11 +119,9 @@ describe("repeat page", () => {
     it("shows the progress", async () => {
       await mountPage()
       expect(teleportTarget.textContent).toContain("0/3")
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { memoryTracker: firstMemoryTrackerId },
-        })
-      )
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
+        path: { memoryTracker: firstMemoryTrackerId },
+      })
     })
 
     it("should show progress", async () => {
@@ -167,11 +149,9 @@ describe("repeat page", () => {
       })
       await flushPromises()
       expect(teleportTarget.textContent).toContain("1/3")
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { memoryTracker: secondMemoryTrackerId },
-        })
-      )
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
+        path: { memoryTracker: secondMemoryTrackerId },
+      })
     })
 
     it("should move current memory tracker to end when requested", async () => {
@@ -209,21 +189,14 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
-        const result = await mockedRandomQuestionCall(options)
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      })
+      vi.spyOn(
+        helper.managedApi.services,
+        "showMemoryTracker"
+      ).mockResolvedValue(makeMe.aMemoryTracker.please() as never)
+      vi.spyOn(
+        helper.managedApi.silent.services,
+        "askAQuestion"
+      ).mockImplementation(mockedRandomQuestionCall)
 
       mockedRepeatCall.mockResolvedValue(
         makeMe.aDueMemoryTrackersList
@@ -242,13 +215,8 @@ describe("repeat page", () => {
       }
 
       const mockedAnswerSpellingCall = vi
-        .spyOn(sdk, "answerSpelling")
-        .mockResolvedValue({
-          data: answerResult,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        .spyOn(helper.managedApi.services, "answerSpelling")
+        .mockResolvedValue(answerResult as never)
 
       const wrapper = await mountPage()
       await flushPromises()

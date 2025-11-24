@@ -2,7 +2,7 @@ import Assimilation from "@/components/review/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockShowNoteAccessory } from "@tests/helpers"
+import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -34,15 +34,9 @@ beforeEach(() => {
       response: {} as Response,
     }
   })
-  vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
-    const result = await mockedGetNoteCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
+  vi.spyOn(helper.managedApi.services, "showNote").mockImplementation(
+    mockedGetNoteCall
+  )
   vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
     data: {} as never,
     error: undefined,
@@ -71,7 +65,6 @@ beforeEach(() => {
     setTotalUnassimilatedCount: vi.fn(),
   })
 
-  mockShowNoteAccessory()
   renderer = helper.component(Assimilation)
 })
 

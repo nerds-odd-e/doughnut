@@ -69,8 +69,7 @@ import type {
   SpellingResultDto,
   MemoryTrackerLite,
 } from "@generated/backend"
-import { answerSpelling, askAQuestion } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
@@ -100,6 +99,7 @@ const useQuestionFetching = (props: QuizProps) => {
   const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
+  const { managedApi } = useLoadingApi()
 
   const fetchNextQuestion = async () => {
     for (
@@ -113,13 +113,12 @@ const useQuestionFetching = (props: QuizProps) => {
 
       if (memoryTrackerId in recallPromptCache.value) continue
 
-      const { data: question, error } = await askAQuestion({
-        path: { memoryTracker: memoryTrackerId },
-        client: globalClientSilent,
-      })
-      if (!error) {
-        recallPromptCache.value[memoryTrackerId] = question!
-      } else {
+      try {
+        const question = await managedApi.silent.services.askAQuestion({
+          path: { memoryTracker: memoryTrackerId },
+        })
+        recallPromptCache.value[memoryTrackerId] = question
+      } catch (e) {
         recallPromptCache.value[memoryTrackerId] = undefined
       }
     }
@@ -143,6 +142,7 @@ const useQuestionFetching = (props: QuizProps) => {
 
 // Use the composable
 const { recallPromptCache, fetchQuestion } = useQuestionFetching(props)
+const { managedApi } = useLoadingApi()
 
 // Computed properties with better naming
 const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
@@ -171,12 +171,14 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
   if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
     return
 
-  const { data: answerResult, error } = await answerSpelling({
-    path: { memoryTracker: currentMemoryTrackerId.value },
-    body: { spellingAnswer: answerData.spellingAnswer },
-  })
-  if (!error) {
-    emit("answered-spelling", answerResult!)
+  try {
+    const answerResult = await managedApi.services.answerSpelling({
+      path: { memoryTracker: currentMemoryTrackerId.value },
+      body: { spellingAnswer: answerData.spellingAnswer },
+    })
+    emit("answered-spelling", answerResult)
+  } catch (e) {
+    // Error handling is already done in the component
   }
 }
 

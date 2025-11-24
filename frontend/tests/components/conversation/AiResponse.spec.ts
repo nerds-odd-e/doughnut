@@ -1,11 +1,10 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
 import { expect, vi } from "vitest"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
-import * as sdk from "@generated/backend/sdk.gen"
 import {
   getLastInstance,
   resetInstance,
@@ -194,7 +193,6 @@ describe("ConversationInner", () => {
   beforeEach(() => {
     storageAccessor = createNoteStorage(helper.managedApi)
     resetInstance()
-    mockShowNote()
 
     const testData = setupTestData()
     note = testData.note
@@ -277,12 +275,10 @@ describe("ConversationInner", () => {
     const renderedCompletion = "bold completion"
 
     beforeEach(async () => {
-      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-        data: {} as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(
+        helper.managedApi.services,
+        "updateNoteDetails"
+      ).mockResolvedValue({} as never)
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -360,10 +356,9 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { details: testCompletion },
-      })
+      expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
+        { path: { note: note.id }, body: { details: testCompletion } }
+      )
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -379,7 +374,9 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
+      expect(
+        helper.managedApi.services.updateNoteDetails
+      ).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -396,7 +393,9 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
+      expect(
+        helper.managedApi.services.updateNoteDetails
+      ).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -426,10 +425,9 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete "world" and add "friends!"
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { details: "Hello friends!" },
-      })
+      expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
+        { path: { note: note.id }, body: { details: "Hello friends!" } }
+      )
     })
 
     it("handles over-deletion by removing all content", async () => {
@@ -448,20 +446,17 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete everything and add new text
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: { details: "Completely new text" },
-      })
+      expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalledWith(
+        { path: { note: note.id }, body: { details: "Completely new text" } }
+      )
     })
 
     describe("Note Access", () => {
       beforeEach(async () => {
-        vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-          data: {} as never,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        vi.spyOn(
+          helper.managedApi.services,
+          "updateNoteDetails"
+        ).mockResolvedValue({} as never)
       })
 
       it("fails to handle completion when note is in answeredQuestion but not in subject", async () => {
@@ -487,7 +482,7 @@ describe("ConversationInner", () => {
         await wrapper.find('button[class*="btn-primary"]').trigger("click")
         await flushPromises()
 
-        expect(sdk.updateNoteDetails).toHaveBeenCalled()
+        expect(helper.managedApi.services.updateNoteDetails).toHaveBeenCalled()
       })
     })
   })
@@ -496,12 +491,9 @@ describe("ConversationInner", () => {
     const testTitle = "Generated Title"
 
     beforeEach(async () => {
-      vi.spyOn(sdk, "updateNoteTitle").mockResolvedValue({
-        data: {} as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockResolvedValue(
+        {} as never
+      )
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -515,7 +507,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).toHaveBeenCalledWith({
+      expect(helper.managedApi.services.updateNoteTitle).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { newTitle: testTitle },
       })
@@ -533,7 +525,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(helper.managedApi.services.updateNoteTitle).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -549,7 +541,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(helper.managedApi.services.updateNoteTitle).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results

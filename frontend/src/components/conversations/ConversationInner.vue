@@ -59,10 +59,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
-import {
-  getConversationMessages,
-  replyToConversation,
-} from "@generated/backend/sdk.gen"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import type {
   User,
   ConversationMessage,
@@ -94,6 +91,8 @@ const emit = defineEmits<{
   (e: "toggle-maximize"): void
 }>()
 
+const { managedApi } = useLoadingApi()
+
 const currentConversationMessages = ref<ConversationMessage[] | undefined>(
   undefined
 )
@@ -120,12 +119,10 @@ const isCurrentUser = (id: number): boolean => {
 const fetchConversationMessages = async () => {
   if (!conversation.id) return
 
-  const { data: messages, error } = await getConversationMessages({
-    path: { conversationId: conversation.id },
-  })
-  if (!error) {
-    currentConversationMessages.value = messages!
-  }
+  currentConversationMessages.value =
+    await managedApi.services.getConversationMessages({
+      path: { conversationId: conversation.id },
+    })
   emit("conversation-fetched", conversation.id)
 }
 
@@ -133,16 +130,14 @@ const handleSendMessage = async (
   message: string,
   inviteAI: boolean = false
 ) => {
-  const { error } = await replyToConversation({
+  await managedApi.services.replyToConversation({
     path: { conversationId: conversation.id },
     body: message,
   })
-  if (!error) {
-    await fetchConversationMessages()
+  await fetchConversationMessages()
 
-    if (inviteAI) {
-      aiReplyTrigger.value++
-    }
+  if (inviteAI) {
+    aiReplyTrigger.value++
   }
 }
 

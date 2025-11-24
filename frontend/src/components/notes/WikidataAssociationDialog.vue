@@ -108,13 +108,10 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick, computed } from "vue"
 import type { WikidataSearchEntity } from "@generated/backend"
-import {
-  searchWikidata,
-  fetchWikidataEntityDataById,
-} from "@generated/backend/sdk.gen"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
+import useLoadingApi from "@/managedApi/useLoadingApi"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 import SvgPopup from "../svgs/SvgPopup.vue"
 
@@ -132,6 +129,8 @@ const emit = defineEmits<{
   "update:modelValue": [value: string]
   save: [wikidataId: string]
 }>()
+
+const { managedApi } = useLoadingApi()
 
 const hasSaveButton = computed(() => props.showSaveButton || false)
 
@@ -158,12 +157,9 @@ const fetchSearchResults = async () => {
   loading.value = true
   hasSearched.value = true
   try {
-    const { data: results, error } = await searchWikidata({
+    searchResults.value = await managedApi.services.searchWikidata({
       query: { search: searchKeyRef.value },
     })
-    if (!error) {
-      searchResults.value = results!
-    }
   } finally {
     loading.value = false
   }
@@ -229,13 +225,11 @@ defineExpose({
 })
 
 const getWikidataItem = async (wikidataId: string) => {
-  const { data: entityData, error } = await fetchWikidataEntityDataById({
-    path: { wikidataId },
-  })
-  if (!error && entityData) {
-    return entityData.WikipediaEnglishUrl
-  }
-  return ""
+  return (
+    await managedApi.services.fetchWikidataEntityDataById({
+      path: { wikidataId },
+    })
+  ).WikipediaEnglishUrl
 }
 
 const wikiUrl = async (wikidataId: string) => {

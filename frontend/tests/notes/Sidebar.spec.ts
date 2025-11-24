@@ -6,7 +6,6 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
 import createNoteStorage from "@/store/createNoteStorage"
-import * as sdk from "@generated/backend/sdk.gen"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
@@ -179,12 +178,7 @@ describe("Sidebar", () => {
     })
 
     it("should call moveAfter when dragging and dropping notes", async () => {
-      vi.spyOn(sdk, "moveAfter").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(helper.managedApi.services, "moveAfter").mockResolvedValue([])
       render(firstGeneration)
 
       await flushPromises()
@@ -202,7 +196,7 @@ describe("Sidebar", () => {
       // Perform drop
       await fireEvent.drop(dropTarget)
 
-      expect(sdk.moveAfter).toHaveBeenCalledWith({
+      expect(helper.managedApi.services.moveAfter).toHaveBeenCalledWith({
         path: {
           note: firstGeneration.id,
           targetNote: firstGenerationSibling.id,
@@ -271,12 +265,9 @@ describe("Sidebar", () => {
     })
 
     it("should not call moveAfter when dragging to the same note", async () => {
-      const moveAfterMock = vi.spyOn(sdk, "moveAfter").mockResolvedValue({
-        data: [] as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      const moveAfterMock = vi
+        .spyOn(helper.managedApi.services, "moveAfter")
+        .mockResolvedValue({} as never)
       render(firstGeneration)
       await flushPromises()
 
@@ -295,12 +286,9 @@ describe("Sidebar", () => {
     })
 
     it("should not call moveAfter when dragging between different parents", async () => {
-      const moveAfterMock = vi.spyOn(sdk, "moveAfter").mockResolvedValue({
-        data: [] as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      const moveAfterMock = vi
+        .spyOn(helper.managedApi.services, "moveAfter")
+        .mockResolvedValue({} as never)
       render(firstGeneration)
       await flushPromises()
 
@@ -455,12 +443,7 @@ describe("Sidebar", () => {
     })
 
     it("should call moveAfter with asFirstChild when dropping on right half", async () => {
-      vi.spyOn(sdk, "moveAfter").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(helper.managedApi.services, "moveAfter").mockResolvedValue([])
       render(firstGeneration)
       await flushPromises()
 
@@ -483,7 +466,7 @@ describe("Sidebar", () => {
       await fireEvent(dropTarget, dragOverEvent)
       await fireEvent.drop(dropTarget)
 
-      expect(sdk.moveAfter).toHaveBeenCalledWith({
+      expect(helper.managedApi.services.moveAfter).toHaveBeenCalledWith({
         path: {
           note: firstGeneration.id,
           targetNote: firstGenerationSibling.id,
@@ -493,12 +476,7 @@ describe("Sidebar", () => {
     })
 
     it("should allow dropping as child even with different parent", async () => {
-      vi.spyOn(sdk, "moveAfter").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      vi.spyOn(helper.managedApi.services, "moveAfter").mockResolvedValue([])
       render(firstGeneration)
       await flushPromises()
 
@@ -521,7 +499,7 @@ describe("Sidebar", () => {
       await fireEvent(firstGenNote, dragOverEvent)
       await fireEvent.drop(firstGenNote)
 
-      expect(sdk.moveAfter).toHaveBeenCalledWith({
+      expect(helper.managedApi.services.moveAfter).toHaveBeenCalledWith({
         path: {
           note: firstGeneration.id,
           targetNote: firstGenerationSibling.id,

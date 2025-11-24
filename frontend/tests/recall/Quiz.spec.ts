@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import type { MemoryTrackerLite, SpellingResultDto } from "@generated/backend"
+import type { MemoryTrackerLite } from "@generated/backend"
 import * as sdk from "@generated/backend/sdk.gen"
 
 describe("repeat page", () => {
@@ -16,21 +16,13 @@ describe("repeat page", () => {
     vi.spyOn(helper.managedApi.services, "showNote").mockResolvedValue(
       makeMe.aNote.please() as never
     )
-    vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-      data: makeMe.aMemoryTracker.please(),
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
-      const result = await mockedRandomQuestionCall(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
-    })
+    vi.spyOn(helper.managedApi.services, "showMemoryTracker").mockResolvedValue(
+      makeMe.aMemoryTracker.please() as never
+    )
+    vi.spyOn(
+      helper.managedApi.silent.services,
+      "askAQuestion"
+    ).mockImplementation(mockedRandomQuestionCall)
     vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
       data: { stem: "Spell the word 'cat'" } as never,
       error: undefined,
@@ -71,44 +63,31 @@ describe("repeat page", () => {
   describe('repeat page with "just review" quiz', () => {
     it("fetch the first 1 question when mount", async () => {
       await mountPage([1, 2, 3], 1)
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { memoryTracker: 1 },
-        })
-      )
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
+        path: { memoryTracker: 1 },
+      })
     })
 
     it("fetch the first 3 question when mount", async () => {
       await mountPage([111, 222, 333, 444], 3)
-      expect(mockedRandomQuestionCall).nthCalledWith(
-        1,
-        expect.objectContaining({
-          path: { memoryTracker: 111 },
-        })
-      )
-      expect(mockedRandomQuestionCall).nthCalledWith(
-        2,
-        expect.objectContaining({
-          path: { memoryTracker: 222 },
-        })
-      )
-      expect(mockedRandomQuestionCall).nthCalledWith(
-        3,
-        expect.objectContaining({
-          path: { memoryTracker: 333 },
-        })
-      )
+      expect(mockedRandomQuestionCall).nthCalledWith(1, {
+        path: { memoryTracker: 111 },
+      })
+      expect(mockedRandomQuestionCall).nthCalledWith(2, {
+        path: { memoryTracker: 222 },
+      })
+      expect(mockedRandomQuestionCall).nthCalledWith(3, {
+        path: { memoryTracker: 333 },
+      })
     })
 
     it("does not fetch question 2 again after prefetched", async () => {
       const wrapper = await mountPage([1, 2, 3, 4], 2)
       expect(mockedRandomQuestionCall).toBeCalledTimes(2)
       await wrapper.setProps({ currentIndex: 1 })
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
-        expect.objectContaining({
-          path: { memoryTracker: 3 },
-        })
-      )
+      expect(mockedRandomQuestionCall).toHaveBeenCalledWith({
+        path: { memoryTracker: 3 },
+      })
     })
   })
 
@@ -135,17 +114,12 @@ describe("repeat page", () => {
         .please()
       mockedRandomQuestionCall.mockResolvedValue(recallPromptWithoutChoices)
 
-      const answerResult: SpellingResultDto = {
-        note: makeMe.aNote.please(),
-        answer: "cat",
-        isCorrect: true,
-      }
-      vi.spyOn(sdk, "answerSpelling").mockResolvedValue({
-        data: answerResult,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      const answerResult = makeMe.anAnsweredQuestion
+        .answerCorrect(true)
+        .please()
+      vi.spyOn(helper.managedApi.services, "answerSpelling").mockResolvedValue(
+        answerResult as never
+      )
 
       const wrapper = await mountPage([1], 1, true)
 
@@ -154,7 +128,7 @@ describe("repeat page", () => {
         .vm.$emit("answer", { spellingAnswer: "cat" })
       await flushPromises()
 
-      expect(sdk.answerSpelling).toHaveBeenCalledWith({
+      expect(helper.managedApi.services.answerSpelling).toHaveBeenCalledWith({
         path: { memoryTracker: 1 },
         body: {
           spellingAnswer: "cat",

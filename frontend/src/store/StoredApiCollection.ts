@@ -5,25 +5,7 @@ import type {
   WikidataAssociationCreation,
 } from "@generated/backend"
 import type { LinkCreation, NoteCreationDto } from "@generated/backend"
-import {
-  createNoteAfter,
-  createNoteUnderParent,
-  deleteNote,
-  linkNoteFinalize,
-  moveAfter,
-  moveNote,
-  showNote,
-  undoDeleteNote,
-  updateLink,
-  updateNoteDetails,
-  updateNoteTitle,
-  updateWikidataId,
-} from "@generated/backend/sdk.gen"
 import ManagedApi from "@/managedApi/ManagedApi"
-import {
-  toOpenApiError,
-  setErrorObjectForFieldErrors,
-} from "@/managedApi/openApiError"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -139,64 +121,37 @@ export default class StoredApiCollection implements StoredApi {
     content: string
   ) {
     if (field === "edit title") {
-      const { data, error } = await updateNoteTitle({
+      return this.managedApi.services.updateNoteTitle({
         path: { note: noteId },
         body: {
           newTitle: content,
         },
       })
-      if (error || !data) {
-        throw new Error(error || "Failed to update note title")
-      }
-      return data
     }
-    const { data, error } = await updateNoteDetails({
+    return this.managedApi.services.updateNoteDetails({
       path: { note: noteId },
       body: {
         details: content,
       },
     })
-    if (error || !data) {
-      throw new Error(error || "Failed to update note details")
-    }
-    return data
   }
 
   async updateWikidataId(
     noteId: Doughnut.ID,
     data: WikidataAssociationCreation
   ): Promise<NoteRealm> {
-    const { data: noteRealm, error } = await updateWikidataId({
-      path: { note: noteId },
-      body: data,
-    })
-    if (error || !noteRealm) {
-      const apiError = new Error("Failed to update Wikidata ID") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to update Wikidata ID"
-        if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
-    }
-    return this.storage.refreshNoteRealm(noteRealm)
+    return this.storage.refreshNoteRealm(
+      await this.managedApi.services.updateWikidataId({
+        path: { note: noteId },
+        body: data,
+      })
+    )
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const { data: noteRealm, error } = await showNote({
+    const noteRealm = await this.managedApi.services.showNote({
       path: { note: noteId },
     })
-    if (error || !noteRealm) {
-      throw new Error(error || "Failed to load note")
-    }
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
@@ -222,27 +177,10 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const { data: nrwp, error } = await createNoteUnderParent({
+    const nrwp = await this.managedApi.services.createNoteUnderParent({
       path: { parentNote: parentId },
       body: data,
     })
-    if (error || !nrwp) {
-      const apiError = new Error("Failed to create note") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to create note"
-        if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
-    }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
@@ -254,27 +192,10 @@ export default class StoredApiCollection implements StoredApi {
     referenceId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const { data: nrwp, error } = await createNoteAfter({
+    const nrwp = await this.managedApi.services.createNoteAfter({
       path: { referenceNote: referenceId },
       body: data,
     })
-    if (error || !nrwp) {
-      const apiError = new Error("Failed to create note after") as Error & {
-        body?: unknown
-        status?: number
-        [key: string]: unknown
-      }
-      if (error) {
-        apiError.body = error
-        setErrorObjectForFieldErrors(apiError)
-        const errorObj = toOpenApiError(error)
-        apiError.message = errorObj.message || "Failed to create note after"
-        if (errorObj.errors) {
-          apiError.status = 400
-        }
-      }
-      throw apiError
-    }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
     this.routerReplaceFocus(router, focus)
@@ -286,28 +207,24 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: LinkCreation
   ) {
-    const { data: noteRealms, error } = await linkNoteFinalize({
-      path: {
-        sourceNote: sourceId,
-        targetNote: targetId,
-      },
-      body: data,
-    })
-    if (error || !noteRealms) {
-      throw new Error(error || "Failed to create link")
-    }
-    this.refreshNoteRealms(noteRealms)
+    this.refreshNoteRealms(
+      await this.managedApi.services.linkNoteFinalize({
+        path: {
+          sourceNote: sourceId,
+          targetNote: targetId,
+        },
+        body: data,
+      })
+    )
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
-    const { data: noteRealms, error } = await updateLink({
-      path: { link: linkId },
-      body: data,
-    })
-    if (error || !noteRealms) {
-      throw new Error(error || "Failed to update link")
-    }
-    this.refreshNoteRealms(noteRealms)
+    this.refreshNoteRealms(
+      await this.managedApi.services.updateLink({
+        path: { link: linkId },
+        body: data,
+      })
+    )
   }
 
   private refreshNoteRealms(noteRealms: NoteRealm[]) {
@@ -319,16 +236,13 @@ export default class StoredApiCollection implements StoredApi {
     targetNoteId: number,
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]> {
-    const { data: updatedNotes, error } = await moveAfter({
+    const updatedNotes = await this.managedApi.services.moveAfter({
       path: {
         note: noteId,
         targetNote: targetNoteId,
         asFirstChild: dropMode === "asFirstChild" ? "true" : "false",
       },
     })
-    if (error || !updatedNotes) {
-      throw new Error(error || "Failed to move note")
-    }
     this.refreshNoteRealms(updatedNotes)
     return updatedNotes
   }
@@ -381,13 +295,9 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!
       )
     }
-    const { data: noteRealm, error } = await undoDeleteNote({
+    return this.managedApi.services.undoDeleteNote({
       path: { note: undone.noteId },
     })
-    if (error || !noteRealm) {
-      throw new Error(error || "Failed to undo delete note")
-    }
-    return noteRealm
   }
 
   async undo(router: Router) {
@@ -400,12 +310,9 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const { data: res, error } = await deleteNote({
+    const res = await this.managedApi.services.deleteNote({
       path: { note: noteId },
     })
-    if (error || !res) {
-      throw new Error(error || "Failed to delete note")
-    }
     this.noteEditingHistory.deleteNote(noteId)
     if (res.length === 0) {
       this.routerReplaceFocus(router)
@@ -421,16 +328,14 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDto
   ) {
-    const { data: noteRealms, error } = await moveNote({
-      path: {
-        sourceNote: sourceId,
-        targetNote: targetId,
-      },
-      body: data,
-    })
-    if (error || !noteRealms) {
-      throw new Error(error || "Failed to move note")
-    }
-    this.refreshNoteRealms(noteRealms)
+    this.refreshNoteRealms(
+      await this.managedApi.services.moveNote({
+        path: {
+          sourceNote: sourceId,
+          targetNote: targetId,
+        },
+        body: data,
+      })
+    )
   }
 }

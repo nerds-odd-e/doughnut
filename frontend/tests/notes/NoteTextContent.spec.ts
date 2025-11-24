@@ -4,7 +4,6 @@ import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedUpdateTitleCall = vi.fn()
 
@@ -26,15 +25,9 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    vi.spyOn(sdk, "updateNoteTitle").mockImplementation(async (options) => {
-      const result = await mockedUpdateTitleCall(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
-    })
+    vi.spyOn(helper.managedApi.services, "updateNoteTitle").mockImplementation(
+      mockedUpdateTitleCall
+    )
   })
 
   afterEach(() => {
