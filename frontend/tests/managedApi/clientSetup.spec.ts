@@ -92,6 +92,34 @@ describe("clientSetup", () => {
       // This is critical for e2e tests - loading spinner must disappear even on errors
       expect(apiStatus.states.length).toBe(0)
     })
+
+    it("manages loading state correctly with concurrent requests when one fails", async () => {
+      // Mock two concurrent requests: one succeeds, one fails
+      let requestCount = 0
+      fetchMock.mockResponse(() => {
+        requestCount++
+        if (requestCount === 1) {
+          // First request succeeds
+          return Promise.resolve(JSON.stringify({ user: {} }))
+        } else {
+          // Second request fails
+          return Promise.resolve({
+            body: JSON.stringify({}),
+            status: 500,
+          })
+        }
+      })
+
+      // Start two concurrent requests
+      const promise1 = getUserProfile({ client: globalClient })
+      const promise2 = getUserProfile({ client: globalClient })
+
+      await Promise.allSettled([promise1, promise2])
+
+      // After both requests complete (one success, one error), loading state should be cleared
+      // This tests that error interceptor doesn't double-clear when response interceptor already cleared
+      expect(apiStatus.states.length).toBe(0)
+    })
   })
 
   describe("globalClient (non-silent) - error handling", () => {
