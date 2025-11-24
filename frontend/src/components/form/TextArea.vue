@@ -4,10 +4,8 @@
       :class="`daisy-textarea daisy-textarea-bordered daisy-w-full ${!!errorMessage ? 'daisy-textarea-error' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
-      :value="modelValue"
-      @input="
-        emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)
-      "
+      :value="internalValue"
+      @input="handleInput"
       :placeholder="placeholder"
       :autofocus="autofocus"
       autocomplete="off"
@@ -38,6 +36,7 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue", "blur", "enterPressed"])
 const input = ref<HTMLTextAreaElement | null>(null)
+const internalValue = ref(props.modelValue || "")
 
 const focus = () => {
   if (input.value === null) return
@@ -47,6 +46,12 @@ const focus = () => {
 defineExpose({
   focus,
 })
+
+const handleInput = (event: Event) => {
+  const newValue = (event.target as HTMLTextAreaElement).value
+  internalValue.value = newValue
+  emit("update:modelValue", newValue)
+}
 
 const handleKeydown = (event: KeyboardEvent) => {
   if (
@@ -75,13 +80,40 @@ const resize = () => {
 
 watch(
   () => props.modelValue,
-  async () => {
+  async (newValue) => {
+    if (input.value && newValue !== undefined && newValue !== null) {
+      // Preserve cursor position when updating value from external changes (e.g., API response)
+      const currentValue = internalValue.value
+      const selectionStart = input.value.selectionStart
+      const selectionEnd = input.value.selectionEnd
+      const isFocused = document.activeElement === input.value
+
+      // Only update internal value if it actually changed
+      if (currentValue !== newValue) {
+        internalValue.value = newValue
+        // Restore cursor position if the textarea was focused
+        if (isFocused && selectionStart !== undefined) {
+          // Try to preserve cursor position, clamping to valid range
+          const newSelectionStart = Math.min(selectionStart, newValue.length)
+          const newSelectionEnd = Math.min(selectionEnd, newValue.length)
+          await nextTick()
+          input.value.setSelectionRange(newSelectionStart, newSelectionEnd)
+        }
+      } else if (isFocused && selectionStart !== undefined) {
+        // Value is the same - ensure cursor position is preserved
+        await nextTick()
+        input.value.setSelectionRange(selectionStart, selectionEnd)
+      }
+    } else {
+      internalValue.value = newValue || ""
+    }
     await nextTick()
     resize()
   }
 )
 
 onMounted(async () => {
+  internalValue.value = props.modelValue || ""
   await nextTick()
   resize()
 })

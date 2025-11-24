@@ -250,4 +250,61 @@ describe("NoteEditableDetails", () => {
 
     vi.useRealTimers()
   })
+
+  it("should preserve cursor position when API response updates the value", async () => {
+    vi.useFakeTimers()
+
+    const noteId = 1
+    const originalDetails = "Original note details text"
+
+    // Mock the API to return the same value (simulating API response)
+    mockedUpdateDetailsCall.mockResolvedValue({
+      id: noteId,
+      details: originalDetails,
+    } as never)
+
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withStorageProps({
+        noteId: noteId,
+        noteDetails: originalDetails,
+        readonly: false,
+        asMarkdown: true,
+      })
+      .mount()
+
+    await flushPromises()
+
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+
+    // Set cursor position in the middle of the text
+    detailsEl.focus()
+    detailsEl.setSelectionRange(15, 15) // Position cursor after "Original note"
+    expect(detailsEl.selectionStart).toBe(15)
+    expect(detailsEl.selectionEnd).toBe(15)
+
+    // Edit the details (this triggers a debounced save)
+    detailsEl.value = originalDetails
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    // Wait for debounce timeout and API response
+    vi.advanceTimersByTime(1000)
+    await flushPromises()
+
+    // Simulate the API response updating the value prop
+    // This happens when refreshNoteRealm is called after the API response
+    await wrapper.setProps({
+      noteId: noteId,
+      noteDetails: originalDetails, // Same value from API response
+    })
+    await flushPromises()
+
+    // The cursor position should be preserved
+    // If the bug exists, the cursor would jump to position 0
+    expect(detailsEl.selectionStart).toBe(15)
+    expect(detailsEl.selectionEnd).toBe(15)
+
+    vi.useRealTimers()
+  })
 })

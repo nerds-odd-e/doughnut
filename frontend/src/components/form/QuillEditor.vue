@@ -24,7 +24,33 @@ const onBlurTextField = () => {
 
 const updateQuillContent = (content: string | undefined) => {
   if (quill.value) {
+    // Preserve cursor position when updating content from external changes (e.g., API response)
+    let savedRange: { index: number; length: number } | null = null
+    let isFocused = false
+    try {
+      savedRange = quill.value.getSelection(true) // true = preserve even if editor not focused
+      isFocused = quill.value.hasFocus()
+    } catch {
+      // Quill might not be fully initialized, ignore
+    }
+
     quill.value.root.innerHTML = content ?? ""
+
+    // Restore cursor position if the editor was focused
+    if (isFocused && savedRange) {
+      try {
+        // Clamp the range to valid bounds
+        const length = quill.value.getLength()
+        const start = Math.min(savedRange.index, length - 1)
+        const end = Math.min(
+          savedRange.index + (savedRange.length || 0),
+          length - 1
+        )
+        quill.value.setSelection({ index: start, length: end - start })
+      } catch {
+        // Ignore errors when setting selection
+      }
+    }
   }
 }
 
@@ -73,9 +99,28 @@ onMounted(() => {
 watch(
   () => modelValue,
   (newValue) => {
-    if (quill.value && localValue.value !== newValue) {
-      localValue.value = newValue
-      updateQuillContent(newValue)
+    if (quill.value) {
+      // Only update if the value actually changed
+      if (localValue.value !== newValue) {
+        localValue.value = newValue
+        updateQuillContent(newValue)
+      } else {
+        // Value is the same but cursor might have been reset - try to preserve it
+        try {
+          const savedRange = quill.value.getSelection(true)
+          if (quill.value.hasFocus() && savedRange) {
+            const length = quill.value.getLength()
+            const start = Math.min(savedRange.index, length - 1)
+            const end = Math.min(
+              savedRange.index + (savedRange.length || 0),
+              length - 1
+            )
+            quill.value.setSelection({ index: start, length: end - start })
+          }
+        } catch {
+          // Ignore errors when getting/setting selection
+        }
+      }
     }
   }
 )

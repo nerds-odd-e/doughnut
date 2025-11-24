@@ -38,7 +38,29 @@ const onEnter = (event: KeyboardEvent) => {
 }
 
 const updateContent = (newValue: string) => {
-  if (editor.value && editor.value.innerText !== newValue) {
+  if (!editor.value) return
+
+  const currentValue = editor.value.innerText
+  const selection = window.getSelection()
+  const range = selection?.rangeCount ? selection.getRangeAt(0) : null
+  const isFocused = document.activeElement === editor.value
+
+  // Save cursor position relative to the text content
+  let savedOffset = 0
+  if (
+    isFocused &&
+    range &&
+    editor.value.contains(range.commonAncestorContainer)
+  ) {
+    // Calculate offset from start of editor
+    const preRange = range.cloneRange()
+    preRange.selectNodeContents(editor.value)
+    preRange.setEnd(range.startContainer, range.startOffset)
+    savedOffset = preRange.toString().length
+  }
+
+  // Only update if the value actually changed
+  if (currentValue !== newValue) {
     // First update innerText to ensure it's set properly for tests and initial render
     editor.value.innerText = newValue
 
@@ -52,6 +74,27 @@ const updateContent = (newValue: string) => {
       const textNode = document.createTextNode(newValue)
       editor.value.appendChild(textNode)
     }
+
+    // Restore cursor position if the editor was focused
+    if (isFocused && savedOffset > 0 && editor.value.firstChild) {
+      const textNode = editor.value.firstChild as Text
+      // Clamp offset to valid range
+      const clampedOffset = Math.min(savedOffset, newValue.length)
+      const newRange = document.createRange()
+      newRange.setStart(textNode, clampedOffset)
+      newRange.setEnd(textNode, clampedOffset)
+      selection?.removeAllRanges()
+      selection?.addRange(newRange)
+    }
+  } else if (isFocused && savedOffset > 0 && editor.value.firstChild) {
+    // Value is the same but cursor might have been reset - restore it
+    const textNode = editor.value.firstChild as Text
+    const clampedOffset = Math.min(savedOffset, newValue.length)
+    const newRange = document.createRange()
+    newRange.setStart(textNode, clampedOffset)
+    newRange.setEnd(textNode, clampedOffset)
+    selection?.removeAllRanges()
+    selection?.addRange(newRange)
   }
 }
 

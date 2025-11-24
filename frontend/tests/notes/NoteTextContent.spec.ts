@@ -304,4 +304,68 @@ describe("in place edit on title", () => {
       expect(wrapper.text()).toContain(note.noteTopology.titleOrPredicate)
     })
   })
+
+  it("should preserve cursor position when API response updates the title value", async () => {
+    const wrapper = mountComponent(note)
+    await flushPromises()
+
+    const titleEl = wrapper.find('[role="title"]').element as HTMLElement
+
+    // Set cursor position in the middle of the text
+    titleEl.focus()
+    const range = document.createRange()
+    const textNode = titleEl.firstChild as Text
+    if (textNode) {
+      const cursorPosition = Math.min(5, textNode.length)
+      range.setStart(textNode, cursorPosition)
+      range.setEnd(textNode, cursorPosition)
+      const selection = window.getSelection()
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+    }
+
+    // Edit the title (this triggers a debounced save)
+    titleEl.innerText = note.noteTopology.titleOrPredicate || ""
+    titleEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+
+    // Wait for debounce timeout and API response
+    await vi.advanceTimersByTimeAsync(1000)
+    await flushPromises()
+
+    // Mock the API response
+    mockedUpdateTitleCall.mockResolvedValue({
+      id: note.id,
+      noteTopology: {
+        ...note.noteTopology,
+        titleOrPredicate: note.noteTopology.titleOrPredicate,
+      },
+    } as never)
+
+    // Simulate the API response updating the value prop
+    // This happens when refreshNoteRealm is called after the API response
+    await wrapper.setProps({
+      note: {
+        ...note,
+        noteTopology: {
+          ...note.noteTopology,
+          titleOrPredicate: note.noteTopology.titleOrPredicate, // Same value from API response
+        },
+      },
+    })
+    await flushPromises()
+
+    // The cursor position should be preserved
+    // If the bug exists, the cursor would jump to position 0
+    const currentSelection = window.getSelection()
+    if (currentSelection && currentSelection.rangeCount > 0) {
+      const currentRange = currentSelection.getRangeAt(0)
+      const preRange = currentRange.cloneRange()
+      preRange.selectNodeContents(titleEl)
+      preRange.setEnd(currentRange.startContainer, currentRange.startOffset)
+      const currentOffset = preRange.toString().length
+      // Cursor should still be around position 5 (or at least not at 0)
+      expect(currentOffset).toBeGreaterThan(0)
+    }
+  })
 })
