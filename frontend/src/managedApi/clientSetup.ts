@@ -93,9 +93,14 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     return error
   })
 
-  // Response interceptor: Clear loading state
+  // Response interceptor: Clear loading state only for successful responses
+  // (Error responses are handled by error interceptor to avoid double-clearing)
   globalClient.interceptors.response.use(async (response) => {
-    apiStatusHandler?.assignLoading(false)
+    // Only clear loading for successful responses
+    // Error responses (status >= 400) will be handled by error interceptor
+    if (response.ok) {
+      apiStatusHandler?.assignLoading(false)
+    }
     return response
   })
 }
