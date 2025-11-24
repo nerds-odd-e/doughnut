@@ -105,11 +105,11 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  private routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
+  private async routerReplaceFocus(router: Router, focusOnNote?: NoteRealm) {
     if (!focusOnNote) {
-      return router.replace({ name: "notebooks" })
+      return await router.replace({ name: "notebooks" })
     }
-    return router.replace({
+    return await router.replace({
       name: "noteShow",
       params: { noteId: focusOnNote.id },
     })
@@ -237,7 +237,7 @@ export default class StoredApiCollection implements StoredApi {
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
-    this.routerReplaceFocus(router, focus)
+    await this.routerReplaceFocus(router, focus)
     return focus
   }
 
@@ -269,7 +269,7 @@ export default class StoredApiCollection implements StoredApi {
     }
     const focus = this.storage.refreshNoteRealm(nrwp.created)
     this.storage.refreshNoteRealm(nrwp.parent)
-    this.routerReplaceFocus(router, focus)
+    await this.routerReplaceFocus(router, focus)
     return focus
   }
 
@@ -400,11 +400,11 @@ export default class StoredApiCollection implements StoredApi {
     }
     this.noteEditingHistory.deleteNote(noteId)
     if (res.length === 0) {
-      this.routerReplaceFocus(router)
+      await this.routerReplaceFocus(router)
       return undefined
     }
     const noteRealm = this.storage.refreshNoteRealm(res[0]!)
-    this.routerReplaceFocus(router, noteRealm)
+    await this.routerReplaceFocus(router, noteRealm)
     return noteRealm
   }
 
