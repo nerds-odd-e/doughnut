@@ -1,4 +1,4 @@
-@usingMockedOpenAiService
+@disableOpenAiService
 Feature: Spaced-repetition
     As a learner, I want to review my notes in the most optimized way
 
@@ -7,7 +7,6 @@ Feature: Spaced-repetition
         And my daily new notes to review is set to 1
         And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 3
-        And the OpenAI service is unavailable due to invalid system token
 
     @mockBrowserTime
     Scenario: The review page
