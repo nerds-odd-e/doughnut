@@ -1,7 +1,7 @@
 import NoteInfoBar from "@/components/notes/NoteInfoBar.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkMethod } from "@tests/helpers"
 import type { NoteInfo } from "@generated/backend"
 import * as sdk from "@generated/backend/sdk.gen"
 
@@ -13,12 +13,7 @@ const stubResponse: NoteInfo = {
 
 describe("note info", () => {
   it("should render values", async () => {
-    vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
-      data: stubResponse,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkMethod("getNoteInfo", stubResponse)
     const wrapper = helper
       .component(NoteInfoBar)
       .withProps({

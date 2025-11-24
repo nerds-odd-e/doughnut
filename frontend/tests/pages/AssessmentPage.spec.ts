@@ -1,7 +1,7 @@
 import { screen } from "@testing-library/vue"
-import { describe, it } from "vitest"
+import { describe, it, vi } from "vitest"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
-import helper from "@tests/helpers"
+import helper, { mockSdkMethod, createMockResponse } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import type { AssessmentQuestionInstance } from "@generated/backend"
@@ -25,12 +25,7 @@ describe("assessment page", () => {
       .withQuestions([assessmentQuestionInstance])
       .please()
     beforeEach(() => {
-      vi.spyOn(sdk, "generateAssessmentQuestions").mockResolvedValue({
-        data: assessmentAttempt,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkMethod("generateAssessmentQuestions", assessmentAttempt)
     })
 
     it("calls API ONCE on mount", async () => {
@@ -82,31 +77,19 @@ describe("assessment page", () => {
       .withQuestions([quizQuestion_1, quizQuestion_2])
       .please()
     beforeEach(() => {
-      vi.spyOn(sdk, "generateAssessmentQuestions").mockResolvedValue({
-        data: assessmentAttempt,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkMethod("generateAssessmentQuestions", assessmentAttempt)
       vi.spyOn(sdk, "answerQuestion")
-        .mockResolvedValueOnce({
-          data: answerResult1,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
-        .mockResolvedValueOnce({
-          data: answerResult2,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
-      vi.spyOn(sdk, "submitAssessmentResult").mockResolvedValue({
-        data: assessmentAttempt,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+        .mockResolvedValueOnce(
+          createMockResponse(answerResult1) as Awaited<
+            ReturnType<typeof sdk.answerQuestion>
+          >
+        )
+        .mockResolvedValueOnce(
+          createMockResponse(answerResult2) as Awaited<
+            ReturnType<typeof sdk.answerQuestion>
+          >
+        )
+      mockSdkMethod("submitAssessmentResult", assessmentAttempt)
     })
 
     it("should submit assessment result when answer all questions", async () => {

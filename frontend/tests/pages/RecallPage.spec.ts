@@ -3,7 +3,10 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, {
+  mockSdkMethod,
+  mockSdkMethodWithImplementation,
+} from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
@@ -37,27 +40,13 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  vi.spyOn(sdk, "showNote").mockResolvedValue({
-    data: makeMe.aNoteRealm.please(),
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
+  mockSdkMethod("showNote", makeMe.aNoteRealm.please())
+  mockSdkMethodWithImplementation("recalling", async (options) => {
+    return await mockedRepeatCall(options)
   })
-  vi.spyOn(sdk, "recalling").mockImplementation(async (options) => {
-    const result = await mockedRepeatCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
-  vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
-    data: { stem: "Spell the word 'cat'" } as never,
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
-  })
+  mockSdkMethod("getSpellingQuestion", {
+    stem: "Spell the word 'cat'",
+  } as never)
   renderer = helper
     .component(RecallPage)
     .withStorageProps({ eagerFetchCount: 1 })
@@ -99,12 +88,7 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkMethod("showMemoryTracker", makeMe.aMemoryTracker.please())
       vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
         try {
           const result = await mockedRandomQuestionCall(options)
@@ -151,14 +135,10 @@ describe("repeat page", () => {
         .withRecallPromptId(1)
         .answerCorrect(false)
         .please()
-      const mockedMarkAsRepeatedCall = vi
-        .spyOn(sdk, "markAsRepeated")
-        .mockResolvedValue({
-          data: answerResult as never,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+      const mockedMarkAsRepeatedCall = mockSdkMethod(
+        "markAsRepeated",
+        answerResult as never
+      )
       const recallPrompt = makeMe.aRecallPrompt.please()
       mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
       vi.runOnlyPendingTimers()
@@ -212,20 +192,9 @@ describe("repeat page", () => {
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
-        const result = await mockedRandomQuestionCall(options)
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
+      mockSdkMethod("showMemoryTracker", makeMe.aMemoryTracker.please())
+      mockSdkMethodWithImplementation("askAQuestion", async (options) => {
+        return await mockedRandomQuestionCall(options)
       })
 
       mockedRepeatCall.mockResolvedValue(
@@ -244,14 +213,10 @@ describe("repeat page", () => {
         isCorrect: false,
       }
 
-      const mockedAnswerSpellingCall = vi
-        .spyOn(sdk, "answerSpelling")
-        .mockResolvedValue({
-          data: answerResult,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+      const mockedAnswerSpellingCall = mockSdkMethod(
+        "answerSpelling",
+        answerResult
+      )
 
       const wrapper = await mountPage()
       await flushPromises()
