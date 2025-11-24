@@ -59,6 +59,7 @@ export const recall = () => {
       getRecallListItemInSidebar(($el) => {
         $el.click()
       })
+      cy.pageIsNotLoading()
       return recallPage()
     },
     assumeRecallPage() {
