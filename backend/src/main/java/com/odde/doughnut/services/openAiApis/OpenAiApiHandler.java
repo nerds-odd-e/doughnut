@@ -211,6 +211,12 @@ public class OpenAiApiHandler {
     ChatCompletionCreateParams chatRequest =
         openAIChatRequestBuilder.responseJsonSchema(tool).build();
 
+    // Guard against misuse: requestAndGetJsonSchemaResult must not be used with tools
+    if (chatRequest.tools().map(list -> !list.isEmpty()).orElse(false)) {
+      throw new RuntimeException(
+          "requestAndGetJsonSchemaResult must not be used with tools; use the conversation tooling path instead");
+    }
+
     try {
       Optional<ChatCompletion.Choice> choiceOpt = chatCompletion(chatRequest);
       if (choiceOpt.isEmpty()) {
