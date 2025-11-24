@@ -46,24 +46,28 @@
         <p>No Wikidata entries found for '{{ searchKeyRef }}'</p>
       </div>
       <div v-else-if="searchResults && searchResults.length > 0 && !showTitleOptions">
-        <select
-          ref="select"
-          size="10"
-          name="wikidataSearchResult"
-          @change="onSelectSearchResult"
-          v-model="selectedOption"
-          class="daisy-select daisy-select-bordered daisy-w-full"
-          :disabled="props.disabled"
+        <div
+          data-testid="wikidata-search-results"
+          class="daisy-border daisy-border-base-300 daisy-rounded-lg daisy-bg-base-100 daisy-w-full"
+          style="max-height: 300px; overflow-y: auto;"
         >
-          <option disabled value="">- Choose Wikidata Search Result -</option>
-          <option
+          <div
             v-for="suggestion in searchResults"
             :key="suggestion.id"
-            :value="suggestion.id"
+            data-testid="wikidata-search-result-item"
+            :data-wikidata-id="suggestion.id"
+            @click="onSelectSearchResultItem(suggestion.id)"
+            :class="[
+              'daisy-px-4 daisy-py-2 daisy-border-b daisy-border-base-300',
+              props.disabled 
+                ? 'daisy-cursor-not-allowed daisy-opacity-50' 
+                : 'daisy-cursor-pointer hover:daisy-bg-base-200',
+              selectedOption === suggestion.id ? 'daisy-bg-primary daisy-text-primary-content' : ''
+            ]"
           >
             {{ suggestion.label }} - {{ suggestion.description }}
-          </option>
-        </select>
+          </div>
+        </div>
       </div>
       <div v-else-if="showTitleOptions" class="daisy-p-4">
         <label class="daisy-label">
@@ -147,7 +151,6 @@ const selectedItem = ref<WikidataSearchEntity | null>(null)
 const showTitleOptions = ref(false)
 const titleAction = ref<"Replace" | "Append" | "">("")
 const hasSearched = ref(false)
-const select = ref<HTMLSelectElement | null>(null)
 const isLoadingUrl = ref(false)
 
 const hasValidWikidataId = computed(() => {
@@ -277,6 +280,12 @@ const onSelectSearchResult = async () => {
   }
 }
 
+const onSelectSearchResultItem = async (wikidataId: string | undefined) => {
+  if (props.disabled || !wikidataId) return
+  selectedOption.value = wikidataId
+  await onSelectSearchResult()
+}
+
 const handleTitleAction = async () => {
   if (!selectedItem.value) return
   const action = getTitleAction()
@@ -327,9 +336,7 @@ watch(
 
 watch(searchResults, async () => {
   await nextTick()
-  if (!props.showSaveButton && select.value && searchResults.value.length > 0) {
-    select.value.focus()
-  }
+  // Focus is no longer needed for the scrollable list
 })
 
 onMounted(() => {
