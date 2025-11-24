@@ -447,7 +447,7 @@ describe("SearchResults.vue", () => {
       vi.useRealTimers()
     })
 
-    it("shows recently updated notes while waiting for search results", async () => {
+    it("shows recently updated notes while waiting for search results when no previous result exists", async () => {
       vi.useFakeTimers()
 
       const delayed = new Promise<Array<unknown>>((resolve) =>
@@ -476,18 +476,6 @@ describe("SearchResults.vue", () => {
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
 
       const wrapper = helper
         .component(SearchResults)
@@ -498,6 +486,8 @@ describe("SearchResults.vue", () => {
       vi.advanceTimersByTime(100)
       await flushPromises()
 
+      // When there's no previous result and we're waiting for the first search,
+      // show recent notes while waiting
       expect(wrapper.text()).toContain("Searching ...")
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
@@ -812,6 +802,127 @@ describe("SearchResults.vue", () => {
       // recent notes should not be shown
       // The component should still show the checkboxes but not recent notes
       expect(wrapper.text()).toContain("All My Notebooks And Subscriptions")
+    })
+
+    it("keeps previous search result visible while waiting for new search response", async () => {
+      vi.useFakeTimers()
+
+      const firstSearchResults: NoteSearchResult[] = [
+        { noteTopology: { id: 1, titleOrPredicate: "First Result" } },
+        { noteTopology: { id: 2, titleOrPredicate: "Second Result" } },
+      ]
+
+      const secondSearchDelayed = new Promise<Array<unknown>>((resolve) =>
+        setTimeout(() => resolve([]), 2000)
+      )
+
+      vi.spyOn(sdk, "searchForLinkTarget")
+        .mockResolvedValueOnce({
+          data: firstSearchResults,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+        .mockReturnValue(
+          secondSearchDelayed.then((data) => ({
+            data,
+            error: undefined,
+            request: {} as Request,
+            response: {} as Response,
+          })) as never
+        )
+
+      vi.spyOn(sdk, "semanticSearch")
+        .mockResolvedValueOnce({
+          data: [],
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+        .mockReturnValue(
+          secondSearchDelayed.then((data) => ({
+            data,
+            error: undefined,
+            request: {} as Request,
+            response: {} as Response,
+          })) as never
+        )
+
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "first", isDropdown: false })
+        .mount()
+
+      // Wait for first search to complete
+      await nextTick()
+      vi.advanceTimersByTime(1100)
+      await flushPromises()
+
+      // Verify first search results are shown
+      expect(wrapper.text()).toContain("First Result")
+      expect(wrapper.text()).toContain("Second Result")
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).not.toContain("Recently updated notes")
+
+      // User continues typing - trigger new search
+      await wrapper.setProps({ inputSearchKey: "first second" })
+      await nextTick()
+      vi.advanceTimersByTime(100) // Advance time but not enough for debounce
+
+      // Previous results should still be visible, not recent notes
+      expect(wrapper.text()).toContain("First Result")
+      expect(wrapper.text()).toContain("Second Result")
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).not.toContain("Recently updated notes")
+      expect(wrapper.text()).not.toContain("Recent Note 1")
+
+      vi.useRealTimers()
+    })
+
+    it("shows recent notes only when search key is empty and no previous result exists", async () => {
+      vi.useFakeTimers()
+
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "", isDropdown: false })
+        .mount()
+
+      await nextTick()
+      await flushPromises()
+
+      // When search key is empty and no previous search, should show recent notes
+      expect(wrapper.text()).toContain("Recently updated notes")
+      expect(wrapper.text()).toContain("Recent Note 1")
+
+      vi.useRealTimers()
     })
   })
 })
