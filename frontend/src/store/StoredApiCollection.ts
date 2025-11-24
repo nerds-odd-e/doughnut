@@ -187,30 +187,21 @@ export default class StoredApiCollection implements StoredApi {
       path: { note: noteId },
     })
     if (error || !noteRealm) {
-      throw new Error(error || "Failed to load note")
+      return undefined
     }
     return this.storage.refreshNoteRealm(noteRealm)
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
-    // Fire and forget - errors are handled by global interceptor (loading state cleared, error toast shown)
-    this.loadNote(noteId).catch(() => {
-      // Error already handled by global interceptor (loading state cleared, error toast shown)
-      // Just prevent unhandled promise rejection
-    })
+    this.loadNote(noteId)
     return this.storage.refOfNoteRealm(noteId)
   }
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Doughnut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
     // if children are undefined instead of empty array, we need to load the note
-    if (!result.value || result.value.children === undefined) {
-      // Fire and forget - errors are handled by global interceptor (loading state cleared, error toast shown)
-      this.loadNote(noteId).catch(() => {
-        // Error already handled by global interceptor (loading state cleared, error toast shown)
-        // Just prevent unhandled promise rejection
-      })
-    }
+    if (!result.value || result.value.children === undefined)
+      this.loadNote(noteId)
     return result
   }
 
@@ -358,7 +349,9 @@ export default class StoredApiCollection implements StoredApi {
 
     let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (!currentNote) {
-      currentNote = (await this.loadNote(noteId)).note
+      const noteRealm = await this.loadNote(noteId)
+      if (!noteRealm) return
+      currentNote = noteRealm.note
     }
 
     const old = currentNote?.details ?? ""
