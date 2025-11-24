@@ -1,14 +1,11 @@
 package com.odde.doughnut.testability;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.openai.client.OpenAIClient;
 import com.openai.core.JsonValue;
 import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
-import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
-import com.openai.models.chat.completions.ChatCompletionMessageToolCall;
 import com.openai.services.blocking.ChatService;
 import com.openai.services.blocking.chat.ChatCompletionService;
 import java.util.Collections;
@@ -30,20 +27,6 @@ public class OpenAIChatCompletionMock {
 
   public ChatCompletionService completionService() {
     return completionService;
-  }
-
-  public void mockChatCompletionAndReturnToolCall(Object result, String functionName) {
-    mockChatCompletionAndReturnToolCallJsonNode(
-        objectMapperConfig.objectMapper().valueToTree(result), functionName);
-  }
-
-  public void mockChatCompletionAndReturnToolCallJsonNode(JsonNode arguments, String functionName) {
-    ChatCompletion completion = buildToolCallCompletion(functionName, arguments);
-    // Match requests with or without tools - this test scenario uses JSON schema but mocks tool
-    // call
-    Mockito.doReturn(completion)
-        .when(completionService)
-        .create(ArgumentMatchers.any(ChatCompletionCreateParams.class));
   }
 
   public void mockChatCompletionAndReturnJsonSchema(Object result) {
@@ -87,40 +70,6 @@ public class OpenAIChatCompletionMock {
         ChatCompletionMessage.builder()
             .role(JsonValue.from("assistant"))
             .content(content)
-            .refusal(Optional.empty())
-            .build();
-    ChatCompletion.Choice choice =
-        ChatCompletion.Choice.builder()
-            .index(0L)
-            .message(message)
-            .finishReason(ChatCompletion.Choice.FinishReason.STOP)
-            .logprobs(Optional.empty())
-            .build();
-    return ChatCompletion.builder()
-        .id("chatcmpl-mock")
-        .created(System.currentTimeMillis() / 1000L)
-        .model("gpt-4o-mini")
-        .choices(List.of(choice))
-        .build();
-  }
-
-  private ChatCompletion buildToolCallCompletion(String functionName, JsonNode arguments) {
-    ChatCompletionMessageFunctionToolCall.Function function =
-        ChatCompletionMessageFunctionToolCall.Function.builder()
-            .name(functionName)
-            .arguments(arguments != null ? arguments.toString() : "{}")
-            .build();
-    ChatCompletionMessageToolCall toolCall =
-        ChatCompletionMessageToolCall.ofFunction(
-            ChatCompletionMessageFunctionToolCall.builder()
-                .id("call_mock")
-                .function(function)
-                .build());
-    ChatCompletionMessage message =
-        ChatCompletionMessage.builder()
-            .role(JsonValue.from("assistant"))
-            .content(Optional.empty())
-            .toolCalls(List.of(toolCall))
             .refusal(Optional.empty())
             .build();
     ChatCompletion.Choice choice =
