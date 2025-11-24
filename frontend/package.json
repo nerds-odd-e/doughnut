@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "file-saver": "^2.0.5",
-    "marked": "^17.0.0",
+    "marked": "^17.0.1",
     "mini-debounce": "^1.0.8",
     "quill": "2.0.3",
     "turndown": "^7.2.2",
