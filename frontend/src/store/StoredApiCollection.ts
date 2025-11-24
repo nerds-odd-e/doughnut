@@ -193,15 +193,24 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   getNoteRealmRefAndReloadPosition(noteId: Doughnut.ID) {
-    this.loadNote(noteId)
+    // Fire and forget - errors are handled by global interceptor (loading state cleared, error toast shown)
+    this.loadNote(noteId).catch(() => {
+      // Error already handled by global interceptor (loading state cleared, error toast shown)
+      // Just prevent unhandled promise rejection
+    })
     return this.storage.refOfNoteRealm(noteId)
   }
 
   getNoteRealmRefAndLoadWhenNeeded(noteId: Doughnut.ID) {
     const result = this.storage.refOfNoteRealm(noteId)
     // if children are undefined instead of empty array, we need to load the note
-    if (!result.value || result.value.children === undefined)
-      this.loadNote(noteId)
+    if (!result.value || result.value.children === undefined) {
+      // Fire and forget - errors are handled by global interceptor (loading state cleared, error toast shown)
+      this.loadNote(noteId).catch(() => {
+        // Error already handled by global interceptor (loading state cleared, error toast shown)
+        // Just prevent unhandled promise rejection
+      })
+    }
     return result
   }
 
