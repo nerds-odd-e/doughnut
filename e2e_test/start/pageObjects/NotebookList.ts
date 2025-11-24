@@ -46,13 +46,15 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
   const finder = () => {
     cy.pageIsNotLoading()
     cy.get('.notebook-card').should('be.visible')
-    return cy
-      .findByText(notebook, {
-        selector: '.notebook-card .daisy-card-title',
-      })
+    // Find the card that contains the notebook title and store it as an alias
+    cy.findByText(notebook, {
+      selector: '.notebook-card .daisy-card-title',
+    })
       .should('be.visible')
       .parents('.daisy-card')
-      .findByRole('button', { name: name })
+      .as('notebookCard')
+    // Now find the button within that card (breaking the chain to avoid DOM detachment)
+    return cy.get('@notebookCard').findByRole('button', { name: name })
   }
 
   return {
