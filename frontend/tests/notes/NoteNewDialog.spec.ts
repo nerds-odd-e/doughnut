@@ -6,7 +6,7 @@ import type { ComponentPublicInstance } from "vue"
 import { nextTick } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { SearchController, NoteController, NoteCreationController } from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -27,7 +27,7 @@ describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "searchForLinkTarget").mockImplementation((...args) =>
       mockedSearch(...args).then((data) => ({
         data,
         error: undefined,
@@ -35,7 +35,7 @@ describe("adding new note", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "searchForLinkTargetWithin").mockImplementation((...args) =>
       mockedSearchWithin(...args).then((data) => ({
         data,
         error: undefined,
@@ -43,19 +43,19 @@ describe("adding new note", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearchWithin").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -66,7 +66,7 @@ describe("adding new note", () => {
       parent: makeMe.aNoteRealm.please(),
     }
     mockedCreateNote = vi
-      .spyOn(sdk, "createNoteUnderParent")
+      .spyOn(NoteCreationController, "createNoteUnderParent")
       .mockImplementation(async (options) => {
         const result = await vi.fn().mockResolvedValue(createNoteResult)(
           options

@@ -5,7 +5,7 @@ import makeMe from "../fixtures/makeMe"
 import Questions from "@/components/notes/Questions.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
 import { reactive } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
 vitest.mock("vue-router", () => ({
@@ -27,7 +27,7 @@ describe("Questions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.spyOn(sdk, "getAllQuestionByNote").mockResolvedValue({
+    vi.spyOn(PredefinedQuestionController, "getAllQuestionByNote").mockResolvedValue({
       data: questions as never,
       error: undefined,
       request: {} as Request,
@@ -54,7 +54,7 @@ describe("Questions", () => {
       },
       title: "Test Note",
     } as never
-    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+    vi.spyOn(PredefinedQuestionController, "exportQuestionGeneration").mockResolvedValue({
       data: exportData,
       error: undefined,
       request: {} as Request,
@@ -75,7 +75,7 @@ describe("Questions", () => {
       expect(getByTestId("export-textarea")).toBeTruthy()
     })
 
-    expect(sdk.exportQuestionGeneration).toHaveBeenCalledWith({
+    expect(PredefinedQuestionController.exportQuestionGeneration).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })

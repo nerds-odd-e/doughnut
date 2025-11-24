@@ -5,7 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockShowNoteAccessory } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import * as sdk from "@generated/backend/sdk.gen"
+import { AssimilationController, NoteController } from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 
@@ -25,19 +25,19 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  vi.spyOn(sdk, "assimilating").mockResolvedValue({
+  vi.spyOn(AssimilationController, "assimilating").mockResolvedValue({
     data: [],
     error: undefined,
     request: {} as Request,
     response: {} as Response,
   })
-  vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
+  vi.spyOn(NoteController, "getNoteInfo").mockResolvedValue({
     data: {} as never,
     error: undefined,
     request: {} as Request,
     response: {} as Response,
   })
-  vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
+  vi.spyOn(NoteController, "showNote").mockImplementation(async (options) => {
     const result = await mockedGetNoteCall(options)
     return {
       data: result,
@@ -52,7 +52,7 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   it("shows completion message when nothing to review", async () => {
-    vi.spyOn(sdk, "assimilating").mockResolvedValue({
+    vi.spyOn(AssimilationController, "assimilating").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -63,7 +63,7 @@ describe("repeat page", () => {
     expect(wrapper.text()).toContain(
       "Congratulations! You've achieved your daily assimilation goal!"
     )
-    expect(vi.mocked(sdk.assimilating)).toBeCalledWith({
+    expect(vi.mocked(AssimilationController.assimilating)).toBeCalledWith({
       query: { timezone: "Europe/Amsterdam" },
     })
   })
@@ -74,7 +74,7 @@ describe("repeat page", () => {
     const { note } = memoryTracker
 
     beforeEach(() => {
-      vi.spyOn(sdk, "assimilating").mockResolvedValue({
+      vi.spyOn(AssimilationController, "assimilating").mockResolvedValue({
         data: [note, note],
         error: undefined,
         request: {} as Request,

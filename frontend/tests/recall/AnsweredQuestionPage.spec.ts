@@ -2,7 +2,7 @@ import { flushPromises } from "@vue/test-utils"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController, NoteController, ConversationMessageController } from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -23,19 +23,19 @@ describe("answered question page", () => {
 
     beforeEach(async () => {
       vitest.resetAllMocks()
-      vi.spyOn(sdk, "showQuestion").mockResolvedValue({
+      vi.spyOn(PredefinedQuestionController, "showQuestion").mockResolvedValue({
         data: answeredQuestion,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "showNote").mockResolvedValue({
+      vi.spyOn(NoteController, "showNote").mockResolvedValue({
         data: makeMe.aNoteRealm.please(),
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "startConversationAboutRecallPrompt").mockResolvedValue({
+      vi.spyOn(ConversationMessageController, "startConversationAboutRecallPrompt").mockResolvedValue({
         data: makeMe.aConversation.withId(123).please(),
         error: undefined,
         request: {} as Request,

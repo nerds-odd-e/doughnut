@@ -4,7 +4,7 @@ import { describe, expect, it, vi } from "vitest"
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { matchByText } from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { FineTuningDataController } from "@generated/backend/sdk.gen"
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {
@@ -49,7 +49,7 @@ describe("Edit Suggested Question", () => {
           .component(SuggestedQuestionList)
           .withProps({ suggestedQuestions: [suggestedQuestion] })
           .mount()
-        const mockDelete = vi.spyOn(sdk, "delete_").mockResolvedValue({
+        const mockDelete = vi.spyOn(FineTuningDataController, "delete").mockResolvedValue({
           data: {} as never,
           error: undefined,
           request: {} as Request,

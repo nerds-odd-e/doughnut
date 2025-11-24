@@ -4,7 +4,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import * as sdk from "@generated/backend/sdk.gen"
+import { CircleController } from "@generated/backend/sdk.gen"
 
 describe("circle show page", () => {
   const notebook = makeMe.aNotebook.please()
@@ -12,7 +12,7 @@ describe("circle show page", () => {
   const circle2 = makeMe.aCircle.please()
 
   beforeEach(() => {
-    vi.spyOn(sdk, "index").mockResolvedValue({
+    vi.spyOn(CircleController, "index").mockResolvedValue({
       data: [circle1, circle2],
       error: undefined,
       request: {} as Request,
@@ -22,7 +22,7 @@ describe("circle show page", () => {
 
   it("fetch API to be called ONCE on mount", async () => {
     helper.component(NotebookMoveDialog).withProps({ notebook }).render()
-    expect(sdk.index).toBeCalled()
+    expect(CircleController.index).toBeCalled()
   })
 
   it("filters the current circle", async () => {

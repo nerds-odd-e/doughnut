@@ -2,7 +2,7 @@ import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDia
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { WikidataController, NoteController } from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -18,7 +18,7 @@ describe("WikidataAssociationDialog", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    vi.spyOn(sdk, "searchWikidata").mockImplementation(async (...args) => {
+    vi.spyOn(WikidataController, "searchWikidata").mockImplementation(async (...args) => {
       const result = await mockedWikidataSearch(...args)
       return {
         data: result,
@@ -27,7 +27,7 @@ describe("WikidataAssociationDialog", () => {
         response: {} as Response,
       }
     })
-    vi.spyOn(sdk, "fetchWikidataEntityDataById").mockImplementation(
+    vi.spyOn(WikidataController, "fetchWikidataEntityDataById").mockImplementation(
       async (...args) => {
         const result = await mockedFetchWikidataEntity(...args)
         return {
@@ -38,7 +38,7 @@ describe("WikidataAssociationDialog", () => {
         }
       }
     )
-    vi.spyOn(sdk, "updateWikidataId").mockImplementation(async (options) => {
+    vi.spyOn(NoteController, "updateWikidataId").mockImplementation(async (options) => {
       const result = await mockedUpdateWikidataId(options)
       return {
         data: result,

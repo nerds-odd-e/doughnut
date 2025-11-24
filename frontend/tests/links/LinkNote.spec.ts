@@ -2,7 +2,7 @@ import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { vi } from "vitest"
-import * as sdk from "@generated/backend/sdk.gen"
+import { LinkController } from "@generated/backend/sdk.gen"
 
 describe("LinkNoteFinalize", () => {
   it("going back", async () => {
@@ -24,7 +24,7 @@ describe("LinkNoteFinalize", () => {
       linkNoteFinalize: vi.fn().mockResolvedValue(undefined),
       moveNote: vi.fn().mockResolvedValue(undefined),
     }
-    vi.spyOn(sdk, "linkNoteFinalize").mockImplementation(async (options) => {
+    vi.spyOn(LinkController, "linkNoteFinalize").mockImplementation(async (options) => {
       const result = await storedApi.linkNoteFinalize(options)
       return {
         data: result,
@@ -33,7 +33,7 @@ describe("LinkNoteFinalize", () => {
         response: {} as Response,
       }
     })
-    vi.spyOn(sdk, "moveNote").mockImplementation(async (options) => {
+    vi.spyOn(LinkController, "moveNote").mockImplementation(async (options) => {
       const result = await storedApi.moveNote(options)
       return {
         data: result,

@@ -1,23 +1,23 @@
 import { describe, it, expect, beforeEach, vi } from "vitest"
 import RecentPage from "@/pages/RecentPage.vue"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController, MemoryTrackerController } from "@generated/backend/sdk.gen"
 
 describe("RecentPage.vue", () => {
   beforeEach(() => {
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "getRecentMemoryTrackers").mockResolvedValue({
+    vi.spyOn(MemoryTrackerController, "getRecentMemoryTrackers").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "getRecentlyReviewed").mockResolvedValue({
+    vi.spyOn(MemoryTrackerController, "getRecentlyReviewed").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,

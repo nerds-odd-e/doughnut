@@ -4,7 +4,7 @@ import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import type { MemoryTrackerLite, SpellingResultDto } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController, MemoryTrackerController, PredefinedQuestionController } from "@generated/backend/sdk.gen"
 
 describe("repeat page", () => {
   const recallPrompt = makeMe.aRecallPrompt.please()
@@ -13,19 +13,19 @@ describe("repeat page", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    vi.spyOn(sdk, "showNote").mockResolvedValue({
+    vi.spyOn(NoteController, "showNote").mockResolvedValue({
       data: makeMe.aNoteRealm.please(),
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
+    vi.spyOn(MemoryTrackerController, "showMemoryTracker").mockResolvedValue({
       data: makeMe.aMemoryTracker.please(),
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
+    vi.spyOn(PredefinedQuestionController, "askAQuestion").mockImplementation(async (options) => {
       const result = await mockedRandomQuestionCall(options)
       return {
         data: result,
@@ -34,7 +34,7 @@ describe("repeat page", () => {
         response: {} as Response,
       }
     })
-    vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
+    vi.spyOn(MemoryTrackerController, "getSpellingQuestion").mockResolvedValue({
       data: { stem: "Spell the word 'cat'" } as never,
       error: undefined,
       request: {} as Request,

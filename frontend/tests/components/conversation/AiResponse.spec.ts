@@ -5,7 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
-import * as sdk from "@generated/backend/sdk.gen"
+import { TextContentController } from "@generated/backend/sdk.gen"
 import {
   getLastInstance,
   resetInstance,
@@ -277,7 +277,7 @@ describe("ConversationInner", () => {
     const renderedCompletion = "bold completion"
 
     beforeEach(async () => {
-      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+      vi.spyOn(TextContentController, "updateNoteDetails").mockResolvedValue({
         data: {} as never,
         error: undefined,
         request: {} as Request,
@@ -360,7 +360,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+      expect(TextContentController.updateNoteDetails).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: testCompletion },
       })
@@ -379,7 +379,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
+      expect(TextContentController.updateNoteDetails).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -396,7 +396,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
+      expect(TextContentController.updateNoteDetails).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -426,7 +426,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete "world" and add "friends!"
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+      expect(TextContentController.updateNoteDetails).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: "Hello friends!" },
       })
@@ -448,7 +448,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete everything and add new text
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+      expect(TextContentController.updateNoteDetails).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: "Completely new text" },
       })
@@ -456,7 +456,7 @@ describe("ConversationInner", () => {
 
     describe("Note Access", () => {
       beforeEach(async () => {
-        vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
+        vi.spyOn(TextContentController, "updateNoteDetails").mockResolvedValue({
           data: {} as never,
           error: undefined,
           request: {} as Request,
@@ -487,7 +487,7 @@ describe("ConversationInner", () => {
         await wrapper.find('button[class*="btn-primary"]').trigger("click")
         await flushPromises()
 
-        expect(sdk.updateNoteDetails).toHaveBeenCalled()
+        expect(TextContentController.updateNoteDetails).toHaveBeenCalled()
       })
     })
   })
@@ -496,7 +496,7 @@ describe("ConversationInner", () => {
     const testTitle = "Generated Title"
 
     beforeEach(async () => {
-      vi.spyOn(sdk, "updateNoteTitle").mockResolvedValue({
+      vi.spyOn(TextContentController, "updateNoteTitle").mockResolvedValue({
         data: {} as never,
         error: undefined,
         request: {} as Request,
@@ -515,7 +515,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).toHaveBeenCalledWith({
+      expect(TextContentController.updateNoteTitle).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { newTitle: testTitle },
       })
@@ -533,7 +533,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(TextContentController.updateNoteTitle).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -549,7 +549,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(TextContentController.updateNoteTitle).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results

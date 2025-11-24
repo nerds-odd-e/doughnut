@@ -3,38 +3,38 @@ import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController, SearchController } from "@generated/backend/sdk.gen"
 import { beforeEach, vi } from "vitest"
 
 describe("LinkNoteDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTargetWithin").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearchWithin").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,

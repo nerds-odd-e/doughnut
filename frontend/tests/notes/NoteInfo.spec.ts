@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import type { NoteInfo } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 
 const stubResponse: NoteInfo = {
   memoryTrackers: [makeMe.aMemoryTracker.please()],
@@ -13,7 +13,7 @@ const stubResponse: NoteInfo = {
 
 describe("note info", () => {
   it("should render values", async () => {
-    vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
+    vi.spyOn(NoteController, "getNoteInfo").mockResolvedValue({
       data: stubResponse,
       error: undefined,
       request: {} as Request,
@@ -27,7 +27,7 @@ describe("note info", () => {
       .mount()
     await flushPromises()
     expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
-    expect(sdk.getNoteInfo).toBeCalledWith({
+    expect(NoteController.getNoteInfo).toBeCalledWith({
       path: { note: 123 },
     })
   })

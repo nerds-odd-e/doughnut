@@ -5,7 +5,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import { fireEvent } from "@testing-library/vue"
 import { useRouter } from "vue-router"
 import { flushPromises } from "@vue/test-utils"
-import * as sdk from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -16,19 +16,19 @@ vitest.mock("vue-router", () => ({
 
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
-    vi.spyOn(sdk, "getConversationsOfCurrentUser").mockResolvedValue({
+    vi.spyOn(ConversationMessageController, "getConversationsOfCurrentUser").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
     helper.component(MessageCenterPage).withStorageProps({}).render()
-    expect(sdk.getConversationsOfCurrentUser).toBeCalledTimes(1)
+    expect(ConversationMessageController.getConversationsOfCurrentUser).toBeCalledTimes(1)
   })
 
   it("should render no conversation selected by default", async () => {
     const conversation = makeMe.aConversation.please()
-    vi.spyOn(sdk, "getConversationsOfCurrentUser").mockResolvedValue({
+    vi.spyOn(ConversationMessageController, "getConversationsOfCurrentUser").mockResolvedValue({
       data: [conversation],
       error: undefined,
       request: {} as Request,
@@ -47,7 +47,7 @@ describe("MessageCenterPage", () => {
       makeMe.aConversation.please(),
     ]
     beforeEach(() => {
-      vi.spyOn(sdk, "getConversationsOfCurrentUser").mockResolvedValue({
+      vi.spyOn(ConversationMessageController, "getConversationsOfCurrentUser").mockResolvedValue({
         data: conversations,
         error: undefined,
         request: {} as Request,

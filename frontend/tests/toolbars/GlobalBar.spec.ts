@@ -6,7 +6,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController, SearchController } from "@generated/backend/sdk.gen"
 import { beforeEach, vi } from "vitest"
 
 const mockedPush = vi.fn()
@@ -25,31 +25,31 @@ describe("global bar", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults (used by LinkNoteDialog in GlobalBar)
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTargetWithin").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearchWithin").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,

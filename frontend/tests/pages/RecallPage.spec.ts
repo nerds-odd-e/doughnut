@@ -7,7 +7,7 @@ import helper from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController, RecallsController } from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -37,13 +37,13 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  vi.spyOn(sdk, "showNote").mockResolvedValue({
+  vi.spyOn(NoteController, "showNote").mockResolvedValue({
     data: makeMe.aNoteRealm.please(),
     error: undefined,
     request: {} as Request,
     response: {} as Response,
   })
-  vi.spyOn(sdk, "recalling").mockImplementation(async (options) => {
+  vi.spyOn(RecallsController, "recalling").mockImplementation(async (options) => {
     const result = await mockedRepeatCall(options)
     return {
       data: result,

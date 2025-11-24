@@ -2,7 +2,7 @@ import RecentlyAddedNotes from "@/components/recent/RecentlyAddedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 
 describe("RecentlyAddedNotes", () => {
   const mockNotes = [
@@ -19,7 +19,7 @@ describe("RecentlyAddedNotes", () => {
   ]
 
   beforeEach(() => {
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: mockNotes,
       error: undefined,
       request: {} as Request,
@@ -33,7 +33,7 @@ describe("RecentlyAddedNotes", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(sdk.getRecentNotes).toBeCalled()
+    expect(NoteController.getRecentNotes).toBeCalled()
 
     // Verify notes are displayed
     const rows = wrapper.findAll("tbody tr")

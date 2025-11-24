@@ -2,12 +2,12 @@ import RecallPromptComponent from "@/components/review/RecallPromptComponent.vue
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
+import { RecallPromptController } from "@generated/backend/sdk.gen"
 
 describe("RecallPromptComponent", () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    vi.spyOn(sdk, "answerQuiz").mockResolvedValue({
+    vi.spyOn(RecallPromptController, "answerQuiz").mockResolvedValue({
       data: {} as never,
       error: undefined,
       request: {} as Request,
@@ -34,7 +34,7 @@ describe("RecallPromptComponent", () => {
   describe("answer submission", () => {
     it("shows loading state while submitting answer", async () => {
       // Setup API to delay response
-      vi.spyOn(sdk, "answerQuiz").mockImplementation(
+      vi.spyOn(RecallPromptController, "answerQuiz").mockImplementation(
         () =>
           new Promise((resolve) =>
             setTimeout(
@@ -44,10 +44,10 @@ describe("RecallPromptComponent", () => {
                   error: undefined,
                   request: {} as Request,
                   response: {} as Response,
-                } as Awaited<ReturnType<typeof sdk.answerQuiz>>),
+                } as Awaited<ReturnType<typeof RecallPromptController.answerQuiz>>),
               100
             )
-          ) as ReturnType<typeof sdk.answerQuiz>
+          ) as ReturnType<typeof RecallPromptController.answerQuiz>
       )
 
       const wrapper = mountComponent()
@@ -112,7 +112,7 @@ describe("RecallPromptComponent", () => {
 
     it("emits answered event on successful submission", async () => {
       const answerResult = { correct: true }
-      vi.spyOn(sdk, "answerQuiz").mockResolvedValue({
+      vi.spyOn(RecallPromptController, "answerQuiz").mockResolvedValue({
         data: answerResult as never,
         error: undefined,
         request: {} as Request,

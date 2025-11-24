@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import helper from "@tests/helpers"
 import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
-import * as sdk from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 
 describe("SpellingQuestionDisplay", () => {
   beforeEach(() => {
-    vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
+    vi.spyOn(MemoryTrackerController, "getSpellingQuestion").mockResolvedValue({
       data: { stem: "Spell the word 'cat'" } as never,
       error: undefined,
       request: {} as Request,

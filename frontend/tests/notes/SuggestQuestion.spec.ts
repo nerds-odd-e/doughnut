@@ -4,7 +4,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { FineTuningDataController } from "@generated/backend/sdk.gen"
 
 describe("SuggestQuestion", () => {
   describe("suggest question for fine tuning AI", () => {
@@ -21,18 +21,18 @@ describe("SuggestQuestion", () => {
     })
 
     it("should be able to suggest a question as good example", async () => {
-      vi.spyOn(sdk, "suggestQuestionForFineTuning").mockResolvedValue({
+      vi.spyOn(FineTuningDataController, "suggestQuestionForFineTuning").mockResolvedValue({
         data: undefined,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       } as unknown as Awaited<
-        ReturnType<typeof sdk.suggestQuestionForFineTuning>
+        ReturnType<typeof FineTuningDataController.suggestQuestionForFineTuning>
       >)
       wrapper.get(".negative-feedback-btn").trigger("click")
       wrapper.get("button.daisy-btn-success").trigger("click")
       await flushPromises()
-      expect(sdk.suggestQuestionForFineTuning).toBeCalledWith({
+      expect(FineTuningDataController.suggestQuestionForFineTuning).toBeCalledWith({
         path: { predefinedQuestion: predefinedQuestion.id },
         body: {
           comment: "",

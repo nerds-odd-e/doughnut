@@ -7,7 +7,7 @@ import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { ref } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
+import { AssimilationController, NoteController } from "@generated/backend/sdk.gen"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
@@ -25,7 +25,7 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  vi.spyOn(sdk, "assimilate").mockImplementation(async (options) => {
+  vi.spyOn(AssimilationController, "assimilate").mockImplementation(async (options) => {
     const result = await mockedAssimilateCall(options)
     return {
       data: result,
@@ -34,7 +34,7 @@ beforeEach(() => {
       response: {} as Response,
     }
   })
-  vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
+  vi.spyOn(NoteController, "showNote").mockImplementation(async (options) => {
     const result = await mockedGetNoteCall(options)
     return {
       data: result,
@@ -43,7 +43,7 @@ beforeEach(() => {
       response: {} as Response,
     }
   })
-  vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
+  vi.spyOn(NoteController, "getNoteInfo").mockResolvedValue({
     data: {} as never,
     error: undefined,
     request: {} as Request,

@@ -4,7 +4,7 @@ import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
 import helper from "@tests/helpers"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import * as sdk from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 
 describe("ManageMCPTokensPage", () => {
   let router: ReturnType<typeof createRouter>
@@ -18,7 +18,7 @@ describe("ManageMCPTokensPage", () => {
   })
 
   it('displays "No Label" when token label is empty', async () => {
-    vi.spyOn(sdk, "generateToken").mockResolvedValue({
+    vi.spyOn(UserController, "generateToken").mockResolvedValue({
       data: {
         token: "mocked-token",
         label: "",
@@ -28,7 +28,7 @@ describe("ManageMCPTokensPage", () => {
       response: new Response(),
     } as never)
 
-    vi.spyOn(sdk, "getTokens").mockResolvedValue({
+    vi.spyOn(UserController, "getTokens").mockResolvedValue({
       data: [],
       request: new Request("http://localhost"),
       response: new Response(),

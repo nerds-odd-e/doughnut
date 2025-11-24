@@ -2,14 +2,14 @@ import NoteEditableDetails from "@/components/notes/core/NoteEditableDetails.vue
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { TextContentController } from "@generated/backend/sdk.gen"
 
 const mockedUpdateDetailsCall = vi.fn()
 
 describe("NoteEditableDetails", () => {
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.spyOn(sdk, "updateNoteDetails").mockImplementation(async (options) => {
+    vi.spyOn(TextContentController, "updateNoteDetails").mockImplementation(async (options) => {
       const result = await mockedUpdateDetailsCall(options)
       return {
         data: result,

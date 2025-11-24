@@ -4,7 +4,7 @@ import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAss
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import type { NotebookAiAssistant } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NotebookController, AiController } from "@generated/backend/sdk.gen"
 
 vitest.mock("file-saver", () => ({ saveAs: vitest.fn() }))
 
@@ -20,11 +20,11 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   beforeEach(() => {
     global.URL.createObjectURL = vitest.fn()
     global.URL.revokeObjectURL = vitest.fn()
-    vi.spyOn(sdk, "downloadNotebookDump").mockImplementation(mockedDump)
-    vi.spyOn(sdk, "updateAiAssistant").mockImplementation(
+    vi.spyOn(NotebookController, "downloadNotebookDump").mockImplementation(mockedDump)
+    vi.spyOn(AiController, "updateAiAssistant").mockImplementation(
       mockedUpdateAiAssistant
     )
-    vi.spyOn(sdk, "getAiAssistant").mockImplementation(mockedGetAiAssistant)
+    vi.spyOn(AiController, "getAiAssistant").mockImplementation(mockedGetAiAssistant)
     mockedGetAiAssistant.mockResolvedValue({
       data: undefined,
       error: undefined,

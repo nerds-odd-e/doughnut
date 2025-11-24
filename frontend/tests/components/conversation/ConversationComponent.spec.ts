@@ -2,7 +2,7 @@ import { expect, vi } from "vitest"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
+import { ConversationMessageController, NoteController } from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -27,20 +27,20 @@ describe("ConversationComponent", () => {
 
   beforeEach(() => {
     mockedPush.mockClear()
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
+    vi.spyOn(ConversationMessageController, "getConversationsAboutNote").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
+    vi.spyOn(ConversationMessageController, "getConversationMessages").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
     // Mock showNote to prevent real API calls from StoredApiCollection
-    vi.spyOn(sdk, "showNote").mockResolvedValue({
+    vi.spyOn(NoteController, "showNote").mockResolvedValue({
       data: makeMe.aNoteRealm.please(),
       error: undefined,
       request: {} as Request,
@@ -71,7 +71,7 @@ describe("ConversationComponent", () => {
       const conversation = makeMe.aConversation.forANote(note).please()
       const user = makeMe.aUser.please()
 
-      vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
+      vi.spyOn(ConversationMessageController, "getConversationMessages").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,

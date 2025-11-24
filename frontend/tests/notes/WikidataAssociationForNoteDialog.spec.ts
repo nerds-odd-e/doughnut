@@ -2,7 +2,7 @@ import WikidataAssociationForNoteDialog from "@/components/notes/WikidataAssocia
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { WikidataController, TextContentController } from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -19,7 +19,7 @@ describe("WikidataAssociationForNoteDialog", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    vi.spyOn(sdk, "searchWikidata").mockImplementation(async (...args) => {
+    vi.spyOn(WikidataController, "searchWikidata").mockImplementation(async (...args) => {
       const result = await mockedWikidataSearch(...args)
       return {
         data: result,
@@ -29,7 +29,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       }
     })
     vi
-      .spyOn(sdk, "fetchWikidataEntityDataById")
+      .spyOn(WikidataController, "fetchWikidataEntityDataById")
       .mockImplementation(async (options) => {
         const result = await mockedFetchWikidataEntity(options)
         return {
@@ -39,7 +39,7 @@ describe("WikidataAssociationForNoteDialog", () => {
           response: {} as Response,
         }
       }) as never
-    vi.spyOn(sdk, "updateWikidataId").mockImplementation(async (options) => {
+    vi.spyOn(WikidataController, "updateWikidataId").mockImplementation(async (options) => {
       const result = await mockedUpdateWikidataId(options)
       return {
         data: result,
@@ -48,7 +48,7 @@ describe("WikidataAssociationForNoteDialog", () => {
         response: {} as Response,
       }
     })
-    vi.spyOn(sdk, "updateNoteTitle").mockImplementation(async (options) => {
+    vi.spyOn(TextContentController, "updateNoteTitle").mockImplementation(async (options) => {
       const result = await mockedUpdateNoteTitle(options)
       return {
         data: result,
@@ -125,7 +125,7 @@ describe("WikidataAssociationForNoteDialog", () => {
         const wrapper = await inputWikidataIdAndSave(note, wikidataId)
         await flushPromises()
 
-        expect(vi.mocked(sdk.fetchWikidataEntityDataById)).toHaveBeenCalledWith(
+        expect(vi.mocked(WikidataController.fetchWikidataEntityDataById)).toHaveBeenCalledWith(
           {
             path: { wikidataId },
           }
@@ -178,7 +178,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       saveButton.click()
       await flushPromises()
 
-      expect(vi.mocked(sdk.fetchWikidataEntityDataById)).toHaveBeenCalledWith({
+      expect(vi.mocked(WikidataController.fetchWikidataEntityDataById)).toHaveBeenCalledWith({
         path: { wikidataId: "Q11399" },
       })
       expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)

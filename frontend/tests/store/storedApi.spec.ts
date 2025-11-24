@@ -1,7 +1,7 @@
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController, TextContentController } from "@generated/backend/sdk.gen"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
@@ -15,7 +15,7 @@ describe("storedApiCollection", () => {
 
     beforeEach(() => {
       deleteNote = vi.fn().mockResolvedValue([note])
-      vi.spyOn(sdk, "deleteNote").mockImplementation(async (options) => {
+      vi.spyOn(NoteController, "deleteNote").mockImplementation(async (options) => {
         const result = await deleteNote(options)
         return {
           data: result,
@@ -42,7 +42,7 @@ describe("storedApiCollection", () => {
     beforeEach(() => {
       updateNoteDetails = vi.fn().mockResolvedValue(note)
       showNote = vi.fn().mockResolvedValue(note)
-      vi.spyOn(sdk, "updateNoteDetails").mockImplementation(async (options) => {
+      vi.spyOn(TextContentController, "updateNoteDetails").mockImplementation(async (options) => {
         const result = await updateNoteDetails(options)
         return {
           data: result,
@@ -51,7 +51,7 @@ describe("storedApiCollection", () => {
           response: {} as Response,
         }
       })
-      vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
+      vi.spyOn(NoteController, "showNote").mockImplementation(async (options) => {
         const result = await showNote(options)
         return {
           data: result,

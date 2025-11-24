@@ -2,12 +2,12 @@ import type { Notebook } from "@generated/backend"
 import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
 import { vi, beforeEach } from "vitest"
 
 describe("NotebookEditDialog.spec", () => {
   beforeEach(() => {
-    vi.spyOn(sdk, "getApprovalForNotebook").mockResolvedValue({
+    vi.spyOn(NotebookCertificateApprovalController, "getApprovalForNotebook").mockResolvedValue({
       data: { approval: undefined },
       error: undefined,
       request: {} as Request,

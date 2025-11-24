@@ -6,7 +6,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
 import createNoteStorage from "@/store/createNoteStorage"
-import * as sdk from "@generated/backend/sdk.gen"
+import { LinkController } from "@generated/backend/sdk.gen"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
@@ -202,7 +202,7 @@ describe("Sidebar", () => {
       // Perform drop
       await fireEvent.drop(dropTarget)
 
-      expect(sdk.moveAfter).toHaveBeenCalledWith({
+      expect(LinkController.moveAfter).toHaveBeenCalledWith({
         path: {
           note: firstGeneration.id,
           targetNote: firstGenerationSibling.id,
@@ -483,7 +483,7 @@ describe("Sidebar", () => {
       await fireEvent(dropTarget, dragOverEvent)
       await fireEvent.drop(dropTarget)
 
-      expect(sdk.moveAfter).toHaveBeenCalledWith({
+      expect(LinkController.moveAfter).toHaveBeenCalledWith({
         path: {
           note: firstGeneration.id,
           targetNote: firstGenerationSibling.id,
@@ -521,7 +521,7 @@ describe("Sidebar", () => {
       await fireEvent(firstGenNote, dragOverEvent)
       await fireEvent.drop(firstGenNote)
 
-      expect(sdk.moveAfter).toHaveBeenCalledWith({
+      expect(LinkController.moveAfter).toHaveBeenCalledWith({
         path: {
           note: firstGeneration.id,
           targetNote: firstGenerationSibling.id,

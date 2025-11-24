@@ -4,7 +4,7 @@ import makeMe from "../fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
 import { saveAs } from "file-saver"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
@@ -19,7 +19,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getDescendants").mockResolvedValue({
+    vi.spyOn(NoteController, "getDescendants").mockResolvedValue({
       data: descendantsData,
       error: undefined,
       request: {} as Request,
@@ -41,7 +41,7 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(sdk.getDescendants).toHaveBeenCalledWith({
+    expect(NoteController.getDescendants).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })
@@ -52,7 +52,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getDescendants").mockResolvedValue({
+    vi.spyOn(NoteController, "getDescendants").mockResolvedValue({
       data: descendantsData,
       error: undefined,
       request: {} as Request,
@@ -75,7 +75,7 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getDescendantsMock = vi
-      .spyOn(sdk, "getDescendants")
+      .spyOn(NoteController, "getDescendants")
       .mockResolvedValue({
         data: descendantsData,
         error: undefined,
@@ -104,7 +104,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getGraph").mockResolvedValue({
+    vi.spyOn(NoteController, "getGraph").mockResolvedValue({
       data: graphData,
       error: undefined,
       request: {} as Request,
@@ -124,7 +124,7 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(sdk.getGraph).toHaveBeenCalledWith({
+    expect(NoteController.getGraph).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 5000 },
     })
@@ -136,7 +136,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getGraph").mockResolvedValue({
+    vi.spyOn(NoteController, "getGraph").mockResolvedValue({
       data: graphData,
       error: undefined,
       request: {} as Request,
@@ -158,7 +158,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    const getGraphMock = vi.spyOn(sdk, "getGraph").mockResolvedValue({
+    const getGraphMock = vi.spyOn(NoteController, "getGraph").mockResolvedValue({
       data: graphData,
       error: undefined,
       request: {} as Request,
@@ -191,7 +191,7 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getGraphMock = vi
-      .spyOn(sdk, "getGraph")
+      .spyOn(NoteController, "getGraph")
       .mockResolvedValueOnce({
         data: graphData1,
         error: undefined,

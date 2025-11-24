@@ -4,7 +4,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import * as sdk from "@generated/backend/sdk.gen"
+import { CircleController } from "@generated/backend/sdk.gen"
 
 describe("circle show page", () => {
   const currentUser = makeMe.aUser.please()
@@ -14,7 +14,7 @@ describe("circle show page", () => {
   const circleNote = makeMe.aCircleNote.notebooks(notebook).please()
 
   beforeEach(() => {
-    vi.spyOn(sdk, "showCircle").mockResolvedValue({
+    vi.spyOn(CircleController, "showCircle").mockResolvedValue({
       data: circleNote,
       error: undefined,
       request: {} as Request,
@@ -28,7 +28,7 @@ describe("circle show page", () => {
       .withRouter()
       .withStorageProps({ circleId: circleNote.id })
       .render()
-    expect(sdk.showCircle).toBeCalledWith({
+    expect(CircleController.showCircle).toBeCalledWith({
       path: { circle: circleNote.id },
     })
   })

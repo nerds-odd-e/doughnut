@@ -5,7 +5,7 @@ import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import type { AssessmentQuestionInstance } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -25,7 +25,7 @@ describe("assessment page", () => {
       .withQuestions([assessmentQuestionInstance])
       .please()
     beforeEach(() => {
-      vi.spyOn(sdk, "generateAssessmentQuestions").mockResolvedValue({
+      vi.spyOn(AssessmentController, "generateAssessmentQuestions").mockResolvedValue({
         data: assessmentAttempt,
         error: undefined,
         request: {} as Request,
@@ -38,7 +38,7 @@ describe("assessment page", () => {
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
         .render()
-      expect(sdk.generateAssessmentQuestions).toBeCalledTimes(1)
+      expect(AssessmentController.generateAssessmentQuestions).toBeCalledTimes(1)
     })
 
     it("renders the questions", async () => {
@@ -82,7 +82,7 @@ describe("assessment page", () => {
       .withQuestions([quizQuestion_1, quizQuestion_2])
       .please()
     beforeEach(() => {
-      vi.spyOn(sdk, "generateAssessmentQuestions").mockResolvedValue({
+      vi.spyOn(AssessmentController, "generateAssessmentQuestions").mockResolvedValue({
         data: assessmentAttempt,
         error: undefined,
         request: {} as Request,

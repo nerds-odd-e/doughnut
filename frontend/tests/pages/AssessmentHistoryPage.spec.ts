@@ -4,7 +4,7 @@ import helper from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/backend/sdk.gen"
 
 describe("assessment and certificate history page", () => {
   const user = makeMe.aUser.please()
@@ -16,7 +16,7 @@ describe("assessment and certificate history page", () => {
   let wrapper
 
   beforeEach(() => {
-    vi.spyOn(sdk, "getMyAssessments").mockResolvedValue({
+    vi.spyOn(AssessmentController, "getMyAssessments").mockResolvedValue({
       data: [assessmentForArt, assessmentForTech],
       error: undefined,
       request: {} as Request,
@@ -29,7 +29,7 @@ describe("assessment and certificate history page", () => {
   })
 
   it("calls API ONCE on mount", async () => {
-    expect(sdk.getMyAssessments).toBeCalledTimes(1)
+    expect(AssessmentController.getMyAssessments).toBeCalledTimes(1)
   })
 
   it("should have two items in the list", async () => {

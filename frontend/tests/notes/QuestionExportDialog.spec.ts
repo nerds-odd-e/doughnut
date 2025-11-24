@@ -4,7 +4,7 @@ import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { waitFor } from "@testing-library/vue"
 import { reactive } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
 vitest.mock("vue-router", () => ({
@@ -28,7 +28,7 @@ describe("QuestionExportDialog", () => {
       },
       title: "Test Note",
     } as never
-    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+    vi.spyOn(PredefinedQuestionController, "exportQuestionGeneration").mockResolvedValue({
       data: exportData,
       error: undefined,
       request: {} as Request,
@@ -47,14 +47,14 @@ describe("QuestionExportDialog", () => {
       expect(textarea.value).toContain('"title"')
     })
 
-    expect(sdk.exportQuestionGeneration).toHaveBeenCalledWith({
+    expect(PredefinedQuestionController.exportQuestionGeneration).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })
 
   it("displays error message when API call fails", async () => {
     const note = makeMe.aNote.please()
-    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+    vi.spyOn(PredefinedQuestionController, "exportQuestionGeneration").mockResolvedValue({
       data: undefined,
       error: "API Error",
       request: {} as Request,
