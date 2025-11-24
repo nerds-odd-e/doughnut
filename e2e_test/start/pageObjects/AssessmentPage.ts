@@ -53,7 +53,9 @@ const assumeQuestionSection = () => {
       this.getQuestionSection()
         .should('be.visible')
         .within(() => {
-          cy.findByText(answer).should('be.visible').click()
+          // Break the chain to avoid DOM detachment
+          cy.findByText(answer).should('be.visible').as('answerButton')
+          cy.get('@answerButton').click()
         })
       cy.pageIsNotLoading()
       return this
