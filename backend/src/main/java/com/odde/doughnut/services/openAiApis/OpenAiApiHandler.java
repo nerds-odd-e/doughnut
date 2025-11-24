@@ -15,8 +15,6 @@ import com.openai.models.chat.completions.ChatCompletion;
 import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
-import com.openai.models.chat.completions.ChatCompletionMessageFunctionToolCall;
-import com.openai.models.chat.completions.ChatCompletionMessageToolCall;
 import com.openai.models.files.FileCreateParams;
 import com.openai.models.files.FileObject;
 import com.openai.models.files.FilePurpose;
@@ -220,29 +218,6 @@ public class OpenAiApiHandler {
       }
       ChatCompletion.Choice choice = choiceOpt.get();
       ChatCompletionMessage message = choice.message();
-
-      // If we get tool calls instead of content, try to extract JSON from tool call arguments
-      // This preserves old behavior where tool calls with invalid data would fail during parsing
-      Optional<List<ChatCompletionMessageToolCall>> toolCallsOpt = message.toolCalls();
-      if (toolCallsOpt.isPresent() && !toolCallsOpt.get().isEmpty()) {
-        ChatCompletionMessageToolCall toolCall = toolCallsOpt.get().get(0);
-        if (toolCall.function().isPresent()) {
-          ChatCompletionMessageFunctionToolCall functionToolCall = toolCall.asFunction();
-          String functionName = functionToolCall.function().name();
-          // If function name is empty or doesn't match expected tool, try to parse arguments
-          // This will fail and throw RuntimeException as expected by tests
-          try {
-            String arguments = functionToolCall.function().arguments();
-            return Optional.of(
-                new ObjectMapperConfig()
-                    .objectMapper()
-                    .readTree(arguments != null ? arguments : "{}"));
-          } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-          }
-        }
-        return Optional.empty();
-      }
 
       // Extract content from message
       Optional<?> contentOpt = message.content();

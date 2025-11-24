@@ -208,15 +208,11 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void refineQuestionFailedWithGpt35WillNotTryAgain() throws JsonProcessingException {
+    void refineQuestionFailedWithGpt35WillNotTryAgain() {
       PredefinedQuestion mcqWithAnswer = makeMe.aPredefinedQuestion().please();
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnToolCallJsonNode(
-          new ObjectMapperConfig()
-              .objectMapper()
-              .readTree(
-                  "{\"multipleChoicesQuestion\":{\"stem\":null,\"choices\":null},\"correctChoiceIndex\":0,\"approve\":false}"),
-          "");
+      // Mock a response with malformed JSON content to trigger a RuntimeException
+      openAIChatCompletionMock.mockChatCompletionWithMalformedJsonContent("{invalid json}");
       assertThrows(RuntimeException.class, () -> controller.refineQuestion(note, mcqWithAnswer));
       verify(openAIChatCompletionMock.completionService(), Mockito.times(1))
           .create(ArgumentMatchers.any(ChatCompletionCreateParams.class));

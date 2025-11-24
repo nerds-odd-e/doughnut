@@ -71,6 +71,13 @@ public class OpenAIChatCompletionMock {
         .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
   }
 
+  public void mockChatCompletionWithMalformedJsonContent(String malformedJson) {
+    ChatCompletion completion = buildContentCompletion(malformedJson);
+    Mockito.doReturn(completion)
+        .when(completionService)
+        .create(ArgumentMatchers.argThat((ChatCompletionCreateParams params) -> !hasTools(params)));
+  }
+
   private boolean hasTools(ChatCompletionCreateParams params) {
     return params.tools().map(list -> !list.isEmpty()).orElse(false);
   }
