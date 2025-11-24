@@ -129,8 +129,11 @@ const useQuestionFetching = (props: QuizProps) => {
 
     if (!fetching.value) {
       fetching.value = true
-      await fetchNextQuestion()
-      fetching.value = false
+      try {
+        await fetchNextQuestion()
+      } finally {
+        fetching.value = false
+      }
     }
   }
 
@@ -191,6 +194,19 @@ const canMoveToEnd = computed(() => {
 })
 
 const moveToEnd = () => {
+  // Pre-mark the next question (which will become the new current question
+  // after moving current item to end) as fetched (even if undefined) to prevent
+  // showing the loader while fetching. This must happen before the emit to
+  // ensure the cache is updated before the watcher fires.
+  const nextIndex = props.currentIndex + 1
+  const nextMemoryTracker = memoryTrackerAt(nextIndex)
+  const nextMemoryTrackerId = nextMemoryTracker?.memoryTrackerId
+  if (
+    nextMemoryTrackerId !== undefined &&
+    !(nextMemoryTrackerId in recallPromptCache.value)
+  ) {
+    recallPromptCache.value[nextMemoryTrackerId] = undefined
+  }
   emit("moveToEnd", props.currentIndex)
 }
 
