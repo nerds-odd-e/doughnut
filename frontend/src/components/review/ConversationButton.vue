@@ -36,7 +36,7 @@ const startConversation = async () => {
       path: { recallPrompt: props.recallPromptId },
     })
   if (!error) {
-    router.push({
+    await router.push({
       name: "messageCenter",
       params: { conversationId: conversation!.id },
     })

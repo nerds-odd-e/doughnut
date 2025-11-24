@@ -43,7 +43,7 @@ export default {
             body: this.noteFormData,
           })
       if (!error) {
-        this.$router.push({
+        await this.$router.push({
           name: "noteShow",
           params: { noteId: result!.noteId },
         })

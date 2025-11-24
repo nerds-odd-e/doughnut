@@ -50,7 +50,7 @@ export default defineComponent({
       })
       if (!error) {
         this.$emit("closeDialog")
-        this.$router.push({ name: "notebooks" })
+        await this.$router.push({ name: "notebooks" })
       } else {
         // Error is handled by global interceptor (toast notification)
         // Extract field-level errors if available (for 400 validation errors)

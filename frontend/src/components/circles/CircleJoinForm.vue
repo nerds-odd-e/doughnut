@@ -41,7 +41,7 @@ export default defineComponent({
         body: this.formData,
       })
       if (!error) {
-        this.$router.push({
+        await this.$router.push({
           name: "circleShow",
           params: { circleId: joinedCircle!.id },
         })

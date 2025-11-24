@@ -35,7 +35,7 @@ export default defineComponent({
       })
       if (!error) {
         this.$emit("closeDialog")
-        this.$router.push({
+        await this.$router.push({
           name: "circleShow",
           params: { circleId: newCircle!.id },
         })

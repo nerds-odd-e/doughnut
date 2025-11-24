@@ -64,7 +64,7 @@ const shareNotebook = async () => {
       path: { notebook: props.notebook.id },
     })
     if (!error) {
-      router.push({ name: "notebooks" })
+      await router.push({ name: "notebooks" })
     }
   }
 }
