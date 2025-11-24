@@ -574,5 +574,42 @@ describe("SearchResults.vue", () => {
       // This test verifies the component respects the checkbox state
       expect(wrapper.text()).toContain("Recently updated notes")
     })
+
+    it("should call getRecentNotes only once when mounting with empty search key", async () => {
+      const getRecentNotesSpy = vi
+        .spyOn(sdk, "getRecentNotes")
+        .mockResolvedValue({
+          data: recentNotes,
+          error: undefined,
+          request: {} as Request,
+          response: {} as Response,
+        })
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      // Clear any previous calls from other tests
+      getRecentNotesSpy.mockClear()
+
+      helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "", isDropdown: false })
+        .mount()
+
+      await nextTick()
+      await flushPromises()
+
+      // Should only be called once, not twice
+      expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
+    })
   })
 })

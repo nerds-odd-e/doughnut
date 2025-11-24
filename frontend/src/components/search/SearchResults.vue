@@ -381,12 +381,8 @@ onMounted(async () => {
   // instead of "Searching ..."
   if (props.inputSearchKey.trim() === "" && props.noteId && props.isDropdown) {
     recentResult.value = []
-  } else if (
-    searchTerm.value.allMyNotebooksAndSubscriptions &&
-    props.inputSearchKey.trim() === ""
-  ) {
-    await fetchRecentNotes()
   }
+  // Note: fetchRecentNotes() will be called by the watcher when allMyNotebooksAndSubscriptions is set to true
 })
 
 onBeforeUnmount(() => {
