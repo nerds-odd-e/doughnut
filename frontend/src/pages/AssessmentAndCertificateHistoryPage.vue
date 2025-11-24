@@ -52,7 +52,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
-import { getMyAssessments } from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/backend/sdk.gen"
 import ContainerPage from "./commons/ContainerPage.vue"
 
 const filterByCertificate = ref(false)
@@ -81,7 +81,7 @@ const filteredAssessmentHistories = computed(() => {
 })
 
 onMounted(async () => {
-  const { data: assessments, error } = await getMyAssessments()
+  const { data: assessments, error } = await AssessmentController.getMyAssessments()
   if (!error) {
     assessmentHistories.value = assessments!
   }

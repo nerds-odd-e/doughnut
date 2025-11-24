@@ -69,7 +69,7 @@ import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionCompo
 import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
 import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
-import { recalling } from "@generated/backend/sdk.gen"
+import { RecallsController } from "@generated/backend/sdk.gen"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -132,7 +132,7 @@ const viewLastResult = (cursor: number | undefined) => {
 }
 
 const loadMore = async (dueInDays?: number) => {
-  const { data: response, error } = await recalling({
+  const { data: response, error } = await RecallsController.recalling({
     query: {
       timezone: timezoneParam(),
       dueindays: dueInDays,

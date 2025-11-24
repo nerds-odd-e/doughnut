@@ -1,7 +1,7 @@
 import RenderingHelper from "./RenderingHelper"
 import matchByText from "./matchByText"
 import { vi } from "vitest"
-import * as sdk from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import type { NoteRealm } from "@generated/backend"
 
 class StoredComponentTestHelper {
@@ -15,7 +15,7 @@ class StoredComponentTestHelper {
  * in tests that use NoteAccessoryAsync component.
  */
 export function mockShowNoteAccessory() {
-  return vi.spyOn(sdk, "showNoteAccessory").mockResolvedValue({
+  return vi.spyOn(NoteController, "showNoteAccessory").mockResolvedValue({
     data: undefined as never,
     error: undefined as never,
     request: {} as Request,
@@ -35,7 +35,7 @@ export function mockShowNote(noteRealm?: NoteRealm) {
       note: { id: 1 },
       children: [],
     } as unknown as NoteRealm)
-  return vi.spyOn(sdk, "showNote").mockResolvedValue({
+  return vi.spyOn(NoteController, "showNote").mockResolvedValue({
     data: defaultNote,
     error: undefined,
     request: {} as Request,

@@ -2,7 +2,7 @@ import "vitest-fetch-mock"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { globalClientSilent, setupGlobalClient } from "@/managedApi/clientSetup"
 import { client as globalClient } from "@generated/backend/client.gen"
-import { getUserProfile } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 import { vi } from "vitest"
 
 const mockToast = {
@@ -37,7 +37,7 @@ describe("clientSetup", () => {
         { url: `${baseUrl}/api/user` }
       )
 
-      await getUserProfile({ client: globalClientSilent })
+      await UserController.getUserProfile({ client: globalClientSilent })
 
       expect(loadingStateDuringCall).toBe(false)
       expect(apiStatus.states.length).toBe(0)
@@ -51,7 +51,7 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      const { error } = await getUserProfile({ client: globalClientSilent })
+      const { error } = await UserController.getUserProfile({ client: globalClientSilent })
 
       // Error should be returned but no toast should be shown
       expect(error).toBeDefined()
@@ -70,7 +70,7 @@ describe("clientSetup", () => {
         { url: `${baseUrl}/api/user` }
       )
 
-      await getUserProfile({ client: globalClient })
+      await UserController.getUserProfile({ client: globalClient })
 
       expect(loadingStateDuringCall).toBe(true)
       expect(apiStatus.states.length).toBe(0)
@@ -86,7 +86,7 @@ describe("clientSetup", () => {
       expect(apiStatus.states.length).toBe(0)
 
       // Make the API call that will fail
-      await getUserProfile({ client: globalClient })
+      await UserController.getUserProfile({ client: globalClient })
 
       // After the error, loading state should be cleared (not stuck)
       // This is critical for e2e tests - loading spinner must disappear even on errors
@@ -111,8 +111,8 @@ describe("clientSetup", () => {
       })
 
       // Start two concurrent requests
-      const promise1 = getUserProfile({ client: globalClient })
-      const promise2 = getUserProfile({ client: globalClient })
+      const promise1 = UserController.getUserProfile({ client: globalClient })
+      const promise2 = UserController.getUserProfile({ client: globalClient })
 
       await Promise.allSettled([promise1, promise2])
 
@@ -129,7 +129,7 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      const { error } = await getUserProfile({ client: globalClient })
+      const { error } = await UserController.getUserProfile({ client: globalClient })
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalled()
@@ -141,7 +141,7 @@ describe("clientSetup", () => {
         status: 404,
       })
 
-      const { error } = await getUserProfile({ client: globalClient })
+      const { error } = await UserController.getUserProfile({ client: globalClient })
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalledWith(
@@ -159,7 +159,7 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      const { error } = await getUserProfile({ client: globalClient })
+      const { error } = await UserController.getUserProfile({ client: globalClient })
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalledWith(

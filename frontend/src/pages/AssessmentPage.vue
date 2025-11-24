@@ -9,7 +9,7 @@
 import { onMounted, ref } from "vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import Assessment from "@/components/assessment/Assessment.vue"
-import { generateAssessmentQuestions as generateAssessmentQuestionsApi } from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/backend/sdk.gen"
 import type { AssessmentAttempt } from "@generated/backend"
 import { toOpenApiError } from "@/managedApi/openApiError"
 
@@ -22,7 +22,7 @@ const assessmentAttempt = ref<AssessmentAttempt | undefined>()
 const errors = ref("")
 
 const generateAssessmentQuestions = async () => {
-  const { data: attempt, error } = await generateAssessmentQuestionsApi({
+  const { data: attempt, error } = await AssessmentController.generateAssessmentQuestions({
     path: { notebook: props.notebookId },
   })
   if (!error) {

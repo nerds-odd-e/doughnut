@@ -4,7 +4,7 @@ import type {
   McpNoteAddDTO,
   CreateNoteViaMcpResponse,
 } from '@generated/backend'
-import * as Services from '@generated/backend/sdk.gen'
+import { McpNoteCreationController } from '@generated/backend/sdk.gen'
 import { createTool } from './tool-builder.js'
 import { jsonResponse } from '../helpers.js'
 
@@ -57,7 +57,7 @@ Response Format:
     noteCreationDTO: noteCreationDTO,
   }
   try {
-    const response = await Services.createNoteViaMcp({
+    const response = await McpNoteCreationController.createNoteViaMcp({
       body: mcpCreationDto,
     })
 

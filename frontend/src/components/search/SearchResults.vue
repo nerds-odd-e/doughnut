@@ -107,13 +107,7 @@ import type { SearchTerm } from "@generated/backend"
 import type { NoteTopology } from "@generated/backend"
 import type { NoteSearchResult } from "@generated/backend"
 import type { NoteRealm } from "@generated/backend"
-import {
-  searchForLinkTargetWithin,
-  searchForLinkTarget,
-  semanticSearchWithin,
-  semanticSearch,
-  getRecentNotes,
-} from "@generated/backend/sdk.gen"
+import { SearchController, NoteController } from "@generated/backend/sdk.gen"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -220,13 +214,13 @@ const relativeSearch = async (
   searchTerm: SearchTerm
 ): Promise<NoteSearchResult[]> => {
   if (noteId) {
-    const { data: results, error } = await searchForLinkTargetWithin({
+    const { data: results, error } = await SearchController.searchForLinkTargetWithin({
       path: { note: noteId },
       body: searchTerm,
     })
     return error ? [] : results || []
   }
-  const { data: results, error } = await searchForLinkTarget({
+  const { data: results, error } = await SearchController.searchForLinkTarget({
     body: searchTerm,
   })
   return error ? [] : results || []
@@ -237,13 +231,13 @@ const semanticRelativeSearch = async (
   searchTerm: SearchTerm
 ): Promise<NoteSearchResult[]> => {
   if (noteId) {
-    const { data: results, error } = await semanticSearchWithin({
+    const { data: results, error } = await SearchController.semanticSearchWithin({
       path: { note: noteId },
       body: searchTerm,
     })
     return error ? [] : results || []
   }
-  const { data: results, error } = await semanticSearch({ body: searchTerm })
+    const { data: results, error } = await SearchController.semanticSearch({ body: searchTerm })
   return error ? [] : results || []
 }
 
@@ -282,7 +276,7 @@ const fetchRecentNotes = async () => {
     searchTerm.value.allMyNotebooksAndSubscriptions &&
     recentNotes.value.length === 0
   ) {
-    const { data: notes, error } = await getRecentNotes()
+    const { data: notes, error } = await NoteController.getRecentNotes()
     if (!error && notes) {
       recentNotes.value = notes
     } else {

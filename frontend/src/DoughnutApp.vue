@@ -10,7 +10,7 @@ import type { ApiStatus } from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient } from "./managedApi/clientSetup"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/backend"
-import { getFeatureToggle, currentUserInfo } from "@generated/backend/sdk.gen"
+import { GlobalSettingsController, CurrentUserInfoController } from "@generated/backend/sdk.gen"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 
@@ -51,12 +51,12 @@ const routeViewProps = computed(() => {
 onMounted(async () => {
   environment.value = getEnvironment()
   if (environment.value === "testing") {
-    const { data: toggle, error: toggleError } = await getFeatureToggle()
+    const { data: toggle, error: toggleError } = await GlobalSettingsController.getFeatureToggle()
     if (!toggleError) {
       featureToggle.value = toggle!
     }
   }
-  const { data: userInfo, error: userError } = await currentUserInfo()
+  const { data: userInfo, error: userError } = await CurrentUserInfoController.currentUserInfo()
   if (!userError) {
     user.value = userInfo!.user
     externalIdentifier.value = userInfo!.externalIdentifier

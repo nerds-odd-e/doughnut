@@ -3,7 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import { FineTuningDataController } from "@generated/backend/sdk.gen"
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {
@@ -20,7 +20,7 @@ describe("Edit Suggested Question", () => {
 
     it("call the api to make update", async () => {
       const mockUpdate = vi
-        .spyOn(sdk, "updateSuggestedQuestionForFineTuning")
+        .spyOn(FineTuningDataController, "updateSuggestedQuestionForFineTuning")
         .mockResolvedValue({
           data: {} as never,
           error: undefined,

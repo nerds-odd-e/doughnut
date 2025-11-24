@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import { showFailureReport } from "@generated/backend/sdk.gen"
+import { FailureReportController } from "@generated/backend/sdk.gen"
 import ContainerPage from "./commons/ContainerPage.vue"
 import type { FailureReport } from "@generated/backend"
 
@@ -37,7 +37,7 @@ const failureReport = ref<FailureReport | undefined>(undefined)
 const githubIssueUrl = ref<string | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: reportData, error } = await showFailureReport({
+  const { data: reportData, error } = await FailureReportController.showFailureReport({
     path: { failureReport: props.failureReportId },
   })
   if (!error) {

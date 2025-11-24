@@ -6,18 +6,10 @@ import type {
 } from "@generated/backend"
 import type { LinkCreation, NoteCreationDto } from "@generated/backend"
 import {
-  createNoteAfter,
-  createNoteUnderParent,
-  deleteNote,
-  linkNoteFinalize,
-  moveAfter,
-  moveNote,
-  showNote,
-  undoDeleteNote,
-  updateLink,
-  updateNoteDetails,
-  updateNoteTitle,
-  updateWikidataId,
+  NoteCreationController,
+  NoteController,
+  LinkController,
+  TextContentController,
 } from "@generated/backend/sdk.gen"
 import {
   toOpenApiError,
@@ -131,7 +123,7 @@ export default class StoredApiCollection implements StoredApi {
     content: string
   ) {
     if (field === "edit title") {
-      const { data, error } = await updateNoteTitle({
+      const { data, error } = await TextContentController.updateNoteTitle({
         path: { note: noteId },
         body: {
           newTitle: content,
@@ -142,7 +134,7 @@ export default class StoredApiCollection implements StoredApi {
       }
       return data
     }
-    const { data, error } = await updateNoteDetails({
+    const { data, error } = await TextContentController.updateNoteDetails({
       path: { note: noteId },
       body: {
         details: content,
@@ -158,7 +150,7 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Doughnut.ID,
     data: WikidataAssociationCreation
   ): Promise<NoteRealm> {
-    const { data: noteRealm, error } = await updateWikidataId({
+    const { data: noteRealm, error } = await NoteController.updateWikidataId({
       path: { note: noteId },
       body: data,
     })
@@ -183,7 +175,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const { data: noteRealm, error } = await showNote({
+    const { data: noteRealm, error } = await NoteController.showNote({
       path: { note: noteId },
     })
     if (error || !noteRealm) {
@@ -223,7 +215,7 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const { data: nrwp, error } = await createNoteUnderParent({
+    const { data: nrwp, error } = await NoteCreationController.createNoteUnderParent({
       path: { parentNote: parentId },
       body: data,
     })
@@ -255,7 +247,7 @@ export default class StoredApiCollection implements StoredApi {
     referenceId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const { data: nrwp, error } = await createNoteAfter({
+    const { data: nrwp, error } = await NoteCreationController.createNoteAfter({
       path: { referenceNote: referenceId },
       body: data,
     })
@@ -287,7 +279,7 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: LinkCreation
   ) {
-    const { data: noteRealms, error } = await linkNoteFinalize({
+    const { data: noteRealms, error } = await LinkController.linkNoteFinalize({
       path: {
         sourceNote: sourceId,
         targetNote: targetId,
@@ -301,7 +293,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
-    const { data: noteRealms, error } = await updateLink({
+    const { data: noteRealms, error } = await LinkController.updateLink({
       path: { link: linkId },
       body: data,
     })
@@ -320,7 +312,7 @@ export default class StoredApiCollection implements StoredApi {
     targetNoteId: number,
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]> {
-    const { data: updatedNotes, error } = await moveAfter({
+    const { data: updatedNotes, error } = await NoteController.moveAfter({
       path: {
         note: noteId,
         targetNote: targetNoteId,
@@ -382,7 +374,7 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!
       )
     }
-    const { data: noteRealm, error } = await undoDeleteNote({
+    const { data: noteRealm, error } = await NoteController.undoDeleteNote({
       path: { note: undone.noteId },
     })
     if (error || !noteRealm) {
@@ -401,7 +393,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const { data: res, error } = await deleteNote({
+    const { data: res, error } = await NoteController.deleteNote({
       path: { note: noteId },
     })
     if (error || !res) {
@@ -422,7 +414,7 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDto
   ) {
-    const { data: noteRealms, error } = await moveNote({
+    const { data: noteRealms, error } = await LinkController.moveNote({
       path: {
         sourceNote: sourceId,
         targetNote: targetId,

@@ -2,7 +2,7 @@ import SearchResults from "@/components/search/SearchResults.vue"
 import helper from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
+import { SearchController, NoteController } from "@generated/backend/sdk.gen"
 import type { NoteRealm, NoteSearchResult } from "@generated/backend"
 
 describe("SearchResults.vue", () => {
@@ -13,9 +13,9 @@ describe("SearchResults.vue", () => {
       setTimeout(() => resolve([]), 1)
     )
 
-    vi.spyOn(sdk, "searchForLinkTarget").mockReturnValue(delayed as never)
-    vi.spyOn(sdk, "semanticSearch").mockReturnValue(delayed as never)
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTarget").mockReturnValue(delayed as never)
+    vi.spyOn(SearchController, "semanticSearch").mockReturnValue(delayed as never)
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -39,19 +39,19 @@ describe("SearchResults.vue", () => {
     vi.useFakeTimers()
 
     const empty: NoteSearchResult[] = []
-    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
       data: empty,
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
       data: empty,
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -101,19 +101,19 @@ describe("SearchResults.vue", () => {
     vi.useFakeTimers()
 
     const empty: NoteSearchResult[] = []
-    vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+    vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
       data: empty,
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+    vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
       data: empty,
       error: undefined,
       request: {} as Request,
       response: {} as Response,
     })
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -144,7 +144,7 @@ describe("SearchResults.vue", () => {
     const withinSpy = vitest.fn().mockResolvedValue(result)
     const semanticSpy = vitest.fn().mockResolvedValue([])
     const semanticWithinSpy = vitest.fn().mockResolvedValue([])
-    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "searchForLinkTarget").mockImplementation((...args) =>
       firstSpy(...args).then((data) => ({
         data,
         error: undefined,
@@ -152,7 +152,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "searchForLinkTargetWithin").mockImplementation((...args) =>
       withinSpy(...args).then((data) => ({
         data,
         error: undefined,
@@ -160,7 +160,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "semanticSearch").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "semanticSearch").mockImplementation((...args) =>
       semanticSpy(...args).then((data) => ({
         data,
         error: undefined,
@@ -168,7 +168,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "semanticSearchWithin").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "semanticSearchWithin").mockImplementation((...args) =>
       semanticWithinSpy(...args).then((data) => ({
         data,
         error: undefined,
@@ -176,7 +176,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -227,7 +227,7 @@ describe("SearchResults.vue", () => {
     const mockSemanticTop = vitest.fn().mockResolvedValueOnce([])
     const mockSemanticWithin = vitest.fn().mockResolvedValueOnce([])
 
-    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "searchForLinkTarget").mockImplementation((...args) =>
       mockTop(...args).then((data) => ({
         data,
         error: undefined,
@@ -235,7 +235,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "searchForLinkTargetWithin").mockImplementation((...args) =>
       mockWithin(...args).then((data) => ({
         data,
         error: undefined,
@@ -243,7 +243,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "semanticSearch").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "semanticSearch").mockImplementation((...args) =>
       mockSemanticTop(...args).then((data) => ({
         data,
         error: undefined,
@@ -251,7 +251,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "semanticSearchWithin").mockImplementation((...args) =>
+    vi.spyOn(SearchController, "semanticSearchWithin").mockImplementation((...args) =>
       mockSemanticWithin(...args).then((data) => ({
         data,
         error: undefined,
@@ -259,7 +259,7 @@ describe("SearchResults.vue", () => {
         response: {} as Response,
       }))
     )
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+    vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
       data: [],
       error: undefined,
       request: {} as Request,
@@ -330,19 +330,19 @@ describe("SearchResults.vue", () => {
     ] as NoteRealm[]
 
     it("shows recently updated notes when search key is empty and searching globally", async () => {
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
         data: recentNotes,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
@@ -357,7 +357,7 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(sdk.getRecentNotes).toHaveBeenCalled()
+      expect(NoteController.getRecentNotes).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).toContain("Recent Note 2")
@@ -367,13 +367,13 @@ describe("SearchResults.vue", () => {
       vi.useFakeTimers()
 
       const empty: NoteSearchResult[] = []
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
         data: empty,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
         data: empty,
         error: undefined,
         request: {} as Request,
@@ -403,19 +403,19 @@ describe("SearchResults.vue", () => {
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
       ]
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
         data: searchResults,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
@@ -445,7 +445,7 @@ describe("SearchResults.vue", () => {
         setTimeout(() => resolve([]), 1)
       )
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockReturnValue(
+      vi.spyOn(SearchController, "searchForLinkTarget").mockReturnValue(
         delayed.then((data) => ({
           data,
           error: undefined,
@@ -453,7 +453,7 @@ describe("SearchResults.vue", () => {
           response: {} as Response,
         })) as never
       )
-      vi.spyOn(sdk, "semanticSearch").mockReturnValue(
+      vi.spyOn(SearchController, "semanticSearch").mockReturnValue(
         delayed.then((data) => ({
           data,
           error: undefined,
@@ -461,19 +461,19 @@ describe("SearchResults.vue", () => {
           response: {} as Response,
         })) as never
       )
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
         data: recentNotes,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
@@ -504,19 +504,19 @@ describe("SearchResults.vue", () => {
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
       ]
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
         data: searchResults,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
         data: recentNotes,
         error: undefined,
         request: {} as Request,
@@ -541,19 +541,19 @@ describe("SearchResults.vue", () => {
     })
 
     it("does not show recent notes when allMyNotebooksAndSubscriptions is false", async () => {
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+      vi.spyOn(NoteController, "getRecentNotes").mockResolvedValue({
         data: recentNotes,
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+      vi.spyOn(SearchController, "searchForLinkTarget").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+      vi.spyOn(SearchController, "semanticSearch").mockResolvedValue({
         data: [],
         error: undefined,
         request: {} as Request,

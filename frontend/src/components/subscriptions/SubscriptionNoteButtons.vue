@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 import type { Subscription } from "@generated/backend"
-import { destroySubscription } from "@generated/backend/sdk.gen"
+import { SubscriptionController } from "@generated/backend/sdk.gen"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
 import SvgEdit from "../svgs/SvgEdit.vue"
@@ -42,7 +42,7 @@ export default defineComponent({
       if (
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        const { error } = await destroySubscription({
+        const { error } = await SubscriptionController.destroySubscription({
           path: { subscription: this.subscription.id },
         })
         if (!error) {

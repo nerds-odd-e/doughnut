@@ -27,14 +27,14 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type { MemoryTracker } from "@generated/backend"
-import { getRecentMemoryTrackers } from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 
 const memoryTrackers = ref<MemoryTracker[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: trackers, error } = await getRecentMemoryTrackers()
+  const { data: trackers, error } = await MemoryTrackerController.getRecentMemoryTrackers()
   if (!error) {
     memoryTrackers.value = trackers!
   }

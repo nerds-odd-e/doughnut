@@ -61,7 +61,7 @@ import type {
   QuestionSuggestionParams,
   SuggestedQuestionForFineTuning,
 } from "@generated/backend"
-import { updateSuggestedQuestionForFineTuning } from "@generated/backend/sdk.gen"
+import { FineTuningDataController } from "@generated/backend/sdk.gen"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
@@ -99,7 +99,7 @@ export default defineComponent({
       const validated = this.validateSuggestedQuestion(this.suggestionParams)
       if (!validated) return
       const { data: updated, error } =
-        await updateSuggestedQuestionForFineTuning({
+        await FineTuningDataController.updateSuggestedQuestionForFineTuning({
           path: { suggestedQuestion: this.modelValue.id },
           body: validated,
         })
