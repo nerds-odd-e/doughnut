@@ -36,7 +36,7 @@
     "@types/turndown": "^5.0.6",
     "@vitejs/plugin-vue": "^6.0.2",
     "@vitejs/plugin-vue-jsx": "^5.1.2",
-    "@vue/server-renderer": "^3.5.24",
+    "@vue/server-renderer": "^3.5.25",
     "@vue/test-utils": "2.4.6",
     "autoprefixer": "^10.4.22",
     "daisyui": "^4.12.23",
@@ -61,7 +61,7 @@
     "vitest": "4.0.13",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
-    "vue": "3.5.24",
+    "vue": "3.5.25",
     "vue-tsc": "3.1.5"
   }
 }
