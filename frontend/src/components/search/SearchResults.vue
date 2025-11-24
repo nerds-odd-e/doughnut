@@ -366,6 +366,8 @@ watch(
       searchTerm.value.allMyNotebooksAndSubscriptions &&
       props.inputSearchKey.trim() === ""
     ) {
+      // Clear recentResult to show "Recently updated notes" title instead of "Search result"
+      recentResult.value = undefined
       fetchRecentNotes()
     }
   }

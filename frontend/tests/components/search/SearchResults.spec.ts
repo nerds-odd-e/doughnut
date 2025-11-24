@@ -611,5 +611,59 @@ describe("SearchResults.vue", () => {
       // Should only be called once, not twice
       expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
     })
+
+    it("should show 'Recently updated notes' title when search key is cleared after searching", async () => {
+      vi.useFakeTimers()
+
+      const searchResults: NoteSearchResult[] = [
+        { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
+      ]
+
+      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
+        data: searchResults,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
+        data: [],
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
+        data: recentNotes,
+        error: undefined,
+        request: {} as Request,
+        response: {} as Response,
+      })
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "test", isDropdown: false })
+        .mount()
+
+      // Wait for search to complete
+      await nextTick()
+      vi.advanceTimersByTime(1100)
+      await flushPromises()
+
+      // Should show "Search result" title after search
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).toContain("Search Result")
+
+      // Clear the search key
+      await wrapper.setProps({ inputSearchKey: "" })
+      await nextTick()
+      await flushPromises()
+
+      // Should now show "Recently updated notes" title, not "Search result"
+      expect(wrapper.text()).toContain("Recently updated notes")
+      expect(wrapper.text()).not.toContain("Search result")
+      expect(wrapper.text()).toContain("Recent Note 1")
+      expect(wrapper.text()).toContain("Recent Note 2")
+
+      vi.useRealTimers()
+    })
   })
 })
