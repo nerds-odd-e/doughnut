@@ -72,7 +72,12 @@ describe("WikidataAssociationForNoteDialog", () => {
       'input[id="wikidataID-wikidataID"]'
     ) as HTMLInputElement
   const getSelect = () =>
-    getModal()?.querySelector("select") as HTMLSelectElement
+    getModal()?.querySelector(
+      '[data-testid="wikidata-search-results"]'
+    ) as HTMLElement
+  const getSelectItem = (wikidataId: string) =>
+    Array.from(getModal()?.querySelectorAll('[data-testid="wikidata-search-result-item"]') || [])
+      .find((item) => item.getAttribute('data-wikidata-id') === wikidataId) as HTMLElement
   const getSaveButton = () =>
     getModal()?.querySelector('button[type="submit"]') as HTMLButtonElement
 
@@ -168,8 +173,9 @@ describe("WikidataAssociationForNoteDialog", () => {
 
       const select = getSelect()
       expect(select).toBeTruthy()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const selectItem = getSelectItem("Q11399")
+      expect(selectItem).toBeTruthy()
+      selectItem.click()
       await flushPromises()
 
       // With showSaveButton=true, need to click Save button
@@ -259,9 +265,9 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Select from search results
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const selectItem = getSelectItem("Q11399")
+      expect(selectItem).toBeTruthy()
+      selectItem.click()
       await flushPromises()
 
       // Select Replace option - this should immediately save and close
@@ -307,9 +313,9 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Select from search results
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const selectItem = getSelectItem("Q11399")
+      expect(selectItem).toBeTruthy()
+      selectItem.click()
       await flushPromises()
 
       // Select Append option - this should immediately save and close
@@ -355,9 +361,9 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Select from search results
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const selectItem = getSelectItem("Q11399")
+      expect(selectItem).toBeTruthy()
+      selectItem.click()
       await flushPromises()
 
       // Select Append option - this should immediately save and close
@@ -402,9 +408,9 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Select from search results (no title conflict, so no title options shown)
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const selectItem = getSelectItem("Q11399")
+      expect(selectItem).toBeTruthy()
+      selectItem.click()
       await flushPromises()
 
       // Click Save button
