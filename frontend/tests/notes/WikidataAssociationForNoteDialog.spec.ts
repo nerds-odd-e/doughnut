@@ -76,8 +76,13 @@ describe("WikidataAssociationForNoteDialog", () => {
       '[data-testid="wikidata-search-results"]'
     ) as HTMLElement
   const getSelectItem = (wikidataId: string) =>
-    Array.from(getModal()?.querySelectorAll('[data-testid="wikidata-search-result-item"]') || [])
-      .find((item) => item.getAttribute('data-wikidata-id') === wikidataId) as HTMLElement
+    Array.from(
+      getModal()?.querySelectorAll(
+        '[data-testid="wikidata-search-result-item"]'
+      ) || []
+    ).find(
+      (item) => item.getAttribute("data-wikidata-id") === wikidataId
+    ) as HTMLElement
   const getSaveButton = () =>
     getModal()?.querySelector('button[type="submit"]') as HTMLButtonElement
 
