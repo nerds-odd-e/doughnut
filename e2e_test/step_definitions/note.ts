@@ -557,3 +557,148 @@ Then(
       .findNoteDetails(expectedDetails)
   }
 )
+
+Given(
+  'I intercept the request to update note title {string} and hold its response',
+  (noteTopology: string) => {
+    start.jumpToNotePage(noteTopology)
+    start.testability().getInjectedNoteIdByTitle(noteTopology).then((noteId) => {
+      // Use a delay to hold the response
+      // We'll check state before this delay completes
+      cy.intercept('PATCH', `/api/text_content/${noteId}/title`, (req) => {
+        // Store request time to track when it was made
+        const requestTime = Date.now()
+        req.reply((res) => {
+          // Delay the response by 5 seconds
+          // This gives us time to check the state before the response arrives
+          const delay = 5000
+          const elapsed = Date.now() - requestTime
+          const remainingDelay = Math.max(0, delay - elapsed)
+          setTimeout(() => {
+            res.send()
+          }, remainingDelay)
+        })
+      }).as('titleUpdateRequest')
+    })
+  }
+)
+
+When(
+  'I type {string} in the title field without triggering save, leaving cursor at the end',
+  (text: string) => {
+    cy.findByRole('title').click()
+    // Type the text without blurring, which would trigger save
+    cy.focused().type(text)
+    // Verify cursor is at the end by checking selection
+    cy.focused().then(($el) => {
+      const el = $el[0]
+      // Handle both input/textarea and contenteditable elements
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+        const cursorPos = el.selectionStart || 0
+        const textLength = el.value.length
+        expect(cursorPos).to.equal(textLength)
+      } else {
+        // For contenteditable, use getSelection
+        const selection = window.getSelection()
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0)
+          const textContent = el.textContent || ''
+          // Check if cursor is at the end
+          const cursorAtEnd = range.startOffset === textContent.length
+          expect(cursorAtEnd).to.be.true
+        }
+      }
+    })
+  }
+)
+
+When('I release the intercepted response', () => {
+  // Wait for the delayed response to complete
+  // The delay gives us time to check state before the response arrives
+  cy.wait('@titleUpdateRequest', { timeout: 10000 })
+})
+
+Then(
+  'the title field should contain {string}',
+  (expectedText: string) => {
+    cy.findByRole('title').should('have.text', expectedText)
+  }
+)
+
+Then('the cursor should be at the end of the title field', () => {
+  cy.findByRole('title').click()
+  cy.focused().then(($el) => {
+    const el = $el[0] as HTMLInputElement | HTMLTextAreaElement
+    const cursorPos = el.selectionStart || 0
+    const textLength = el.value.length
+    expect(cursorPos).to.equal(textLength)
+  })
+})
+
+Then(
+  'the title field should contain {string} before the response arrives',
+  (expectedText: string) => {
+    // Check immediately, before the delayed response arrives
+    cy.findByRole('title').should('have.text', expectedText)
+  }
+)
+
+Then(
+  'the cursor should be at the end of the title field before the response arrives',
+  () => {
+    cy.findByRole('title').click()
+    cy.focused().then(($el) => {
+      const el = $el[0]
+      // Handle both input/textarea and contenteditable elements
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+        const cursorPos = el.selectionStart || 0
+        const textLength = el.value.length
+        expect(cursorPos).to.equal(textLength)
+      } else {
+        // For contenteditable, use getSelection
+        const selection = window.getSelection()
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0)
+          const textContent = el.textContent || ''
+          const cursorAtEnd = range.startOffset === textContent.length
+          expect(cursorAtEnd).to.be.true
+        }
+      }
+    })
+  }
+)
+
+Then(
+  'the title field should contain {string} after the response arrives',
+  (expectedText: string) => {
+    // Check after the response has arrived - this should fail, reproducing the bug
+    cy.findByRole('title').should('have.text', expectedText)
+  }
+)
+
+Then(
+  'the cursor should be at the end of the title field after the response arrives',
+  () => {
+    cy.findByRole('title').click()
+    cy.focused().then(($el) => {
+      const el = $el[0]
+      // Handle both input/textarea and contenteditable elements
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+        const cursorPos = el.selectionStart || 0
+        const textLength = el.value.length
+        // This assertion should fail, reproducing the bug where cursor jumps to front
+        expect(cursorPos).to.equal(textLength)
+      } else {
+        // For contenteditable, use getSelection
+        const selection = window.getSelection()
+        if (selection && selection.rangeCount > 0) {
+          const range = selection.getRangeAt(0)
+          const textContent = el.textContent || ''
+          const cursorAtEnd = range.startOffset === textContent.length
+          // This assertion should fail, reproducing the bug where cursor jumps to front
+          expect(cursorAtEnd).to.be.true
+        }
+      }
+    })
+  }
+)

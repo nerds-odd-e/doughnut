@@ -81,3 +81,13 @@ Feature: Note Edit
     Then I should see the note tree in the sidebar
       | note-title        |
       | Critical thinking |
+
+  Scenario: Edit note title with slow network should preserve cursor position
+    Given I intercept the request to update note title "LeSS in Action" and hold its response
+    When I update note title "LeSS in Action" to become "First Edit"
+    And I type "Second Edit" in the title field without triggering save, leaving cursor at the end
+    Then the title field should contain "First EditSecond Edit" before the response arrives
+    And the cursor should be at the end of the title field before the response arrives
+    When I release the intercepted response
+    Then the title field should contain "First EditSecond Edit" after the response arrives
+    And the cursor should be at the end of the title field after the response arrives
