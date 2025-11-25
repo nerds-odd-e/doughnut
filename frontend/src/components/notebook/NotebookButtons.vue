@@ -5,7 +5,9 @@
       <template #button_face>
         <SvgEditNotebook />
       </template>
-      <NotebookEditDialog v-bind="{ notebook, user }" />
+      <template #default="{ closer }">
+        <NotebookEditDialog v-bind="{ notebook, user, closer }" />
+      </template>
     </PopButton>
     <PopButton
       title="Move to ..."
