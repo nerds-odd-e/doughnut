@@ -2,11 +2,10 @@ import ConversationInner from "@/components/conversations/ConversationInner.vue"
 import ConversationTemplate from "@/components/conversations/ConversationTemplate.vue"
 import NoteConversation from "@/components/conversations/NoteConversation.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { expect, vi } from "vitest"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -54,34 +53,26 @@ describe("NoteConversation", () => {
     vi.useFakeTimers() // Use fake timers to control timing
   })
 
+  let startConversationSpy: ReturnType<
+    typeof mockSdkService<"startConversationAboutNote">
+  >
+
   beforeEach(() => {
-    vi.spyOn(sdk, "startConversationAboutNote").mockResolvedValue({
-      data: conversation,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    startConversationSpy = mockSdkService(
+      "startConversationAboutNote",
+      conversation
+    )
+    mockSdkService("getConversationMessages", [])
   })
 
   it("calls api to start conversation and shows ConversationInner when successful", async () => {
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [])
     const wrapper = await mount()
     await wrapper.find("textarea").setValue("Hello")
     await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
 
-    expect(sdk.startConversationAboutNote).toHaveBeenCalledWith({
+    expect(startConversationSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: "Hello",
     })
@@ -93,12 +84,7 @@ describe("NoteConversation", () => {
   })
 
   it("shows the first conversation if conversation exists", async () => {
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [conversation],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [conversation])
     const wrapper = await mount()
     const conversationInner = wrapper.findComponent(ConversationInner)
 
@@ -107,12 +93,7 @@ describe("NoteConversation", () => {
   })
 
   it("shows ConversationTemplate when no conversation exists", async () => {
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [])
     const wrapper = await mount()
     const conversationTemplate = wrapper.findComponent(ConversationTemplate)
     const conversationInner = wrapper.findComponent(ConversationInner)
@@ -137,12 +118,7 @@ describe("NoteConversation", () => {
       },
     ]
 
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: conversations,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", conversations)
 
     const wrapper = await mount()
 
@@ -162,12 +138,7 @@ describe("NoteConversation", () => {
   })
 
   it("shows conversation selector only when multiple conversations exist", async () => {
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [conversation],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [conversation])
 
     const wrapper = await mount()
 
@@ -183,12 +154,7 @@ describe("NoteConversation", () => {
       createdAt: "2024-01-01T00:00:00Z",
       updatedAt: "2024-01-01T00:00:00Z",
     }
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [existingConversation],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [existingConversation])
 
     const wrapper = await mount()
 
@@ -208,7 +174,7 @@ describe("NoteConversation", () => {
     await flushPromises()
 
     // Verify API was called
-    expect(sdk.startConversationAboutNote).toHaveBeenCalledWith({
+    expect(startConversationSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: "New conversation message",
     })
@@ -218,12 +184,7 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when starting new conversation with AI invite", async () => {
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [])
     const mockStart = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
       mockStart
@@ -237,7 +198,7 @@ describe("NoteConversation", () => {
     await flushPromises()
 
     // Verify conversation was started
-    expect(sdk.startConversationAboutNote).toHaveBeenCalledWith({
+    expect(startConversationSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: "Hello AI",
     })
@@ -253,18 +214,8 @@ describe("NoteConversation", () => {
   })
 
   it("handles AI reply when sending message with AI invite in existing conversation", async () => {
-    vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-      data: [conversation],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "replyToConversation").mockResolvedValue({
-      data: undefined as never,
-      error: undefined as never,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsAboutNote", [conversation])
+    const replySpy = mockSdkService("replyToConversation", undefined)
     const mockStart = vi.fn()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(
       mockStart
@@ -277,7 +228,7 @@ describe("NoteConversation", () => {
     await flushPromises()
 
     // Verify message was sent
-    expect(sdk.replyToConversation).toHaveBeenCalledWith({
+    expect(replySpy).toHaveBeenCalledWith({
       path: { conversationId: conversation.id },
       body: "Hello AI",
     })

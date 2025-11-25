@@ -1,11 +1,10 @@
 import AiResponse from "@/components/conversations/AiResponse.vue"
 import { expect, vi } from "vitest"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper, { mockShowNote, mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { TitleReplacement } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
-import * as sdk from "@generated/backend/sdk.gen"
 import {
   getLastInstance,
   resetInstance,
@@ -275,14 +274,15 @@ describe("ConversationInner", () => {
   describe("Tool Call Handling", () => {
     const testCompletion = "**bold completion**"
     const renderedCompletion = "bold completion"
+    let updateNoteDetailsSpy: ReturnType<
+      typeof mockSdkService<"updateNoteDetails">
+    >
 
     beforeEach(async () => {
-      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-        data: {} as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      updateNoteDetailsSpy = mockSdkService(
+        "updateNoteDetails",
+        makeMe.aNoteRealm.please()
+      )
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -360,7 +360,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: testCompletion },
       })
@@ -379,7 +379,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -396,7 +396,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteDetails).not.toHaveBeenCalled()
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results
@@ -426,7 +426,7 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete "world" and add "friends!"
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: "Hello friends!" },
       })
@@ -448,20 +448,22 @@ describe("ConversationInner", () => {
       await flushPromises()
 
       // Should delete everything and add new text
-      expect(sdk.updateNoteDetails).toHaveBeenCalledWith({
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: "Completely new text" },
       })
     })
 
     describe("Note Access", () => {
+      let updateNoteDetailsSpy: ReturnType<
+        typeof mockSdkService<"updateNoteDetails">
+      >
+
       beforeEach(async () => {
-        vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-          data: {} as never,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        updateNoteDetailsSpy = mockSdkService(
+          "updateNoteDetails",
+          makeMe.aNoteRealm.please()
+        )
       })
 
       it("fails to handle completion when note is in answeredQuestion but not in subject", async () => {
@@ -487,21 +489,20 @@ describe("ConversationInner", () => {
         await wrapper.find('button[class*="btn-primary"]').trigger("click")
         await flushPromises()
 
-        expect(sdk.updateNoteDetails).toHaveBeenCalled()
+        expect(updateNoteDetailsSpy).toHaveBeenCalled()
       })
     })
   })
 
   describe("Title Title Generation", () => {
     const testTitle = "Generated Title"
+    let updateNoteTitleSpy: ReturnType<typeof mockSdkService<"updateNoteTitle">>
 
     beforeEach(async () => {
-      vi.spyOn(sdk, "updateNoteTitle").mockResolvedValue({
-        data: {} as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      updateNoteTitleSpy = mockSdkService(
+        "updateNoteTitle",
+        makeMe.aNoteRealm.please()
+      )
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
@@ -515,7 +516,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).toHaveBeenCalledWith({
+      expect(updateNoteTitleSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { newTitle: testTitle },
       })
@@ -533,7 +534,7 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-secondary"]').trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(updateNoteTitleSpy).not.toHaveBeenCalled()
 
       // Rejection is handled silently - no API calls needed
 
@@ -549,7 +550,7 @@ describe("ConversationInner", () => {
         .trigger("click")
       await flushPromises()
 
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(updateNoteTitleSpy).not.toHaveBeenCalled()
 
       // Tool calls are executed inline with Chat Completion API
       // No need to submit results

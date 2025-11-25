@@ -1,11 +1,10 @@
 import NoteShowPage from "@/pages/NoteShowPage.vue"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockShowNoteAccessory } from "@tests/helpers"
+import helper, { mockShowNoteAccessory, mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("all in note show page", () => {
   let router: ReturnType<typeof createRouter>
@@ -22,22 +21,18 @@ describe("all in note show page", () => {
     const noteRealm = makeMe.aNoteRealm.inCircle("a circle").please()
 
     beforeEach(() => {
-      vi.spyOn(sdk, "showNote").mockResolvedValue({
-        data: noteRealm,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("showNote", noteRealm)
     })
 
     it(" should fetch API", async () => {
+      const showNoteSpy = mockSdkService("showNote", noteRealm)
       helper
         .component(NoteShowPage)
         .withStorageProps({ noteId: noteRealm.id })
         .withRouter(router)
         .render()
       await screen.findByText(noteRealm.note.noteTopology.titleOrPredicate)
-      expect(sdk.showNote).toHaveBeenCalledWith({
+      expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: noteRealm.id },
       })
     })
@@ -46,18 +41,8 @@ describe("all in note show page", () => {
   describe("conversation maximize/minimize", () => {
     it("should maximize conversation when maximize button is clicked", async () => {
       const note = makeMe.aNoteRealm.please()
-      vi.spyOn(sdk, "showNote").mockResolvedValue({
-        data: note,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("showNote", note)
+      mockSdkService("getConversationsAboutNote", [])
 
       const wrapper = helper
         .component(NoteShowPage)
@@ -87,18 +72,8 @@ describe("all in note show page", () => {
 
     it("should restore maximized state before closing conversation", async () => {
       const note = makeMe.aNoteRealm.please()
-      vi.spyOn(sdk, "showNote").mockResolvedValue({
-        data: note,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("showNote", note)
+      mockSdkService("getConversationsAboutNote", [])
 
       const wrapper = helper
         .component(NoteShowPage)
@@ -136,18 +111,8 @@ describe("all in note show page", () => {
 
     it("should open conversation when URL has conversation=true", async () => {
       const note = makeMe.aNoteRealm.please()
-      vi.spyOn(sdk, "showNote").mockResolvedValue({
-        data: note,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "getConversationsAboutNote").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("showNote", note)
+      mockSdkService("getConversationsAboutNote", [])
 
       // Start with conversation in URL
       router.push({

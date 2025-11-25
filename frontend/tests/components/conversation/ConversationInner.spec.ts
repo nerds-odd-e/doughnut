@@ -1,13 +1,12 @@
 import { expect, vi } from "vitest"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper, { mockShowNote, mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { type ConversationMessage } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
 import { simulateAiResponse } from "./AiResponse.spec"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
-import * as sdk from "@generated/backend/sdk.gen"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -77,22 +76,15 @@ describe("ConversationInner", () => {
   let wrapper
   let conversation
   let user
+  let replyToConversationSpy: ReturnType<
+    typeof mockSdkService<"replyToConversation">
+  >
 
   beforeEach(() => {
     window.HTMLElement.prototype.scrollIntoView = vi.fn()
     mockShowNote()
-    vi.spyOn(sdk, "replyToConversation").mockResolvedValue({
-      data: undefined as never,
-      error: undefined as never,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "getConversationMessages").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    replyToConversationSpy = mockSdkService("replyToConversation", undefined)
+    mockSdkService("getConversationMessages", [])
     resetInstance()
     vi.spyOn(AiReplyEventSource.prototype, "start").mockImplementation(vi.fn())
 
@@ -139,12 +131,12 @@ describe("ConversationInner", () => {
 
     it("prevents form submission for empty messages", async () => {
       await submitMessage(wrapper, "   ")
-      expect(sdk.replyToConversation).not.toHaveBeenCalled()
+      expect(replyToConversationSpy).not.toHaveBeenCalled()
     })
 
     it("allows form submission for non-empty messages", async () => {
       await submitMessage(wrapper, "Hello")
-      expect(sdk.replyToConversation).toHaveBeenCalled()
+      expect(replyToConversationSpy).toHaveBeenCalled()
     })
   })
 
@@ -239,7 +231,7 @@ describe("ConversationInner", () => {
       const firstButton = wrapper.find(".default-message-button")
       await firstButton.trigger("click")
 
-      expect(sdk.replyToConversation).toHaveBeenCalledWith({
+      expect(replyToConversationSpy).toHaveBeenCalledWith({
         path: { conversationId: reviewConversation.id },
         body: "Why is my answer wrong?",
       })
