@@ -1,8 +1,11 @@
 import SearchResults from "@/components/search/SearchResults.vue"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
 import type { NoteRealm, NoteSearchResult } from "@generated/backend"
 
 describe("SearchResults.vue", () => {
@@ -13,8 +16,14 @@ describe("SearchResults.vue", () => {
       setTimeout(() => resolve([]), 1)
     )
 
-    vi.spyOn(sdk, "searchForLinkTarget").mockReturnValue(delayed as never)
-    vi.spyOn(sdk, "semanticSearch").mockReturnValue(delayed as never)
+    const searchSpy = mockSdkService("searchForLinkTarget", [])
+    const semanticSpy = mockSdkService("semanticSearch", [])
+    searchSpy.mockReturnValue(
+      delayed.then((data) => wrapSdkResponse(data)) as never
+    )
+    semanticSpy.mockReturnValue(
+      delayed.then((data) => wrapSdkResponse(data)) as never
+    )
     mockSdkService("getRecentNotes", [])
 
     const wrapper = helper
@@ -113,37 +122,23 @@ describe("SearchResults.vue", () => {
     const withinSpy = vitest.fn().mockResolvedValue(result)
     const semanticSpy = vitest.fn().mockResolvedValue([])
     const semanticWithinSpy = vitest.fn().mockResolvedValue([])
-    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
-      firstSpy(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
+    mockSdkServiceWithImplementation("searchForLinkTarget", async (options) => {
+      return await firstSpy(options)
+    })
+    mockSdkServiceWithImplementation(
+      "searchForLinkTargetWithin",
+      async (options) => {
+        return await withinSpy(options)
+      }
     )
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
-      withinSpy(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
-    )
-    vi.spyOn(sdk, "semanticSearch").mockImplementation((...args) =>
-      semanticSpy(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
-    )
-    vi.spyOn(sdk, "semanticSearchWithin").mockImplementation((...args) =>
-      semanticWithinSpy(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
+    mockSdkServiceWithImplementation("semanticSearch", async (options) => {
+      return await semanticSpy(options)
+    })
+    mockSdkServiceWithImplementation(
+      "semanticSearchWithin",
+      async (options) => {
+        return await semanticWithinSpy(options)
+      }
     )
     mockSdkService("getRecentNotes", [])
 
@@ -191,37 +186,23 @@ describe("SearchResults.vue", () => {
     const mockSemanticTop = vitest.fn().mockResolvedValueOnce([])
     const mockSemanticWithin = vitest.fn().mockResolvedValueOnce([])
 
-    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
-      mockTop(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
+    mockSdkServiceWithImplementation("searchForLinkTarget", async (options) => {
+      return await mockTop(options)
+    })
+    mockSdkServiceWithImplementation(
+      "searchForLinkTargetWithin",
+      async (options) => {
+        return await mockWithin(options)
+      }
     )
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
-      mockWithin(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
-    )
-    vi.spyOn(sdk, "semanticSearch").mockImplementation((...args) =>
-      mockSemanticTop(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
-    )
-    vi.spyOn(sdk, "semanticSearchWithin").mockImplementation((...args) =>
-      mockSemanticWithin(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
+    mockSdkServiceWithImplementation("semanticSearch", async (options) => {
+      return await mockSemanticTop(options)
+    })
+    mockSdkServiceWithImplementation(
+      "semanticSearchWithin",
+      async (options) => {
+        return await mockSemanticWithin(options)
+      }
     )
     mockSdkService("getRecentNotes", [])
 
@@ -301,7 +282,7 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(sdk.getRecentNotes).toHaveBeenCalled()
+      expect(mockSdkService("getRecentNotes", recentNotes)).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).toContain("Recent Note 2")
@@ -311,18 +292,8 @@ describe("SearchResults.vue", () => {
       vi.useFakeTimers()
 
       const empty: NoteSearchResult[] = []
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
-        data: empty,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-        data: empty,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("searchForLinkTarget", empty)
+      mockSdkService("semanticSearch", empty)
 
       const wrapper = helper
         .component(SearchResults)
@@ -374,28 +345,15 @@ describe("SearchResults.vue", () => {
         setTimeout(() => resolve([]), 1)
       )
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockReturnValue(
-        delayed.then((data) => ({
-          data,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })) as never
+      const searchSpy = mockSdkService("searchForLinkTarget", [])
+      searchSpy.mockReturnValue(
+        delayed.then((data) => wrapSdkResponse(data)) as never
       )
-      vi.spyOn(sdk, "semanticSearch").mockReturnValue(
-        delayed.then((data) => ({
-          data,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })) as never
+      const semanticSpy = mockSdkService("semanticSearch", [])
+      semanticSpy.mockReturnValue(
+        delayed.then((data) => wrapSdkResponse(data)) as never
       )
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-        data: recentNotes,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getRecentNotes", recentNotes)
 
       const wrapper = helper
         .component(SearchResults)
@@ -423,24 +381,9 @@ describe("SearchResults.vue", () => {
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
       ]
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
-        data: searchResults,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-        data: recentNotes,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("searchForLinkTarget", searchResults)
+      mockSdkService("semanticSearch", [])
+      mockSdkService("getRecentNotes", recentNotes)
 
       const wrapper = helper
         .component(SearchResults)
@@ -480,26 +423,9 @@ describe("SearchResults.vue", () => {
     })
 
     it("should call getRecentNotes only once when mounting with empty search key", async () => {
-      const getRecentNotesSpy = vi
-        .spyOn(sdk, "getRecentNotes")
-        .mockResolvedValue({
-          data: recentNotes,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
+      mockSdkService("searchForLinkTarget", [])
+      mockSdkService("semanticSearch", [])
 
       // Clear any previous calls from other tests
       getRecentNotesSpy.mockClear()
@@ -523,24 +449,9 @@ describe("SearchResults.vue", () => {
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
       ]
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
-        data: searchResults,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-        data: recentNotes,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("searchForLinkTarget", searchResults)
+      mockSdkService("semanticSearch", [])
+      mockSdkService("getRecentNotes", recentNotes)
 
       const wrapper = helper
         .component(SearchResults)
@@ -583,7 +494,7 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(sdk.getRecentNotes).toHaveBeenCalled()
+      expect(mockSdkService("getRecentNotes", recentNotes)).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).toContain("Recent Note 2")
@@ -676,44 +587,21 @@ describe("SearchResults.vue", () => {
         setTimeout(() => resolve([]), 2000)
       )
 
-      vi.spyOn(sdk, "searchForLinkTarget")
-        .mockResolvedValueOnce({
-          data: firstSearchResults,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
-        .mockReturnValue(
-          secondSearchDelayed.then((data) => ({
-            data,
-            error: undefined,
-            request: {} as Request,
-            response: {} as Response,
-          })) as never
-        )
+      const searchForLinkTargetSpy = mockSdkService("searchForLinkTarget", [])
+      searchForLinkTargetSpy.mockResolvedValueOnce(
+        wrapSdkResponse(firstSearchResults)
+      )
+      searchForLinkTargetSpy.mockReturnValue(
+        secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
+      )
 
-      vi.spyOn(sdk, "semanticSearch")
-        .mockResolvedValueOnce({
-          data: [],
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
-        .mockReturnValue(
-          secondSearchDelayed.then((data) => ({
-            data,
-            error: undefined,
-            request: {} as Request,
-            response: {} as Response,
-          })) as never
-        )
+      const semanticSearchSpy = mockSdkService("semanticSearch", [])
+      semanticSearchSpy.mockResolvedValueOnce(wrapSdkResponse([]))
+      semanticSearchSpy.mockReturnValue(
+        secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
+      )
 
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-        data: recentNotes,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getRecentNotes", recentNotes)
 
       const wrapper = helper
         .component(SearchResults)
@@ -749,26 +637,11 @@ describe("SearchResults.vue", () => {
     it("shows recent notes only when search key is empty and no previous result exists", async () => {
       vi.useFakeTimers()
 
-      vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-        data: recentNotes,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getRecentNotes", recentNotes)
 
-      vi.spyOn(sdk, "searchForLinkTarget").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("searchForLinkTarget", [])
 
-      vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("semanticSearch", [])
 
       const wrapper = helper
         .component(SearchResults)

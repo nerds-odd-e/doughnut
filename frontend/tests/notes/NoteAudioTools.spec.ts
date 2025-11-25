@@ -2,10 +2,13 @@ import FullScreen from "@/components/common/FullScreen.vue"
 import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockShowNote } from "@tests/helpers"
+import helper, {
+  mockShowNote,
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockMediaStreamSource = {
   connect: vi.fn(),
@@ -462,10 +465,9 @@ describe("NoteAudioTools", () => {
     const processPromise = new Promise<AudioResponse>((resolve) => {
       resolveProcess = resolve
     })
-    vi.spyOn(sdk, "audioToText").mockImplementation(
-      // biome-ignore lint/suspicious/noExplicitAny: Mock function type compatibility for Promise
-      () => processPromise as any
-    )
+    mockSdkServiceWithImplementation("audioToText", async () => {
+      return await processPromise
+    })
 
     // Trigger audio processing
     const processPromise2 = wrapper.vm.processAudio({
@@ -531,23 +533,15 @@ describe("NoteAudioTools", () => {
   })
 
   describe("Title suggestion", () => {
+    let updateNoteTitleSpy: ReturnType<typeof mockSdkService<"updateNoteTitle">>
+
     beforeEach(() => {
       // Reset mocks and wrapper before each test
       vi.clearAllMocks()
-      vi.spyOn(sdk, "updateNoteTitle").mockResolvedValue({
-        data: {} as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "audioToText").mockResolvedValue({
-        data: {
-          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-          endTimestamp: "00:00:00,000",
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      updateNoteTitleSpy = mockSdkService("updateNoteTitle", {} as never)
+      mockSdkService("audioToText", {
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:00,000",
       })
     })
 
@@ -558,18 +552,10 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      vi.spyOn(sdk, "suggestTitle").mockResolvedValue({
-        data: { title: "Suggested Title" },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      const suggestTitleSpy = mockSdkService("suggestTitle", {
+        title: "Suggested Title",
       })
-      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-        data: makeMe.aNoteRealm.please() as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
 
       // Simulate 9 audio processes (should trigger on 1st, 2nd, 4th, 8th calls)
       for (let i = 0; i < 9; i++) {
@@ -577,8 +563,8 @@ describe("NoteAudioTools", () => {
       }
 
       // Should call suggestTitle 4 times (on calls 1, 2, 4, and 8)
-      expect(sdk.suggestTitle).toHaveBeenCalledTimes(4)
-      expect(sdk.updateNoteTitle).toHaveBeenCalledTimes(4)
+      expect(suggestTitleSpy).toHaveBeenCalledTimes(4)
+      expect(updateNoteTitleSpy).toHaveBeenCalledTimes(4)
     })
 
     it("does not update title when suggestion is empty", async () => {
@@ -588,23 +574,13 @@ describe("NoteAudioTools", () => {
         .withStorageProps({ note })
         .mount()
 
-      vi.spyOn(sdk, "suggestTitle").mockResolvedValue({
-        data: { title: "" },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-        data: makeMe.aNoteRealm.please() as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      const suggestTitleSpy = mockSdkService("suggestTitle", { title: "" })
+      mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
 
       await wrapper.vm.processAudio(new Blob())
 
-      expect(sdk.suggestTitle).toHaveBeenCalled()
-      expect(sdk.updateNoteTitle).not.toHaveBeenCalled()
+      expect(suggestTitleSpy).toHaveBeenCalled()
+      expect(updateNoteTitleSpy).not.toHaveBeenCalled()
     })
   })
 
@@ -612,14 +588,9 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
-        data: {
-          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-          endTimestamp: "00:00:37,270",
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      audioToTextMock = mockSdkService("audioToText", {
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:37,270",
       })
     })
 
@@ -655,7 +626,7 @@ describe("NoteAudioTools", () => {
       // First call
       await wrapper.vm.processAudio(new Blob())
 
-      expect(sdk.audioToText).toHaveBeenLastCalledWith({
+      expect(audioToTextMock).toHaveBeenLastCalledWith({
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
@@ -664,7 +635,7 @@ describe("NoteAudioTools", () => {
       // Second call should include previous thread context
       await wrapper.vm.processAudio(new Blob())
 
-      expect(sdk.audioToText).toHaveBeenLastCalledWith({
+      expect(audioToTextMock).toHaveBeenLastCalledWith({
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
@@ -720,14 +691,9 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
-        data: {
-          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-          endTimestamp: "00:00:37,270",
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      audioToTextMock = mockSdkService("audioToText", {
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:37,270",
       })
     })
 
@@ -756,7 +722,7 @@ describe("NoteAudioTools", () => {
       const testBlob = new Blob(["test"])
       await wrapper.vm.processAudio(testBlob)
 
-      expect(sdk.audioToText).toHaveBeenCalledWith({
+      expect(audioToTextMock).toHaveBeenCalledWith({
         body: expect.objectContaining({
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
@@ -800,14 +766,9 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
-        data: {
-          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-          endTimestamp: "00:00:37,270",
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      audioToTextMock = mockSdkService("audioToText", {
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:37,270",
       })
     })
 
@@ -838,18 +799,8 @@ describe("NoteAudioTools", () => {
       endTimestamp: "00:00:37,270",
     }
 
-    vi.spyOn(sdk, "audioToText").mockResolvedValue({
-      data: mockResponse,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "updateNoteDetails").mockResolvedValue({
-      data: makeMe.aNoteRealm.please() as never,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    const audioToTextSpy = mockSdkService("audioToText", mockResponse)
+    mockSdkService("updateNoteDetails", makeMe.aNoteRealm.please())
 
     const testBlob = new Blob(["test"])
     const result = await wrapper.vm.processAudio({
@@ -860,7 +811,7 @@ describe("NoteAudioTools", () => {
     expect(result).toBe("00:00:37,270")
 
     // Verify API call was made with correct parameters
-    expect(sdk.audioToText).toHaveBeenCalledWith({
+    expect(audioToTextSpy).toHaveBeenCalledWith({
       body: expect.objectContaining({
         isMidSpeech: true,
         previousNoteDetailsToAppendTo: note.details,
@@ -925,14 +876,9 @@ describe("NoteAudioTools", () => {
     let audioToTextMock
 
     beforeEach(() => {
-      audioToTextMock = vi.spyOn(sdk, "audioToText").mockResolvedValue({
-        data: {
-          completionFromAudio: { completion: "text", deleteFromEnd: 0 },
-          endTimestamp: "00:00:37,270",
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      audioToTextMock = mockSdkService("audioToText", {
+        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        endTimestamp: "00:00:37,270",
       })
     })
 
