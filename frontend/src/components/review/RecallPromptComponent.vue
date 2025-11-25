@@ -6,11 +6,13 @@
       }"
       @answer="submitQuizAnswer($event)"
       :key="recallPrompt.id"
-      :disabled="isLoading"
+      :disabled="isLoading || isAnswered"
     />
 
-    <div v-if="isLoading" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-flex daisy-justify-center daisy-items-center daisy-z-50">
-      <span class="daisy-loading daisy-loading-spinner daisy-loading-lg"></span>
+    <div v-if="isAnswered" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-z-50">
+      <div v-if="isLoading" class="daisy-flex daisy-justify-center daisy-items-center daisy-h-full">
+        <span class="daisy-loading daisy-loading-spinner daisy-loading-lg"></span>
+      </div>
     </div>
 
     <div v-if="error" class="daisy-alert daisy-alert-error daisy-mt-4">
@@ -30,6 +32,7 @@ import QuestionDisplay from "./QuestionDisplay.vue"
 const { popups } = usePopups()
 
 const isLoading = ref(false)
+const isAnswered = ref(false)
 const error = ref("")
 
 const props = defineProps({
@@ -51,6 +54,7 @@ const handleError = async () => {
 const submitQuizAnswer = async (answerData: AnswerDto) => {
   if (answerData.choiceIndex === undefined) return
 
+  isAnswered.value = true
   isLoading.value = true
   error.value = ""
 
@@ -62,6 +66,7 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
     emits("answered", answerResult!)
   } else {
     await handleError()
+    isAnswered.value = false
   }
   isLoading.value = false
 }
