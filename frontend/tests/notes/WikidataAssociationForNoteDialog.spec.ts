@@ -1,7 +1,7 @@
 import WikidataAssociationForNoteDialog from "@/components/notes/WikidataAssociationForNoteDialog.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -10,32 +10,29 @@ vitest.mock("vue-router", () => ({
 }))
 
 describe("WikidataAssociationForNoteDialog", () => {
-  const mockedWikidataSearch = vitest.fn()
-  const mockedFetchWikidataEntity = vitest.fn()
-  const mockedUpdateWikidataId = vitest.fn()
-  const mockedUpdateNoteTitle = vitest.fn()
+  let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
   let fetchWikidataEntitySpy: ReturnType<
-    typeof mockSdkServiceWithImplementation<"fetchWikidataEntityDataById">
+    typeof mockSdkService<"fetchWikidataEntityDataById">
   >
+  let updateWikidataIdSpy: ReturnType<typeof mockSdkService<"updateWikidataId">>
+  let updateNoteTitleSpy: ReturnType<typeof mockSdkService<"updateNoteTitle">>
 
   beforeEach(() => {
     vi.resetAllMocks()
     document.body.innerHTML = ""
-    mockSdkServiceWithImplementation("searchWikidata", async (...args) => {
-      return await mockedWikidataSearch(...args)
-    })
-    fetchWikidataEntitySpy = mockSdkServiceWithImplementation(
+    searchWikidataSpy = mockSdkService("searchWikidata", [])
+    fetchWikidataEntitySpy = mockSdkService(
       "fetchWikidataEntityDataById",
-      async (options) => {
-        return await mockedFetchWikidataEntity(options)
-      }
+      makeMe.aWikidataEntity.wikidataTitle("").please()
     )
-    mockSdkServiceWithImplementation("updateWikidataId", async (options) => {
-      return await mockedUpdateWikidataId(options)
-    })
-    mockSdkServiceWithImplementation("updateNoteTitle", async (options) => {
-      return await mockedUpdateNoteTitle(options)
-    })
+    updateWikidataIdSpy = mockSdkService(
+      "updateWikidataId",
+      makeMe.aNoteRealm.please()
+    )
+    updateNoteTitleSpy = mockSdkService(
+      "updateNoteTitle",
+      makeMe.aNoteRealm.please()
+    )
   })
 
   const mountDialog = (note: ReturnType<typeof makeMe.aNote.please>) => {
@@ -103,22 +100,32 @@ describe("WikidataAssociationForNoteDialog", () => {
           .wikidataTitle(wikidataTitle)
           .please()
 
-        mockedFetchWikidataEntity.mockResolvedValue(wikidata as never)
-        mockedUpdateWikidataId.mockResolvedValue(
-          makeMe.aNoteRealm.please() as never
+        // Set up mocks before calling inputWikidataIdAndSave
+        // Must return non-empty search results so "No results" condition is false
+        // This allows the title options to be shown when showTitleOptions is set
+        searchWikidataSpy.mockResolvedValue(
+          wrapSdkResponse([makeMe.aWikidataSearchEntity.please()])
         )
-        mockedUpdateNoteTitle.mockResolvedValue(
-          makeMe.aNoteRealm.please() as never
+        fetchWikidataEntitySpy.mockResolvedValue(wrapSdkResponse(wikidata))
+        updateWikidataIdSpy.mockResolvedValue(
+          wrapSdkResponse(makeMe.aNoteRealm.please())
+        )
+        updateNoteTitleSpy.mockResolvedValue(
+          wrapSdkResponse(makeMe.aNoteRealm.please())
         )
 
         const wrapper = await inputWikidataIdAndSave(note, wikidataId)
         await flushPromises()
+        await flushPromises() // Wait for async operations
 
         expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
           path: { wikidataId },
         })
 
         if (needsTitleAction) {
+          // Wait for title options dialog to appear after fetch completes
+          await flushPromises()
+          await flushPromises()
           const replaceLabel = getModal()?.querySelector(
             'label[for*="Replace"]'
           ) as HTMLLabelElement
@@ -128,11 +135,11 @@ describe("WikidataAssociationForNoteDialog", () => {
           await flushPromises() // Wait for async operations in handleSelectedForEdit
 
           // When title action is selected, both updateNoteTitle and updateWikidataId are called
-          expect(mockedUpdateNoteTitle).toHaveBeenCalledTimes(1)
-          expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
+          expect(updateNoteTitleSpy).toHaveBeenCalledTimes(1)
+          expect(updateWikidataIdSpy).toHaveBeenCalledTimes(1)
         } else {
           // When no title action is needed, only updateWikidataId is called
-          expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
+          expect(updateWikidataIdSpy).toHaveBeenCalledTimes(1)
         }
         expect(wrapper.emitted("closeDialog")).toBeTruthy()
       }
@@ -144,11 +151,13 @@ describe("WikidataAssociationForNoteDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
-      mockedFetchWikidataEntity.mockResolvedValue(
-        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      fetchWikidataEntitySpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aWikidataEntity.wikidataTitle("Dog").please())
       )
-      mockedUpdateWikidataId.mockResolvedValue({} as never)
+      updateWikidataIdSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
 
       const wrapper = mountDialog(note)
       await flushPromises()
@@ -169,7 +178,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
         path: { wikidataId: "Q11399" },
       })
-      expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
+      expect(updateWikidataIdSpy).toHaveBeenCalledTimes(1)
       expect(wrapper.emitted("closeDialog")).toBeTruthy()
     })
 
@@ -188,7 +197,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       const wrapper = await inputWikidataIdAndSave(note, wikidataId)
       await flushPromises()
 
-      expect(mockedUpdateWikidataId).not.toHaveBeenCalled()
+      expect(updateWikidataIdSpy).not.toHaveBeenCalled()
       expect(wrapper.emitted("closeDialog")).toBeFalsy()
       const errorMessage = getModal()?.querySelector(".daisy-text-error")
       expect(errorMessage?.textContent).toContain(
@@ -199,14 +208,20 @@ describe("WikidataAssociationForNoteDialog", () => {
     it("shows error when updateWikidataId fails", async () => {
       const note = makeMe.aNote.topicConstructor("dog").please()
       const wikidata = makeMe.aWikidataEntity.wikidataTitle("dog").please()
-      mockedFetchWikidataEntity.mockResolvedValue(wikidata as never)
+      fetchWikidataEntitySpy.mockResolvedValue(wrapSdkResponse(wikidata))
       const error = { wikidataId: "Duplicate Wikidata ID Detected." }
-      mockedUpdateWikidataId.mockRejectedValue(error)
+      updateWikidataIdSpy.mockResolvedValue({
+        data: undefined,
+        error: { errors: error },
+        request: {} as Request,
+        response: {} as Response,
+        // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+      } as any)
 
       const wrapper = await inputWikidataIdAndSave(note, wikidataId)
       await flushPromises()
 
-      expect(mockedUpdateWikidataId).toHaveBeenCalledTimes(1)
+      expect(updateWikidataIdSpy).toHaveBeenCalledTimes(1)
       expect(wrapper.emitted("closeDialog")).toBeFalsy()
       const errorMessage = getModal()?.querySelector(".daisy-text-error")
       expect(errorMessage?.textContent).toContain(
@@ -220,12 +235,12 @@ describe("WikidataAssociationForNoteDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
 
       mountDialog(note)
       await flushPromises()
 
-      expect(mockedWikidataSearch).toHaveBeenCalledWith({
+      expect(searchWikidataSpy).toHaveBeenCalledWith({
         query: { search: "dog" },
       })
     })
@@ -236,12 +251,16 @@ describe("WikidataAssociationForNoteDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
-      mockedFetchWikidataEntity.mockResolvedValue(
-        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      fetchWikidataEntitySpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aWikidataEntity.wikidataTitle("Dog").please())
       )
-      mockedUpdateWikidataId.mockResolvedValue({} as never)
-      mockedUpdateNoteTitle.mockResolvedValue({} as never)
+      updateWikidataIdSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
+      updateNoteTitleSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
 
       const wrapper = mountDialog(note)
       await flushPromises()
@@ -261,14 +280,14 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Verify title is replaced
-      expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
+      expect(updateNoteTitleSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           newTitle: "Dog",
         },
       })
       // Verify wikidata ID is saved
-      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+      expect(updateWikidataIdSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           wikidataId: "Q11399",
@@ -284,12 +303,16 @@ describe("WikidataAssociationForNoteDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
-      mockedFetchWikidataEntity.mockResolvedValue(
-        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      fetchWikidataEntitySpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aWikidataEntity.wikidataTitle("Dog").please())
       )
-      mockedUpdateWikidataId.mockResolvedValue({} as never)
-      mockedUpdateNoteTitle.mockResolvedValue({} as never)
+      updateWikidataIdSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
+      updateNoteTitleSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
 
       const wrapper = mountDialog(note)
       await flushPromises()
@@ -309,14 +332,14 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Verify title is appended with / separator
-      expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
+      expect(updateNoteTitleSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           newTitle: "Canine / Dog",
         },
       })
       // Verify wikidata ID is saved
-      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+      expect(updateWikidataIdSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           wikidataId: "Q11399",
@@ -332,12 +355,16 @@ describe("WikidataAssociationForNoteDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
-      mockedFetchWikidataEntity.mockResolvedValue(
-        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      fetchWikidataEntitySpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aWikidataEntity.wikidataTitle("Dog").please())
       )
-      mockedUpdateWikidataId.mockResolvedValue({} as never)
-      mockedUpdateNoteTitle.mockResolvedValue({} as never)
+      updateWikidataIdSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
+      updateNoteTitleSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
 
       const wrapper = mountDialog(note)
       await flushPromises()
@@ -357,14 +384,14 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Verify title is set to the entity label when current title is empty
-      expect(mockedUpdateNoteTitle).toHaveBeenCalledWith({
+      expect(updateNoteTitleSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           newTitle: "Dog",
         },
       })
       // Verify wikidata ID is saved
-      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+      expect(updateWikidataIdSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           wikidataId: "Q11399",
@@ -380,11 +407,13 @@ describe("WikidataAssociationForNoteDialog", () => {
         .label("Dog")
         .id("Q11399")
         .please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
-      mockedFetchWikidataEntity.mockResolvedValue(
-        makeMe.aWikidataEntity.wikidataTitle("Dog").please() as never
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
+      fetchWikidataEntitySpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aWikidataEntity.wikidataTitle("Dog").please())
       )
-      mockedUpdateWikidataId.mockResolvedValue({} as never)
+      updateWikidataIdSpy.mockResolvedValue(
+        wrapSdkResponse(makeMe.aNoteRealm.please())
+      )
 
       const wrapper = mountDialog(note)
       await flushPromises()
@@ -402,9 +431,9 @@ describe("WikidataAssociationForNoteDialog", () => {
       await flushPromises()
 
       // Verify title is NOT updated (no title action)
-      expect(mockedUpdateNoteTitle).not.toHaveBeenCalled()
+      expect(updateNoteTitleSpy).not.toHaveBeenCalled()
       // Verify wikidata ID is saved
-      expect(mockedUpdateWikidataId).toHaveBeenCalledWith({
+      expect(updateWikidataIdSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           wikidataId: "Q11399",
