@@ -5,8 +5,10 @@ import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { nextTick } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -21,63 +23,34 @@ vitest.mock("vue-router", () => ({
 
 const mockedSearch = vitest.fn()
 const mockedSearchWithin = vitest.fn()
-let mockedCreateNote: ReturnType<typeof vi.fn>
+let mockedCreateNote: ReturnType<typeof mockSdkService<"createNoteUnderParent">>
 
 describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    vi.spyOn(sdk, "searchForLinkTarget").mockImplementation((...args) =>
-      mockedSearch(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
+    mockSdkServiceWithImplementation("searchForLinkTarget", async (options) => {
+      return await mockedSearch(options)
+    })
+    mockSdkServiceWithImplementation(
+      "searchForLinkTargetWithin",
+      async (options) => {
+        return await mockedSearchWithin(options)
+      }
     )
-    vi.spyOn(sdk, "searchForLinkTargetWithin").mockImplementation((...args) =>
-      mockedSearchWithin(...args).then((data) => ({
-        data,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }))
-    )
-    vi.spyOn(sdk, "semanticSearch").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "semanticSearchWithin").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("semanticSearch", [])
+    mockSdkService("semanticSearchWithin", [])
+    mockSdkService("getRecentNotes", [])
     const createNoteResult = {
       created: makeMe.aNoteRealm.please(),
       parent: makeMe.aNoteRealm.please(),
     }
-    mockedCreateNote = vi
-      .spyOn(sdk, "createNoteUnderParent")
-      .mockImplementation(async (options) => {
-        const result = await vi.fn().mockResolvedValue(createNoteResult)(
-          options
-        )
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      })
+    mockedCreateNote = mockSdkServiceWithImplementation(
+      "createNoteUnderParent",
+      async () => {
+        return createNoteResult
+      }
+    )
   })
 
   afterEach(() => {
@@ -185,14 +158,8 @@ describe("adding new note", () => {
 
     beforeEach(() => {
       mockedSearchWithin.mockResolvedValue([])
-      vi.spyOn(sdk, "searchWikidata").mockImplementation(async (...args) => {
-        const result = await mockedWikidataSearch(...args)
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
+      mockSdkServiceWithImplementation("searchWikidata", async (options) => {
+        return await mockedWikidataSearch(options)
       })
       wrapper = helper
         .component(NoteNewDialog)

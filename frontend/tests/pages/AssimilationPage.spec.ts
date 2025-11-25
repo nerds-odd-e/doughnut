@@ -2,10 +2,13 @@ import AssimilationPage from "@/pages/AssimilationPage.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockShowNoteAccessory } from "@tests/helpers"
+import helper, {
+  mockShowNoteAccessory,
+  mockSdkService,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 
@@ -16,7 +19,7 @@ vitest.mock("vue-router", () => ({
 }))
 
 let renderer: RenderingHelper<typeof AssimilationPage>
-const mockedGetNoteCall = vi.fn()
+let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -25,45 +28,25 @@ afterEach(() => {
 mockBrowserTimeZone("Europe/Amsterdam", beforeEach, afterEach)
 
 beforeEach(() => {
-  vi.spyOn(sdk, "assimilating").mockResolvedValue({
-    data: [],
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
+  mockSdkService("assimilating", [])
+  mockSdkService("getNoteInfo", {
+    note: makeMe.aNoteRealm.please(),
+    createdAt: "",
   })
-  vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
-    data: {} as never,
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
-  })
-  vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
-    const result = await mockedGetNoteCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
+  showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
   mockShowNoteAccessory()
   renderer = helper.component(AssimilationPage).withStorageProps({})
 })
 
 describe("repeat page", () => {
   it("shows completion message when nothing to review", async () => {
-    vi.spyOn(sdk, "assimilating").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    const assimilatingSpy = mockSdkService("assimilating", [])
     const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
     await flushPromises()
     expect(wrapper.text()).toContain(
       "Congratulations! You've achieved your daily assimilation goal!"
     )
-    expect(vi.mocked(sdk.assimilating)).toBeCalledWith({
+    expect(assimilatingSpy).toBeCalledWith({
       query: { timezone: "Europe/Amsterdam" },
     })
   })
@@ -74,13 +57,8 @@ describe("repeat page", () => {
     const { note } = memoryTracker
 
     beforeEach(() => {
-      vi.spyOn(sdk, "assimilating").mockResolvedValue({
-        data: [note, note],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      mockedGetNoteCall.mockResolvedValue(noteRealm)
+      mockSdkService("assimilating", [note, note])
+      showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
     })
 
     it("normal view", async () => {
