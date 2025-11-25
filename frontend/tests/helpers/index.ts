@@ -59,7 +59,7 @@ export function mockShowNote(noteRealm?: NoteRealm) {
  * Wraps data in the standard SDK response format.
  * Useful for updating mocks that need to return different values.
  */
-function wrapSdkResponse<T>(data: T) {
+export function wrapSdkResponse<T>(data: T) {
   return {
     data,
     error: undefined,
@@ -71,6 +71,20 @@ function wrapSdkResponse<T>(data: T) {
     request: Request
     response: Response
   }
+}
+
+/**
+ * Wraps an error in the standard SDK response format.
+ * Useful for mocking error responses in tests.
+ */
+export function wrapSdkError(error: string | Record<string, unknown>) {
+  return {
+    data: undefined,
+    error,
+    request: {} as Request,
+    response: {} as Response,
+    // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+  } as any
 }
 
 /**
@@ -143,4 +157,4 @@ export function mockSdkServiceWithImplementation<K extends SdkServiceName>(
 }
 
 export default new StoredComponentTestHelper()
-export { matchByText, wrapSdkResponse }
+export { matchByText }

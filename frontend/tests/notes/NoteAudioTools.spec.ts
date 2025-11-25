@@ -7,6 +7,7 @@ import helper, {
   mockSdkService,
   mockSdkServiceWithImplementation,
   wrapSdkResponse,
+  wrapSdkError,
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
@@ -641,13 +642,7 @@ describe("NoteAudioTools", () => {
 
       audioToTextMock
         .mockResolvedValueOnce(wrapSdkResponse(mockResponse))
-        .mockResolvedValueOnce({
-          data: undefined,
-          error: "API Error",
-          request: {} as Request,
-          response: {} as Response,
-          // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
-        } as any)
+        .mockResolvedValueOnce(wrapSdkError("API Error"))
         .mockResolvedValueOnce(wrapSdkResponse(mockResponse))
 
       // First successful call

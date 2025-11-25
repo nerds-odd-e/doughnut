@@ -3,7 +3,11 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkResponse,
+  wrapSdkError,
+} from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
@@ -88,12 +92,7 @@ describe("repeat page", () => {
         "askAQuestion",
         makeMe.aRecallPrompt.please()
       )
-      askAQuestionSpy.mockResolvedValueOnce({
-        data: undefined,
-        error: "API Error",
-        request: {} as Request,
-        response: {} as Response,
-      })
+      askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
       recallingSpy.mockResolvedValue(
         wrapSdkResponse(
           makeMe.aDueMemoryTrackersList

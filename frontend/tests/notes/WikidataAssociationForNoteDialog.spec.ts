@@ -1,7 +1,11 @@
 import WikidataAssociationForNoteDialog from "@/components/notes/WikidataAssociationForNoteDialog.vue"
 import { flushPromises } from "@vue/test-utils"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkResponse,
+  wrapSdkError,
+} from "@tests/helpers"
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -187,13 +191,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       const error = {
         message: "The wikidata service is not available",
       }
-      fetchWikidataEntitySpy.mockResolvedValue({
-        data: undefined,
-        error: error.message,
-        request: {} as Request,
-        response: {} as Response,
-        // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
-      } as any)
+      fetchWikidataEntitySpy.mockResolvedValue(wrapSdkError(error.message))
 
       const wrapper = await inputWikidataIdAndSave(note, wikidataId)
       await flushPromises()
@@ -211,13 +209,7 @@ describe("WikidataAssociationForNoteDialog", () => {
       const wikidata = makeMe.aWikidataEntity.wikidataTitle("dog").please()
       fetchWikidataEntitySpy.mockResolvedValue(wrapSdkResponse(wikidata))
       const error = { wikidataId: "Duplicate Wikidata ID Detected." }
-      updateWikidataIdSpy.mockResolvedValue({
-        data: undefined,
-        error: { errors: error },
-        request: {} as Request,
-        response: {} as Response,
-        // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
-      } as any)
+      updateWikidataIdSpy.mockResolvedValue(wrapSdkError({ errors: error }))
 
       const wrapper = await inputWikidataIdAndSave(note, wikidataId)
       await flushPromises()

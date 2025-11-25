@@ -1,6 +1,10 @@
 import RecallPromptComponent from "@/components/review/RecallPromptComponent.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkResponse,
+  wrapSdkError,
+} from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 
 describe("RecallPromptComponent", () => {
@@ -76,13 +80,7 @@ describe("RecallPromptComponent", () => {
         makeMe.anAnsweredQuestion.answerCorrect(true).please()
       )
       answerQuizSpy
-        .mockResolvedValueOnce({
-          data: undefined,
-          error: "API Error",
-          request: {} as Request,
-          response: {} as Response,
-          // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
-        } as any)
+        .mockResolvedValueOnce(wrapSdkError("API Error"))
         .mockResolvedValueOnce(
           wrapSdkResponse(
             makeMe.anAnsweredQuestion.answerCorrect(true).please()

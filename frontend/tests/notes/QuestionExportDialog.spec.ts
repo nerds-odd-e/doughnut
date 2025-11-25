@@ -1,5 +1,5 @@
 import { describe, it, vi, expect, beforeEach } from "vitest"
-import helper, { mockSdkService } from "../helpers"
+import helper, { mockSdkService, wrapSdkError } from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { waitFor } from "@testing-library/vue"
@@ -53,13 +53,7 @@ describe("QuestionExportDialog", () => {
       request: { model: "gpt-4", messages: [] },
       title: "Test Note",
     } as never)
-    spy.mockResolvedValue({
-      data: undefined,
-      error: "API Error",
-      request: {} as Request,
-      response: {} as Response,
-      // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
-    } as any)
+    spy.mockResolvedValue(wrapSdkError("API Error"))
 
     const { getByTestId } = helper
       .component(QuestionExportDialog)
