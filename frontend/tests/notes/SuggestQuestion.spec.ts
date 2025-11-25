@@ -4,7 +4,6 @@ import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("SuggestQuestion", () => {
   describe("suggest question for fine tuning AI", () => {
@@ -21,11 +20,14 @@ describe("SuggestQuestion", () => {
     })
 
     it("should be able to suggest a question as good example", async () => {
-      mockSdkService("suggestQuestionForFineTuning", undefined)
+      const suggestQuestionSpy = mockSdkService(
+        "suggestQuestionForFineTuning",
+        undefined
+      )
       wrapper.get(".negative-feedback-btn").trigger("click")
       wrapper.get("button.daisy-btn-success").trigger("click")
       await flushPromises()
-      expect(sdk.suggestQuestionForFineTuning).toBeCalledWith({
+      expect(suggestQuestionSpy).toBeCalledWith({
         path: { predefinedQuestion: predefinedQuestion.id },
         body: {
           comment: "",
