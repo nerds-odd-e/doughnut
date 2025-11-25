@@ -2,9 +2,9 @@ import NoteTextContent from "@/components/notes/core/NoteTextContent.vue"
 import type { Note } from "@generated/backend"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
+import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 
 const mockedUpdateTitleCall = vi.fn()
 
@@ -26,14 +26,8 @@ describe("in place edit on title", () => {
   beforeEach(() => {
     vi.resetAllMocks()
     vi.useFakeTimers()
-    vi.spyOn(sdk, "updateNoteTitle").mockImplementation(async (options) => {
-      const result = await mockedUpdateTitleCall(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
+    mockSdkServiceWithImplementation("updateNoteTitle", async (options) => {
+      return await mockedUpdateTitleCall(options)
     })
   })
 

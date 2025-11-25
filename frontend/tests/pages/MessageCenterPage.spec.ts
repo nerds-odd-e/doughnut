@@ -1,6 +1,6 @@
 import MessageCenterPage from "@/pages/MessageCenterPage.vue"
 import { describe, it, expect } from "vitest"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { fireEvent } from "@testing-library/vue"
 import { useRouter } from "vue-router"
@@ -16,24 +16,14 @@ vitest.mock("vue-router", () => ({
 
 describe("MessageCenterPage", () => {
   it("fetch API to be called ONCE on mount", async () => {
-    vi.spyOn(sdk, "getConversationsOfCurrentUser").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsOfCurrentUser", [])
     helper.component(MessageCenterPage).withStorageProps({}).render()
     expect(sdk.getConversationsOfCurrentUser).toBeCalledTimes(1)
   })
 
   it("should render no conversation selected by default", async () => {
     const conversation = makeMe.aConversation.please()
-    vi.spyOn(sdk, "getConversationsOfCurrentUser").mockResolvedValue({
-      data: [conversation],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getConversationsOfCurrentUser", [conversation])
     const { findByText } = helper
       .component(MessageCenterPage)
       .withStorageProps({})
@@ -47,12 +37,7 @@ describe("MessageCenterPage", () => {
       makeMe.aConversation.please(),
     ]
     beforeEach(() => {
-      vi.spyOn(sdk, "getConversationsOfCurrentUser").mockResolvedValue({
-        data: conversations,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getConversationsOfCurrentUser", conversations)
     })
 
     it("should highlight the selected conversation", async () => {
