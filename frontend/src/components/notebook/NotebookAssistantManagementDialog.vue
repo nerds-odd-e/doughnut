@@ -34,6 +34,7 @@ import TextInput from "../form/TextInput.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
+  closer: { type: Function as PropType<() => void>, required: false },
 })
 
 const additionalInstruction = ref("")
@@ -49,6 +50,9 @@ const updateAiInstructions = async () => {
   })
   if (!error) {
     // Success - handled by global interceptor
+    if (props.closer) {
+      props.closer()
+    }
   }
 }
 
