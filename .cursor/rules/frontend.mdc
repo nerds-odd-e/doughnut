@@ -254,18 +254,39 @@ if (error) {
    - Avoid testing implementation details
    - Use data-testid for test selectors
 
-2. Minimal Mocking
-   - Mock only external dependencies (API calls)
-   - Use real component instances when possible
-   - Mock services directly from `@generated/backend/sdk.gen`:
-   ```typescript
-   import * as sdk from "@generated/backend/sdk.gen"
+2. **Mocking SDK Services**
+   - Use `mockSdkService` from `@tests/helpers` for type-safe mocking
+   - Automatically wraps responses in the standard format `{ data, error, request, response }`
+   - Returns a spy that can be reconfigured in tests
+   - Use `wrapSdkResponse` when updating mock return values
+   - Only use `mockSdkServiceWithImplementation` for custom async logic based on options
    
-   vi.spyOn(sdk, "getUserProfile").mockResolvedValue({
-     data: makeMe.aUser.please(),
-     error: undefined,
-     request: {} as Request,
-     response: {} as Response,
+   **Simple mocking:**
+   ```typescript
+   import { mockSdkService } from "@tests/helpers"
+   
+   beforeEach(() => {
+     mockSdkService("getRecentNotes", [])
+     mockSdkService("showNote", makeMe.aNoteRealm.please())
+   })
+   ```
+   
+   **Reconfiguring mocks in tests:**
+   ```typescript
+   import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+   
+   const spy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+   // Later in test:
+   spy.mockResolvedValue(wrapSdkResponse(differentNote))
+   ```
+   
+   **Custom implementation (only when needed):**
+   ```typescript
+   import { mockSdkServiceWithImplementation } from "@tests/helpers"
+   
+   mockSdkServiceWithImplementation("updateNoteDetails", async (options) => {
+     // Custom logic based on options
+     return await someAsyncOperation(options)
    })
    ```
 
