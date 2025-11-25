@@ -250,4 +250,66 @@ describe("NoteEditableDetails", () => {
 
     vi.useRealTimers()
   })
+
+  it("should preserve second edit when first save response arrives after second edit", async () => {
+    // Bug: When user edits, saves, then edits again before save completes,
+    // the content gets reverted to the first edit value when the save response arrives
+    const noteId = 1
+    let resolveFirstSave: (() => void) | undefined
+    const firstSavePromise = new Promise<void>((resolve) => {
+      resolveFirstSave = resolve
+    })
+
+    mockedUpdateDetailsCall.mockImplementation(async (options) => {
+      if (options.body.details === "First edit") {
+        await firstSavePromise
+        // After promise resolves, update prop before changerInner completes
+        // This simulates the store update happening
+      }
+      return {
+        id: noteId,
+        note: {
+          id: noteId,
+          details: options.body.details,
+          noteTopology: { id: noteId, titleOrPredicate: "Test Note" },
+        },
+      }
+    })
+
+    const wrapper = helper
+      .component(NoteEditableDetails)
+      .withStorageProps({
+        noteId,
+        noteDetails: "Original",
+        readonly: false,
+        asMarkdown: true,
+      })
+      .mount()
+
+    await flushPromises()
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+
+    // First edit and save
+    detailsEl.value = "First edit"
+    detailsEl.dispatchEvent(new Event("input"))
+    detailsEl.dispatchEvent(new Event("blur"))
+    await flushPromises()
+
+    // Second edit while first save is pending
+    detailsEl.value = "Second edit"
+    detailsEl.dispatchEvent(new Event("input"))
+    await flushPromises()
+    expect(detailsEl.value).toBe("Second edit")
+
+    // First save completes - this triggers store update which changes prop
+    // The bug: prop change happens, but lastSavedValue hasn't been updated yet
+    // because changerInner is still running, so the watch incorrectly resets the value
+    resolveFirstSave!()
+    // Simulate prop update from store refresh (happens before changerInner sets lastSavedValue)
+    await wrapper.setProps({ noteDetails: "First edit" })
+    await flushPromises()
+
+    // Bug: Should still show "Second edit" but shows "First edit"
+    expect(detailsEl.value).toBe("Second edit")
+  })
 })

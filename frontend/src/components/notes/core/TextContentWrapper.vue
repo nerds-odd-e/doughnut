@@ -32,18 +32,24 @@ const { storageAccessor, field, value } = defineProps({
 
 const savedVersion = ref(0)
 const lastSavedValue = ref(value)
+const pendingSaveValues = new Set<string>()
 const changerInner = async (
   noteId: number,
   newValue: string,
   version: number,
   errorHander: (errs: unknown) => void
 ) => {
-  await storageAccessor
-    .storedApi()
-    .updateTextField(noteId, field, newValue)
-    .catch(errorHander)
-  savedVersion.value = version
-  lastSavedValue.value = newValue
+  pendingSaveValues.add(newValue)
+  try {
+    await storageAccessor
+      .storedApi()
+      .updateTextField(noteId, field, newValue)
+      .catch(errorHander)
+    savedVersion.value = version
+    lastSavedValue.value = newValue
+  } finally {
+    pendingSaveValues.delete(newValue)
+  }
 }
 // Debounced executor for auto-save
 const changer = debounce(changerInner, 1000)
@@ -100,6 +106,10 @@ watch(
   (newValue) => {
     if (version.value !== savedVersion.value) {
       // There are unsaved changes
+      // If the incoming value matches a pending save, ignore it to preserve newer edits
+      if (newValue !== undefined && pendingSaveValues.has(newValue)) {
+        return
+      }
       // Check if this is navigation to a different note or just API returning with saved value
       if (newValue !== localValue.value && newValue !== lastSavedValue.value) {
         // The incoming value is different from both current and last saved value
@@ -109,9 +119,12 @@ watch(
         localValue.value = newValue
         lastSavedValue.value = newValue
       }
-      // Otherwise, keep the unsaved changes (API returning with old value during typing)
+      // Otherwise, keep the unsaved changes
+      // This handles the case where API returns with a previously saved value
+      // but user has made newer edits that haven't been saved yet
       return
     }
+    // No unsaved changes, update to match the prop
     localValue.value = newValue
     lastSavedValue.value = newValue
   }
