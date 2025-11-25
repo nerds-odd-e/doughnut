@@ -61,8 +61,12 @@ describe("RecallPromptComponent", () => {
       vi.runAllTimers()
       await flushPromises()
 
-      // Verify loading state is removed after response
-      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(false)
+      // Verify loading spinner is removed after response
+      expect(
+        wrapper.find(".daisy-loading.daisy-loading-spinner").exists()
+      ).toBe(false)
+      // The gray overlay should remain visible after answering (isAnswered stays true)
+      expect(wrapper.find(".daisy-absolute.daisy-inset-0").exists()).toBe(true)
     })
 
     it("allows retrying on API error", async () => {
