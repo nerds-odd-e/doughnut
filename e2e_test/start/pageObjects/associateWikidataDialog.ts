@@ -45,6 +45,8 @@ export const assumeAssociateWikidataDialog = () => {
       withinModalContainer(() => {
         cy.findByRole('button', { name: 'Close' }).click()
       })
+      // Wait for the dialog to fully disappear
+      cy.findByText('Associate Wikidata').should('not.exist')
     },
 
     // Assertions
