@@ -4,6 +4,7 @@ const submittableForm = {
       const value = noteAttributes[propName]
       if (value) {
         cy.formField(propName).assignFieldValue(value)
+        cy.formField(propName).fieldShouldHaveValue(value)
       } else {
         cy.formField(propName).clear()
       }
