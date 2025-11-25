@@ -233,6 +233,17 @@ When(
   }
 )
 
+When(
+  'I attempt to create a note belonging to {string} with title {string} and wikidata id {string}',
+  (noteTopology: string, title: string, wikidataId: string) => {
+    mock_services.wikidata().stubWikidataSearchResult(title, wikidataId)
+    start
+      .jumpToNotePage(noteTopology)
+      .addingChildNote()
+      .createNoteWithTitleAndWikidataId(title, wikidataId)
+  }
+)
+
 When('I am creating a note under {notepath}', (notePath: NotePath) => {
   start.routerToNotebooksPage().navigateToPath(notePath).addingChildNote()
 })

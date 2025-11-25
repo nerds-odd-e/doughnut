@@ -14,7 +14,7 @@ Feature: Nested Note Create with wikidata
 
   @usingMockedWikidataService @mockBrowserTime
   Scenario: Create a new note with invalid wikidata id
-    When I create a note belonging to "Animals" with title "snake" and wikidata id "Q12345R"
+    When I attempt to create a note belonging to "Animals" with title "snake" and wikidata id "Q12345R"
     Then I should see an error "The wikidata Id should be Q<numbers>" on Wikidata Id in note creation
 
   @usingMockedWikidataService @mockBrowserTime
@@ -31,5 +31,5 @@ Feature: Nested Note Create with wikidata
     Given I have a notebook with head note "Star" and notes:
       | Title            | Wikidata Id| Parent Title|
       | Sun              | Q123       | Star        |
-    When I create a note belonging to "Star" with title "Solar" and wikidata id "Q123"
+    When I attempt to create a note belonging to "Star" with title "Solar" and wikidata id "Q123"
     Then I should see an error "Duplicate Wikidata ID Detected." on Wikidata Id in note creation
