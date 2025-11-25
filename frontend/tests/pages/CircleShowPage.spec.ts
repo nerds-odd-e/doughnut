@@ -4,7 +4,6 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("circle show page", () => {
   const currentUser = makeMe.aUser.please()
@@ -12,9 +11,10 @@ describe("circle show page", () => {
     .creator(currentUser.externalIdentifier)
     .please()
   const circleNote = makeMe.aCircleNote.notebooks(notebook).please()
+  let showCircleSpy: ReturnType<typeof mockSdkService<"showCircle">>
 
   beforeEach(() => {
-    mockSdkService("showCircle", circleNote)
+    showCircleSpy = mockSdkService("showCircle", circleNote)
   })
 
   it("fetch API to be called ONCE on mount", async () => {
@@ -23,7 +23,7 @@ describe("circle show page", () => {
       .withRouter()
       .withStorageProps({ circleId: circleNote.id })
       .render()
-    expect(sdk.showCircle).toBeCalledWith({
+    expect(showCircleSpy).toBeCalledWith({
       path: { circle: circleNote.id },
     })
   })
