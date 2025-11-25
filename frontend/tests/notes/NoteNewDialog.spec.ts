@@ -5,10 +5,7 @@ import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
 import { nextTick } from "vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-} from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -21,22 +18,19 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-const mockedSearch = vitest.fn()
-const mockedSearchWithin = vitest.fn()
+let searchForLinkTargetWithinSpy: ReturnType<
+  typeof mockSdkService<"searchForLinkTargetWithin">
+>
 let mockedCreateNote: ReturnType<typeof mockSdkService<"createNoteUnderParent">>
 
 describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    mockSdkServiceWithImplementation("searchForLinkTarget", async (options) => {
-      return await mockedSearch(options)
-    })
-    mockSdkServiceWithImplementation(
+    mockSdkService("searchForLinkTarget", [])
+    searchForLinkTargetWithinSpy = mockSdkService(
       "searchForLinkTargetWithin",
-      async (options) => {
-        return await mockedSearchWithin(options)
-      }
+      []
     )
     mockSdkService("semanticSearch", [])
     mockSdkService("semanticSearchWithin", [])
@@ -45,12 +39,7 @@ describe("adding new note", () => {
       created: makeMe.aNoteRealm.please(),
       parent: makeMe.aNoteRealm.please(),
     }
-    mockedCreateNote = mockSdkServiceWithImplementation(
-      "createNoteUnderParent",
-      async () => {
-        return createNoteResult
-      }
-    )
+    mockedCreateNote = mockSdkService("createNoteUnderParent", createNoteResult)
   })
 
   afterEach(() => {
@@ -61,7 +50,7 @@ describe("adding new note", () => {
   const note = makeMe.aNote.topicConstructor("mythical").please()
 
   it("does not search for initial default 'Untitled' title", async () => {
-    mockedSearchWithin.mockResolvedValue([])
+    searchForLinkTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
     helper
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -72,13 +61,13 @@ describe("adding new note", () => {
     await flushPromises()
 
     // Search should not be called for the initial "Untitled" title
-    expect(mockedSearchWithin).not.toHaveBeenCalled()
+    expect(searchForLinkTargetWithinSpy).not.toHaveBeenCalled()
   })
 
   it("searches when user edits title back to 'Untitled'", async () => {
-    mockedSearchWithin.mockResolvedValue([
-      { noteTopology: note.noteTopology, distance: 0.9 },
-    ])
+    searchForLinkTargetWithinSpy.mockResolvedValue(
+      wrapSdkResponse([{ noteTopology: note.noteTopology, distance: 0.9 }])
+    )
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -90,7 +79,7 @@ describe("adding new note", () => {
     await flushPromises()
 
     // Clear previous calls
-    mockedSearchWithin.mockClear()
+    searchForLinkTargetWithinSpy.mockClear()
 
     // Now change it back to "Untitled"
     await wrapper.find("input#note-title").setValue("Untitled")
@@ -98,16 +87,16 @@ describe("adding new note", () => {
     await flushPromises()
 
     // Search should be called when user edits back to "Untitled"
-    expect(mockedSearchWithin).toHaveBeenCalledWith({
+    expect(searchForLinkTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "Untitled" }),
     })
   })
 
   it("search for duplicate", async () => {
-    mockedSearchWithin.mockResolvedValue([
-      { noteTopology: note.noteTopology, distance: 0.9 },
-    ])
+    searchForLinkTargetWithinSpy.mockResolvedValue(
+      wrapSdkResponse([{ noteTopology: note.noteTopology, distance: 0.9 }])
+    )
     const wrapper = helper
       .component(NoteNewDialog)
       .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -118,7 +107,7 @@ describe("adding new note", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("mythical")
-    expect(mockedSearchWithin).toHaveBeenCalledWith({
+    expect(searchForLinkTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "myth" }),
     })
@@ -154,13 +143,11 @@ describe("adding new note", () => {
 
   describe("search wikidata entry", () => {
     let wrapper: VueWrapper<ComponentPublicInstance>
-    const mockedWikidataSearch = vitest.fn()
+    let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
 
     beforeEach(() => {
-      mockedSearchWithin.mockResolvedValue([])
-      mockSdkServiceWithImplementation("searchWikidata", async (options) => {
-        return await mockedWikidataSearch(options)
-      })
+      searchForLinkTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+      searchWikidataSpy = mockSdkService("searchWikidata", [])
       wrapper = helper
         .component(NoteNewDialog)
         .withStorageProps({ referenceNote: note, insertMode: "as-child" })
@@ -247,9 +234,9 @@ describe("adding new note", () => {
 
     it("opens dialog when clicking search button", async () => {
       const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
       await openWikidataDialog("dog")
-      expect(mockedWikidataSearch).toHaveBeenCalledWith({
+      expect(searchWikidataSpy).toHaveBeenCalledWith({
         query: { search: "dog" },
       })
       const dialog = document.querySelector(".modal-container")
@@ -258,7 +245,7 @@ describe("adding new note", () => {
 
     it("closes dialog when cancel is clicked", async () => {
       const searchResult = makeMe.aWikidataSearchEntity.label("dog").please()
-      mockedWikidataSearch.mockResolvedValue([searchResult])
+      searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
       await openWikidataDialog("dog")
 
       // Verify dialog is open
@@ -307,7 +294,7 @@ describe("adding new note", () => {
           .id(wikidataId)
           .please()
 
-        mockedWikidataSearch.mockResolvedValue([searchResult])
+        searchWikidataSpy.mockResolvedValue(wrapSdkResponse([searchResult]))
         await openWikidataDialog(searchTitle)
         await selectFromDropdown(wikidataId)
 
@@ -321,7 +308,7 @@ describe("adding new note", () => {
 
         await waitForDialogToClose()
 
-        expect(mockedWikidataSearch).toHaveBeenCalledWith({
+        expect(searchWikidataSpy).toHaveBeenCalledWith({
           query: { search: searchTitle },
         })
         expect((<HTMLInputElement>titleInput().element).value).toBe(
