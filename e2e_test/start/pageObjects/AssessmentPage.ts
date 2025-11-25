@@ -1,4 +1,5 @@
 import { CertificatePopup } from './CertificatePopup'
+import { assumeQuestionPage } from './QuizQuestionPage'
 
 const assumeWrongAnswerPage = () => {
   return {
@@ -23,47 +24,27 @@ const assumeWrongAnswerPage = () => {
 }
 
 const assumeQuestionSection = () => {
+  const questionPage = assumeQuestionPage()
   return {
-    getQuestionSection() {
-      return cy.get('[data-test="question-section"]')
-    },
-    getStemText() {
-      return this.getQuestionSection()
-        .get('[data-test="stem"]')
-        .first()
-        .invoke('text')
-    },
-    answerFirstOption() {
-      return this.getQuestionSection().find('button').first().click()
-    },
+    ...questionPage,
     answerFromTable(answersTable: Record<string, string>[]) {
-      return this.getStemText().then((stem) => {
+      return questionPage.getStemText().then((stem) => {
         const row = answersTable.find((row) => row.Question === stem)
         if (!row) {
           throw new Error(`No answer found for question: ${stem}`)
         }
         if (row.AnswerCorrect === 'true') {
-          this.answer(row.Answer!)
+          questionPage.answer(row.Answer!)
         } else {
           this.answerIncorrectAndContinue(row.Answer!)
         }
       })
     },
-    answer(answer: string) {
-      this.getQuestionSection()
-        .should('be.visible')
-        .within(() => {
-          cy.findByText(answer).should('be.visible').click()
-        })
-      cy.pageIsNotLoading()
-      return this
-    },
     answerIncorrectAndContinue(answer: string) {
-      this.answerIncorrectly(answer).continueAssessment()
-      return this
+      return this.answerIncorrectly(answer).continueAssessment()
     },
     answerIncorrectly(answer: string) {
-      this.answer(answer)
+      questionPage.answer(answer)
       return assumeWrongAnswerPage()
     },
   }

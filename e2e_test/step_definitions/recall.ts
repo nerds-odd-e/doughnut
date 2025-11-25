@@ -140,13 +140,8 @@ Then('I type my answer {string}', (answer: string) => {
   cy.replaceFocusedTextAndEnter(answer)
 })
 
-Then('I choose answer {string}', (noteTopology: string) => {
-  cy.findByRole('button', { name: noteTopology }).click()
-  // Wait for the answered overlay to disappear, indicating it moved to the next stage
-  // The gray overlay (daisy-bg-base-100/80) should disappear when the question moves to the next stage
-  cy.get('.daisy-relative .daisy-absolute.daisy-bg-base-100\\/80').should(
-    'not.exist'
-  )
+Then('I choose answer {string}', (answer: string) => {
+  start.assumeQuestionPage().answer(answer)
 })
 
 Then(
