@@ -1,17 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest"
+import { describe, it, expect, beforeEach } from "vitest"
 import { flushPromises } from "@vue/test-utils"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("SpellingQuestionDisplay", () => {
   beforeEach(() => {
-    vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
-      data: { stem: "Spell the word 'cat'" } as never,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
   })
 
   it("renders spelling question input form", async () => {

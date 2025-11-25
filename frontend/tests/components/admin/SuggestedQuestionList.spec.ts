@@ -1,10 +1,9 @@
 import SuggestedQuestionList from "@/components/admin/SuggestedQuestionList.vue"
 import { flushPromises } from "@vue/test-utils"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it } from "vitest"
 import usePopups from "@/components/commons/Popups/usePopups"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { matchByText } from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import helper, { matchByText, mockSdkService } from "@tests/helpers"
 
 describe("Edit Suggested Question", () => {
   describe("suggest question for fine tuning AI", () => {
@@ -49,12 +48,7 @@ describe("Edit Suggested Question", () => {
           .component(SuggestedQuestionList)
           .withProps({ suggestedQuestions: [suggestedQuestion] })
           .mount()
-        const mockDelete = vi.spyOn(sdk, "delete_").mockResolvedValue({
-          data: {} as never,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        const mockDelete = mockSdkService("delete_", undefined as never)
         matchByText(wrapper, /Del/, "button")!.trigger("click")
         usePopups().popups.done(true)
         await flushPromises()

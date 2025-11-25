@@ -1,6 +1,6 @@
 import { describe, it, vi, expect, beforeEach } from "vitest"
 import { flushPromises } from "@vue/test-utils"
-import helper from "../helpers"
+import helper, { mockSdkService } from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import Questions from "@/components/notes/Questions.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
@@ -27,12 +27,7 @@ describe("Questions", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.spyOn(sdk, "getAllQuestionByNote").mockResolvedValue({
-      data: questions as never,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getAllQuestionByNote", questions)
   })
 
   it("renders questions table when questions exist", async () => {
@@ -54,12 +49,7 @@ describe("Questions", () => {
       },
       title: "Test Note",
     } as never
-    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
-      data: exportData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("exportQuestionGeneration", exportData)
 
     const { getByLabelText, getByTestId } = helper
       .component(Questions)

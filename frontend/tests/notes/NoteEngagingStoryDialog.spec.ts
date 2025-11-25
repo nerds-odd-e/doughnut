@@ -1,18 +1,13 @@
 import AIGenerateImageDialog from "@/components/notes/AIGenerateImageDialog.vue"
 import { flushPromises } from "@vue/test-utils"
-import { expect, vi } from "vitest"
+import { expect } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import * as sdk from "@generated/backend/sdk.gen"
 
 const createWrapper = async () => {
   const note = makeMe.aNoteRealm.please()
-  vi.spyOn(sdk, "generateImage").mockResolvedValue({
-    data: { b64encoded: "This is an encoded image" },
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
-  })
+  mockSdkService("generateImage", { b64encoded: "This is an encoded image" })
   const wrapper = helper
     .component(AIGenerateImageDialog)
     .withStorageProps({ note: note.note })

@@ -1,5 +1,5 @@
 import { describe, it, vi, expect, beforeEach } from "vitest"
-import helper from "../helpers"
+import helper, { mockSdkService } from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { waitFor } from "@testing-library/vue"
@@ -28,12 +28,7 @@ describe("QuestionExportDialog", () => {
       },
       title: "Test Note",
     } as never
-    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
-      data: exportData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("exportQuestionGeneration", exportData)
 
     const { getByTestId } = helper
       .component(QuestionExportDialog)
@@ -54,7 +49,11 @@ describe("QuestionExportDialog", () => {
 
   it("displays error message when API call fails", async () => {
     const note = makeMe.aNote.please()
-    vi.spyOn(sdk, "exportQuestionGeneration").mockResolvedValue({
+    const spy = mockSdkService("exportQuestionGeneration", {
+      request: { model: "gpt-4", messages: [] },
+      title: "Test Note",
+    } as never)
+    spy.mockResolvedValue({
       data: undefined,
       error: "API Error",
       request: {} as Request,
