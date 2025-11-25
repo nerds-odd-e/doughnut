@@ -1,17 +1,10 @@
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
-import * as sdk from "@generated/backend/sdk.gen"
-import { vi } from "vitest"
 
 describe("NoteBookEditDialog.vue", () => {
   beforeEach(() => {
-    vi.spyOn(sdk, "getApprovalForNotebook").mockResolvedValue({
-      data: { approval: undefined },
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getApprovalForNotebook", { approval: undefined })
   })
 
   it("shows the current number of questions in assessment if set", () => {

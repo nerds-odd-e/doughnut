@@ -1,6 +1,6 @@
-import { describe, it, beforeEach, vi } from "vitest"
+import { describe, it, beforeEach } from "vitest"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
@@ -16,12 +16,7 @@ describe("assessment and certificate history page", () => {
   let wrapper
 
   beforeEach(() => {
-    vi.spyOn(sdk, "getMyAssessments").mockResolvedValue({
-      data: [assessmentForArt, assessmentForTech],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getMyAssessments", [assessmentForArt, assessmentForTech])
     wrapper = helper
       .component(AssessmentAndCertificateHistoryPage)
       .withCurrentUser(user)

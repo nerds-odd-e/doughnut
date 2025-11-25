@@ -1,6 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import * as sdk from "@generated/backend/sdk.gen"
 
@@ -23,24 +23,12 @@ describe("answered question page", () => {
 
     beforeEach(async () => {
       vitest.resetAllMocks()
-      vi.spyOn(sdk, "showQuestion").mockResolvedValue({
-        data: answeredQuestion,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "showNote").mockResolvedValue({
-        data: makeMe.aNoteRealm.please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "startConversationAboutRecallPrompt").mockResolvedValue({
-        data: makeMe.aConversation.withId(123).please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("showQuestion", answeredQuestion)
+      mockSdkService("showNote", makeMe.aNoteRealm.please())
+      mockSdkService(
+        "startConversationAboutRecallPrompt",
+        makeMe.aConversation.withId(123).please()
+      )
     })
 
     it("click on note when doing review", async () => {

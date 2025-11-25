@@ -1,7 +1,7 @@
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import { describe, it } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import * as sdk from "@generated/backend/sdk.gen"
@@ -12,12 +12,7 @@ describe("circle show page", () => {
   const circle2 = makeMe.aCircle.please()
 
   beforeEach(() => {
-    vi.spyOn(sdk, "index").mockResolvedValue({
-      data: [circle1, circle2],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("index", [circle1, circle2])
   })
 
   it("fetch API to be called ONCE on mount", async () => {

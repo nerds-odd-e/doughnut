@@ -1,8 +1,7 @@
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 import { vi } from "vitest"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("LinkNoteFinalize", () => {
   it("going back", async () => {
@@ -24,23 +23,11 @@ describe("LinkNoteFinalize", () => {
       linkNoteFinalize: vi.fn().mockResolvedValue(undefined),
       moveNote: vi.fn().mockResolvedValue(undefined),
     }
-    vi.spyOn(sdk, "linkNoteFinalize").mockImplementation(async (options) => {
-      const result = await storedApi.linkNoteFinalize(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
+    mockSdkServiceWithImplementation("linkNoteFinalize", async (options) => {
+      return await storedApi.linkNoteFinalize(options)
     })
-    vi.spyOn(sdk, "moveNote").mockImplementation(async (options) => {
-      const result = await storedApi.moveNote(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
+    mockSdkServiceWithImplementation("moveNote", async (options) => {
+      return await storedApi.moveNote(options)
     })
     const wrapper = helper
       .component(LinkNoteFinalize)
