@@ -5,7 +5,6 @@ import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
 import type { AssessmentQuestionInstance } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -24,8 +23,15 @@ describe("assessment page", () => {
       .forNotebook(notebook)
       .withQuestions([assessmentQuestionInstance])
       .please()
+    let generateAssessmentQuestionsSpy: ReturnType<
+      typeof mockSdkService<"generateAssessmentQuestions">
+    >
+
     beforeEach(() => {
-      mockSdkService("generateAssessmentQuestions", assessmentAttempt)
+      generateAssessmentQuestionsSpy = mockSdkService(
+        "generateAssessmentQuestions",
+        assessmentAttempt
+      )
     })
 
     it("calls API ONCE on mount", async () => {
@@ -33,7 +39,7 @@ describe("assessment page", () => {
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
         .render()
-      expect(sdk.generateAssessmentQuestions).toBeCalledTimes(1)
+      expect(generateAssessmentQuestionsSpy).toBeCalledTimes(1)
     })
 
     it("renders the questions", async () => {
@@ -77,6 +83,9 @@ describe("assessment page", () => {
       .withQuestions([quizQuestion_1, quizQuestion_2])
       .please()
     let answerQuestionSpy: ReturnType<typeof mockSdkService<"answerQuestion">>
+    let submitAssessmentResultSpy: ReturnType<
+      typeof mockSdkService<"submitAssessmentResult">
+    >
 
     beforeEach(() => {
       mockSdkService("generateAssessmentQuestions", assessmentAttempt)
@@ -84,7 +93,10 @@ describe("assessment page", () => {
       answerQuestionSpy
         .mockResolvedValueOnce(wrapSdkResponse(answerResult1))
         .mockResolvedValueOnce(wrapSdkResponse(answerResult2))
-      mockSdkService("submitAssessmentResult", assessmentAttempt)
+      submitAssessmentResultSpy = mockSdkService(
+        "submitAssessmentResult",
+        assessmentAttempt
+      )
     })
 
     it("should submit assessment result when answer all questions", async () => {
@@ -98,7 +110,7 @@ describe("assessment page", () => {
       ;(await wrapper.findByRole("button", { name: "answer3" })).click()
       await flushPromises()
 
-      expect(sdk.submitAssessmentResult).toBeCalledWith({
+      expect(submitAssessmentResultSpy).toBeCalledWith({
         path: { assessmentAttempt: assessmentAttempt.id },
       })
     })
