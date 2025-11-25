@@ -67,6 +67,9 @@ public class OpenAiApiHandler {
   }
 
   public Optional<ChatCompletion.Choice> chatCompletion(ChatCompletionCreateParams params) {
+    // Note: The SDK serializes params internally, so we can't easily clean the request
+    // before it's sent. The cleaning utility is available for export/debugging purposes.
+    // To fully clean requests sent to OpenAI, we would need to manually send HTTP requests.
     ChatCompletion response = officialClient.chat().completions().create(params);
     if (response == null || response.choices() == null || response.choices().isEmpty()) {
       return Optional.empty();
@@ -75,6 +78,9 @@ public class OpenAiApiHandler {
   }
 
   public Flowable<String> streamChatCompletion(ChatCompletionCreateParams params) {
+    // Note: The SDK serializes params internally, so we can't easily clean the request
+    // before it's sent. The cleaning utility is available for export/debugging purposes.
+    // To fully clean requests sent to OpenAI, we would need to manually send HTTP requests.
 
     return Flowable.create(
         emitter -> {

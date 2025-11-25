@@ -12,6 +12,7 @@ import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.openAiApis.OpenAiRequestCleaner;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -138,7 +139,11 @@ class PredefinedQuestionController {
       // Serialize the Body using ObjectMapper, which handles JsonField properly
       String jsonString = objectMapper.writeValueAsString(body);
       // Convert back to Map to ensure all non-empty fields are included
-      return objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+      Map<String, Object> requestMap =
+          objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+      // Clean the request by removing internal/useless fields before sending to OpenAI
+      OpenAiRequestCleaner cleaner = new OpenAiRequestCleaner(objectMapper);
+      return cleaner.cleanRequest(requestMap);
     } catch (Exception e) {
       throw new RuntimeException("Failed to serialize ChatCompletionCreateParams", e);
     }
