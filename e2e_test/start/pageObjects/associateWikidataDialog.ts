@@ -23,7 +23,9 @@ export const assumeAssociateWikidataDialog = () => {
     },
     selectResult(wikidataID: string) {
       withinModalContainer(() => {
-        cy.get(`[data-wikidata-id="${wikidataID}"]`).should('be.visible').click()
+        cy.get(`[data-wikidata-id="${wikidataID}"]`)
+          .should('be.visible')
+          .click()
       })
       return this
     },
