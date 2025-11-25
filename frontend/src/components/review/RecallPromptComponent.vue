@@ -5,7 +5,7 @@
         multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
       }"
       @answer="submitQuizAnswer($event)"
-      :key="`choice-${recallPrompt.id}`"
+      :key="recallPrompt.id"
       :disabled="isLoading"
     />
 

@@ -48,11 +48,6 @@ export default defineComponent({
     disabled: Boolean,
   },
   emits: ["answer"],
-  data() {
-    return {
-      answer: "" as string,
-    }
-  },
   methods: {
     handleInnerClick(event: Event) {
       // Prevent any link clicks from navigating
@@ -69,14 +64,6 @@ export default defineComponent({
     },
     async submitAnswer(answerData: AnswerDto) {
       this.$emit("answer", answerData)
-
-      // This ensures that any tapped button is blurred
-      this.$nextTick(() => {
-        const active = document.activeElement
-        if (active instanceof HTMLElement) {
-          active.blur()
-        }
-      })
     },
     getChoiceHtml(choice: string) {
       return markdownizer.markdownToHtml(choice)
