@@ -9,7 +9,7 @@
       :disabled="isLoading || isAnswered"
     />
 
-    <div v-if="isAnswered" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-z-50">
+    <div v-if="isAnswered" data-test="answered-overlay" class="daisy-absolute daisy-inset-0 daisy-bg-base-100/80 daisy-z-50">
       <div v-if="isLoading" class="daisy-flex daisy-justify-center daisy-items-center daisy-h-full">
         <span class="daisy-loading daisy-loading-spinner daisy-loading-lg"></span>
       </div>

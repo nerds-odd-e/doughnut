@@ -67,11 +67,7 @@ const assumeQuestionPage = (stem?: string) => {
         })
       cy.pageIsNotLoading()
       // Wait for the answered overlay to disappear, indicating it moved to the next stage
-      // The gray overlay (daisy-bg-base-100/80) should disappear when the question moves to the next stage
-      // This check is safe for both recall and assessment flows - if overlay doesn't exist, it passes immediately
-      cy.get('.daisy-relative .daisy-absolute.daisy-bg-base-100\\/80', {
-        timeout: 5000,
-      }).should('not.exist')
+      cy.get('[data-test="answered-overlay"]').should('not.exist')
       return this
     },
   }
