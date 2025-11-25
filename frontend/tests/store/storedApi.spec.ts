@@ -1,7 +1,7 @@
 import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
-import { mockSdkServiceWithImplementation } from "@tests/helpers"
+import { mockSdkService } from "@tests/helpers"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
@@ -11,43 +11,36 @@ describe("storedApiCollection", () => {
   const sa = storageAccessor.storedApi()
 
   describe("delete note", () => {
-    let deleteNote
+    let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
 
     beforeEach(() => {
-      deleteNote = vi.fn().mockResolvedValue([note])
-      mockSdkServiceWithImplementation("deleteNote", async (options) => {
-        return await deleteNote(options)
-      })
+      deleteNoteSpy = mockSdkService("deleteNote", [note])
     })
 
     it("should call the api", async () => {
       await sa.deleteNote(router, note.id)
-      expect(deleteNote).toHaveBeenCalledTimes(1)
-      expect(deleteNote).toHaveBeenCalledWith({ path: { note: note.id } })
+      expect(deleteNoteSpy).toHaveBeenCalledTimes(1)
+      expect(deleteNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
       expect(routerReplace).toHaveBeenCalledTimes(1)
     })
   })
 
   describe("completeDetails", () => {
-    let updateNoteDetails
-    let showNote
+    let updateNoteDetailsSpy: ReturnType<
+      typeof mockSdkService<"updateNoteDetails">
+    >
+    let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
     let noteRef
 
     beforeEach(() => {
-      updateNoteDetails = vi.fn().mockResolvedValue(note)
-      showNote = vi.fn().mockResolvedValue(note)
-      mockSdkServiceWithImplementation("updateNoteDetails", async (options) => {
-        return await updateNoteDetails(options)
-      })
-      mockSdkServiceWithImplementation("showNote", async (options) => {
-        return await showNote(options)
-      })
+      updateNoteDetailsSpy = mockSdkService("updateNoteDetails", note)
+      showNoteSpy = mockSdkService("showNote", note)
       noteRef = storageAccessor.refOfNoteRealm(note.id)
     })
 
     it("should do nothing when no completion value is provided", async () => {
       await sa.completeDetails(note.id)
-      expect(updateNoteDetails).not.toHaveBeenCalled()
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
     })
 
     it("should update note details with completion", async () => {
@@ -58,7 +51,7 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 0,
       })
 
-      expect(updateNoteDetails).toHaveBeenCalledWith({
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           details: "Hello world!",
@@ -74,7 +67,7 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 5,
       })
 
-      expect(updateNoteDetails).toHaveBeenCalledWith({
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           details: "Hello !",
@@ -90,8 +83,8 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 0,
       })
 
-      expect(showNote).toHaveBeenCalledWith({ path: { note: note.id } })
-      expect(updateNoteDetails).toHaveBeenCalledWith({
+      expect(showNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
           details: "<p>Desc</p>world!",

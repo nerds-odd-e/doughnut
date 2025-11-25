@@ -2,10 +2,7 @@ import MainMenu from "@/components/toolbars/MainMenu.vue"
 import type { User } from "@generated/backend"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, {
-  mockSdkService,
-  mockSdkServiceWithImplementation,
-} from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { beforeEach, vi } from "vitest"
@@ -124,22 +121,11 @@ describe("main menu", () => {
     })
 
     it("fetches due count when user changes", async () => {
-      const mockGetCount = vitest.fn().mockResolvedValue({
-        data: {
-          dueCount: 3,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      const getAssimilationCountSpy = mockSdkService("getAssimilationCount", {
+        dueCount: 3,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
-      mockSdkServiceWithImplementation(
-        "getAssimilationCount",
-        async (options) => {
-          return await mockGetCount(options)
-        }
-      )
 
       mockSdkService("overview", {
         toRepeatCount: 0,
@@ -159,26 +145,15 @@ describe("main menu", () => {
       await rerender({ user: newUser })
       await flushPromises()
 
-      expect(mockGetCount).toHaveBeenCalledTimes(2)
+      expect(getAssimilationCountSpy).toHaveBeenCalledTimes(2)
     })
 
     it("calls getAssimilationCount with the correct timezone", async () => {
-      const mockGetCount = vitest.fn().mockResolvedValue({
-        data: {
-          dueCount: 3,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      const getAssimilationCountSpy = mockSdkService("getAssimilationCount", {
+        dueCount: 3,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
-      mockSdkServiceWithImplementation(
-        "getAssimilationCount",
-        async (options) => {
-          return await mockGetCount(options)
-        }
-      )
 
       mockSdkService("overview", {
         toRepeatCount: 0,
@@ -191,7 +166,7 @@ describe("main menu", () => {
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
-      expect(mockGetCount).toHaveBeenCalledWith({
+      expect(getAssimilationCountSpy).toHaveBeenCalledWith({
         query: { timezone: timezoneParam() },
       })
     })
@@ -244,18 +219,10 @@ describe("main menu", () => {
     })
 
     it("fetches recall count when user changes", async () => {
-      const mockGetOverview = vitest.fn().mockResolvedValue({
-        data: {
-          toRepeatCount: 3,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      mockSdkServiceWithImplementation("overview", async (options) => {
-        return await mockGetOverview(options)
+      const overviewSpy = mockSdkService("overview", {
+        toRepeatCount: 3,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
       mockSdkService("getAssimilationCount", {
@@ -276,8 +243,8 @@ describe("main menu", () => {
       await rerender({ user: newUser })
       await flushPromises()
 
-      expect(mockGetOverview).toHaveBeenCalledTimes(2)
-      expect(mockGetOverview).toHaveBeenCalledWith({
+      expect(overviewSpy).toHaveBeenCalledTimes(2)
+      expect(overviewSpy).toHaveBeenCalledWith({
         query: { timezone: timezoneParam() },
       })
     })
