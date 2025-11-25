@@ -1,28 +1,12 @@
-import { describe, it, expect, beforeEach, vi } from "vitest"
+import { describe, it, expect, beforeEach } from "vitest"
 import RecentPage from "@/pages/RecentPage.vue"
-import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
+import helper, { mockSdkService } from "@tests/helpers"
 
 describe("RecentPage.vue", () => {
   beforeEach(() => {
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "getRecentMemoryTrackers").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
-    vi.spyOn(sdk, "getRecentlyReviewed").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getRecentNotes", [])
+    mockSdkService("getRecentMemoryTrackers", [])
+    mockSdkService("getRecentlyReviewed", [])
   })
   describe("Tab Navigation", () => {
     it("shows Recently Added/Updated tab by default", async () => {

@@ -1,23 +1,21 @@
 import NoteEditableDetails from "@/components/notes/core/NoteEditableDetails.vue"
 import { VueWrapper, flushPromises } from "@vue/test-utils"
 import type { ComponentPublicInstance } from "vue"
-import helper from "@tests/helpers"
-import * as sdk from "@generated/backend/sdk.gen"
-
-const mockedUpdateDetailsCall = vi.fn()
+import { vi } from "vitest"
+import makeMe from "@tests/fixtures/makeMe"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 
 describe("NoteEditableDetails", () => {
+  let updateNoteDetailsSpy: ReturnType<
+    typeof mockSdkService<"updateNoteDetails">
+  >
+
   beforeEach(() => {
     vi.resetAllMocks()
-    vi.spyOn(sdk, "updateNoteDetails").mockImplementation(async (options) => {
-      const result = await mockedUpdateDetailsCall(options)
-      return {
-        data: result,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      }
-    })
+    updateNoteDetailsSpy = mockSdkService(
+      "updateNoteDetails",
+      makeMe.aNoteRealm.please()
+    )
   })
 
   it("should not save previous note's details to the new note when navigating", async () => {
@@ -54,7 +52,7 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    const calls = mockedUpdateDetailsCall.mock.calls
+    const calls = updateNoteDetailsSpy.mock.calls
     expect(
       calls.some(
         (call) =>
@@ -130,7 +128,7 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    expect(mockedUpdateDetailsCall).toHaveBeenCalledWith({
+    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
       path: { note: noteId },
       body: { details: "Edited details" },
     })
@@ -157,7 +155,7 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    expect(mockedUpdateDetailsCall).toHaveBeenCalledWith({
+    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
       path: { note: firstNoteId },
       body: { details: "Edited details" },
     })
@@ -189,7 +187,7 @@ describe("NoteEditableDetails", () => {
     vi.advanceTimersByTime(1000)
     await flushPromises()
 
-    expect(mockedUpdateDetailsCall).toHaveBeenCalledWith({
+    expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
       path: { note: noteId },
       body: { details: "Edited details" },
     })
@@ -205,18 +203,19 @@ describe("NoteEditableDetails", () => {
       resolveFirstSave = resolve
     })
 
-    mockedUpdateDetailsCall.mockImplementation(async (options) => {
+    // @ts-expect-error - Complex return type that matches at runtime
+    updateNoteDetailsSpy.mockImplementation(async (options) => {
       if (options.body.details === "First edit") {
         await firstSavePromise
       }
-      return {
+      return wrapSdkResponse({
         id: noteId,
         note: {
           id: noteId,
           details: options.body.details,
           noteTopology: { id: noteId, titleOrPredicate: "Test Note" },
         },
-      }
+      })
     })
 
     const wrapper = helper

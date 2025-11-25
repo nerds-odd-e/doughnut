@@ -3,11 +3,10 @@ import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { useRouter } from "vue-router"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -22,7 +21,7 @@ vitest.mock("vue-router", () => ({
 useRouter().currentRoute.value.name = "recall"
 
 let renderer: RenderingHelper<typeof RecallPage>
-const mockedRepeatCall = vi.fn()
+let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
 
 let teleportTarget: HTMLDivElement
 
@@ -37,27 +36,12 @@ afterEach(() => {
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  vi.spyOn(sdk, "showNote").mockResolvedValue({
-    data: makeMe.aNoteRealm.please(),
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
-  })
-  vi.spyOn(sdk, "recalling").mockImplementation(async (options) => {
-    const result = await mockedRepeatCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
-  vi.spyOn(sdk, "getSpellingQuestion").mockResolvedValue({
-    data: { stem: "Spell the word 'cat'" } as never,
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
-  })
+  mockSdkService("showNote", makeMe.aNoteRealm.please())
+  recallingSpy = mockSdkService(
+    "recalling",
+    makeMe.aDueMemoryTrackersList.please()
+  )
+  mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
   renderer = helper
     .component(RecallPage)
     .withStorageProps({ eagerFetchCount: 1 })
@@ -82,9 +66,9 @@ describe("repeat page", () => {
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueMemoryTrackersList.please()
-    mockedRepeatCall.mockResolvedValue(repetition)
+    recallingSpy.mockResolvedValue(wrapSdkResponse(repetition))
     await mountPage()
-    expect(vi.spyOn(sdk, "recalling")).toHaveBeenCalledWith({
+    expect(recallingSpy).toHaveBeenCalledWith({
       query: {
         timezone: "Asia/Shanghai",
         dueindays: 0,
@@ -95,50 +79,38 @@ describe("repeat page", () => {
   describe('repeat page with "just review" quiz', () => {
     const firstMemoryTrackerId = 123
     const secondMemoryTrackerId = 456
-    const mockedRandomQuestionCall = vi.fn()
+    let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please(),
-        error: undefined,
+      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      askAQuestionSpy = mockSdkService(
+        "askAQuestion",
+        makeMe.aRecallPrompt.please()
+      )
+      askAQuestionSpy.mockResolvedValueOnce({
+        data: undefined,
+        error: "API Error",
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
-        try {
-          const result = await mockedRandomQuestionCall(options)
-          return {
-            data: result,
-            error: undefined,
-            request: {} as Request,
-            response: {} as Response,
-          }
-        } catch (error) {
-          return {
-            data: undefined,
-            error: error instanceof Error ? error.message : String(error),
-            request: {} as Request,
-            response: {} as Response,
-          }
-        }
-      })
-      mockedRandomQuestionCall.mockRejectedValueOnce(makeMe.anApiError.please())
-      mockedRepeatCall.mockResolvedValue(
-        makeMe.aDueMemoryTrackersList
-          .toRepeat([
-            createMemoryTrackerLite(firstMemoryTrackerId),
-            createMemoryTrackerLite(secondMemoryTrackerId),
-            createMemoryTrackerLite(3),
-          ])
-          .please()
+      recallingSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aDueMemoryTrackersList
+            .toRepeat([
+              createMemoryTrackerLite(firstMemoryTrackerId),
+              createMemoryTrackerLite(secondMemoryTrackerId),
+              createMemoryTrackerLite(3),
+            ])
+            .please()
+        )
       )
     })
 
     it("shows the progress", async () => {
       await mountPage()
       expect(teleportTarget.textContent).toContain("0/3")
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
+      expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: firstMemoryTrackerId },
         })
@@ -147,20 +119,12 @@ describe("repeat page", () => {
 
     it("should show progress", async () => {
       const wrapper = await mountPage()
-      const answerResult = makeMe.anAnsweredQuestion
-        .withRecallPromptId(1)
-        .answerCorrect(false)
-        .please()
-      const mockedMarkAsRepeatedCall = vi
-        .spyOn(sdk, "markAsRepeated")
-        .mockResolvedValue({
-          data: answerResult as never,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+      const mockedMarkAsRepeatedCall = mockSdkService(
+        "markAsRepeated",
+        makeMe.aMemoryTracker.please()
+      )
       const recallPrompt = makeMe.aRecallPrompt.please()
-      mockedRandomQuestionCall.mockResolvedValueOnce(recallPrompt)
+      askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
       vi.runOnlyPendingTimers()
       await flushPromises()
       await wrapper.find("button.daisy-btn-primary").trigger("click")
@@ -170,7 +134,7 @@ describe("repeat page", () => {
       })
       await flushPromises()
       expect(teleportTarget.textContent).toContain("1/3")
-      expect(mockedRandomQuestionCall).toHaveBeenCalledWith(
+      expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: secondMemoryTrackerId },
         })
@@ -208,30 +172,18 @@ describe("repeat page", () => {
 
   describe('repeat page with "spelling" quiz', () => {
     const firstMemoryTrackerId = 123
-    const mockedRandomQuestionCall = vi.fn()
 
     beforeEach(() => {
       vi.useFakeTimers()
-      vi.spyOn(sdk, "showMemoryTracker").mockResolvedValue({
-        data: makeMe.aMemoryTracker.please(),
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      vi.spyOn(sdk, "askAQuestion").mockImplementation(async (options) => {
-        const result = await mockedRandomQuestionCall(options)
-        return {
-          data: result,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        }
-      })
+      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
 
-      mockedRepeatCall.mockResolvedValue(
-        makeMe.aDueMemoryTrackersList
-          .toRepeat([createMemoryTrackerLite(firstMemoryTrackerId, true)])
-          .please()
+      recallingSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aDueMemoryTrackersList
+            .toRepeat([createMemoryTrackerLite(firstMemoryTrackerId, true)])
+            .please()
+        )
       )
     })
 
@@ -244,14 +196,10 @@ describe("repeat page", () => {
         isCorrect: false,
       }
 
-      const mockedAnswerSpellingCall = vi
-        .spyOn(sdk, "answerSpelling")
-        .mockResolvedValue({
-          data: answerResult,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+      const mockedAnswerSpellingCall = mockSdkService(
+        "answerSpelling",
+        answerResult
+      )
 
       const wrapper = await mountPage()
       await flushPromises()

@@ -2,19 +2,22 @@ import Assimilation from "@/components/review/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockShowNoteAccessory } from "@tests/helpers"
+import helper, {
+  mockShowNoteAccessory,
+  mockSdkService,
+  wrapSdkResponse,
+} from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import { ref } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
 
 let renderer: RenderingHelper<typeof Assimilation>
-const mockedAssimilateCall = vi.fn()
-const mockedGetNoteCall = vi.fn()
+let assimilateSpy: ReturnType<typeof mockSdkService<"assimilate">>
+let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
 const mockedGetNoteInfoCall = vi.fn()
 const mockedIncrementAssimilatedCount = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
@@ -25,29 +28,11 @@ afterEach(() => {
 })
 
 beforeEach(() => {
-  vi.spyOn(sdk, "assimilate").mockImplementation(async (options) => {
-    const result = await mockedAssimilateCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
-  vi.spyOn(sdk, "showNote").mockImplementation(async (options) => {
-    const result = await mockedGetNoteCall(options)
-    return {
-      data: result,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    }
-  })
-  vi.spyOn(sdk, "getNoteInfo").mockResolvedValue({
-    data: {} as never,
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
+  assimilateSpy = mockSdkService("assimilate", [])
+  showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+  mockSdkService("getNoteInfo", {
+    note: makeMe.aNoteRealm.please(),
+    createdAt: "",
   })
   mockedGetNoteInfoCall.mockResolvedValue({})
 
@@ -81,7 +66,7 @@ describe("Assimilation component", () => {
   const { note } = memoryTracker
 
   beforeEach(() => {
-    mockedGetNoteCall.mockResolvedValue(noteRealm)
+    showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
     mockedGetNoteInfoCall.mockResolvedValue({})
   })
 
@@ -92,7 +77,8 @@ describe("Assimilation component", () => {
         { id: 2, removedFromTracking: true },
         { id: 3, removedFromTracking: false },
       ]
-      mockedAssimilateCall.mockResolvedValue(returnedTrackers)
+      // @ts-expect-error - returnedTrackers type doesn't match exactly but is correct at runtime
+      assimilateSpy.mockResolvedValue(wrapSdkResponse(returnedTrackers))
       const wrapper = renderer
         .withStorageProps({
           note,
@@ -103,7 +89,7 @@ describe("Assimilation component", () => {
       await wrapper.find('input[value="Keep for repetition"]').trigger("click")
       await flushPromises()
 
-      expect(mockedAssimilateCall).toHaveBeenCalledWith({
+      expect(assimilateSpy).toHaveBeenCalledWith({
         body: {
           noteId: note.id,
           skipMemoryTracking: false,
