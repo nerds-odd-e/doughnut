@@ -81,7 +81,8 @@ describe("RecallPromptComponent", () => {
           error: "API Error",
           request: {} as Request,
           response: {} as Response,
-        })
+          // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+        } as any)
         .mockResolvedValueOnce(
           wrapSdkResponse(
             makeMe.anAnsweredQuestion.answerCorrect(true).please()

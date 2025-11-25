@@ -192,7 +192,8 @@ describe("WikidataAssociationForNoteDialog", () => {
         error: error.message,
         request: {} as Request,
         response: {} as Response,
-      })
+        // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+      } as any)
 
       const wrapper = await inputWikidataIdAndSave(note, wikidataId)
       await flushPromises()

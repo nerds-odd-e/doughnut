@@ -6,6 +6,7 @@ import helper, {
   mockShowNote,
   mockSdkService,
   mockSdkServiceWithImplementation,
+  wrapSdkResponse,
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
@@ -610,18 +611,8 @@ describe("NoteAudioTools", () => {
       }
 
       audioToTextMock
-        .mockResolvedValueOnce({
-          data: mockResponse1,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
-        .mockResolvedValueOnce({
-          data: mockResponse2,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        .mockResolvedValueOnce(wrapSdkResponse(mockResponse1))
+        .mockResolvedValueOnce(wrapSdkResponse(mockResponse2))
 
       // First call
       await wrapper.vm.processAudio(new Blob())
@@ -649,24 +640,15 @@ describe("NoteAudioTools", () => {
       }
 
       audioToTextMock
-        .mockResolvedValueOnce({
-          data: mockResponse,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        .mockResolvedValueOnce(wrapSdkResponse(mockResponse))
         .mockResolvedValueOnce({
           data: undefined,
           error: "API Error",
           request: {} as Request,
           response: {} as Response,
-        })
-        .mockResolvedValueOnce({
-          data: mockResponse,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+          // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+        } as any)
+        .mockResolvedValueOnce(wrapSdkResponse(mockResponse))
 
       // First successful call
       await wrapper.vm.processAudio(new Blob())

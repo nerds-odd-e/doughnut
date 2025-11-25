@@ -270,7 +270,7 @@ describe("SearchResults.vue", () => {
     ] as NoteRealm[]
 
     it("shows recently updated notes when search key is empty and searching globally", async () => {
-      mockSdkService("getRecentNotes", recentNotes)
+      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
       mockSdkService("searchForLinkTarget", [])
       mockSdkService("semanticSearch", [])
 
@@ -282,7 +282,7 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(mockSdkService("getRecentNotes", recentNotes)).toHaveBeenCalled()
+      expect(getRecentNotesSpy).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).toContain("Recent Note 2")
@@ -482,7 +482,7 @@ describe("SearchResults.vue", () => {
     })
 
     it("shows recently updated notes when searching for link targets (noteId provided) and search key is empty", async () => {
-      mockSdkService("getRecentNotes", recentNotes)
+      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
       mockSdkService("searchForLinkTargetWithin", [])
       mockSdkService("semanticSearchWithin", [])
 
@@ -494,7 +494,7 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(mockSdkService("getRecentNotes", recentNotes)).toHaveBeenCalled()
+      expect(getRecentNotesSpy).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
       expect(wrapper.text()).toContain("Recent Note 2")
