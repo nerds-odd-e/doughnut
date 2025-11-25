@@ -1,5 +1,5 @@
 import { describe, it, vi, expect } from "vitest"
-import helper from "../helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "../helpers"
 import makeMe from "../fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
@@ -19,12 +19,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getDescendants").mockResolvedValue({
-      data: descendantsData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getDescendants", descendantsData)
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -52,12 +47,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getDescendants").mockResolvedValue({
-      data: descendantsData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getDescendants", descendantsData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -74,14 +64,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    const getDescendantsMock = vi
-      .spyOn(sdk, "getDescendants")
-      .mockResolvedValue({
-        data: descendantsData,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+    const getDescendantsMock = mockSdkService("getDescendants", descendantsData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -104,12 +87,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getGraph").mockResolvedValue({
-      data: graphData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getGraph", graphData)
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -136,12 +114,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    vi.spyOn(sdk, "getGraph").mockResolvedValue({
-      data: graphData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getGraph", graphData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -158,12 +131,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    const getGraphMock = vi.spyOn(sdk, "getGraph").mockResolvedValue({
-      data: graphData,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    const getGraphMock = mockSdkService("getGraph", graphData)
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -190,20 +158,10 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id, token: 1234 },
       relatedNotes: [],
     } as never
-    const getGraphMock = vi
-      .spyOn(sdk, "getGraph")
-      .mockResolvedValueOnce({
-        data: graphData1,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
-      .mockResolvedValueOnce({
-        data: graphData2,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+    const getGraphMock = mockSdkService("getGraph", graphData1)
+    getGraphMock
+      .mockResolvedValueOnce(wrapSdkResponse(graphData1))
+      .mockResolvedValueOnce(wrapSdkResponse(graphData2))
     const { getByText, getByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
