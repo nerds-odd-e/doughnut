@@ -51,7 +51,6 @@ const changerInner = async (
     pendingSaveValues.delete(newValue)
   }
 }
-// Debounced executor for auto-save
 const changer = debounce(changerInner, 1000)
 
 const localValue = ref(value)
@@ -67,31 +66,34 @@ const wrapperClass = computed(() => {
 
 const onUpdate = (noteId: number, newValue: string) => {
   if (field === "edit title" && !newValue.trim()) {
-    // Do not update or schedule save for blank titles
     return
   }
   version.value += 1
   errors.value = {}
   localValue.value = newValue
-  // Schedule auto-save with debouncing
   changer(noteId, newValue, version.value, setError)
 }
 
 const onBlur = () => {
-  // Flush any pending debounced save immediately
   changer.flush()
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const is401Error = (errs: unknown): boolean => {
+  return (
+    typeof errs === "object" &&
+    errs !== null &&
+    "status" in errs &&
+    errs.status === 401
+  )
+}
+
 const setError = (errs: unknown) => {
-  if (typeof errs === "object" && errs !== null && "status" in errs) {
-    if (errs.status === 401) {
-      errors.value = {
-        title:
-          "You are not authorized to edit this note. Perhaps you are not logged in?",
-      }
-      return
+  if (is401Error(errs)) {
+    errors.value = {
+      title:
+        "You are not authorized to edit this note. Perhaps you are not logged in?",
     }
+    return
   }
 
   if (typeof errs === "object" && errs !== null) {
@@ -101,37 +103,45 @@ const setError = (errs: unknown) => {
   }
 }
 
-watch(
-  () => value,
-  (newValue) => {
-    if (version.value !== savedVersion.value) {
-      // There are unsaved changes
-      // If the incoming value matches a pending save, ignore it to preserve newer edits
-      if (newValue !== undefined && pendingSaveValues.has(newValue)) {
-        return
-      }
-      // Check if this is navigation to a different note or just API returning with saved value
-      if (newValue !== localValue.value && newValue !== lastSavedValue.value) {
-        // The incoming value is different from both current and last saved value
-        // This indicates navigation to a different note
-        changer.cancel()
-        version.value = savedVersion.value
-        localValue.value = newValue
-        lastSavedValue.value = newValue
-      }
-      // Otherwise, keep the unsaved changes
-      // This handles the case where API returns with a previously saved value
-      // but user has made newer edits that haven't been saved yet
-      return
-    }
-    // No unsaved changes, update to match the prop
+const isNavigation = (newValue: string | undefined): newValue is string => {
+  return (
+    newValue !== undefined &&
+    newValue !== localValue.value &&
+    newValue !== lastSavedValue.value
+  )
+}
+
+const handleNavigation = (newValue: string) => {
+  changer.cancel()
+  version.value = savedVersion.value
+  localValue.value = newValue
+  lastSavedValue.value = newValue
+}
+
+const updateToPropValue = (newValue: string | undefined) => {
+  if (newValue !== undefined) {
     localValue.value = newValue
     lastSavedValue.value = newValue
   }
-)
+}
+
+const handlePropChange = (newValue: string | undefined) => {
+  if (version.value !== savedVersion.value) {
+    if (newValue !== undefined && pendingSaveValues.has(newValue)) {
+      return
+    }
+    if (isNavigation(newValue)) {
+      handleNavigation(newValue)
+      return
+    }
+    return
+  }
+  updateToPropValue(newValue)
+}
+
+watch(() => value, handlePropChange)
 
 onUnmounted(() => {
-  // Flush any pending debounced save before unmounting
   changer.flush()
 })
 </script>

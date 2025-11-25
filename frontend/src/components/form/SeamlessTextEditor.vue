@@ -39,13 +39,8 @@ const onEnter = (event: KeyboardEvent) => {
 
 const updateContent = (newValue: string) => {
   if (editor.value && editor.value.innerText !== newValue) {
-    // First update innerText to ensure it's set properly for tests and initial render
     editor.value.innerText = newValue
-
-    // Then update or create a text node to handle cursor position
-    // This fixes the cursor jumping issue in Safari and Chrome mobile
-    // by maintaining a single text node instead of recreating the content
-    // which would reset cursor position
+    // Maintain single text node to prevent cursor jumping in Safari/Chrome mobile
     if (editor.value.firstChild) {
       ;(editor.value.firstChild as Text).data = newValue
     } else {
