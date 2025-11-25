@@ -5,8 +5,7 @@
     </template>
     <template #default="{ closer }">
       <NoteNewDialog
-        v-bind="{ referenceNote, insertMode, storageAccessor }"
-        @close-dialog="closer"
+        v-bind="{ referenceNote, insertMode, storageAccessor, closer }"
       />
     </template>
   </PopButton>

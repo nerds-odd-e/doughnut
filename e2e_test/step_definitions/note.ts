@@ -562,24 +562,27 @@ Given(
   'I intercept the request to update note title {string} and hold its response',
   (noteTopology: string) => {
     start.jumpToNotePage(noteTopology)
-    start.testability().getInjectedNoteIdByTitle(noteTopology).then((noteId) => {
-      // Use a delay to hold the response
-      // We'll check state before this delay completes
-      cy.intercept('PATCH', `/api/text_content/${noteId}/title`, (req) => {
-        // Store request time to track when it was made
-        const requestTime = Date.now()
-        req.reply((res) => {
-          // Delay the response by 5 seconds
-          // This gives us time to check the state before the response arrives
-          const delay = 5000
-          const elapsed = Date.now() - requestTime
-          const remainingDelay = Math.max(0, delay - elapsed)
-          setTimeout(() => {
-            res.send()
-          }, remainingDelay)
-        })
-      }).as('titleUpdateRequest')
-    })
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(noteTopology)
+      .then((noteId) => {
+        // Use a delay to hold the response
+        // We'll check state before this delay completes
+        cy.intercept('PATCH', `/api/text_content/${noteId}/title`, (req) => {
+          // Store request time to track when it was made
+          const requestTime = Date.now()
+          req.reply((res) => {
+            // Delay the response by 5 seconds
+            // This gives us time to check the state before the response arrives
+            const delay = 5000
+            const elapsed = Date.now() - requestTime
+            const remainingDelay = Math.max(0, delay - elapsed)
+            setTimeout(() => {
+              res.send()
+            }, remainingDelay)
+          })
+        }).as('titleUpdateRequest')
+      })
   }
 )
 
@@ -618,12 +621,9 @@ When('I release the intercepted response', () => {
   cy.wait('@titleUpdateRequest', { timeout: 10000 })
 })
 
-Then(
-  'the title field should contain {string}',
-  (expectedText: string) => {
-    cy.findByRole('title').should('have.text', expectedText)
-  }
-)
+Then('the title field should contain {string}', (expectedText: string) => {
+  cy.findByRole('title').should('have.text', expectedText)
+})
 
 Then('the cursor should be at the end of the title field', () => {
   cy.findByRole('title').click()

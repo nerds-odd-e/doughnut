@@ -60,6 +60,7 @@ const props = defineProps<{
   referenceNote: Note
   insertMode: InsertMode
   storageAccessor: StorageAccessor
+  closer?: () => void
 }>()
 
 // Emits
@@ -108,7 +109,11 @@ const processForm = async () => {
         creationData.value
       )
     }
-    emit("closeDialog")
+    if (props.closer) {
+      props.closer()
+    } else {
+      emit("closeDialog")
+    }
   } catch (res: unknown) {
     noteFormErrors.value = {
       newTitle: undefined,
