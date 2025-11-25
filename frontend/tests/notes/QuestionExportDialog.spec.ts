@@ -4,7 +4,6 @@ import makeMe from "../fixtures/makeMe"
 import QuestionExportDialog from "@/components/notes/QuestionExportDialog.vue"
 import { waitFor } from "@testing-library/vue"
 import { reactive } from "vue"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockRoute = reactive({ name: "", path: "", params: {}, query: {} })
 vitest.mock("vue-router", () => ({
@@ -42,7 +41,8 @@ describe("QuestionExportDialog", () => {
       expect(textarea.value).toContain('"title"')
     })
 
-    expect(sdk.exportQuestionGeneration).toHaveBeenCalledWith({
+    const spy = mockSdkService("exportQuestionGeneration", exportData)
+    expect(spy).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })
@@ -58,7 +58,8 @@ describe("QuestionExportDialog", () => {
       error: "API Error",
       request: {} as Request,
       response: {} as Response,
-    })
+      // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
+    } as any)
 
     const { getByTestId } = helper
       .component(QuestionExportDialog)
