@@ -228,6 +228,8 @@ When(
       .jumpToNotePage(noteTopology)
       .addingChildNote()
       .createNoteWithTitleAndWikidataId(title, wikidataId)
+    // Wait for the note to be created and verify the title appears
+    start.assumeNotePage(title)
   }
 )
 

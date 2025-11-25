@@ -2,10 +2,12 @@ import MainMenu from "@/components/toolbars/MainMenu.vue"
 import type { User } from "@generated/backend"
 import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  mockSdkServiceWithImplementation,
+} from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import timezoneParam from "@/managedApi/window/timezoneParam"
-import * as sdk from "@generated/backend/sdk.gen"
 import { beforeEach, vi } from "vitest"
 
 const useRouteValue = { name: "" }
@@ -19,32 +21,17 @@ describe("main menu", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Default mocks for all tests (can be overridden in individual tests)
-    vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
-      data: {
-        dueCount: 0,
-        assimilatedCountOfTheDay: 0,
-        totalUnassimilatedCount: 0,
-      },
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
+    mockSdkService("getAssimilationCount", {
+      dueCount: 0,
+      assimilatedCountOfTheDay: 0,
+      totalUnassimilatedCount: 0,
     })
-    vi.spyOn(sdk, "overview").mockResolvedValue({
-      data: {
-        toRepeatCount: 0,
-        recallWindowEndAt: "",
-        totalAssimilatedCount: 0,
-      },
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
+    mockSdkService("overview", {
+      toRepeatCount: 0,
+      recallWindowEndAt: "",
+      totalAssimilatedCount: 0,
     })
-    vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-      data: [],
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getUnreadConversations", [])
     user = makeMe.aUser.please()
   })
 
@@ -92,34 +79,19 @@ describe("main menu", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
-        data: {
-          dueCount: 5,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("getAssimilationCount", {
+        dueCount: 5,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "overview").mockResolvedValue({
-        data: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("overview", {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getUnreadConversations", [])
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -130,34 +102,19 @@ describe("main menu", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
-        data: {
-          dueCount: 0,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("getAssimilationCount", {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "overview").mockResolvedValue({
-        data: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("overview", {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getUnreadConversations", [])
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -177,25 +134,20 @@ describe("main menu", () => {
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "getAssimilationCount").mockImplementation(mockGetCount)
+      mockSdkServiceWithImplementation(
+        "getAssimilationCount",
+        async (options) => {
+          return await mockGetCount(options)
+        }
+      )
 
-      vi.spyOn(sdk, "overview").mockResolvedValue({
-        data: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("overview", {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getUnreadConversations", [])
 
       const { rerender } = helper
         .component(MainMenu)
@@ -221,25 +173,20 @@ describe("main menu", () => {
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "getAssimilationCount").mockImplementation(mockGetCount)
+      mockSdkServiceWithImplementation(
+        "getAssimilationCount",
+        async (options) => {
+          return await mockGetCount(options)
+        }
+      )
 
-      vi.spyOn(sdk, "overview").mockResolvedValue({
-        data: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("overview", {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getUnreadConversations", [])
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -252,34 +199,19 @@ describe("main menu", () => {
 
   describe("recall count", () => {
     it("shows recall count when there are items to repeat", async () => {
-      vi.spyOn(sdk, "overview").mockResolvedValue({
-        data: {
-          toRepeatCount: 789,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("overview", {
+        toRepeatCount: 789,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
-        data: {
-          dueCount: 0,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("getAssimilationCount", {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getUnreadConversations", [])
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -290,34 +222,19 @@ describe("main menu", () => {
     })
 
     it("does not show recall count when there are no items to repeat", async () => {
-      vi.spyOn(sdk, "overview").mockResolvedValue({
-        data: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("overview", {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
-        data: {
-          dueCount: 0,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("getAssimilationCount", {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      mockSdkService("getUnreadConversations", [])
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -337,25 +254,17 @@ describe("main menu", () => {
         request: {} as Request,
         response: {} as Response,
       })
-      vi.spyOn(sdk, "overview").mockImplementation(mockGetOverview)
-
-      vi.spyOn(sdk, "getAssimilationCount").mockResolvedValue({
-        data: {
-          dueCount: 0,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkServiceWithImplementation("overview", async (options) => {
+        return await mockGetOverview(options)
       })
 
-      vi.spyOn(sdk, "getUnreadConversations").mockResolvedValue({
-        data: [],
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
+      mockSdkService("getAssimilationCount", {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
       })
+
+      mockSdkService("getUnreadConversations", [])
 
       const { rerender } = helper
         .component(MainMenu)
