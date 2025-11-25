@@ -14,48 +14,55 @@
       />
     </div>
 
-    <div v-if="searchResult === undefined && trimmedSearchKey !== ''">
-      <em>Searching ...</em>
-      <div v-if="shouldShowRecentNotes && filteredRecentNotes.length > 0" class="result-section">
-        <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
-        <div v-if="isDropdown" class="dropdown-list">
-          <NoteTitleWithLink
-            v-for="note in filteredRecentNotes"
-            :key="note.id"
-            :noteTopology="note.note.noteTopology"
-          />
-        </div>
-        <Cards
-          v-else
-          class="search-result"
-          :noteTopologies="filteredRecentNotes.map((n) => n.note.noteTopology)"
-          :columns="3"
-        >
-          <template #button="{ noteTopology }">
-            <slot name="button" :note-topology="noteTopology" />
-          </template>
-        </Cards>
-      </div>
+    <!-- Searching indicator: show when searching is in progress or waiting for first result -->
+    <div v-if="(searchResult === undefined && trimmedSearchKey !== '') || searchState.isSearchInProgress">
+      <em class="searching-indicator">Searching ...</em>
     </div>
 
-    <div v-else-if="searchResult === undefined && trimmedSearchKey === '' && isDropdown && props.noteId && filteredRecentNotes.length === 0" class="dropdown-list">
+    <!-- Recent notes while waiting for first search (when no previous result exists) -->
+    <div v-if="shouldShowRecentNotes && filteredRecentNotes.length > 0 && searchResult === undefined && previousSearchResult === undefined" class="result-section">
+      <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
+      <div v-if="isDropdown" class="dropdown-list">
+        <NoteTitleWithLink
+          v-for="note in filteredRecentNotes"
+          :key="note.id"
+          :noteTopology="note.note.noteTopology"
+        />
+      </div>
+      <Cards
+        v-else
+        class="search-result"
+        :noteTopologies="filteredRecentNotes.map((n) => n.note.noteTopology)"
+        :columns="3"
+      >
+        <template #button="{ noteTopology }">
+          <slot name="button" :note-topology="noteTopology" />
+        </template>
+      </Cards>
+    </div>
+
+    <!-- Empty state when search key is empty in dropdown mode with noteId -->
+    <div v-if="searchResult === undefined && trimmedSearchKey === '' && isDropdown && props.noteId && filteredRecentNotes.length === 0 && !searchState.isSearchInProgress" class="dropdown-list">
       <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <em>No recent notes found.</em>
     </div>
 
-    <div v-else-if="searchResult !== undefined && searchResult.length === 0 && isDropdown" class="dropdown-list">
+    <!-- Empty search results in dropdown mode (only show when not searching to avoid flicker) -->
+    <div v-if="searchResult !== undefined && searchResult.length === 0 && isDropdown && !searchState.isSearchInProgress" class="dropdown-list">
       <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <em v-if="trimmedSearchKey === '' && !props.noteId">Similar notes within the same notebook</em>
       <em v-else-if="trimmedSearchKey === '' && props.noteId && filteredRecentNotes.length === 0">No recent notes found.</em>
       <em v-else>No matching notes found.</em>
     </div>
 
-    <div v-else-if="searchResult !== undefined && searchResult.length === 0">
+    <!-- Empty search results in non-dropdown mode (only show when not searching to avoid flicker) -->
+    <div v-if="searchResult !== undefined && searchResult.length === 0 && !isDropdown && !searchState.isSearchInProgress">
       <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <em>No matching notes found.</em>
     </div>
 
-    <div v-else-if="shouldShowRecentNotes && filteredRecentNotes.length > 0 && trimmedSearchKey === ''">
+    <!-- Recent notes when search key is empty -->
+    <div v-if="shouldShowRecentNotes && filteredRecentNotes.length > 0 && trimmedSearchKey === '' && searchResult === undefined && !searchState.isSearchInProgress">
       <div class="result-section">
         <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
         <div v-if="isDropdown" class="dropdown-list">
@@ -78,7 +85,8 @@
       </div>
     </div>
 
-    <div v-else-if="searchResult !== undefined && isDropdown" class="dropdown-list">
+    <!-- Search results in dropdown mode (show even when searching is in progress to display previous results) -->
+    <div v-if="searchResult !== undefined && searchResult.length > 0 && isDropdown" class="dropdown-list">
       <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <NoteTitleWithLink
         v-for="noteTopology in searchResult"
@@ -87,7 +95,8 @@
       />
     </div>
 
-    <div v-else-if="searchResult !== undefined">
+    <!-- Search results in non-dropdown mode (show even when searching is in progress to display previous results) -->
+    <div v-if="searchResult !== undefined && searchResult.length > 0 && !isDropdown">
       <div class="result-title" v-if="resultTitle">{{ resultTitle }}</div>
       <Cards
         class="search-result"
@@ -125,6 +134,7 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
+import { SearchState } from "@/models/searchState"
 
 // Props definition
 const props = defineProps({
@@ -163,6 +173,7 @@ const recentResult = ref<NoteSearchResult[] | undefined>()
 const recentNotes = ref<NoteRealm[]>([])
 const timeoutId = ref<ReturnType<typeof setTimeout>>()
 const previousSearchResult = ref<NoteSearchResult[] | undefined>()
+const searchState = new SearchState()
 
 // Computed properties
 const trimmedSearchKey = computed(() => searchTerm.value.searchKey.trim())
@@ -375,6 +386,10 @@ const search = () => {
       fetchRecentNotes()
     }
   }
+  // Mark search as in progress when starting a new search
+  if (originalTrimmedKey !== "") {
+    searchState.startSearch()
+  }
   timeoutId.value = debounced(async () => {
     const trimmedKey = trimmedSearchKey.value
     // perform literal and semantic searches in parallel
@@ -389,6 +404,8 @@ const search = () => {
     recentResult.value = cachedSearches.value[trimmedKey]
     // Clear previous result once we have the new result
     previousSearchResult.value = undefined
+    // Mark search as complete
+    searchState.completeSearch()
   })
 }
 
@@ -519,5 +536,19 @@ onBeforeUnmount(() => {
   font-weight: bold;
   margin-bottom: 0.5rem;
   padding: 0.5rem;
+}
+
+.searching-indicator {
+  display: inline-block;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 </style>

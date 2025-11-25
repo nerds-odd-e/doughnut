@@ -657,5 +657,60 @@ describe("SearchResults.vue", () => {
 
       vi.useRealTimers()
     })
+
+    it("shows 'Searching ...' indicator when editing search key after first result is received", async () => {
+      vi.useFakeTimers()
+
+      const firstSearchResults: NoteSearchResult[] = [
+        { noteTopology: { id: 1, titleOrPredicate: "First Result" } },
+      ]
+
+      const secondSearchDelayed = new Promise<Array<unknown>>((resolve) =>
+        setTimeout(() => resolve([]), 2000)
+      )
+
+      const searchForLinkTargetSpy = mockSdkService("searchForLinkTarget", [])
+      searchForLinkTargetSpy.mockResolvedValueOnce(
+        wrapSdkResponse(firstSearchResults)
+      )
+      searchForLinkTargetSpy.mockReturnValue(
+        secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
+      )
+
+      const semanticSearchSpy = mockSdkService("semanticSearch", [])
+      semanticSearchSpy.mockResolvedValueOnce(wrapSdkResponse([]))
+      semanticSearchSpy.mockReturnValue(
+        secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
+      )
+
+      mockSdkService("getRecentNotes", [])
+
+      const wrapper = helper
+        .component(SearchResults)
+        .withProps({ inputSearchKey: "first", isDropdown: false })
+        .mount()
+
+      // Wait for first search to complete
+      await nextTick()
+      vi.advanceTimersByTime(1100)
+      await flushPromises()
+
+      // Verify first search results are shown
+      expect(wrapper.text()).toContain("First Result")
+      expect(wrapper.text()).toContain("Search result")
+      expect(wrapper.text()).not.toContain("Searching ...")
+
+      // User edits the search key - trigger new search
+      await wrapper.setProps({ inputSearchKey: "first second" })
+      await nextTick()
+      vi.advanceTimersByTime(100) // Advance time but not enough for debounce to complete
+
+      // "Searching ..." indicator should be shown even though previous results are still visible
+      expect(wrapper.text()).toContain("Searching ...")
+      expect(wrapper.text()).toContain("First Result") // Previous results still visible
+      expect(wrapper.text()).toContain("Search result")
+
+      vi.useRealTimers()
+    })
   })
 })
