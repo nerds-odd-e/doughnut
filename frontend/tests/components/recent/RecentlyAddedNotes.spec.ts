@@ -1,8 +1,7 @@
 import RecentlyAddedNotes from "@/components/recent/RecentlyAddedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("RecentlyAddedNotes", () => {
   const mockNotes = [
@@ -19,21 +18,17 @@ describe("RecentlyAddedNotes", () => {
   ]
 
   beforeEach(() => {
-    vi.spyOn(sdk, "getRecentNotes").mockResolvedValue({
-      data: mockNotes,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("getRecentNotes", mockNotes)
   })
 
   it("fetches and displays recent notes", async () => {
+    const getRecentNotesSpy = mockSdkService("getRecentNotes", mockNotes)
     const wrapper = helper.component(RecentlyAddedNotes).withRouter().mount()
 
     await flushPromises()
 
     // Verify API was called
-    expect(sdk.getRecentNotes).toBeCalled()
+    expect(getRecentNotesSpy).toBeCalled()
 
     // Verify notes are displayed
     const rows = wrapper.findAll("tbody tr")

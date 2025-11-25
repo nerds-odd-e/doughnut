@@ -1,18 +1,12 @@
 import RecallPromptComponent from "@/components/review/RecallPromptComponent.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper from "@tests/helpers"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("RecallPromptComponent", () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    vi.spyOn(sdk, "answerQuiz").mockResolvedValue({
-      data: {} as never,
-      error: undefined,
-      request: {} as Request,
-      response: {} as Response,
-    })
+    mockSdkService("answerQuiz", makeMe.anAnsweredQuestion.please())
   })
 
   afterEach(() => {
@@ -34,20 +28,21 @@ describe("RecallPromptComponent", () => {
   describe("answer submission", () => {
     it("shows loading state while submitting answer", async () => {
       // Setup API to delay response
-      vi.spyOn(sdk, "answerQuiz").mockImplementation(
+      const answerQuizSpy = mockSdkService(
+        "answerQuiz",
+        makeMe.anAnsweredQuestion.please()
+      )
+      answerQuizSpy.mockImplementation(
         () =>
-          new Promise((resolve) =>
-            setTimeout(
-              () =>
-                resolve({
-                  data: {} as never,
-                  error: undefined,
-                  request: {} as Request,
-                  response: {} as Response,
-                } as Awaited<ReturnType<typeof sdk.answerQuiz>>),
-              100
-            )
-          ) as ReturnType<typeof sdk.answerQuiz>
+          new Promise(
+            (resolve) =>
+              setTimeout(
+                () =>
+                  resolve(wrapSdkResponse(makeMe.anAnsweredQuestion.please())),
+                100
+              )
+            // biome-ignore lint/suspicious/noExplicitAny: Promise type requires any for mock implementation
+          ) as any
       )
 
       const wrapper = mountComponent()
@@ -72,19 +67,22 @@ describe("RecallPromptComponent", () => {
 
     it("allows retrying on API error", async () => {
       // Setup API to fail first time
-      vi.spyOn(sdk, "answerQuiz")
+      const answerQuizSpy = mockSdkService(
+        "answerQuiz",
+        makeMe.anAnsweredQuestion.answerCorrect(true).please()
+      )
+      answerQuizSpy
         .mockResolvedValueOnce({
           data: undefined,
           error: "API Error",
           request: {} as Request,
           response: {} as Response,
         })
-        .mockResolvedValueOnce({
-          data: { correct: true } as never,
-          error: undefined,
-          request: {} as Request,
-          response: {} as Response,
-        })
+        .mockResolvedValueOnce(
+          wrapSdkResponse(
+            makeMe.anAnsweredQuestion.answerCorrect(true).please()
+          )
+        )
 
       const wrapper = mountComponent()
 
@@ -111,13 +109,10 @@ describe("RecallPromptComponent", () => {
     })
 
     it("emits answered event on successful submission", async () => {
-      const answerResult = { correct: true }
-      vi.spyOn(sdk, "answerQuiz").mockResolvedValue({
-        data: answerResult as never,
-        error: undefined,
-        request: {} as Request,
-        response: {} as Response,
-      })
+      const answerResult = makeMe.anAnsweredQuestion
+        .answerCorrect(true)
+        .please()
+      mockSdkService("answerQuiz", answerResult)
 
       const wrapper = mountComponent()
 
