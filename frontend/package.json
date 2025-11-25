@@ -58,7 +58,7 @@
     "vite": "7.2.4",
     "vite-plugin-checker": "^0.11.0",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "4.0.13",
+    "vitest": "4.0.14",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.5",
     "vue": "3.5.25",

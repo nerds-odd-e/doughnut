@@ -22,7 +22,7 @@
     "@types/node": "^22.15.30",
     "esbuild": "0.27.0",
     "typescript": "5.9.3",
-    "vitest": "4.0.13",
+    "vitest": "4.0.14",
     "zod": "^4.1.13"
   }
 }
