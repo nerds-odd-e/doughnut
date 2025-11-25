@@ -215,6 +215,8 @@ When(
       .jumpToNotePage(noteTopology)
       .addingChildNote()
       .createNoteWithTitle(title)
+    // Wait for the note to be created and verify the title appears
+    start.assumeNotePage(title)
   }
 )
 
@@ -545,6 +547,8 @@ When(
       .jumpToNotePage(noteTopology)
       .addingNextSiblingNote()
       .createNoteWithTitle(title)
+    // Wait for the note to be created and verify the title appears
+    start.assumeNotePage(title)
   }
 )
 
