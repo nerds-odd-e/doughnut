@@ -29,7 +29,6 @@ spring:
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
-    clean-on-validation-error: true
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
   jpa:
@@ -95,7 +94,6 @@ spring:
       validation-timeout: 5000
       leak-detection-threshold: 60000
   flyway:
-    clean-on-validation-error: false
     clean-disabled: true
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
@@ -153,7 +151,6 @@ spring:
       validation-timeout: 5000
       leak-detection-threshold: 60000
   flyway:
-    clean-on-validation-error: false
     clean-disabled: true
     placeholders:
       embedding_column: "embedding VECTOR(1536) USING VARBINARY NOT NULL"
@@ -217,7 +214,6 @@ spring:
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
-    clean-on-validation-error: true
     placeholders:
       embedding_column: "embedding_raw VARBINARY(6144) NOT NULL"
   jpa:
