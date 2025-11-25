@@ -3,8 +3,17 @@ const submittableForm = {
     for (const propName in noteAttributes) {
       const value = noteAttributes[propName]
       if (value) {
-        cy.formField(propName).assignFieldValue(value)
-        cy.formField(propName).fieldShouldHaveValue(value)
+        cy.formField(propName)
+          .then(($input) => {
+            const isFileInput = $input.attr('type') === 'file'
+            return { $input, isFileInput }
+          })
+          .then(({ $input, isFileInput }) => {
+            cy.wrap($input).assignFieldValue(value)
+            if (!isFileInput) {
+              cy.wrap($input).fieldShouldHaveValue(value)
+            }
+          })
       } else {
         cy.formField(propName).clear()
       }
