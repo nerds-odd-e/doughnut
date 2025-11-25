@@ -1,12 +1,13 @@
 ---
-description:
-globs:
+description: General development guidelines, nix environment, service startup, development preferences, code quality principles
 alwaysApply: true
 ---
 
 # The use of nix
 
-**CRITICAL: This project uses nix to manage the development environment locally. For Cloud Agent, see the later instructions**
+**CRITICAL: This project uses nix to manage the development environment locally.**
+
+**For detailed command execution instructions (tests, linting, etc.), see the `cloud-agent-setup` rule.**
 
 **YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true` when running them through `nix develop -c` (When running as a local agent):**
 
@@ -40,53 +41,11 @@ This command starts:
 
 ## Running Commands in Terminal
 
-### For Cloud Agents (Cursor Background Agent)
+**For detailed instructions on running tests and commands (cloud agent vs local development), see the `cloud-agent-setup` rule.**
 
-**Cloud agents run in a pre-configured virtual machine with the correct Node.js and pnpm versions already installed.**
-
-The cloud environment includes:
-- Node.js v22.21.1
-- pnpm 10.22.0
-
-**Cloud agents should run commands DIRECTLY without nix:**
-
-#### Running Tests on Cloud Agent
-
-**Frontend unit test:**
-```bash
-pnpm frontend:test
-```
-
-**Backend unit test:**
-```bash
-pnpm backend:verify
-```
-
-**E2E test** (assumes services are already running):
-```bash
-pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
-```
-
-**Note:** Cloud agents do NOT need the `CURSOR_DEV=true nix develop -c` prefix.
-
-#### Running Tests for Local Development
-
-**Backend unit test:**
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
-```
-
-**Frontend unit test:**
-```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test
-```
-
-**E2E test** (assumes services are already running via `pnpm sut`):
-```bash
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
-```
-
-**Note:** ALL commands in local development that need to run in the nix development environment MUST use `CURSOR_DEV=true nix develop -c` prefix.
+**Quick reference:**
+- **Cloud agents:** Run commands directly without nix prefix (e.g., `pnpm frontend:test`)
+- **Local development:** Always use `CURSOR_DEV=true nix develop -c` prefix (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`)
 
 # Development preferences
 

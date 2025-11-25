@@ -1,22 +1,35 @@
 ---
-description: Backend development guildelines
+description: Backend development, Java, Spring Boot, unit tests, JUnit, Mockito, repositories, services, controllers, database migrations
 alwaysApply: false
 ---
-# Backend Unit Test Practices
+# Backend Development Practices
+
+## When to Use This Rule
+
+**Use this rule when:**
+- Writing or modifying backend Java code
+- Creating or updating backend unit tests
+- Working with Spring Boot components
+- Setting up repositories, services, or controllers
+- Running backend tests
+- Working with database migrations
+- Mocking dependencies in tests
 
 ## Run Test in Terminal
+
+**For general command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
 
 ### Local Development (with Nix)
 
 To run the tests in local development environment with Nix, at the root folder level run command:
 
-```
+```bash
 CURSOR_DEV=true nix develop -c pnpm backend:verify
 ```
 
 or, when there's no db migration needed, run the follow will be faster:
 
-```
+```bash
 CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 

@@ -1,8 +1,18 @@
 ---
-description: Linting, formating and code quality checks in the Doughnut project
+description: Linting, formatting, code quality, Biome, Redocly, OpenAPI validation, code style, fix formatting errors
 alwaysApply: false
 ---
-# Linting in Doughnut Project
+# Linting and Formatting in Doughnut Project
+
+## When to Use This Rule
+
+**Use this rule when:**
+- Fixing linting or formatting errors
+- Running code quality checks
+- Validating OpenAPI specifications
+- Formatting code before committing
+- Troubleshooting linting failures
+- Working with Biome, Redocly, or backend linting
 
 ## Overview
 
@@ -17,16 +27,18 @@ This project uses multiple linting tools to ensure code quality:
 
 ## Running Linting
 
+**For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
+
 ### Lint All Code
 
-**For local development:**
-```bash
-CURSOR_DEV=true nix develop -c pnpm lint:all
-```
-
-**For cloud agents:**
+**Cloud Agent:**
 ```bash
 pnpm lint:all
+```
+
+**Local Development:**
+```bash
+CURSOR_DEV=true nix develop -c pnpm lint:all
 ```
 
 This runs:
@@ -56,8 +68,8 @@ The OpenAPI specification (`open_api_docs.yaml`) is validated using Redocly CLI.
 1. **DO NOT** edit `open_api_docs.yaml` directly - it is auto-generated
 2. **Fix the issue** in the backend Java controller that generates the problematic endpoint
 3. **Regenerate** the OpenAPI spec:
-   - **Local**: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
-   - **Cloud**: `pnpm generateTypeScript`
+   - **Cloud Agent**: `pnpm generateTypeScript`
+   - **Local Development**: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
 4. **Verify** by running `pnpm openapi:lint` again
 
 ### Common OpenAPI Issues

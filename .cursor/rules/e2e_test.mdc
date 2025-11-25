@@ -1,8 +1,19 @@
 ---
-description: e2e test /end to end test / system test / integrated test guildeline
+description: E2E testing, end-to-end tests, Cypress, Cucumber, BDD, feature files, step definitions, page objects, test execution
 alwaysApply: false
 ---
 # E2E Testing Practices for Doughnut
+
+## When to Use This Rule
+
+**Use this rule when:**
+- Writing or modifying E2E tests
+- Working with Cypress or Cucumber
+- Creating feature files or step definitions
+- Setting up page objects
+- Running E2E tests
+- Debugging E2E test failures
+- Mocking external services for tests
 
 ## Development Environment Assumption
 
@@ -17,15 +28,23 @@ All services automatically restart when code changes are made. The developer doe
 
 ## Run E2E Test in Terminal
 
+**For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
+
 We usually don't run all the e2e tests locally, since it will take too much time. To run one feature file:
 
-```
-nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+**Cloud Agent:**
+```bash
+pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```
 
-Note: don't use `cypress run -- --spec`. The empty `--` will ignore the `--spec` parameter after it.
+**Local Development:**
+```bash
+CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
+```
 
-If a scenario has the "@focus" tag, the other scenarios in the same feature file are ignored.
+**Important notes:**
+- Don't use `cypress run -- --spec`. The empty `--` will ignore the `--spec` parameter after it.
+- If a scenario has the "@focus" tag, the other scenarios in the same feature file are ignored.
 
 ## Technology Stack
 - Cypress for E2E testing

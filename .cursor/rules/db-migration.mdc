@@ -1,31 +1,43 @@
 ---
-description: Database migration guildeline
+description: Database migration, Flyway, SQL migrations, schema changes, database versioning, migration files
 alwaysApply: false
 ---
-## Migration Tool:
+# Database Migration Guidelines
+
+## When to Use This Rule
+
+**Use this rule when:**
+- Creating new database migrations
+- Modifying database schema
+- Understanding migration file naming conventions
+- Working with Flyway migrations
+- Troubleshooting migration issues
+- Versioning database changes
+
+## Migration Tool
 
 The project uses Flyway for database migrations, configured in Spring Boot.
 
-## Migration Files Location:
+## Migration Files Location
 
-* Migrations are stored in backend/src/main/resources/db/migration/
-* Files follow the naming convention: V{version}__{description}.sql
-    * Example: V200000176__rename_onboarded_at_in_memory_tracker_to_assimilated_at.sql
+* Migrations are stored in `backend/src/main/resources/db/migration/`
+* Files follow the naming convention: `V{version}__{description}.sql`
+    * Example: `V200000176__rename_onboarded_at_in_memory_tracker_to_assimilated_at.sql`
 
-## Version Numbering:
+## Version Numbering
 
 * Versions use a numerical format
 
 The project uses two main version patterns:
-V10000xxx for baseline migrations
-V200000xxx for subsequent migrations
+- `V10000xxx` for baseline migrations
+- `V200000xxx` for subsequent migrations
 
-New migration need to be using a greater number than the current latest version number.
+New migrations need to use a greater number than the current latest version number.
 
-### Migration Process:
+### Migration Process
 
 * Migrations run automatically when the application starts (non-test environments)
-* For unit test, DB migration is included in command `nix develop -c pnpm backend:test`
+* For unit tests, DB migration is included in the test command (see `backend-development` rule for test execution)
 
 ## Migration File Structure:
 

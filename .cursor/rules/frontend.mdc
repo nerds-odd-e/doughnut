@@ -1,14 +1,31 @@
 ---
-description: Vue.js frontend development in the Doughnut project
+description: Vue.js frontend development, Vue 3, TypeScript, components, testing, Vitest, DaisyUI, Tailwind, API integration, linting
 alwaysApply: false
 ---
 # Frontend Development Cursor Rules
 
+## When to Use This Rule
+
+**Use this rule when:**
+- Writing or modifying Vue components
+- Working with frontend TypeScript code
+- Creating or updating frontend tests
+- Integrating with backend APIs
+- Styling components with DaisyUI/Tailwind
+- Fixing linting or type errors in frontend code
+- Organizing frontend file structure
+
 ## Run Test in Terminal
 
-To run frontend tests in terminal:
+**For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
 
+**Cloud Agent:**
+```bash
+pnpm frontend:test
 ```
+
+**Local Development:**
+```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
