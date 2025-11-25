@@ -50,7 +50,7 @@
   <!-- Admin Section -->
   <template v-if="user?.admin">
     <hr/>
-    <NotebookAssistantManagementDialog :notebook="notebook" :closer="closer" />
+    <NotebookAssistantManagementDialog :notebook="notebook" />
   </template>
 
   <!-- Notebook Indexing Section -->
@@ -112,7 +112,6 @@ const router = useRouter()
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
-  closer: { type: Function as PropType<() => void>, required: false },
 })
 
 // Form data
