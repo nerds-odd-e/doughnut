@@ -1,23 +1,23 @@
 import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
-import { describe, it } from "vitest"
+import { describe, it, beforeEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("circle show page", () => {
   const notebook = makeMe.aNotebook.please()
   const circle1 = makeMe.aCircle.please()
   const circle2 = makeMe.aCircle.please()
+  let indexSpy: ReturnType<typeof mockSdkService<"index">>
 
   beforeEach(() => {
-    mockSdkService("index", [circle1, circle2])
+    indexSpy = mockSdkService("index", [circle1, circle2])
   })
 
   it("fetch API to be called ONCE on mount", async () => {
     helper.component(NotebookMoveDialog).withProps({ notebook }).render()
-    expect(sdk.index).toBeCalled()
+    expect(indexSpy).toBeCalled()
   })
 
   it("filters the current circle", async () => {

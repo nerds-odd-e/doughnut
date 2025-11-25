@@ -4,7 +4,6 @@ import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
-import * as sdk from "@generated/backend/sdk.gen"
 
 describe("assessment and certificate history page", () => {
   const user = makeMe.aUser.please()
@@ -14,9 +13,13 @@ describe("assessment and certificate history page", () => {
     .passed()
     .please()
   let wrapper
+  let getMyAssessmentsSpy: ReturnType<typeof mockSdkService<"getMyAssessments">>
 
   beforeEach(() => {
-    mockSdkService("getMyAssessments", [assessmentForArt, assessmentForTech])
+    getMyAssessmentsSpy = mockSdkService("getMyAssessments", [
+      assessmentForArt,
+      assessmentForTech,
+    ])
     wrapper = helper
       .component(AssessmentAndCertificateHistoryPage)
       .withCurrentUser(user)
@@ -24,7 +27,7 @@ describe("assessment and certificate history page", () => {
   })
 
   it("calls API ONCE on mount", async () => {
-    expect(sdk.getMyAssessments).toBeCalledTimes(1)
+    expect(getMyAssessmentsSpy).toBeCalledTimes(1)
   })
 
   it("should have two items in the list", async () => {

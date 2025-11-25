@@ -2,7 +2,6 @@ import { flushPromises } from "@vue/test-utils"
 import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
-import * as sdk from "@generated/backend/sdk.gen"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -15,17 +14,20 @@ describe("answered question page", () => {
   describe("answered question page for a link", () => {
     const REVIEW_QUESTION_ID = 1
     const link = makeMe.aLink.please()
-    const mockedShowAnswerCall = vi.fn()
     const answeredQuestion = makeMe.anAnsweredQuestion
       .withNote(link)
       .withRecallPromptId(REVIEW_QUESTION_ID)
       .please()
+    let showQuestionSpy: ReturnType<typeof mockSdkService<"showQuestion">>
+    let startConversationSpy: ReturnType<
+      typeof mockSdkService<"startConversationAboutRecallPrompt">
+    >
 
     beforeEach(async () => {
       vitest.resetAllMocks()
-      mockSdkService("showQuestion", answeredQuestion)
+      showQuestionSpy = mockSdkService("showQuestion", answeredQuestion)
       mockSdkService("showNote", makeMe.aNoteRealm.please())
-      mockSdkService(
+      startConversationSpy = mockSdkService(
         "startConversationAboutRecallPrompt",
         makeMe.aConversation.withId(123).please()
       )
@@ -40,7 +42,7 @@ describe("answered question page", () => {
       await flushPromises()
       wrapper.find(".note-under-question").trigger("click")
       await flushPromises()
-      expect(sdk.showQuestion).toHaveBeenCalledWith({
+      expect(showQuestionSpy).toHaveBeenCalledWith({
         path: { recallPrompt: REVIEW_QUESTION_ID },
       })
     })
@@ -62,7 +64,7 @@ describe("answered question page", () => {
         await button.trigger("click")
         await flushPromises()
 
-        expect(sdk.startConversationAboutRecallPrompt).toHaveBeenCalledWith({
+        expect(startConversationSpy).toHaveBeenCalledWith({
           path: { recallPrompt: REVIEW_QUESTION_ID },
         })
         expect(mockedPush).toHaveBeenCalledWith({
@@ -72,7 +74,6 @@ describe("answered question page", () => {
       })
 
       it("should not show conversation button when answer is not loaded", () => {
-        mockedShowAnswerCall.mockResolvedValue(undefined)
         const wrapper = helper
           .component(AnsweredQuestionPage)
           .withStorageProps({ recallPromptId: REVIEW_QUESTION_ID })
