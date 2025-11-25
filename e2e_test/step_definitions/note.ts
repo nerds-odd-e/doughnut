@@ -562,18 +562,21 @@ Given(
   'I intercept the request to update note title {string} and hold its response',
   (noteTopology: string) => {
     start.jumpToNotePage(noteTopology)
-    start.testability().getInjectedNoteIdByTitle(noteTopology).then((noteId) => {
-      // Use a very long delay to effectively hold the response
-      // We can check the state before this delay completes
-      cy.intercept('PATCH', `/api/text_content/${noteId}/title`, (req) => {
-        // Delay the response significantly (20 seconds)
-        // This gives us time to check the state before the response arrives
-        req.reply((res) => {
-          res.delay(20000)
-          res.send()
-        })
-      }).as('titleUpdateRequest')
-    })
+    start
+      .testability()
+      .getInjectedNoteIdByTitle(noteTopology)
+      .then((noteId) => {
+        // Use a very long delay to effectively hold the response
+        // We can check the state before this delay completes
+        cy.intercept('PATCH', `/api/text_content/${noteId}/title`, (req) => {
+          // Delay the response significantly (20 seconds)
+          // This gives us time to check the state before the response arrives
+          req.reply((res) => {
+            res.delay(20000)
+            res.send()
+          })
+        }).as('titleUpdateRequest')
+      })
   }
 )
 
@@ -600,12 +603,9 @@ When('I release the intercepted response', () => {
   cy.wait('@titleUpdateRequest', { timeout: 25000 })
 })
 
-Then(
-  'the title field should contain {string}',
-  (expectedText: string) => {
-    cy.findByRole('title').should('have.text', expectedText)
-  }
-)
+Then('the title field should contain {string}', (expectedText: string) => {
+  cy.findByRole('title').should('have.text', expectedText)
+})
 
 Then('the cursor should be at the end of the title field', () => {
   cy.findByRole('title').click()
@@ -615,4 +615,4 @@ Then('the cursor should be at the end of the title field', () => {
     const textLength = el.value.length
     expect(cursorPos).to.equal(textLength)
   })
-)
+})

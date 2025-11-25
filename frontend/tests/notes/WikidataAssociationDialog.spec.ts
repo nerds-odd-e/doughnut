@@ -71,10 +71,12 @@ describe("WikidataAssociationDialog", () => {
     getModal()?.querySelector(
       'input[id="wikidataID-wikidataID"]'
     ) as HTMLInputElement
-  const getSelect = () =>
+  const getListContainer = () =>
+    getModal()?.querySelector('[role="listbox"]') as HTMLDivElement
+  const getListItem = (wikidataId: string) =>
     getModal()?.querySelector(
-      'select[name="wikidataSearchResult"]'
-    ) as HTMLSelectElement
+      `[data-wikidata-id="${wikidataId}"]`
+    ) as HTMLDivElement
 
   describe("basic functionality", () => {
     it("shows the current wikidata ID in the input field", async () => {
@@ -138,7 +140,7 @@ describe("WikidataAssociationDialog", () => {
       expect(getModal()?.textContent).toContain("No Wikidata entries found")
     })
 
-    it("displays search results in select when searchKey is provided", async () => {
+    it("displays search results in list when searchKey is provided", async () => {
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")
@@ -146,8 +148,8 @@ describe("WikidataAssociationDialog", () => {
       mockedWikidataSearch.mockResolvedValue([searchResult])
       mountDialog("dog")
       await flushPromises()
-      expect(getSelect()).toBeTruthy()
-      expect(getSelect()?.textContent).toContain("Dog")
+      expect(getListContainer()).toBeTruthy()
+      expect(getListItem("Q11399")?.textContent).toContain("Dog")
     })
   })
 
@@ -186,9 +188,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog")
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       const emitted = wrapper.emitted("selected")?.[0]
@@ -206,9 +208,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("DOG")
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       const emitted = wrapper.emitted("selected")?.[0]
@@ -225,9 +227,9 @@ describe("WikidataAssociationDialog", () => {
       mountDialog("dog")
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       expect(getModal()?.textContent).toContain("Suggested Title: Canine")
@@ -244,9 +246,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog")
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       const replaceLabel = getModal()?.querySelector(
@@ -269,9 +271,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog")
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       const appendLabel = getModal()?.querySelector(
@@ -392,10 +394,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const select = getSelect()
-      expect(select).toBeTruthy()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       // Should NOT emit selected immediately when showSaveButton is true
@@ -415,9 +416,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       // Click Save button
@@ -439,9 +440,9 @@ describe("WikidataAssociationDialog", () => {
       mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       // Should show title options
@@ -459,9 +460,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       // Select Replace option - this should immediately emit selected
@@ -488,9 +489,9 @@ describe("WikidataAssociationDialog", () => {
       const wrapper = mountDialog("dog", { showSaveButton: true })
       await flushPromises()
 
-      const select = getSelect()
-      select.value = "Q11399"
-      select.dispatchEvent(new Event("change", { bubbles: true }))
+      const listItem = getListItem("Q11399")
+      expect(listItem).toBeTruthy()
+      listItem.click()
       await flushPromises()
 
       // Select Append option - this should immediately emit selected

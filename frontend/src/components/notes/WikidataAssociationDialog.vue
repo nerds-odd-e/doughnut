@@ -46,24 +46,38 @@
         <p>No Wikidata entries found for '{{ searchKeyRef }}'</p>
       </div>
       <div v-else-if="searchResults && searchResults.length > 0 && !showTitleOptions">
-        <select
-          ref="select"
-          size="10"
-          name="wikidataSearchResult"
-          @change="onSelectSearchResult"
-          v-model="selectedOption"
-          class="daisy-select daisy-select-bordered daisy-w-full"
-          :disabled="props.disabled"
+        <div
+          ref="listContainer"
+          role="listbox"
+          aria-label="Wikidata search results"
+          class="daisy-border daisy-border-base-300 daisy-rounded-lg daisy-bg-base-100 daisy-w-full"
+          :class="{
+            'daisy-opacity-50 daisy-cursor-not-allowed': props.disabled,
+          }"
+          style="max-height: 300px; overflow-y: auto"
         >
-          <option disabled value="">- Choose Wikidata Search Result -</option>
-          <option
+          <div
             v-for="suggestion in searchResults"
             :key="suggestion.id"
-            :value="suggestion.id"
+            :data-wikidata-id="suggestion.id"
+            @click="handleListItemClick(suggestion.id)"
+            @keydown.enter="handleListItemClick(suggestion.id)"
+            @keydown.space.prevent="handleListItemClick(suggestion.id)"
+            tabindex="0"
+            role="option"
+            :aria-selected="selectedOption === suggestion.id"
+            class="daisy-px-4 daisy-py-2 daisy-cursor-pointer daisy-border-b daisy-border-base-200 hover:daisy-bg-base-200 focus:daisy-outline focus:daisy-outline-2 focus:daisy-outline-primary"
+            :class="{
+              'daisy-bg-primary daisy-text-primary-content': selectedOption === suggestion.id,
+              'daisy-cursor-not-allowed': props.disabled,
+            }"
           >
-            {{ suggestion.label }} - {{ suggestion.description }}
-          </option>
-        </select>
+            <div class="daisy-font-medium">{{ suggestion.label }}</div>
+            <div class="daisy-text-sm daisy-text-base-content/70">
+              {{ suggestion.description }}
+            </div>
+          </div>
+        </div>
       </div>
       <div v-else-if="showTitleOptions" class="daisy-p-4">
         <label class="daisy-label">
@@ -147,7 +161,7 @@ const selectedItem = ref<WikidataSearchEntity | null>(null)
 const showTitleOptions = ref(false)
 const titleAction = ref<"Replace" | "Append" | "">("")
 const hasSearched = ref(false)
-const select = ref<HTMLSelectElement | null>(null)
+const listContainer = ref<HTMLDivElement | null>(null)
 const isLoadingUrl = ref(false)
 
 const hasValidWikidataId = computed(() => {
@@ -265,8 +279,10 @@ const handleInputChange = (value: string) => {
   emit("update:modelValue", value)
 }
 
-const onSelectSearchResult = async () => {
-  const result = selectSearchResult(selectedOption.value)
+const handleListItemClick = async (wikidataId: string | undefined) => {
+  if (props.disabled || !wikidataId) return
+  selectedOption.value = wikidataId
+  const result = selectSearchResult(wikidataId)
   if (!result || !result.entity.id) return
 
   emit("update:modelValue", result.entity.id)
@@ -327,8 +343,18 @@ watch(
 
 watch(searchResults, async () => {
   await nextTick()
-  if (!props.showSaveButton && select.value && searchResults.value.length > 0) {
-    select.value.focus()
+  if (
+    !props.showSaveButton &&
+    listContainer.value &&
+    searchResults.value.length > 0
+  ) {
+    // Focus the first item in the list
+    const firstItem = listContainer.value.querySelector(
+      "[data-wikidata-id]"
+    ) as HTMLElement
+    if (firstItem) {
+      firstItem.focus()
+    }
   }
 })
 
