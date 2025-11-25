@@ -557,3 +557,62 @@ Then(
       .findNoteDetails(expectedDetails)
   }
 )
+
+Given(
+  'I intercept the request to update note title {string} and hold its response',
+  (noteTopology: string) => {
+    start.jumpToNotePage(noteTopology)
+    start.testability().getInjectedNoteIdByTitle(noteTopology).then((noteId) => {
+      // Use a very long delay to effectively hold the response
+      // We can check the state before this delay completes
+      cy.intercept('PATCH', `/api/text_content/${noteId}/title`, (req) => {
+        // Delay the response significantly (20 seconds)
+        // This gives us time to check the state before the response arrives
+        req.reply((res) => {
+          res.delay(20000)
+          res.send()
+        })
+      }).as('titleUpdateRequest')
+    })
+  }
+)
+
+When(
+  'I type {string} in the title field without triggering save, leaving cursor at the end',
+  (text: string) => {
+    cy.findByRole('title').click()
+    // Type the text without blurring, which would trigger save
+    cy.focused().type(text)
+    // Verify cursor is at the end by checking selection
+    cy.focused().then(($el) => {
+      const el = $el[0] as HTMLInputElement | HTMLTextAreaElement
+      const cursorPos = el.selectionStart || 0
+      const textLength = el.value.length
+      expect(cursorPos).to.equal(textLength)
+    })
+  }
+)
+
+When('I release the intercepted response', () => {
+  // The response was already set to delay, so we just wait for it to complete
+  // In a real scenario with manual control, we'd need a different mechanism
+  // For this test, we'll wait for the delayed response
+  cy.wait('@titleUpdateRequest', { timeout: 25000 })
+})
+
+Then(
+  'the title field should contain {string}',
+  (expectedText: string) => {
+    cy.findByRole('title').should('have.text', expectedText)
+  }
+)
+
+Then('the cursor should be at the end of the title field', () => {
+  cy.findByRole('title').click()
+  cy.focused().then(($el) => {
+    const el = $el[0] as HTMLInputElement | HTMLTextAreaElement
+    const cursorPos = el.selectionStart || 0
+    const textLength = el.value.length
+    expect(cursorPos).to.equal(textLength)
+  })
+)
