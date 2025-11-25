@@ -4,7 +4,6 @@ import makeMe from "../fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
 import { fireEvent, waitFor } from "@testing-library/vue"
 import { saveAs } from "file-saver"
-import * as sdk from "@generated/backend/sdk.gen"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
@@ -19,7 +18,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    mockSdkService("getDescendants", descendantsData)
+    const getDescendantsSpy = mockSdkService("getDescendants", descendantsData)
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -36,7 +35,7 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(sdk.getDescendants).toHaveBeenCalledWith({
+    expect(getDescendantsSpy).toHaveBeenCalledWith({
       path: { note: note.id },
     })
   })
@@ -87,7 +86,7 @@ describe("NoteExportDialog", () => {
       focusNote: { id: note.id },
       relatedNotes: [],
     } as never
-    mockSdkService("getGraph", graphData)
+    const getGraphSpy = mockSdkService("getGraph", graphData)
     const { getByText, getByTestId, queryByTestId } = helper
       .component(NoteExportDialog)
       .withProps({ note })
@@ -102,7 +101,7 @@ describe("NoteExportDialog", () => {
       expect(textarea.value).toContain('"focusNote"')
     })
     // Should call API once
-    expect(sdk.getGraph).toHaveBeenCalledWith({
+    expect(getGraphSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 5000 },
     })
