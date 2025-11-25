@@ -27,12 +27,8 @@ class StoredComponentTestHelper {
  * in tests that use NoteAccessoryAsync component.
  */
 export function mockShowNoteAccessory() {
-  return vi.spyOn(sdk, "showNoteAccessory").mockResolvedValue({
-    data: undefined as never,
-    error: undefined as never,
-    request: {} as Request,
-    response: {} as Response,
-  })
+  // biome-ignore lint/suspicious/noExplicitAny: showNoteAccessory returns undefined which requires special handling
+  return mockSdkService("showNoteAccessory", undefined as any)
 }
 
 /**
@@ -47,12 +43,7 @@ export function mockShowNote(noteRealm?: NoteRealm) {
       note: { id: 1 },
       children: [],
     } as unknown as NoteRealm)
-  return vi.spyOn(sdk, "showNote").mockResolvedValue({
-    data: defaultNote,
-    error: undefined,
-    request: {} as Request,
-    response: {} as Response,
-  })
+  return mockSdkService("showNote", defaultNote)
 }
 
 /**
