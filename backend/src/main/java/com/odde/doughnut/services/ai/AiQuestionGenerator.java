@@ -65,13 +65,33 @@ public class AiQuestionGenerator {
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
       MCQWithAnswer original = service.generateQuestion(additionalMessage);
-      if (original != null && !original.isStrictChoiceOrder()) {
-        return shuffleChoices(original);
+      if (original != null) {
+        // Always shuffle unless there are interdependent choices that require strict order
+        if (!hasInterdependentChoices(original)) {
+          return shuffleChoices(original);
+        }
+        // Only respect strictChoiceOrder if interdependent choices are detected
+        if (!original.isStrictChoiceOrder()) {
+          return shuffleChoices(original);
+        }
       }
       return original;
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private boolean hasInterdependentChoices(MCQWithAnswer question) {
+    List<String> choices = question.getMultipleChoicesQuestion().getChoices();
+    if (choices == null) {
+      return false;
+    }
+    // Check for interdependent choice patterns that require strict order
+    String lowerCaseChoices = String.join(" ", choices).toLowerCase();
+    return lowerCaseChoices.contains("none of the above")
+        || lowerCaseChoices.contains("all of the above")
+        || lowerCaseChoices.contains("both of the above")
+        || lowerCaseChoices.contains("neither of the above");
   }
 
   private MCQWithAnswer shuffleChoices(MCQWithAnswer original) {

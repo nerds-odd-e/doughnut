@@ -200,4 +200,77 @@ class AiQuestionGeneratorTests {
     // Assert
     assertThat(result, equalTo(null)); // Question generation should be skipped
   }
+
+  @Test
+  void shouldShuffleChoicesEvenWhenStrictChoiceOrderIsTrueIfNoInterdependentChoices() {
+    // Setup a mocked randomizer
+    Randomizer mockedRandomizer = mock(Randomizer.class);
+    var objectMapper = new ObjectMapperConfig().objectMapper();
+    AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
+        new AiQuestionGenerator(
+            notebookAssistantForNoteServiceFactory,
+            globalSettingsService,
+            mockedRandomizer,
+            objectMapper,
+            openAiApiHandler,
+            testabilitySettings);
+
+    // Setup a note with enough content for question generation
+    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    makeMe.aNote().under(note).please();
+
+    // Prepare the AI response with strictChoiceOrder = true but no interdependent choices
+    MCQWithAnswer originalQuestion =
+        makeMe
+            .aMCQWithAnswer()
+            .stem("What is 2+2?")
+            .choices("4", "3", "5", "6")
+            .correctChoiceIndex(0)
+            .strictChoiceOrder(true) // AI sets this, but no interdependent choices
+            .please();
+
+    // Mock the randomizer to return a specific shuffled order
+    List<String> shuffledChoices = Arrays.asList("6", "4", "5", "3");
+    doReturn(shuffledChoices).when(mockedRandomizer).shuffle(any());
+
+    // Mock the chat completion API calls
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(originalQuestion);
+
+    // Act
+    MCQWithAnswer result =
+        aiQuestionGeneratorWithMockedRandomizer.getAiGeneratedQuestion(note, null);
+
+    // Assert - should still shuffle even though strictChoiceOrder is true
+    assertThat(result.getMultipleChoicesQuestion().getChoices(), equalTo(shuffledChoices));
+    assertThat(result.getCorrectChoiceIndex(), equalTo(1)); // "4" is now at index 1
+  }
+
+  @Test
+  void shouldRespectStrictChoiceOrderWhenInterdependentChoicesExist() {
+    // Setup a note with enough content for question generation
+    Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
+    makeMe.aNote().under(note).please();
+
+    // Prepare the AI response with strictChoiceOrder = true and interdependent choices
+    MCQWithAnswer originalQuestion =
+        makeMe
+            .aMCQWithAnswer()
+            .stem("What is 2+2?")
+            .choices("4", "3", "None of the above")
+            .correctChoiceIndex(0)
+            .strictChoiceOrder(true) // Should be respected when interdependent choices exist
+            .please();
+
+    // Mock the chat completion API calls
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(originalQuestion);
+
+    // Act
+    MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
+
+    // Assert - should NOT shuffle when interdependent choices exist and strictChoiceOrder is true
+    assertThat(
+        result.getMultipleChoicesQuestion().getChoices(),
+        equalTo(originalQuestion.getMultipleChoicesQuestion().getChoices()));
+    assertThat(result.getCorrectChoiceIndex(), equalTo(0));
+  }
 }
