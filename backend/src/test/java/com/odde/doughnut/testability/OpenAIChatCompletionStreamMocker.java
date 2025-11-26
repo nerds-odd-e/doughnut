@@ -5,14 +5,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.openai.client.OpenAIClient;
-import com.openai.core.http.StreamResponse;
+import com.openai.client.OpenAIClientAsync;
+import com.openai.core.http.AsyncStreamResponse;
 import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionChunk.Choice;
 import com.openai.models.chat.completions.ChatCompletionChunk.Choice.Delta;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import com.openai.services.async.ChatServiceAsync;
+import com.openai.services.async.chat.ChatCompletionServiceAsync;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import org.mockito.ArgumentMatchers;
+import org.mockito.stubbing.Answer;
 
 public class OpenAIChatCompletionStreamMocker {
   private final OpenAIClient officialClient;
@@ -74,20 +81,41 @@ public class OpenAIChatCompletionStreamMocker {
             .build();
     chunks.add(finalChunk);
 
-    // Mock the streaming response
+    // Mock the async streaming response
     @SuppressWarnings("unchecked")
-    StreamResponse<ChatCompletionChunk> streamResponse = mock(StreamResponse.class);
-    when(streamResponse.stream()).thenReturn(chunks.stream());
+    AsyncStreamResponse<ChatCompletionChunk> asyncStreamResponse = mock(AsyncStreamResponse.class);
 
-    com.openai.services.blocking.chat.ChatCompletionService completionService =
-        mock(com.openai.services.blocking.chat.ChatCompletionService.class);
+    CompletableFuture<Void> completionFuture = CompletableFuture.completedFuture(null);
+    when(asyncStreamResponse.onCompleteFuture()).thenReturn(completionFuture);
+
+    Answer<AsyncStreamResponse<ChatCompletionChunk>> subscribeAnswer =
+        invocation -> {
+          AsyncStreamResponse.Handler<ChatCompletionChunk> handler = invocation.getArgument(0);
+          for (ChatCompletionChunk chunk : chunks) {
+            handler.onNext(chunk);
+          }
+          handler.onComplete(Optional.empty());
+          return asyncStreamResponse;
+        };
+
+    when(asyncStreamResponse.subscribe(
+            ArgumentMatchers.<AsyncStreamResponse.Handler<ChatCompletionChunk>>any()))
+        .thenAnswer(subscribeAnswer);
+    when(asyncStreamResponse.subscribe(
+            ArgumentMatchers.<AsyncStreamResponse.Handler<ChatCompletionChunk>>any(),
+            any(Executor.class)))
+        .thenAnswer(subscribeAnswer);
+
+    ChatCompletionServiceAsync completionService = mock(ChatCompletionServiceAsync.class);
     when(completionService.createStreaming(any(ChatCompletionCreateParams.class)))
-        .thenReturn(streamResponse);
+        .thenReturn(asyncStreamResponse);
 
-    com.openai.services.blocking.ChatService chatService =
-        mock(com.openai.services.blocking.ChatService.class);
+    ChatServiceAsync chatService = mock(ChatServiceAsync.class);
     when(chatService.completions()).thenReturn(completionService);
 
-    when(officialClient.chat()).thenReturn(chatService);
+    OpenAIClientAsync asyncClient = mock(OpenAIClientAsync.class);
+    when(asyncClient.chat()).thenReturn(chatService);
+
+    when(officialClient.async()).thenReturn(asyncClient);
   }
 }

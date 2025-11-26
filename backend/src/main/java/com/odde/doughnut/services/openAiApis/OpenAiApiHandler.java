@@ -10,9 +10,7 @@ import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.openai.client.OpenAIClient;
-import com.openai.core.http.StreamResponse;
 import com.openai.models.chat.completions.ChatCompletion;
-import com.openai.models.chat.completions.ChatCompletionChunk;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import com.openai.models.chat.completions.ChatCompletionMessage;
 import com.openai.models.files.FileCreateParams;
@@ -76,58 +74,45 @@ public class OpenAiApiHandler {
 
   public Flowable<String> streamChatCompletion(ChatCompletionCreateParams params) {
 
-    return Flowable.create(
+    return Flowable.<String>create(
         emitter -> {
-          StreamResponse<ChatCompletionChunk> streamResponse = null;
-          try {
-            streamResponse = officialClient.chat().completions().createStreaming(params);
-            final StreamResponse<ChatCompletionChunk> finalStreamResponse = streamResponse;
-
-            // Register cleanup when emitter is cancelled
-            emitter.setCancellable(
-                () -> {
-                  if (finalStreamResponse != null) {
+          // Use the async client's subscribe() method for true async streaming
+          // The OpenAI SDK's async API handles threading internally, so we don't need
+          // subscribeOn() which would move session-scoped bean access to a background thread
+          officialClient
+              .async()
+              .chat()
+              .completions()
+              .createStreaming(params)
+              .subscribe(
+                  chunk -> {
                     try {
-                      finalStreamResponse.close();
-                    } catch (Exception e) {
-                      // Ignore errors during cleanup
+                      // Convert ChatCompletionChunk to JSON string to preserve delta field
+                      // structure expected by frontend
+                      String jsonString = objectMapper.writeValueAsString(chunk);
+                      emitter.onNext(jsonString);
+                    } catch (JsonProcessingException e) {
+                      emitter.onError(new RuntimeException("Failed to serialize chunk to JSON", e));
                     }
-                  }
-                });
-
-            streamResponse.stream()
-                .forEach(
-                    chunk -> {
-                      try {
-                        // Convert ChatCompletionChunk back to JSON string to preserve delta field
-                        // structure expected by frontend
-                        String jsonString = objectMapper.writeValueAsString(chunk);
-                        emitter.onNext(jsonString);
-                      } catch (JsonProcessingException e) {
+                  })
+              .onCompleteFuture()
+              .whenComplete(
+                  (unused, error) -> {
+                    if (error != null) {
+                      // Handle unauthorized errors
+                      if (error.getMessage() != null
+                          && (error.getMessage().contains("401")
+                              || error.getMessage().contains("Unauthorized"))) {
                         emitter.onError(
-                            new RuntimeException("Failed to serialize chunk to JSON", e));
+                            new com.odde.doughnut.exceptions.OpenAiUnauthorizedException(
+                                "Unauthorized: " + error.getMessage()));
+                      } else {
+                        emitter.onError(error);
                       }
-                    });
-            emitter.onComplete();
-          } catch (Exception e) {
-            // Handle unauthorized errors
-            if (e.getMessage() != null
-                && (e.getMessage().contains("401") || e.getMessage().contains("Unauthorized"))) {
-              emitter.onError(
-                  new com.odde.doughnut.exceptions.OpenAiUnauthorizedException(
-                      "Unauthorized: " + e.getMessage()));
-            } else {
-              emitter.onError(e);
-            }
-          } finally {
-            if (streamResponse != null) {
-              try {
-                streamResponse.close();
-              } catch (Exception e) {
-                // Ignore errors during cleanup
-              }
-            }
-          }
+                    } else {
+                      emitter.onComplete();
+                    }
+                  });
         },
         BackpressureStrategy.BUFFER);
   }
