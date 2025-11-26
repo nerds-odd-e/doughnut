@@ -19,6 +19,9 @@ public class AiToolFactory {
 
   public static InstructionAndSchema mcqWithAnswerAiTool(LinkType linkType) {
     String linkTypeInstruction = getLinkTypeInstruction(linkType);
+
+    // 5. **Empty Stems When Necessary**: Leave the question stem empty if there's insufficient
+    // information to create a meaningful question.
     String baseInstruction =
         """
         Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
@@ -30,22 +33,18 @@ public class AiToolFactory {
            - Use other focus note info and related notes to enrich the question formulation.
            - Avoid accidental bias by ensuring the focus note isn't falsely assumed to be the sole specialization of a general concept.
            - Related notes often serve as excellent distractor choices for the MCQs. But avoid more than 1 correct answers.
-        3. **Context Visibility**:
-           - Avoid explicitly mentioning the focus note title in stem
-           - Focus note can appear in the choices when necessary.
-        4. **Generate Multiple-Choice Questions (MCQs)**:
+        3. **Generate Multiple-Choice Questions (MCQs)**:
            - Provide 2 to 3 options, with ONLY one correct answer.
            - Vary the length of answer choices to avoid patterns where the correct answer is consistently the longest.
            - Use markdown for both the question stem and the answer choices.
-        6. **Ensure Question Self-Sufficiency**:
+        4. **Ensure Question Self-Sufficiency**:
            - Ensure the question provides all necessary context within the stem and choices.
            - Avoid vague phrasing like "this X" or "the following X" unless the X is explicitly defined in the stem or choices.
            - IMPORTANT: Avoid using "this note"!!! User won't know which note you are referring to.
-        7. **Empty Stems When Necessary**: Leave the question stem empty if there's insufficient information to create a meaningful question.
-        8. **Make sure correct choice index is accurate**:
+        6. **Make sure correct choice index is accurate**:
            - The correct choice is also exclusive, and plausible.
            - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
-      	9. **Choice order semantics (strictChoiceOrder)**:
+      	7. **Choice order semantics (strictChoiceOrder)**:
            - In typical MCQs without meta-choices (‘All of the above’, ‘None of the above’, ‘Only A and B’), strictChoiceOrder must ALWAYS be false.
 
       """;
