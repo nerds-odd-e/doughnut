@@ -16,8 +16,7 @@ public class MultipleChoicesQuestion {
   @JsonProperty(required = true)
   private String stem;
 
-  @JsonPropertyDescription(
-      "All choices. Accepts **Markdown** notation. Only one should be correct.")
+  @JsonPropertyDescription("List of choices. Markdown allowed.")
   @JsonProperty(required = true)
   private List<String> choices;
 }
