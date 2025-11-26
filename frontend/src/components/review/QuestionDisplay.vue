@@ -7,6 +7,7 @@
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answer?.choiceIndex"
       :disabled="disabled"
+      :question-id="questionId"
       @answer="submitAnswer($event)"
     />
   </div>
@@ -30,6 +31,10 @@ defineProps({
   correctChoiceIndex: Number,
   answer: Object as PropType<Answer>,
   disabled: Boolean,
+  questionId: {
+    type: [Number, String],
+    default: undefined,
+  },
 })
 
 const emits = defineEmits(["answer"])

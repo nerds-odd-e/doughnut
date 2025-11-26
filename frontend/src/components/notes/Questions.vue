@@ -59,7 +59,7 @@
               :class="{
                 'correct-choice': index === question.correctAnswerIndex,
               }"
-              :key="index"
+              :key="`${question.id}-${choice}`"
             >
               {{ choice }}
             </td>
