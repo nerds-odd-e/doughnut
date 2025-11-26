@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MultipleChoicesQuestion {
-  @JsonPropertyDescription(
-      "The stem of the multiple-choice question. Accepts **Markdown** notation. Provide background or disclosure necessary to clarify the question when needed.")
+  @JsonPropertyDescription("The question stem — the text of the prompt.")
   @JsonProperty(required = true)
   @JsonAlias("stem")
   private String f0__stem;

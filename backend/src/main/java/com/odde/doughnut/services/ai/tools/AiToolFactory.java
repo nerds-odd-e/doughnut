@@ -45,8 +45,8 @@ public class AiToolFactory {
         8. **Make sure correct choice index is accurate**:
            - The correct choice is also exclusive, and plausible.
            - Ensure distractor choices are logical but clearly incorrect (without needing to be obvious).
-        9. **Output Handling**:
-           - Create only one question and make only one call to the function.
+      	9. **Choice order semantics (strictChoiceOrder)**:
+           - In typical MCQs without meta-choices (‘All of the above’, ‘None of the above’, ‘Only A and B’), strictChoiceOrder must ALWAYS be false.
 
       """;
     String fullInstruction =

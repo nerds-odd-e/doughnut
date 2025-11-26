@@ -142,19 +142,34 @@ class NoteQuestionGenerationServiceTests {
 
   @Nested
   class BuildQuestionGenerationRequest {
+
     @Test
     void shouldBuildRequestWithNoteDescription() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(null);
-
       assertThat(request, is(notNullValue()));
       assertThat(request.model().toString(), is("gpt-4o-mini"));
       boolean hasNoteDescription =
           request.messages().stream()
-              .filter(message -> message.system().isPresent())
+              .filter(message -> message.user().isPresent())
               .anyMatch(
                   message ->
                       message.toString().contains("Focus Note and the notes related to it:"));
+      assertThat("Request should contain note description", hasNoteDescription, is(true));
+    }
+
+    @Test
+    void shouldBuildRequestWithNoteInstructions() {
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(null);
+      assertThat(request, is(notNullValue()));
+      assertThat(request.model().toString(), is("gpt-4o-mini"));
+      boolean hasNoteDescription =
+          request.messages().stream()
+              .filter(message -> message.user().isPresent())
+              .anyMatch(
+                  message ->
+                      message.toString().contains("The JSON below is available only to you"));
       assertThat("Request should contain note description", hasNoteDescription, is(true));
     }
 
@@ -228,10 +243,7 @@ class NoteQuestionGenerationServiceTests {
       long systemMessageCount =
           request.messages().stream().filter(message -> message.system().isPresent()).count();
 
-      assertThat(
-          "Request should have only one system message (note description)",
-          systemMessageCount,
-          is(1L));
+      assertThat("Request should have no system message", systemMessageCount, is(0L));
     }
   }
 

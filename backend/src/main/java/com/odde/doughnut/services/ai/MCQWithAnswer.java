@@ -27,7 +27,7 @@ public class MCQWithAnswer {
   private int f1__correctChoiceIndex;
 
   @JsonPropertyDescription(
-      "If true, the order of choices should not be randomized due to interdependent statements like 'None of the above'")
+      "If true, the order of choices must be preserved and must not be randomized.")
   @JsonProperty(required = true)
   @JsonAlias("strictChoiceOrder")
   private boolean f2__strictChoiceOrder;

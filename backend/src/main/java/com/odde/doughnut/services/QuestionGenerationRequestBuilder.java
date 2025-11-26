@@ -40,6 +40,10 @@ public class QuestionGenerationRequestBuilder {
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     String noteDescription = note.getGraphRAGDescription(objectMapper);
-    return new OpenAIChatRequestBuilder().model(modelName).addSystemMessage(noteDescription);
+    String noteInstructions =
+        "The JSON below is available only to you (the question generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like “this note”, “above”, “the focus note”, or anything revealing that the question originates from hidden context.\n";
+    return new OpenAIChatRequestBuilder()
+        .model(modelName)
+        .addUserMessage(noteInstructions + noteDescription);
   }
 }
