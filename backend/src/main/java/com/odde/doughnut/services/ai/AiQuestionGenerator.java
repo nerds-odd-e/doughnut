@@ -65,7 +65,7 @@ public class AiQuestionGenerator {
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
       MCQWithAnswer original = service.generateQuestion(additionalMessage);
-      if (original != null && !original.isStrictChoiceOrder()) {
+      if (original != null && !original.isF2__strictChoiceOrder()) {
         return shuffleChoices(original);
       }
       return original;
@@ -75,13 +75,15 @@ public class AiQuestionGenerator {
   }
 
   private MCQWithAnswer shuffleChoices(MCQWithAnswer original) {
-    List<String> choices = new ArrayList<>(original.getMultipleChoicesQuestion().getF1__choices());
-    String correctChoice = choices.get(original.getCorrectChoiceIndex());
+    List<String> choices =
+        new ArrayList<>(original.getF0__multipleChoicesQuestion().getF1__choices());
+    String correctChoice = choices.get(original.getF1__correctChoiceIndex());
     choices = randomizer.shuffle(choices);
     int newCorrectIndex = choices.indexOf(correctChoice);
 
     MultipleChoicesQuestion shuffledQuestion =
-        new MultipleChoicesQuestion(original.getMultipleChoicesQuestion().getF0__stem(), choices);
+        new MultipleChoicesQuestion(
+            original.getF0__multipleChoicesQuestion().getF0__stem(), choices);
 
     return new MCQWithAnswer(shuffledQuestion, newCorrectIndex, false);
   }

@@ -71,7 +71,7 @@ class AiQuestionGeneratorTests {
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
     assertThat(
-        result.getMultipleChoicesQuestion().getF0__stem(),
+        result.getF0__multipleChoicesQuestion().getF0__stem(),
         equalTo("What is the first color in the rainbow?"));
   }
 
@@ -99,20 +99,23 @@ class AiQuestionGeneratorTests {
 
     // Assert
     assertThat(
-        result.getMultipleChoicesQuestion().getF0__stem(),
-        equalTo(originalQuestion.getMultipleChoicesQuestion().getF0__stem()));
+        result.getF0__multipleChoicesQuestion().getF0__stem(),
+        equalTo(originalQuestion.getF0__multipleChoicesQuestion().getF0__stem()));
     assertThat(
-        result.getMultipleChoicesQuestion().getF1__choices().size(),
-        equalTo(originalQuestion.getMultipleChoicesQuestion().getF1__choices().size()));
+        result.getF0__multipleChoicesQuestion().getF1__choices().size(),
+        equalTo(originalQuestion.getF0__multipleChoicesQuestion().getF1__choices().size()));
 
     // Verify the correct answer is maintained
     String expectedCorrectAnswer =
         originalQuestion
-            .getMultipleChoicesQuestion()
+            .getF0__multipleChoicesQuestion()
             .getF1__choices()
-            .get(originalQuestion.getCorrectChoiceIndex());
+            .get(originalQuestion.getF1__correctChoiceIndex());
     String actualCorrectAnswer =
-        result.getMultipleChoicesQuestion().getF1__choices().get(result.getCorrectChoiceIndex());
+        result
+            .getF0__multipleChoicesQuestion()
+            .getF1__choices()
+            .get(result.getF1__correctChoiceIndex());
     assertThat(actualCorrectAnswer, equalTo(expectedCorrectAnswer));
   }
 
@@ -156,8 +159,8 @@ class AiQuestionGeneratorTests {
         aiQuestionGeneratorWithMockedRandomizer.getAiGeneratedQuestion(note, null);
 
     // Assert
-    assertThat(result.getMultipleChoicesQuestion().getF1__choices(), equalTo(shuffledChoices));
-    assertThat(result.getCorrectChoiceIndex(), equalTo(1)); // "4" is now at index 1
+    assertThat(result.getF0__multipleChoicesQuestion().getF1__choices(), equalTo(shuffledChoices));
+    assertThat(result.getF1__correctChoiceIndex(), equalTo(1)); // "4" is now at index 1
   }
 
   @Test

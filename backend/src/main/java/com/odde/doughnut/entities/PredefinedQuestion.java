@@ -44,8 +44,8 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public MCQWithAnswer getMcqWithAnswer() {
     MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
-    mcqWithAnswer.setMultipleChoicesQuestion(getMultipleChoicesQuestion());
-    mcqWithAnswer.setCorrectChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
+    mcqWithAnswer.setF0__multipleChoicesQuestion(getMultipleChoicesQuestion());
+    mcqWithAnswer.setF1__correctChoiceIndex(correctAnswerIndex == null ? -1 : correctAnswerIndex);
     return mcqWithAnswer;
   }
 
@@ -57,8 +57,8 @@ public class PredefinedQuestion extends EntityIdentifiedByIdOnly {
   public static PredefinedQuestion fromMCQWithAnswer(MCQWithAnswer MCQWithAnswer, Note note) {
     PredefinedQuestion predefinedQuestion = new PredefinedQuestion();
     predefinedQuestion.setNote(note);
-    predefinedQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getMultipleChoicesQuestion());
-    predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getCorrectChoiceIndex());
+    predefinedQuestion.setMultipleChoicesQuestion(MCQWithAnswer.getF0__multipleChoicesQuestion());
+    predefinedQuestion.setCorrectAnswerIndex(MCQWithAnswer.getF1__correctChoiceIndex());
     return predefinedQuestion;
   }
 

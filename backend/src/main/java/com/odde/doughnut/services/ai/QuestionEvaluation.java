@@ -31,7 +31,7 @@ public class QuestionEvaluation {
   }
 
   public QuestionContestResult getQuestionContestResult(MCQWithAnswer mcqWithAnswer) {
-    int correctChoiceIndex = mcqWithAnswer.getCorrectChoiceIndex();
+    int correctChoiceIndex = mcqWithAnswer.getF1__correctChoiceIndex();
     if (feasibleQuestion && indisputableAnswer(correctChoiceIndex)) {
       QuestionContestResult result = new QuestionContestResult();
       result.advice = "This seems to be a legitimate question. Please answer it.";
@@ -41,7 +41,7 @@ public class QuestionEvaluation {
     QuestionContestResult result = new QuestionContestResult();
     result.advice = "";
     if (!indisputableAnswer(correctChoiceIndex)) {
-      var choices = mcqWithAnswer.getMultipleChoicesQuestion().getF1__choices();
+      var choices = mcqWithAnswer.getF0__multipleChoicesQuestion().getF1__choices();
       if (choices == null) {
         result.advice = "The question has no choices defined.";
         return result;

@@ -89,7 +89,7 @@ class QuestionEvaluationTest {
             .stem("What is the capital of France?")
             .correctChoiceIndex(0)
             .please();
-    mcqWithNullChoices.getMultipleChoicesQuestion().setF1__choices(null);
+    mcqWithNullChoices.getF0__multipleChoicesQuestion().setF1__choices(null);
 
     QuestionContestResult result = questionEvaluation.getQuestionContestResult(mcqWithNullChoices);
     assertEquals("The question has no choices defined.", result.advice);

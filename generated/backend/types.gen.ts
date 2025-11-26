@@ -50,9 +50,9 @@ export type Randomization = {
 };
 
 export type McqWithAnswer = {
-    multipleChoicesQuestion: MultipleChoicesQuestion;
-    correctChoiceIndex: number;
-    strictChoiceOrder: boolean;
+    f0__multipleChoicesQuestion: MultipleChoicesQuestion;
+    f1__correctChoiceIndex: number;
+    f2__strictChoiceOrder: boolean;
 };
 
 export type MultipleChoicesQuestion = {

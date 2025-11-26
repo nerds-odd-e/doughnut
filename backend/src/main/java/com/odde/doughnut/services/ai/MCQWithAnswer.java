@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,25 +18,28 @@ import lombok.NoArgsConstructor;
 public class MCQWithAnswer {
 
   @JsonProperty(required = true)
-  private MultipleChoicesQuestion multipleChoicesQuestion = new MultipleChoicesQuestion();
+  @JsonAlias("multipleChoicesQuestion")
+  private MultipleChoicesQuestion f0__multipleChoicesQuestion = new MultipleChoicesQuestion();
 
   @JsonPropertyDescription("Index of the correct choice. 0-based.")
   @JsonProperty(required = true)
-  private int correctChoiceIndex;
+  @JsonAlias("correctChoiceIndex")
+  private int f1__correctChoiceIndex;
 
   @JsonPropertyDescription(
       "If true, the order of choices should not be randomized due to interdependent statements like 'None of the above'")
   @JsonProperty(required = true)
-  private boolean strictChoiceOrder;
+  @JsonAlias("strictChoiceOrder")
+  private boolean f2__strictChoiceOrder;
 
   @JsonIgnore
   public boolean isValid() {
-    if (multipleChoicesQuestion == null) return false;
-    if (multipleChoicesQuestion.getF0__stem() == null
-        || multipleChoicesQuestion.getF0__stem().isBlank()) return false;
-    if (multipleChoicesQuestion.getF1__choices() == null) return false;
-    int choicesCount = multipleChoicesQuestion.getF1__choices().size();
+    if (f0__multipleChoicesQuestion == null) return false;
+    if (f0__multipleChoicesQuestion.getF0__stem() == null
+        || f0__multipleChoicesQuestion.getF0__stem().isBlank()) return false;
+    if (f0__multipleChoicesQuestion.getF1__choices() == null) return false;
+    int choicesCount = f0__multipleChoicesQuestion.getF1__choices().size();
     if (choicesCount == 0) return false;
-    return correctChoiceIndex >= 0 && correctChoiceIndex < choicesCount;
+    return f1__correctChoiceIndex >= 0 && f1__correctChoiceIndex < choicesCount;
   }
 }

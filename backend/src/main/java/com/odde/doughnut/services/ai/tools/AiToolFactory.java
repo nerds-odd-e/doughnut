@@ -64,7 +64,7 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {
-    MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
+    MultipleChoicesQuestion mcq = question.getF0__multipleChoicesQuestion();
 
     String messageBody =
         """
@@ -92,7 +92,7 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema questionRefineAiTool(MCQWithAnswer question) {
-    MultipleChoicesQuestion mcq = question.getMultipleChoicesQuestion();
+    MultipleChoicesQuestion mcq = question.getF0__multipleChoicesQuestion();
 
     String messageBody =
 """

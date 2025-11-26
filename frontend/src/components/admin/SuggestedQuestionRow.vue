@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td>
-      {{ suggestedQuestion.preservedQuestion.multipleChoicesQuestion.f0__stem }}
+      {{ suggestedQuestion.preservedQuestion.f0__multipleChoicesQuestion.f0__stem }}
     </td>
     <td>{{ suggestedQuestion.positiveFeedback ? "Positive" : "Negative" }}</td>
     <td>{{ suggestedQuestion.comment }}</td>
@@ -78,7 +78,7 @@ export default {
     async deleteSuggestedQuestion(suggested: SuggestedQuestionForFineTuning) {
       if (
         await this.popups.confirm(
-          `Are you sure to delete this suggestion (${suggested.preservedQuestion.multipleChoicesQuestion.f0__stem})?`
+          `Are you sure to delete this suggestion (${suggested.preservedQuestion.f0__multipleChoicesQuestion.f0__stem})?`
         )
       ) {
         await delete_({

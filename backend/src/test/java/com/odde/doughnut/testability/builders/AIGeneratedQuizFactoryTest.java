@@ -61,7 +61,7 @@ class AIGeneratedQuizFactoryTest {
     void correct() {
       AnsweredQuestion answerResult =
           questionBuilder()
-              .answerChoiceIndex(mcqWithAnswer.getCorrectChoiceIndex())
+              .answerChoiceIndex(mcqWithAnswer.getF1__correctChoiceIndex())
               .please(false)
               .getAnsweredQuestion();
       assertTrue(answerResult.answer.getCorrect());

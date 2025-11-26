@@ -8,7 +8,7 @@ public class MCQWithAnswerBuilder {
   MCQWithAnswer mcqWithAnswer = new MCQWithAnswer();
 
   public MCQWithAnswer please() {
-    MultipleChoicesQuestion mcq = mcqWithAnswer.getMultipleChoicesQuestion();
+    MultipleChoicesQuestion mcq = mcqWithAnswer.getF0__multipleChoicesQuestion();
     if (mcq.getF0__stem() == null) {
       mcq.setF0__stem("a default question stem");
     }
@@ -19,22 +19,22 @@ public class MCQWithAnswerBuilder {
   }
 
   public MCQWithAnswerBuilder stem(String stem) {
-    mcqWithAnswer.getMultipleChoicesQuestion().setF0__stem(stem);
+    mcqWithAnswer.getF0__multipleChoicesQuestion().setF0__stem(stem);
     return this;
   }
 
   public MCQWithAnswerBuilder choices(String... choices) {
-    mcqWithAnswer.getMultipleChoicesQuestion().setF1__choices(List.of(choices));
+    mcqWithAnswer.getF0__multipleChoicesQuestion().setF1__choices(List.of(choices));
     return this;
   }
 
   public MCQWithAnswerBuilder correctChoiceIndex(int i) {
-    mcqWithAnswer.setCorrectChoiceIndex(i);
+    mcqWithAnswer.setF1__correctChoiceIndex(i);
     return this;
   }
 
   public MCQWithAnswerBuilder strictChoiceOrder(boolean b) {
-    mcqWithAnswer.setStrictChoiceOrder(b);
+    mcqWithAnswer.setF2__strictChoiceOrder(b);
     return this;
   }
 }

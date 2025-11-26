@@ -38,7 +38,8 @@ describe("Edit Suggested Question", () => {
         matchByText(wrapper, /Chat/, "button")!.trigger("click")
         const alertMsg = usePopups().popups.peek()[0]!.message
         expect(alertMsg).toContain(
-          suggestedQuestion.preservedQuestion.multipleChoicesQuestion.f0__stem
+          suggestedQuestion.preservedQuestion.f0__multipleChoicesQuestion
+            .f0__stem
         )
         expect(alertMsg).toContain(suggestedQuestion.preservedNoteContent)
       })

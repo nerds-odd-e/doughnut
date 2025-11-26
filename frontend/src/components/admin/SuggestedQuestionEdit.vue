@@ -8,7 +8,7 @@
     />
     <TextArea
       :field="`stem`"
-      v-model="suggestionParams.preservedQuestion.multipleChoicesQuestion.f0__stem"
+      v-model="suggestionParams.preservedQuestion.f0__multipleChoicesQuestion.f0__stem"
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
@@ -17,7 +17,7 @@
         <TextInput
           :field="`choice-${index}`"
           v-model="
-            suggestionParams.preservedQuestion.multipleChoicesQuestion.f1__choices[
+            suggestionParams.preservedQuestion.f0__multipleChoicesQuestion.f1__choices[
               index
             ]
           "
@@ -27,7 +27,7 @@
     </ul>
     <TextInput
       field="correctChoiceIndex"
-      v-model="suggestionParams.preservedQuestion.correctChoiceIndex"
+      v-model="suggestionParams.preservedQuestion.f1__correctChoiceIndex"
       placeholder="correct choice index"
       :error-message="errors.preservedQuestion.correctChoiceIndex"
     />
@@ -111,21 +111,21 @@ export default defineComponent({
       params: QuestionSuggestionParams
     ): QuestionSuggestionParams | undefined {
       const validated = cloneDeep(params)
-      validated.preservedQuestion.multipleChoicesQuestion.f1__choices =
-        validated.preservedQuestion.multipleChoicesQuestion.f1__choices
+      validated.preservedQuestion.f0__multipleChoicesQuestion.f1__choices =
+        validated.preservedQuestion.f0__multipleChoicesQuestion.f1__choices
           .map((choice) => choice?.trim())
           .filter((choice) => choice?.length > 0)
       if (
-        validated.preservedQuestion.multipleChoicesQuestion.f1__choices.length <
-        2
+        validated.preservedQuestion.f0__multipleChoicesQuestion.f1__choices
+          .length < 2
       ) {
         this.errors.preservedQuestion.choices[1] =
           "At least 2 choices are required"
         return undefined
       }
       if (
-        validated.preservedQuestion.multipleChoicesQuestion.f1__choices
-          .length <= validated.preservedQuestion.correctChoiceIndex
+        validated.preservedQuestion.f0__multipleChoicesQuestion.f1__choices
+          .length <= validated.preservedQuestion.f1__correctChoiceIndex
       ) {
         this.errors.preservedQuestion.correctChoiceIndex =
           "Correct choice index is out of range"

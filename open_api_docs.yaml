@@ -3567,17 +3567,17 @@ components:
     MCQWithAnswer:
       type: object
       properties:
-        multipleChoicesQuestion:
+        f0__multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
-        correctChoiceIndex:
+        f1__correctChoiceIndex:
           type: integer
           format: int32
-        strictChoiceOrder:
+        f2__strictChoiceOrder:
           type: boolean
       required:
-      - correctChoiceIndex
-      - multipleChoicesQuestion
-      - strictChoiceOrder
+      - f0__multipleChoicesQuestion
+      - f1__correctChoiceIndex
+      - f2__strictChoiceOrder
     MultipleChoicesQuestion:
       type: object
       properties:

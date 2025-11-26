@@ -122,7 +122,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private int[] getRealCorrectAnswerIndice() {
     if (isPositiveFeedback) {
-      return new int[] {getPreservedQuestion().getCorrectChoiceIndex()};
+      return new int[] {getPreservedQuestion().getF1__correctChoiceIndex()};
     }
     if (!Strings.isBlank(realCorrectAnswers)) {
       return Arrays.stream(realCorrectAnswers.split(","))

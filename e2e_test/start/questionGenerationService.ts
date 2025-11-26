@@ -1,14 +1,14 @@
-import type { MCQWithAnswer } from '@generated/backend/models/MCQWithAnswer'
+import type { McqWithAnswer } from '@generated/backend/types.gen'
 import mock_services from './mock_services'
 
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
-    const mcqWithAnswer: MCQWithAnswer = {
-      correctChoiceIndex: 0,
-      strictChoiceOrder: true,
-      multipleChoicesQuestion: {
-        stem: record['Question Stem']!,
-        choices: [
+    const mcqWithAnswer: McqWithAnswer = {
+      f1__correctChoiceIndex: 0,
+      f2__strictChoiceOrder: true,
+      f0__multipleChoicesQuestion: {
+        f0__stem: record['Question Stem']!,
+        f1__choices: [
           record['Correct Choice']!,
           record['Incorrect Choice 1']!,
           record['Incorrect Choice 2']!,

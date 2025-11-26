@@ -57,7 +57,7 @@ class PredefinedQuestionTest {
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
           qq.getMultipleChoicesQuestion().getF0__stem(),
-          containsString(mcqWithAnswer.getMultipleChoicesQuestion().getF0__stem()));
+          containsString(mcqWithAnswer.getF0__multipleChoicesQuestion().getF0__stem()));
     }
   }
 
@@ -126,8 +126,8 @@ class PredefinedQuestionTest {
       // The first saved question should be the original with contested=true
       PredefinedQuestion firstSavedQuestion = questionCaptor.getAllValues().get(0);
       assertThat(
-          firstSavedQuestion.getMcqWithAnswer().getMultipleChoicesQuestion(),
-          equalTo(mcqWithAnswer.getMultipleChoicesQuestion()));
+          firstSavedQuestion.getMcqWithAnswer().getF0__multipleChoicesQuestion(),
+          equalTo(mcqWithAnswer.getF0__multipleChoicesQuestion()));
       assertThat(
           "First question should be marked as contested",
           firstSavedQuestion.isContested(),
@@ -136,14 +136,14 @@ class PredefinedQuestionTest {
       // The second saved question should be the regenerated one
       PredefinedQuestion secondSavedQuestion = questionCaptor.getAllValues().get(1);
       assertThat(
-          secondSavedQuestion.getMcqWithAnswer().getMultipleChoicesQuestion(),
-          equalTo(regeneratedQuestion.getMultipleChoicesQuestion()));
+          secondSavedQuestion.getMcqWithAnswer().getF0__multipleChoicesQuestion(),
+          equalTo(regeneratedQuestion.getF0__multipleChoicesQuestion()));
       assertThat(secondSavedQuestion.isContested(), is(false));
 
       // The result should be the regenerated question
       assertThat(
-          result.getMcqWithAnswer().getMultipleChoicesQuestion(),
-          equalTo(regeneratedQuestion.getMultipleChoicesQuestion()));
+          result.getMcqWithAnswer().getF0__multipleChoicesQuestion(),
+          equalTo(regeneratedQuestion.getF0__multipleChoicesQuestion()));
     }
   }
 
