@@ -45,6 +45,7 @@
           zulu24
           nodejs_22
           corepack_22
+          fzf
           git-secret
           gitleaks
           jq
