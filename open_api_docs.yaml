@@ -4711,10 +4711,6 @@ components:
           $ref: "#/components/schemas/NoteDetailsCompletion"
         titleReplacement:
           $ref: "#/components/schemas/TitleReplacement"
-        aiToolName:
-          type: string
-          enum:
-          - suggest_note_title
     TitleReplacement:
       type: object
       properties:

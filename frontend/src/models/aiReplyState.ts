@@ -137,7 +137,7 @@ export const createAiReplyStates = (
                   content: JSON.parse(functionArgs),
                   toolCallId: toolCall.id || "synthetic",
                 })
-              } else if (functionName === "suggest_note_title") {
+              } else if (functionName === "TitleReplacement") {
                 const { newTitle } = JSON.parse(functionArgs)
                 await context.handleSuggestion({
                   suggestionType: "title",

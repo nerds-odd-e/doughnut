@@ -127,7 +127,7 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   type: "function",
                   function: {
-                    name: "suggest_note_title",
+                    name: "TitleReplacement",
                     arguments: '{"newTitle":"New Title"}',
                   },
                 },
@@ -398,7 +398,7 @@ describe("aiReplyState", () => {
                   index: 1,
                   id: "call-2",
                   function: {
-                    name: "suggest_note_title",
+                    name: "TitleReplacement",
                     arguments: '{"newTitle":"Second Title"}',
                   },
                 },

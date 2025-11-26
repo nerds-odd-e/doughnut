@@ -506,7 +506,7 @@ describe("ConversationInner", () => {
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("suggest_note_title", <TitleReplacement>{
+        createToolCallChunk("TitleReplacement", <TitleReplacement>{
           newTitle: testTitle,
         })
       )
