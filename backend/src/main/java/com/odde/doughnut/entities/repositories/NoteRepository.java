@@ -87,4 +87,10 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
               + " ORDER BY n.updatedAt DESC"
               + " LIMIT 100")
   List<Note> findRecentNotesByUser(@Param("userId") Integer userId);
+
+  @Query(value = selectFromNote + " WHERE n.targetNote.id = :targetNoteId")
+  List<Note> findAllByTargetNote(@Param("targetNoteId") Integer targetNoteId);
+
+  @Query(value = selectFromNote + " WHERE n.parent.id = :parentId")
+  List<Note> findAllByParentId(@Param("parentId") Integer parentId);
 }

@@ -37,6 +37,29 @@ public class NoteService {
       }
     }
 
+    // Delete all descendants recursively
+    List<Note> descendants = note.getAllDescendants().toList();
+    for (Note descendant : descendants) {
+      descendant.setDeletedAt(currentUTCTimestamp);
+      entityPersister.merge(descendant);
+    }
+
+    // Delete all inbound references to the note itself
+    List<Note> inboundReferences = noteRepository.findAllByTargetNote(note.getId());
+    for (Note reference : inboundReferences) {
+      reference.setDeletedAt(currentUTCTimestamp);
+      entityPersister.merge(reference);
+    }
+
+    // Delete all inbound references to all descendants
+    for (Note descendant : descendants) {
+      List<Note> descendantReferences = noteRepository.findAllByTargetNote(descendant.getId());
+      for (Note reference : descendantReferences) {
+        reference.setDeletedAt(currentUTCTimestamp);
+        entityPersister.merge(reference);
+      }
+    }
+
     note.setDeletedAt(currentUTCTimestamp);
     entityPersister.merge(note);
   }
@@ -48,8 +71,54 @@ public class NoteService {
         entityPersister.merge(note.getNotebook());
       }
     }
+
+    Timestamp deletedAt = note.getDeletedAt();
+    if (deletedAt != null) {
+      // Restore all descendants that were deleted at the same time (cascaded deletion)
+      restoreDescendantsRecursively(note, deletedAt);
+
+      // Restore all inbound references that were deleted at the same time
+      List<Note> inboundReferences = noteRepository.findAllByTargetNote(note.getId());
+      for (Note reference : inboundReferences) {
+        if (deletedAt.equals(reference.getDeletedAt())) {
+          reference.setDeletedAt(null);
+          entityPersister.merge(reference);
+        }
+      }
+
+      // Restore all inbound references to descendants that were deleted at the same time
+      restoreDescendantReferencesRecursively(note, deletedAt);
+    }
+
     note.setDeletedAt(null);
     entityPersister.merge(note);
+  }
+
+  private void restoreDescendantsRecursively(Note note, Timestamp deletedAt) {
+    List<Note> children = noteRepository.findAllByParentId(note.getId());
+    for (Note child : children) {
+      if (deletedAt.equals(child.getDeletedAt())) {
+        child.setDeletedAt(null);
+        entityPersister.merge(child);
+        restoreDescendantsRecursively(child, deletedAt);
+      }
+    }
+  }
+
+  private void restoreDescendantReferencesRecursively(Note note, Timestamp deletedAt) {
+    List<Note> children = noteRepository.findAllByParentId(note.getId());
+    for (Note child : children) {
+      if (deletedAt.equals(child.getDeletedAt())) {
+        List<Note> descendantReferences = noteRepository.findAllByTargetNote(child.getId());
+        for (Note reference : descendantReferences) {
+          if (deletedAt.equals(reference.getDeletedAt())) {
+            reference.setDeletedAt(null);
+            entityPersister.merge(reference);
+          }
+        }
+        restoreDescendantReferencesRecursively(child, deletedAt);
+      }
+    }
   }
 
   public boolean hasDuplicateWikidataId(Note note) {
