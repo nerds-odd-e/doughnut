@@ -116,7 +116,6 @@
             # Initialize basic shell environment
             setup_shell
             setup_logging
-            setup_fzf "${pkgs.fzf}"
 
             # Add git push script alias
             alias g='./scripts/git_push.sh'

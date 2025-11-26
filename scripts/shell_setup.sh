@@ -20,20 +20,6 @@ setup_logging() {
   trap 'handle_error "0" "$?"' ERR
 }
 
-# Configure fzf
-setup_fzf() {
-  local fzf_path="$1"
-  export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
-
-  if [ -n "${ZSH_VERSION:-}" ]; then
-    [ -e "${fzf_path}/share/fzf/key-bindings.zsh" ] && source "${fzf_path}/share/fzf/key-bindings.zsh"
-    [ -e "${fzf_path}/share/fzf/completion.zsh" ] && source "${fzf_path}/share/fzf/completion.zsh"
-  else
-    [ -e "${fzf_path}/share/fzf/key-bindings.bash" ] && source "${fzf_path}/share/fzf/key-bindings.bash"
-    [ -e "${fzf_path}/share/fzf/completion.bash" ] && source "${fzf_path}/share/fzf/completion.bash"
-  fi
-}
-
 # Setup core environment variables
 setup_env_vars() {
   export LANG="en_US.UTF-8"
