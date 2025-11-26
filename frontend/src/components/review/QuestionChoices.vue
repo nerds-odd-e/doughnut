@@ -11,7 +11,7 @@
           'daisy-rounded-lg daisy-bg-base-200',
           'hover:daisy-bg-primary hover:daisy-text-primary-content',
           'focus:daisy-outline-none focus:daisy-ring-2 focus:daisy-ring-primary',
-          'disabled:daisy-opacity-65 daisy-transition-colors daisy-select-none',
+          'disabled:daisy-opacity-65 daisy-transition-colors',
           {
             'is-correct': isOptionCorrect(index),
             'is-incorrect': !isOptionCorrect(index),
@@ -23,8 +23,8 @@
       >
         <div
           v-html="getChoiceHtml(choice)"
-          class="daisy-whitespace-normal daisy-break-words"
-          @click.capture.prevent="handleInnerClick"
+          class="daisy-whitespace-normal daisy-break-words choice-text"
+          @click.capture="handleInnerClick"
         />
       </button>
     </li>
@@ -50,7 +50,7 @@ export default defineComponent({
   emits: ["answer"],
   methods: {
     handleInnerClick(event: Event) {
-      // Prevent any link clicks from navigating
+      // Prevent any link clicks from navigating, but allow text selection
       if (event.target instanceof HTMLAnchorElement) {
         event.preventDefault()
         event.stopPropagation()
@@ -100,4 +100,10 @@ button, a, input
   -webkit-tap-highlight-color: rgba(0,0,0,0)
   -webkit-touch-callout: none
   -webkit-user-select: none
+
+.choice-text
+  user-select: text
+  -webkit-user-select: text
+  -moz-user-select: text
+  -ms-user-select: text
 </style>
