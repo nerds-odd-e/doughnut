@@ -21,8 +21,7 @@ import lombok.Getter;
   "parentUriAndTitle",
   "relationToFocusNote",
   "details",
-  "createdAt",
-  "updatedAt"
+  "createdAt"
 })
 public class BareNote {
   private final Note note;
@@ -77,11 +76,6 @@ public class BareNote {
   @JsonProperty("createdAt")
   public java.sql.Timestamp getCreatedAt() {
     return note.getCreatedAt();
-  }
-
-  @JsonProperty("updatedAt")
-  public java.sql.Timestamp getUpdatedAt() {
-    return note.getUpdatedAt();
   }
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {

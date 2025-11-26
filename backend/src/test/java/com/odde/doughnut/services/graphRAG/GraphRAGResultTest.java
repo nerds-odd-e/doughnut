@@ -106,12 +106,11 @@ class GraphRAGResultTest {
     // Assert
     assertThat(
         jsonNode::fieldNames,
-        containsInAnyOrder(
-            "uri", "title", "details", "relationToFocusNote", "createdAt", "updatedAt"));
+        containsInAnyOrder("uri", "title", "details", "relationToFocusNote", "createdAt"));
   }
 
   @Test
-  void shouldIncludeCreatedAtAndUpdatedAtWhenSerializedToJson() throws Exception {
+  void shouldIncludeCreatedAtWhenSerializedToJson() throws Exception {
     // Arrange
     Timestamp createdAt = new Timestamp(System.currentTimeMillis() - 86400000); // 1 day ago
     Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
@@ -132,10 +131,9 @@ class GraphRAGResultTest {
 
     // Assert
     assertThat(jsonNode.has("createdAt"), is(true));
-    assertThat(jsonNode.has("updatedAt"), is(true));
+    assertThat(jsonNode.has("updatedAt"), is(false));
     // Timestamps are serialized as ISO strings when WRITE_DATES_AS_TIMESTAMPS is disabled
     assertThat(jsonNode.get("createdAt").asText(), is(not(emptyString())));
-    assertThat(jsonNode.get("updatedAt").asText(), is(not(emptyString())));
   }
 
   @Nested
@@ -165,7 +163,7 @@ class GraphRAGResultTest {
     }
 
     @Test
-    void shouldIncludeCreatedAtAndUpdatedAtWhenSerializedToJson() throws Exception {
+    void shouldIncludeCreatedAtWhenSerializedToJson() throws Exception {
       // Arrange
       Timestamp createdAt = new Timestamp(System.currentTimeMillis() - 86400000); // 1 day ago
       Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
@@ -186,10 +184,9 @@ class GraphRAGResultTest {
 
       // Assert
       assertThat(jsonNode.has("createdAt"), is(true));
-      assertThat(jsonNode.has("updatedAt"), is(true));
+      assertThat(jsonNode.has("updatedAt"), is(false));
       // Timestamps are serialized as ISO strings when WRITE_DATES_AS_TIMESTAMPS is disabled
       assertThat(jsonNode.get("createdAt").asText(), is(not(emptyString())));
-      assertThat(jsonNode.get("updatedAt").asText(), is(not(emptyString())));
     }
   }
 }
