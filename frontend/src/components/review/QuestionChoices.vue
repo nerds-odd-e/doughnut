@@ -89,11 +89,15 @@ export default defineComponent({
     width: 100%
 
 .is-correct
-  background-color: #00ff00 !important
+  background-color: hsl(142, 76%, 36%) !important
+  color: white !important
+  border: 2px solid hsl(142, 76%, 28%) !important
 
-.is-selected
+.is-selected:not(.is-correct)
   font-weight: bold
-  background-color: orange !important
+  background-color: hsl(0, 84%, 60%) !important
+  color: white !important
+  border: 2px solid hsl(0, 84%, 50%) !important
 
 button, a, input
   border: 0
