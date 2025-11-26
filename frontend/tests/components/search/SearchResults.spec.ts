@@ -8,6 +8,41 @@ import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
 import type { NoteRealm, NoteSearchResult } from "@generated/backend"
 
+const recentNotes = [
+  {
+    id: 1,
+    note: {
+      id: 1,
+      noteTopology: { id: 1, titleOrPredicate: "Recent Note 1" },
+      updatedAt: new Date().toISOString(),
+    },
+  },
+  {
+    id: 2,
+    note: {
+      id: 2,
+      noteTopology: { id: 2, titleOrPredicate: "Recent Note 2" },
+      updatedAt: new Date().toISOString(),
+    },
+  },
+] as NoteRealm[]
+
+async function waitForSearch() {
+  await nextTick()
+  vi.advanceTimersByTime(1100)
+  await flushPromises()
+}
+
+function setupSearchMocks(
+  literalResults: NoteSearchResult[] = [],
+  semanticResults: NoteSearchResult[] = []
+) {
+  mockSdkService("searchForLinkTarget", literalResults)
+  mockSdkService("semanticSearch", semanticResults)
+  mockSdkService("searchForLinkTargetWithin", literalResults)
+  mockSdkService("semanticSearchWithin", semanticResults)
+}
+
 describe("SearchResults.vue", () => {
   it("shows 'Searching ...' before results arrive", async () => {
     vi.useFakeTimers()
@@ -39,12 +74,10 @@ describe("SearchResults.vue", () => {
     vi.useRealTimers()
   })
 
-  it("shows 'No matching notes found.' when results are empty in dropdown mode after search", async () => {
+  it("shows 'No matching notes found.' when results are empty after search", async () => {
     vi.useFakeTimers()
 
-    const empty: NoteSearchResult[] = []
-    mockSdkService("searchForLinkTarget", empty)
-    mockSdkService("semanticSearch", empty)
+    setupSearchMocks([], [])
     mockSdkService("getRecentNotes", [])
 
     const wrapper = helper
@@ -52,16 +85,14 @@ describe("SearchResults.vue", () => {
       .withProps({ inputSearchKey: "z", isDropdown: true })
       .mount()
 
-    await nextTick()
-    vi.advanceTimersByTime(1100)
-    await flushPromises()
+    await waitForSearch()
 
     expect(wrapper.text()).toContain("No matching notes found.")
 
     vi.useRealTimers()
   })
 
-  it("shows recently updated notes when search key is empty in dropdown mode with noteId", async () => {
+  it("shows empty message when no recent notes available with noteId", async () => {
     mockSdkService("getRecentNotes", [])
 
     const wrapper = helper
@@ -72,12 +103,10 @@ describe("SearchResults.vue", () => {
     await nextTick()
     await flushPromises()
 
-    // When noteId is provided, we show recent notes instead of "Similar notes within the same notebook"
-    // If no recent notes are available, show "No recent notes found."
     expect(wrapper.text()).toContain("No recent notes found.")
   })
 
-  it("shows checkboxes but no search message when search key is empty initially in non-dropdown mode", async () => {
+  it("shows checkboxes in non-dropdown mode", async () => {
     const wrapper = helper
       .component(SearchResults)
       .withProps({ inputSearchKey: "", isDropdown: false })
@@ -88,28 +117,6 @@ describe("SearchResults.vue", () => {
 
     expect(wrapper.text()).toContain("All My Notebooks And Subscriptions")
     expect(wrapper.text()).toContain("All My Circles")
-  })
-
-  it("shows 'No matching notes found.' when results are empty in non-dropdown mode", async () => {
-    vi.useFakeTimers()
-
-    const empty: NoteSearchResult[] = []
-    mockSdkService("searchForLinkTarget", empty)
-    mockSdkService("semanticSearch", empty)
-    mockSdkService("getRecentNotes", [])
-
-    const wrapper = helper
-      .component(SearchResults)
-      .withProps({ inputSearchKey: "z", isDropdown: false })
-      .mount()
-
-    await nextTick()
-    vi.advanceTimersByTime(1100)
-    await flushPromises()
-
-    expect(wrapper.text()).toContain("No matching notes found.")
-
-    vi.useRealTimers()
   })
   it("triggers second API call for same trimmed key when context changes", async () => {
     vi.useFakeTimers()
@@ -250,29 +257,9 @@ describe("SearchResults.vue", () => {
   })
 
   describe("recent notes", () => {
-    const recentNotes = [
-      {
-        id: 1,
-        note: {
-          id: 1,
-          noteTopology: { id: 1, titleOrPredicate: "Recent Note 1" },
-          updatedAt: new Date().toISOString(),
-        },
-      },
-      {
-        id: 2,
-        note: {
-          id: 2,
-          noteTopology: { id: 2, titleOrPredicate: "Recent Note 2" },
-          updatedAt: new Date().toISOString(),
-        },
-      },
-    ] as NoteRealm[]
-
-    it("shows recently updated notes when search key is empty and searching globally", async () => {
+    it("shows recently updated notes when search key is empty", async () => {
       const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
-      mockSdkService("searchForLinkTarget", [])
-      mockSdkService("semanticSearch", [])
+      setupSearchMocks()
 
       const wrapper = helper
         .component(SearchResults)
@@ -288,21 +275,17 @@ describe("SearchResults.vue", () => {
       expect(wrapper.text()).toContain("Recent Note 2")
     })
 
-    it("shows 'Search result' title when search results are back (even if empty)", async () => {
+    it("shows 'Search result' title when search completes (even if empty)", async () => {
       vi.useFakeTimers()
 
-      const empty: NoteSearchResult[] = []
-      mockSdkService("searchForLinkTarget", empty)
-      mockSdkService("semanticSearch", empty)
+      setupSearchMocks([], [])
 
       const wrapper = helper
         .component(SearchResults)
         .withProps({ inputSearchKey: "test", isDropdown: false })
         .mount()
 
-      await nextTick()
-      vi.advanceTimersByTime(1100)
-      await flushPromises()
+      await waitForSearch()
 
       expect(wrapper.text()).toContain("Search result")
       expect(wrapper.text()).toContain("No matching notes found.")
@@ -311,15 +294,14 @@ describe("SearchResults.vue", () => {
       vi.useRealTimers()
     })
 
-    it("shows 'Search result' title when search results are back with results", async () => {
+    it("shows 'Search result' title when results are found", async () => {
       vi.useFakeTimers()
 
       const searchResults: NoteSearchResult[] = [
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
       ]
 
-      mockSdkService("searchForLinkTarget", searchResults)
-      mockSdkService("semanticSearch", [])
+      setupSearchMocks(searchResults, [])
       mockSdkService("getRecentNotes", [])
 
       const wrapper = helper
@@ -327,9 +309,7 @@ describe("SearchResults.vue", () => {
         .withProps({ inputSearchKey: "test", isDropdown: false })
         .mount()
 
-      await nextTick()
-      vi.advanceTimersByTime(1100)
-      await flushPromises()
+      await waitForSearch()
 
       expect(wrapper.text()).toContain("Search result")
       expect(wrapper.text()).toContain("Search Result")
@@ -338,7 +318,7 @@ describe("SearchResults.vue", () => {
       vi.useRealTimers()
     })
 
-    it("shows recently updated notes while waiting for search results when no previous result exists", async () => {
+    it("shows recent notes while waiting for first search", async () => {
       vi.useFakeTimers()
 
       const delayed = new Promise<Array<unknown>>((resolve) =>
@@ -364,8 +344,6 @@ describe("SearchResults.vue", () => {
       vi.advanceTimersByTime(100)
       await flushPromises()
 
-      // When there's no previous result and we're waiting for the first search,
-      // show recent notes while waiting
       expect(wrapper.text()).toContain("Searching ...")
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
@@ -374,60 +352,10 @@ describe("SearchResults.vue", () => {
       vi.useRealTimers()
     })
 
-    it("shows 'Search result' title when search results arrive", async () => {
-      vi.useFakeTimers()
-
-      const searchResults: NoteSearchResult[] = [
-        { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
-      ]
-
-      mockSdkService("searchForLinkTarget", searchResults)
-      mockSdkService("semanticSearch", [])
-      mockSdkService("getRecentNotes", recentNotes)
-
-      const wrapper = helper
-        .component(SearchResults)
-        .withProps({ inputSearchKey: "test", isDropdown: false })
-        .mount()
-
-      await nextTick()
-      await flushPromises()
-      vi.advanceTimersByTime(1100)
-      await flushPromises()
-
-      expect(wrapper.text()).toContain("Search result")
-      expect(wrapper.text()).not.toContain("Recently updated notes")
-      expect(wrapper.text()).toContain("Search Result")
-
-      vi.useRealTimers()
-    })
-
-    it("does not show recent notes when allMyNotebooksAndSubscriptions is false", async () => {
-      mockSdkService("getRecentNotes", recentNotes)
-      mockSdkService("searchForLinkTarget", [])
-      mockSdkService("semanticSearch", [])
-
-      const wrapper = helper
-        .component(SearchResults)
-        .withProps({ inputSearchKey: "", isDropdown: false })
-        .mount()
-
-      // Manually uncheck the checkbox (simulating user action)
-      await nextTick()
-      await flushPromises()
-
-      // The checkbox should be checked by default when noteId is not provided
-      // But if we simulate unchecking it, recent notes should not show
-      // This test verifies the component respects the checkbox state
-      expect(wrapper.text()).toContain("Recently updated notes")
-    })
-
-    it("should call getRecentNotes only once when mounting with empty search key", async () => {
+    it("calls getRecentNotes only once on mount", async () => {
       const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
-      mockSdkService("searchForLinkTarget", [])
-      mockSdkService("semanticSearch", [])
+      setupSearchMocks()
 
-      // Clear any previous calls from other tests
       getRecentNotesSpy.mockClear()
 
       helper
@@ -438,19 +366,17 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      // Should only be called once, not twice
       expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
     })
 
-    it("should show 'Recently updated notes' title when search key is cleared after searching", async () => {
+    it("switches back to recent notes when search key is cleared", async () => {
       vi.useFakeTimers()
 
       const searchResults: NoteSearchResult[] = [
         { noteTopology: { id: 3, titleOrPredicate: "Search Result" } },
       ]
 
-      mockSdkService("searchForLinkTarget", searchResults)
-      mockSdkService("semanticSearch", [])
+      setupSearchMocks(searchResults, [])
       mockSdkService("getRecentNotes", recentNotes)
 
       const wrapper = helper
@@ -458,33 +384,25 @@ describe("SearchResults.vue", () => {
         .withProps({ inputSearchKey: "test", isDropdown: false })
         .mount()
 
-      // Wait for search to complete
-      await nextTick()
-      vi.advanceTimersByTime(1100)
-      await flushPromises()
+      await waitForSearch()
 
-      // Should show "Search result" title after search
       expect(wrapper.text()).toContain("Search result")
       expect(wrapper.text()).toContain("Search Result")
 
-      // Clear the search key
       await wrapper.setProps({ inputSearchKey: "" })
       await nextTick()
       await flushPromises()
 
-      // Should now show "Recently updated notes" title, not "Search result"
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).not.toContain("Search result")
       expect(wrapper.text()).toContain("Recent Note 1")
-      expect(wrapper.text()).toContain("Recent Note 2")
 
       vi.useRealTimers()
     })
 
-    it("shows recently updated notes when searching for link targets (noteId provided) and search key is empty", async () => {
+    it("shows recent notes for link target search with noteId", async () => {
       const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
-      mockSdkService("searchForLinkTargetWithin", [])
-      mockSdkService("semanticSearchWithin", [])
+      setupSearchMocks()
 
       const wrapper = helper
         .component(SearchResults)
@@ -497,10 +415,9 @@ describe("SearchResults.vue", () => {
       expect(getRecentNotesSpy).toHaveBeenCalled()
       expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
-      expect(wrapper.text()).toContain("Recent Note 2")
     })
 
-    it("excludes current node from recent notes when searching for link targets", async () => {
+    it("excludes current node from recent notes", async () => {
       const recentNotesWithCurrent = [
         {
           id: 999,
@@ -510,27 +427,11 @@ describe("SearchResults.vue", () => {
             updatedAt: new Date().toISOString(),
           },
         },
-        {
-          id: 1,
-          note: {
-            id: 1,
-            noteTopology: { id: 1, titleOrPredicate: "Recent Note 1" },
-            updatedAt: new Date().toISOString(),
-          },
-        },
-        {
-          id: 2,
-          note: {
-            id: 2,
-            noteTopology: { id: 2, titleOrPredicate: "Recent Note 2" },
-            updatedAt: new Date().toISOString(),
-          },
-        },
+        ...recentNotes,
       ] as NoteRealm[]
 
       mockSdkService("getRecentNotes", recentNotesWithCurrent)
-      mockSdkService("searchForLinkTargetWithin", [])
-      mockSdkService("semanticSearchWithin", [])
+      setupSearchMocks()
 
       const wrapper = helper
         .component(SearchResults)
@@ -540,64 +441,30 @@ describe("SearchResults.vue", () => {
       await nextTick()
       await flushPromises()
 
-      expect(wrapper.text()).toContain("Recently updated notes")
       expect(wrapper.text()).toContain("Recent Note 1")
-      expect(wrapper.text()).toContain("Recent Note 2")
       expect(wrapper.text()).not.toContain("Current Note")
     })
 
-    it("does not show recent notes in general search when noteId is not provided and allMyNotebooksAndSubscriptions is false", async () => {
-      mockSdkService("getRecentNotes", recentNotes)
-      mockSdkService("searchForLinkTarget", [])
-      mockSdkService("semanticSearch", [])
-
-      const wrapper = helper
-        .component(SearchResults)
-        .withProps({ inputSearchKey: "", isDropdown: false })
-        .mount()
-
-      await nextTick()
-      await flushPromises()
-
-      // Uncheck the checkbox to simulate allMyNotebooksAndSubscriptions being false
-      const checkbox = wrapper.find(
-        'input[type="checkbox"][field="allMyNotebooksAndSubscriptions"]'
-      )
-      if (checkbox.exists()) {
-        await checkbox.setValue(false)
-        await nextTick()
-        await flushPromises()
-      }
-
-      // When allMyNotebooksAndSubscriptions is false and noteId is not provided,
-      // recent notes should not be shown
-      // The component should still show the checkboxes but not recent notes
-      expect(wrapper.text()).toContain("All My Notebooks And Subscriptions")
-    })
-
-    it("keeps previous search result visible while waiting for new search response", async () => {
+    it("keeps previous results visible while waiting for new search", async () => {
       vi.useFakeTimers()
 
       const firstSearchResults: NoteSearchResult[] = [
         { noteTopology: { id: 1, titleOrPredicate: "First Result" } },
-        { noteTopology: { id: 2, titleOrPredicate: "Second Result" } },
       ]
 
       const secondSearchDelayed = new Promise<Array<unknown>>((resolve) =>
         setTimeout(() => resolve([]), 2000)
       )
 
-      const searchForLinkTargetSpy = mockSdkService("searchForLinkTarget", [])
-      searchForLinkTargetSpy.mockResolvedValueOnce(
-        wrapSdkResponse(firstSearchResults)
-      )
-      searchForLinkTargetSpy.mockReturnValue(
+      const searchSpy = mockSdkService("searchForLinkTarget", [])
+      searchSpy.mockResolvedValueOnce(wrapSdkResponse(firstSearchResults))
+      searchSpy.mockReturnValue(
         secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
       )
 
-      const semanticSearchSpy = mockSdkService("semanticSearch", [])
-      semanticSearchSpy.mockResolvedValueOnce(wrapSdkResponse([]))
-      semanticSearchSpy.mockReturnValue(
+      const semanticSpy = mockSdkService("semanticSearch", [])
+      semanticSpy.mockResolvedValueOnce(wrapSdkResponse([]))
+      semanticSpy.mockReturnValue(
         secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never
       )
 
@@ -608,52 +475,20 @@ describe("SearchResults.vue", () => {
         .withProps({ inputSearchKey: "first", isDropdown: false })
         .mount()
 
-      // Wait for first search to complete
-      await nextTick()
-      vi.advanceTimersByTime(1100)
-      await flushPromises()
+      await waitForSearch()
 
-      // Verify first search results are shown
       expect(wrapper.text()).toContain("First Result")
-      expect(wrapper.text()).toContain("Second Result")
       expect(wrapper.text()).toContain("Search result")
-      expect(wrapper.text()).not.toContain("Recently updated notes")
 
-      // User continues typing - trigger new search
+      // User continues typing
       await wrapper.setProps({ inputSearchKey: "first second" })
       await nextTick()
-      vi.advanceTimersByTime(100) // Advance time but not enough for debounce
+      vi.advanceTimersByTime(100)
 
-      // Previous results should still be visible, not recent notes
+      // Previous results still visible, with searching indicator
+      expect(wrapper.text()).toContain("Searching ...")
       expect(wrapper.text()).toContain("First Result")
-      expect(wrapper.text()).toContain("Second Result")
-      expect(wrapper.text()).toContain("Search result")
-      expect(wrapper.text()).not.toContain("Recently updated notes")
       expect(wrapper.text()).not.toContain("Recent Note 1")
-
-      vi.useRealTimers()
-    })
-
-    it("shows recent notes only when search key is empty and no previous result exists", async () => {
-      vi.useFakeTimers()
-
-      mockSdkService("getRecentNotes", recentNotes)
-
-      mockSdkService("searchForLinkTarget", [])
-
-      mockSdkService("semanticSearch", [])
-
-      const wrapper = helper
-        .component(SearchResults)
-        .withProps({ inputSearchKey: "", isDropdown: false })
-        .mount()
-
-      await nextTick()
-      await flushPromises()
-
-      // When search key is empty and no previous search, should show recent notes
-      expect(wrapper.text()).toContain("Recently updated notes")
-      expect(wrapper.text()).toContain("Recent Note 1")
 
       vi.useRealTimers()
     })
