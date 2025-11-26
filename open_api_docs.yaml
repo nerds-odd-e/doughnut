@@ -4528,9 +4528,6 @@ components:
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
     FocusNote:
       type: object
       properties:
@@ -4570,9 +4567,6 @@ components:
         details:
           type: string
         createdAt:
-          type: string
-          format: date-time
-        updatedAt:
           type: string
           format: date-time
         contextualPath:
