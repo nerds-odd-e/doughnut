@@ -31,10 +31,10 @@ public class MCQWithAnswer {
   @JsonIgnore
   public boolean isValid() {
     if (multipleChoicesQuestion == null) return false;
-    if (multipleChoicesQuestion.getStem() == null || multipleChoicesQuestion.getStem().isBlank())
-      return false;
-    if (multipleChoicesQuestion.getChoices() == null) return false;
-    int choicesCount = multipleChoicesQuestion.getChoices().size();
+    if (multipleChoicesQuestion.getF0__stem() == null
+        || multipleChoicesQuestion.getF0__stem().isBlank()) return false;
+    if (multipleChoicesQuestion.getF1__choices() == null) return false;
+    int choicesCount = multipleChoicesQuestion.getF1__choices().size();
     if (choicesCount == 0) return false;
     return correctChoiceIndex >= 0 && correctChoiceIndex < choicesCount;
   }

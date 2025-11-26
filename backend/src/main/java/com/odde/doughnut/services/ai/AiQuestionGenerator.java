@@ -75,13 +75,13 @@ public class AiQuestionGenerator {
   }
 
   private MCQWithAnswer shuffleChoices(MCQWithAnswer original) {
-    List<String> choices = new ArrayList<>(original.getMultipleChoicesQuestion().getChoices());
+    List<String> choices = new ArrayList<>(original.getMultipleChoicesQuestion().getF1__choices());
     String correctChoice = choices.get(original.getCorrectChoiceIndex());
     choices = randomizer.shuffle(choices);
     int newCorrectIndex = choices.indexOf(correctChoice);
 
     MultipleChoicesQuestion shuffledQuestion =
-        new MultipleChoicesQuestion(original.getMultipleChoicesQuestion().getStem(), choices);
+        new MultipleChoicesQuestion(original.getMultipleChoicesQuestion().getF0__stem(), choices);
 
     return new MCQWithAnswer(shuffledQuestion, newCorrectIndex, false);
   }

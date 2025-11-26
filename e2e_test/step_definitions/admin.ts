@@ -94,8 +94,8 @@ Given(
       realCorrectAnswers: '',
       preservedQuestion: {
         multipleChoicesQuestion: {
-          stem: `good question #${index}`,
-          choices: ['choice 1', 'choice 2'],
+          f0__stem: `good question #${index}`,
+          f1__choices: ['choice 1', 'choice 2'],
         },
         correctChoiceIndex: 0,
         strictChoiceOrder: true,
@@ -107,8 +107,8 @@ Given(
       realCorrectAnswers: '',
       preservedQuestion: {
         multipleChoicesQuestion: {
-          stem: `bad question #${index}`,
-          choices: ['choice 1', 'choice 2'],
+          f0__stem: `bad question #${index}`,
+          f1__choices: ['choice 1', 'choice 2'],
         },
         correctChoiceIndex: 0,
         strictChoiceOrder: true,

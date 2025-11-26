@@ -1,5 +1,6 @@
 package com.odde.doughnut.services.ai;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import java.util.List;
@@ -14,9 +15,11 @@ public class MultipleChoicesQuestion {
   @JsonPropertyDescription(
       "The stem of the multiple-choice question. Accepts **Markdown** notation. Provide background or disclosure necessary to clarify the question when needed.")
   @JsonProperty(required = true)
-  private String stem;
+  @JsonAlias("stem")
+  private String f0__stem;
 
   @JsonPropertyDescription("List of choices. Markdown allowed.")
   @JsonProperty(required = true)
-  private List<String> choices;
+  @JsonAlias("choices")
+  private List<String> f1__choices;
 }

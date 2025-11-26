@@ -56,8 +56,8 @@ class PredefinedQuestionTest {
       assertThat(randomQuizQuestion, instanceOf(PredefinedQuestion.class));
       PredefinedQuestion qq = randomQuizQuestion;
       assertThat(
-          qq.getMultipleChoicesQuestion().getStem(),
-          containsString(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
+          qq.getMultipleChoicesQuestion().getF0__stem(),
+          containsString(mcqWithAnswer.getMultipleChoicesQuestion().getF0__stem()));
     }
   }
 

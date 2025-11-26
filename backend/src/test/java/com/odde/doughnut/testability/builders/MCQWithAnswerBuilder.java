@@ -9,22 +9,22 @@ public class MCQWithAnswerBuilder {
 
   public MCQWithAnswer please() {
     MultipleChoicesQuestion mcq = mcqWithAnswer.getMultipleChoicesQuestion();
-    if (mcq.getStem() == null) {
-      mcq.setStem("a default question stem");
+    if (mcq.getF0__stem() == null) {
+      mcq.setF0__stem("a default question stem");
     }
-    if (mcq.getChoices() == null) {
-      mcq.setChoices(List.of("choice1", "choice2", "choice3"));
+    if (mcq.getF1__choices() == null) {
+      mcq.setF1__choices(List.of("choice1", "choice2", "choice3"));
     }
     return mcqWithAnswer;
   }
 
   public MCQWithAnswerBuilder stem(String stem) {
-    mcqWithAnswer.getMultipleChoicesQuestion().setStem(stem);
+    mcqWithAnswer.getMultipleChoicesQuestion().setF0__stem(stem);
     return this;
   }
 
   public MCQWithAnswerBuilder choices(String... choices) {
-    mcqWithAnswer.getMultipleChoicesQuestion().setChoices(List.of(choices));
+    mcqWithAnswer.getMultipleChoicesQuestion().setF1__choices(List.of(choices));
     return this;
   }
 

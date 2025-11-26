@@ -56,8 +56,8 @@ export type McqWithAnswer = {
 };
 
 export type MultipleChoicesQuestion = {
-    stem: string;
-    choices: Array<string>;
+    f0__stem: string;
+    f1__choices: Array<string>;
 };
 
 export type QuestionSuggestionParams = {

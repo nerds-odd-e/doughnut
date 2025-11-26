@@ -41,7 +41,7 @@ public class QuestionEvaluation {
     QuestionContestResult result = new QuestionContestResult();
     result.advice = "";
     if (!indisputableAnswer(correctChoiceIndex)) {
-      var choices = mcqWithAnswer.getMultipleChoicesQuestion().getChoices();
+      var choices = mcqWithAnswer.getMultipleChoicesQuestion().getF1__choices();
       if (choices == null) {
         result.advice = "The question has no choices defined.";
         return result;

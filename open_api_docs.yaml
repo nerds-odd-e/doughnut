@@ -3581,15 +3581,15 @@ components:
     MultipleChoicesQuestion:
       type: object
       properties:
-        stem:
+        f0__stem:
           type: string
-        choices:
+        f1__choices:
           type: array
           items:
             type: string
       required:
-      - choices
-      - stem
+      - f0__stem
+      - f1__choices
     QuestionSuggestionParams:
       type: object
       properties:

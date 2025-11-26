@@ -35,8 +35,8 @@ public class PredefinedQuestionsTestData {
 
     public PredefinedQuestion buildPredefinedQuestion(Note note) {
       MultipleChoicesQuestion mcq = new MultipleChoicesQuestion();
-      mcq.setStem(question);
-      mcq.setChoices(List.of(answer, oneWrongChoice));
+      mcq.setF0__stem(question);
+      mcq.setF1__choices(List.of(answer, oneWrongChoice));
       PredefinedQuestion question = new PredefinedQuestion();
       question.setNote(note);
       question.setCorrectAnswerIndex(0);

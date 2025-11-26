@@ -8,7 +8,7 @@
     />
     <TextArea
       :field="`stem`"
-      v-model="suggestionParams.preservedQuestion.multipleChoicesQuestion.stem"
+      v-model="suggestionParams.preservedQuestion.multipleChoicesQuestion.f0__stem"
       placeholder="Add a suggested question"
       :rows="2"
     /><br />
@@ -17,7 +17,7 @@
         <TextInput
           :field="`choice-${index}`"
           v-model="
-            suggestionParams.preservedQuestion.multipleChoicesQuestion.choices[
+            suggestionParams.preservedQuestion.multipleChoicesQuestion.f1__choices[
               index
             ]
           "
@@ -111,20 +111,21 @@ export default defineComponent({
       params: QuestionSuggestionParams
     ): QuestionSuggestionParams | undefined {
       const validated = cloneDeep(params)
-      validated.preservedQuestion.multipleChoicesQuestion.choices =
-        validated.preservedQuestion.multipleChoicesQuestion.choices
+      validated.preservedQuestion.multipleChoicesQuestion.f1__choices =
+        validated.preservedQuestion.multipleChoicesQuestion.f1__choices
           .map((choice) => choice?.trim())
           .filter((choice) => choice?.length > 0)
       if (
-        validated.preservedQuestion.multipleChoicesQuestion.choices.length < 2
+        validated.preservedQuestion.multipleChoicesQuestion.f1__choices.length <
+        2
       ) {
         this.errors.preservedQuestion.choices[1] =
           "At least 2 choices are required"
         return undefined
       }
       if (
-        validated.preservedQuestion.multipleChoicesQuestion.choices.length <=
-        validated.preservedQuestion.correctChoiceIndex
+        validated.preservedQuestion.multipleChoicesQuestion.f1__choices
+          .length <= validated.preservedQuestion.correctChoiceIndex
       ) {
         this.errors.preservedQuestion.correctChoiceIndex =
           "Correct choice index is out of range"

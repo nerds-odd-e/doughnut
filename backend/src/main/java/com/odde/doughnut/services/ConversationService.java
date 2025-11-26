@@ -101,7 +101,7 @@ public class ConversationService {
     AssessmentQuestionInstance assessmentQuestionInstance =
         conversation.getSubject().getAssessmentQuestionInstance();
     if (assessmentQuestionInstance != null) {
-      return assessmentQuestionInstance.getMultipleChoicesQuestion().getStem();
+      return assessmentQuestionInstance.getMultipleChoicesQuestion().getF0__stem();
     }
 
     RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();

@@ -66,7 +66,7 @@ class NoteQuestionGenerationServiceTests {
 
       // Verify
       assertThat(
-          generatedQuestion.getMultipleChoicesQuestion().getStem(),
+          generatedQuestion.getMultipleChoicesQuestion().getF0__stem(),
           containsString("What is the first color in the rainbow?"));
     }
 

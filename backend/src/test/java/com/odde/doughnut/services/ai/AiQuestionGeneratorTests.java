@@ -71,7 +71,7 @@ class AiQuestionGeneratorTests {
     MCQWithAnswer result = aiQuestionGenerator.getAiGeneratedQuestion(note, null);
 
     assertThat(
-        result.getMultipleChoicesQuestion().getStem(),
+        result.getMultipleChoicesQuestion().getF0__stem(),
         equalTo("What is the first color in the rainbow?"));
   }
 
@@ -99,20 +99,20 @@ class AiQuestionGeneratorTests {
 
     // Assert
     assertThat(
-        result.getMultipleChoicesQuestion().getStem(),
-        equalTo(originalQuestion.getMultipleChoicesQuestion().getStem()));
+        result.getMultipleChoicesQuestion().getF0__stem(),
+        equalTo(originalQuestion.getMultipleChoicesQuestion().getF0__stem()));
     assertThat(
-        result.getMultipleChoicesQuestion().getChoices().size(),
-        equalTo(originalQuestion.getMultipleChoicesQuestion().getChoices().size()));
+        result.getMultipleChoicesQuestion().getF1__choices().size(),
+        equalTo(originalQuestion.getMultipleChoicesQuestion().getF1__choices().size()));
 
     // Verify the correct answer is maintained
     String expectedCorrectAnswer =
         originalQuestion
             .getMultipleChoicesQuestion()
-            .getChoices()
+            .getF1__choices()
             .get(originalQuestion.getCorrectChoiceIndex());
     String actualCorrectAnswer =
-        result.getMultipleChoicesQuestion().getChoices().get(result.getCorrectChoiceIndex());
+        result.getMultipleChoicesQuestion().getF1__choices().get(result.getCorrectChoiceIndex());
     assertThat(actualCorrectAnswer, equalTo(expectedCorrectAnswer));
   }
 
@@ -156,7 +156,7 @@ class AiQuestionGeneratorTests {
         aiQuestionGeneratorWithMockedRandomizer.getAiGeneratedQuestion(note, null);
 
     // Assert
-    assertThat(result.getMultipleChoicesQuestion().getChoices(), equalTo(shuffledChoices));
+    assertThat(result.getMultipleChoicesQuestion().getF1__choices(), equalTo(shuffledChoices));
     assertThat(result.getCorrectChoiceIndex(), equalTo(1)); // "4" is now at index 1
   }
 

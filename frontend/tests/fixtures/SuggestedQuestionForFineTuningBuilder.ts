@@ -10,8 +10,8 @@ class SuggestQuestionForFineTuningBuilder extends Builder<SuggestedQuestionForFi
       id: 1357,
       preservedQuestion: {
         multipleChoicesQuestion: {
-          stem: "What is the capital of France?",
-          choices: ["Paris", "London", "Berlin"],
+          f0__stem: "What is the capital of France?",
+          f1__choices: ["Paris", "London", "Berlin"],
         },
         correctChoiceIndex: 1,
         strictChoiceOrder: false,

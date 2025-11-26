@@ -186,7 +186,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       contestResult.advice = "test";
       RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
 
-      Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getStem())
+      Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getF0__stem())
           .contains("What is the first color in the rainbow?");
     }
 

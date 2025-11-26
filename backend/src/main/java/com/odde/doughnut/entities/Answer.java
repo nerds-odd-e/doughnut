@@ -28,7 +28,7 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   String getAnswerDisplay(@NotNull MultipleChoicesQuestion bareQuestion) {
     if (getChoiceIndex() != null) {
-      return bareQuestion.getChoices().get(getChoiceIndex());
+      return bareQuestion.getF1__choices().get(getChoiceIndex());
     }
     return "";
   }

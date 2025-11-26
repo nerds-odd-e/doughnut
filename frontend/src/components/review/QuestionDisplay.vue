@@ -1,9 +1,9 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
-    <QuestionStem :stem="multipleChoicesQuestion.stem" />
+    <QuestionStem :stem="multipleChoicesQuestion.f0__stem" />
     <QuestionChoices
-      v-if="multipleChoicesQuestion.choices"
-      :choices="multipleChoicesQuestion.choices"
+      v-if="multipleChoicesQuestion.f1__choices"
+      :choices="multipleChoicesQuestion.f1__choices"
       :correct-choice-index="correctChoiceIndex"
       :answer-choice-index="answer?.choiceIndex"
       :disabled="disabled"

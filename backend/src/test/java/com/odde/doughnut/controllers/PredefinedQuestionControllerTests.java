@@ -104,8 +104,8 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
           suggestedQuestionForFineTuning
               .getPreservedQuestion()
               .getMultipleChoicesQuestion()
-              .getStem(),
-          equalTo(mcqWithAnswer.getMultipleChoicesQuestion().getStem()));
+              .getF0__stem(),
+          equalTo(mcqWithAnswer.getMultipleChoicesQuestion().getF0__stem()));
     }
 
     @Test
