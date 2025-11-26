@@ -32,10 +32,6 @@ Cypress.Commands.add('pageIsNotLoading', () => {
   cy.get('.loading-bar').should('not.exist', { timeout: 10000 })
 })
 
-Cypress.Commands.add('dialogDisappeared', () => {
-  cy.get('.modal-body').should('not.exist')
-})
-
 Cypress.Commands.add('expectBreadcrumb', (items: string) => {
   cy.get('.daisy-breadcrumbs').within(() =>
     commonSenseSplit(items, ', ').forEach((noteTopology: string) =>
@@ -135,23 +131,25 @@ Cypress.Commands.add(
       // Extract the value from the Cypress subject
       const isFirstVisited =
         (firstVisited as unknown as { valueOf(): string }).valueOf() === 'yes'
-      cy.window().then(async (win: CustomWindow) => {
+      cy.window().then((win: CustomWindow) => {
         if (win.router && isFirstVisited) {
-          try {
-            await win.router.push({
-              name,
-              params,
-              query: { time: Date.now() }, // make sure the route re-render
-            })
-            cy.dialogDisappeared()
-            return
-          } catch (error) {
-            cy.log('router push failed')
-            cy.log(error as string)
-          }
+          cy.wrap(
+            win.router
+              .push({
+                name,
+                params,
+                query: { time: Date.now() }, // make sure the route re-render
+              })
+              .catch((error) => {
+                cy.log('router push failed')
+                cy.log(error as string)
+                throw error
+              })
+          )
+        } else {
+          cy.wrap('yes').as('firstVisited')
+          cy.visit(fallback)
         }
-        cy.wrap('yes').as('firstVisited')
-        cy.visit(fallback)
       })
     })
   }

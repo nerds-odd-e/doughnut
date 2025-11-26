@@ -8,7 +8,6 @@ declare namespace Cypress {
     cleanDownloadFolder(): Chainable<any>
     clickButtonOnCardBody(noteTopology: any, buttonTitle: any): Chainable<any>
     clickRadioByLabel(labelText: any): Chainable<any>
-    dialogDisappeared(): Chainable<any>
     expectBreadcrumb(
       item: string,
       addChildButton: boolean = true
