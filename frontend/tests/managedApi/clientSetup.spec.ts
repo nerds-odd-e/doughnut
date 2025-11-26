@@ -1,6 +1,10 @@
 import "vitest-fetch-mock"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
-import { globalClientSilent, setupGlobalClient } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+  setupGlobalClient,
+} from "@/managedApi/clientSetup"
 import { client as globalClient } from "@generated/backend/client.gen"
 import { getUserProfile } from "@generated/backend/sdk.gen"
 import { vi } from "vitest"
@@ -123,6 +127,118 @@ describe("clientSetup", () => {
           timeout: 3000,
         })
       )
+    })
+  })
+
+  describe("apiCallWithLoading - loading state management", () => {
+    it("sets loading state synchronously before API call", async () => {
+      let loadingStateBeforeCall = false
+      let loadingStateDuringCall = false
+
+      fetchMock.mockResponse(
+        () => {
+          loadingStateDuringCall = apiStatus.states.length > 0
+          return Promise.resolve(JSON.stringify({ user: {} }))
+        },
+        { url: `${baseUrl}/api/user` }
+      )
+
+      // Check loading state is set synchronously
+      const promise = apiCallWithLoading((client) => {
+        loadingStateBeforeCall = apiStatus.states.length > 0
+        return getUserProfile({ client })
+      })
+
+      // Loading should be set immediately (synchronously)
+      expect(apiStatus.states.length).toBe(1)
+
+      await promise
+
+      expect(loadingStateBeforeCall).toBe(true)
+      expect(loadingStateDuringCall).toBe(true)
+      expect(apiStatus.states.length).toBe(0)
+    })
+
+    it("clears loading state after successful API call", async () => {
+      fetchMock.mockResponse(JSON.stringify({ user: {} }), {
+        url: `${baseUrl}/api/user`,
+      })
+
+      await apiCallWithLoading((client) => getUserProfile({ client }))
+
+      expect(apiStatus.states.length).toBe(0)
+    })
+
+    it("clears loading state even on API error", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      await apiCallWithLoading((client) => getUserProfile({ client }))
+
+      expect(apiStatus.states.length).toBe(0)
+    })
+
+    it("clears loading state even on network error", async () => {
+      fetchMock.mockReject(new Error("Network error"))
+
+      const { error } = await apiCallWithLoading((client) =>
+        getUserProfile({ client })
+      )
+
+      expect(error).toBeDefined()
+      expect(apiStatus.states.length).toBe(0)
+    })
+
+    it("does not show error toast (uses silent client)", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      const { error } = await apiCallWithLoading((client) =>
+        getUserProfile({ client })
+      )
+
+      expect(error).toBeDefined()
+      expect(mockToast.error).not.toHaveBeenCalled()
+    })
+
+    it("returns the API result correctly", async () => {
+      const mockUser = { name: "Test User" }
+      fetchMock.mockResponse(JSON.stringify(mockUser), {
+        url: `${baseUrl}/api/user`,
+        headers: { "Content-Type": "application/json" },
+      })
+
+      const { data } = await apiCallWithLoading((client) =>
+        getUserProfile({ client })
+      )
+
+      expect(data).toEqual(mockUser)
+    })
+
+    it("handles multiple concurrent calls correctly", async () => {
+      fetchMock.mockResponse(JSON.stringify({ user: {} }), {
+        url: `${baseUrl}/api/user`,
+      })
+
+      // Start two concurrent calls
+      const promise1 = apiCallWithLoading((client) =>
+        getUserProfile({ client })
+      )
+      const promise2 = apiCallWithLoading((client) =>
+        getUserProfile({ client })
+      )
+
+      // Both should increment loading state
+      expect(apiStatus.states.length).toBe(2)
+
+      await Promise.all([promise1, promise2])
+
+      // All should be cleared
+      expect(apiStatus.states.length).toBe(0)
     })
   })
 })

@@ -21,6 +21,33 @@ export const globalClientSilent = createClient({
 let apiStatusHandler: ApiStatusHandler | undefined
 
 /**
+ * Wrapper for API calls that manages loading state.
+ * Use this when you need the loading state to be set immediately before the API call.
+ *
+ * @param apiCall - Function that takes a silent client and returns a Promise with the API result
+ * @returns Promise with the API result
+ *
+ * @example
+ * const result = await apiCallWithLoading((client) =>
+ *   someApiCall({ path: { id: 123 }, client })
+ * )
+ */
+export async function apiCallWithLoading<T>(
+  apiCall: (client: typeof globalClientSilent) => Promise<T>
+): Promise<T> {
+  if (!apiStatusHandler) {
+    return await apiCall(globalClientSilent)
+  }
+
+  apiStatusHandler.assignLoading(true)
+  try {
+    return await apiCall(globalClientSilent)
+  } finally {
+    apiStatusHandler.assignLoading(false)
+  }
+}
+
+/**
  * Sets up the global client with interceptors for loading states and error handling.
  * This should be called once during app initialization (e.g., in DoughnutApp.vue).
  */

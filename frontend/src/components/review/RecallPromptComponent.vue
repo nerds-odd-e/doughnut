@@ -26,6 +26,7 @@ import { ref } from "vue"
 import type { PropType } from "vue"
 import type { AnswerDto, RecallPrompt } from "@generated/backend"
 import { answerQuiz } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"
 
@@ -58,10 +59,14 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
   isLoading.value = true
   error.value = ""
 
-  const { data: answerResult, error: apiError } = await answerQuiz({
-    path: { recallPrompt: props.recallPrompt.id },
-    body: answerData,
-  })
+  const { data: answerResult, error: apiError } = await apiCallWithLoading(
+    (client) =>
+      answerQuiz({
+        path: { recallPrompt: props.recallPrompt.id },
+        body: answerData,
+        client,
+      })
+  )
   if (!apiError) {
     emits("answered", answerResult!)
   } else {
