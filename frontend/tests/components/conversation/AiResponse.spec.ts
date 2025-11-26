@@ -286,7 +286,7 @@ describe("ConversationInner", () => {
 
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: testCompletion,
         })
       )
@@ -298,7 +298,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: testCompletion,
           deleteFromEnd: 0,
         })
@@ -310,7 +310,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: testCompletion,
           deleteFromEnd: 0,
         })
@@ -325,7 +325,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: " friends!",
           deleteFromEnd: 5,
         })
@@ -343,7 +343,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: "New content",
           deleteFromEnd: 20,
         })
@@ -409,7 +409,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: " friends!",
           deleteFromEnd: 6,
         })
@@ -437,7 +437,7 @@ describe("ConversationInner", () => {
       storageAccessor.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
-        createToolCallChunk("complete_note_details", {
+        createToolCallChunk("NoteDetailsCompletion", {
           completion: "Completely new text",
           deleteFromEnd: 20, // More than "Hello world" length
         })
@@ -480,7 +480,7 @@ describe("ConversationInner", () => {
         // Simulate completion suggestion
         await submitMessageAndSimulateRunResponse(
           wrapper,
-          createToolCallChunk("complete_note_details", {
+          createToolCallChunk("NoteDetailsCompletion", {
             completion: "test completion",
           })
         )

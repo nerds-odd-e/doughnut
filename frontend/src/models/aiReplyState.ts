@@ -131,7 +131,7 @@ export const createAiReplyStates = (
               const functionArgs = toolCall.function.arguments || "{}"
               const functionName = toolCall.function.name
 
-              if (functionName === "complete_note_details") {
+              if (functionName === "NoteDetailsCompletion") {
                 await context.handleSuggestion({
                   suggestionType: "completion",
                   content: JSON.parse(functionArgs),

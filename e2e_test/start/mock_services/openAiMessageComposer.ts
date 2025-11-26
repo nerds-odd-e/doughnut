@@ -22,7 +22,7 @@ export function buildChatCompletionStreamEvent(
                 id: 'tool-call-1',
                 type: 'function',
                 function: {
-                  name: 'complete_note_details',
+                  name: 'NoteDetailsCompletion',
                   arguments: argumentsString.substring(
                     0,
                     Math.min(10, argumentsString.length)

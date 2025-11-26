@@ -573,7 +573,7 @@ export type AssimilationCountDto = {
 export type DummyForGeneratingTypes = {
     noteDetailsCompletion?: NoteDetailsCompletion;
     titleReplacement?: TitleReplacement;
-    aiToolName?: 'complete_note_details' | 'suggest_note_title';
+    aiToolName?: 'suggest_note_title';
 };
 
 export type TitleReplacement = {

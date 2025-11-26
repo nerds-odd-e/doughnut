@@ -4714,7 +4714,6 @@ components:
         aiToolName:
           type: string
           enum:
-          - complete_note_details
           - suggest_note_title
     TitleReplacement:
       type: object
