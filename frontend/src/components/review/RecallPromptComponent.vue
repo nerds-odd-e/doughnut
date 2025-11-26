@@ -6,6 +6,7 @@
       }"
       @answer="submitQuizAnswer($event)"
       :key="recallPrompt.id"
+      :question-id="recallPrompt.id"
       :disabled="isLoading || isAnswered"
     />
 
