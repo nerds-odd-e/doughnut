@@ -228,8 +228,6 @@ const handleDefaultMessageClick = (message: string) => {
 
 .chat-controls {
   flex-shrink: 0;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
 }
 
 .chat-input-form {
@@ -244,7 +242,7 @@ const handleDefaultMessageClick = (message: string) => {
   flex: 1;
   border: none;
   background: transparent;
-  padding: 0.5rem;
+  padding: 0.25rem;
   resize: none;
 }
 
@@ -332,7 +330,7 @@ const handleDefaultMessageClick = (message: string) => {
 .bottom-container {
   flex-shrink: 0;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .default-messages {
