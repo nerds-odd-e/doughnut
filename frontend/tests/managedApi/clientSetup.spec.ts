@@ -26,25 +26,7 @@ describe("clientSetup", () => {
     setupGlobalClient(apiStatus)
   })
 
-  describe("globalClient (non-silent) - loading state management", () => {
-    it("sets loading state during API calls", async () => {
-      let loadingStateDuringCall = false
-      fetchMock.mockResponse(
-        () => {
-          loadingStateDuringCall = apiStatus.states.length > 0
-          return Promise.resolve(JSON.stringify({ user: {} }))
-        },
-        { url: `${baseUrl}/api/user` }
-      )
-
-      await UserController.getUserProfile({ client: globalClient })
-
-      expect(loadingStateDuringCall).toBe(true)
-      expect(apiStatus.states.length).toBe(0)
-    })
-  })
-
-  describe("globalClient (non-silent) - error handling", () => {
+  describe("globalClient - error handling", () => {
     it("shows error toast on API errors", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
@@ -176,8 +158,8 @@ describe("clientSetup", () => {
         UserController.getUserProfile({})
       )
 
-      // Both should increment loading state (2 from apiCallWithLoading + 2 from interceptor)
-      expect(apiStatus.states.length).toBeGreaterThanOrEqual(2)
+      // Both should increment loading state (2 from apiCallWithLoading)
+      expect(apiStatus.states.length).toBe(2)
 
       await Promise.all([promise1, promise2])
 

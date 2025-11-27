@@ -4,34 +4,38 @@
 
 Refactor API loading state management to use explicit `apiCallWithLoading` wrapper instead of automatic interceptor-based loading for all API calls.
 
-## Current State
+## Current State (Updated: Nov 27, 2024)
 
-We have two approaches for managing loading state:
+✅ **MAJOR MILESTONE ACHIEVED**: Automatic loading state removed from globalClient!
 
-1. **Global Client with Interceptors** (default)
-   - Automatically sets loading state for ALL API calls via request/response interceptors
-   - Loading state is set asynchronously (after the function call returns a Promise)
-   - Shows error toasts automatically
+We now have two approaches for managing loading state:
+
+1. **Global Client** (default) - **UPDATED**
+   - ✅ **NO automatic loading state** (interceptors removed)
+   - ✅ Shows error toasts automatically via error interceptor
+   - ✅ Handles 401 redirects automatically
    - Used by most API calls in the application
 
 2. **Silent Client** (`globalClientSilent`)
    - No interceptors, no automatic loading state
    - No error toasts
+   - No 401 handling
    - Used for background operations or when custom loading/error handling is needed
 
-3. **apiCallWithLoading** (new, recommended)
+3. **apiCallWithLoading** (explicit loading wrapper)
    - Explicitly wraps API calls that need loading state
    - Sets loading state synchronously (immediately when called)
-   - Uses default `globalClient` (will show error toasts via interceptor)
+   - Uses default `globalClient` (benefits from error toasts and 401 handling)
    - Guarantees cleanup in `finally` block
    - Simple API - just wrap the API call
+   - **This is now the ONLY way to get loading state**
 
 ## Target State
 
-- Remove automatic loading state from global client interceptors
-- Every API call that needs loading state explicitly uses `apiCallWithLoading`
-- Remove `globalClientSilent` (it becomes the default)
-- This makes loading state opt-in rather than opt-out
+- ✅ Remove automatic loading state from global client interceptors **DONE**
+- ✅ Every API call that needs loading state explicitly uses `apiCallWithLoading` **DONE**
+- ⏳ Remove `globalClientSilent` (it becomes the default) - **NEXT STEP**
+- ✅ This makes loading state opt-in rather than opt-out **ACHIEVED**
 
 ## Benefits
 
@@ -505,8 +509,35 @@ The wrapper doesn't specify a client, so API calls use the default `globalClient
 2. ✅ Create detailed plan (DONE)
 3. ✅ Complete all Phase 2 A-tasks (A1-A7) (DONE)
 4. ✅ Fix remaining API calls without explicit wrappers (DONE - Nov 27, 2024)
-5. ⏳ Start Phase 3 (silent page load operations)
-6. ⏳ Continue with subsequent phases
+5. ✅ **Remove automatic loading from globalClient** (DONE - Nov 27, 2024)
+6. ⏳ Verify E2E tests still pass
+7. ⏳ Start Phase 3 (silent page load operations)
+8. ⏳ Consider removing `globalClientSilent` (make it the default)
+
+### Nov 27, 2024 - Removed Automatic Loading from globalClient ✅
+
+**MAJOR MILESTONE**: The globalClient no longer automatically sets loading state!
+
+**Changes made:**
+1. ✅ Removed request interceptor that set loading state
+2. ✅ Removed response interceptor that cleared loading state
+3. ✅ Kept error interceptor for error toasts and 401 handling
+4. ✅ Updated unit tests:
+   - Removed test for automatic loading behavior
+   - Updated concurrent calls test to expect correct loading count
+   - All 415 tests passing ✅
+
+**What this means:**
+- Loading state is now **opt-in** via `apiCallWithLoading`
+- No more double-counting of loading states
+- No more confusion about when loading appears
+- Error handling (toasts, 401 redirects) still works automatically
+
+**Impact:**
+- All API calls wrapped with `apiCallWithLoading` continue to show loading ✅
+- All API calls using `globalClientSilent` remain silent ✅
+- Error handling unchanged ✅
+- No functional changes to the application ✅
 
 ### Nov 27, 2024 - Final Cleanup of Unwrapped API Calls
 

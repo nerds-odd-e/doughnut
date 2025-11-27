@@ -67,12 +67,6 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     throwOnError: false,
   })
 
-  // Request interceptor: Set loading state
-  globalClient.interceptors.request.use(async (request) => {
-    apiStatusHandler?.assignLoading(true)
-    return request
-  })
-
   // Error interceptor: Handle errors (toasts, 401 redirects, etc.)
   // This runs when there's an error response, before it's returned
   globalClient.interceptors.error.use(async (error, response, request) => {
@@ -116,12 +110,6 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
 
     // Return the error as-is (don't transform it)
     return error
-  })
-
-  // Response interceptor: Clear loading state
-  globalClient.interceptors.response.use(async (response) => {
-    apiStatusHandler?.assignLoading(false)
-    return response
   })
 }
 
