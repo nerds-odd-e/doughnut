@@ -14,13 +14,12 @@ vi.mock("vue-toastification", () => ({
 }))
 
 describe("clientSetup", () => {
-  const apiStatus: ApiStatus = { states: [], errors: [] }
+  const apiStatus: ApiStatus = { states: [] }
   const baseUrl = "http://localhost:9081"
 
   beforeEach(() => {
     fetchMock.resetMocks()
     apiStatus.states = []
-    apiStatus.errors = []
     mockToast.error.mockClear()
     // Setup global client before each test
     setupGlobalClient(apiStatus)

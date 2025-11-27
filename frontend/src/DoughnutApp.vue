@@ -24,7 +24,6 @@ interface RouteViewProps {
 
 const apiStatus: Ref<ApiStatus> = ref({
   states: [],
-  errors: [],
 })
 // Initialize global client with interceptors for direct service imports
 setupGlobalClient(apiStatus.value)

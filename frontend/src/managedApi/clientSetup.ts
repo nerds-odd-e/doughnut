@@ -40,7 +40,7 @@ export async function apiCallWithLoading<T>(
  * This should be called once during app initialization (e.g., in DoughnutApp.vue).
  */
 export function setupGlobalClient(apiStatus: ApiStatus) {
-  apiStatusHandler = new ApiStatusHandler(apiStatus, false)
+  apiStatusHandler = new ApiStatusHandler(apiStatus)
 
   // Configure global client
   // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }

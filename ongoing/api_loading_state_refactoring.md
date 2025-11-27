@@ -509,9 +509,54 @@ The wrapper doesn't specify a client, so API calls use the default `globalClient
 4. ✅ Fix remaining API calls without explicit wrappers (DONE - Nov 27, 2024)
 5. ✅ **Remove automatic loading from globalClient** (DONE - Nov 27, 2024)
 6. ✅ **Remove `globalClientSilent` completely** (DONE - Nov 27, 2024)
-7. ⏳ Verify E2E tests still pass
-8. ⏳ Remove ApiStatus from components (optional cleanup)
-9. ⏳ Remove deprecated Phase 3-7 plans (no longer needed)
+7. ✅ **Remove unused ApiStatus infrastructure** (DONE - Nov 27, 2024)
+8. ⏳ Verify E2E tests still pass
+9. ⏳ Archive this document (refactoring complete!)
+
+### Nov 27, 2024 - Cleaned Up Unused ApiStatus Infrastructure ✅
+
+**CLEANUP**: Removed unused parts of ApiStatus infrastructure!
+
+**Changes made:**
+1. ✅ Removed `ApiStatus.errors[]` array (never read, only written)
+2. ✅ Removed `ApiError` type (not used)
+3. ✅ Removed `silentMode` parameter from ApiStatusHandler (always false)
+4. ✅ Simplified ApiStatus to only contain `states: boolean[]`
+5. ✅ All 415 tests passing ✅
+
+**What was removed:**
+```typescript
+// Before
+export type ApiError = {
+  id: number
+  message: string
+}
+
+export type ApiStatus = {
+  states: boolean[]
+  errors: ApiError[]  // ❌ Removed - never read
+}
+
+// ApiStatusHandler constructor
+constructor(apiStatus: ApiStatus, silent?: boolean)  // ❌ silent param removed
+```
+
+**What remains:**
+```typescript
+// After
+export type ApiStatus = {
+  states: boolean[]  // ✅ Still used for loading indicator
+}
+
+// ApiStatusHandler constructor
+constructor(apiStatus: ApiStatus)  // ✅ Simplified
+```
+
+**Why this matters:**
+- 📉 Simpler data structure
+- 🧹 Removed dead code
+- ✨ Clearer intent - ApiStatus is only for loading state
+- 🎯 Error handling is now clearly separated (toast-only, no state tracking)
 
 ### Nov 27, 2024 - Removed `globalClientSilent` Completely ✅
 
