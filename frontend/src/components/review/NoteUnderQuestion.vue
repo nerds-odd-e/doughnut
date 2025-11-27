@@ -1,7 +1,9 @@
 <template>
   <fieldset class="note-under-question">
     <legend>Note under question</legend>
-    <Breadcrumb v-bind="{ noteTopology, includingSelf: true }" />
+    <div class="breadcrumb-container">
+      <Breadcrumb v-bind="{ noteTopology, includingSelf: true }" />
+    </div>
   </fieldset>
 </template>
 
@@ -40,4 +42,17 @@ defineProps({
     top: -12px
     left: 10px
     width: auto
+
+  .breadcrumb-container
+    max-width: 100%
+    overflow-x: auto
+    overflow-y: hidden
+    -webkit-overflow-scrolling: touch
+
+    :deep(.daisy-breadcrumbs)
+      white-space: nowrap
+
+      ul
+        white-space: nowrap
+        display: inline-flex
 </style>
