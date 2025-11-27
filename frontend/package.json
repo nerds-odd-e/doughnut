@@ -29,7 +29,7 @@
     "vue-toastification": "2.0.0-rc.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.7",
+    "@biomejs/biome": "2.3.8",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
     "@types/node": "^22.15.30",

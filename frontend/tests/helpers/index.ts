@@ -181,13 +181,12 @@ type SdkServiceName = keyof typeof methodToController
 type SdkController<K extends SdkServiceName> = (typeof methodToController)[K]
 type SdkService<K extends SdkServiceName> = SdkController<K>[K]
 type SdkServiceReturnType<K extends SdkServiceName> = ReturnType<SdkService<K>>
-type SdkServiceData<K extends SdkServiceName> = Awaited<
-  SdkServiceReturnType<K>
-> extends {
-  data: infer D
-}
-  ? D
-  : never
+type SdkServiceData<K extends SdkServiceName> =
+  Awaited<SdkServiceReturnType<K>> extends {
+    data: infer D
+  }
+    ? D
+    : never
 type SdkServiceOptions<K extends SdkServiceName> = Parameters<SdkService<K>>[0]
 
 class StoredComponentTestHelper {
