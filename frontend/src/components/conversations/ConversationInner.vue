@@ -60,7 +60,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import type {
   User,
   ConversationMessage,
@@ -121,6 +124,7 @@ const fetchConversationMessages = async () => {
   const { data: messages, error } =
     await ConversationMessageController.getConversationMessages({
       path: { conversationId: conversation.id },
+      client: globalClientSilent,
     })
   if (!error) {
     currentConversationMessages.value = messages!

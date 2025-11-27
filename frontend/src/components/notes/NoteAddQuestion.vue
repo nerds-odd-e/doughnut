@@ -157,10 +157,11 @@ const refineQuestion = async () => {
 }
 
 const generateQuestionByAI = async () => {
-  const { data: generated, error } =
-    await PredefinedQuestionController.generateQuestionWithoutSave({
+  const { data: generated, error } = await apiCallWithLoading(() =>
+    PredefinedQuestionController.generateQuestionWithoutSave({
       query: { note: props.note.id },
     })
+  )
   if (!error && generated) {
     predefinedQuestion.value = generated
   }

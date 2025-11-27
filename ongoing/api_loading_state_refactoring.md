@@ -503,7 +503,29 @@ The wrapper doesn't specify a client, so API calls use the default `globalClient
 
 1. ✅ Complete audit (DONE)
 2. ✅ Create detailed plan (DONE)
-3. ⏳ Start Phase 1 (high-priority silent operations)
-4. ⏳ Test Phase 1 thoroughly
-5. ⏳ Continue with subsequent phases
+3. ✅ Complete all Phase 2 A-tasks (A1-A7) (DONE)
+4. ✅ Fix remaining API calls without explicit wrappers (DONE - Nov 27, 2024)
+5. ⏳ Start Phase 3 (silent page load operations)
+6. ⏳ Continue with subsequent phases
+
+### Nov 27, 2024 - Final Cleanup of Unwrapped API Calls
+
+**Identified and fixed 6 API calls using default client without explicit wrapper:**
+
+✅ **GET calls converted to silent client:**
+1. `DoughnutApp.vue` - `TestabilityRestController.getFeatureToggle()` → added `client: globalClientSilent`
+2. `DoughnutApp.vue` - `CurrentUserInfoController.currentUserInfo()` → added `client: globalClientSilent`
+3. `ManageBazaar.vue` - `BazaarController.bazaar()` → added `client: globalClientSilent`
+4. `NotebookCertificateRequest.vue` - `NotebookCertificateApprovalController.getApprovalForNotebook()` → added `client: globalClientSilent`
+5. `ConversationInner.vue` - `ConversationMessageController.getConversationMessages()` → added `client: globalClientSilent`
+
+✅ **POST call wrapped with loading:**
+6. `NoteAddQuestion.vue` - `PredefinedQuestionController.generateQuestionWithoutSave()` → wrapped with `apiCallWithLoading()`
+
+**Result:** All 416 frontend unit tests passing ✅
+
+**Current Status Summary:**
+- `apiCallWithLoading` usage: 116 occurrences across 46 files
+- `globalClientSilent` usage: 93 occurrences across 44 files
+- Calls using default client without wrapper: **0** ✅
 

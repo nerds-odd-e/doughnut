@@ -23,7 +23,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { BazaarController } from "@generated/backend/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import type { BazaarNotebook } from "@generated/backend"
 import NotebookLink from "../notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
@@ -33,7 +36,9 @@ const { popups } = usePopups()
 const notebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: bazaarNotebooks, error } = await BazaarController.bazaar()
+  const { data: bazaarNotebooks, error } = await BazaarController.bazaar({
+    client: globalClientSilent,
+  })
   if (!error) {
     notebooks.value = bazaarNotebooks!
   }
