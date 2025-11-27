@@ -1,6 +1,6 @@
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockSdkService } from "@tests/helpers"
+import helper from "@tests/helpers"
 
 describe("LinkNoteFinalize", () => {
   it("going back", async () => {
