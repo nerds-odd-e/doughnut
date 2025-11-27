@@ -4,7 +4,7 @@
       v-for="notebook in notebooks"
       :key="notebook.id"
     >
-      <NotebookCard :notebook="notebook">
+      <NotebookCard :notebook="notebook" :is-subscribed="isSubscribed">
         <template #cardHeader>
           <span class="daisy-flex daisy-justify-end daisy-p-0">
             <slot :notebook="notebook" />
@@ -21,5 +21,6 @@ import NotebookCard from "../notebooks/NotebookCard.vue"
 
 defineProps<{
   notebooks: Notebook[]
+  isSubscribed?: boolean
 }>()
 </script>

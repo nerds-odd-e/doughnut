@@ -1,5 +1,5 @@
 <template>
-  <div role="card" class="daisy-card notebook-card" data-cy="notebook-card">
+  <div role="card" class="daisy-card notebook-card" :class="{ 'subscribed-notebook': isSubscribed }" data-cy="notebook-card">
     <div class="notebook-binding"></div>
     <slot name="cardHeader" />
     <router-link
@@ -24,6 +24,7 @@ import type { Notebook } from "@generated/backend"
 
 defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
+  isSubscribed: { type: Boolean, default: false },
 })
 </script>
 
@@ -37,6 +38,20 @@ defineProps({
   height: 200px;
   overflow: hidden;
   margin-bottom: 1rem;
+}
+
+.notebook-card.subscribed-notebook {
+  background: linear-gradient(to right, #e8f4f8 0%, #f0f8fc 5%);
+  border: 1px solid #a8d8ea;
+}
+
+.notebook-card.subscribed-notebook:hover {
+  background: linear-gradient(to right, #d4eaf2 0%, #e3f2f7 5%);
+}
+
+.notebook-card.subscribed-notebook .notebook-binding {
+  background: #7cb5d1;
+  border-right: 1px solid #5a9bb5;
 }
 
 .notebook-binding {
