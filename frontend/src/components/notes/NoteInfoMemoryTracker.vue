@@ -46,6 +46,7 @@ import type { PropType } from "vue"
 import { ref, watch } from "vue"
 import type { MemoryTracker } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import SvgNoReview from "../svgs/SvgNoReview.vue"
 import SvgSad from "../svgs/SvgSad.vue"
@@ -72,13 +73,14 @@ watch(
 )
 
 const selfEvaluateHandler = async (adjustment: number) => {
-  const { data: memoryTracker, error } =
-    await MemoryTrackerController.selfEvaluate({
+  const { data: memoryTracker, error } = await apiCallWithLoading(() =>
+    MemoryTrackerController.selfEvaluate({
       path: { memoryTracker: localMemoryTracker.value.id },
       body: {
         adjustment,
       },
     })
+  )
   if (!error) {
     localMemoryTracker.value = memoryTracker!
     emit("update:modelValue", memoryTracker!)
@@ -93,10 +95,11 @@ const removeFromReview = async () => {
   ) {
     return
   }
-  const { data: memoryTracker, error } =
-    await MemoryTrackerController.removeFromRepeating({
+  const { data: memoryTracker, error } = await apiCallWithLoading(() =>
+    MemoryTrackerController.removeFromRepeating({
       path: { memoryTracker: localMemoryTracker.value.id },
     })
+  )
   if (!error) {
     localMemoryTracker.value = memoryTracker!
     emit("update:modelValue", memoryTracker!)

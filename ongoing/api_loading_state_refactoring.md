@@ -112,8 +112,15 @@ Every API call in the codebase needs careful analysis:
   - MemoryTrackerController.answerSpelling (Quiz.vue)
   - AssessmentController.submitAssessmentResult (Assessment.vue)
   - AssessmentController.generateAssessmentQuestions (AssessmentPage.vue)
+- ✅ **A4 Complete**: Review Actions wrapped with `apiCallWithLoading` (6 operations)
+  - MemoryTrackerController.markAsRepeated (JustReview.vue)
+  - MemoryTrackerController.selfEvaluate (NoteInfoMemoryTracker.vue)
+  - MemoryTrackerController.removeFromRepeating (NoteInfoMemoryTracker.vue)
+  - RecallPromptController.contest (ContestableQuestion.vue)
+  - RecallPromptController.regenerate (ContestableQuestion.vue)
+  - AssimilationController.assimilate (Assimilation.vue)
 - ✅ All 416 frontend unit tests passing
-- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A4-A7)
+- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A5-A7)
 
 ## Critical Issue Discovered (Nov 27, 2024)
 

@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -38,10 +39,12 @@ export default defineComponent({
       if (this.memoryTrackerId === undefined) {
         return
       }
-      const { error } = await MemoryTrackerController.markAsRepeated({
-        path: { memoryTracker: this.memoryTrackerId },
-        query: { successful },
-      })
+      const { error } = await apiCallWithLoading(() =>
+        MemoryTrackerController.markAsRepeated({
+          path: { memoryTracker: this.memoryTrackerId! },
+          query: { successful },
+        })
+      )
       if (!error) {
         this.$emit("reviewed")
       }

@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import type { AnsweredQuestion, RecallPrompt } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref } from "vue"
@@ -80,9 +81,11 @@ const contestQuestion = async () => {
   contesting.value = true
   try {
     const { data: contestResult, error: contestError } =
-      await RecallPromptController.contest({
-        path: { recallPrompt: currentQuestion.value.id },
-      })
+      await apiCallWithLoading(() =>
+        RecallPromptController.contest({
+          path: { recallPrompt: currentQuestion.value.id },
+        })
+      )
 
     if (!contestError && contestResult && !contestResult.rejected) {
       regenerating.value = true
@@ -92,10 +95,12 @@ const contestQuestion = async () => {
       })
       try {
         const { data: regeneratedQuestion, error: regenerateError } =
-          await RecallPromptController.regenerate({
-            path: { recallPrompt: currentQuestion.value.id },
-            body: contestResult,
-          })
+          await apiCallWithLoading(() =>
+            RecallPromptController.regenerate({
+              path: { recallPrompt: currentQuestion.value.id },
+              body: contestResult,
+            })
+          )
         if (!regenerateError && regeneratedQuestion) {
           currentQuestion.value = regeneratedQuestion
         }
