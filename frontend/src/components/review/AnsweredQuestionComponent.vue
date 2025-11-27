@@ -8,7 +8,6 @@
       multipleChoicesQuestion: answeredQuestion.predefinedQuestion.multipleChoicesQuestion,
       correctChoiceIndex: answeredQuestion.predefinedQuestion.correctAnswerIndex,
       answer: answeredQuestion.answer,
-      questionId: answeredQuestion.predefinedQuestion.id,
     }"
   />
   <AnswerResult v-bind="{ answeredQuestion }" />
