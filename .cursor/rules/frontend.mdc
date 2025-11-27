@@ -118,19 +118,28 @@ onMounted(() => {
 ### API Integration
 
 - Import services directly from `@generated/backend/sdk.gen`
-- The global client is automatically configured with interceptors for loading states and error handling (set up in `DoughnutApp.vue`)
 - Use the wrapped response pattern: `{ data, error, request, response }`
 - Follow the API types from generated code
-- For silent calls (no loading indicators or error toasts), use `globalClientSilent` from `@/managedApi/clientSetup`:
-  ```typescript
-  import { askAQuestion } from "@generated/backend/sdk.gen"
-  import { globalClientSilent } from "@/managedApi/clientSetup"
-  
-  const { data, error } = await askAQuestion({
-    path: { memoryTracker: trackerId },
-    client: globalClientSilent, // Use silent client for background calls
+
+**Loading State and Error Handling:**
+- Use `apiCallWithLoading` wrapper for user-initiated actions that need loading indicators
+- Wrapped calls show loading state and error toasts automatically
+- Non-wrapped calls are silent (no loading, no error toasts)
+
+```typescript
+import { UserController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+
+// For user actions (shows loading + error toasts)
+const { data: newUser, error } = await apiCallWithLoading(() =>
+  UserController.createUser({
+    body: formData,
   })
-  ```
+)
+
+// For background fetches (silent - no loading, no error toasts)
+const { data: users, error } = await UserController.getUserProfile()
+```
 
 ### API Return Value Usage Pattern
 
@@ -163,16 +172,19 @@ if (!error) {
 3. TypeScript types are guaranteed: when `error` is undefined, `data` is always the correct type
 4. No need for runtime property checks: if the type says `token: string`, it's always present
 5. No need for `else if (data)` check: when `error` is undefined, `data` is always defined and has the correct type
-6. Errors are handled in the response interceptor: the global client's interceptor handles error display (toasts, loading states, etc.)
+6. Use `apiCallWithLoading` for user actions to enable error toasts and loading state
 
 **Example:**
 
 ```typescript
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+
 const generateToken = async () => {
-  loading.value = true
-  const { data: newToken, error } = await generateTokenApi({
-    body: { label: tokenFormData.value.label },
-  })
+  const { data: newToken, error } = await apiCallWithLoading(() =>
+    UserController.generateToken({
+      body: { label: tokenFormData.value.label },
+    })
+  )
   if (!error) {
     // newToken is guaranteed to be UserToken type when error is undefined
     token.value = newToken.token
@@ -181,11 +193,10 @@ const generateToken = async () => {
       label: newToken.label,
     })
   }
-  loading.value = false
 }
 ```
 
-This pattern provides type safety and consistent error handling through the global client interceptors.
+This pattern provides type safety, automatic loading state, and error handling for user actions.
 
 ### Handling Validation Errors (400 Bad Request)
 
@@ -195,17 +206,20 @@ When handling 400 Bad Request errors with validation errors, use the `toOpenApiE
 
 ```typescript
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 // In your component
 const errors = ref<Record<string, string>>({})
 
 const processForm = async () => {
-  const { data, error } = await updateUser({
-    path: { user: formData.value.id },
-    body: formData.value,
-  })
+  const { data, error } = await apiCallWithLoading(() =>
+    UserController.updateUser({
+      path: { user: formData.value.id },
+      body: formData.value,
+    })
+  )
   if (error) {
-    // Error is handled by global interceptor (toast notification)
+    // Error toast is shown automatically by apiCallWithLoading
     // Extract field-level errors if available (for 400 validation errors)
     const errorObj = toOpenApiError(error)
     errors.value = errorObj.errors || {}
@@ -222,12 +236,14 @@ const processForm = async () => {
 2. `OpenApiError` type: `{ errors?: Record<string, string>; message?: string }`
 3. The helper safely handles both string and object errors
 4. Extract `errors` field for field-level validation errors (typically from 400 responses)
-5. Global interceptor already handles error display (toasts), so you only need to extract field-level errors for form validation
+5. `apiCallWithLoading` shows error toasts automatically, you only need to extract field-level errors for form validation
 
 **Example:**
 
 ```typescript
-const { data: updatedUser, error } = await updateUser({ path: { user: id }, body: formData })
+const { data: updatedUser, error } = await apiCallWithLoading(() =>
+  UserController.updateUser({ path: { user: id }, body: formData })
+)
 if (error) {
   const errorObj = toOpenApiError(error)
   // errorObj.errors contains field-level validation errors
