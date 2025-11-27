@@ -513,6 +513,42 @@ The wrapper doesn't specify a client, so API calls use the default `globalClient
 8. ⏳ Verify E2E tests still pass
 9. ⏳ Archive this document (refactoring complete!)
 
+### Nov 27, 2024 - Moved Error Toast to Caller ✅
+
+**FINAL SIMPLIFICATION**: Moved `addError` method to the caller since it doesn't use internal state!
+
+**Changes made:**
+1. ✅ Moved error toast logic from `ApiStatusHandler.addError()` to `clientSetup.handleApiError()`
+2. ✅ Removed `addError` method from `ApiStatusHandler`
+3. ✅ Removed `useToast` import from `ApiStatusHandler`
+4. ✅ `ApiStatusHandler` now ONLY manages loading state
+5. ✅ All 415 tests passing ✅
+
+**Why this matters:**
+- 🎯 **Single Responsibility**: `ApiStatusHandler` now has ONE job - manage loading state
+- 🧹 **No dependencies**: `ApiStatusHandler` no longer needs `vue-toastification`
+- 📦 **Simpler class**: Just 15 lines of code, crystal clear purpose
+- ✨ **Better separation**: Error display logic lives where it's used
+
+**ApiStatusHandler is now minimal:**
+```typescript
+export default class ApiStatusHandler {
+  apiStatus: ApiStatus
+
+  constructor(apiStatus: ApiStatus) {
+    this.apiStatus = apiStatus
+  }
+
+  assignLoading(value: boolean) {
+    if (value) {
+      this.apiStatus.states.push(true)
+    } else {
+      this.apiStatus.states.pop()
+    }
+  }
+}
+```
+
 ### Nov 27, 2024 - Cleaned Up Unused ApiStatus Infrastructure ✅
 
 **CLEANUP**: Removed unused parts of ApiStatus infrastructure!

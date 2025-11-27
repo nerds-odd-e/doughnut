@@ -3,6 +3,7 @@ import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
+import { useToast } from "vue-toastification"
 
 // Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined
@@ -151,7 +152,15 @@ function handleApiError(
   }
 
   // Show error toast
-  apiStatusHandler.addError(msg, error.status)
+  const toast = useToast()
+  // For 404 errors, show longer timeout and make it more visible
+  const timeout = error.status === 404 ? 15000 : 3000 // 15 seconds for 404, 3 seconds for others
+  toast.error(msg, {
+    timeout,
+    closeOnClick: false, // Prevent accidental dismissal for 404 errors
+    pauseOnFocusLoss: true,
+    pauseOnHover: true,
+  })
 
   // Handle 400 bad request - assign properties to error object
   if (error.status === 400) {
