@@ -62,6 +62,7 @@ import type {
   SuggestedQuestionForFineTuning,
 } from "@generated/backend"
 import { FineTuningDataController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
@@ -98,11 +99,12 @@ export default defineComponent({
     async suggestQuestionForFineTuning() {
       const validated = this.validateSuggestedQuestion(this.suggestionParams)
       if (!validated) return
-      const { data: updated, error } =
-        await FineTuningDataController.updateSuggestedQuestionForFineTuning({
+      const { data: updated, error } = await apiCallWithLoading(() =>
+        FineTuningDataController.updateSuggestedQuestionForFineTuning({
           path: { suggestedQuestion: this.modelValue.id },
           body: validated,
         })
+      )
       if (!error && updated) {
         this.$emit("update:modelValue", updated)
       }

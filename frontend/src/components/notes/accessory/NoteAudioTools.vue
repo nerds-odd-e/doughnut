@@ -84,7 +84,10 @@ import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/backend"
 import { AiAudioController, AiController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {
+  globalClientSilent,
+  apiCallWithLoading,
+} from "@/managedApi/clientSetup"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
@@ -115,9 +118,11 @@ const shouldSuggestTitle = (callCount: number): boolean => {
 }
 
 const updateTopicIfSuggested = async (noteId: number) => {
-  const { data: suggestedTopic, error } = await AiController.suggestTitle({
-    path: { note: noteId },
-  })
+  const { data: suggestedTopic, error } = await apiCallWithLoading(() =>
+    AiController.suggestTitle({
+      path: { note: noteId },
+    })
+  )
   if (!error && suggestedTopic?.title) {
     await storageAccessor
       .storedApi()

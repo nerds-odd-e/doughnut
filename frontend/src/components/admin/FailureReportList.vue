@@ -41,8 +41,8 @@ import { defineComponent } from "vue"
 import type { FailureReport } from "@generated/backend"
 import { FailureReportController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
-import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
 export default defineComponent({
   components: { ContainerPage },
@@ -79,9 +79,11 @@ export default defineComponent({
         return
       }
 
-      const { error } = await FailureReportController.deleteFailureReports({
-        body: this.selectedFailureReports,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        FailureReportController.deleteFailureReports({
+          body: this.selectedFailureReports,
+        })
+      )
       if (!error) {
         this.fetchData()
         this.selectedFailureReports = []

@@ -65,6 +65,7 @@ import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/backend"
 import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
@@ -131,11 +132,12 @@ const removeChoice = () => {
 
 const submitQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
-  const { data: response, error } =
-    await PredefinedQuestionController.addQuestionManually({
+  const { data: response, error } = await apiCallWithLoading(() =>
+    PredefinedQuestionController.addQuestionManually({
       path: { note: props.note.id },
       body: recallPrompt,
     })
+  )
   if (!error && response) {
     emit("close-dialog", response)
   }
@@ -143,11 +145,12 @@ const submitQuestion = async () => {
 
 const refineQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
-  const { data: refined, error } =
-    await PredefinedQuestionController.refineQuestion({
+  const { data: refined, error } = await apiCallWithLoading(() =>
+    PredefinedQuestionController.refineQuestion({
       path: { note: props.note.id },
       body: recallPrompt,
     })
+  )
   if (!error && refined) {
     predefinedQuestion.value = refined
   }

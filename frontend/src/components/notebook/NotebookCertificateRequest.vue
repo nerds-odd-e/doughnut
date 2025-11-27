@@ -13,6 +13,7 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Notebook, NotebookCertificateApproval } from "@generated/backend"
 import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -58,10 +59,11 @@ const isApprovalButtonDisabled = computed(() => {
   return approval.value !== undefined && approval.value !== null
 })
 const requestNotebookApproval = async () => {
-  const { data: newApproval, error } =
-    await NotebookCertificateApprovalController.requestApprovalForNotebook({
+  const { data: newApproval, error } = await apiCallWithLoading(() =>
+    NotebookCertificateApprovalController.requestApprovalForNotebook({
       path: { notebook: props.notebook.id },
     })
+  )
   if (!error) {
     approval.value = newApproval!
   }

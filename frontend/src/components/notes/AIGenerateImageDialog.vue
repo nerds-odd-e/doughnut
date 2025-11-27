@@ -12,6 +12,7 @@
 <script lang="ts">
 import type { Note } from "@generated/backend"
 import { AiController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -45,9 +46,11 @@ export default defineComponent({
   },
   methods: {
     async askForImage() {
-      const { data: imageResult, error } = await AiController.generateImage({
-        body: this.prompt,
-      })
+      const { data: imageResult, error } = await apiCallWithLoading(() =>
+        AiController.generateImage({
+          body: this.prompt,
+        })
+      )
       if (!error) {
         this.b64Json = imageResult!.b64encoded
         this.promptError = undefined

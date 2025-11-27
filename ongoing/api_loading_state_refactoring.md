@@ -124,8 +124,27 @@ Every API call in the codebase needs careful analysis:
   - ConversationMessageController.startConversationAboutNote (NoteConversation.vue - 2 places)
   - ConversationMessageController.startConversationAboutAssessmentQuestion (FeedbackForm.vue)
   - ConversationMessageController.startConversationAboutRecallPrompt (ConversationButton.vue)
+- ✅ **A6 Complete**: Note/Question Management wrapped with `apiCallWithLoading` (8 operations)
+  - PredefinedQuestionController.addQuestionManually (NoteAddQuestion.vue)
+  - PredefinedQuestionController.refineQuestion (NoteAddQuestion.vue)
+  - PredefinedQuestionController.toggleApproval (Questions.vue)
+  - NoteController.updateRecallSetting (RecallSettingForm.vue)
+  - NoteController.updateNoteAccessories (NoteEditImageDialog.vue - already wrapped)
+  - NoteController.updateNoteAccessories (NoteEditUrlDialog.vue - already wrapped)
+  - AiController.suggestTitle (NoteAudioTools.vue)
+  - AiController.generateImage (AIGenerateImageDialog.vue)
+- ✅ **A7 Complete**: Admin Operations wrapped with `apiCallWithLoading` (8 operations)
+  - FineTuningDataController.uploadAndTriggerFineTuning (FineTuningData.vue)
+  - FineTuningDataController.updateSuggestedQuestionForFineTuning (SuggestedQuestionEdit.vue)
+  - FineTuningDataController.duplicate (SuggestedQuestionRow.vue)
+  - FineTuningDataController.delete (SuggestedQuestionRow.vue)
+  - GlobalSettingsController.setCurrentModelVersions (ManageModel.vue)
+  - NotebookCertificateApprovalController.approve (CertificateRequests.vue)
+  - NotebookCertificateApprovalController.requestApprovalForNotebook (NotebookCertificateRequest.vue)
+  - FailureReportController.deleteFailureReports (FailureReportList.vue)
 - ✅ All 416 frontend unit tests passing
-- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A6-A7)
+- ✅ **Phase 2 Complete**: All user mutations (A1-A7) wrapped with `apiCallWithLoading`
+- **Total operations wrapped**: 51 user-initiated mutations now show proper loading state
 
 ## Critical Issue Discovered (Nov 27, 2024)
 

@@ -35,8 +35,9 @@ export default {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated]
     },
     async triggerFineTuning() {
-      const { error } =
-        await FineTuningDataController.uploadAndTriggerFineTuning()
+      const { error } = await apiCallWithLoading(() =>
+        FineTuningDataController.uploadAndTriggerFineTuning()
+      )
       if (!error) {
         this.fineTuningDataResultMsg = "Training initiated."
       } else {

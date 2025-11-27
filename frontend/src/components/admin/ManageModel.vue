@@ -38,10 +38,11 @@ onMounted(async () => {
 })
 
 const save = async (settings: GlobalAiModelSettings) => {
-  const { data: updatedSettings, error } =
-    await GlobalSettingsController.setCurrentModelVersions({
+  const { data: updatedSettings, error } = await apiCallWithLoading(() =>
+    GlobalSettingsController.setCurrentModelVersions({
       body: settings,
     })
+  )
   if (!error && updatedSettings) {
     selectedModels.value = updatedSettings
   }

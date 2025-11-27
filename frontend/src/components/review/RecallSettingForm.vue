@@ -27,6 +27,7 @@
 import type { RecallSetting } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { defineComponent, computed, ref } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -62,10 +63,12 @@ export default defineComponent({
         ...formData.value,
         ...newValue,
       }
-      const { error } = await NoteController.updateRecallSetting({
-        path: { note: props.noteId },
-        body: formData.value,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        NoteController.updateRecallSetting({
+          path: { note: props.noteId },
+          body: formData.value,
+        })
+      )
       if (!error) {
         if (newValue.level !== undefined) {
           emit("levelChanged", newValue.level)

@@ -34,10 +34,10 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { NotebookCertificateApproval } from "@generated/backend"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const { popups } = usePopups()
 
@@ -54,9 +54,11 @@ const fetchNotebooks = async () => {
 
 const approveNoteBook = async (approvalId: number) => {
   if (await popups.confirm(`Are you sure you want to approve this notebook?`)) {
-    const { error } = await NotebookCertificateApprovalController.approve({
-      path: { notebookCertificateApproval: approvalId },
-    })
+    const { error } = await apiCallWithLoading(() =>
+      NotebookCertificateApprovalController.approve({
+        path: { notebookCertificateApproval: approvalId },
+      })
+    )
     if (!error) {
       fetchNotebooks()
     }

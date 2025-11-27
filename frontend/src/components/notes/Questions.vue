@@ -93,7 +93,10 @@ import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/backend"
 import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {
+  globalClientSilent,
+  apiCallWithLoading,
+} from "@/managedApi/clientSetup"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
@@ -128,9 +131,11 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
-    await PredefinedQuestionController.toggleApproval({
-      path: { predefinedQuestion: questionId },
-    })
+    await apiCallWithLoading(() =>
+      PredefinedQuestionController.toggleApproval({
+        path: { predefinedQuestion: questionId },
+      })
+    )
   }
 }
 onMounted(() => {
