@@ -3,7 +3,6 @@
     v-bind="{
       multipleChoicesQuestion: localAssessmentQuestionInstance.multipleChoicesQuestion,
       answer: localAssessmentQuestionInstance.answer,
-      questionId: localAssessmentQuestionInstance.id,
     }"
     @answer="submitAnswer($event)"
     :key="localAssessmentQuestionInstance.id"

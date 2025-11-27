@@ -3,7 +3,7 @@
     <li
       class="choice daisy-w-[46%] daisy-min-h-[80px] daisy-m-[2%] sm:daisy-w-full"
       v-for="(choice, index) in choices"
-      :key="getChoiceKey(choice, index)"
+      :key="index"
     >
       <button
         :class="[
@@ -46,19 +46,9 @@ export default defineComponent({
     correctChoiceIndex: Number,
     answerChoiceIndex: Number,
     disabled: Boolean,
-    questionId: {
-      type: [Number, String],
-      default: undefined,
-    },
   },
   emits: ["answer"],
   methods: {
-    getChoiceKey(choice: string, index: number) {
-      if (this.questionId !== undefined) {
-        return `${this.questionId}-${choice}`
-      }
-      return `choice-${index}-${choice}`
-    },
     handleInnerClick(event: Event) {
       // Prevent any link clicks from navigating, but allow text selection
       if (event.target instanceof HTMLAnchorElement) {
