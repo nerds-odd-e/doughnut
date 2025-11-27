@@ -45,7 +45,10 @@ import type { Conversation, User } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
-import { globalClientSilent, apiCallWithLoading } from "@/managedApi/clientSetup"
+import {
+  globalClientSilent,
+  apiCallWithLoading,
+} from "@/managedApi/clientSetup"
 
 const conversation = ref<Conversation | undefined>()
 const user = inject<Ref<User | undefined>>("currentUser")
