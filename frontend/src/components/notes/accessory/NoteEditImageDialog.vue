@@ -12,7 +12,10 @@
 <script lang="ts">
 import type { NoteAccessoriesDto, NoteAccessory } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"
 import ImageFormBody from "./ImageFormBody.vue"
@@ -47,11 +50,12 @@ export default defineComponent({
       }
     },
     async processForm() {
-      const { data: updatedAccessory, error } =
-        await NoteController.updateNoteAccessories({
+      const { data: updatedAccessory, error } = await apiCallWithLoading(() =>
+        NoteController.updateNoteAccessories({
           path: { note: this.noteId },
           body: this.formData,
         })
+      )
       if (error) {
         const errorObj = toOpenApiError(error)
         this.noteFormErrors = errorObj.errors || {}
