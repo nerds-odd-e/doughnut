@@ -8,8 +8,11 @@ import { useToast } from "vue-toastification"
 // Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined
 
-// Track if we're inside apiCallWithLoading to determine if errors should be shown
-let isInApiCallWithLoading = false
+type SdkResult = {
+  error?: unknown
+  response?: { url?: string; status?: number }
+  request?: { method?: string; url?: string }
+}
 
 /**
  * Wrapper for API calls that manages loading state and enables error handling.
@@ -18,7 +21,7 @@ let isInApiCallWithLoading = false
  * IMPORTANT: Only calls wrapped with this function will show error toasts and handle 401 redirects.
  * Non-wrapped calls are "silent" and will not trigger error UI.
  *
- * @param apiCall - Function that returns a Promise with the API result
+ * @param apiCall - Function that returns a Promise with the API result (SDK format with error, response, request)
  * @returns Promise with the API result
  *
  * @example
@@ -26,7 +29,7 @@ let isInApiCallWithLoading = false
  *   someApiCall({ path: { id: 123 } })
  * )
  */
-export async function apiCallWithLoading<T>(
+export async function apiCallWithLoading<T extends SdkResult>(
   apiCall: () => Promise<T>
 ): Promise<T> {
   if (!apiStatusHandler) {
@@ -34,18 +37,22 @@ export async function apiCallWithLoading<T>(
   }
 
   apiStatusHandler.assignLoading(true)
-  const wasInApiCallWithLoading = isInApiCallWithLoading
-  isInApiCallWithLoading = true
   try {
-    return await apiCall()
+    const result = await apiCall()
+
+    // Handle error if present in the SDK result
+    if (result.error) {
+      handleSdkError(result)
+    }
+
+    return result
   } finally {
     apiStatusHandler.assignLoading(false)
-    isInApiCallWithLoading = wasInApiCallWithLoading
   }
 }
 
 /**
- * Sets up the global client with interceptors for loading states and error handling.
+ * Sets up the global client.
  * This should be called once during app initialization (e.g., in DoughnutApp.vue).
  */
 export function setupGlobalClient(apiStatus: ApiStatus) {
@@ -62,78 +69,26 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     responseStyle: "fields",
     throwOnError: false,
   })
-
-  // Error interceptor: Handle errors (toasts, 401 redirects, etc.)
-  // This runs when there's an error response, before it's returned
-  // NOTE: Only shows errors for calls wrapped with apiCallWithLoading (non-wrapped calls are silent)
-  globalClient.interceptors.error.use(async (error, response, request) => {
-    // Only handle errors if we're inside apiCallWithLoading
-    // This restores the previous "silent" behavior for non-wrapped API calls
-    if (!isInApiCallWithLoading) {
-      return error
-    }
-
-    // Construct error object for handleApiError
-    // The error parameter is the parsed response body (object or string)
-    const errorBody = error
-    const errorObj = new Error(
-      typeof errorBody === "string"
-        ? errorBody
-        : typeof errorBody === "object" &&
-            errorBody !== null &&
-            "message" in errorBody &&
-            typeof errorBody.message === "string"
-          ? errorBody.message
-          : "API Error"
-    ) as Error & {
-      status?: number
-      body?: unknown
-      request?: { method?: string; url?: string }
-      url?: string
-    }
-
-    // Set status from response
-    if (response) {
-      errorObj.status = response.status
-      errorObj.url = response.url
-    }
-
-    // Set request info
-    if (request) {
-      errorObj.request = {
-        method: request.method || "UNKNOWN",
-        url: request.url || "UNKNOWN",
-      }
-    }
-
-    // Set body - the error parameter IS the body
-    errorObj.body = errorBody
-
-    handleApiError(errorObj)
-
-    // Return the error as-is (don't transform it)
-    return error
-  })
 }
 
 /**
- * Handles API errors with appropriate user feedback and actions.
- * This logic is extracted from ManagedApi.handleApiError for use in interceptors.
+ * Handles API errors from SDK result format.
+ * Extracted from ManagedApi.handleApiError.
+ * @param result - SDK result with { error, response, request }
  */
-function handleApiError(
-  error: Error & {
-    status?: number
-    body?: unknown
-    request?: { method?: string; url?: string }
-    url?: string
-  }
-) {
+function handleSdkError(result: SdkResult) {
   if (!apiStatusHandler) return
+  if (!result.error) return
+
+  const status = result.response?.status
+  const url = result.response?.url
+  const method = result.request?.method
+  const errorBody = result.error
 
   // Handle 401 unauthorized - redirect to login
-  if (error.status === 401) {
+  if (status === 401) {
     if (
-      error.request?.method === "GET" ||
+      method === "GET" ||
       // eslint-disable-next-line no-alert
       window.confirm(
         "You are logged out. Do you want to log in (and lose the current changes)?"
@@ -145,31 +100,28 @@ function handleApiError(
   }
 
   // Extract error message
-  let msg =
-    error.body &&
-    typeof error.body === "object" &&
-    "message" in error.body &&
-    typeof error.body.message === "string"
-      ? error.body.message
-      : error.message
+  let msg = "API Error"
+  if (
+    errorBody &&
+    typeof errorBody === "object" &&
+    "message" in errorBody &&
+    typeof errorBody.message === "string"
+  ) {
+    msg = errorBody.message
+  } else if (typeof errorBody === "string") {
+    msg = errorBody
+  }
 
   // For 404 errors, include endpoint details for better debugging
-  if (error.status === 404) {
-    const method = error.request?.method || "UNKNOWN"
-    const url = error.url || error.request?.url || "UNKNOWN"
-    const enhancedMsg = `[404 Not Found] ${method} ${url}\n\n${msg}`
-    Object.defineProperty(error, "message", {
-      value: enhancedMsg,
-      writable: true,
-      configurable: true,
-    })
+  if (status === 404) {
+    const enhancedMsg = `[404 Not Found] ${method || "UNKNOWN"} ${url || "UNKNOWN"}\n\n${msg}`
     msg = enhancedMsg
   }
 
   // Show error toast
   const toast = useToast()
   // For 404 errors, show longer timeout and make it more visible
-  const timeout = error.status === 404 ? 15000 : 3000 // 15 seconds for 404, 3 seconds for others
+  const timeout = status === 404 ? 15000 : 3000 // 15 seconds for 404, 3 seconds for others
   toast.error(msg, {
     timeout,
     closeOnClick: false, // Prevent accidental dismissal for 404 errors
@@ -178,9 +130,9 @@ function handleApiError(
   })
 
   // Handle 400 bad request - assign properties to error object
-  if (error.status === 400) {
+  if (status === 400 && errorBody) {
     const jsonResponse =
-      typeof error.body === "string" ? JSON.parse(error.body) : error.body
-    assignBadRequestProperties(error, jsonResponse)
+      typeof errorBody === "string" ? JSON.parse(errorBody) : errorBody
+    assignBadRequestProperties(errorBody as Error, jsonResponse)
   }
 }

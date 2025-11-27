@@ -513,62 +513,68 @@ The wrapper doesn't specify a client, so API calls use the default `globalClient
 8. ⏳ Verify E2E tests still pass
 9. ⏳ Archive this document (refactoring complete!)
 
-### Nov 27, 2024 - Restored Silent Behavior for Non-Wrapped Calls ✅
+### Nov 27, 2024 - Refactored to Handle Errors in apiCallWithLoading (Final) ✅
 
-**IMPORTANT FIX**: Restored previous behavior where non-`apiCallWithLoading` calls are truly silent!
+**CLEANER APPROACH**: Handle errors directly in `apiCallWithLoading` by extracting from SDK result!
 
-**The Problem:**
-After removing `globalClientSilent`, ALL API calls were showing error toasts and handling 401s. This broke the previous "silent" behavior for background fetches, prefetching, etc.
+**The Problem with Previous Approach:**
+Using `isInApiCallWithLoading` flag and interceptors was indirect - the error information was already available in the SDK result's `error` property.
 
-**The Solution:**
-Track whether we're inside `apiCallWithLoading` and only show errors for wrapped calls:
+**The Better Solution:**
+Handle errors directly in `apiCallWithLoading` by extracting from the SDK result:
 
 ```typescript
-// Track if we're inside apiCallWithLoading
-let isInApiCallWithLoading = false
+type SdkResult = {
+  error?: unknown
+  response?: { url?: string; status?: number }
+  request?: { method?: string; url?: string }
+}
 
-export async function apiCallWithLoading<T>(apiCall: () => Promise<T>): Promise<T> {
-  // Set flag before call
-  isInApiCallWithLoading = true
+export async function apiCallWithLoading<T extends SdkResult>(
+  apiCall: () => Promise<T>
+): Promise<T> {
+  apiStatusHandler.assignLoading(true)
   try {
-    return await apiCall()
+    const result = await apiCall()
+    
+    // Handle error if present in the SDK result
+    if (result.error) {
+      handleSdkError(result)  // Extract and process error
+    }
+    
+    return result
   } finally {
-    isInApiCallWithLoading = false
+    apiStatusHandler.assignLoading(false)
   }
 }
 
-// In error interceptor
-globalClient.interceptors.error.use(async (error, response, request) => {
-  // Only handle errors if wrapped
-  if (!isInApiCallWithLoading) {
-    return error  // Silent!
-  }
-  // ... show toasts, handle 401s ...
-})
+// No error interceptor needed!
+// Errors are handled directly in apiCallWithLoading
 ```
 
 **Changes made:**
-1. ✅ Added `isInApiCallWithLoading` flag to track wrapped calls
-2. ✅ Error interceptor checks flag before showing toasts/handling 401s
-3. ✅ Non-wrapped calls are now truly silent (no toasts, no 401 redirects)
-4. ✅ Added 3 new unit tests to verify silent vs with-loading behavior
-5. ✅ All 418 tests passing ✅
+1. ✅ Removed `isInApiCallWithLoading` flag (no longer needed)
+2. ✅ Removed error interceptor from setupGlobalClient
+3. ✅ Created `SdkResult` type for SDK response format
+4. ✅ `apiCallWithLoading` now extracts `result.error` and calls `handleSdkError`
+5. ✅ Extracted error handling logic to `handleSdkError` function
+6. ✅ All 418 tests passing ✅
 
-**Test Coverage:**
-- ✅ Wrapped calls show error toasts
-- ✅ Non-wrapped calls DON'T show error toasts (silent)
-- ✅ 404 errors enhanced for wrapped calls
-- ✅ 404 errors NOT shown for non-wrapped calls
-- ✅ Nested `apiCallWithLoading` works correctly
+**Benefits:**
+- 🎯 **Explicit**: Errors are handled where they're detected
+- 🧹 **Simpler**: No need for context tracking flag
+- 📦 **No Interceptor**: Cleaner setup, no hidden behavior
+- ✨ **Co-located**: Error handling lives with loading state management
+- 🔧 **Easier to Test**: Direct function call, no side effects
 
-**Behavior Restored:**
+**Behavior (unchanged):**
 ```typescript
-// Shows error toast + handles 401
+// Shows error toast + handles 401 (has .error property)
 await apiCallWithLoading(() => 
   UserController.getUserProfile()
 )
 
-// Silent - no error toast, no 401 handling
+// Silent - no error handling (error ignored)
 await UserController.getUserProfile()
 ```
 

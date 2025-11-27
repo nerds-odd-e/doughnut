@@ -108,15 +108,13 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      await apiCallWithLoading(async () => {
+      const result = await apiCallWithLoading(async () => {
         // Inner call should also show errors
-        const { error } = await apiCallWithLoading(() =>
-          UserController.getUserProfile({})
-        )
-        expect(error).toBeDefined()
+        return await apiCallWithLoading(() => UserController.getUserProfile({}))
       })
 
       // Should show error toast for the inner call
+      expect(result.error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalled()
     })
   })
