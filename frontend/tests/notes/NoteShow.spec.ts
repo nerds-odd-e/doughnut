@@ -62,7 +62,6 @@ describe("note wth children", () => {
     render(note)
     expect(showNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
-      client: expect.anything(),
     })
   })
 

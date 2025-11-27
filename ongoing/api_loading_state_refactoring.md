@@ -85,6 +85,36 @@ Every API call in the codebase needs careful analysis:
 - ✅ Complete audit of all API calls (127+ locations identified)
 - ⏳ Migration plan created (see below)
 
+## Critical Issue Discovered (Nov 27, 2024)
+
+**Problem**: Using `globalClientSilent` for API calls breaks 401 authentication handling.
+
+**Root Cause**: 
+- `globalClientSilent` has NO interceptors (no loading, no error handling)
+- When a 401 error occurs, the error interceptor calls `loginOrRegisterAndHaltThisThread()` to redirect to login
+- Silent operations lose this critical functionality
+
+**Impact**:
+- E2E test `account_control.feature` failed - unauthenticated users weren't redirected to login
+- Any page using `globalClientSilent` for initial data fetch will fail authentication checks
+
+**Fixes Applied**:
+- ✅ `FailureReportList.vue` - Removed `client: globalClientSilent`, now uses default client
+- ✅ `FailureReportPage.vue` - Removed `client: globalClientSilent`, now uses default client
+- ✅ `ManageModel.vue` - Removed `client: globalClientSilent` from 2 API calls
+- ✅ `FineTuningData.vue` - Removed `client: globalClientSilent`, now uses default client
+- ✅ `CertificateRequests.vue` - Removed `client: globalClientSilent`, now uses default client
+- ✅ E2E test `account_control.feature` now passing
+
+**Architectural Implication**:
+- We need THREE client modes, not two:
+  1. **Full client** (loading + error handling) - user actions
+  2. **Error-only client** (no loading, but error handling) - background operations that need 401 handling
+  3. **Silent client** (no interceptors) - truly silent operations like prefetch
+
+- Current architecture only has #1 and #3, missing #2
+- For now, operations that need 401 handling must use the default client (will show loading)
+
 ## Implementation Details
 
 `apiCallWithLoading` has been simplified - just wrap your API call:

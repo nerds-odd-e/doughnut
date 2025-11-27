@@ -13,19 +13,19 @@ import {
   AiController,
   GlobalSettingsController,
 } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ManageModelInner from "./ManageModelInner.vue"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const modelList = ref<string[] | undefined>(undefined)
 const selectedModels = ref<GlobalAiModelSettings | undefined>(undefined)
 
 onMounted(async () => {
   const [modelListRes, selectedModelRes] = await Promise.all([
-    AiController.getAvailableGptModels({ client: globalClientSilent }),
-    GlobalSettingsController.getCurrentModelVersions({
-      client: globalClientSilent,
-    }),
+    apiCallWithLoading(() => AiController.getAvailableGptModels({})),
+    apiCallWithLoading(() =>
+      GlobalSettingsController.getCurrentModelVersions({})
+    ),
   ])
   const { data: models, error: modelsError } = modelListRes
   const { data: modelsSettings, error: settingsError } = selectedModelRes

@@ -34,7 +34,6 @@ describe("all in note show page", () => {
       await screen.findByText(noteRealm.note.noteTopology.titleOrPredicate)
       expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: noteRealm.id },
-        client: expect.anything(),
       })
     })
   })

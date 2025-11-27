@@ -24,9 +24,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { FailureReportController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
 import ContainerPage from "./commons/ContainerPage.vue"
 import type { FailureReport } from "@generated/backend"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 interface Props {
   failureReportId: number
@@ -38,11 +38,11 @@ const failureReport = ref<FailureReport | undefined>(undefined)
 const githubIssueUrl = ref<string | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: reportData, error } =
-    await FailureReportController.showFailureReport({
+  const { data: reportData, error } = await apiCallWithLoading(() =>
+    FailureReportController.showFailureReport({
       path: { failureReport: props.failureReportId },
-      client: globalClientSilent,
     })
+  )
   if (!error) {
     // reportData is guaranteed to be FailureReportForView when error is undefined
     failureReport.value = reportData!.failureReport

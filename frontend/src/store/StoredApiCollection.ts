@@ -15,10 +15,7 @@ import {
   toOpenApiError,
   setErrorObjectForFieldErrors,
 } from "@/managedApi/openApiError"
-import {
-  apiCallWithLoading,
-  globalClientSilent,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -185,10 +182,11 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   private async loadNote(noteId: Doughnut.ID) {
-    const { data: noteRealm, error } = await NoteController.showNote({
-      path: { note: noteId },
-      client: globalClientSilent,
-    })
+    const { data: noteRealm, error } = await apiCallWithLoading(() =>
+      NoteController.showNote({
+        path: { note: noteId },
+      })
+    )
     if (error || !noteRealm) {
       throw new Error(error || "Failed to load note")
     }
