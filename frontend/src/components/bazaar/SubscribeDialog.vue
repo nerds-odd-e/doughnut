@@ -25,6 +25,7 @@ import TextInput from "@/components/form/TextInput.vue"
 import type { Notebook, SubscriptionDto } from "@generated/backend"
 import { SubscriptionController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 
@@ -44,10 +45,12 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { error } = await SubscriptionController.createSubscription({
-        path: { notebook: this.notebook.id },
-        body: this.formData,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        SubscriptionController.createSubscription({
+          path: { notebook: this.notebook.id },
+          body: this.formData,
+        })
+      )
       if (!error) {
         this.$emit("closeDialog")
         await this.$router.push({ name: "notebooks" })

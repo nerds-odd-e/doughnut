@@ -23,6 +23,7 @@
 import { defineComponent, type PropType } from "vue"
 import type { Subscription } from "@generated/backend"
 import { SubscriptionController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import PopButton from "../commons/Popups/PopButton.vue"
 import usePopups from "../commons/Popups/usePopups"
 import SvgEdit from "../svgs/SvgEdit.vue"
@@ -46,9 +47,11 @@ export default defineComponent({
       if (
         await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        const { error } = await SubscriptionController.destroySubscription({
-          path: { subscription: this.subscription.id },
-        })
+        const { error } = await apiCallWithLoading(() =>
+          SubscriptionController.destroySubscription({
+            path: { subscription: this.subscription.id },
+          })
+        )
         if (!error) {
           this.$emit("updated")
         }

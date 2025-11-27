@@ -17,6 +17,7 @@ import { defineComponent } from "vue"
 import type { Circle, CircleJoiningByInvitation } from "@generated/backend"
 import { CircleController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import TextInput from "@/components/form/TextInput.vue"
 
 export default defineComponent({
@@ -37,9 +38,11 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { data: joinedCircle, error } = await CircleController.joinCircle({
-        body: this.formData,
-      })
+      const { data: joinedCircle, error } = await apiCallWithLoading(() =>
+        CircleController.joinCircle({
+          body: this.formData,
+        })
+      )
       if (!error) {
         await this.$router.push({
           name: "circleShow",

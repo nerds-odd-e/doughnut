@@ -96,11 +96,11 @@ import { ref } from "vue"
 import type { Notebook, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "../form/TextInput.vue"
 import NotebookCertificateRequest from "./NotebookCertificateRequest.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -167,10 +167,12 @@ const handleObsidianImport = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
 
-  const { error } = await NotebookController.importObsidian({
-    path: { notebook: props.notebook.id },
-    body: { file },
-  })
+  const { error } = await apiCallWithLoading(() =>
+    NotebookController.importObsidian({
+      path: { notebook: props.notebook.id },
+      body: { file },
+    })
+  )
   if (!error) {
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
@@ -184,9 +186,11 @@ const handleObsidianImport = async (event: Event) => {
 
 const reindexNotebook = async () => {
   isIndexing.value = true
-  const { error } = await NotebookController.resetNotebookIndex({
-    path: { notebook: props.notebook.id },
-  })
+  const { error } = await apiCallWithLoading(() =>
+    NotebookController.resetNotebookIndex({
+      path: { notebook: props.notebook.id },
+    })
+  )
   if (!error) {
     showIndexingComplete.value = true
   } else {
@@ -198,9 +202,11 @@ const reindexNotebook = async () => {
 
 const updateIndexNotebook = async () => {
   isIndexing.value = true
-  const { error } = await NotebookController.updateNotebookIndex({
-    path: { notebook: props.notebook.id },
-  })
+  const { error } = await apiCallWithLoading(() =>
+    NotebookController.updateNotebookIndex({
+      path: { notebook: props.notebook.id },
+    })
+  )
   if (!error) {
     showIndexingComplete.value = true
   } else {

@@ -16,6 +16,7 @@ import { defineComponent, type PropType } from "vue"
 import type { Subscription, SubscriptionDto } from "@generated/backend"
 import { SubscriptionController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import TextInput from "../form/TextInput.vue"
 
 export default defineComponent({
@@ -36,10 +37,12 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { error } = await SubscriptionController.updateSubscription({
-        path: { subscription: this.subscription.id },
-        body: this.formData,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        SubscriptionController.updateSubscription({
+          path: { subscription: this.subscription.id },
+          body: this.formData,
+        })
+      )
       if (!error) {
         await this.$router.push({ name: "notebooks" })
       } else {

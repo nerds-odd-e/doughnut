@@ -50,6 +50,7 @@ import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import type { Notebook, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
@@ -69,9 +70,11 @@ const emit = defineEmits<{
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
-    const { error } = await NotebookController.shareNotebook({
-      path: { notebook: props.notebook.id },
-    })
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.shareNotebook({
+        path: { notebook: props.notebook.id },
+      })
+    )
     if (!error) {
       await router.push({ name: "notebooks" })
     }

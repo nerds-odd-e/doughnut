@@ -15,6 +15,7 @@
 import type { Circle } from "@generated/backend"
 import { CircleController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
 
@@ -30,9 +31,11 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { data: newCircle, error } = await CircleController.createCircle({
-        body: this.formData,
-      })
+      const { data: newCircle, error } = await apiCallWithLoading(() =>
+        CircleController.createCircle({
+          body: this.formData,
+        })
+      )
       if (!error) {
         this.$emit("closeDialog")
         await this.$router.push({

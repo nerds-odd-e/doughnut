@@ -83,7 +83,33 @@ Every API call in the codebase needs careful analysis:
 - ✅ Applied to `RecallPromptComponent` (quiz answers)
 - ✅ Applied to `AssessmentQuestion` (assessment answers)
 - ✅ Complete audit of all API calls (127+ locations identified)
-- ⏳ Migration plan created (see below)
+- ✅ Migration plan created (7 phases)
+- ✅ **Phase 1 Complete**: Category B - All background/silent operations converted (~80 locations)
+  - Badge counts in MainMenu
+  - All page load data fetches
+  - Component display fetches
+  - Search operations
+  - Admin read operations
+  - Export operations
+  - Wikidata searches
+  - Audio processing
+- ✅ **A1 Complete**: StoredApiCollection.ts already uses `apiCallWithLoading` for all mutations (11 operations)
+- ✅ **A2 Complete**: Notebook/Subscription/Circle operations wrapped with `apiCallWithLoading` (13 operations)
+  - NotebookController.createNotebook
+  - CircleController.createNotebookInCircle
+  - NotebookController.updateNotebook
+  - NotebookController.importObsidian
+  - NotebookController.resetNotebookIndex
+  - NotebookController.updateNotebookIndex
+  - NotebookController.shareNotebook
+  - SubscriptionController.createSubscription
+  - SubscriptionController.updateSubscription
+  - SubscriptionController.destroySubscription
+  - CircleController.createCircle
+  - CircleController.joinCircle
+  - BazaarController.removeFromBazaar
+- ✅ All 412 frontend unit tests passing
+- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A3-A7)
 
 ## Critical Issue Discovered (Nov 27, 2024)
 

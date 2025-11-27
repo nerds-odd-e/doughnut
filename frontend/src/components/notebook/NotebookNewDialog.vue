@@ -16,6 +16,7 @@ import {
   NotebookController,
 } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 
 export default {
@@ -34,14 +35,16 @@ export default {
   },
   methods: {
     async processForm() {
-      const { data: result, error } = this.circle
-        ? await CircleController.createNotebookInCircle({
-            path: { circle: this.circle.id },
-            body: this.noteFormData,
-          })
-        : await NotebookController.createNotebook({
-            body: this.noteFormData,
-          })
+      const { data: result, error } = await apiCallWithLoading(() =>
+        this.circle
+          ? CircleController.createNotebookInCircle({
+              path: { circle: this.circle.id },
+              body: this.noteFormData,
+            })
+          : NotebookController.createNotebook({
+              body: this.noteFormData,
+            })
+      )
       if (!error) {
         await this.$router.push({
           name: "noteShow",
