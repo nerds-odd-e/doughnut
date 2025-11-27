@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined, title: 'Notebooks' }">
-    <section class="daisy-mb-8">
+    <main class="daisy-mb-8">
       <div class="daisy-flex daisy-items-center daisy-justify-between daisy-mb-6">
         <h2 class="daisy-text-2xl daisy-font-bold">My Notebooks</h2>
         <NotebookNewButton>Add New Notebook</NotebookNewButton>
@@ -10,7 +10,7 @@
           <NotebookButtons v-bind="{ notebook, user }" />
         </template>
       </NotebookCardsWithButtons>
-    </section>
+    </main>
     
     <section class="subscribed-section">
       <h2 class="daisy-text-2xl daisy-font-bold daisy-mb-6 daisy-flex daisy-items-center daisy-gap-2">
