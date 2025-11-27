@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import SvgAssociation from "@/components/svgs/SvgAssociation.vue"
 import { WikidataController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 import nonBlockingPopup from "@/managedApi/window/nonBlockingPopup"
 
 const props = defineProps<{
@@ -24,7 +24,6 @@ const getWikidataItem = async () => {
   const { data: entityData, error } =
     await WikidataController.fetchWikidataEntityDataById({
       path: { wikidataId: props.wikidataId },
-      client: globalClientSilent,
     })
   if (!error && entityData) {
     return entityData.WikipediaEnglishUrl

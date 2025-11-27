@@ -84,10 +84,7 @@ import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/backend"
 import { AiAudioController, AiController } from "@generated/backend/sdk.gen"
-import {
-  globalClientSilent,
-  apiCallWithLoading,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
@@ -159,7 +156,6 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
         isMidSpeech: chunk.isMidSpeech,
         previousNoteDetailsToAppendTo: getLastContentChunk(note.details),
       },
-      client: globalClientSilent,
     })
 
     if (error || !response) {

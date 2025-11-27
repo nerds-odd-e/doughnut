@@ -124,7 +124,6 @@ describe("WikidataAssociationForNoteDialog", () => {
 
         expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
           path: { wikidataId },
-          client: expect.anything(),
         })
 
         if (needsTitleAction) {
@@ -182,7 +181,6 @@ describe("WikidataAssociationForNoteDialog", () => {
 
       expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
         path: { wikidataId: "Q11399" },
-        client: expect.anything(),
       })
       expect(updateWikidataIdSpy).toHaveBeenCalledTimes(1)
       expect(wrapper.emitted("closeDialog")).toBeTruthy()
@@ -237,7 +235,6 @@ describe("WikidataAssociationForNoteDialog", () => {
 
       expect(searchWikidataSpy).toHaveBeenCalledWith({
         query: { search: "dog" },
-        client: expect.anything(),
       })
     })
 

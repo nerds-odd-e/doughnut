@@ -73,10 +73,7 @@ import {
   MemoryTrackerController,
   RecallPromptController,
 } from "@generated/backend/sdk.gen"
-import {
-  globalClientSilent,
-  apiCallWithLoading,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
@@ -122,7 +119,6 @@ const useQuestionFetching = (props: QuizProps) => {
       const { data: question, error } =
         await RecallPromptController.askAQuestion({
           path: { memoryTracker: memoryTrackerId },
-          client: globalClientSilent,
         })
       if (!error) {
         recallPromptCache.value[memoryTrackerId] = question!

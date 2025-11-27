@@ -28,7 +28,7 @@
 import { ref, onMounted } from "vue"
 import type { SpellingQuestion } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"
@@ -50,7 +50,6 @@ const fetchSpellingQuestion = async () => {
   const { data: question, error } =
     await MemoryTrackerController.getSpellingQuestion({
       path: { memoryTracker: props.memoryTrackerId },
-      client: globalClientSilent,
     })
   if (!error) {
     spellingQuestion.value = question!

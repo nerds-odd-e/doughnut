@@ -330,7 +330,6 @@ describe("WikidataAssociationDialog", () => {
       expect(windowOpenSpy).toHaveBeenCalledWith("")
       expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
         path: { wikidataId: "Q123" },
-        client: expect.anything(),
       })
 
       windowOpenSpy.mockRestore()
@@ -363,7 +362,6 @@ describe("WikidataAssociationDialog", () => {
       expect(windowOpenSpy).toHaveBeenCalledWith("")
       expect(fetchWikidataEntitySpy).toHaveBeenCalledWith({
         path: { wikidataId: "Q123" },
-        client: expect.anything(),
       })
 
       windowOpenSpy.mockRestore()

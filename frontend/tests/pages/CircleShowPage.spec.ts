@@ -25,7 +25,6 @@ describe("circle show page", () => {
       .render()
     expect(showCircleSpy).toBeCalledWith({
       path: { circle: circleNote.id },
-      client: expect.anything(),
     })
   })
 

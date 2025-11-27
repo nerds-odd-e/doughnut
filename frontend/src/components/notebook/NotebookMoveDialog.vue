@@ -22,10 +22,7 @@ import {
   CircleController,
   NotebookController,
 } from "@generated/backend/sdk.gen"
-import {
-  apiCallWithLoading,
-  globalClientSilent,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 const { popups } = usePopups()
@@ -40,9 +37,7 @@ const props = defineProps({
 const circles = ref<Circle[]>([])
 
 onMounted(async () => {
-  const { data: circlesList, error } = await CircleController.index({
-    client: globalClientSilent,
-  })
+  const { data: circlesList, error } = await CircleController.index({})
   if (!error) {
     circles.value = circlesList || []
   }

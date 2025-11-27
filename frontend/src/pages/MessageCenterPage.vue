@@ -60,7 +60,7 @@ import {
   type Ref,
 } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
@@ -91,7 +91,6 @@ watch(
       const { data: conversation, error } =
         await ConversationMessageController.getConversation({
           path: { conversationId: newId },
-          client: globalClientSilent,
         })
       if (!error) {
         currentConversation.value = conversation!
@@ -104,9 +103,7 @@ watch(
 
 const fetchData = async () => {
   const { data: userConversations, error } =
-    await ConversationMessageController.getConversationsOfCurrentUser({
-      client: globalClientSilent,
-    })
+    await ConversationMessageController.getConversationsOfCurrentUser({})
   if (!error) {
     conversations.value = userConversations!
 
@@ -123,7 +120,6 @@ const handleConversationFetched = async (conversationId: number) => {
   const { data: unreadConversations, error } =
     await ConversationMessageController.markConversationAsRead({
       path: { conversationId },
-      client: globalClientSilent,
     })
   if (!error) {
     messageCenterConversations.unreadConversations = unreadConversations!

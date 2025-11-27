@@ -168,7 +168,6 @@ describe("main menu", () => {
 
       expect(getAssimilationCountSpy).toHaveBeenCalledWith({
         query: { timezone: timezoneParam() },
-        client: expect.anything(),
       })
     })
   })
@@ -247,7 +246,6 @@ describe("main menu", () => {
       expect(overviewSpy).toHaveBeenCalledTimes(2)
       expect(overviewSpy).toHaveBeenCalledWith({
         query: { timezone: timezoneParam() },
-        client: expect.anything(),
       })
     })
   })

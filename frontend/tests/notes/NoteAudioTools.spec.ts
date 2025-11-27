@@ -622,7 +622,6 @@ describe("NoteAudioTools", () => {
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
-        client: expect.anything(),
       })
 
       // Second call should include previous thread context
@@ -632,7 +631,6 @@ describe("NoteAudioTools", () => {
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: note.details,
         }),
-        client: expect.anything(),
       })
     })
 
@@ -706,7 +704,6 @@ describe("NoteAudioTools", () => {
           additionalProcessingInstructions: "Test instructions",
           previousNoteDetailsToAppendTo: note.details,
         }),
-        client: expect.anything(),
       })
     })
 
@@ -769,7 +766,6 @@ describe("NoteAudioTools", () => {
           isMidSpeech: true,
           previousNoteDetailsToAppendTo: note.details,
         }),
-        client: expect.anything(),
       })
     })
   })
@@ -797,7 +793,6 @@ describe("NoteAudioTools", () => {
         isMidSpeech: true,
         previousNoteDetailsToAppendTo: note.details,
       }),
-      client: expect.anything(),
     })
   })
 
@@ -885,7 +880,6 @@ describe("NoteAudioTools", () => {
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: shortContent,
         }),
-        client: expect.anything(),
       })
     })
 
@@ -907,7 +901,6 @@ describe("NoteAudioTools", () => {
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: expectedContent,
         }),
-        client: expect.anything(),
       })
     })
 
@@ -927,7 +920,6 @@ describe("NoteAudioTools", () => {
         body: expect.objectContaining({
           previousNoteDetailsToAppendTo: "",
         }),
-        client: expect.anything(),
       })
     })
   })

@@ -13,7 +13,7 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import type { AnsweredQuestion } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { onMounted, ref, watch, type PropType } from "vue"
 
@@ -29,7 +29,6 @@ const answeredQuestion = ref<AnsweredQuestion | undefined>()
 const fetchData = async () => {
   const { data: question, error } = await RecallPromptController.showQuestion({
     path: { recallPrompt: recallPromptId },
-    client: globalClientSilent,
   })
   if (!error) {
     answeredQuestion.value = question!

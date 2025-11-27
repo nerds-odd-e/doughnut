@@ -56,10 +56,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { UserController } from "@generated/backend/sdk.gen"
-import {
-  apiCallWithLoading,
-  globalClientSilent,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
@@ -78,9 +75,7 @@ const token = ref<string | null>(null)
 const loading = ref(false)
 
 const loadTokens = async () => {
-  const { data: tokensList, error } = await UserController.getTokens({
-    client: globalClientSilent,
-  })
+  const { data: tokensList, error } = await UserController.getTokens({})
   if (!error) {
     // tokensList is guaranteed to be UserToken[] when error is undefined
     tokens.value = tokensList!.map((t) => ({

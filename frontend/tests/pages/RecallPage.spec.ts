@@ -77,7 +77,6 @@ describe("repeat page", () => {
         timezone: "Asia/Shanghai",
         dueindays: 0,
       },
-      client: expect.anything(),
     })
   })
 

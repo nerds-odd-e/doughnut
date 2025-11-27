@@ -1,21 +1,8 @@
-import { createClient } from "@generated/backend/client"
 import { client as globalClient } from "@generated/backend/client.gen"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
 import loginOrRegisterAndHaltThisThread from "./window/loginOrRegisterAndHaltThisThread"
-
-// Create silent client instance (no interceptors, no loading/error UI)
-// Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
-export const globalClientSilent = createClient({
-  baseUrl:
-    typeof window !== "undefined" && window.location.origin
-      ? window.location.origin
-      : "http://localhost:9081",
-  credentials: "include",
-  responseStyle: "fields",
-  throwOnError: false,
-})
 
 // Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined

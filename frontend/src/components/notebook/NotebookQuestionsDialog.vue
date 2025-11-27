@@ -12,7 +12,7 @@ import { onMounted, ref } from "vue"
 import type { Note, Notebook } from "@generated/backend"
 import Questions from "../notes/Questions.vue"
 import { NotebookController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 const props = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
@@ -23,7 +23,6 @@ const notes = ref<Note[] | undefined>(undefined)
 const fetchData = async () => {
   const { data: notesList, error } = await NotebookController.getNotes({
     path: { notebook: props.notebook.id },
-    client: globalClientSilent,
   })
   if (!error) {
     notes.value = notesList!

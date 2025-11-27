@@ -69,7 +69,6 @@ describe("Questions", () => {
 
     expect(exportQuestionGenerationSpy).toHaveBeenCalledWith({
       path: { note: note.id },
-      client: expect.anything(),
     })
   })
 })

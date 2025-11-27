@@ -43,7 +43,6 @@ describe("QuestionExportDialog", () => {
 
     expect(spy).toHaveBeenCalledWith({
       path: { note: note.id },
-      client: expect.anything(),
     })
   })
 

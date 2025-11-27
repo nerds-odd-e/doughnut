@@ -7,7 +7,7 @@ import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import createNoteStorage from "./store/createNoteStorage"
 import type { ApiStatus } from "./managedApi/ApiStatusHandler"
-import { globalClientSilent, setupGlobalClient } from "./managedApi/clientSetup"
+import { setupGlobalClient } from "./managedApi/clientSetup"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import type { User } from "@generated/backend"
 import {
@@ -55,17 +55,13 @@ onMounted(async () => {
   environment.value = getEnvironment()
   if (environment.value === "testing") {
     const { data: toggle, error: toggleError } =
-      await TestabilityRestController.getFeatureToggle({
-        client: globalClientSilent,
-      })
+      await TestabilityRestController.getFeatureToggle({})
     if (!toggleError) {
       featureToggle.value = toggle!
     }
   }
   const { data: userInfo, error: userError } =
-    await CurrentUserInfoController.currentUserInfo({
-      client: globalClientSilent,
-    })
+    await CurrentUserInfoController.currentUserInfo({})
   if (!userError) {
     user.value = userInfo!.user
     externalIdentifier.value = userInfo!.externalIdentifier

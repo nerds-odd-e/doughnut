@@ -70,7 +70,7 @@ import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuesti
 import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
 import { RecallsController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -138,7 +138,6 @@ const loadMore = async (dueInDays?: number) => {
       timezone: timezoneParam(),
       dueindays: dueInDays,
     },
-    client: globalClientSilent,
   })
   if (!error && response) {
     toRepeat.value = response.toRepeat

@@ -93,10 +93,7 @@ import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/backend"
 import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
-import {
-  globalClientSilent,
-  apiCallWithLoading,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
@@ -117,7 +114,6 @@ const fetchQuestions = async () => {
   const { data: allQuestions, error } =
     await PredefinedQuestionController.getAllQuestionByNote({
       path: { note: props.note.id },
-      client: globalClientSilent,
     })
   if (!error && allQuestions) {
     questions.value = allQuestions

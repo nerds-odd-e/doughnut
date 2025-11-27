@@ -37,7 +37,6 @@ describe("NoteExportDialog", () => {
     // Should call API once
     expect(getDescendantsSpy).toHaveBeenCalledWith({
       path: { note: note.id },
-      client: expect.anything(),
     })
   })
 
@@ -105,7 +104,6 @@ describe("NoteExportDialog", () => {
     expect(getGraphSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       query: { tokenLimit: 5000 },
-      client: expect.anything(),
     })
   })
 
@@ -178,7 +176,6 @@ describe("NoteExportDialog", () => {
       expect(getGraphMock).toHaveBeenLastCalledWith({
         path: { note: note.id },
         query: { tokenLimit: 1234 },
-        client: expect.anything(),
       })
       const textarea = getByTestId("graph-json-textarea") as HTMLTextAreaElement
       expect(textarea.value).toContain('"token": 1234')

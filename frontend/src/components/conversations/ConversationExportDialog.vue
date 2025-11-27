@@ -31,7 +31,7 @@ import { ref, onMounted } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   conversationId: number
@@ -47,7 +47,6 @@ onMounted(async () => {
   const { data: response, error } =
     await ConversationMessageController.exportConversation({
       path: { conversationId: props.conversationId },
-      client: globalClientSilent,
     })
   if (!error) {
     exportContent.value = JSON.stringify(response, null, 2)

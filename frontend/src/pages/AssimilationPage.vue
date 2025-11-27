@@ -63,7 +63,7 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Note } from "@generated/backend"
 import { AssimilationController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {} from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -109,7 +109,6 @@ const loadInitialReview = async () => {
   const { data: assimilatingNotes, error } =
     await AssimilationController.assimilating({
       query: { timezone: timezoneParam() },
-      client: globalClientSilent,
     })
   if (!error) {
     notes.value = assimilatingNotes!

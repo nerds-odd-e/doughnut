@@ -13,10 +13,7 @@ import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Notebook, NotebookCertificateApproval } from "@generated/backend"
 import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
-import {
-  apiCallWithLoading,
-  globalClientSilent,
-} from "@/managedApi/clientSetup"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -29,7 +26,6 @@ onMounted(async () => {
   const { data: dto, error } =
     await NotebookCertificateApprovalController.getApprovalForNotebook({
       path: { notebook: props.notebook.id },
-      client: globalClientSilent,
     })
   if (!error) {
     approval.value = dto!.approval
