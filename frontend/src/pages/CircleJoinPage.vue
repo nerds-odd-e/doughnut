@@ -9,6 +9,7 @@ import { defineComponent } from "vue"
 import type { RouteLocationNormalized, NavigationGuardNext } from "vue-router"
 import CircleJoinForm from "@/components/circles/CircleJoinForm.vue"
 import { CurrentUserInfoController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import loginOrRegisterAndHaltThisThread from "@/managedApi/window/loginOrRegisterAndHaltThisThread"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -24,7 +25,9 @@ export default defineComponent({
   ) {
     next(async () => {
       const { data: userInfo, error } =
-        await CurrentUserInfoController.currentUserInfo()
+        await CurrentUserInfoController.currentUserInfo({
+          client: globalClientSilent,
+        })
       if (error || !userInfo?.user) {
         loginOrRegisterAndHaltThisThread()
         next(false)

@@ -31,6 +31,7 @@
 import { ref, onMounted } from "vue"
 import type { Circle } from "@generated/backend"
 import { CircleController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import CircleNewDialog from "@/components/circles/CircleNewDialog.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
@@ -39,7 +40,9 @@ import ContainerPage from "@/pages/commons/ContainerPage.vue"
 const circles = ref<Circle[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: circlesList, error } = await CircleController.index()
+  const { data: circlesList, error } = await CircleController.index({
+    client: globalClientSilent,
+  })
   if (!error) {
     // circlesList is guaranteed to be Circle[] when error is undefined
     circles.value = circlesList!

@@ -113,6 +113,7 @@
 import { ref, watch, onMounted, nextTick, computed } from "vue"
 import type { WikidataSearchEntity } from "@generated/backend"
 import { WikidataController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
@@ -160,6 +161,7 @@ const fetchSearchResults = async () => {
   try {
     const { data: results, error } = await WikidataController.searchWikidata({
       query: { search: searchKeyRef.value },
+      client: globalClientSilent,
     })
     if (!error) {
       searchResults.value = results!
@@ -232,6 +234,7 @@ const getWikidataItem = async (wikidataId: string) => {
   const { data: entityData, error } =
     await WikidataController.fetchWikidataEntityDataById({
       path: { wikidataId },
+      client: globalClientSilent,
     })
   if (!error && entityData) {
     return entityData.WikipediaEnglishUrl

@@ -55,6 +55,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 
 const props = defineProps<{
@@ -77,6 +78,7 @@ onMounted(async () => {
     const { data: conversationsList, error } =
       await ConversationMessageController.getConversationsAboutNote({
         path: { note: props.conversation.subject.note.id },
+        client: globalClientSilent,
       })
     if (!error) {
       conversations.value = conversationsList!

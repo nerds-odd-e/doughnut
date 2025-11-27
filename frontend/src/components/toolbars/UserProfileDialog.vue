@@ -36,6 +36,7 @@
 import TextInput from "@/components/form/TextInput.vue"
 import type { User } from "@generated/backend"
 import { UserController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { onMounted, ref } from "vue"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -46,7 +47,9 @@ const formData = ref<User | undefined>()
 const errors = ref<Record<string, string>>({})
 
 const fetchData = async () => {
-  const { data, error } = await UserController.getUserProfile()
+  const { data, error } = await UserController.getUserProfile({
+    client: globalClientSilent,
+  })
   if (!error && data) {
     formData.value = data
   }

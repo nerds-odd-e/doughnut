@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import { FailureReportController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import ContainerPage from "./commons/ContainerPage.vue"
 import type { FailureReport } from "@generated/backend"
 
@@ -40,6 +41,7 @@ const fetchData = async () => {
   const { data: reportData, error } =
     await FailureReportController.showFailureReport({
       path: { failureReport: props.failureReportId },
+      client: globalClientSilent,
     })
   if (!error) {
     // reportData is guaranteed to be FailureReportForView when error is undefined

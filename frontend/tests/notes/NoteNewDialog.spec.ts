@@ -90,6 +90,7 @@ describe("adding new note", () => {
     expect(searchForLinkTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "Untitled" }),
+      client: expect.anything(),
     })
   })
 
@@ -110,6 +111,7 @@ describe("adding new note", () => {
     expect(searchForLinkTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "myth" }),
+      client: expect.anything(),
     })
   })
 
@@ -238,6 +240,7 @@ describe("adding new note", () => {
       await openWikidataDialog("dog")
       expect(searchWikidataSpy).toHaveBeenCalledWith({
         query: { search: "dog" },
+        client: expect.anything(),
       })
       const dialog = document.querySelector(".modal-container")
       expect(dialog).toBeTruthy()
@@ -310,6 +313,7 @@ describe("adding new note", () => {
 
         expect(searchWikidataSpy).toHaveBeenCalledWith({
           query: { search: searchTitle },
+          client: expect.anything(),
         })
         expect((<HTMLInputElement>titleInput().element).value).toBe(
           expectedTitle

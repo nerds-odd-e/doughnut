@@ -23,6 +23,7 @@ describe("note info", () => {
     expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
     expect(getNoteInfoSpy).toBeCalledWith({
       path: { note: 123 },
+      client: expect.anything(),
     })
   })
 })

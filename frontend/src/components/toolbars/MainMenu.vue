@@ -105,6 +105,7 @@ import {
   ConversationMessageController,
   RecallsController,
 } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import { watch, computed, ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -136,6 +137,7 @@ const fetchDueCount = async () => {
   const { data: count, error } =
     await AssimilationController.getAssimilationCount({
       query: { timezone: timezoneParam() },
+      client: globalClientSilent,
     })
   if (!error && count) {
     setDueCount(count.dueCount)
@@ -147,6 +149,7 @@ const fetchDueCount = async () => {
 const fetchRecallCount = async () => {
   const { data: overviewData, error } = await RecallsController.overview({
     query: { timezone: timezoneParam() },
+    client: globalClientSilent,
   })
   if (!error && overviewData) {
     setToRepeatCount(overviewData.toRepeatCount)
@@ -157,7 +160,9 @@ const fetchRecallCount = async () => {
 
 const fetchUnreadMessageCount = async () => {
   const { data: unreadConversations, error } =
-    await ConversationMessageController.getUnreadConversations()
+    await ConversationMessageController.getUnreadConversations({
+      client: globalClientSilent,
+    })
   if (!error && unreadConversations !== undefined) {
     messageCenterConversations.unreadConversations = unreadConversations
   }

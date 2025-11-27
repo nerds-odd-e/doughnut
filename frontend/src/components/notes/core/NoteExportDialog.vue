@@ -72,6 +72,7 @@
 import { ref, watch } from "vue"
 import type { Note } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
@@ -89,6 +90,7 @@ watch(
     if (val && !jsonDescendants.value) {
       const { data: descendants, error } = await NoteController.getDescendants({
         path: { note: props.note.id },
+        client: globalClientSilent,
       })
       if (!error && descendants) {
         jsonDescendants.value = JSON.stringify(descendants, null, 2)
@@ -111,6 +113,7 @@ async function fetchGraph() {
   const { data: graph, error } = await NoteController.getGraph({
     path: { note: props.note.id },
     query: { tokenLimit: tokenLimit.value },
+    client: globalClientSilent,
   })
   if (!error && graph) {
     jsonGraph.value = JSON.stringify(graph, null, 2)

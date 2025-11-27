@@ -39,6 +39,7 @@
 import { inject, onMounted, ref, type Ref } from "vue"
 import type { Notebook, Subscription, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
@@ -50,7 +51,9 @@ const subscriptions = ref<Subscription[] | undefined>(undefined)
 const notebooks = ref<Notebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: result, error } = await NotebookController.myNotebooks()
+  const { data: result, error } = await NotebookController.myNotebooks({
+    client: globalClientSilent,
+  })
   if (!error) {
     notebooks.value = result!.notebooks
     subscriptions.value = result!.subscriptions

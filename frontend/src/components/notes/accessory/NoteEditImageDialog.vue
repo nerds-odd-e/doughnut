@@ -12,6 +12,7 @@
 <script lang="ts">
 import type { NoteAccessoriesDto, NoteAccessory } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"
 import ImageFormBody from "./ImageFormBody.vue"
@@ -37,6 +38,7 @@ export default defineComponent({
       const { data: accessory, error } = await NoteController.showNoteAccessory(
         {
           path: { note: this.noteId },
+          client: globalClientSilent,
         }
       )
       if (!error) {

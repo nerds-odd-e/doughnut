@@ -27,7 +27,7 @@ describe("QuestionExportDialog", () => {
       },
       title: "Test Note",
     } as never
-    mockSdkService("exportQuestionGeneration", exportData)
+    const spy = mockSdkService("exportQuestionGeneration", exportData)
 
     const { getByTestId } = helper
       .component(QuestionExportDialog)
@@ -41,9 +41,9 @@ describe("QuestionExportDialog", () => {
       expect(textarea.value).toContain('"title"')
     })
 
-    const spy = mockSdkService("exportQuestionGeneration", exportData)
     expect(spy).toHaveBeenCalledWith({
       path: { note: note.id },
+      client: expect.anything(),
     })
   })
 

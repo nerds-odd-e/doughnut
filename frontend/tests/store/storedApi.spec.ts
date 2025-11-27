@@ -83,7 +83,10 @@ describe("storedApiCollection", () => {
         deleteFromEnd: 0,
       })
 
-      expect(showNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
+      expect(showNoteSpy).toHaveBeenCalledWith({
+        path: { note: note.id },
+        client: expect.anything(),
+      })
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {

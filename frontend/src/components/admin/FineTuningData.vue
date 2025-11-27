@@ -15,6 +15,7 @@
 import { ContentLoader } from "vue-content-loader"
 import type { SuggestedQuestionForFineTuning } from "@generated/backend"
 import { FineTuningDataController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 
@@ -52,7 +53,9 @@ export default {
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
     const { data: questions, error } =
-      await FineTuningDataController.getAllSuggestedQuestions()
+      await FineTuningDataController.getAllSuggestedQuestions({
+        client: globalClientSilent,
+      })
     if (!error && questions) {
       this.suggestedQuestions = questions
     }

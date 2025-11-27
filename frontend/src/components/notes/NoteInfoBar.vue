@@ -9,6 +9,7 @@
 <script setup lang="ts">
 import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, onMounted } from "vue"
 
@@ -25,6 +26,7 @@ const noteInfo = ref<NoteInfo | undefined>(undefined)
 const fetchData = async () => {
   const { data: noteInfoData, error } = await NoteController.getNoteInfo({
     path: { note: props.noteId },
+    client: globalClientSilent,
   })
   if (!error) {
     noteInfo.value = noteInfoData!

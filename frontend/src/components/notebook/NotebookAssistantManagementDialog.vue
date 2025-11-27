@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import type { Notebook } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
 import { saveAs } from "file-saver"
@@ -55,6 +56,7 @@ const updateAiInstructions = async () => {
 const downloadNotebookDump = async () => {
   const { data: notes, error } = await NotebookController.downloadNotebookDump({
     path: { notebook: props.notebook.id },
+    client: globalClientSilent,
   })
   if (!error && notes) {
     const blob = new Blob([JSON.stringify(notes, null, 2)], {
@@ -67,6 +69,7 @@ const downloadNotebookDump = async () => {
 const loadCurrentSettings = async () => {
   const { data: assistant, error } = await NotebookController.getAiAssistant({
     path: { notebook: props.notebook.id },
+    client: globalClientSilent,
   })
   if (!error && assistant) {
     additionalInstruction.value = assistant.additionalInstructionsToAi || ""

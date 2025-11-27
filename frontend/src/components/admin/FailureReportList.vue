@@ -40,6 +40,7 @@
 import { defineComponent } from "vue"
 import type { FailureReport } from "@generated/backend"
 import { FailureReportController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
@@ -55,7 +56,9 @@ export default defineComponent({
   methods: {
     async fetchData() {
       const { data: reports, error } =
-        await FailureReportController.failureReports()
+        await FailureReportController.failureReports({
+          client: globalClientSilent,
+        })
       if (!error) {
         this.failureReports = reports as unknown as FailureReport[]
       } else {

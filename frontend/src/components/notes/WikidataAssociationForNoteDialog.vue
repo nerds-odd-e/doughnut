@@ -22,6 +22,7 @@ import type {
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
 import { WikidataController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 
@@ -90,6 +91,7 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
     const { data: entityData, error } =
       await WikidataController.fetchWikidataEntityDataById({
         path: { wikidataId },
+        client: globalClientSilent,
       })
 
     if (error) {

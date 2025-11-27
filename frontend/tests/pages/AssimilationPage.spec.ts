@@ -48,6 +48,7 @@ describe("repeat page", () => {
     )
     expect(assimilatingSpy).toBeCalledWith({
       query: { timezone: "Europe/Amsterdam" },
+      client: expect.anything(),
     })
   })
 

@@ -44,6 +44,7 @@ describe("answered question page", () => {
       await flushPromises()
       expect(showQuestionSpy).toHaveBeenCalledWith({
         path: { recallPrompt: REVIEW_QUESTION_ID },
+        client: expect.anything(),
       })
     })
 

@@ -76,6 +76,7 @@
 <script setup lang="ts">
 import type { SearchTerm, NoteTopology } from "@generated/backend"
 import { NoteController, SearchController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -144,14 +145,22 @@ const performSearch = async (noteId: number | undefined, term: SearchTerm) => {
       ? SearchController.searchForLinkTargetWithin({
           path: { note: noteId },
           body: term,
+          client: globalClientSilent,
         })
-      : SearchController.searchForLinkTarget({ body: term }),
+      : SearchController.searchForLinkTarget({
+          body: term,
+          client: globalClientSilent,
+        }),
     noteId
       ? SearchController.semanticSearchWithin({
           path: { note: noteId },
           body: term,
+          client: globalClientSilent,
         })
-      : SearchController.semanticSearch({ body: term }),
+      : SearchController.semanticSearch({
+          body: term,
+          client: globalClientSilent,
+        }),
   ])
 
   return {
@@ -167,7 +176,9 @@ const fetchRecentNotes = async () => {
     (isGlobalSearch.value || props.noteId) &&
     model.recentNotes.length === 0
   ) {
-    const { data: notes, error } = await NoteController.getRecentNotes()
+    const { data: notes, error } = await NoteController.getRecentNotes({
+      client: globalClientSilent,
+    })
     model.recentNotes = error ? [] : notes || []
   }
 }

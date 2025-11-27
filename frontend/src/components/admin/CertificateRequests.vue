@@ -34,6 +34,7 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
+import { globalClientSilent } from "@/managedApi/clientSetup"
 import type { NotebookCertificateApproval } from "@generated/backend"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
 import usePopups from "../commons/Popups/usePopups"
@@ -44,7 +45,9 @@ const approvals = ref<NotebookCertificateApproval[] | undefined>(undefined)
 
 const fetchNotebooks = async () => {
   const { data: pendingRequests, error } =
-    await NotebookCertificateApprovalController.getAllPendingRequest()
+    await NotebookCertificateApprovalController.getAllPendingRequest({
+      client: globalClientSilent,
+    })
   if (!error) {
     approvals.value = pendingRequests!
   }
