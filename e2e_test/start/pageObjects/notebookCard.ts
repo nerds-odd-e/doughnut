@@ -13,6 +13,8 @@ export const notebookCard = (notebook: string) => ({
   },
   unsubscribe() {
     findNotebookCardButton(notebook, 'Unsubscribe').click()
+    cy.findByRole('button', { name: 'OK' }).click()
+    cy.pageIsNotLoading()
   },
   openNotebookQuestions() {
     findNotebookCardButton(notebook, 'Notebook Questions').click()

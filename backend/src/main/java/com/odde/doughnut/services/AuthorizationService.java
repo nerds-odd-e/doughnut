@@ -144,7 +144,7 @@ public class AuthorizationService {
 
   private void assertAuthorizationSubscription(User user, Subscription subscription)
       throws UnexpectedNoAccessRightException {
-    if (subscription.getUser() != user) {
+    if (!user.equals(subscription.getUser())) {
       throw new UnexpectedNoAccessRightException();
     }
   }

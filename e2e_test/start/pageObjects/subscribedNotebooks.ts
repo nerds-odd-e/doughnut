@@ -1,0 +1,44 @@
+/// <reference types="cypress" />
+/// <reference path="../../support/index.d.ts" />
+
+export const subscribedNotebooks = () => {
+  cy.pageIsNotLoading()
+  cy.findByText('Subscribed Notes').should('exist')
+
+  const getContainer = () => cy.findByText('Subscribed Notes').parent()
+
+  return {
+    expectNotebook(notebookTitle: string) {
+      getContainer().within(() => {
+        cy.findByText(notebookTitle, {
+          selector: '.notebook-card .daisy-card-title',
+        }).should(($el) => {
+          expect(
+            $el.length,
+            `Expected to find subscribed notebook "${notebookTitle}" in the Subscribed Notes section, but it was not found`
+          ).to.be.greaterThan(0)
+        })
+      })
+    },
+    expectNotebookNotPresent(notebookTitle: string) {
+      getContainer().then(($container) => {
+        cy.wrap($container)
+          .find('.notebook-card .daisy-card-title')
+          .should(($titles) => {
+            const titles = Array.from($titles, (el) => el.textContent)
+            expect(
+              titles.includes(notebookTitle),
+              `Expected notebook "${notebookTitle}" not to be in Subscribed Notes section, but found it among: ${titles.join(', ')}`
+            ).to.be.false
+          })
+      })
+    },
+    openNotebook(notebookTitle: string) {
+      getContainer().within(() => {
+        cy.findByText(notebookTitle, {
+          selector: '.notebook-card .daisy-card-title',
+        }).click()
+      })
+    },
+  }
+}

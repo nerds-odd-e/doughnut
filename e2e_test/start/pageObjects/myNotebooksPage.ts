@@ -5,6 +5,7 @@ import type { assumeNotePage } from './notePage'
 import { notebookCard } from './notebookCard'
 import { notebookList } from './NotebookList'
 import noteCreationForm from './noteForms/noteCreationForm'
+import { subscribedNotebooks } from './subscribedNotebooks'
 
 const myNotebooksPage = () => {
   cy.get('.path-and-content').within(() => {
@@ -24,6 +25,9 @@ const myNotebooksPage = () => {
     },
     notebookCard(notebook: string) {
       return notebookCard(notebook)
+    },
+    subscribedNotebooks() {
+      return subscribedNotebooks()
     },
   }
 }

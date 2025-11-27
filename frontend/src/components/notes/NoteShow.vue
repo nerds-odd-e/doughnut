@@ -47,7 +47,7 @@
         <template v-else>
           <template v-if="!isMinimized">
             <NoteToolbar
-              v-if="!readonly"
+              v-if="!readonly(noteRealm)"
               v-bind="{
                 note: noteRealm.note,
                 storageAccessor,
@@ -66,12 +66,12 @@
                   v-bind="{
                     note: noteRealm.note,
                     asMarkdown,
-                    readonly,
+                    readonly: readonly(noteRealm),
                     storageAccessor,
                   }"
                 />
                 <NoteAccessoryAsync
-                  v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly }"
+                  v-bind="{ noteId: noteRealm.id, updatedNoteAccessory, readonly: readonly(noteRealm) }"
                   :key="noteRealm.id"
                 />
                 <NoteRecentUpdateIndicator
@@ -90,7 +90,7 @@
                   </p>
                 </NoteRecentUpdateIndicator>
                 <ChildrenNotes
-                  v-bind="{ expandChildren, readonly, storageAccessor }"
+                  v-bind="{ expandChildren, readonly: readonly(noteRealm), storageAccessor }"
                   :notes="noteRealm.children ?? []"
                 />
               </div>
@@ -132,10 +132,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, inject, ref, type PropType, type Ref } from "vue"
+import { inject, ref, type PropType, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
-import type { NoteAccessory, User } from "@generated/backend"
+import type { NoteAccessory, NoteRealm, User } from "@generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
 import type { StorageAccessor } from "../../store/createNoteStorage"
@@ -161,7 +161,9 @@ defineProps({
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
-const readonly = computed(() => !currentUser?.value)
+const readonly = (noteRealm: NoteRealm) => {
+  return !currentUser?.value || noteRealm?.fromBazaar === true
+}
 
 const updatedNoteAccessory = ref<NoteAccessory | undefined>(undefined)
 const reloadKey = ref(0)

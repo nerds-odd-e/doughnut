@@ -51,7 +51,10 @@ Then(
 )
 
 Then("I should see I've subscribed to {string}", (noteTopology: string) => {
-  cy.findCardTitle(noteTopology)
+  start
+    .routerToNotebooksPage()
+    .subscribedNotebooks()
+    .expectNotebook(noteTopology)
 })
 
 Then('I should see message that says {string}', (message: string) => {
@@ -59,8 +62,10 @@ Then('I should see message that says {string}', (message: string) => {
 })
 
 Then("I should see I've not subscribed to {string}", (noteTopology: string) => {
-  cy.findByText('Subscribed Notes').should('exist')
-  cy.findCardTitle(noteTopology).should('not.exist')
+  start
+    .routerToNotebooksPage()
+    .subscribedNotebooks()
+    .expectNotebookNotPresent(noteTopology)
 })
 
 Then('I should see it has link to {string}', (noteTopology: string) => {

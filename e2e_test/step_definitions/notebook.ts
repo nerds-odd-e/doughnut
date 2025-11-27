@@ -21,10 +21,13 @@ Given('I choose to share my notebook {string}', (noteTopology: string) => {
 Then(
   'I should see readonly notebook {string} in my notes',
   (noteTopology: string) => {
-    start.routerToNotebooksPage()
-    cy.findByText(noteTopology).click()
+    start
+      .routerToNotebooksPage()
+      .subscribedNotebooks()
+      .openNotebook(noteTopology)
     cy.pageIsNotLoading()
-    start.assumeNotePage().editNoteImage().shouldNotExist()
+    // For readonly notes, the toolbar shouldn't be rendered at all
+    start.assumeNotePage().addingChildNoteButton().shouldNotExist()
   }
 )
 
