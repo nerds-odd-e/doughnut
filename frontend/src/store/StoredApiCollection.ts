@@ -15,6 +15,7 @@ import {
   toOpenApiError,
   setErrorObjectForFieldErrors,
 } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
@@ -123,23 +124,27 @@ export default class StoredApiCollection implements StoredApi {
     content: string
   ) {
     if (field === "edit title") {
-      const { data, error } = await TextContentController.updateNoteTitle({
-        path: { note: noteId },
-        body: {
-          newTitle: content,
-        },
-      })
+      const { data, error } = await apiCallWithLoading(() =>
+        TextContentController.updateNoteTitle({
+          path: { note: noteId },
+          body: {
+            newTitle: content,
+          },
+        })
+      )
       if (error || !data) {
         throw new Error(error || "Failed to update note title")
       }
       return data
     }
-    const { data, error } = await TextContentController.updateNoteDetails({
-      path: { note: noteId },
-      body: {
-        details: content,
-      },
-    })
+    const { data, error } = await apiCallWithLoading(() =>
+      TextContentController.updateNoteDetails({
+        path: { note: noteId },
+        body: {
+          details: content,
+        },
+      })
+    )
     if (error || !data) {
       throw new Error(error || "Failed to update note details")
     }
@@ -150,10 +155,12 @@ export default class StoredApiCollection implements StoredApi {
     noteId: Doughnut.ID,
     data: WikidataAssociationCreation
   ): Promise<NoteRealm> {
-    const { data: noteRealm, error } = await NoteController.updateWikidataId({
-      path: { note: noteId },
-      body: data,
-    })
+    const { data: noteRealm, error } = await apiCallWithLoading(() =>
+      NoteController.updateWikidataId({
+        path: { note: noteId },
+        body: data,
+      })
+    )
     if (error || !noteRealm) {
       const apiError = new Error("Failed to update Wikidata ID") as Error & {
         body?: unknown
@@ -206,11 +213,12 @@ export default class StoredApiCollection implements StoredApi {
     parentId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const { data: nrwp, error } =
-      await NoteCreationController.createNoteUnderParent({
+    const { data: nrwp, error } = await apiCallWithLoading(() =>
+      NoteCreationController.createNoteUnderParent({
         path: { parentNote: parentId },
         body: data,
       })
+    )
     if (error || !nrwp) {
       const apiError = new Error("Failed to create note") as Error & {
         body?: unknown
@@ -239,10 +247,12 @@ export default class StoredApiCollection implements StoredApi {
     referenceId: Doughnut.ID,
     data: NoteCreationDto
   ) {
-    const { data: nrwp, error } = await NoteCreationController.createNoteAfter({
-      path: { referenceNote: referenceId },
-      body: data,
-    })
+    const { data: nrwp, error } = await apiCallWithLoading(() =>
+      NoteCreationController.createNoteAfter({
+        path: { referenceNote: referenceId },
+        body: data,
+      })
+    )
     if (error || !nrwp) {
       const apiError = new Error("Failed to create note after") as Error & {
         body?: unknown
@@ -271,13 +281,15 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: LinkCreation
   ) {
-    const { data: noteRealms, error } = await LinkController.linkNoteFinalize({
-      path: {
-        sourceNote: sourceId,
-        targetNote: targetId,
-      },
-      body: data,
-    })
+    const { data: noteRealms, error } = await apiCallWithLoading(() =>
+      LinkController.linkNoteFinalize({
+        path: {
+          sourceNote: sourceId,
+          targetNote: targetId,
+        },
+        body: data,
+      })
+    )
     if (error || !noteRealms) {
       throw new Error(error || "Failed to create link")
     }
@@ -285,10 +297,12 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
-    const { data: noteRealms, error } = await LinkController.updateLink({
-      path: { link: linkId },
-      body: data,
-    })
+    const { data: noteRealms, error } = await apiCallWithLoading(() =>
+      LinkController.updateLink({
+        path: { link: linkId },
+        body: data,
+      })
+    )
     if (error || !noteRealms) {
       throw new Error(error || "Failed to update link")
     }
@@ -304,13 +318,15 @@ export default class StoredApiCollection implements StoredApi {
     targetNoteId: number,
     dropMode: "after" | "asFirstChild"
   ): Promise<NoteRealm[]> {
-    const { data: updatedNotes, error } = await NoteController.moveAfter({
-      path: {
-        note: noteId,
-        targetNote: targetNoteId,
-        asFirstChild: dropMode === "asFirstChild" ? "true" : "false",
-      },
-    })
+    const { data: updatedNotes, error } = await apiCallWithLoading(() =>
+      NoteController.moveAfter({
+        path: {
+          note: noteId,
+          targetNote: targetNoteId,
+          asFirstChild: dropMode === "asFirstChild" ? "true" : "false",
+        },
+      })
+    )
     if (error || !updatedNotes) {
       throw new Error(error || "Failed to move note")
     }
@@ -366,9 +382,11 @@ export default class StoredApiCollection implements StoredApi {
         undone.textContent!
       )
     }
-    const { data: noteRealm, error } = await NoteController.undoDeleteNote({
-      path: { note: undone.noteId },
-    })
+    const { data: noteRealm, error } = await apiCallWithLoading(() =>
+      NoteController.undoDeleteNote({
+        path: { note: undone.noteId },
+      })
+    )
     if (error || !noteRealm) {
       throw new Error(error || "Failed to undo delete note")
     }
@@ -385,9 +403,11 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async deleteNote(router: Router, noteId: Doughnut.ID) {
-    const { data: res, error } = await NoteController.deleteNote({
-      path: { note: noteId },
-    })
+    const { data: res, error } = await apiCallWithLoading(() =>
+      NoteController.deleteNote({
+        path: { note: noteId },
+      })
+    )
     if (error || !res) {
       throw new Error(error || "Failed to delete note")
     }
@@ -406,13 +426,15 @@ export default class StoredApiCollection implements StoredApi {
     targetId: Doughnut.ID,
     data: NoteMoveDto
   ) {
-    const { data: noteRealms, error } = await LinkController.moveNote({
-      path: {
-        sourceNote: sourceId,
-        targetNote: targetId,
-      },
-      body: data,
-    })
+    const { data: noteRealms, error } = await apiCallWithLoading(() =>
+      LinkController.moveNote({
+        path: {
+          sourceNote: sourceId,
+          targetNote: targetId,
+        },
+        body: data,
+      })
+    )
     if (error || !noteRealms) {
       throw new Error(error || "Failed to move note")
     }
