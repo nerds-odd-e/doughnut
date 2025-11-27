@@ -23,6 +23,7 @@ import { ref } from "vue"
 import type { User } from "@generated/backend"
 import { UserController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import TextInput from "@/components/form/TextInput.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -32,9 +33,11 @@ const errors = ref<Record<string, string>>({})
 const emits = defineEmits(["updateUser"])
 
 const processForm = async () => {
-  const { data: newUser, error } = await UserController.createUser({
-    body: formData.value,
-  })
+  const { data: newUser, error } = await apiCallWithLoading(() =>
+    UserController.createUser({
+      body: formData.value,
+    })
+  )
   if (!error) {
     emits("updateUser", newUser!)
   } else {

@@ -144,7 +144,20 @@ Every API call in the codebase needs careful analysis:
   - FailureReportController.deleteFailureReports (FailureReportList.vue)
 - ✅ All 416 frontend unit tests passing
 - ✅ **Phase 2 Complete**: All user mutations (A1-A7) wrapped with `apiCallWithLoading`
-- **Total operations wrapped**: 51 user-initiated mutations now show proper loading state
+- **Total operations wrapped**: 54 user-initiated mutations now show proper loading state
+- ✅ **Additional Cleanup (Nov 27, 2024)**: Found and fixed 10 more API calls that weren't using proper client setup:
+  - 6 mutations wrapped with `apiCallWithLoading`:
+    - UserController.createUser (user registration)
+    - UserController.generateToken (MCP token generation)
+    - UserController.deleteToken (MCP token deletion)
+    - NotebookController.moveToCircle (move notebook)
+    - PredefinedQuestionController.suggestQuestionForFineTuning (suggest fine-tuning)
+    - NotebookController.updateAiAssistant (update AI assistant)
+  - 4 background reads made silent with `client: globalClientSilent`:
+    - UserController.getTokens (load tokens on page mount)
+    - CircleController.index (load circles in dialog)
+    - NotebookController.getNotes (load notebook notes)
+    - CertificateController.getCertificate (load certificate data)
 
 ## Critical Issue Discovered (Nov 27, 2024)
 

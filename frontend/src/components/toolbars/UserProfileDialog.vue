@@ -36,7 +36,10 @@
 import TextInput from "@/components/form/TextInput.vue"
 import type { User } from "@generated/backend"
 import { UserController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { onMounted, ref } from "vue"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -57,10 +60,13 @@ const fetchData = async () => {
 
 const processForm = async () => {
   if (!formData.value) return
-  const { data: updatedUser, error } = await UserController.updateUser({
-    path: { user: formData.value.id },
-    body: formData.value,
-  })
+  const userData = formData.value
+  const { data: updatedUser, error } = await apiCallWithLoading(() =>
+    UserController.updateUser({
+      path: { user: userData.id },
+      body: userData,
+    })
+  )
   if (error) {
     // Error is handled by global interceptor (toast notification)
     // Extract field-level errors if available (for 400 validation errors)

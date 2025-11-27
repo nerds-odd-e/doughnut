@@ -22,6 +22,10 @@ import {
   CircleController,
   NotebookController,
 } from "@generated/backend/sdk.gen"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 const { popups } = usePopups()
@@ -36,7 +40,9 @@ const props = defineProps({
 const circles = ref<Circle[]>([])
 
 onMounted(async () => {
-  const { data: circlesList, error } = await CircleController.index()
+  const { data: circlesList, error } = await CircleController.index({
+    client: globalClientSilent,
+  })
   if (!error) {
     circles.value = circlesList || []
   }
@@ -44,12 +50,14 @@ onMounted(async () => {
 
 const move = async (circle: Circle) => {
   if (await popups.confirm(`Move notebook to ${circle.name}?`)) {
-    await NotebookController.moveToCircle({
-      path: {
-        notebook: props.notebook.id,
-        circle: circle.id,
-      },
-    })
+    await apiCallWithLoading(() =>
+      NotebookController.moveToCircle({
+        path: {
+          notebook: props.notebook.id,
+          circle: circle.id,
+        },
+      })
+    )
   }
 }
 </script>

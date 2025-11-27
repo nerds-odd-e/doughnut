@@ -56,6 +56,10 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { UserController } from "@generated/backend/sdk.gen"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
@@ -74,7 +78,9 @@ const token = ref<string | null>(null)
 const loading = ref(false)
 
 const loadTokens = async () => {
-  const { data: tokensList, error } = await UserController.getTokens()
+  const { data: tokensList, error } = await UserController.getTokens({
+    client: globalClientSilent,
+  })
   if (!error) {
     // tokensList is guaranteed to be UserToken[] when error is undefined
     tokens.value = tokensList!.map((t) => ({
@@ -88,11 +94,13 @@ loadTokens()
 
 const generateToken = async () => {
   loading.value = true
-  const { data: newToken, error } = await UserController.generateToken({
-    body: {
-      label: tokenFormData.value.label,
-    },
-  })
+  const { data: newToken, error } = await apiCallWithLoading(() =>
+    UserController.generateToken({
+      body: {
+        label: tokenFormData.value.label,
+      },
+    })
+  )
   if (!error) {
     // newToken is guaranteed to be UserToken when error is undefined
     token.value = newToken!.token
@@ -107,7 +115,9 @@ const generateToken = async () => {
 }
 
 const deleteToken = async (id: number) => {
-  const { error } = await UserController.deleteToken({ path: { tokenId: id } })
+  const { error } = await apiCallWithLoading(() =>
+    UserController.deleteToken({ path: { tokenId: id } })
+  )
   if (!error) {
     tokens.value = tokens.value.filter((token) => token.id !== id)
   }

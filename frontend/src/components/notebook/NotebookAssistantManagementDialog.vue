@@ -23,7 +23,10 @@
 <script setup lang="ts">
 import type { Notebook } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {
+  apiCallWithLoading,
+  globalClientSilent,
+} from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
 import { saveAs } from "file-saver"
@@ -39,12 +42,14 @@ const additionalInstruction = ref("")
 const emit = defineEmits(["close"])
 
 const updateAiInstructions = async () => {
-  const { error } = await NotebookController.updateAiAssistant({
-    path: { notebook: props.notebook.id },
-    body: {
-      additionalInstructions: additionalInstruction.value,
-    },
-  })
+  const { error } = await apiCallWithLoading(() =>
+    NotebookController.updateAiAssistant({
+      path: { notebook: props.notebook.id },
+      body: {
+        additionalInstructions: additionalInstruction.value,
+      },
+    })
+  )
   if (!error) {
     // Success - handled by global interceptor
     if (props.closer) {
