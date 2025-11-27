@@ -31,11 +31,4 @@ describe("RichMarkdownEditor", () => {
     const emitted = wrapper.emitted()["update:modelValue"]
     expect(emitted![0]![0]).toEqual("Title\n=====")
   })
-
-  it.skip("will try to unify the markdown", async () => {
-    const wrapper = await mountEditor("**」**x")
-    await flushPromises()
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted![0]![0]).toEqual("Title\n=====")
-  })
 })
