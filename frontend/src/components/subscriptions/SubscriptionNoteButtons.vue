@@ -9,7 +9,11 @@
         @done="doneHandler()"
       />
     </PopButton>
-    <button class="daisy-btn daisy-btn-sm" title="Unsubscribe" @click="processForm()">
+    <button
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      title="Unsubscribe"
+      @click="processForm()"
+    >
       <SvgUnsubscribe />
     </button>
   </div>
