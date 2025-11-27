@@ -14,7 +14,11 @@
         />
       </template>
     </PopButton>
-    <button class="daisy-btn" title="Start Assessment" @click="openAssessmentPage">
+    <button
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      title="Start Assessment"
+      @click="openAssessmentPage"
+    >
       <SvgAssessment />
     </button>
   </div>
