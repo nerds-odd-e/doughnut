@@ -93,7 +93,6 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
-import { useRouter } from "vue-router"
 import type { Notebook, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -101,14 +100,17 @@ import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "../form/TextInput.vue"
 import NotebookCertificateRequest from "./NotebookCertificateRequest.vue"
 import NotebookAssistantManagementDialog from "./NotebookAssistantManagementDialog.vue"
-
-const router = useRouter()
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
   user: { type: Object as PropType<User>, required: false },
   closer: { type: Function as PropType<() => void>, required: false },
 })
+
+const emit = defineEmits<{
+  (e: "notebook-updated", notebook: Notebook): void
+}>()
 
 // Form data
 const {
@@ -134,12 +136,15 @@ const isIndexing = ref(false)
 const showIndexingComplete = ref(false)
 
 const processForm = async () => {
-  const { error } = await NotebookController.updateNotebook({
-    path: { notebook: props.notebook.id },
-    body: formData.value,
-  })
+  const { data: updatedNotebook, error } = await apiCallWithLoading(() =>
+    NotebookController.updateNotebook({
+      path: { notebook: props.notebook.id },
+      body: formData.value,
+    })
+  )
   if (!error) {
-    router.go(0)
+    emit("notebook-updated", updatedNotebook!)
+    props.closer?.()
   } else {
     // Error is handled by global interceptor (toast notification)
     // Extract field-level errors if available (for 400 validation errors)
@@ -169,7 +174,8 @@ const handleObsidianImport = async (event: Event) => {
   if (!error) {
     // Clear file input for reuse
     ;(event.target as HTMLInputElement).value = ""
-    router.go(0) // Refresh page to show imported notes
+    // Obsidian import doesn't return updated notebook, so refresh the page
+    window.location.reload()
   } else {
     // Error is handled by global interceptor (toast notification)
     alert("Failed to import file")

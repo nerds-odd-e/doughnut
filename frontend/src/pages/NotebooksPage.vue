@@ -7,7 +7,10 @@
       </div>
       <NotebookCardsWithButtons v-if="notebooks" :notebooks="notebooks">
         <template #default="{ notebook }">
-          <NotebookButtons v-bind="{ notebook, user }" />
+          <NotebookButtons 
+            v-bind="{ notebook, user }" 
+            @notebook-updated="handleNotebookUpdated"
+          />
         </template>
       </NotebookCardsWithButtons>
     </main>
@@ -59,6 +62,16 @@ const fetchData = async () => {
     subscriptions.value = result!.subscriptions
   }
 }
+
+const handleNotebookUpdated = (updatedNotebook: Notebook) => {
+  if (notebooks.value) {
+    const index = notebooks.value.findIndex((n) => n.id === updatedNotebook.id)
+    if (index !== -1) {
+      notebooks.value[index] = updatedNotebook
+    }
+  }
+}
+
 onMounted(() => {
   fetchData()
 })

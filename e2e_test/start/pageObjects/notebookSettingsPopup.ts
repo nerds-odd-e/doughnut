@@ -14,6 +14,7 @@ const notebookSettingsPopup = () => {
     skipMemoryTracking() {
       cy.formField('Skip Memory Tracking Entirely').check()
       clickButton('Update')
+      cy.pageIsNotLoading()
     },
     requestForNotebookApproval() {
       clickButton('Send Request')

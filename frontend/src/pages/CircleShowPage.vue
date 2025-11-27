@@ -15,6 +15,7 @@
             <NotebookButtons
               v-bind="{ notebook, user }"
               class="card-header-btn"
+              @notebook-updated="handleNotebookUpdated"
             />
           </template>
         </NotebookCardsWithButtons>
@@ -45,7 +46,7 @@ import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
-import type { CircleForUserView, User } from "@generated/backend"
+import type { CircleForUserView, Notebook, User } from "@generated/backend"
 import { CircleController } from "@generated/backend/sdk.gen"
 import { globalClientSilent } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -74,6 +75,17 @@ const fetchData = async () => {
   })
   if (!error) {
     circle.value = circleData!
+  }
+}
+
+const handleNotebookUpdated = (updatedNotebook: Notebook) => {
+  if (circle.value) {
+    const index = circle.value.notebooks.notebooks.findIndex(
+      (n) => n.id === updatedNotebook.id
+    )
+    if (index !== -1) {
+      circle.value.notebooks.notebooks[index] = updatedNotebook
+    }
   }
 }
 

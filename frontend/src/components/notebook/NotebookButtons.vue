@@ -6,7 +6,10 @@
         <SvgEditNotebook />
       </template>
       <template #default="{ closer }">
-        <NotebookEditDialog v-bind="{ notebook, user, closer }" />
+        <NotebookEditDialog 
+          v-bind="{ notebook, user, closer }" 
+          @notebook-updated="(updatedNotebook) => emit('notebook-updated', updatedNotebook)"
+        />
       </template>
     </PopButton>
     <PopButton
@@ -58,6 +61,10 @@ const { popups } = usePopups()
 const props = defineProps<{
   notebook: Notebook
   user?: User
+}>()
+
+const emit = defineEmits<{
+  (e: "notebook-updated", notebook: Notebook): void
 }>()
 
 const shareNotebook = async () => {
