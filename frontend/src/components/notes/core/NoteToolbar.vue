@@ -2,6 +2,7 @@
   <nav class="daisy-navbar daisy-bg-base-200">
     <div class="daisy-btn-group daisy-btn-group-sm">
       <NoteNewButton
+        v-if="!readonly"
         button-title="Add Child Note"
         v-bind="{ referenceNote: note, insertMode: 'as-child', storageAccessor }"
       >
@@ -9,14 +10,14 @@
       </NoteNewButton>
 
       <NoteNewButton
-        v-if="note.parentId"
+        v-if="!readonly && note.parentId"
         button-title="Add Next Sibling Note"
         v-bind="{ referenceNote: note, insertMode: 'after', storageAccessor }"
       >
         <SvgAddSibling />
       </NoteNewButton>
 
-      <PopButton title="search and link note">
+      <PopButton v-if="!readonly" title="search and link note">
         <template #button_face>
           <SvgSearchForLink />
         </template>
@@ -42,7 +43,7 @@
         <SvgChat />
       </a>
 
-      <PopButton title="associate wikidata">
+      <PopButton v-if="!readonly" title="associate wikidata">
         <template #button_face>
           <SvgWikidata :class="{ 'wikidata-has-value': note.wikidataId }" />
         </template>
@@ -55,18 +56,18 @@
         </template>
       </PopButton>
 
-      <button v-if="!asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
+      <button v-if="!readonly && !asMarkdown" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as markdown" @click="$emit('edit-as-markdown', true)">
         <SvgMarkdown />
       </button>
-      <button v-else class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
+      <button v-else-if="!readonly" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Edit as rich content" @click="$emit('edit-as-markdown', false)">
         <SvgRichContent />
       </button>
 
-      <button class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" v-if="!audioTools" @click="audioTools = true">
+      <button v-if="!readonly && !audioTools" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="Audio tools" @click="audioTools = true">
         <SvgAudioInput />
       </button>
 
-      <div class="daisy-dropdown daisy-dropdown-end">
+      <div v-if="!readonly" class="daisy-dropdown daisy-dropdown-end">
         <button
           tabindex="0"
           class="daisy-btn daisy-btn-ghost daisy-btn-sm"
@@ -160,7 +161,7 @@
     </div>
   </nav>
   <NoteAudioTools
-    v-if="audioTools"
+    v-if="!readonly && audioTools"
     v-bind="{ note, storageAccessor }"
     @close-dialog="audioTools = false"
   />
@@ -203,6 +204,7 @@ const { storageAccessor, note } = defineProps<{
   note: Note
   asMarkdown?: boolean
   conversationButton?: boolean
+  readonly?: boolean
 }>()
 
 const audioTools = ref(false)

@@ -47,12 +47,13 @@
         <template v-else>
           <template v-if="!isMinimized">
             <NoteToolbar
-              v-if="!readonly(noteRealm)"
+              v-if="currentUser"
               v-bind="{
                 note: noteRealm.note,
                 storageAccessor,
                 asMarkdown,
                 conversationButton: noConversationButton,
+                readonly: readonly(noteRealm),
               }"
               @note-accessory-updated="onNoteAccessoryUpdated"
               @edit-as-markdown="asMarkdown = $event"
