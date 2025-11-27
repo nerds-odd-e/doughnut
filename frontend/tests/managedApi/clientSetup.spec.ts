@@ -1,7 +1,6 @@
 import "vitest-fetch-mock"
 import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 import { apiCallWithLoading, setupGlobalClient } from "@/managedApi/clientSetup"
-import { client as globalClient } from "@generated/backend/client.gen"
 import { UserController } from "@generated/backend/sdk.gen"
 import { vi } from "vitest"
 
@@ -25,30 +24,42 @@ describe("clientSetup", () => {
     setupGlobalClient(apiStatus)
   })
 
-  describe("globalClient - error handling", () => {
-    it("shows error toast on API errors", async () => {
+  describe("error handling - silent vs with-loading behavior", () => {
+    it("shows error toast for apiCallWithLoading wrapped calls", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 500,
       })
 
-      const { error } = await UserController.getUserProfile({
-        client: globalClient,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        UserController.getUserProfile({})
+      )
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalled()
     })
 
-    it("enhances 404 errors with method and URL", async () => {
+    it("does NOT show error toast for non-wrapped (silent) calls", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      const { error } = await UserController.getUserProfile({})
+
+      expect(error).toBeDefined()
+      expect(mockToast.error).not.toHaveBeenCalled()
+    })
+
+    it("enhances 404 errors with method and URL for wrapped calls", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 404,
       })
 
-      const { error } = await UserController.getUserProfile({
-        client: globalClient,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        UserController.getUserProfile({})
+      )
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalledWith(
@@ -60,15 +71,27 @@ describe("clientSetup", () => {
       )
     })
 
-    it("uses shorter timeout for non-404 errors", async () => {
+    it("does NOT show 404 errors for non-wrapped (silent) calls", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 404,
+      })
+
+      const { error } = await UserController.getUserProfile({})
+
+      expect(error).toBeDefined()
+      expect(mockToast.error).not.toHaveBeenCalled()
+    })
+
+    it("uses shorter timeout for non-404 errors in wrapped calls", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 500,
       })
 
-      const { error } = await UserController.getUserProfile({
-        client: globalClient,
-      })
+      const { error } = await apiCallWithLoading(() =>
+        UserController.getUserProfile({})
+      )
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalledWith(
@@ -77,6 +100,24 @@ describe("clientSetup", () => {
           timeout: 3000,
         })
       )
+    })
+
+    it("handles nested apiCallWithLoading correctly", async () => {
+      fetchMock.mockResponse(JSON.stringify({}), {
+        url: `${baseUrl}/api/user`,
+        status: 500,
+      })
+
+      await apiCallWithLoading(async () => {
+        // Inner call should also show errors
+        const { error } = await apiCallWithLoading(() =>
+          UserController.getUserProfile({})
+        )
+        expect(error).toBeDefined()
+      })
+
+      // Should show error toast for the inner call
+      expect(mockToast.error).toHaveBeenCalled()
     })
   })
 

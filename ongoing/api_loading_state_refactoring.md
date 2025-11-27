@@ -513,6 +513,65 @@ The wrapper doesn't specify a client, so API calls use the default `globalClient
 8. ⏳ Verify E2E tests still pass
 9. ⏳ Archive this document (refactoring complete!)
 
+### Nov 27, 2024 - Restored Silent Behavior for Non-Wrapped Calls ✅
+
+**IMPORTANT FIX**: Restored previous behavior where non-`apiCallWithLoading` calls are truly silent!
+
+**The Problem:**
+After removing `globalClientSilent`, ALL API calls were showing error toasts and handling 401s. This broke the previous "silent" behavior for background fetches, prefetching, etc.
+
+**The Solution:**
+Track whether we're inside `apiCallWithLoading` and only show errors for wrapped calls:
+
+```typescript
+// Track if we're inside apiCallWithLoading
+let isInApiCallWithLoading = false
+
+export async function apiCallWithLoading<T>(apiCall: () => Promise<T>): Promise<T> {
+  // Set flag before call
+  isInApiCallWithLoading = true
+  try {
+    return await apiCall()
+  } finally {
+    isInApiCallWithLoading = false
+  }
+}
+
+// In error interceptor
+globalClient.interceptors.error.use(async (error, response, request) => {
+  // Only handle errors if wrapped
+  if (!isInApiCallWithLoading) {
+    return error  // Silent!
+  }
+  // ... show toasts, handle 401s ...
+})
+```
+
+**Changes made:**
+1. ✅ Added `isInApiCallWithLoading` flag to track wrapped calls
+2. ✅ Error interceptor checks flag before showing toasts/handling 401s
+3. ✅ Non-wrapped calls are now truly silent (no toasts, no 401 redirects)
+4. ✅ Added 3 new unit tests to verify silent vs with-loading behavior
+5. ✅ All 418 tests passing ✅
+
+**Test Coverage:**
+- ✅ Wrapped calls show error toasts
+- ✅ Non-wrapped calls DON'T show error toasts (silent)
+- ✅ 404 errors enhanced for wrapped calls
+- ✅ 404 errors NOT shown for non-wrapped calls
+- ✅ Nested `apiCallWithLoading` works correctly
+
+**Behavior Restored:**
+```typescript
+// Shows error toast + handles 401
+await apiCallWithLoading(() => 
+  UserController.getUserProfile()
+)
+
+// Silent - no error toast, no 401 handling
+await UserController.getUserProfile()
+```
+
 ### Nov 27, 2024 - Moved Error Toast to Caller ✅
 
 **FINAL SIMPLIFICATION**: Moved `addError` method to the caller since it doesn't use internal state!

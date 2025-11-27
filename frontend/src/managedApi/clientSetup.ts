@@ -8,10 +8,15 @@ import { useToast } from "vue-toastification"
 // Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined
 
+// Track if we're inside apiCallWithLoading to determine if errors should be shown
+let isInApiCallWithLoading = false
+
 /**
- * Wrapper for API calls that manages loading state.
+ * Wrapper for API calls that manages loading state and enables error handling.
  * Use this when you need the loading state to be set immediately before the API call.
- * The API call will use the default globalClient unless explicitly overridden.
+ *
+ * IMPORTANT: Only calls wrapped with this function will show error toasts and handle 401 redirects.
+ * Non-wrapped calls are "silent" and will not trigger error UI.
  *
  * @param apiCall - Function that returns a Promise with the API result
  * @returns Promise with the API result
@@ -29,10 +34,13 @@ export async function apiCallWithLoading<T>(
   }
 
   apiStatusHandler.assignLoading(true)
+  const wasInApiCallWithLoading = isInApiCallWithLoading
+  isInApiCallWithLoading = true
   try {
     return await apiCall()
   } finally {
     apiStatusHandler.assignLoading(false)
+    isInApiCallWithLoading = wasInApiCallWithLoading
   }
 }
 
@@ -57,7 +65,14 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
 
   // Error interceptor: Handle errors (toasts, 401 redirects, etc.)
   // This runs when there's an error response, before it's returned
+  // NOTE: Only shows errors for calls wrapped with apiCallWithLoading (non-wrapped calls are silent)
   globalClient.interceptors.error.use(async (error, response, request) => {
+    // Only handle errors if we're inside apiCallWithLoading
+    // This restores the previous "silent" behavior for non-wrapped API calls
+    if (!isInApiCallWithLoading) {
+      return error
+    }
+
     // Construct error object for handleApiError
     // The error parameter is the parsed response body (object or string)
     const errorBody = error
