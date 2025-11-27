@@ -15,11 +15,12 @@ type SdkResult = {
 }
 
 /**
- * Wrapper for API calls that manages loading state and enables error handling.
- * Use this when you need the loading state to be set immediately before the API call.
+ * Wrapper for API calls that manages loading state and error handling.
  *
- * IMPORTANT: Only calls wrapped with this function will show error toasts and handle 401 redirects.
- * Non-wrapped calls are "silent" and will not trigger error UI.
+ * This function:
+ * - Sets loading state synchronously before the API call
+ * - Shows error toasts for failed requests
+ * - Handles 401 unauthorized redirects
  *
  * @param apiCall - Function that returns a Promise with the API result (SDK format with error, response, request)
  * @returns Promise with the API result
@@ -58,8 +59,7 @@ export async function apiCallWithLoading<T extends SdkResult>(
 export function setupGlobalClient(apiStatus: ApiStatus) {
   apiStatusHandler = new ApiStatusHandler(apiStatus)
 
-  // Configure global client
-  // Use 'fields' and throwOnError: false to match ManagedApi's response format: { data, error, request, response }
+  // Configure global client with SDK response format
   globalClient.setConfig({
     baseUrl:
       typeof window !== "undefined" && window.location.origin
@@ -73,8 +73,7 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
 
 /**
  * Handles API errors from SDK result format.
- * Extracted from ManagedApi.handleApiError.
- * @param result - SDK result with { error, response, request }
+ * Shows error toasts and handles special cases (401, 404, 400).
  */
 function handleSdkError(result: SdkResult) {
   if (!apiStatusHandler) return
