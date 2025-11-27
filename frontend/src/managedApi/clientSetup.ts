@@ -23,25 +23,26 @@ let apiStatusHandler: ApiStatusHandler | undefined
 /**
  * Wrapper for API calls that manages loading state.
  * Use this when you need the loading state to be set immediately before the API call.
+ * The API call will use the default globalClient unless explicitly overridden.
  *
- * @param apiCall - Function that takes a silent client and returns a Promise with the API result
+ * @param apiCall - Function that returns a Promise with the API result
  * @returns Promise with the API result
  *
  * @example
- * const result = await apiCallWithLoading((client) =>
- *   someApiCall({ path: { id: 123 }, client })
+ * const result = await apiCallWithLoading(() =>
+ *   someApiCall({ path: { id: 123 } })
  * )
  */
 export async function apiCallWithLoading<T>(
-  apiCall: (client: typeof globalClientSilent) => Promise<T>
+  apiCall: () => Promise<T>
 ): Promise<T> {
   if (!apiStatusHandler) {
-    return await apiCall(globalClientSilent)
+    return await apiCall()
   }
 
   apiStatusHandler.assignLoading(true)
   try {
-    return await apiCall(globalClientSilent)
+    return await apiCall()
   } finally {
     apiStatusHandler.assignLoading(false)
   }

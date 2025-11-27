@@ -57,13 +57,12 @@ const formSubmitted = ref(false)
 const emits = defineEmits(["advance"])
 
 const submitAnswer = async (answerData: AnswerDto) => {
-  const { data: answeredInstance, error } = await apiCallWithLoading((client) =>
+  const { data: answeredInstance, error } = await apiCallWithLoading(() =>
     AssessmentController.answerQuestion({
       path: {
         assessmentQuestionInstance: props.assessmentQuestionInstance.id,
       },
       body: answerData,
-      client,
     })
   )
 

@@ -60,13 +60,11 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
   isLoading.value = true
   error.value = ""
 
-  const { data: answerResult, error: apiError } = await apiCallWithLoading(
-    (client) =>
-      RecallPromptController.answerQuiz({
-        path: { recallPrompt: props.recallPrompt.id },
-        body: answerData,
-        client,
-      })
+  const { data: answerResult, error: apiError } = await apiCallWithLoading(() =>
+    RecallPromptController.answerQuiz({
+      path: { recallPrompt: props.recallPrompt.id },
+      body: answerData,
+    })
   )
   if (!apiError) {
     emits("answered", answerResult!)

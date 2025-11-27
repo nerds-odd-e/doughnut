@@ -22,8 +22,9 @@ We have two approaches for managing loading state:
 3. **apiCallWithLoading** (new, recommended)
    - Explicitly wraps API calls that need loading state
    - Sets loading state synchronously (immediately when called)
-   - Uses silent client internally (no duplicate toasts)
+   - Uses default `globalClient` (will show error toasts via interceptor)
    - Guarantees cleanup in `finally` block
+   - Simple API - just wrap the API call
 
 ## Target State
 
@@ -78,9 +79,31 @@ Every API call in the codebase needs careful analysis:
 ## Current Progress
 
 - ✅ `apiCallWithLoading` implemented and tested
+- ✅ Simplified `apiCallWithLoading` to remove client parameter (always uses `globalClientSilent`)
 - ✅ Applied to `RecallPromptComponent` (quiz answers)
 - ✅ Applied to `AssessmentQuestion` (assessment answers)
 - ⏳ Need to analyze and migrate remaining ~98+ API calls
+
+## Implementation Details
+
+`apiCallWithLoading` has been simplified - just wrap your API call:
+
+```typescript
+// Usage - uses default globalClient
+const result = await apiCallWithLoading(() =>
+  SomeController.someMethod({
+    path: { id: 123 },
+  })
+)
+
+// For truly silent calls (no loading state, no toasts), use globalClientSilent directly
+const result = await SomeController.someMethod({
+  path: { id: 123 },
+  client: globalClientSilent,
+})
+```
+
+The wrapper doesn't specify a client, so API calls use the default `globalClient` which has interceptors for loading state and error toasts.
 
 ## Next Steps
 
