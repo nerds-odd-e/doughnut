@@ -37,7 +37,7 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import type { AnswerDto, AssessmentQuestionInstance } from "@generated/backend"
-import { answerQuestion } from "@generated/backend/sdk.gen"
+import { AssessmentController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "../review/QuestionDisplay.vue"
@@ -58,7 +58,7 @@ const emits = defineEmits(["advance"])
 
 const submitAnswer = async (answerData: AnswerDto) => {
   const { data: answeredInstance, error } = await apiCallWithLoading((client) =>
-    answerQuestion({
+    AssessmentController.answerQuestion({
       path: {
         assessmentQuestionInstance: props.assessmentQuestionInstance.id,
       },

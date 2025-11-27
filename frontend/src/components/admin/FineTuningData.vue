@@ -14,10 +14,7 @@
 <script lang="ts">
 import { ContentLoader } from "vue-content-loader"
 import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import {
-  getAllSuggestedQuestions,
-  uploadAndTriggerFineTuning,
-} from "@generated/backend/sdk.gen"
+import { FineTuningDataController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import SuggestedQuestionList from "./SuggestedQuestionList.vue"
 
@@ -37,7 +34,8 @@ export default {
       this.suggestedQuestions = [...this.suggestedQuestions!, duplicated]
     },
     async triggerFineTuning() {
-      const { error } = await uploadAndTriggerFineTuning()
+      const { error } =
+        await FineTuningDataController.uploadAndTriggerFineTuning()
       if (!error) {
         this.fineTuningDataResultMsg = "Training initiated."
       } else {
@@ -53,7 +51,8 @@ export default {
 
   components: { ContentLoader, SuggestedQuestionList },
   async mounted() {
-    const { data: questions, error } = await getAllSuggestedQuestions()
+    const { data: questions, error } =
+      await FineTuningDataController.getAllSuggestedQuestions()
     if (!error && questions) {
       this.suggestedQuestions = questions
     }

@@ -69,7 +69,10 @@ import type {
   SpellingResultDto,
   MemoryTrackerLite,
 } from "@generated/backend"
-import { answerSpelling, askAQuestion } from "@generated/backend/sdk.gen"
+import {
+  MemoryTrackerController,
+  RecallPromptController,
+} from "@generated/backend/sdk.gen"
 import { globalClientSilent } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
@@ -113,10 +116,11 @@ const useQuestionFetching = (props: QuizProps) => {
 
       if (memoryTrackerId in recallPromptCache.value) continue
 
-      const { data: question, error } = await askAQuestion({
-        path: { memoryTracker: memoryTrackerId },
-        client: globalClientSilent,
-      })
+      const { data: question, error } =
+        await RecallPromptController.askAQuestion({
+          path: { memoryTracker: memoryTrackerId },
+          client: globalClientSilent,
+        })
       if (!error) {
         recallPromptCache.value[memoryTrackerId] = question!
       } else {
@@ -174,10 +178,11 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
   if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
     return
 
-  const { data: answerResult, error } = await answerSpelling({
-    path: { memoryTracker: currentMemoryTrackerId.value },
-    body: { spellingAnswer: answerData.spellingAnswer },
-  })
+  const { data: answerResult, error } =
+    await MemoryTrackerController.answerSpelling({
+      path: { memoryTracker: currentMemoryTrackerId.value },
+      body: { spellingAnswer: answerData.spellingAnswer },
+    })
   if (!error) {
     emit("answered-spelling", answerResult!)
   }

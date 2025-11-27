@@ -112,10 +112,7 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick, computed } from "vue"
 import type { WikidataSearchEntity } from "@generated/backend"
-import {
-  searchWikidata,
-  fetchWikidataEntityDataById,
-} from "@generated/backend/sdk.gen"
+import { WikidataController } from "@generated/backend/sdk.gen"
 import Modal from "../commons/Modal.vue"
 import RadioButtons from "../form/RadioButtons.vue"
 import TextInput from "../form/TextInput.vue"
@@ -161,7 +158,7 @@ const fetchSearchResults = async () => {
   loading.value = true
   hasSearched.value = true
   try {
-    const { data: results, error } = await searchWikidata({
+    const { data: results, error } = await WikidataController.searchWikidata({
       query: { search: searchKeyRef.value },
     })
     if (!error) {
@@ -232,9 +229,10 @@ defineExpose({
 })
 
 const getWikidataItem = async (wikidataId: string) => {
-  const { data: entityData, error } = await fetchWikidataEntityDataById({
-    path: { wikidataId },
-  })
+  const { data: entityData, error } =
+    await WikidataController.fetchWikidataEntityDataById({
+      path: { wikidataId },
+    })
   if (!error && entityData) {
     return entityData.WikipediaEnglishUrl
   }

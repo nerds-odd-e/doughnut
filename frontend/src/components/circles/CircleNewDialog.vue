@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import type { Circle } from "@generated/backend"
-import { createCircle } from "@generated/backend/sdk.gen"
+import { CircleController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"
 import TextInput from "../form/TextInput.vue"
@@ -30,7 +30,7 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { data: newCircle, error } = await createCircle({
+      const { data: newCircle, error } = await CircleController.createCircle({
         body: this.formData,
       })
       if (!error) {

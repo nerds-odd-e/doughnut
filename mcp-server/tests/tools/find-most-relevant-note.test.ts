@@ -1,12 +1,14 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
-import * as Services from '@generated/backend/sdk.gen'
+import { SearchController } from '@generated/backend/sdk.gen'
 import { client } from '@generated/backend/client.gen'
 import type { SearchForLinkTargetResponse } from '@generated/backend'
 
 // Mock the generated services
 vi.mock('@generated/backend/sdk.gen', () => ({
-  searchForLinkTarget: vi.fn(),
+  SearchController: {
+    searchForLinkTarget: vi.fn(),
+  },
 }))
 
 describe('find_most_relevant_note tool', () => {
@@ -34,12 +36,14 @@ describe('find_most_relevant_note tool', () => {
       : []
 
     // Mock the service response
-    const mockSearchForLinkTarget = vi.mocked(Services.searchForLinkTarget)
+    const mockSearchForLinkTarget = vi.mocked(
+      SearchController.searchForLinkTarget
+    )
     // OpenAPI client returns { data, error, request, response } structure
     mockSearchForLinkTarget.mockResolvedValue({
       data: searchResult as SearchForLinkTargetResponse,
       error: undefined,
-    } as Awaited<ReturnType<typeof Services.searchForLinkTarget>>)
+    } as Awaited<ReturnType<typeof SearchController.searchForLinkTarget>>)
 
     const ctx = createMockContext()
 

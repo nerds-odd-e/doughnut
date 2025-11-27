@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { User } from "@generated/backend"
-import { createUser } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import TextInput from "@/components/form/TextInput.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
@@ -32,7 +32,7 @@ const errors = ref<Record<string, string>>({})
 const emits = defineEmits(["updateUser"])
 
 const processForm = async () => {
-  const { data: newUser, error } = await createUser({
+  const { data: newUser, error } = await UserController.createUser({
     body: formData.value,
   })
   if (!error) {

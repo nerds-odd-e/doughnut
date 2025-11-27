@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import type { NoteAccessory } from "@generated/backend"
-import { showNoteAccessory } from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import type { PropType } from "vue"
 import { onMounted, ref, watch } from "vue"
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue"
@@ -32,7 +32,7 @@ watch(
 )
 
 const fetchData = async () => {
-  const { data: accessory, error } = await showNoteAccessory({
+  const { data: accessory, error } = await NoteController.showNoteAccessory({
     path: { note: noteId },
   })
   if (!error) {

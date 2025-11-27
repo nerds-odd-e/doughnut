@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import type { Note } from "@generated/backend"
-import { generateImage } from "@generated/backend/sdk.gen"
+import { AiController } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -45,7 +45,7 @@ export default defineComponent({
   },
   methods: {
     async askForImage() {
-      const { data: imageResult, error } = await generateImage({
+      const { data: imageResult, error } = await AiController.generateImage({
         body: this.prompt,
       })
       if (!error) {

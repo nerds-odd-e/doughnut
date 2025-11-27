@@ -21,7 +21,7 @@ import type {
 } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
-import { fetchWikidataEntityDataById } from "@generated/backend/sdk.gen"
+import { WikidataController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
 
@@ -87,9 +87,10 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
   if (isProcessing.value) return
   isProcessing.value = true
   try {
-    const { data: entityData, error } = await fetchWikidataEntityDataById({
-      path: { wikidataId },
-    })
+    const { data: entityData, error } =
+      await WikidataController.fetchWikidataEntityDataById({
+        path: { wikidataId },
+      })
 
     if (error) {
       const errorObj = toOpenApiError(error)

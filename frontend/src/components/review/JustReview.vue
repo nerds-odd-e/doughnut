@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { markAsRepeated } from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -38,7 +38,7 @@ export default defineComponent({
       if (this.memoryTrackerId === undefined) {
         return
       }
-      const { error } = await markAsRepeated({
+      const { error } = await MemoryTrackerController.markAsRepeated({
         path: { memoryTracker: this.memoryTrackerId },
         query: { successful },
       })

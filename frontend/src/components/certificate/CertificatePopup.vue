@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import { getCertificate } from "@generated/backend/sdk.gen"
+import { CertificateController } from "@generated/backend/sdk.gen"
 import type { Certificate } from "@generated/backend"
 const props = defineProps({
   notebookId: { type: Number, required: true },
@@ -65,7 +65,7 @@ const formatDate = (date: Date): string => {
 }
 
 const fetchData = async () => {
-  const { data: cert, error } = await getCertificate({
+  const { data: cert, error } = await CertificateController.getCertificate({
     path: { notebook: props.notebookId },
   })
   if (!error) {

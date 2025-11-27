@@ -1,12 +1,14 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
-import * as Services from '@generated/backend/sdk.gen'
+import { McpNoteCreationController } from '@generated/backend/sdk.gen'
 import { client } from '@generated/backend/client.gen'
 import type { CreateNoteViaMcpResponse } from '@generated/backend'
 
 // Mock the generated services
 vi.mock('@generated/backend/sdk.gen', () => ({
-  createNoteViaMcp: vi.fn(),
+  McpNoteCreationController: {
+    createNoteViaMcp: vi.fn(),
+  },
 }))
 
 describe('add_note tool', () => {
@@ -26,7 +28,7 @@ describe('add_note tool', () => {
     expect(addNoteTool).toBeDefined()
 
     // Mock the service response
-    const mockCreateNote = vi.mocked(Services.createNoteViaMcp)
+    const mockCreateNote = vi.mocked(McpNoteCreationController.createNoteViaMcp)
     const mockResponse: CreateNoteViaMcpResponse = {
       created: {
         note: {
@@ -47,7 +49,7 @@ describe('add_note tool', () => {
     mockCreateNote.mockResolvedValue({
       data: mockResponse,
       error: undefined,
-    } as Awaited<ReturnType<typeof Services.createNoteViaMcp>>)
+    } as Awaited<ReturnType<typeof McpNoteCreationController.createNoteViaMcp>>)
 
     const ctx = createMockContext()
 

@@ -77,7 +77,6 @@ describe("Assimilation component", () => {
         { id: 2, removedFromTracking: true },
         { id: 3, removedFromTracking: false },
       ]
-      // @ts-expect-error - returnedTrackers type doesn't match exactly but is correct at runtime
       assimilateSpy.mockResolvedValue(wrapSdkResponse(returnedTrackers))
       const wrapper = renderer
         .withStorageProps({

@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import type { RecallSetting } from "@generated/backend"
-import { updateRecallSetting } from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropType } from "vue"
 import { defineComponent, computed, ref } from "vue"
@@ -62,7 +62,7 @@ export default defineComponent({
         ...formData.value,
         ...newValue,
       }
-      const { error } = await updateRecallSetting({
+      const { error } = await NoteController.updateRecallSetting({
         path: { note: props.noteId },
         body: formData.value,
       })

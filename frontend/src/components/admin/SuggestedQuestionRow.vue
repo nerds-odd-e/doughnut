@@ -29,7 +29,7 @@
 <script lang="ts">
 import usePopups from "@/components/commons/Popups/usePopups"
 import type { SuggestedQuestionForFineTuning } from "@generated/backend"
-import { duplicate, delete_ } from "@generated/backend/sdk.gen"
+import { FineTuningDataController } from "@generated/backend/sdk.gen"
 import type { PropType } from "vue"
 
 export default {
@@ -65,9 +65,10 @@ export default {
   },
   methods: {
     async duplicateQuestion(suggested: SuggestedQuestionForFineTuning) {
-      const { data: duplicated, error } = await duplicate({
-        path: { suggestedQuestion: suggested.id },
-      })
+      const { data: duplicated, error } =
+        await FineTuningDataController.duplicate({
+          path: { suggestedQuestion: suggested.id },
+        })
       if (!error && duplicated) {
         this.$emit("duplicated", duplicated)
       }
@@ -81,7 +82,7 @@ export default {
           `Are you sure to delete this suggestion (${suggested.preservedQuestion.f0__multipleChoicesQuestion.f0__stem})?`
         )
       ) {
-        await delete_({
+        await FineTuningDataController.delete({
           path: { suggestedQuestion: suggested.id },
         })
       }

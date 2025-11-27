@@ -54,7 +54,7 @@ import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionCompo
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
-import { getConversationsAboutNote } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import ConversationInner from "@/components/conversations/ConversationInner.vue"
 
 const props = defineProps<{
@@ -74,9 +74,10 @@ const isMaximized = ref(false)
 
 onMounted(async () => {
   if (props.conversation.subject?.note?.id) {
-    const { data: conversationsList, error } = await getConversationsAboutNote({
-      path: { note: props.conversation.subject.note.id },
-    })
+    const { data: conversationsList, error } =
+      await ConversationMessageController.getConversationsAboutNote({
+        path: { note: props.conversation.subject.note.id },
+      })
     if (!error) {
       conversations.value = conversationsList!
     }

@@ -59,11 +59,7 @@ import {
   inject,
   type Ref,
 } from "vue"
-import {
-  getConversation,
-  getConversationsOfCurrentUser,
-  markConversationAsRead,
-} from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
@@ -91,9 +87,10 @@ watch(
   () => props.conversationId,
   async (newId) => {
     if (newId) {
-      const { data: conversation, error } = await getConversation({
-        path: { conversationId: newId },
-      })
+      const { data: conversation, error } =
+        await ConversationMessageController.getConversation({
+          path: { conversationId: newId },
+        })
       if (!error) {
         currentConversation.value = conversation!
       }
@@ -105,7 +102,7 @@ watch(
 
 const fetchData = async () => {
   const { data: userConversations, error } =
-    await getConversationsOfCurrentUser()
+    await ConversationMessageController.getConversationsOfCurrentUser()
   if (!error) {
     conversations.value = userConversations!
 
@@ -119,9 +116,10 @@ const fetchData = async () => {
 }
 
 const handleConversationFetched = async (conversationId: number) => {
-  const { data: unreadConversations, error } = await markConversationAsRead({
-    path: { conversationId },
-  })
+  const { data: unreadConversations, error } =
+    await ConversationMessageController.markConversationAsRead({
+      path: { conversationId },
+    })
   if (!error) {
     messageCenterConversations.unreadConversations = unreadConversations!
   }

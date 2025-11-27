@@ -7,7 +7,7 @@ import {
   jsonResponse,
 } from '../helpers.js'
 import type { ToolResponse } from '../types.js'
-import * as Services from '@generated/backend/sdk.gen'
+import { NoteController } from '@generated/backend/sdk.gen'
 
 // Schema definition co-located with the tool
 const NoteIdParamsSchema = z.object({
@@ -28,7 +28,7 @@ async function getNoteById(
   noteId: number,
   tokenLimit: number
 ): Promise<ToolResponse> {
-  const response = await Services.getGraph({
+  const response = await NoteController.getGraph({
     path: { note: noteId },
     query: { tokenLimit },
   })

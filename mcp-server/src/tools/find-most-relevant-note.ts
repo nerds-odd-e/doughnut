@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { createTool } from './tool-builder.js'
 import { textResponse, jsonResponse } from '../helpers.js'
 import type { NoteSearchResult } from '@generated/backend'
-import * as Services from '@generated/backend/sdk.gen'
+import { SearchController } from '@generated/backend/sdk.gen'
 
 // Schema definitions co-located with the tool
 const SearchNoteParamsSchema = z.object({
@@ -43,7 +43,7 @@ For broader search results, consider breaking down complex queries into specific
   }
 
   try {
-    const response = await Services.searchForLinkTarget({
+    const response = await SearchController.searchForLinkTarget({
       body: searchTerm,
     })
 

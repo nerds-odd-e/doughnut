@@ -30,7 +30,7 @@
 import { ref, onMounted } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
-import { exportConversation } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 
 const props = defineProps<{
   conversationId: number
@@ -43,9 +43,10 @@ const emit = defineEmits<{
 const exportContent = ref("")
 
 onMounted(async () => {
-  const { data: response, error } = await exportConversation({
-    path: { conversationId: props.conversationId },
-  })
+  const { data: response, error } =
+    await ConversationMessageController.exportConversation({
+      path: { conversationId: props.conversationId },
+    })
   if (!error) {
     exportContent.value = JSON.stringify(response, null, 2)
   } else {

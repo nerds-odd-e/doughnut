@@ -83,7 +83,7 @@ import type { StorageAccessor } from "../../../store/createNoteStorage"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/backend"
-import { audioToText, suggestTitle } from "@generated/backend/sdk.gen"
+import { AiAudioController, AiController } from "@generated/backend/sdk.gen"
 import Waveform from "./Waveform.vue"
 import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
@@ -114,7 +114,7 @@ const shouldSuggestTitle = (callCount: number): boolean => {
 }
 
 const updateTopicIfSuggested = async (noteId: number) => {
-  const { data: suggestedTopic, error } = await suggestTitle({
+  const { data: suggestedTopic, error } = await AiController.suggestTitle({
     path: { note: noteId },
   })
   if (!error && suggestedTopic?.title) {
@@ -146,7 +146,7 @@ const getLastContentChunk = (
 const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
   isProcessing.value = true
   try {
-    const { data: response, error } = await audioToText({
+    const { data: response, error } = await AiAudioController.audioToText({
       body: {
         uploadAudioFile: chunk.data,
         additionalProcessingInstructions: processingInstructions.value,

@@ -9,7 +9,7 @@ import type { TimeTravel } from '@generated/backend'
 import type { TimeTravelRelativeToNow } from '@generated/backend'
 import type { SuggestedQuestionsData } from '@generated/backend'
 import type { NotesTestData } from '@generated/backend'
-import * as Services from '@generated/backend/sdk.gen'
+import { TestabilityRestController } from '@generated/backend/sdk.gen'
 
 const hourOfDay = (days: number, hours: number) => {
   return new Date(1976, 5, 1 + days, hours)
@@ -17,7 +17,7 @@ const hourOfDay = (days: number, hours: number) => {
 
 const cleanAndReset = (cy: Cypress.cy & CyEventEmitter, countdown: number) => {
   return cy
-    .wrap(Services.resetDbAndTestabilitySettings(), {
+    .wrap(TestabilityRestController.resetDbAndTestabilitySettings(), {
       log: false,
     })
     .then(
@@ -53,7 +53,7 @@ const testability = () => {
 
     featureToggle(enabled: boolean) {
       return cy.wrap(
-        Services.enableFeatureToggle({
+        TestabilityRestController.enableFeatureToggle({
           body: { enabled: enabled.toString() },
         }),
         { log: false }
@@ -74,7 +74,7 @@ const testability = () => {
       return cy.get(`@${injectedNoteIdMapAliasName}`).then((existingMap) => {
         return cy
           .wrap(
-            Services.injectNotes({
+            TestabilityRestController.injectNotes({
               body: requestBody,
             }).then((response) => {
               const data = unwrapData<Record<string, number>>(response)
@@ -110,7 +110,7 @@ const testability = () => {
     ) {
       return cy
         .wrap(
-          Services.injectPredefinedQuestion({
+          TestabilityRestController.injectPredefinedQuestion({
             body: predefinedQuestionsTestData,
           }),
           { log: false }
@@ -175,7 +175,7 @@ const testability = () => {
             target_id: toNoteId.toString(),
           }
 
-          const promise = Services.linkNotes({
+          const promise = TestabilityRestController.linkNotes({
             body: requestBody,
           })
           return cy.wrap(promise, { log: false })
@@ -185,7 +185,9 @@ const testability = () => {
     injectSuggestedQuestions(examples: Array<QuestionSuggestionParams>) {
       return cy.get<string>('@currentLoginUser').then((username) => {
         const requestBody: SuggestedQuestionsData = { examples, username }
-        const promise = Services.injectSuggestedQuestion({ body: requestBody })
+        const promise = TestabilityRestController.injectSuggestedQuestion({
+          body: requestBody,
+        })
         return cy.wrap(promise, { log: false })
       })
     },
@@ -230,7 +232,10 @@ const testability = () => {
     backendTimeTravelToDate(date: Date) {
       const requestBody: TimeTravel = { travel_to: JSON.stringify(date) }
 
-      return cy.wrap(Services.timeTravel({ body: requestBody }), { log: false })
+      return cy.wrap(
+        TestabilityRestController.timeTravel({ body: requestBody }),
+        { log: false }
+      )
     },
 
     backendTimeTravelTo(day: number, hour: number) {
@@ -238,7 +243,10 @@ const testability = () => {
         travel_to: JSON.stringify(hourOfDay(day, hour)),
       }
 
-      return cy.wrap(Services.timeTravel({ body: requestBody }), { log: false })
+      return cy.wrap(
+        TestabilityRestController.timeTravel({ body: requestBody }),
+        { log: false }
+      )
     },
 
     backendTimeTravelRelativeToNow(hours: number) {
@@ -247,7 +255,7 @@ const testability = () => {
       }
 
       return cy.wrap(
-        Services.timeTravelRelativeToNow({
+        TestabilityRestController.timeTravelRelativeToNow({
           body: requestBody,
         }),
         { log: false }
@@ -257,12 +265,15 @@ const testability = () => {
     randomizerSettings(strategy: 'first' | 'last' | 'seed', seed: number) {
       const requestBody: Randomization = { choose: strategy, seed }
 
-      return cy.wrap(Services.randomizer({ body: requestBody }), { log: false })
+      return cy.wrap(
+        TestabilityRestController.randomizer({ body: requestBody }),
+        { log: false }
+      )
     },
 
     triggerException() {
       return cy.wrap(
-        Services.triggerException().catch(() => {
+        TestabilityRestController.triggerException().catch(() => {
           // Expected: the exception triggers a 500 error which is caught and logged
           return Promise.resolve()
         }),
@@ -274,7 +285,7 @@ const testability = () => {
       const requestBody = { noteTopology }
 
       return cy.wrap(
-        Services.shareToBazaar({
+        TestabilityRestController.shareToBazaar({
           body: requestBody,
         }),
         { log: false }
@@ -282,14 +293,17 @@ const testability = () => {
     },
 
     injectCircle(circleInfo: Record<string, string>) {
-      return cy.wrap(Services.injectCircle({ body: circleInfo }), {
-        log: false,
-      })
+      return cy.wrap(
+        TestabilityRestController.injectCircle({ body: circleInfo }),
+        {
+          log: false,
+        }
+      )
     },
 
     updateCurrentUserSettingsWith(hash: Record<string, string>) {
       return cy.get<string>('@currentLoginUser').then((username) => {
-        const promise = Services.testabilityUpdateUser({
+        const promise = TestabilityRestController.testabilityUpdateUser({
           query: { username },
           body: hash,
         })
@@ -301,7 +315,7 @@ const testability = () => {
       const requestBody = { [serviceName]: serviceUrl }
 
       return cy.wrap(
-        Services.replaceServiceUrl({
+        TestabilityRestController.replaceServiceUrl({
           body: requestBody,
         }),
         { log: false }

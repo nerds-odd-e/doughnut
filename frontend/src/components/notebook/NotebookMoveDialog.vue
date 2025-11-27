@@ -18,7 +18,10 @@
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
 import type { Circle, Notebook } from "@generated/backend"
-import { index, moveToCircle } from "@generated/backend/sdk.gen"
+import {
+  CircleController,
+  NotebookController,
+} from "@generated/backend/sdk.gen"
 import usePopups from "@/components/commons/Popups/usePopups"
 
 const { popups } = usePopups()
@@ -33,7 +36,7 @@ const props = defineProps({
 const circles = ref<Circle[]>([])
 
 onMounted(async () => {
-  const { data: circlesList, error } = await index()
+  const { data: circlesList, error } = await CircleController.index()
   if (!error) {
     circles.value = circlesList || []
   }
@@ -41,7 +44,7 @@ onMounted(async () => {
 
 const move = async (circle: Circle) => {
   if (await popups.confirm(`Move notebook to ${circle.name}?`)) {
-    await moveToCircle({
+    await NotebookController.moveToCircle({
       path: {
         notebook: props.notebook.id,
         circle: circle.id,

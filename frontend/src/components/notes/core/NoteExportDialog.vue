@@ -71,7 +71,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import type { Note } from "@generated/backend"
-import { getDescendants, getGraph } from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import JsonExportSection from "../../commons/JsonExportSection.vue"
 
 const props = defineProps<{ note: Note }>()
@@ -87,7 +87,7 @@ watch(
   () => expandedDescendants.value,
   async (val) => {
     if (val && !jsonDescendants.value) {
-      const { data: descendants, error } = await getDescendants({
+      const { data: descendants, error } = await NoteController.getDescendants({
         path: { note: props.note.id },
       })
       if (!error && descendants) {
@@ -108,7 +108,7 @@ watch(
 
 async function fetchGraph() {
   loadingGraph.value = true
-  const { data: graph, error } = await getGraph({
+  const { data: graph, error } = await NoteController.getGraph({
     path: { note: props.note.id },
     query: { tokenLimit: tokenLimit.value },
   })

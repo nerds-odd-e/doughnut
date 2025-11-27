@@ -55,11 +55,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import {
-  deleteToken as deleteTokenApi,
-  generateToken as generateTokenApi,
-  getTokens,
-} from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 import PopButton from "@/components/commons/Popups/PopButton.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
@@ -78,7 +74,7 @@ const token = ref<string | null>(null)
 const loading = ref(false)
 
 const loadTokens = async () => {
-  const { data: tokensList, error } = await getTokens()
+  const { data: tokensList, error } = await UserController.getTokens()
   if (!error) {
     // tokensList is guaranteed to be UserToken[] when error is undefined
     tokens.value = tokensList!.map((t) => ({
@@ -92,7 +88,7 @@ loadTokens()
 
 const generateToken = async () => {
   loading.value = true
-  const { data: newToken, error } = await generateTokenApi({
+  const { data: newToken, error } = await UserController.generateToken({
     body: {
       label: tokenFormData.value.label,
     },
@@ -111,7 +107,7 @@ const generateToken = async () => {
 }
 
 const deleteToken = async (id: number) => {
-  const { error } = await deleteTokenApi({ path: { tokenId: id } })
+  const { error } = await UserController.deleteToken({ path: { tokenId: id } })
   if (!error) {
     tokens.value = tokens.value.filter((token) => token.id !== id)
   }

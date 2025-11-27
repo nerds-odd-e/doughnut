@@ -6,7 +6,7 @@ import {
   setupGlobalClient,
 } from "@/managedApi/clientSetup"
 import { client as globalClient } from "@generated/backend/client.gen"
-import { getUserProfile } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 import { vi } from "vitest"
 
 const mockToast = {
@@ -41,7 +41,7 @@ describe("clientSetup", () => {
         { url: `${baseUrl}/api/user` }
       )
 
-      await getUserProfile({ client: globalClientSilent })
+      await UserController.getUserProfile({ client: globalClientSilent })
 
       expect(loadingStateDuringCall).toBe(false)
       expect(apiStatus.states.length).toBe(0)
@@ -55,7 +55,9 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      const { error } = await getUserProfile({ client: globalClientSilent })
+      const { error } = await UserController.getUserProfile({
+        client: globalClientSilent,
+      })
 
       // Error should be returned but no toast should be shown
       expect(error).toBeDefined()
@@ -74,7 +76,7 @@ describe("clientSetup", () => {
         { url: `${baseUrl}/api/user` }
       )
 
-      await getUserProfile({ client: globalClient })
+      await UserController.getUserProfile({ client: globalClient })
 
       expect(loadingStateDuringCall).toBe(true)
       expect(apiStatus.states.length).toBe(0)
@@ -88,7 +90,9 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      const { error } = await getUserProfile({ client: globalClient })
+      const { error } = await UserController.getUserProfile({
+        client: globalClient,
+      })
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalled()
@@ -100,7 +104,9 @@ describe("clientSetup", () => {
         status: 404,
       })
 
-      const { error } = await getUserProfile({ client: globalClient })
+      const { error } = await UserController.getUserProfile({
+        client: globalClient,
+      })
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalledWith(
@@ -118,7 +124,9 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      const { error } = await getUserProfile({ client: globalClient })
+      const { error } = await UserController.getUserProfile({
+        client: globalClient,
+      })
 
       expect(error).toBeDefined()
       expect(mockToast.error).toHaveBeenCalledWith(
@@ -146,7 +154,7 @@ describe("clientSetup", () => {
       // Check loading state is set synchronously
       const promise = apiCallWithLoading((client) => {
         loadingStateBeforeCall = apiStatus.states.length > 0
-        return getUserProfile({ client })
+        return UserController.getUserProfile({ client })
       })
 
       // Loading should be set immediately (synchronously)
@@ -164,7 +172,9 @@ describe("clientSetup", () => {
         url: `${baseUrl}/api/user`,
       })
 
-      await apiCallWithLoading((client) => getUserProfile({ client }))
+      await apiCallWithLoading((client) =>
+        UserController.getUserProfile({ client })
+      )
 
       expect(apiStatus.states.length).toBe(0)
     })
@@ -175,7 +185,9 @@ describe("clientSetup", () => {
         status: 500,
       })
 
-      await apiCallWithLoading((client) => getUserProfile({ client }))
+      await apiCallWithLoading((client) =>
+        UserController.getUserProfile({ client })
+      )
 
       expect(apiStatus.states.length).toBe(0)
     })
@@ -184,7 +196,7 @@ describe("clientSetup", () => {
       fetchMock.mockReject(new Error("Network error"))
 
       const { error } = await apiCallWithLoading((client) =>
-        getUserProfile({ client })
+        UserController.getUserProfile({ client })
       )
 
       expect(error).toBeDefined()
@@ -198,7 +210,7 @@ describe("clientSetup", () => {
       })
 
       const { error } = await apiCallWithLoading((client) =>
-        getUserProfile({ client })
+        UserController.getUserProfile({ client })
       )
 
       expect(error).toBeDefined()
@@ -213,7 +225,7 @@ describe("clientSetup", () => {
       })
 
       const { data } = await apiCallWithLoading((client) =>
-        getUserProfile({ client })
+        UserController.getUserProfile({ client })
       )
 
       expect(data).toEqual(mockUser)
@@ -226,10 +238,10 @@ describe("clientSetup", () => {
 
       // Start two concurrent calls
       const promise1 = apiCallWithLoading((client) =>
-        getUserProfile({ client })
+        UserController.getUserProfile({ client })
       )
       const promise2 = apiCallWithLoading((client) =>
-        getUserProfile({ client })
+        UserController.getUserProfile({ client })
       )
 
       // Both should increment loading state

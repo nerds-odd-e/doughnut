@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref, onMounted, inject, type Ref } from "vue"
 import type { BazaarNotebook, User } from "@generated/backend"
-import { bazaar } from "@generated/backend/sdk.gen"
+import { BazaarController } from "@generated/backend/sdk.gen"
 import NotebookBazaarViewCards from "@/components/bazaar/NotebookBazaarViewCards.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 
@@ -27,7 +27,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 const bazaarNotebooks = ref<BazaarNotebook[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: notebooks, error } = await bazaar()
+  const { data: notebooks, error } = await BazaarController.bazaar()
   if (!error) {
     // notebooks is guaranteed to be BazaarNotebook[] when error is undefined
     bazaarNotebooks.value = notebooks!

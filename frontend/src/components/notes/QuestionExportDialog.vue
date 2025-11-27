@@ -30,7 +30,7 @@
 import { ref, onMounted } from "vue"
 import Modal from "@/components/commons/Modal.vue"
 import CopyButton from "@/components/commons/CopyButton.vue"
-import { exportQuestionGeneration } from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
 
 const props = defineProps<{
   noteId: number
@@ -43,9 +43,10 @@ const emit = defineEmits<{
 const exportContent = ref("")
 
 onMounted(async () => {
-  const { data: response, error } = await exportQuestionGeneration({
-    path: { note: props.noteId },
-  })
+  const { data: response, error } =
+    await PredefinedQuestionController.exportQuestionGeneration({
+      path: { note: props.noteId },
+    })
   if (!error && response) {
     exportContent.value = JSON.stringify(response, null, 2)
   } else {

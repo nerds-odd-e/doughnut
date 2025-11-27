@@ -46,7 +46,7 @@ import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithBut
 import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import type { CircleForUserView, User } from "@generated/backend"
-import { showCircle } from "@generated/backend/sdk.gen"
+import { CircleController } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType, Ref } from "vue"
 import { computed, inject, onMounted, ref } from "vue"
@@ -67,7 +67,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 const circle = ref<CircleForUserView | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: circleData, error } = await showCircle({
+  const { data: circleData, error } = await CircleController.showCircle({
     path: { circle: circleId },
   })
   if (!error) {

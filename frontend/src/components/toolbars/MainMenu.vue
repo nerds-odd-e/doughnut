@@ -101,9 +101,9 @@ import { useRoute } from "vue-router"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
 import {
-  getAssimilationCount,
-  overview,
-  getUnreadConversations,
+  AssimilationController,
+  ConversationMessageController,
+  RecallsController,
 } from "@generated/backend/sdk.gen"
 import { watch, computed, ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
@@ -133,9 +133,10 @@ const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
 const fetchDueCount = async () => {
-  const { data: count, error } = await getAssimilationCount({
-    query: { timezone: timezoneParam() },
-  })
+  const { data: count, error } =
+    await AssimilationController.getAssimilationCount({
+      query: { timezone: timezoneParam() },
+    })
   if (!error && count) {
     setDueCount(count.dueCount)
     setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
@@ -144,7 +145,7 @@ const fetchDueCount = async () => {
 }
 
 const fetchRecallCount = async () => {
-  const { data: overviewData, error } = await overview({
+  const { data: overviewData, error } = await RecallsController.overview({
     query: { timezone: timezoneParam() },
   })
   if (!error && overviewData) {
@@ -155,7 +156,8 @@ const fetchRecallCount = async () => {
 }
 
 const fetchUnreadMessageCount = async () => {
-  const { data: unreadConversations, error } = await getUnreadConversations()
+  const { data: unreadConversations, error } =
+    await ConversationMessageController.getUnreadConversations()
   if (!error && unreadConversations !== undefined) {
     messageCenterConversations.unreadConversations = unreadConversations
   }

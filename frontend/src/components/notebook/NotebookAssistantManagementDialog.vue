@@ -22,11 +22,7 @@
 
 <script setup lang="ts">
 import type { Notebook } from "@generated/backend"
-import {
-  updateAiAssistant,
-  downloadNotebookDump as downloadNotebookDumpApi,
-  getAiAssistant,
-} from "@generated/backend/sdk.gen"
+import { NotebookController } from "@generated/backend/sdk.gen"
 import type { PropType } from "vue"
 import { ref, onMounted } from "vue"
 import { saveAs } from "file-saver"
@@ -42,7 +38,7 @@ const additionalInstruction = ref("")
 const emit = defineEmits(["close"])
 
 const updateAiInstructions = async () => {
-  const { error } = await updateAiAssistant({
+  const { error } = await NotebookController.updateAiAssistant({
     path: { notebook: props.notebook.id },
     body: {
       additionalInstructions: additionalInstruction.value,
@@ -57,7 +53,7 @@ const updateAiInstructions = async () => {
 }
 
 const downloadNotebookDump = async () => {
-  const { data: notes, error } = await downloadNotebookDumpApi({
+  const { data: notes, error } = await NotebookController.downloadNotebookDump({
     path: { notebook: props.notebook.id },
   })
   if (!error && notes) {
@@ -69,7 +65,7 @@ const downloadNotebookDump = async () => {
 }
 
 const loadCurrentSettings = async () => {
-  const { data: assistant, error } = await getAiAssistant({
+  const { data: assistant, error } = await NotebookController.getAiAssistant({
     path: { notebook: props.notebook.id },
   })
   if (!error && assistant) {

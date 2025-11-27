@@ -11,10 +11,7 @@
 
 <script lang="ts">
 import type { NoteAccessoriesDto, NoteAccessory } from "@generated/backend"
-import {
-  showNoteAccessory,
-  updateNoteAccessories,
-} from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { defineComponent } from "vue"
 import ImageFormBody from "./ImageFormBody.vue"
@@ -37,19 +34,22 @@ export default defineComponent({
 
   methods: {
     async fetchData() {
-      const { data: accessory, error } = await showNoteAccessory({
-        path: { note: this.noteId },
-      })
+      const { data: accessory, error } = await NoteController.showNoteAccessory(
+        {
+          path: { note: this.noteId },
+        }
+      )
       if (!error) {
         this.noteAccessory = accessory!
         this.formData = { ...this.noteAccessory }
       }
     },
     async processForm() {
-      const { data: updatedAccessory, error } = await updateNoteAccessories({
-        path: { note: this.noteId },
-        body: this.formData,
-      })
+      const { data: updatedAccessory, error } =
+        await NoteController.updateNoteAccessories({
+          path: { note: this.noteId },
+          body: this.formData,
+        })
       if (error) {
         const errorObj = toOpenApiError(error)
         this.noteFormErrors = errorObj.errors || {}

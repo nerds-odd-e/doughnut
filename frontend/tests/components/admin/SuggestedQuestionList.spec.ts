@@ -49,7 +49,7 @@ describe("Edit Suggested Question", () => {
           .component(SuggestedQuestionList)
           .withProps({ suggestedQuestions: [suggestedQuestion] })
           .mount()
-        const mockDelete = mockSdkService("delete_", undefined as never)
+        const mockDelete = mockSdkService("delete", undefined as never)
         matchByText(wrapper, /Del/, "button")!.trigger("click")
         usePopups().popups.done(true)
         await flushPromises()

@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
 import type { User } from "@generated/backend"
-import { getUserProfile, updateUser } from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import { onMounted, ref } from "vue"
 import { toOpenApiError } from "@/managedApi/openApiError"
@@ -46,7 +46,7 @@ const formData = ref<User | undefined>()
 const errors = ref<Record<string, string>>({})
 
 const fetchData = async () => {
-  const { data, error } = await getUserProfile()
+  const { data, error } = await UserController.getUserProfile()
   if (!error && data) {
     formData.value = data
   }
@@ -54,7 +54,7 @@ const fetchData = async () => {
 
 const processForm = async () => {
   if (!formData.value) return
-  const { data: updatedUser, error } = await updateUser({
+  const { data: updatedUser, error } = await UserController.updateUser({
     path: { user: formData.value.id },
     body: formData.value,
   })

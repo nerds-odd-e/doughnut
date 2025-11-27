@@ -12,7 +12,7 @@
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import type { AnsweredQuestion } from "@generated/backend"
-import { showQuestion } from "@generated/backend/sdk.gen"
+import { RecallPromptController } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { onMounted, ref, watch, type PropType } from "vue"
 
@@ -26,7 +26,7 @@ const { recallPromptId } = defineProps({
 const answeredQuestion = ref<AnsweredQuestion | undefined>()
 
 const fetchData = async () => {
-  const { data: question, error } = await showQuestion({
+  const { data: question, error } = await RecallPromptController.showQuestion({
     path: { recallPrompt: recallPromptId },
   })
   if (!error) {

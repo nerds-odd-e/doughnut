@@ -12,8 +12,8 @@
 import NoteFormTitleOnly from "@/components/notes/NoteFormTitleOnly.vue"
 import type { Circle, NoteCreationDto } from "@generated/backend"
 import {
-  createNotebookInCircle,
-  createNotebook,
+  CircleController,
+  NotebookController,
 } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropType } from "vue"
@@ -35,11 +35,11 @@ export default {
   methods: {
     async processForm() {
       const { data: result, error } = this.circle
-        ? await createNotebookInCircle({
+        ? await CircleController.createNotebookInCircle({
             path: { circle: this.circle.id },
             body: this.noteFormData,
           })
-        : await createNotebook({
+        : await NotebookController.createNotebook({
             body: this.noteFormData,
           })
       if (!error) {

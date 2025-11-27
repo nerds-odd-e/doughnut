@@ -42,7 +42,7 @@ import type {
   PredefinedQuestion,
   QuestionSuggestionCreationParams,
 } from "@generated/backend"
-import { suggestQuestionForFineTuning as suggestQuestionForFineTuningApi } from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
 import { ref } from "vue"
 
 const params = ref<QuestionSuggestionCreationParams>({
@@ -59,10 +59,11 @@ const emit = defineEmits(["closeDialog"])
 const { predefinedQuestion } = props
 
 async function suggestQuestionForFineTuning() {
-  const { error } = await suggestQuestionForFineTuningApi({
-    path: { predefinedQuestion: predefinedQuestion.id },
-    body: params.value,
-  })
+  const { error } =
+    await PredefinedQuestionController.suggestQuestionForFineTuning({
+      path: { predefinedQuestion: predefinedQuestion.id },
+      body: params.value,
+    })
   if (!error) {
     emit("closeDialog")
   }

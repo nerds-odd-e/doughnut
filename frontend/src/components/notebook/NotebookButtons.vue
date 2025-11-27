@@ -46,7 +46,7 @@ import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
 import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import type { Notebook, User } from "@generated/backend"
-import { shareNotebook as shareNotebookApi } from "@generated/backend/sdk.gen"
+import { NotebookController } from "@generated/backend/sdk.gen"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
@@ -62,7 +62,7 @@ const props = defineProps<{
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {
-    const { error } = await shareNotebookApi({
+    const { error } = await NotebookController.shareNotebook({
       path: { notebook: props.notebook.id },
     })
     if (!error) {

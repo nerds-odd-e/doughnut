@@ -34,7 +34,7 @@
 <script lang="ts">
 import type { User } from "@generated/backend"
 import type { Randomization } from "@generated/backend"
-import { randomizer, enableFeatureToggle } from "@generated/backend/sdk.gen"
+import { TestabilityRestController } from "@generated/backend/sdk.gen"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
 import CheckInput from "../form/CheckInput.vue"
@@ -60,7 +60,7 @@ export default defineComponent({
   },
   methods: {
     async updateRandomSelector() {
-      await randomizer({
+      await TestabilityRestController.randomizer({
         body: {
           choose: this.randomSelector,
           seed: this.seed,
@@ -68,7 +68,7 @@ export default defineComponent({
       })
     },
     async updateFeatureToggle(value) {
-      await enableFeatureToggle({
+      await TestabilityRestController.enableFeatureToggle({
         body: {
           enabled: value,
         },

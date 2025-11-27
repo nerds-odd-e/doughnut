@@ -23,7 +23,7 @@
 <script lang="ts">
 import TextInput from "@/components/form/TextInput.vue"
 import type { Notebook, SubscriptionDto } from "@generated/backend"
-import { createSubscription } from "@generated/backend/sdk.gen"
+import { SubscriptionController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import type { PropType } from "vue"
 import { defineComponent } from "vue"
@@ -44,7 +44,7 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { error } = await createSubscription({
+      const { error } = await SubscriptionController.createSubscription({
         path: { notebook: this.notebook.id },
         body: this.formData,
       })

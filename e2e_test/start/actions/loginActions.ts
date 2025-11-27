@@ -1,5 +1,5 @@
 import { mainMenu } from '../pageObjects/mainMenu'
-import * as Services from '@generated/backend/sdk.gen'
+import { HealthCheckController } from '@generated/backend/sdk.gen'
 
 export const loginActions = {
   logout() {
@@ -23,7 +23,7 @@ export const loginActions = {
     // Call the service directly - it will use cy.request via our custom request function
     cy.wrap(username).as('currentLoginUser')
     return cy.wrap(
-      Services.ping({
+      HealthCheckController.ping({
         headers: {
           Authorization: `Basic ${btoa(`${username}:password`)}`,
         },

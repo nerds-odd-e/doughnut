@@ -4,6 +4,7 @@ import type { ComponentPublicInstance } from "vue"
 import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import type { UpdateNoteDetailsData } from "@generated/backend"
 
 describe("NoteEditableDetails", () => {
   let updateNoteDetailsSpy: ReturnType<
@@ -52,12 +53,14 @@ describe("NoteEditableDetails", () => {
     detailsEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    const calls = updateNoteDetailsSpy.mock.calls
+    const calls = updateNoteDetailsSpy.mock.calls as Array<
+      [UpdateNoteDetailsData]
+    >
     expect(
       calls.some(
         (call) =>
           call[0].path?.note === secondNoteId &&
-          call[0].body.details === "Edited details from first note"
+          call[0].body?.details === "Edited details from first note"
       )
     ).toBe(false)
     expect(calls.some((call) => call[0].path?.note === firstNoteId)).toBe(false)
@@ -66,7 +69,7 @@ describe("NoteEditableDetails", () => {
         calls.some(
           (call) =>
             call[0].path?.note === secondNoteId &&
-            call[0].body.details === "New edits on second note"
+            call[0].body?.details === "New edits on second note"
         )
       ).toBe(true)
     }
@@ -203,20 +206,22 @@ describe("NoteEditableDetails", () => {
       resolveFirstSave = resolve
     })
 
-    // @ts-expect-error - Complex return type that matches at runtime
-    updateNoteDetailsSpy.mockImplementation(async (options) => {
-      if (options.body.details === "First edit") {
+    updateNoteDetailsSpy.mockImplementation((async (
+      options: UpdateNoteDetailsData
+    ) => {
+      if (options.body?.details === "First edit") {
         await firstSavePromise
       }
       return wrapSdkResponse({
         id: noteId,
         note: {
           id: noteId,
-          details: options.body.details,
+          details: options.body?.details,
           noteTopology: { id: noteId, titleOrPredicate: "Test Note" },
         },
       })
-    })
+      // biome-ignore lint/suspicious/noExplicitAny: Vitest mock typing requires any for implementation functions
+    }) as any)
 
     const wrapper = helper
       .component(NoteEditableDetails)

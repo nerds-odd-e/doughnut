@@ -15,7 +15,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import type { Circle, CircleJoiningByInvitation } from "@generated/backend"
-import { joinCircle } from "@generated/backend/sdk.gen"
+import { CircleController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import TextInput from "@/components/form/TextInput.vue"
 
@@ -37,7 +37,7 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { data: joinedCircle, error } = await joinCircle({
+      const { data: joinedCircle, error } = await CircleController.joinCircle({
         body: this.formData,
       })
       if (!error) {

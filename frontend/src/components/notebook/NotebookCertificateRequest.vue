@@ -12,10 +12,7 @@
 import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Notebook, NotebookCertificateApproval } from "@generated/backend"
-import {
-  getApprovalForNotebook,
-  requestApprovalForNotebook,
-} from "@generated/backend/sdk.gen"
+import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
@@ -25,9 +22,10 @@ const loaded = ref(false)
 const approval = ref<NotebookCertificateApproval | undefined>()
 
 onMounted(async () => {
-  const { data: dto, error } = await getApprovalForNotebook({
-    path: { notebook: props.notebook.id },
-  })
+  const { data: dto, error } =
+    await NotebookCertificateApprovalController.getApprovalForNotebook({
+      path: { notebook: props.notebook.id },
+    })
   if (!error) {
     approval.value = dto!.approval
     loaded.value = true
@@ -60,9 +58,10 @@ const isApprovalButtonDisabled = computed(() => {
   return approval.value !== undefined && approval.value !== null
 })
 const requestNotebookApproval = async () => {
-  const { data: newApproval, error } = await requestApprovalForNotebook({
-    path: { notebook: props.notebook.id },
-  })
+  const { data: newApproval, error } =
+    await NotebookCertificateApprovalController.requestApprovalForNotebook({
+      path: { notebook: props.notebook.id },
+    })
   if (!error) {
     approval.value = newApproval!
   }

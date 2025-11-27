@@ -95,12 +95,7 @@ import type { PropType } from "vue"
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import type { Notebook, User } from "@generated/backend"
-import {
-  updateNotebook,
-  importObsidian,
-  resetNotebookIndex,
-  updateNotebookIndex,
-} from "@generated/backend/sdk.gen"
+import { NotebookController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "../form/TextInput.vue"
@@ -139,7 +134,7 @@ const isIndexing = ref(false)
 const showIndexingComplete = ref(false)
 
 const processForm = async () => {
-  const { error } = await updateNotebook({
+  const { error } = await NotebookController.updateNotebook({
     path: { notebook: props.notebook.id },
     body: formData.value,
   })
@@ -167,7 +162,7 @@ const handleObsidianImport = async (event: Event) => {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
 
-  const { error } = await importObsidian({
+  const { error } = await NotebookController.importObsidian({
     path: { notebook: props.notebook.id },
     body: { file },
   })
@@ -183,7 +178,7 @@ const handleObsidianImport = async (event: Event) => {
 
 const reindexNotebook = async () => {
   isIndexing.value = true
-  const { error } = await resetNotebookIndex({
+  const { error } = await NotebookController.resetNotebookIndex({
     path: { notebook: props.notebook.id },
   })
   if (!error) {
@@ -197,7 +192,7 @@ const reindexNotebook = async () => {
 
 const updateIndexNotebook = async () => {
   isIndexing.value = true
-  const { error } = await updateNotebookIndex({
+  const { error } = await NotebookController.updateNotebookIndex({
     path: { notebook: props.notebook.id },
   })
   if (!error) {

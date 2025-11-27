@@ -15,7 +15,7 @@
 import { ref, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { MemoryTracker } from "@generated/backend"
-import { showMemoryTracker } from "@generated/backend/sdk.gen"
+import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "../notes/NoteShow.vue"
 
@@ -30,9 +30,10 @@ const memoryTracker = ref<MemoryTracker>()
 
 // Methods
 const fetchData = async () => {
-  const { data: tracker, error } = await showMemoryTracker({
-    path: { memoryTracker: props.memoryTrackerId },
-  })
+  const { data: tracker, error } =
+    await MemoryTrackerController.showMemoryTracker({
+      path: { memoryTracker: props.memoryTrackerId },
+    })
   if (!error) {
     memoryTracker.value = tracker!
   }

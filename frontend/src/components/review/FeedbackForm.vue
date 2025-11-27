@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import type { AssessmentQuestionInstance } from "@generated/backend"
 import { ref } from "vue"
-import { startConversationAboutAssessmentQuestion } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 
 const props = defineProps<{
   question: AssessmentQuestionInstance
@@ -32,10 +32,13 @@ const feedback = ref<string>("")
 const emit = defineEmits(["submitted"])
 
 async function submitFeedback() {
-  const { error } = await startConversationAboutAssessmentQuestion({
-    path: { assessmentQuestion: props.question.id },
-    body: feedback.value,
-  })
+  const { error } =
+    await ConversationMessageController.startConversationAboutAssessmentQuestion(
+      {
+        path: { assessmentQuestion: props.question.id },
+        body: feedback.value,
+      }
+    )
   if (!error) {
     emit("submitted")
   }

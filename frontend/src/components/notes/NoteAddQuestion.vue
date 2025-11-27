@@ -64,11 +64,7 @@
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/backend"
-import {
-  addQuestionManually,
-  refineQuestion as refineQuestionApi,
-  generateQuestionWithoutSave,
-} from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
 import isMCQWithAnswerValid from "@/models/isMCQWithAnswerValid"
 import TextArea from "../form/TextArea.vue"
 import TextInput from "../form/TextInput.vue"
@@ -135,10 +131,11 @@ const removeChoice = () => {
 
 const submitQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
-  const { data: response, error } = await addQuestionManually({
-    path: { note: props.note.id },
-    body: recallPrompt,
-  })
+  const { data: response, error } =
+    await PredefinedQuestionController.addQuestionManually({
+      path: { note: props.note.id },
+      body: recallPrompt,
+    })
   if (!error && response) {
     emit("close-dialog", response)
   }
@@ -146,19 +143,21 @@ const submitQuestion = async () => {
 
 const refineQuestion = async () => {
   const recallPrompt = predefinedQuestion.value
-  const { data: refined, error } = await refineQuestionApi({
-    path: { note: props.note.id },
-    body: recallPrompt,
-  })
+  const { data: refined, error } =
+    await PredefinedQuestionController.refineQuestion({
+      path: { note: props.note.id },
+      body: recallPrompt,
+    })
   if (!error && refined) {
     predefinedQuestion.value = refined
   }
 }
 
 const generateQuestionByAI = async () => {
-  const { data: generated, error } = await generateQuestionWithoutSave({
-    query: { note: props.note.id },
-  })
+  const { data: generated, error } =
+    await PredefinedQuestionController.generateQuestionWithoutSave({
+      query: { note: props.note.id },
+    })
   if (!error && generated) {
     predefinedQuestion.value = generated
   }

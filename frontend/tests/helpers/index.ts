@@ -1,11 +1,185 @@
 import RenderingHelper from "./RenderingHelper"
 import matchByText from "./matchByText"
 import { vi } from "vitest"
-import * as sdk from "@generated/backend/sdk.gen"
+import {
+  UserController,
+  TestabilityRestController,
+  SubscriptionController,
+  GlobalSettingsController,
+  RecallPromptController,
+  PredefinedQuestionController,
+  NoteCreationController,
+  NoteController,
+  SearchController,
+  NotebookController,
+  NotebookCertificateApprovalController,
+  MemoryTrackerController,
+  McpNoteCreationController,
+  LinkController,
+  FineTuningDataController,
+  ConversationMessageController,
+  CircleController,
+  CertificateController,
+  BazaarController,
+  AiAudioController,
+  AssimilationController,
+  AssessmentController,
+  AiController,
+  TextContentController,
+  WikidataController,
+  CurrentUserInfoController,
+  RecallsController,
+  HealthCheckController,
+  FailureReportController,
+} from "@generated/backend/sdk.gen"
 import type { NoteRealm } from "@generated/backend"
 
-type SdkServiceName = keyof typeof sdk
-type SdkService<K extends SdkServiceName> = (typeof sdk)[K]
+// Mapping of method names to their controller classes
+// biome-ignore lint/suspicious/noExplicitAny: Controller classes have different types and need any for dynamic access
+const methodToController: Record<string, any> = {
+  getUserProfile: UserController,
+  createUser: UserController,
+  generateToken: UserController,
+  updateUser: UserController,
+  getTokens: UserController,
+  deleteToken: UserController,
+  closeAllGithubIssues: TestabilityRestController,
+  triggerException: TestabilityRestController,
+  timeTravelRelativeToNow: TestabilityRestController,
+  timeTravel: TestabilityRestController,
+  testabilityUpdateUser: TestabilityRestController,
+  shareToBazaar: TestabilityRestController,
+  replaceServiceUrl: TestabilityRestController,
+  randomizer: TestabilityRestController,
+  linkNotes: TestabilityRestController,
+  injectSuggestedQuestion: TestabilityRestController,
+  injectNotes: TestabilityRestController,
+  injectCircle: TestabilityRestController,
+  injectPredefinedQuestion: TestabilityRestController,
+  getFeatureToggle: TestabilityRestController,
+  enableFeatureToggle: TestabilityRestController,
+  resetDbAndTestabilitySettings: TestabilityRestController,
+  githubIssues: TestabilityRestController,
+  updateSubscription: SubscriptionController,
+  destroySubscription: SubscriptionController,
+  createSubscription: SubscriptionController,
+  getCurrentModelVersions: GlobalSettingsController,
+  setCurrentModelVersions: GlobalSettingsController,
+  regenerate: RecallPromptController,
+  contest: RecallPromptController,
+  answerQuiz: RecallPromptController,
+  showQuestion: RecallPromptController,
+  askAQuestion: RecallPromptController,
+  toggleApproval: PredefinedQuestionController,
+  suggestQuestionForFineTuning: PredefinedQuestionController,
+  refineQuestion: PredefinedQuestionController,
+  getAllQuestionByNote: PredefinedQuestionController,
+  addQuestionManually: PredefinedQuestionController,
+  generateQuestionWithoutSave: PredefinedQuestionController,
+  exportQuestionGeneration: PredefinedQuestionController,
+  createNoteAfter: NoteCreationController,
+  createNoteUnderParent: NoteCreationController,
+  updateWikidataId: NoteController,
+  updateRecallSetting: NoteController,
+  deleteNote: NoteController,
+  moveAfter: NoteController,
+  showNote: NoteController,
+  updateNoteAccessories: NoteController,
+  undoDeleteNote: NoteController,
+  getNoteInfo: NoteController,
+  getGraph: NoteController,
+  getDescendants: NoteController,
+  showNoteAccessory: NoteController,
+  getRecentNotes: NoteController,
+  semanticSearchWithin: SearchController,
+  searchForLinkTargetWithin: SearchController,
+  semanticSearch: SearchController,
+  searchForLinkTarget: SearchController,
+  get: NotebookController,
+  updateNotebook: NotebookController,
+  updateNotebookIndex: NotebookController,
+  shareNotebook: NotebookController,
+  resetNotebookIndex: NotebookController,
+  downloadNotebookForObsidian: NotebookController,
+  importObsidian: NotebookController,
+  createNotebook: NotebookController,
+  moveToCircle: NotebookController,
+  getAiAssistant: NotebookController,
+  updateAiAssistant: NotebookController,
+  myNotebooks: NotebookController,
+  getNotes: NotebookController,
+  downloadNotebookDump: NotebookController,
+  approve: NotebookCertificateApprovalController,
+  requestApprovalForNotebook: NotebookCertificateApprovalController,
+  getAllPendingRequest: NotebookCertificateApprovalController,
+  getApprovalForNotebook: NotebookCertificateApprovalController,
+  selfEvaluate: MemoryTrackerController,
+  removeFromRepeating: MemoryTrackerController,
+  answerSpelling: MemoryTrackerController,
+  markAsRepeated: MemoryTrackerController,
+  showMemoryTracker: MemoryTrackerController,
+  getSpellingQuestion: MemoryTrackerController,
+  getRecentlyReviewed: MemoryTrackerController,
+  getRecentMemoryTrackers: MemoryTrackerController,
+  createNoteViaMcp: McpNoteCreationController,
+  updateLink: LinkController,
+  moveNote: LinkController,
+  linkNoteFinalize: LinkController,
+  duplicate: FineTuningDataController,
+  delete: FineTuningDataController,
+  uploadAndTriggerFineTuning: FineTuningDataController,
+  updateSuggestedQuestionForFineTuning: FineTuningDataController,
+  getAllSuggestedQuestions: FineTuningDataController,
+  replyToConversation: ConversationMessageController,
+  getAiReply: ConversationMessageController,
+  startConversationAboutRecallPrompt: ConversationMessageController,
+  getConversationsAboutNote: ConversationMessageController,
+  startConversationAboutNote: ConversationMessageController,
+  startConversationAboutAssessmentQuestion: ConversationMessageController,
+  markConversationAsRead: ConversationMessageController,
+  getConversation: ConversationMessageController,
+  getConversationMessages: ConversationMessageController,
+  exportConversation: ConversationMessageController,
+  getUnreadConversations: ConversationMessageController,
+  getConversationsOfCurrentUser: ConversationMessageController,
+  index: CircleController,
+  createCircle: CircleController,
+  createNotebookInCircle: CircleController,
+  joinCircle: CircleController,
+  showCircle: CircleController,
+  getCertificate: CertificateController,
+  claimCertificate: CertificateController,
+  removeFromBazaar: BazaarController,
+  bazaar: BazaarController,
+  audioToText: AiAudioController,
+  assimilate: AssimilationController,
+  getAssimilationCount: AssimilationController,
+  assimilating: AssimilationController,
+  answerQuestion: AssessmentController,
+  submitAssessmentResult: AssessmentController,
+  generateAssessmentQuestions: AssessmentController,
+  getMyAssessments: AssessmentController,
+  suggestTitle: AiController,
+  generateImage: AiController,
+  dummyEntryToGenerateDataTypesThatAreRequiredInEventStream: AiController,
+  getAvailableGptModels: AiController,
+  updateNoteTitle: TextContentController,
+  updateNoteDetails: TextContentController,
+  searchWikidata: WikidataController,
+  fetchWikidataEntityDataById: WikidataController,
+  currentUserInfo: CurrentUserInfoController,
+  recalling: RecallsController,
+  overview: RecallsController,
+  ping: HealthCheckController,
+  dataUpgrade: HealthCheckController,
+  failureReports: FailureReportController,
+  showFailureReport: FailureReportController,
+  deleteFailureReports: FailureReportController,
+}
+
+type SdkServiceName = keyof typeof methodToController
+type SdkController<K extends SdkServiceName> = (typeof methodToController)[K]
+type SdkService<K extends SdkServiceName> = SdkController<K>[K]
 type SdkServiceReturnType<K extends SdkServiceName> = ReturnType<SdkService<K>>
 type SdkServiceData<K extends SdkServiceName> = Awaited<
   SdkServiceReturnType<K>
@@ -101,9 +275,13 @@ export function mockSdkService<K extends SdkServiceName>(
   serviceName: K,
   data: SdkServiceData<K>
 ) {
+  const controller = methodToController[serviceName]
+  if (!controller) {
+    throw new Error(`Unknown service: ${serviceName}`)
+  }
   return (
     vi
-      .spyOn(sdk, serviceName)
+      .spyOn(controller, serviceName)
       // biome-ignore lint/suspicious/noExplicitAny: SDK response types are complex unions that require any for proper mocking
       .mockResolvedValue(wrapSdkResponse(data) as any)
   )
@@ -132,8 +310,12 @@ export function mockSdkServiceWithImplementation<K extends SdkServiceName>(
     options: SdkServiceOptions<K>
   ) => Promise<SdkServiceData<K>> | SdkServiceData<K>
 ) {
+  const controller = methodToController[serviceName]
+  if (!controller) {
+    throw new Error(`Unknown service: ${serviceName}`)
+  }
   // biome-ignore lint/suspicious/noExplicitAny: Vitest spy types are complex and require any for proper typing
-  const spy = vi.spyOn(sdk, serviceName) as any
+  const spy = vi.spyOn(controller, serviceName) as any
   spy.mockImplementation(async (options: SdkServiceOptions<K>) => {
     const result = await implementation(options)
     return {

@@ -44,10 +44,7 @@ import { inject, ref, type Ref, onMounted } from "vue"
 import type { Conversation, User } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
-import {
-  getConversationsAboutNote,
-  startConversationAboutNote,
-} from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 
 const conversation = ref<Conversation | undefined>()
 const user = inject<Ref<User | undefined>>("currentUser")
@@ -66,7 +63,7 @@ const initialAiReply = ref(false)
 onMounted(async () => {
   try {
     const { data: fetchedConversations, error } =
-      await getConversationsAboutNote({
+      await ConversationMessageController.getConversationsAboutNote({
         path: { note: props.noteId },
       })
     if (!error && fetchedConversations) {
@@ -85,10 +82,11 @@ const handleConversationChange = (conversationId: number) => {
 
 async function startConversationWithMessage(message: string) {
   initialAiReply.value = false
-  const { data: newConversation, error } = await startConversationAboutNote({
-    path: { note: props.noteId },
-    body: message,
-  })
+  const { data: newConversation, error } =
+    await ConversationMessageController.startConversationAboutNote({
+      path: { note: props.noteId },
+      body: message,
+    })
   if (!error) {
     conversation.value = newConversation!
     emit("submitted")
@@ -97,10 +95,11 @@ async function startConversationWithMessage(message: string) {
 
 async function startConversationWithMessageAndAI(message: string) {
   initialAiReply.value = true
-  const { data: newConversation, error } = await startConversationAboutNote({
-    path: { note: props.noteId },
-    body: message,
-  })
+  const { data: newConversation, error } =
+    await ConversationMessageController.startConversationAboutNote({
+      path: { note: props.noteId },
+      body: message,
+    })
   if (!error) {
     conversation.value = newConversation!
     emit("submitted")

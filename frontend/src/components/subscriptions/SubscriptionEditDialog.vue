@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, type PropType } from "vue"
 import type { Subscription, SubscriptionDto } from "@generated/backend"
-import { updateSubscription } from "@generated/backend/sdk.gen"
+import { SubscriptionController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import TextInput from "../form/TextInput.vue"
 
@@ -36,7 +36,7 @@ export default defineComponent({
 
   methods: {
     async processForm() {
-      const { error } = await updateSubscription({
+      const { error } = await SubscriptionController.updateSubscription({
         path: { subscription: this.subscription.id },
         body: this.formData,
       })

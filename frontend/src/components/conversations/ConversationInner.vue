@@ -59,10 +59,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
-import {
-  getConversationMessages,
-  replyToConversation,
-} from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import type {
   User,
   ConversationMessage,
@@ -120,9 +117,10 @@ const isCurrentUser = (id: number): boolean => {
 const fetchConversationMessages = async () => {
   if (!conversation.id) return
 
-  const { data: messages, error } = await getConversationMessages({
-    path: { conversationId: conversation.id },
-  })
+  const { data: messages, error } =
+    await ConversationMessageController.getConversationMessages({
+      path: { conversationId: conversation.id },
+    })
   if (!error) {
     currentConversationMessages.value = messages!
   }
@@ -133,7 +131,7 @@ const handleSendMessage = async (
   message: string,
   inviteAI: boolean = false
 ) => {
-  const { error } = await replyToConversation({
+  const { error } = await ConversationMessageController.replyToConversation({
     path: { conversationId: conversation.id },
     body: message,
   })

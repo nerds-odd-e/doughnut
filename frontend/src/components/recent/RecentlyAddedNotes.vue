@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
 import type { NoteRealm } from "@generated/backend"
-import { getRecentNotes } from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import NoteTitleWithLink from "@/components/notes/NoteTitleWithLink.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NotebookLink from "@/components/notes/NotebookLink.vue"
@@ -37,7 +37,7 @@ import NotebookLink from "@/components/notes/NotebookLink.vue"
 const notes = ref<NoteRealm[] | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: recentNotes, error } = await getRecentNotes()
+  const { data: recentNotes, error } = await NoteController.getRecentNotes()
   if (!error) {
     notes.value = recentNotes!
   }

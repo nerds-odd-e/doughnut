@@ -11,7 +11,7 @@ import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, Notebook } from "@generated/backend"
 import Questions from "../notes/Questions.vue"
-import { getNotes } from "@generated/backend/sdk.gen"
+import { NotebookController } from "@generated/backend/sdk.gen"
 const props = defineProps({
   notebook: {
     type: Object as PropType<Notebook>,
@@ -20,7 +20,7 @@ const props = defineProps({
 })
 const notes = ref<Note[] | undefined>(undefined)
 const fetchData = async () => {
-  const { data: notesList, error } = await getNotes({
+  const { data: notesList, error } = await NotebookController.getNotes({
     path: { notebook: props.notebook.id },
   })
   if (!error) {

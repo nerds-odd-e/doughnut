@@ -1,12 +1,14 @@
 import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { findTool, createMockContext } from '../helpers/index.js'
-import * as Services from '@generated/backend/sdk.gen'
+import { NoteController } from '@generated/backend/sdk.gen'
 import { client } from '@generated/backend/client.gen'
 import type { GetGraphResponse } from '@generated/backend'
 
 // Mock the generated services
 vi.mock('@generated/backend/sdk.gen', () => ({
-  getGraph: vi.fn(),
+  NoteController: {
+    getGraph: vi.fn(),
+  },
 }))
 
 describe('get_note_graph tool', () => {
@@ -61,7 +63,7 @@ describe('get_note_graph tool', () => {
       const ctx = createMockContext()
 
       // Mock the service response
-      const mockGetGraph = vi.mocked(Services.getGraph)
+      const mockGetGraph = vi.mocked(NoteController.getGraph)
       const mockResponse: GetGraphResponse = {
         focusNote: { id: 1 },
       } as GetGraphResponse
@@ -69,7 +71,7 @@ describe('get_note_graph tool', () => {
       mockGetGraph.mockResolvedValue({
         data: mockResponse,
         error: undefined,
-      } as Awaited<ReturnType<typeof Services.getGraph>>)
+      } as Awaited<ReturnType<typeof NoteController.getGraph>>)
 
       const result = await getNoteGraphTool.handle(ctx, {
         noteId: 1,

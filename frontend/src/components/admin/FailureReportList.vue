@@ -39,10 +39,7 @@
 <script lang="ts">
 import { defineComponent } from "vue"
 import type { FailureReport } from "@generated/backend"
-import {
-  failureReports,
-  deleteFailureReports,
-} from "@generated/backend/sdk.gen"
+import { FailureReportController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 
@@ -57,7 +54,8 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      const { data: reports, error } = await failureReports()
+      const { data: reports, error } =
+        await FailureReportController.failureReports()
       if (!error) {
         this.failureReports = reports as unknown as FailureReport[]
       } else {
@@ -79,7 +77,7 @@ export default defineComponent({
         return
       }
 
-      const { error } = await deleteFailureReports({
+      const { error } = await FailureReportController.deleteFailureReports({
         body: this.selectedFailureReports,
       })
       if (!error) {

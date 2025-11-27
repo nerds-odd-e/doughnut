@@ -8,7 +8,7 @@
 
 <script setup lang="ts">
 import type { NoteInfo } from "@generated/backend"
-import { getNoteInfo } from "@generated/backend/sdk.gen"
+import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, onMounted } from "vue"
 
@@ -23,7 +23,7 @@ defineEmits<{
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
 const fetchData = async () => {
-  const { data: noteInfoData, error } = await getNoteInfo({
+  const { data: noteInfoData, error } = await NoteController.getNoteInfo({
     path: { note: props.noteId },
   })
   if (!error) {

@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
-import { startConversationAboutRecallPrompt } from "@generated/backend/sdk.gen"
+import { ConversationMessageController } from "@generated/backend/sdk.gen"
 
 const props = defineProps<{
   recallPromptId: number
@@ -32,7 +32,7 @@ const router = useRouter()
 
 const startConversation = async () => {
   const { data: conversation, error } =
-    await startConversationAboutRecallPrompt({
+    await ConversationMessageController.startConversationAboutRecallPrompt({
       path: { recallPrompt: props.recallPromptId },
     })
   if (!error) {

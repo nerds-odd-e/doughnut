@@ -92,10 +92,7 @@
 import type { PropType } from "vue"
 import { onMounted, ref } from "vue"
 import type { Note, PredefinedQuestion } from "@generated/backend"
-import {
-  getAllQuestionByNote,
-  toggleApproval as toggleApprovalApi,
-} from "@generated/backend/sdk.gen"
+import { PredefinedQuestionController } from "@generated/backend/sdk.gen"
 import NoteAddQuestion from "./NoteAddQuestion.vue"
 import QuestionManagement from "./QuestionManagement.vue"
 import QuestionExportDialog from "./QuestionExportDialog.vue"
@@ -113,9 +110,10 @@ const openedQuestion = ref<PredefinedQuestion | undefined>()
 const showExportDialog = ref(false)
 
 const fetchQuestions = async () => {
-  const { data: allQuestions, error } = await getAllQuestionByNote({
-    path: { note: props.note.id },
-  })
+  const { data: allQuestions, error } =
+    await PredefinedQuestionController.getAllQuestionByNote({
+      path: { note: props.note.id },
+    })
   if (!error && allQuestions) {
     questions.value = allQuestions
   }
@@ -128,7 +126,7 @@ const questionAdded = (newQuestion: PredefinedQuestion) => {
 }
 const toggleApproval = async (questionId?: number) => {
   if (questionId) {
-    await toggleApprovalApi({
+    await PredefinedQuestionController.toggleApproval({
       path: { predefinedQuestion: questionId },
     })
   }

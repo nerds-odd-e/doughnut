@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
-import { assimilate } from "@generated/backend/sdk.gen"
+import { AssimilationController } from "@generated/backend/sdk.gen"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
@@ -62,12 +62,13 @@ const processForm = async (skipMemoryTracking: boolean) => {
     }
   }
 
-  const { data: memoryTrackers, error } = await assimilate({
-    body: {
-      noteId: note.id,
-      skipMemoryTracking,
-    },
-  })
+  const { data: memoryTrackers, error } =
+    await AssimilationController.assimilate({
+      body: {
+        noteId: note.id,
+        skipMemoryTracking,
+      },
+    })
 
   if (!error && memoryTrackers) {
     const newTrackerCount = memoryTrackers.filter(
