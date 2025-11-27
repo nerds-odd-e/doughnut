@@ -26,11 +26,11 @@ setup_fzf() {
   export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
 
   if [ -n "${ZSH_VERSION:-}" ]; then
-    [ -e "${fzf_path}/share/fzf/key-bindings.zsh" ] && source "${fzf_path}/share/fzf/key-bindings.zsh
-    [ -e "${fzf_path}/share/fzf/completion.zsh" ] && source "${fzf_path}/share/fzf/completion.zsh
+    [ -e "${fzf_path}/share/fzf/key-bindings.zsh" ] && source "${fzf_path}/share/fzf/key-bindings.zsh"
+    [ -e "${fzf_path}/share/fzf/completion.zsh" ] && source "${fzf_path}/share/fzf/completion.zsh"
   else
-    [ -e "${fzf_path}/share/fzf/key-bindings.bash" ] && source "${fzf_path}/share/fzf/key-bindings.bash
-    [ -e "${fzf_path}/share/fzf/completion.bash" ] && source "${fzf_path}/share/fzf/completion.bash
+    [ -e "${fzf_path}/share/fzf/key-bindings.bash" ] && source "${fzf_path}/share/fzf/key-bindings.bash"
+    [ -e "${fzf_path}/share/fzf/completion.bash" ] && source "${fzf_path}/share/fzf/completion.bash"
   fi
 }
 
