@@ -108,8 +108,12 @@ Every API call in the codebase needs careful analysis:
   - CircleController.createCircle
   - CircleController.joinCircle
   - BazaarController.removeFromBazaar
-- ✅ All 412 frontend unit tests passing
-- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A3-A7)
+- ✅ **A3 Complete**: Quiz/Assessment operations wrapped with `apiCallWithLoading` (3 operations)
+  - MemoryTrackerController.answerSpelling (Quiz.vue)
+  - AssessmentController.submitAssessmentResult (Assessment.vue)
+  - AssessmentController.generateAssessmentQuestions (AssessmentPage.vue)
+- ✅ All 416 frontend unit tests passing
+- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A4-A7)
 
 ## Critical Issue Discovered (Nov 27, 2024)
 

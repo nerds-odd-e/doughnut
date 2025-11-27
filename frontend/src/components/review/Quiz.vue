@@ -73,7 +73,10 @@ import {
   MemoryTrackerController,
   RecallPromptController,
 } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import {
+  globalClientSilent,
+  apiCallWithLoading,
+} from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
@@ -178,11 +181,12 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
   if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
     return
 
-  const { data: answerResult, error } =
-    await MemoryTrackerController.answerSpelling({
-      path: { memoryTracker: currentMemoryTrackerId.value },
-      body: { spellingAnswer: answerData.spellingAnswer },
+  const { data: answerResult, error } = await apiCallWithLoading(() =>
+    MemoryTrackerController.answerSpelling({
+      path: { memoryTracker: currentMemoryTrackerId.value! },
+      body: { spellingAnswer: answerData.spellingAnswer! },
     })
+  )
   if (!error) {
     emit("answered-spelling", answerResult!)
   }

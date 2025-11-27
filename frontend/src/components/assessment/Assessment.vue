@@ -31,6 +31,7 @@
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import { AssessmentController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { AssessmentAttempt } from "@generated/backend"
 import AssessmentQuestion from "./AssessmentQuestion.vue"
 import AssessmentClaimCertificate from "./AssessmentClaimCertificate.vue"
@@ -65,10 +66,11 @@ const checkIfQuizComplete = async () => {
     currentQuestion.value >= assessmentQuestionInstance.value.length &&
     assessmentQuestionInstance.value.length > 0
   ) {
-    const { data: submittedAttempt, error } =
-      await AssessmentController.submitAssessmentResult({
+    const { data: submittedAttempt, error } = await apiCallWithLoading(() =>
+      AssessmentController.submitAssessmentResult({
         path: { assessmentAttempt: props.assessmentAttempt.id },
       })
+    )
     if (!error && submittedAttempt) {
       localAssessmentAttempt.value = submittedAttempt
     }
