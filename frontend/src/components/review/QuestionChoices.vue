@@ -111,7 +111,7 @@ export default defineComponent({
 
 button, a, input
   border: 0
-  -webkit-tap-highlight-color: rgba(0,0,0,0)
+  -webkit-tap-highlight-color: transparent
   -webkit-touch-callout: none
   -webkit-user-select: none
 
