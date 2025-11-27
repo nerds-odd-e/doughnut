@@ -45,7 +45,7 @@ import type { Conversation, User } from "@generated/backend"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
-import { globalClientSilent } from "@/managedApi/clientSetup"
+import { globalClientSilent, apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const conversation = ref<Conversation | undefined>()
 const user = inject<Ref<User | undefined>>("currentUser")
@@ -84,11 +84,12 @@ const handleConversationChange = (conversationId: number) => {
 
 async function startConversationWithMessage(message: string) {
   initialAiReply.value = false
-  const { data: newConversation, error } =
-    await ConversationMessageController.startConversationAboutNote({
+  const { data: newConversation, error } = await apiCallWithLoading(() =>
+    ConversationMessageController.startConversationAboutNote({
       path: { note: props.noteId },
       body: message,
     })
+  )
   if (!error) {
     conversation.value = newConversation!
     emit("submitted")
@@ -97,11 +98,12 @@ async function startConversationWithMessage(message: string) {
 
 async function startConversationWithMessageAndAI(message: string) {
   initialAiReply.value = true
-  const { data: newConversation, error } =
-    await ConversationMessageController.startConversationAboutNote({
+  const { data: newConversation, error } = await apiCallWithLoading(() =>
+    ConversationMessageController.startConversationAboutNote({
       path: { note: props.noteId },
       body: message,
     })
+  )
   if (!error) {
     conversation.value = newConversation!
     emit("submitted")

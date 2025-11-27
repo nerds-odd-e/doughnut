@@ -22,6 +22,7 @@
 import type { AssessmentQuestionInstance } from "@generated/backend"
 import { ref } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   question: AssessmentQuestionInstance
@@ -32,13 +33,12 @@ const feedback = ref<string>("")
 const emit = defineEmits(["submitted"])
 
 async function submitFeedback() {
-  const { error } =
-    await ConversationMessageController.startConversationAboutAssessmentQuestion(
-      {
-        path: { assessmentQuestion: props.question.id },
-        body: feedback.value,
-      }
-    )
+  const { error } = await apiCallWithLoading(() =>
+    ConversationMessageController.startConversationAboutAssessmentQuestion({
+      path: { assessmentQuestion: props.question.id },
+      body: feedback.value,
+    })
+  )
   if (!error) {
     emit("submitted")
   }

@@ -119,8 +119,13 @@ Every API call in the codebase needs careful analysis:
   - RecallPromptController.contest (ContestableQuestion.vue)
   - RecallPromptController.regenerate (ContestableQuestion.vue)
   - AssimilationController.assimilate (Assimilation.vue)
+- ✅ **A5 Complete**: Conversation Actions wrapped with `apiCallWithLoading` (5 operations)
+  - ConversationMessageController.replyToConversation (ConversationInner.vue)
+  - ConversationMessageController.startConversationAboutNote (NoteConversation.vue - 2 places)
+  - ConversationMessageController.startConversationAboutAssessmentQuestion (FeedbackForm.vue)
+  - ConversationMessageController.startConversationAboutRecallPrompt (ConversationButton.vue)
 - ✅ All 416 frontend unit tests passing
-- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A5-A7)
+- ⏳ **Next**: Phase 2 - Wrap remaining user mutations with `apiCallWithLoading` (A6-A7)
 
 ## Critical Issue Discovered (Nov 27, 2024)
 

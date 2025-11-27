@@ -60,6 +60,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type {
   User,
   ConversationMessage,
@@ -131,10 +132,12 @@ const handleSendMessage = async (
   message: string,
   inviteAI: boolean = false
 ) => {
-  const { error } = await ConversationMessageController.replyToConversation({
-    path: { conversationId: conversation.id },
-    body: message,
-  })
+  const { error } = await apiCallWithLoading(() =>
+    ConversationMessageController.replyToConversation({
+      path: { conversationId: conversation.id },
+      body: message,
+    })
+  )
   if (!error) {
     await fetchConversationMessages()
 

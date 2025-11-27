@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
   recallPromptId: number
@@ -31,10 +32,11 @@ const props = defineProps<{
 const router = useRouter()
 
 const startConversation = async () => {
-  const { data: conversation, error } =
-    await ConversationMessageController.startConversationAboutRecallPrompt({
+  const { data: conversation, error } = await apiCallWithLoading(() =>
+    ConversationMessageController.startConversationAboutRecallPrompt({
       path: { recallPrompt: props.recallPromptId },
     })
+  )
   if (!error) {
     await router.push({
       name: "messageCenter",
