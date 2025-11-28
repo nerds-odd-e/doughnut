@@ -15,8 +15,8 @@ const assumeAnsweredQuestionPage = () => {
         })
       return assumeNotePage(noteTopology).memoryTracker()
     },
-    goToLastResult: () => {
-      cy.findByRole('button', { name: 'view last result' }).click()
+    goToLastAnsweredQuestion: () => {
+      cy.findByRole('button', { name: 'view last answered question' }).click()
       return assumeAnsweredQuestionPage()
     },
   }

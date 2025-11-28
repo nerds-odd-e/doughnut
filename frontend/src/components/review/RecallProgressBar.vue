@@ -1,23 +1,23 @@
 <template>
-  <div class="header" :class="previousResultCursor ? 'repeat-paused' : ''">
+  <div class="header" :class="previousAnsweredQuestionCursor ? 'repeat-paused' : ''">
     <ProgressBar
       v-bind="{ title: `Recalling: `, finished, toRepeatCount }"
-      @resume="$emit('viewLastResult', undefined)"
+      @resume="$emit('viewLastAnsweredQuestion', undefined)"
       @showMore="$emit('showMore')"
     >
       <template #buttons>
         <div class="btn-group btn-group-sm">
-          <template v-if="previousResultCursor !== undefined">
+          <template v-if="previousAnsweredQuestionCursor !== undefined">
             <button
               class="btn large-btn"
-              title="view previous result"
-              :disabled="finished === 0 || previousResultCursor === 0"
+              title="view previous answered question"
+              :disabled="finished === 0 || previousAnsweredQuestionCursor === 0"
               @click="
                 $emit(
-                  'viewLastResult',
-                  !previousResultCursor
+                  'viewLastAnsweredQuestion',
+                  !previousAnsweredQuestionCursor
                     ? finished - 1
-                    : previousResultCursor - 1
+                    : previousAnsweredQuestionCursor - 1
                 )
               "
             >
@@ -26,8 +26,8 @@
 
             <button
               class="btn large-btn"
-              title="view next result"
-              @click="$emit('viewLastResult', undefined)"
+              title="view next answered question"
+              @click="$emit('viewLastAnsweredQuestion', undefined)"
             >
               <SvgResume />
             </button>
@@ -35,9 +35,9 @@
           <button
             v-else
             class="btn large-btn"
-            title="view last result"
+            title="view last answered question"
             :disabled="finished === 0"
-            @click="$emit('viewLastResult', finished - 1)"
+            @click="$emit('viewLastAnsweredQuestion', finished - 1)"
           >
             <SvgPause />
           </button>
@@ -56,9 +56,9 @@ import SvgResume from "../svgs/SvgResume.vue"
 defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
-  previousResultCursor: Number,
+  previousAnsweredQuestionCursor: Number,
 })
-defineEmits(["viewLastResult", "showMore"])
+defineEmits(["viewLastAnsweredQuestion", "showMore"])
 </script>
 
 <style lang="scss" scoped>

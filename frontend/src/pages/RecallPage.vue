@@ -4,9 +4,9 @@
     v-bind="{
       finished,
       toRepeatCount,
-      previousResultCursor,
+      previousAnsweredQuestionCursor,
     }"
-    @view-last-result="viewLastResult($event)"
+    @view-last-answered-question="viewLastAnsweredQuestion($event)"
     @show-more="showTooltip = true"
   >
   </RecallProgressBar>
@@ -104,32 +104,34 @@ defineProps({
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const currentIndex = ref(0)
-const previousResults = ref<(RecallResult | undefined)[]>([])
-const previousResultCursor = ref<number | undefined>(undefined)
+const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
+const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const showTooltip = ref(false)
 
 const currentAnsweredQuestion = computed(() => {
-  if (previousResultCursor.value === undefined) return undefined
-  const result = previousResults.value[previousResultCursor.value]
+  if (previousAnsweredQuestionCursor.value === undefined) return undefined
+  const result =
+    previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
   return result.type === "question" ? result.answeredQuestion : undefined
 })
 
 const currentAnsweredSpelling = computed(() => {
-  if (previousResultCursor.value === undefined) return undefined
-  const result = previousResults.value[previousResultCursor.value]
+  if (previousAnsweredQuestionCursor.value === undefined) return undefined
+  const result =
+    previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
   return result.type === "spelling" ? result : undefined
 })
 
-const finished = computed(() => previousResults.value.length)
+const finished = computed(() => previousAnsweredQuestions.value.length)
 const toRepeatCount = computed(
   () => (toRepeat.value?.length ?? 0) - currentIndex.value
 )
 
-const viewLastResult = (cursor: number | undefined) => {
-  previousResultCursor.value = cursor
+const viewLastAnsweredQuestion = (cursor: number | undefined) => {
+  previousAnsweredQuestionCursor.value = cursor
 }
 
 const loadMore = async (dueInDays?: number) => {
@@ -155,31 +157,31 @@ const loadMore = async (dueInDays?: number) => {
 
 const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
   currentIndex.value += 1
-  previousResults.value.push({
+  previousAnsweredQuestions.value.push({
     type: "question",
     answeredQuestion: answerResult,
   })
   if (!answerResult.answer.correct) {
-    viewLastResult(previousResults.value.length - 1)
+    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
   decrementToRepeatCount()
 }
 
 const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
   currentIndex.value += 1
-  previousResults.value.push({
+  previousAnsweredQuestions.value.push({
     type: "spelling",
     ...answerResult,
   })
   if (!answerResult.isCorrect) {
-    viewLastResult(previousResults.value.length - 1)
+    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
   decrementToRepeatCount()
 }
 
 const onJustReviewed = () => {
   currentIndex.value += 1
-  previousResults.value.push(undefined)
+  previousAnsweredQuestions.value.push(undefined)
   decrementToRepeatCount()
 }
 

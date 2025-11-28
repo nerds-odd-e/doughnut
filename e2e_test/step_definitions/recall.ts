@@ -166,7 +166,7 @@ Then('I should see that my answer is correct', () => {
 Then('I should see that my last answer is correct', () => {
   start
     .assumeAnsweredQuestionPage()
-    .goToLastResult()
+    .goToLastAnsweredQuestion()
     .expectLastAnswerToBeCorrect()
 })
 
@@ -183,7 +183,7 @@ Then(
 Then('choose to remove the last memory tracker from recalls', () => {
   start
     .assumeAnsweredQuestionPage()
-    .goToLastResult()
+    .goToLastAnsweredQuestion()
     .showMemoryTracker()
     .removeMemoryTrackerFromReview('normal')
 })
