@@ -83,7 +83,11 @@ public class RecallQuestionService {
   }
 
   public AnsweredQuestion answerQuestion(
-      RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
+      PredefinedQuestion predefinedQuestion,
+      AnswerDTO answerDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    RecallPrompt recallPrompt = createARecallPromptFromQuestion(predefinedQuestion);
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);

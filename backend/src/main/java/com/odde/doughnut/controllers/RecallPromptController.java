@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -21,15 +22,18 @@ class RecallPromptController {
 
   private final RecallQuestionService recallQuestionService;
   private final AuthorizationService authorizationService;
+  private final RecallPromptRepository recallPromptRepository;
 
   @Autowired
   public RecallPromptController(
       RecallQuestionService recallQuestionService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService) {
+      AuthorizationService authorizationService,
+      RecallPromptRepository recallPromptRepository) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallQuestionService = recallQuestionService;
+    this.recallPromptRepository = recallPromptRepository;
   }
 
   @GetMapping("/{memoryTracker}/question")
@@ -67,8 +71,10 @@ class RecallPromptController {
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     authorizationService.assertLoggedIn();
+    PredefinedQuestion predefinedQuestion = recallPrompt.getPredefinedQuestion();
+    recallPromptRepository.delete(recallPrompt);
     return recallQuestionService.answerQuestion(
-        recallPrompt,
+        predefinedQuestion,
         answerDTO,
         authorizationService.getCurrentUser(),
         testabilitySettings.getCurrentUTCTimestamp());
