@@ -14,12 +14,7 @@
   </p>
   <ContentLoader v-if="regenerating" />
   <div class="recall-prompt daisy-overflow-y-auto" v-else>
-    <AnsweredQuestionComponent
-      v-if="answeredQuestion"
-      :answered-question="answeredQuestion"
-      :conversation-button="true"
-    />
-    <div v-else class="daisy-flex daisy-flex-col daisy-gap-4" :class="{ 'daisy-opacity-50 daisy-pointer-events-none': contesting }">
+    <div class="daisy-flex daisy-flex-col daisy-gap-4" :class="{ 'daisy-opacity-50 daisy-pointer-events-none': contesting }">
       <RecallPromptComponent
         v-if="currentQuestion"
         :recall-prompt="currentQuestion"
@@ -46,7 +41,6 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref } from "vue"
-import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 const props = defineProps({
@@ -64,7 +58,6 @@ const regenerating = ref(false)
 const contesting = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
 const currentQuestion = ref(props.recallPrompt)
-const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
 const prevQuestions = ref<
   {
     quizeQuestion: RecallPrompt
@@ -117,8 +110,7 @@ const contestQuestion = async () => {
 }
 
 const onAnswered = (answer: AnsweredQuestion) => {
-  answeredQuestion.value = answer
-  emit("answered", answeredQuestion.value)
+  emit("answered", answer)
 }
 </script>
 
