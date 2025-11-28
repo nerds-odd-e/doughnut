@@ -59,7 +59,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
   @Nested
   class answerQuizQuestion {
     MemoryTracker memoryTracker;
-    PredefinedQuestion predefinedQuestion;
+    RecallPrompt recallPrompt;
     AnswerDTO answerDTO = new AnswerDTO();
 
     @BeforeEach
@@ -72,15 +72,15 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .forgettingCurveAndNextRecallAt(200)
               .please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      predefinedQuestion =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, answerNote).please();
+      recallPrompt =
+          makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, answerNote).please();
       answerDTO.setChoiceIndex(0);
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateMemoryTracker() {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-      AnsweredQuestion answerResult = controller.answerQuiz(predefinedQuestion, answerDTO);
+      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(answerResult.answer.getCorrect(), is(true));
       assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
@@ -89,7 +89,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerQuiz(predefinedQuestion, answerDTO);
+      controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
@@ -97,7 +97,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerQuiz(predefinedQuestion, answerDTO);
+      controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
@@ -108,7 +108,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
           ResponseStatusException.class,
-          () -> nullUserController().answerQuiz(predefinedQuestion, answer));
+          () -> nullUserController().answerQuiz(recallPrompt, answer));
     }
 
     @Nested
@@ -122,7 +122,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldValidateTheWrongAnswer() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-        AnsweredQuestion answerResult = controller.answerQuiz(predefinedQuestion, answerDTO);
+        AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(answerResult.answer.getCorrect(), is(false));
         assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
       }
@@ -132,14 +132,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
         Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-        controller.answerQuiz(predefinedQuestion, answerDTO);
+        controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
       }
 
       @Test
       void shouldRepeatTheNextDay() {
-        controller.answerQuiz(predefinedQuestion, answerDTO);
+        controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(
             memoryTracker.getNextRecallAt(),
             lessThan(
@@ -182,7 +182,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
-      PredefinedQuestion regeneratedQuestion =
+      RecallPrompt regeneratedQuestion =
           controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
 
       Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getF0__stem())
@@ -305,9 +305,9 @@ class RecallPromptControllerTests extends ControllerTestBase {
       makeMe.aNote().under(note).please();
       MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      PredefinedQuestion predefinedQuestion = controller.askAQuestion(rp);
+      RecallPrompt recallPrompt = controller.askAQuestion(rp);
 
-      assertThat(predefinedQuestion.getId(), notNullValue());
+      assertThat(recallPrompt.getId(), notNullValue());
     }
 
     @Test
@@ -324,10 +324,10 @@ class RecallPromptControllerTests extends ControllerTestBase {
           makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
 
       // Ask for a question for the memory tracker
-      PredefinedQuestion returnedQuestion = controller.askAQuestion(memoryTracker);
+      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
 
-      // Verify that the existing prompt's predefined question was returned
-      assertThat(returnedQuestion.getId(), equalTo(existingPrompt.getPredefinedQuestion().getId()));
+      // Verify that the existing prompt was returned
+      assertThat(returnedPrompt.getId(), equalTo(existingPrompt.getId()));
 
       // Verify that no new prompt was created
       long count =
@@ -361,19 +361,18 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .please();
 
       // Ask for a question for the memory tracker
-      PredefinedQuestion returnedQuestion = controller.askAQuestion(memoryTracker);
+      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
 
-      // Verify that a new question was returned
-      assertThat(
-          returnedQuestion.getId(), not(equalTo(existingPrompt.getPredefinedQuestion().getId())));
+      // Verify that a new prompt was returned
+      assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
 
-      // Verify that no new recall prompt was created (they are only created when answering)
+      // Verify that a new prompt was created
       long count =
           makeMe
               .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
-      assertThat(count, equalTo(1L));
+      assertThat(count, equalTo(2L));
     }
 
     @Test
@@ -405,20 +404,19 @@ class RecallPromptControllerTests extends ControllerTestBase {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(newQuestion);
 
       // Ask for a question for the memory tracker
-      PredefinedQuestion returnedQuestion = controller.askAQuestion(memoryTracker);
+      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
 
-      // Verify that a new question was returned
-      assertThat(
-          returnedQuestion.getId(), not(equalTo(existingPrompt.getPredefinedQuestion().getId())));
-      assertThat(returnedQuestion.isContested(), equalTo(false));
+      // Verify that a new prompt was returned
+      assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
+      assertThat(returnedPrompt.getPredefinedQuestion().isContested(), equalTo(false));
 
-      // Verify that no new recall prompt was created (they are only created when answering)
+      // Verify that a new prompt was created
       long count =
           makeMe
               .entityPersister
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
-      assertThat(count, equalTo(1L));
+      assertThat(count, equalTo(2L));
     }
   }
 

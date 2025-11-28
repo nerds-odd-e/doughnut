@@ -90,7 +90,7 @@ describe("repeat page", () => {
       mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
       askAQuestionSpy = mockSdkService(
         "askAQuestion",
-        makeMe.aPredefinedQuestion.please()
+        makeMe.aRecallPrompt.please()
       )
       askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
       recallingSpy.mockResolvedValue(
@@ -122,7 +122,7 @@ describe("repeat page", () => {
         "markAsRepeated",
         makeMe.aMemoryTracker.please()
       )
-      const recallPrompt = makeMe.aPredefinedQuestion.please()
+      const recallPrompt = makeMe.aRecallPrompt.please()
       askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
       vi.runOnlyPendingTimers()
       await flushPromises()
@@ -175,7 +175,7 @@ describe("repeat page", () => {
     beforeEach(() => {
       vi.useFakeTimers()
       mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
-      mockSdkService("askAQuestion", makeMe.aPredefinedQuestion.please())
+      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
 
       recallingSpy.mockResolvedValue(
         wrapSdkResponse(

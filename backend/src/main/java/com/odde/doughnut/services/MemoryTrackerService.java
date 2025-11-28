@@ -5,7 +5,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -88,12 +88,9 @@ public class MemoryTrackerService {
   }
 
   public void updateMemoryTrackerAfterAnsweringQuestion(
-      User user,
-      Timestamp currentUTCTimestamp,
-      Boolean correct,
-      PredefinedQuestion predefinedQuestion) {
+      User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     List<MemoryTracker> memoryTrackers =
-        userService.getMemoryTrackersFor(user, predefinedQuestion.getNote());
+        userService.getMemoryTrackersFor(user, recallPrompt.getPredefinedQuestion().getNote());
     memoryTrackers.stream()
         .filter(
             tracker -> {

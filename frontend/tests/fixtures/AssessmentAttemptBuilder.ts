@@ -1,7 +1,7 @@
 import type {
   AssessmentAttempt,
   Notebook,
-  PredefinedQuestion,
+  RecallPrompt,
 } from "@generated/backend"
 import Builder from "./Builder"
 import generateId from "./generateId"
@@ -16,7 +16,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
     return this
   }
 
-  withQuestions(questions: PredefinedQuestion[]) {
+  withQuestions(questions: RecallPrompt[]) {
     this.data.assessmentQuestionInstances = questions.map((question) => ({
       id: question.id,
       multipleChoicesQuestion: question.multipleChoicesQuestion,

@@ -165,11 +165,6 @@ export type GlobalAiModelSettings = {
     othersModel?: string;
 };
 
-export type QuestionContestResult = {
-    advice?: string;
-    rejected?: boolean;
-};
-
 export type AnswerDto = {
     choiceIndex?: number;
 };
@@ -186,6 +181,18 @@ export type AnsweredQuestion = {
     answer: Answer;
     answerDisplay?: string;
     recallPromptId: number;
+};
+
+export type QuestionContestResult = {
+    advice?: string;
+    rejected?: boolean;
+};
+
+export type RecallPrompt = {
+    id: number;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
+    notebook?: Notebook;
+    predefinedQuestionId?: number;
 };
 
 export type QuestionSuggestionCreationParams = {
@@ -1305,6 +1312,33 @@ export type SetCurrentModelVersionsResponses = {
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
 
+export type AnswerQuizData = {
+    body: AnswerDto;
+    path: {
+        recallPrompt: number;
+    };
+    query?: never;
+    url: '/api/recall-prompts/{recallPrompt}/answer';
+};
+
+export type AnswerQuizErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type AnswerQuizError = AnswerQuizErrors[keyof AnswerQuizErrors];
+
+export type AnswerQuizResponses = {
+    /**
+     * OK
+     */
+    200: AnsweredQuestion;
+};
+
+export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
+
 export type RegenerateData = {
     body: QuestionContestResult;
     path: {
@@ -1327,7 +1361,7 @@ export type RegenerateResponses = {
     /**
      * OK
      */
-    200: PredefinedQuestion;
+    200: RecallPrompt;
 };
 
 export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
@@ -1358,33 +1392,6 @@ export type ContestResponses = {
 };
 
 export type ContestResponse = ContestResponses[keyof ContestResponses];
-
-export type AnswerQuizData = {
-    body: AnswerDto;
-    path: {
-        predefinedQuestion: number;
-    };
-    query?: never;
-    url: '/api/recall-prompts/{predefinedQuestion}/answer';
-};
-
-export type AnswerQuizErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AnswerQuizError = AnswerQuizErrors[keyof AnswerQuizErrors];
-
-export type AnswerQuizResponses = {
-    /**
-     * OK
-     */
-    200: AnsweredQuestion;
-};
-
-export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
 
 export type ToggleApprovalData = {
     body?: never;
@@ -3417,7 +3424,7 @@ export type AskAQuestionResponses = {
     /**
      * OK
      */
-    200: PredefinedQuestion;
+    200: RecallPrompt;
 };
 
 export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];

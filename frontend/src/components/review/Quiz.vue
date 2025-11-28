@@ -11,7 +11,7 @@
         :key="`spelling-${currentMemoryTrackerId}`"
       />
       <template v-else>
-        <div v-if="!currentPredefinedQuestion">
+        <div v-if="!currentRecallPrompt">
           <JustReview
             v-bind="{
               memoryTrackerId: currentMemoryTrackerId,
@@ -21,13 +21,16 @@
           />
         </div>
         <template v-else>
+         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
+            <NotebookLink :notebook="currentRecallPrompt.notebook" />
+          </div>
           <ContestableQuestion
             v-bind="{
-              predefinedQuestion: currentPredefinedQuestion,
+              recallPrompt: currentRecallPrompt,
               storageAccessor,
             }"
             @answered="onAnswered($event)"
-            :key="currentPredefinedQuestion.id"
+            :key="currentRecallPrompt.id"
           />
         </template>
       </template>
@@ -61,7 +64,7 @@ import { ref, computed, watch, onMounted } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type {
   AnsweredQuestion,
-  PredefinedQuestion,
+  RecallPrompt,
   AnswerSpellingDto,
   SpellingResultDto,
   MemoryTrackerLite,
@@ -75,6 +78,7 @@ import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 import SpellingQuestionComponent from "./SpellingQuestionComponent.vue"
+import NotebookLink from "../notes/NotebookLink.vue"
 
 // Interface definitions for better type safety
 interface QuizProps {
@@ -96,9 +100,7 @@ const emit = defineEmits<{
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const recallPromptCache = ref<Record<number, PredefinedQuestion | undefined>>(
-    {}
-  )
+  const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
   const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
@@ -175,7 +177,7 @@ const currentQuestionFetched = computed(() => {
     memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
   )
 })
-const currentPredefinedQuestion = computed(() => {
+const currentRecallPrompt = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return memoryTrackerId !== undefined
     ? recallPromptCache.value[memoryTrackerId]

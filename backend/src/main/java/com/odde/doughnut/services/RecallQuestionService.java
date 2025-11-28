@@ -37,14 +37,14 @@ public class RecallQuestionService {
     this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
-  public PredefinedQuestion generateAQuestion(MemoryTracker memoryTracker) {
+  public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
     // First check if there's an existing unanswered recall prompt for this note
     RecallPrompt existingPrompt = findExistingUnansweredRecallPrompt(memoryTracker.getNote());
     if (existingPrompt != null) {
-      return existingPrompt.getPredefinedQuestion();
+      return existingPrompt;
     }
 
-    return generateNewQuestion(memoryTracker.getNote());
+    return generateNewRecallPrompt(memoryTracker.getNote());
   }
 
   private RecallPrompt findExistingUnansweredRecallPrompt(Note note) {
@@ -52,11 +52,15 @@ public class RecallQuestionService {
     return results.isEmpty() ? null : results.get(0);
   }
 
-  private PredefinedQuestion generateNewQuestion(Note note) {
-    return predefinedQuestionService.generateAFeasibleQuestion(note);
+  private RecallPrompt generateNewRecallPrompt(Note note) {
+    PredefinedQuestion question = predefinedQuestionService.generateAFeasibleQuestion(note);
+    if (question == null) {
+      return null;
+    }
+    return createARecallPromptFromQuestion(question);
   }
 
-  public PredefinedQuestion regenerateAQuestion(
+  public RecallPrompt regenerateAQuestion(
       QuestionContestResult contestResult, Note note, MCQWithAnswer mcqWithAnswer) {
     MCQWithAnswer MCQWithAnswer =
         aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
@@ -64,7 +68,8 @@ public class RecallQuestionService {
       return null;
     }
     PredefinedQuestion question = PredefinedQuestion.fromMCQWithAnswer(MCQWithAnswer, note);
-    return entityPersister.save(question);
+    entityPersister.save(question);
+    return createARecallPromptFromQuestion(question);
   }
 
   private RecallPrompt createARecallPromptFromQuestion(PredefinedQuestion question) {
@@ -85,7 +90,7 @@ public class RecallQuestionService {
     RecallPrompt recallPrompt = createARecallPromptFromQuestion(predefinedQuestion);
     Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
-        user, currentUTCTimestamp, answer.getCorrect(), predefinedQuestion);
+        user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();
   }
 }

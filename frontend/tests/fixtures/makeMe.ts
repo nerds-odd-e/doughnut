@@ -14,6 +14,7 @@ import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
+import RecallPromptBuilder from "./RecallPromptBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
 import UserBuilder from "./UserBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
@@ -42,6 +43,10 @@ class MakeMe {
 
   static get aDueMemoryTrackersList(): DueMemoryTrackersBuilder {
     return new DueMemoryTrackersBuilder()
+  }
+
+  static get aRecallPrompt(): RecallPromptBuilder {
+    return new RecallPromptBuilder()
   }
 
   static get anAssessmentQuestionInstance(): AssessmentQuestionInstanceBuilder {
