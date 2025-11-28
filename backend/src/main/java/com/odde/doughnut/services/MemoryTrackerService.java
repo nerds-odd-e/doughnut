@@ -126,7 +126,7 @@ public class MemoryTrackerService {
 
   public AnsweredQuestion getLastAnsweredQuestion(MemoryTracker memoryTracker) {
     return recallPromptRepository
-        .findLastAnsweredByMemoryTracker(memoryTracker)
+        .findLastAnsweredByMemoryTracker(memoryTracker.getId())
         .map(RecallPrompt::getAnsweredQuestion)
         .orElse(null);
   }

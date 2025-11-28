@@ -1,6 +1,12 @@
-import { describe, it, expect, beforeEach } from "vitest"
+import { describe, it, expect, beforeEach, vi } from "vitest"
 import RecentPage from "@/pages/RecentPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
+
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}))
 
 describe("RecentPage.vue", () => {
   beforeEach(() => {

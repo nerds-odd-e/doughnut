@@ -1,18 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
-import AnsweredQuestionComponent from './AnsweredQuestionComponent.vue'
-import makeMe from '@tests/fixtures/makeMe'
-import type { AnsweredQuestion } from '@generated/backend'
+import type { Meta, StoryObj } from "@storybook/vue3"
+import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
+import makeMe from "@tests/fixtures/makeMe"
+import type { AnsweredQuestion } from "@generated/backend"
 
 const meta = {
-  title: 'Review/AnsweredQuestionComponent',
+  title: "Review/AnsweredQuestionComponent",
   component: AnsweredQuestionComponent,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     answeredQuestion: {
-      control: 'object',
+      control: "object",
     },
     conversationButton: {
-      control: 'boolean',
+      control: "boolean",
     },
   },
 } satisfies Meta<typeof AnsweredQuestionComponent>
@@ -33,16 +33,16 @@ const createAnsweredQuestionWithQuestion = (
     .withChoices(choices)
     .correctAnswerIndex(correctIndex)
     .please()
-  
+
   const baseQuestion = makeMe.anAnsweredQuestion
     .answerCorrect(isCorrect)
     .withChoiceIndex(answerIndex)
     .please()
-  
+
   return {
     ...baseQuestion,
     predefinedQuestion,
-    answerDisplay: choices[answerIndex] || '',
+    answerDisplay: choices[answerIndex] || "",
   }
 }
 
@@ -50,8 +50,8 @@ const createAnsweredQuestionWithQuestion = (
 export const CorrectAnswer: Story = {
   args: {
     answeredQuestion: createAnsweredQuestionWithQuestion(
-      'What is the capital of France?',
-      ['Paris', 'London', 'Berlin', 'Madrid'],
+      "What is the capital of France?",
+      ["Paris", "London", "Berlin", "Madrid"],
       0,
       0,
       true
@@ -64,8 +64,8 @@ export const CorrectAnswer: Story = {
 export const IncorrectAnswer: Story = {
   args: {
     answeredQuestion: createAnsweredQuestionWithQuestion(
-      'What is the capital of France?',
-      ['Paris', 'London', 'Berlin', 'Madrid'],
+      "What is the capital of France?",
+      ["Paris", "London", "Berlin", "Madrid"],
       0,
       1,
       false
@@ -79,15 +79,17 @@ export const WithNote: Story = {
   args: {
     answeredQuestion: (() => {
       const question = createAnsweredQuestionWithQuestion(
-        'What is TypeScript?',
-        ['A programming language', 'A database', 'A framework', 'A browser'],
+        "What is TypeScript?",
+        ["A programming language", "A database", "A framework", "A browser"],
         0,
         0,
         true
       )
       question.note = makeMe.aNote
-        .topicConstructor('TypeScript')
-        .details('TypeScript is a typed superset of JavaScript that compiles to plain JavaScript.')
+        .topicConstructor("TypeScript")
+        .details(
+          "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
+        )
         .please()
       return question
     })(),
@@ -100,8 +102,8 @@ export const InSequence: Story = {
   args: {
     answeredQuestion: (() => {
       const question = createAnsweredQuestionWithQuestion(
-        'Which of the following is a JavaScript framework?',
-        ['React', 'Python', 'Java', 'C++'],
+        "Which of the following is a JavaScript framework?",
+        ["React", "Python", "Java", "C++"],
         0,
         0,
         true
@@ -117,8 +119,8 @@ export const InSequence: Story = {
 export const WithoutConversationButton: Story = {
   args: {
     answeredQuestion: createAnsweredQuestionWithQuestion(
-      'What is 2 + 2?',
-      ['3', '4', '5', '6'],
+      "What is 2 + 2?",
+      ["3", "4", "5", "6"],
       1,
       1,
       true
@@ -132,15 +134,17 @@ export const CustomQuestion: Story = {
   args: {
     answeredQuestion: (() => {
       const question = createAnsweredQuestionWithQuestion(
-        'Which data structure follows LIFO principle?',
-        ['Queue', 'Stack', 'Array', 'Linked List'],
+        "Which data structure follows LIFO principle?",
+        ["Queue", "Stack", "Array", "Linked List"],
         1,
         2,
         false
       )
       question.note = makeMe.aNote
-        .topicConstructor('Data Structures')
-        .details('A stack is a linear data structure that follows the Last In First Out (LIFO) principle.')
+        .topicConstructor("Data Structures")
+        .details(
+          "A stack is a linear data structure that follows the Last In First Out (LIFO) principle."
+        )
         .please()
       return question
     })(),
@@ -148,7 +152,8 @@ export const CustomQuestion: Story = {
   },
   decorators: [
     () => ({
-      template: '<div style="max-width: 800px; margin: 0 auto; padding: 20px;"><story /></div>',
+      template:
+        '<div style="max-width: 800px; margin: 0 auto; padding: 20px;"><story /></div>',
     }),
   ],
 }

@@ -1,14 +1,14 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
-import AnswerResult from './AnswerResult.vue'
-import makeMe from '@tests/fixtures/makeMe'
+import type { Meta, StoryObj } from "@storybook/vue3"
+import AnswerResult from "./AnswerResult.vue"
+import makeMe from "@tests/fixtures/makeMe"
 
 const meta = {
-  title: 'Review/AnswerResult',
+  title: "Review/AnswerResult",
   component: AnswerResult,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     answeredQuestion: {
-      control: 'object',
+      control: "object",
     },
   },
 } satisfies Meta<typeof AnswerResult>
@@ -19,9 +19,7 @@ type Story = StoryObj<typeof meta>
 // Correct answer
 export const Correct: Story = {
   args: {
-    answeredQuestion: makeMe.anAnsweredQuestion
-      .answerCorrect(true)
-      .please(),
+    answeredQuestion: makeMe.anAnsweredQuestion.answerCorrect(true).please(),
   },
 }
 
@@ -43,7 +41,7 @@ export const IncorrectWithDisplay: Story = {
         .answerCorrect(false)
         .withChoiceIndex(2)
         .please()
-      question.answerDisplay = 'Wrong Answer'
+      question.answerDisplay = "Wrong Answer"
       return question
     })(),
   },

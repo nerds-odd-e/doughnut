@@ -5,6 +5,12 @@ import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}))
+
 describe("MemoryTrackerPage", () => {
   const memoryTrackerId = 123
   const answeredQuestion = makeMe.anAnsweredQuestion.please()
