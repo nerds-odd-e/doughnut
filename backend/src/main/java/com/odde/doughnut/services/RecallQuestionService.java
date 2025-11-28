@@ -8,7 +8,6 @@ import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,13 +47,7 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt findExistingUnansweredRecallPrompt(MemoryTracker memoryTracker) {
-    List<RecallPrompt> results =
-        recallPromptRepository.findUnansweredByNote(memoryTracker.getNote());
-    // Filter by memory tracker to ensure we get the right one for this user
-    return results.stream()
-        .filter(rp -> rp.getMemoryTracker().getId().equals(memoryTracker.getId()))
-        .findFirst()
-        .orElse(null);
+    return recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker).orElse(null);
   }
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {

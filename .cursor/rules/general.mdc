@@ -7,9 +7,9 @@ alwaysApply: true
 
 **CRITICAL: This project uses nix to manage the development environment locally.**
 
-**For detailed command execution instructions (tests, linting, etc.), see the `cloud-agent-setup` rule.**
+**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true nix develop -c` (unless you are on a Cursor Cloud VM):**
 
-**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true` when running them through `nix develop -c` (When running as a local agent):**
+**For how to run commands on Cloud VM see the `cloud-agent-setup` rule.**
 
 ```bash
 CURSOR_DEV=true nix develop -c <command>
