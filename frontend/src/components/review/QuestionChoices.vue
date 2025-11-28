@@ -105,6 +105,14 @@ button, a, input
   -webkit-touch-callout: none
   -webkit-user-select: none
 
+button:active
+  background-color: yellow !important
+  color: black !important
+
+button:focus
+  background-color: yellow !important
+  color: black !important
+
 .choice-text
   user-select: text
   -webkit-user-select: text
