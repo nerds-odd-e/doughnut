@@ -78,8 +78,8 @@ public class RecallQuestionService {
     return entityPersister.save(recallPrompt);
   }
 
-  public QuestionContestResult contest(RecallPrompt recallPrompt) {
-    return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
+  public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
+    return predefinedQuestionService.contest(predefinedQuestion);
   }
 
   public AnsweredQuestion answerQuestion(

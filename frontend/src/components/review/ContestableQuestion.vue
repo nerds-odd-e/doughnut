@@ -80,10 +80,14 @@ const contestQuestion = async () => {
   currentQuestionLegitMessage.value = ""
   contesting.value = true
   try {
+    const predefinedQuestionId = currentQuestion.value.predefinedQuestionId
+    if (!predefinedQuestionId) {
+      throw new Error("PredefinedQuestion ID is not available")
+    }
     const { data: contestResult, error: contestError } =
       await apiCallWithLoading(() =>
         RecallPromptController.contest({
-          path: { recallPrompt: currentQuestion.value.id },
+          path: { predefinedQuestion: predefinedQuestionId },
         })
       )
 

@@ -53,12 +53,13 @@ class RecallPromptController {
         contestResult, predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
   }
 
-  @PostMapping("/{recallPrompt}/contest")
+  @PostMapping("/{predefinedQuestion}/contest")
   @Transactional
   public QuestionContestResult contest(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion) {
     authorizationService.assertLoggedIn();
-    return recallQuestionService.contest(recallPrompt);
+    return recallQuestionService.contest(predefinedQuestion);
   }
 
   @PostMapping("/{recallPrompt}/answer")
