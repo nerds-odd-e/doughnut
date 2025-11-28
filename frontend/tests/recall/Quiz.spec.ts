@@ -10,7 +10,7 @@ import helper, {
 import type { MemoryTrackerLite, SpellingResultDto } from "@generated/backend"
 
 describe("repeat page", () => {
-  const question = makeMe.aPredefinedQuestion.please()
+  const recallPrompt = makeMe.aPredefinedQuestion.please()
   let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe("repeat page", () => {
     vi.useFakeTimers()
     mockSdkService("showNote", makeMe.aNoteRealm.please())
     mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
-    askAQuestionSpy = mockSdkService("askAQuestion", question)
+    askAQuestionSpy = mockSdkService("askAQuestion", recallPrompt)
     mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
   })
 
@@ -101,10 +101,12 @@ describe("repeat page", () => {
 
   describe("spelling questions", () => {
     it("shows spelling question input when question has no choices", async () => {
-      const questionWithoutChoices = makeMe.aPredefinedQuestion
+      const recallPromptWithoutChoices = makeMe.aPredefinedQuestion
         .withQuestionStem("Spell the word 'cat'")
         .please()
-      askAQuestionSpy.mockResolvedValue(wrapSdkResponse(questionWithoutChoices))
+      askAQuestionSpy.mockResolvedValue(
+        wrapSdkResponse(recallPromptWithoutChoices)
+      )
 
       const wrapper = await mountPage([1], 1, true)
 
@@ -117,10 +119,12 @@ describe("repeat page", () => {
     })
 
     it("submits spelling answer correctly", async () => {
-      const questionWithoutChoices = makeMe.aPredefinedQuestion
+      const recallPromptWithoutChoices = makeMe.aPredefinedQuestion
         .withQuestionStem("Spell the word 'cat'")
         .please()
-      askAQuestionSpy.mockResolvedValue(wrapSdkResponse(questionWithoutChoices))
+      askAQuestionSpy.mockResolvedValue(
+        wrapSdkResponse(recallPromptWithoutChoices)
+      )
 
       const answerResult: SpellingResultDto = {
         note: makeMe.aNote.please(),

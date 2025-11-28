@@ -5,7 +5,7 @@ import helper from "@tests/helpers"
 
 describe("AnswerResult", () => {
   const answeredQuestion = makeMe.anAnsweredQuestion
-    .withQuestionId(1)
+    .withRecallPromptId(1)
     .answerCorrect(false)
     .withChoiceIndex(1)
     .please()

@@ -20,7 +20,7 @@ class AssessmentAttemptBuilder extends Builder<AssessmentAttempt> {
     this.data.assessmentQuestionInstances = questions.map((question) => ({
       id: question.id,
       multipleChoicesQuestion: question.multipleChoicesQuestion,
-      question: question,
+      recallPrompt: question,
     }))
     return this
   }

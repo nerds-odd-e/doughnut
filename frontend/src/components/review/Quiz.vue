@@ -96,7 +96,9 @@ const emit = defineEmits<{
 
 // Composable for question fetching logic
 const useQuestionFetching = (props: QuizProps) => {
-  const questionCache = ref<Record<number, PredefinedQuestion | undefined>>({})
+  const recallPromptCache = ref<Record<number, PredefinedQuestion | undefined>>(
+    {}
+  )
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
   const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
@@ -111,7 +113,7 @@ const useQuestionFetching = (props: QuizProps) => {
       const memoryTrackerId = memoryTracker?.memoryTrackerId
       if (memoryTrackerId === undefined) break
 
-      const cachedValue = questionCache.value[memoryTrackerId]
+      const cachedValue = recallPromptCache.value[memoryTrackerId]
       if (cachedValue !== undefined) continue
 
       fetchingMemoryTrackerIds.value.add(memoryTrackerId)
@@ -121,9 +123,9 @@ const useQuestionFetching = (props: QuizProps) => {
             path: { memoryTracker: memoryTrackerId },
           })
         if (!error) {
-          questionCache.value[memoryTrackerId] = question!
+          recallPromptCache.value[memoryTrackerId] = question!
         } else {
-          questionCache.value[memoryTrackerId] = undefined
+          recallPromptCache.value[memoryTrackerId] = undefined
         }
       } finally {
         fetchingMemoryTrackerIds.value.delete(memoryTrackerId)
@@ -145,14 +147,14 @@ const useQuestionFetching = (props: QuizProps) => {
   }
 
   return {
-    questionCache,
+    recallPromptCache,
     fetchQuestion,
     fetchingMemoryTrackerIds,
   }
 }
 
 // Use the composable
-const { questionCache, fetchQuestion, fetchingMemoryTrackerIds } =
+const { recallPromptCache, fetchQuestion, fetchingMemoryTrackerIds } =
   useQuestionFetching(props)
 
 // Computed properties with better naming
@@ -169,12 +171,14 @@ const isCurrentMemoryTrackerFetching = computed(() => {
 })
 const currentQuestionFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
-  return memoryTrackerId !== undefined && memoryTrackerId in questionCache.value
+  return (
+    memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
+  )
 })
 const currentPredefinedQuestion = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return memoryTrackerId !== undefined
-    ? questionCache.value[memoryTrackerId]
+    ? recallPromptCache.value[memoryTrackerId]
     : undefined
 })
 
@@ -216,9 +220,9 @@ const moveToEnd = () => {
   const nextMemoryTrackerId = nextMemoryTracker?.memoryTrackerId
   if (
     nextMemoryTrackerId !== undefined &&
-    !(nextMemoryTrackerId in questionCache.value)
+    !(nextMemoryTrackerId in recallPromptCache.value)
   ) {
-    questionCache.value[nextMemoryTrackerId] = undefined
+    recallPromptCache.value[nextMemoryTrackerId] = undefined
   }
   emit("moveToEnd", props.currentIndex)
 }

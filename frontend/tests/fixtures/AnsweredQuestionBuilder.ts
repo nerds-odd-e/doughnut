@@ -5,7 +5,7 @@ import makeMe from "./makeMe"
 
 class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
   private noteToUse?: Note
-  private questionIdToUse?: number
+  private recallPromptIdToUse?: number
   private isCorrect: boolean = true
   private choiceIndexToUse?: number
 
@@ -14,8 +14,8 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
     return this
   }
 
-  withQuestionId(id: number): this {
-    this.questionIdToUse = id
+  withRecallPromptId(id: number): this {
+    this.recallPromptIdToUse = id
     return this
   }
 
@@ -41,7 +41,7 @@ class AnsweredQuestionBuilder extends Builder<AnsweredQuestion> {
       answerDisplay: "",
       note: this.noteToUse ?? makeMe.aNote.please(),
       predefinedQuestion: makeMe.aPredefinedQuestion.please(),
-      recallPromptId: this.questionIdToUse ?? generateId(),
+      recallPromptId: this.recallPromptIdToUse ?? generateId(),
     }
   }
 }

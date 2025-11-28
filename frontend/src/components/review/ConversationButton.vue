@@ -26,7 +26,7 @@ import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 
 const props = defineProps<{
-  questionId: number
+  recallPromptId: number
 }>()
 
 const router = useRouter()
@@ -34,7 +34,7 @@ const router = useRouter()
 const startConversation = async () => {
   const { data: conversation, error } = await apiCallWithLoading(() =>
     ConversationMessageController.startConversationAboutRecallPrompt({
-      path: { recallPrompt: props.questionId },
+      path: { recallPrompt: props.recallPromptId },
     })
   )
   if (!error) {
