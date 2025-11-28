@@ -3402,33 +3402,6 @@ export type OverviewResponses = {
 
 export type OverviewResponse = OverviewResponses[keyof OverviewResponses];
 
-export type ShowQuestionData = {
-    body?: never;
-    path: {
-        recallPrompt: number;
-    };
-    query?: never;
-    url: '/api/recall-prompts/{recallPrompt}';
-};
-
-export type ShowQuestionErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ShowQuestionError = ShowQuestionErrors[keyof ShowQuestionErrors];
-
-export type ShowQuestionResponses = {
-    /**
-     * OK
-     */
-    200: AnsweredQuestion;
-};
-
-export type ShowQuestionResponse = ShowQuestionResponses[keyof ShowQuestionResponses];
-
 export type AskAQuestionData = {
     body?: never;
     path: {

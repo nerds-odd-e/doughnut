@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -73,14 +72,5 @@ class RecallPromptController {
         answerDTO,
         authorizationService.getCurrentUser(),
         testabilitySettings.getCurrentUTCTimestamp());
-  }
-
-  @GetMapping(path = "/{recallPrompt}")
-  @Transactional
-  public AnsweredQuestion showQuestion(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertReadAuthorization(recallPrompt);
-    return recallPrompt.getAnsweredQuestion();
   }
 }

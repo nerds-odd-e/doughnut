@@ -9,13 +9,11 @@ import static org.mockito.Mockito.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.odde.doughnut.utils.TimestampOperations;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
@@ -419,28 +417,6 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
               .getSingleResult();
       assertThat(count, equalTo(2L));
-    }
-  }
-
-  @Nested
-  class showQuestion {
-
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      RecallPrompt recallPrompt = makeMe.aRecallPrompt().please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.showQuestion(recallPrompt));
-    }
-
-    @Test
-    void canSeeNoteThatHasReadAccess() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      RecallPrompt recallPrompt = recallPromptBuilder.approvedQuestionOf(note).please();
-      makeMe.theRecallPrompt(recallPrompt).answerChoiceIndex(1).please();
-      makeMe.refresh(currentUser.getUser());
-      AnsweredQuestion answeredQuestion = controller.showQuestion(recallPrompt);
-      assertThat(answeredQuestion.recallPromptId, equalTo(recallPrompt.getId()));
     }
   }
 

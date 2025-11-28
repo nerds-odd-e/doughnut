@@ -2658,30 +2658,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatus"
-  /api/recall-prompts/{recallPrompt}:
-    get:
-      tags:
-      - recall-prompt-controller
-      operationId: showQuestion
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
   /api/recall-prompts/{memoryTracker}/question:
     get:
       tags:

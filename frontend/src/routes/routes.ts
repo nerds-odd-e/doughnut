@@ -10,7 +10,6 @@ import AssimilationPage from "@/pages/AssimilationPage.vue"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
 import CircleJoinPage from "@/pages/CircleJoinPage.vue"
 import FailureReportPage from "@/pages/FailureReportPage.vue"
-import AnsweredQuestionPage from "@/pages/AnsweredQuestionPage.vue"
 import AdminDashboardPage from "@/pages/AdminDashboardPage.vue"
 import NonproductionOnlyLoginPage from "@/pages/NonproductionOnlyLoginPage.vue"
 import MessageCenterPage from "../pages/MessageCenterPage.vue"
@@ -23,13 +22,6 @@ import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
 // when refreshing the page or directly accessing the URL.
 const routes = [
   { path: "/", name: "root", component: HomePage },
-  {
-    path: `/d/answers/:recallPromptId`,
-    name: "answer",
-    component: AnsweredQuestionPage,
-    props: true,
-    meta: { useNoteStorageAccessor: true },
-  },
   {
     path: "/d/notebooks",
     name: "notebooks",
