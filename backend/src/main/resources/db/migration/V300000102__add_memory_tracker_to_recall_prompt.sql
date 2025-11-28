@@ -35,8 +35,22 @@ SET rp.memory_tracker_id = mt.first_memory_tracker_id
 WHERE rp.memory_tracker_id IS NULL
   AND @col_is_nullable = 'YES';
 
--- Step 2b: Delete orphaned recall_prompt rows that don't have a matching memory_tracker
--- (These are likely orphaned data that can't be properly associated)
+-- Step 2b: Delete conversations that reference recall_prompt rows without memory_tracker
+-- Then delete the orphaned recall_prompt rows
+DELETE c FROM `conversation` c
+INNER JOIN `recall_prompt` rp ON c.recall_prompt_id = rp.id
+LEFT JOIN `predefined_question` pq ON rp.predefined_question_id = pq.id
+LEFT JOIN (
+    SELECT note_id, MIN(id) as first_memory_tracker_id
+    FROM `memory_tracker`
+    WHERE removed_from_tracking = 0
+    GROUP BY note_id
+) mt ON pq.note_id = mt.note_id
+WHERE rp.memory_tracker_id IS NULL
+  AND mt.first_memory_tracker_id IS NULL
+  AND @col_is_nullable = 'YES';
+
+-- Delete orphaned recall_prompt rows that don't have a matching memory_tracker
 DELETE rp FROM `recall_prompt` rp
 LEFT JOIN `predefined_question` pq ON rp.predefined_question_id = pq.id
 LEFT JOIN (
@@ -46,6 +60,7 @@ LEFT JOIN (
     GROUP BY note_id
 ) mt ON pq.note_id = mt.note_id
 WHERE rp.memory_tracker_id IS NULL
+  AND mt.first_memory_tracker_id IS NULL
   AND @col_is_nullable = 'YES';
 
 -- Step 3: Make NOT NULL (only if it's still nullable and no NULL values exist)
