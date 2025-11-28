@@ -247,7 +247,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           ResponseStatusException.class,
           () -> {
             currentUser.setUser(null);
-            controller.contest(recallPrompt.getPredefinedQuestion());
+            controller.contest(recallPrompt);
           });
     }
 
@@ -256,7 +256,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       questionEvaluation.feasibleQuestion = true;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
-      QuestionContestResult contest = controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult contest = controller.contest(recallPrompt);
       assertTrue(contest.rejected);
     }
 
@@ -269,7 +269,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       questionEvaluation.feasibleQuestion = true;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
-      controller.contest(recallPrompt.getPredefinedQuestion());
+      controller.contest(recallPrompt);
 
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(
@@ -283,8 +283,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       questionEvaluation.feasibleQuestion = false;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
-      QuestionContestResult contestResult =
-          controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult contestResult = controller.contest(recallPrompt);
       assertFalse(contestResult.rejected);
     }
   }
@@ -440,7 +439,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       // When
-      QuestionContestResult result = controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult result = controller.contest(recallPrompt);
 
       // Then
       assertThat(result.rejected, equalTo(false));
@@ -453,7 +452,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       // When
-      QuestionContestResult result = controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult result = controller.contest(recallPrompt);
 
       // Then
       assertThat(result.rejected, equalTo(true));

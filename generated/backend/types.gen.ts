@@ -165,6 +165,11 @@ export type GlobalAiModelSettings = {
     othersModel?: string;
 };
 
+export type QuestionContestResult = {
+    advice?: string;
+    rejected?: boolean;
+};
+
 export type AnswerDto = {
     choiceIndex?: number;
 };
@@ -181,11 +186,6 @@ export type AnsweredQuestion = {
     answer: Answer;
     answerDisplay?: string;
     recallPromptId: number;
-};
-
-export type QuestionContestResult = {
-    advice?: string;
-    rejected?: boolean;
 };
 
 export type RecallPrompt = {
@@ -1312,6 +1312,33 @@ export type SetCurrentModelVersionsResponses = {
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
 
+export type ContestData = {
+    body?: never;
+    path: {
+        recallPrompt: number;
+    };
+    query?: never;
+    url: '/api/recall-prompts/{recallPrompt}/contest';
+};
+
+export type ContestErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type ContestError = ContestErrors[keyof ContestErrors];
+
+export type ContestResponses = {
+    /**
+     * OK
+     */
+    200: QuestionContestResult;
+};
+
+export type ContestResponse = ContestResponses[keyof ContestResponses];
+
 export type AnswerQuizData = {
     body: AnswerDto;
     path: {
@@ -1365,33 +1392,6 @@ export type RegenerateResponses = {
 };
 
 export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
-
-export type ContestData = {
-    body?: never;
-    path: {
-        predefinedQuestion: number;
-    };
-    query?: never;
-    url: '/api/recall-prompts/{predefinedQuestion}/contest';
-};
-
-export type ContestErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type ContestError = ContestErrors[keyof ContestErrors];
-
-export type ContestResponses = {
-    /**
-     * OK
-     */
-    200: QuestionContestResult;
-};
-
-export type ContestResponse = ContestResponses[keyof ContestResponses];
 
 export type ToggleApprovalData = {
     body?: never;
