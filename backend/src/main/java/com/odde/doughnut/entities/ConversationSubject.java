@@ -20,17 +20,17 @@ public class ConversationSubject {
   @ManyToOne
   @JoinColumn(name = "recall_prompt_id", referencedColumnName = "id")
   @JsonIgnore
-  private QuestionAnswer questionAnswer;
+  private RecallPrompt recallPrompt;
 
   @JsonIgnore
   public boolean isEmpty() {
-    return assessmentQuestionInstance == null && note == null && questionAnswer == null;
+    return assessmentQuestionInstance == null && note == null && recallPrompt == null;
   }
 
   public AnsweredQuestion getAnsweredQuestion() {
-    if (questionAnswer == null) {
+    if (recallPrompt == null) {
       return null;
     }
-    return questionAnswer.getAnsweredQuestion();
+    return recallPrompt.getAnsweredQuestion();
   }
 }

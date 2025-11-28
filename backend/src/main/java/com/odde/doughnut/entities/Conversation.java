@@ -53,9 +53,9 @@ public class Conversation extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public void setQuestionAnswer(QuestionAnswer questionAnswer) {
-    this.subject.setQuestionAnswer(questionAnswer);
-    this.subjectOwnership = questionAnswer.getNotebook().getOwnership();
+  public void setRecallPrompt(RecallPrompt recallPrompt) {
+    this.subject.setRecallPrompt(recallPrompt);
+    this.subjectOwnership = recallPrompt.getNotebook().getOwnership();
   }
 
   @JsonIgnore
@@ -65,9 +65,9 @@ public class Conversation extends EntityIdentifiedByIdOnly {
       return note;
     }
 
-    QuestionAnswer questionAnswer = subject.getQuestionAnswer();
-    if (questionAnswer != null) {
-      return questionAnswer.getPredefinedQuestion().getNote();
+    RecallPrompt recallPrompt = subject.getRecallPrompt();
+    if (recallPrompt != null) {
+      return recallPrompt.getPredefinedQuestion().getNote();
     }
 
     AssessmentQuestionInstance assessmentQuestionInstance = subject.getAssessmentQuestionInstance();
@@ -80,8 +80,8 @@ public class Conversation extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public String getAdditionalContextForSubject() {
-    QuestionAnswer questionAnswer = subject.getQuestionAnswer();
-    if (questionAnswer != null) {
+    RecallPrompt recallPrompt = subject.getRecallPrompt();
+    if (recallPrompt != null) {
       return """
           User attempted to answer the following question about the note of focus.
           Please note that user is not prompted with the specific note of focus,
@@ -90,7 +90,7 @@ public class Conversation extends EntityIdentifiedByIdOnly {
           Here's the question definition and user's answer:
 
           """
-          + questionAnswer.getQuestionDetails();
+          + recallPrompt.getQuestionDetails();
     }
 
     return null;

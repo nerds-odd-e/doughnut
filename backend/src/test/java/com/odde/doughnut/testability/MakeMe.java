@@ -121,12 +121,12 @@ public class MakeMe extends MakeMeWithoutDB {
     return new PredefinedQuestionBuilder(this);
   }
 
-  public QuestionAnswerBuilder aQuestionAnswer() {
-    return new QuestionAnswerBuilder(this, null);
+  public RecallPromptBuilder aRecallPrompt() {
+    return new RecallPromptBuilder(this, null);
   }
 
-  public QuestionAnswerBuilder theQuestionAnswer(QuestionAnswer questionAnswer) {
-    return new QuestionAnswerBuilder(this, questionAnswer);
+  public RecallPromptBuilder theRecallPrompt(RecallPrompt recallPrompt) {
+    return new RecallPromptBuilder(this, recallPrompt);
   }
 
   public FailureReportBuilder aFailureReport() {

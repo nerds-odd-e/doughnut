@@ -14,8 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/question-answers")
-class QuestionAnswerController {
+@RequestMapping("/api/recall-prompts")
+class RecallPromptController {
 
   private final TestabilitySettings testabilitySettings;
 
@@ -23,7 +23,7 @@ class QuestionAnswerController {
   private final AuthorizationService authorizationService;
 
   @Autowired
-  public QuestionAnswerController(
+  public RecallPromptController(
       RecallQuestionService recallQuestionService,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService) {

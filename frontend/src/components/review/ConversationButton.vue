@@ -33,8 +33,8 @@ const router = useRouter()
 
 const startConversation = async () => {
   const { data: conversation, error } = await apiCallWithLoading(() =>
-    ConversationMessageController.startConversationAboutQuestionAnswer({
-      path: { questionAnswer: props.questionId },
+    ConversationMessageController.startConversationAboutRecallPrompt({
+      path: { recallPrompt: props.questionId },
     })
   )
   if (!error) {

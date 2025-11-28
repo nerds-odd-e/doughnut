@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAnswer;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +41,9 @@ class AIGeneratedQuizFactoryTest {
 
   @Test
   void shouldIncludeQuestionStem() {
-    QuestionAnswer questionAnswer = buildQuestion();
+    RecallPrompt recallPrompt = buildQuestion();
     assertThat(
-        questionAnswer.getPredefinedQuestion().getMultipleChoicesQuestion().getF0__stem(),
+        recallPrompt.getMultipleChoicesQuestion().getF0__stem(),
         containsString("How long did it take to build Rome?"));
   }
 
@@ -68,11 +68,11 @@ class AIGeneratedQuizFactoryTest {
     }
   }
 
-  private QuestionAnswerBuilder questionBuilder() {
-    return makeMe.aQuestionAnswer().ofAIGeneratedQuestion(mcqWithAnswer, note);
+  private RecallPromptBuilder questionBuilder() {
+    return makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note);
   }
 
-  private QuestionAnswer buildQuestion() {
+  private RecallPrompt buildQuestion() {
     return questionBuilder().inMemoryPlease();
   }
 }

@@ -3,34 +3,57 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.ai.AiQuestionGenerator;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import java.sql.Timestamp;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RecallQuestionService {
   private final PredefinedQuestionService predefinedQuestionService;
+  private final RecallPromptRepository recallPromptRepository;
   private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
+  private final AnswerService answerService;
   private final MemoryTrackerService memoryTrackerService;
 
   @Autowired
   public RecallQuestionService(
+      RecallPromptRepository recallPromptRepository,
       EntityPersister entityPersister,
+      AnswerService answerService,
       MemoryTrackerService memoryTrackerService,
       PredefinedQuestionService predefinedQuestionService,
       AiQuestionGenerator aiQuestionGenerator) {
+    this.recallPromptRepository = recallPromptRepository;
     this.entityPersister = entityPersister;
+    this.answerService = answerService;
     this.memoryTrackerService = memoryTrackerService;
     this.predefinedQuestionService = predefinedQuestionService;
     this.aiQuestionGenerator = aiQuestionGenerator;
   }
 
   public PredefinedQuestion generateAQuestion(MemoryTracker memoryTracker) {
-    return predefinedQuestionService.generateAFeasibleQuestion(memoryTracker.getNote());
+    // First check if there's an existing unanswered recall prompt for this note
+    RecallPrompt existingPrompt = findExistingUnansweredRecallPrompt(memoryTracker.getNote());
+    if (existingPrompt != null) {
+      return existingPrompt.getPredefinedQuestion();
+    }
+
+    return generateNewQuestion(memoryTracker.getNote());
+  }
+
+  private RecallPrompt findExistingUnansweredRecallPrompt(Note note) {
+    List<RecallPrompt> results = recallPromptRepository.findUnansweredByNote(note);
+    return results.isEmpty() ? null : results.get(0);
+  }
+
+  private PredefinedQuestion generateNewQuestion(Note note) {
+    return predefinedQuestionService.generateAFeasibleQuestion(note);
   }
 
   public PredefinedQuestion regenerateAQuestion(
@@ -44,12 +67,10 @@ public class RecallQuestionService {
     return entityPersister.save(question);
   }
 
-  private QuestionAnswer createQuestionAnswerFromQuestion(
-      PredefinedQuestion question, AnswerDTO answerDTO) {
-    QuestionAnswer questionAnswer = new QuestionAnswer();
-    questionAnswer.setPredefinedQuestion(question);
-    questionAnswer.buildAnswer(answerDTO);
-    return entityPersister.save(questionAnswer);
+  private RecallPrompt createARecallPromptFromQuestion(PredefinedQuestion question) {
+    RecallPrompt recallPrompt = new RecallPrompt();
+    recallPrompt.setPredefinedQuestion(question);
+    return entityPersister.save(recallPrompt);
   }
 
   public QuestionContestResult contest(PredefinedQuestion predefinedQuestion) {
@@ -61,10 +82,10 @@ public class RecallQuestionService {
       AnswerDTO answerDTO,
       User user,
       Timestamp currentUTCTimestamp) {
-    QuestionAnswer questionAnswer = createQuestionAnswerFromQuestion(predefinedQuestion, answerDTO);
-    Answer answer = questionAnswer.getAnswer();
+    RecallPrompt recallPrompt = createARecallPromptFromQuestion(predefinedQuestion);
+    Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), predefinedQuestion);
-    return questionAnswer.getAnsweredQuestion();
+    return recallPrompt.getAnsweredQuestion();
   }
 }

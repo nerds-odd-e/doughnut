@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAnswer;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
@@ -36,10 +36,10 @@ public class ConversationService {
     return conversationRepository.save(conversation);
   }
 
-  public Conversation startConversationAboutQuestionAnswer(
-      QuestionAnswer questionAnswer, User initiator) {
+  public Conversation startConversationAboutRecallPrompt(
+      RecallPrompt recallPrompt, User initiator) {
     Conversation conversation = initializeConversation(initiator);
-    conversation.setQuestionAnswer(questionAnswer);
+    conversation.setRecallPrompt(recallPrompt);
     conversationRepository.save(conversation);
     return conversation;
   }
@@ -104,9 +104,9 @@ public class ConversationService {
       return assessmentQuestionInstance.getMultipleChoicesQuestion().getF0__stem();
     }
 
-    QuestionAnswer questionAnswer = conversation.getSubject().getQuestionAnswer();
-    if (questionAnswer != null) {
-      return questionAnswer.getPredefinedQuestion().getNote().getTopicConstructor();
+    RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();
+    if (recallPrompt != null) {
+      return recallPrompt.getPredefinedQuestion().getNote().getTopicConstructor();
     }
 
     return "Unknown Subject";

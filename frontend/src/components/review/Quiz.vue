@@ -68,7 +68,7 @@ import type {
 } from "@generated/backend"
 import {
   MemoryTrackerController,
-  QuestionAnswerController,
+  RecallPromptController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -117,7 +117,7 @@ const useQuestionFetching = (props: QuizProps) => {
       fetchingMemoryTrackerIds.value.add(memoryTrackerId)
       try {
         const { data: question, error } =
-          await QuestionAnswerController.askAQuestion({
+          await RecallPromptController.askAQuestion({
             path: { memoryTracker: memoryTrackerId },
           })
         if (!error) {

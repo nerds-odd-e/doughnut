@@ -26,13 +26,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
-class QuestionAnswerControllerTests extends ControllerTestBase {
+class RecallPromptControllerTests extends ControllerTestBase {
 
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
   @Autowired MakeMe makeMe;
-  @Autowired QuestionAnswerController controller;
+  @Autowired RecallPromptController controller;
   @Autowired GlobalSettingsService globalSettingsService;
   OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -51,7 +51,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
   }
 
-  QuestionAnswerController nullUserController() {
+  RecallPromptController nullUserController() {
     currentUser.setUser(null);
     return controller;
   }

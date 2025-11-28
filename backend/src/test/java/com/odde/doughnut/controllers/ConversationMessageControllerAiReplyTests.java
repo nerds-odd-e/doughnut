@@ -7,10 +7,10 @@ import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookAiAssistant;
-import com.odde.doughnut.entities.QuestionAnswer;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.testability.OpenAIChatCompletionStreamMocker;
-import com.odde.doughnut.testability.builders.QuestionAnswerBuilder;
+import com.odde.doughnut.testability.builders.RecallPromptBuilder;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
 import org.apache.coyote.BadRequestException;
@@ -114,20 +114,20 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
   }
 
   @Nested
-  class QuestionAnswerConversationTests {
-    QuestionAnswer questionAnswer;
+  class RecallPromptConversationTests {
+    RecallPrompt recallPrompt;
     Note questionNote;
-    Conversation questionAnswerConversation;
+    Conversation recallConversation;
 
     @BeforeEach
     void setup() {
       questionNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      QuestionAnswerBuilder questionAnswerBuilder = makeMe.aQuestionAnswer();
-      questionAnswer = questionAnswerBuilder.approvedQuestionOf(questionNote).please();
-      questionAnswerConversation =
+      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
+      recallPrompt = recallPromptBuilder.approvedQuestionOf(questionNote).please();
+      recallConversation =
           makeMe
               .aConversation()
-              .forAQuestionAnswer(questionAnswer)
+              .forARecallPrompt(recallPrompt)
               .from(currentUser.getUser())
               .please();
 
@@ -137,23 +137,23 @@ public class ConversationMessageControllerAiReplyTests extends ControllerTestBas
     }
 
     @Test
-    void shouldUseNoteFromQuestionAnswer()
+    void shouldUseNoteFromRecallPrompt()
         throws UnexpectedNoAccessRightException, BadRequestException {
-      controller.getAiReply(questionAnswerConversation);
+      controller.getAiReply(recallConversation);
 
       // Verify streaming was called (the actual request parameters are tested via integration)
       // The official client's createStreaming is called internally by OpenAiApiHandler
-      assertThat(questionAnswerConversation.getConversationMessages().size()).isGreaterThan(0);
+      assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
     }
 
     @Test
     void shouldIncludeQuestionDetailsWhenCreatingNewConversation()
         throws UnexpectedNoAccessRightException, BadRequestException {
-      controller.getAiReply(questionAnswerConversation);
+      controller.getAiReply(recallConversation);
 
       // Verify streaming was called (the actual request parameters are tested via integration)
       // The official client's createStreaming is called internally by OpenAiApiHandler
-      assertThat(questionAnswerConversation.getConversationMessages().size()).isGreaterThan(0);
+      assertThat(recallConversation.getConversationMessages().size()).isGreaterThan(0);
     }
   }
 }

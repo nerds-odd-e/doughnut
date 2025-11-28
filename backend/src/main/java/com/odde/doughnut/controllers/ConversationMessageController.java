@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.AssessmentQuestionInstance;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuestionAnswer;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -176,10 +176,10 @@ public class ConversationMessageController {
         note, authorizationService.getCurrentUser());
   }
 
-  @PostMapping("/question-answer/{questionAnswer}")
-  public Conversation startConversationAboutQuestionAnswer(
-      @PathVariable("questionAnswer") @Schema(type = "integer") QuestionAnswer questionAnswer) {
-    return conversationService.startConversationAboutQuestionAnswer(
-        questionAnswer, authorizationService.getCurrentUser());
+  @PostMapping("/recall-prompt/{recallPrompt}")
+  public Conversation startConversationAboutRecallPrompt(
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt) {
+    return conversationService.startConversationAboutRecallPrompt(
+        recallPrompt, authorizationService.getCurrentUser());
   }
 }
