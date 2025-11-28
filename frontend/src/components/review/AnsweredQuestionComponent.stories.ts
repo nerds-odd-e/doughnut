@@ -92,8 +92,8 @@ export const IncorrectAnswer: Story = {
   },
 }
 
-// Question with explanation/metadata (using a note)
-export const WithNote: Story = {
+// Question with note that has many ancestors
+export const NoteWithManyAncestors: Story = {
   args: {
     answeredQuestion: (() => {
       const question = createAnsweredQuestionWithQuestion(
@@ -103,8 +103,20 @@ export const WithNote: Story = {
         0,
         true
       )
+      
+      // Create a chain of 10 ancestor notes
+      let currentNote = makeMe.aNote.topicConstructor("Ancestor 1").please()
+      for (let i = 2; i <= 10; i++) {
+        currentNote = makeMe.aNote
+          .topicConstructor(`Ancestor ${i}`)
+          .underNote(currentNote)
+          .please()
+      }
+      
+      // Create the final note with all ancestors
       question.note = makeMe.aNote
         .topicConstructor("TypeScript")
+        .underNote(currentNote)
         .details(
           "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."
         )
