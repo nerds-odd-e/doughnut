@@ -94,10 +94,14 @@ const contestQuestion = async () => {
         badQuestionReason: contestResult.advice,
       })
       try {
+        const predefinedQuestionId = currentQuestion.value.predefinedQuestionId
+        if (!predefinedQuestionId) {
+          throw new Error("PredefinedQuestion ID is not available")
+        }
         const { data: regeneratedQuestion, error: regenerateError } =
           await apiCallWithLoading(() =>
             RecallPromptController.regenerate({
-              path: { recallPrompt: currentQuestion.value.id },
+              path: { predefinedQuestion: predefinedQuestionId },
               body: contestResult,
             })
           )

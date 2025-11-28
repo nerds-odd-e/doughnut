@@ -20,6 +20,10 @@ public class RecallPrompt extends AnswerableQuestionInstance {
     return getPredefinedQuestion().getNote().getNotebook();
   }
 
+  public Integer getPredefinedQuestionId() {
+    return getPredefinedQuestion() != null ? getPredefinedQuestion().getId() : null;
+  }
+
   @JsonIgnore
   public AnsweredQuestion getAnsweredQuestion() {
     if (answer == null) {
