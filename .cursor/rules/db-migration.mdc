@@ -22,7 +22,7 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 
 * Migrations are stored in `backend/src/main/resources/db/migration/`
 * Files follow the naming convention: `V{version}__{description}.sql`
-    * Example: `V200000176__rename_onboarded_at_in_memory_tracker_to_assimilated_at.sql`
+    * Example: `V300000176__rename_onboarded_at_in_memory_tracker_to_assimilated_at.sql`
 
 ## Version Numbering
 
@@ -30,7 +30,7 @@ The project uses Flyway for database migrations, configured in Spring Boot.
 
 The project uses two main version patterns:
 - `V10000xxx` for baseline migrations
-- `V200000xxx` for subsequent migrations
+- `V300000xxx` for subsequent migrations
 
 New migrations need to use a greater number than the current latest version number.
 
@@ -53,7 +53,7 @@ Baseline:
 
 There's a baseline migration file (V10000063__baseline.sql) that contains the initial schema
 
-As noted in V200000101__db_migration_placeholder.sql, previous migrations were collapsed into this baseline file for brevity
+As noted in V300000101__db_migration_placeholder.sql, previous migrations were collapsed into this baseline file for brevity
 
 ## Best Practices:
 
