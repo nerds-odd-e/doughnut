@@ -131,11 +131,11 @@ const removeChoice = () => {
 }
 
 const submitQuestion = async () => {
-  const recallPrompt = predefinedQuestion.value
+  const question = predefinedQuestion.value
   const { data: response, error } = await apiCallWithLoading(() =>
     PredefinedQuestionController.addQuestionManually({
       path: { note: props.note.id },
-      body: recallPrompt,
+      body: question,
     })
   )
   if (!error && response) {
@@ -144,11 +144,11 @@ const submitQuestion = async () => {
 }
 
 const refineQuestion = async () => {
-  const recallPrompt = predefinedQuestion.value
+  const question = predefinedQuestion.value
   const { data: refined, error } = await apiCallWithLoading(() =>
     PredefinedQuestionController.refineQuestion({
       path: { note: props.note.id },
-      body: recallPrompt,
+      body: question,
     })
   )
   if (!error && refined) {

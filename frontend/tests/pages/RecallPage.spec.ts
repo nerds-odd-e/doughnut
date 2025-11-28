@@ -122,8 +122,8 @@ describe("repeat page", () => {
         "markAsRepeated",
         makeMe.aMemoryTracker.please()
       )
-      const recallPrompt = makeMe.aPredefinedQuestion.please()
-      askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
+      const question = makeMe.aPredefinedQuestion.please()
+      askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(question))
       vi.runOnlyPendingTimers()
       await flushPromises()
       await wrapper.find("button.daisy-btn-primary").trigger("click")

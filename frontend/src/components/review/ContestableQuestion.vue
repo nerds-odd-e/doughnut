@@ -13,7 +13,7 @@
     {{ currentQuestionLegitMessage }}
   </p>
   <ContentLoader v-if="regenerating" />
-  <div class="recall-prompt daisy-overflow-y-auto" v-else>
+  <div class="question daisy-overflow-y-auto" v-else>
     <AnsweredQuestionComponent
       v-if="answeredQuestion"
       :answered-question="answeredQuestion"
@@ -123,7 +123,7 @@ const onAnswered = (answer: AnsweredQuestion) => {
 </script>
 
 <style lang="scss" scoped>
-.recall-prompt {
+.question {
   overflow-y: auto;
 }
 
@@ -132,7 +132,7 @@ const onAnswered = (answer: AnsweredQuestion) => {
 }
 
 /* These styles are to-be replaced by DaisyUI classes:
-.recall-prompt -> daisy-overflow-y-auto
+.question -> daisy-overflow-y-auto
 .notebook-source -> daisy-mb-4
 */
 </style>

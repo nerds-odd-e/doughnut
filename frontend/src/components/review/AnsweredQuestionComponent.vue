@@ -13,7 +13,7 @@
   <AnswerResult v-bind="{ answeredQuestion }" />
   <ConversationButton
     v-if="conversationButton"
-    :recall-prompt-id="answeredQuestion.recallPromptId"
+    :question-id="answeredQuestion.recallPromptId"
   />
 </template>
 
