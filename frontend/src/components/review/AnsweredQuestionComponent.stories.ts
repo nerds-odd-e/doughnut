@@ -59,7 +59,9 @@ export const CorrectAnswer: Story = {
       )
       question.note = makeMe.aNote
         .topicConstructor("France")
-        .details("France is a country in Western Europe. Paris is its capital and largest city.")
+        .details(
+          "France is a country in Western Europe. Paris is its capital and largest city."
+        )
         .please()
       return question
     })(),
@@ -80,7 +82,9 @@ export const IncorrectAnswer: Story = {
       )
       question.note = makeMe.aNote
         .topicConstructor("France")
-        .details("France is a country in Western Europe. Paris is its capital and largest city.")
+        .details(
+          "France is a country in Western Europe. Paris is its capital and largest city."
+        )
         .please()
       return question
     })(),
@@ -125,7 +129,9 @@ export const InSequence: Story = {
       question.recallPromptId = 1
       question.note = makeMe.aNote
         .topicConstructor("React")
-        .details("React is a JavaScript library for building user interfaces, particularly web applications.")
+        .details(
+          "React is a JavaScript library for building user interfaces, particularly web applications."
+        )
         .please()
       return question
     })(),
@@ -146,7 +152,9 @@ export const WithoutConversationButton: Story = {
       )
       question.note = makeMe.aNote
         .topicConstructor("Basic Arithmetic")
-        .details("Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4.")
+        .details(
+          "Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4."
+        )
         .please()
       return question
     })(),

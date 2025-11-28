@@ -15,7 +15,7 @@ const config: StorybookConfig = {
     // Storybook automatically merges with vite.config.ts, but we need to ensure
     // tsconfigPaths plugin is present to resolve @generated/* from tsconfig.json
     const frontendDir = fileURLToPath(new URL("..", import.meta.url))
-    
+
     return mergeConfig(config, {
       plugins: [
         // Ensure tsconfigPaths is present to resolve path aliases from tsconfig.json
