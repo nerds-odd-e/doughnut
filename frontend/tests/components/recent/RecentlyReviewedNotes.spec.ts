@@ -2,6 +2,8 @@ import RecentlyReviewedNotes from "@/components/recent/RecentlyReviewedNotes.vue
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
+import { createRouter, createWebHistory } from "vue-router"
+import routes from "@/routes/routes"
 
 describe("RecentlyReviewedNotes", () => {
   const mockMemoryTrackers = [
@@ -48,5 +50,31 @@ describe("RecentlyReviewedNotes", () => {
     // Verify removed memory tracker has correct styling
     const removedRow = rows[1]
     expect(removedRow?.classes()).toContain("removed")
+  })
+
+  it("navigates to memory tracker page when row is clicked", async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes,
+    })
+    const pushSpy = vi.spyOn(router, "push")
+
+    mockSdkService("getRecentlyReviewed", mockMemoryTrackers)
+    const wrapper = helper
+      .component(RecentlyReviewedNotes)
+      .withRouter(router)
+      .mount()
+
+    await flushPromises()
+
+    const rows = wrapper.findAll("tbody tr")
+    const firstRow = rows[0]
+    expect(firstRow).toBeDefined()
+    await firstRow!.trigger("click")
+
+    expect(pushSpy).toHaveBeenCalledWith({
+      name: "memoryTrackerShow",
+      params: { memoryTrackerId: mockMemoryTrackers[0]!.id },
+    })
   })
 })

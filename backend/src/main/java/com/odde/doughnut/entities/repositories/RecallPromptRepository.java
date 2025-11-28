@@ -17,4 +17,9 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
           + "AND pq.contested = false")
   Optional<RecallPrompt> findUnansweredByMemoryTracker(
       @Param("memoryTracker") MemoryTracker memoryTracker);
+
+  @Query(
+      "SELECT rp FROM RecallPrompt rp WHERE rp.memoryTracker = :memoryTracker AND rp.answer IS NOT NULL ORDER BY rp.id DESC")
+  Optional<RecallPrompt> findLastAnsweredByMemoryTracker(
+      @Param("memoryTracker") MemoryTracker memoryTracker);
 }

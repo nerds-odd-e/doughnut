@@ -3,11 +3,13 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
+import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -19,14 +21,17 @@ public class MemoryTrackerService {
   private final EntityPersister entityPersister;
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
+  private final RecallPromptRepository recallPromptRepository;
 
   public MemoryTrackerService(
       EntityPersister entityPersister,
       UserService userService,
-      MemoryTrackerRepository memoryTrackerRepository) {
+      MemoryTrackerRepository memoryTrackerRepository,
+      RecallPromptRepository recallPromptRepository) {
     this.entityPersister = entityPersister;
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
+    this.recallPromptRepository = recallPromptRepository;
   }
 
   public List<MemoryTracker> findLast100ByUser(Integer userId) {
@@ -117,5 +122,12 @@ public class MemoryTrackerService {
     Boolean correct = note.matchAnswer(spellingAnswer);
     markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
     return new SpellingResultDTO(note, spellingAnswer, correct);
+  }
+
+  public AnsweredQuestion getLastAnsweredQuestion(MemoryTracker memoryTracker) {
+    return recallPromptRepository
+        .findLastAnsweredByMemoryTracker(memoryTracker)
+        .map(RecallPrompt::getAnsweredQuestion)
+        .orElse(null);
   }
 }

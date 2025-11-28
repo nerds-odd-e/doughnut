@@ -3779,6 +3779,33 @@ export type GetSpellingQuestionResponses = {
 
 export type GetSpellingQuestionResponse = GetSpellingQuestionResponses[keyof GetSpellingQuestionResponses];
 
+export type GetLastAnsweredQuestionData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/last-answered-question';
+};
+
+export type GetLastAnsweredQuestionErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type GetLastAnsweredQuestionError = GetLastAnsweredQuestionErrors[keyof GetLastAnsweredQuestionErrors];
+
+export type GetLastAnsweredQuestionResponses = {
+    /**
+     * OK
+     */
+    200: AnsweredQuestion;
+};
+
+export type GetLastAnsweredQuestionResponse = GetLastAnsweredQuestionResponses[keyof GetLastAnsweredQuestionResponses];
+
 export type GetRecentlyReviewedData = {
     body?: never;
     path?: never;

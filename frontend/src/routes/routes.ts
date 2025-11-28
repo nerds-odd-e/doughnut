@@ -16,6 +16,7 @@ import MessageCenterPage from "../pages/MessageCenterPage.vue"
 import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
+import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
 
 // Please start most of the path with "/d/"
 // so that the server will render the page correctly
@@ -119,6 +120,14 @@ const routes = [
     path: "/d/generate-token",
     name: "manageMCPTokens",
     component: ManageMCPTokensPage,
+  },
+  {
+    path: "/d/memory-trackers/:memoryTrackerId",
+    name: "memoryTrackerShow",
+    component: MemoryTrackerPage,
+    props: (route: RouteLocation) => ({
+      memoryTrackerId: Number(route.params.memoryTrackerId),
+    }),
   },
 ] as RouteRecordRaw[]
 

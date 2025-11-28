@@ -114,6 +114,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/MemoryTrackerPage': RouteRecordInfo<
+      '/MemoryTrackerPage',
+      '/MemoryTrackerPage',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/MessageCenterPage': RouteRecordInfo<
       '/MessageCenterPage',
       '/MessageCenterPage',
@@ -251,6 +258,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/ManageMCPTokensPage.vue': {
       routes:
         | '/ManageMCPTokensPage'
+      views:
+        | never
+    }
+    'src/pages/MemoryTrackerPage.vue': {
+      routes:
+        | '/MemoryTrackerPage'
       views:
         | never
     }

@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
+import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -117,5 +118,14 @@ class MemoryTrackerController {
         answerDTO,
         authorizationService.getCurrentUser(),
         testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  @GetMapping("/{memoryTracker}/last-answered-question")
+  public AnsweredQuestion getLastAnsweredQuestion(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    return memoryTrackerService.getLastAnsweredQuestion(memoryTracker);
   }
 }
