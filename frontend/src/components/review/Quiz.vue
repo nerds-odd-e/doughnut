@@ -1,6 +1,6 @@
 <template>
   <div class="content">
-    <ContentLoader v-if="!currentQuestionFetched" />
+    <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
       <SpellingQuestionComponent
         v-if="currentMemoryTracker?.spelling"
@@ -103,6 +103,7 @@ const useQuestionFetching = (props: QuizProps) => {
   const recallPromptCache = ref<Record<number, RecallPrompt | undefined>>({})
   const eagerFetchUntil = ref(0)
   const fetching = ref(false)
+  const fetchingMemoryTrackerIds = ref<Set<number>>(new Set())
 
   const fetchNextQuestion = async () => {
     for (
@@ -114,16 +115,22 @@ const useQuestionFetching = (props: QuizProps) => {
       const memoryTrackerId = memoryTracker?.memoryTrackerId
       if (memoryTrackerId === undefined) break
 
-      if (memoryTrackerId in recallPromptCache.value) continue
+      const cachedValue = recallPromptCache.value[memoryTrackerId]
+      if (cachedValue !== undefined) continue
 
-      const { data: question, error } =
-        await RecallPromptController.askAQuestion({
-          path: { memoryTracker: memoryTrackerId },
-        })
-      if (!error) {
-        recallPromptCache.value[memoryTrackerId] = question!
-      } else {
-        recallPromptCache.value[memoryTrackerId] = undefined
+      fetchingMemoryTrackerIds.value.add(memoryTrackerId)
+      try {
+        const { data: question, error } =
+          await RecallPromptController.askAQuestion({
+            path: { memoryTracker: memoryTrackerId },
+          })
+        if (!error) {
+          recallPromptCache.value[memoryTrackerId] = question!
+        } else {
+          recallPromptCache.value[memoryTrackerId] = undefined
+        }
+      } finally {
+        fetchingMemoryTrackerIds.value.delete(memoryTrackerId)
       }
     }
   }
@@ -144,17 +151,26 @@ const useQuestionFetching = (props: QuizProps) => {
   return {
     recallPromptCache,
     fetchQuestion,
+    fetchingMemoryTrackerIds,
   }
 }
 
 // Use the composable
-const { recallPromptCache, fetchQuestion } = useQuestionFetching(props)
+const { recallPromptCache, fetchQuestion, fetchingMemoryTrackerIds } =
+  useQuestionFetching(props)
 
 // Computed properties with better naming
 const currentMemoryTracker = computed(() => memoryTrackerAt(props.currentIndex))
 const currentMemoryTrackerId = computed(
   () => currentMemoryTracker.value?.memoryTrackerId
 )
+const isCurrentMemoryTrackerFetching = computed(() => {
+  const memoryTrackerId = currentMemoryTrackerId.value
+  return (
+    memoryTrackerId !== undefined &&
+    fetchingMemoryTrackerIds.value.has(memoryTrackerId)
+  )
+})
 const currentQuestionFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
   return (

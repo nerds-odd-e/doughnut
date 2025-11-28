@@ -1,8 +1,12 @@
 import Quiz from "@/components/review/Quiz.vue"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, it, vi } from "vitest"
+import { beforeEach, describe, it, vi, afterEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import helper, {
+  mockSdkService,
+  wrapSdkResponse,
+  wrapSdkError,
+} from "@tests/helpers"
 import type { MemoryTrackerLite, SpellingResultDto } from "@generated/backend"
 
 describe("repeat page", () => {
@@ -16,6 +20,10 @@ describe("repeat page", () => {
     mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
     askAQuestionSpy = mockSdkService("askAQuestion", recallPrompt)
     mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
   })
 
   const createMemoryTrackerLite = (
@@ -144,6 +152,27 @@ describe("repeat page", () => {
       const emitted = wrapper.emitted()
       expect(emitted["answered-spelling"]).toBeTruthy()
       expect(emitted["answered-spelling"]![0]).toEqual([answerResult])
+    })
+  })
+
+  describe("loading state when fetching recall prompt", () => {
+    it("should show ContentLoader, not JustReview, when navigating to a memory tracker that previously failed", async () => {
+      askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("Failed to fetch"))
+      const wrapper = await mountPage([1, 2], 1)
+      await flushPromises()
+
+      expect(wrapper.findComponent({ name: "JustReview" }).exists()).toBe(true)
+
+      await wrapper.setProps({ currentIndex: 1 })
+      await flushPromises()
+      await wrapper.setProps({ currentIndex: 0 })
+
+      expect(wrapper.findComponent({ name: "JustReview" }).exists()).toBe(false)
+      expect(wrapper.findComponent({ name: "ContentLoader" }).exists()).toBe(
+        true
+      )
+
+      await flushPromises()
     })
   })
 })
