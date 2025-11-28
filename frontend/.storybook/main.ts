@@ -1,7 +1,8 @@
 import type { StorybookConfig } from "@storybook/vue3-vite"
-import { fileURLToPath } from "node:url"
 import { mergeConfig } from "vite"
 import tsconfigPaths from "vite-tsconfig-paths"
+import { fileURLToPath } from "node:url"
+import path from "path"
 
 const config: StorybookConfig = {
   stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|mjs|ts|tsx)"],
@@ -11,17 +12,16 @@ const config: StorybookConfig = {
     options: {},
   },
   async viteFinal(config) {
+    // Storybook automatically merges with vite.config.ts, but we need to ensure
+    // tsconfigPaths plugin is present to resolve @generated/* from tsconfig.json
+    const frontendDir = fileURLToPath(new URL("..", import.meta.url))
+    
     return mergeConfig(config, {
-      resolve: {
-        alias: {
-          "@": fileURLToPath(new URL("../src", import.meta.url)),
-          "@tests": fileURLToPath(new URL("../tests", import.meta.url)),
-          "@generated": fileURLToPath(new URL("../generated", import.meta.url)),
-        },
-      },
       plugins: [
+        // Ensure tsconfigPaths is present to resolve path aliases from tsconfig.json
+        // This will handle @generated/* automatically based on tsconfig.json paths
         tsconfigPaths({
-          root: fileURLToPath(new URL("..", import.meta.url)),
+          root: frontendDir,
         }),
       ],
     })
