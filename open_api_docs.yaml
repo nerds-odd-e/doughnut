@@ -584,10 +584,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
-  /api/recall-prompts/{predefinedQuestion}/regenerate:
+  /api/question-answers/{predefinedQuestion}/regenerate:
     post:
       tags:
-      - recall-prompt-controller
+      - question-answer-controller
       operationId: regenerate
       parameters:
       - name: predefinedQuestion
@@ -614,10 +614,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PredefinedQuestion"
-  /api/recall-prompts/{predefinedQuestion}/contest:
+  /api/question-answers/{predefinedQuestion}/contest:
     post:
       tags:
-      - recall-prompt-controller
+      - question-answer-controller
       operationId: contest
       parameters:
       - name: predefinedQuestion
@@ -638,10 +638,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuestionContestResult"
-  /api/recall-prompts/{predefinedQuestion}/answer:
+  /api/question-answers/{predefinedQuestion}/answer:
     post:
       tags:
-      - recall-prompt-controller
+      - question-answer-controller
       operationId: answerQuiz
       parameters:
       - name: predefinedQuestion
@@ -1707,13 +1707,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SseEmitter"
-  /api/conversation/recall-prompt/{recallPrompt}:
+  /api/conversation/question-answer/{questionAnswer}:
     post:
       tags:
       - conversation-message-controller
-      operationId: startConversationAboutRecallPrompt
+      operationId: startConversationAboutQuestionAnswer
       parameters:
-      - name: recallPrompt
+      - name: questionAnswer
         in: path
         required: true
         schema:
@@ -2658,10 +2658,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/RecallStatus"
-  /api/recall-prompts/{memoryTracker}/question:
+  /api/question-answers/{memoryTracker}/question:
     get:
       tags:
-      - recall-prompt-controller
+      - question-answer-controller
       operationId: askAQuestion
       parameters:
       - name: memoryTracker

@@ -7,7 +7,7 @@ import com.odde.doughnut.controllers.dto.Randomization;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
+import com.odde.doughnut.testability.builders.QuestionAnswerBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -91,24 +91,24 @@ class ConversationMessageServiceTest {
 
   @Nested
   class QuestionConversationTest {
-    private RecallPrompt recallPrompt;
+    private QuestionAnswer questionAnswer;
     private Note note;
 
     @BeforeEach
     void setup() {
       note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.approvedQuestionOf(note).answerChoiceIndex(1).please();
+      QuestionAnswerBuilder questionAnswerBuilder = makeMe.aQuestionAnswer();
+      questionAnswer = questionAnswerBuilder.approvedQuestionOf(note).answerChoiceIndex(1).please();
     }
 
     @Test
     void shouldSetCorrectOwnershipAndSubject() {
       Conversation conversation =
-          conversationService.startConversationAboutRecallPrompt(
-              recallPrompt, currentUser.getUser());
+          conversationService.startConversationAboutQuestionAnswer(
+              questionAnswer, currentUser.getUser());
 
       makeMe.refresh(conversation);
-      assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
+      assertEquals(questionAnswer, conversation.getSubject().getQuestionAnswer());
       assertEquals(note.getNotebook().getOwnership(), conversation.getSubjectOwnership());
       assertEquals(currentUser.getUser(), conversation.getConversationInitiator());
     }

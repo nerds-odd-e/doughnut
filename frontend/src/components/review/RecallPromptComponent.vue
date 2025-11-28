@@ -25,7 +25,7 @@
 import { ref } from "vue"
 import type { PropType } from "vue"
 import type { AnswerDto, PredefinedQuestion } from "@generated/backend"
-import { RecallPromptController } from "@generated/backend/sdk.gen"
+import { QuestionAnswerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import QuestionDisplay from "./QuestionDisplay.vue"
@@ -60,7 +60,7 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
   error.value = ""
 
   const { data: answerResult, error: apiError } = await apiCallWithLoading(() =>
-    RecallPromptController.answerQuiz({
+    QuestionAnswerController.answerQuiz({
       path: { predefinedQuestion: props.predefinedQuestion.id },
       body: answerData,
     })

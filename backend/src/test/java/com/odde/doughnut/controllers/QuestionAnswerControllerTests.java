@@ -151,13 +151,13 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
   @Nested
   class RegenerateQuestion {
-    RecallPrompt recallPrompt;
+    QuestionAnswer questionAnswer;
     Note note;
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().approvedQuestionOf(note).please();
+      questionAnswer = makeMe.aQuestionAnswer().approvedQuestionOf(note).please();
     }
 
     @Test
@@ -168,7 +168,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
             currentUser.setUser(null);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
-            controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
+            controller.regenerate(questionAnswer.getPredefinedQuestion(), contestResult);
           });
     }
 
@@ -183,7 +183,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
       PredefinedQuestion regeneratedQuestion =
-          controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
+          controller.regenerate(questionAnswer.getPredefinedQuestion(), contestResult);
 
       Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getF0__stem())
           .contains("What is the first color in the rainbow?");
@@ -199,7 +199,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
-      controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
+      controller.regenerate(questionAnswer.getPredefinedQuestion(), contestResult);
 
       // Verify chat completion call contains message with question info and contest result
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
@@ -226,7 +226,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
   @Nested
   class Contest {
-    RecallPrompt recallPrompt;
+    QuestionAnswer questionAnswer;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
@@ -237,8 +237,8 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
       MCQWithAnswer aiGeneratedQuestion = makeMe.aMCQWithAnswer().please();
       Note note = makeMe.aNote().please();
-      recallPrompt =
-          makeMe.aRecallPrompt().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
+      questionAnswer =
+          makeMe.aQuestionAnswer().ofAIGeneratedQuestion(aiGeneratedQuestion, note).please();
     }
 
     @Test
@@ -247,7 +247,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
           ResponseStatusException.class,
           () -> {
             currentUser.setUser(null);
-            controller.contest(recallPrompt.getPredefinedQuestion());
+            controller.contest(questionAnswer.getPredefinedQuestion());
           });
     }
 
@@ -256,7 +256,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       questionEvaluation.feasibleQuestion = true;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
-      QuestionContestResult contest = controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult contest = controller.contest(questionAnswer.getPredefinedQuestion());
       assertTrue(contest.rejected);
     }
 
@@ -269,7 +269,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       questionEvaluation.feasibleQuestion = true;
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
-      controller.contest(recallPrompt.getPredefinedQuestion());
+      controller.contest(questionAnswer.getPredefinedQuestion());
 
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(
@@ -284,7 +284,7 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       QuestionContestResult contestResult =
-          controller.contest(recallPrompt.getPredefinedQuestion());
+          controller.contest(questionAnswer.getPredefinedQuestion());
       assertFalse(contestResult.rejected);
     }
   }
@@ -311,31 +311,25 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldReuseExistingUnansweredRecallPrompt() {
+    void shouldAlwaysGenerateNewQuestion() {
       // Create a note and memory tracker
       Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
       makeMe.aNote().under(note).please(); // Add another note to the notebook
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      // Create an existing unanswered recall prompt for the note
+      // Create an existing question answer for the note
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      RecallPrompt existingPrompt =
-          makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+      QuestionAnswer existingQuestionAnswer =
+          makeMe.aQuestionAnswer().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
 
       // Ask for a question for the memory tracker
       PredefinedQuestion returnedQuestion = controller.askAQuestion(memoryTracker);
 
-      // Verify that the existing prompt's predefined question was returned
-      assertThat(returnedQuestion.getId(), equalTo(existingPrompt.getPredefinedQuestion().getId()));
-
-      // Verify that no new prompt was created
-      long count =
-          makeMe
-              .entityPersister
-              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
-              .getSingleResult();
-      assertThat(count, equalTo(1L));
+      // Verify that a new question was returned (not reusing existing)
+      assertThat(
+          returnedQuestion.getId(),
+          not(equalTo(existingQuestionAnswer.getPredefinedQuestion().getId())));
     }
 
     @Test
@@ -353,9 +347,9 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
       // Create an existing recall prompt with an answer
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      RecallPrompt existingPrompt =
+      QuestionAnswer existingQuestionAnswer =
           makeMe
-              .aRecallPrompt()
+              .aQuestionAnswer()
               .ofAIGeneratedQuestion(mcqWithAnswer, note)
               .answerChoiceIndex(0) // Add an answer
               .please();
@@ -365,13 +359,14 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
       // Verify that a new question was returned
       assertThat(
-          returnedQuestion.getId(), not(equalTo(existingPrompt.getPredefinedQuestion().getId())));
+          returnedQuestion.getId(),
+          not(equalTo(existingQuestionAnswer.getPredefinedQuestion().getId())));
 
       // Verify that no new recall prompt was created (they are only created when answering)
       long count =
           makeMe
               .entityPersister
-              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
+              .createQuery("SELECT COUNT(qa) FROM QuestionAnswer qa", Long.class)
               .getSingleResult();
       assertThat(count, equalTo(1L));
     }
@@ -389,15 +384,15 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      // Create an existing unanswered recall prompt with a contested question
+      // Create an existing question answer with a contested question
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       PredefinedQuestion contestedQuestion =
           makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
       contestedQuestion.setContested(true);
       makeMe.entityPersister.save(contestedQuestion);
-      RecallPrompt existingPrompt = makeMe.aRecallPrompt().please();
-      existingPrompt.setPredefinedQuestion(contestedQuestion);
-      makeMe.entityPersister.save(existingPrompt);
+      QuestionAnswer existingQuestionAnswer = makeMe.aQuestionAnswer().please();
+      existingQuestionAnswer.setPredefinedQuestion(contestedQuestion);
+      makeMe.entityPersister.save(existingQuestionAnswer);
 
       // Mock the AI to generate a new question
       MCQWithAnswer newQuestion =
@@ -409,14 +404,15 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
       // Verify that a new question was returned
       assertThat(
-          returnedQuestion.getId(), not(equalTo(existingPrompt.getPredefinedQuestion().getId())));
+          returnedQuestion.getId(),
+          not(equalTo(existingQuestionAnswer.getPredefinedQuestion().getId())));
       assertThat(returnedQuestion.isContested(), equalTo(false));
 
       // Verify that no new recall prompt was created (they are only created when answering)
       long count =
           makeMe
               .entityPersister
-              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
+              .createQuery("SELECT COUNT(qa) FROM QuestionAnswer qa", Long.class)
               .getSingleResult();
       assertThat(count, equalTo(1L));
     }
@@ -424,14 +420,14 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
 
   @Nested
   class ContestQuestion {
-    RecallPrompt recallPrompt;
+    QuestionAnswer questionAnswer;
     Note note;
     QuestionEvaluation questionEvaluation = new QuestionEvaluation();
 
     @BeforeEach
     void setUp() {
       note = makeMe.aNote().please();
-      recallPrompt = makeMe.aRecallPrompt().approvedQuestionOf(note).please();
+      questionAnswer = makeMe.aQuestionAnswer().approvedQuestionOf(note).please();
       questionEvaluation.correctChoices = new int[] {0};
       questionEvaluation.feasibleQuestion = false;
       questionEvaluation.improvementAdvices = "This is a valid contest";
@@ -442,11 +438,11 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       // When
-      QuestionContestResult result = controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult result = controller.contest(questionAnswer.getPredefinedQuestion());
 
       // Then
       assertThat(result.rejected, equalTo(false));
-      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
+      assertThat(questionAnswer.getPredefinedQuestion().isContested(), equalTo(true));
     }
 
     @Test
@@ -455,11 +451,11 @@ class QuestionAnswerControllerTests extends ControllerTestBase {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(questionEvaluation);
 
       // When
-      QuestionContestResult result = controller.contest(recallPrompt.getPredefinedQuestion());
+      QuestionContestResult result = controller.contest(questionAnswer.getPredefinedQuestion());
 
       // Then
       assertThat(result.rejected, equalTo(true));
-      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
+      assertThat(questionAnswer.getPredefinedQuestion().isContested(), equalTo(false));
     }
   }
 }

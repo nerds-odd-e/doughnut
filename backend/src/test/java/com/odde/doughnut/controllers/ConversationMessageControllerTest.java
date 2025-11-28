@@ -12,7 +12,7 @@ import com.odde.doughnut.entities.repositories.ConversationMessageRepository;
 import com.odde.doughnut.entities.repositories.ConversationRepository;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.ai.ChatMessageForFineTuning;
-import com.odde.doughnut.testability.builders.RecallPromptBuilder;
+import com.odde.doughnut.testability.builders.QuestionAnswerBuilder;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -405,30 +405,30 @@ class ConversationMessageControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class StartConversationAboutRecallPrompt {
-    RecallPrompt recallPrompt;
+  class StartConversationAboutQuestionAnswer {
+    QuestionAnswer questionAnswer;
 
     @BeforeEach
     void setup() {
       Note note = makeMe.aNote().please();
-      RecallPromptBuilder recallPromptBuilder = makeMe.aRecallPrompt();
-      recallPrompt = recallPromptBuilder.approvedQuestionOf(note).please();
+      QuestionAnswerBuilder questionAnswerBuilder = makeMe.aQuestionAnswer();
+      questionAnswer = questionAnswerBuilder.approvedQuestionOf(note).please();
     }
 
     @Test
     void shouldStartConversation() {
-      Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
+      Conversation conversation = controller.startConversationAboutQuestionAnswer(questionAnswer);
       List<Conversation> conversations = (List<Conversation>) conversationRepository.findAll();
       assertEquals(1, conversations.size());
       assertEquals(conversation.getConversationInitiator(), currentUser.getUser());
     }
 
     @Test
-    void shouldSetRecallPromptAsSubject() {
-      Conversation conversation = controller.startConversationAboutRecallPrompt(recallPrompt);
+    void shouldSetQuestionAnswerAsSubject() {
+      Conversation conversation = controller.startConversationAboutQuestionAnswer(questionAnswer);
       makeMe.refresh(conversation);
-      assertEquals(recallPrompt, conversation.getSubject().getRecallPrompt());
-      assertEquals(recallPrompt.getNotebook().getOwnership(), conversation.getSubjectOwnership());
+      assertEquals(questionAnswer, conversation.getSubject().getQuestionAnswer());
+      assertEquals(questionAnswer.getNotebook().getOwnership(), conversation.getSubjectOwnership());
     }
   }
 

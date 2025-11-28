@@ -1311,7 +1311,7 @@ export type RegenerateData = {
         predefinedQuestion: number;
     };
     query?: never;
-    url: '/api/recall-prompts/{predefinedQuestion}/regenerate';
+    url: '/api/question-answers/{predefinedQuestion}/regenerate';
 };
 
 export type RegenerateErrors = {
@@ -1338,7 +1338,7 @@ export type ContestData = {
         predefinedQuestion: number;
     };
     query?: never;
-    url: '/api/recall-prompts/{predefinedQuestion}/contest';
+    url: '/api/question-answers/{predefinedQuestion}/contest';
 };
 
 export type ContestErrors = {
@@ -1365,7 +1365,7 @@ export type AnswerQuizData = {
         predefinedQuestion: number;
     };
     query?: never;
-    url: '/api/recall-prompts/{predefinedQuestion}/answer';
+    url: '/api/question-answers/{predefinedQuestion}/answer';
 };
 
 export type AnswerQuizErrors = {
@@ -2406,32 +2406,32 @@ export type GetAiReplyResponses = {
 
 export type GetAiReplyResponse = GetAiReplyResponses[keyof GetAiReplyResponses];
 
-export type StartConversationAboutRecallPromptData = {
+export type StartConversationAboutQuestionAnswerData = {
     body?: never;
     path: {
-        recallPrompt: number;
+        questionAnswer: number;
     };
     query?: never;
-    url: '/api/conversation/recall-prompt/{recallPrompt}';
+    url: '/api/conversation/question-answer/{questionAnswer}';
 };
 
-export type StartConversationAboutRecallPromptErrors = {
+export type StartConversationAboutQuestionAnswerErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type StartConversationAboutRecallPromptError = StartConversationAboutRecallPromptErrors[keyof StartConversationAboutRecallPromptErrors];
+export type StartConversationAboutQuestionAnswerError = StartConversationAboutQuestionAnswerErrors[keyof StartConversationAboutQuestionAnswerErrors];
 
-export type StartConversationAboutRecallPromptResponses = {
+export type StartConversationAboutQuestionAnswerResponses = {
     /**
      * OK
      */
     200: Conversation;
 };
 
-export type StartConversationAboutRecallPromptResponse = StartConversationAboutRecallPromptResponses[keyof StartConversationAboutRecallPromptResponses];
+export type StartConversationAboutQuestionAnswerResponse = StartConversationAboutQuestionAnswerResponses[keyof StartConversationAboutQuestionAnswerResponses];
 
 export type GetConversationsAboutNoteData = {
     body?: never;
@@ -3401,7 +3401,7 @@ export type AskAQuestionData = {
         memoryTracker: number;
     };
     query?: never;
-    url: '/api/recall-prompts/{memoryTracker}/question';
+    url: '/api/question-answers/{memoryTracker}/question';
 };
 
 export type AskAQuestionErrors = {

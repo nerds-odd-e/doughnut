@@ -41,7 +41,7 @@
 
 <script setup lang="ts">
 import type { AnsweredQuestion, PredefinedQuestion } from "@generated/backend"
-import { RecallPromptController } from "@generated/backend/sdk.gen"
+import { QuestionAnswerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
@@ -82,7 +82,7 @@ const contestQuestion = async () => {
   try {
     const { data: contestResult, error: contestError } =
       await apiCallWithLoading(() =>
-        RecallPromptController.contest({
+        QuestionAnswerController.contest({
           path: { predefinedQuestion: currentQuestion.value.id },
         })
       )
@@ -96,7 +96,7 @@ const contestQuestion = async () => {
       try {
         const { data: regeneratedQuestion, error: regenerateError } =
           await apiCallWithLoading(() =>
-            RecallPromptController.regenerate({
+            QuestionAnswerController.regenerate({
               path: { predefinedQuestion: currentQuestion.value.id },
               body: contestResult,
             })
