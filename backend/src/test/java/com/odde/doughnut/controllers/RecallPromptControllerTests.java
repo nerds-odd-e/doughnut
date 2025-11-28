@@ -316,10 +316,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
       MemoryTracker memoryTracker =
           makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
 
-      // Create an existing unanswered recall prompt for the note
+      // Create an existing unanswered recall prompt for the note with the same memory tracker
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       RecallPrompt existingPrompt =
-          makeMe.aRecallPrompt().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
+          makeMe
+              .aRecallPrompt()
+              .ofAIGeneratedQuestion(mcqWithAnswer, note)
+              .forMemoryTracker(memoryTracker)
+              .please();
 
       // Ask for a question for the memory tracker
       RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);

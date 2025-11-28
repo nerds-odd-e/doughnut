@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,6 +17,12 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({"id", "multipleChoicesQuestion", "notebook"})
 public class RecallPrompt extends AnswerableQuestionInstance {
+  @ManyToOne
+  @JoinColumn(name = "memory_tracker_id", referencedColumnName = "id")
+  @NotNull
+  @JsonIgnore
+  private MemoryTracker memoryTracker;
+
   public Notebook getNotebook() {
     return getPredefinedQuestion().getNote().getNotebook();
   }

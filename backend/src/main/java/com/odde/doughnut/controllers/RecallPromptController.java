@@ -50,7 +50,8 @@ class RecallPromptController {
     return recallQuestionService.regenerateAQuestion(
         contestResult,
         recallPrompt.getPredefinedQuestion().getNote(),
-        recallPrompt.getPredefinedQuestion().getMcqWithAnswer());
+        recallPrompt.getPredefinedQuestion().getMcqWithAnswer(),
+        recallPrompt);
   }
 
   @PostMapping("/{recallPrompt}/contest")
