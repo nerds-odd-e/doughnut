@@ -265,17 +265,6 @@ export class GlobalSettingsController {
 }
 
 export class RecallPromptController {
-    public static answerQuiz<ThrowOnError extends boolean = false>(options: Options<AnswerQuizData, ThrowOnError>) {
-        return (options.client ?? client).post<AnswerQuizResponses, AnswerQuizErrors, ThrowOnError>({
-            url: '/api/recall-prompts/{recallPrompt}/answer',
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                ...options.headers
-            }
-        });
-    }
-    
     public static regenerate<ThrowOnError extends boolean = false>(options: Options<RegenerateData, ThrowOnError>) {
         return (options.client ?? client).post<RegenerateResponses, RegenerateErrors, ThrowOnError>({
             url: '/api/recall-prompts/{predefinedQuestion}/regenerate',
@@ -289,6 +278,17 @@ export class RecallPromptController {
     
     public static contest<ThrowOnError extends boolean = false>(options: Options<ContestData, ThrowOnError>) {
         return (options.client ?? client).post<ContestResponses, ContestErrors, ThrowOnError>({ url: '/api/recall-prompts/{predefinedQuestion}/contest', ...options });
+    }
+    
+    public static answerQuiz<ThrowOnError extends boolean = false>(options: Options<AnswerQuizData, ThrowOnError>) {
+        return (options.client ?? client).post<AnswerQuizResponses, AnswerQuizErrors, ThrowOnError>({
+            url: '/api/recall-prompts/{predefinedQuestion}/answer',
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            }
+        });
     }
     
     public static askAQuestion<ThrowOnError extends boolean = false>(options: Options<AskAQuestionData, ThrowOnError>) {

@@ -584,36 +584,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
-  /api/recall-prompts/{recallPrompt}/answer:
-    post:
-      tags:
-      - recall-prompt-controller
-      operationId: answerQuiz
-      parameters:
-      - name: recallPrompt
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AnswerDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
   /api/recall-prompts/{predefinedQuestion}/regenerate:
     post:
       tags:
@@ -643,7 +613,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RecallPrompt"
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/recall-prompts/{predefinedQuestion}/contest:
     post:
       tags:
@@ -668,6 +638,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/QuestionContestResult"
+  /api/recall-prompts/{predefinedQuestion}/answer:
+    post:
+      tags:
+      - recall-prompt-controller
+      operationId: answerQuiz
+      parameters:
+      - name: predefinedQuestion
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnswerDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/AnsweredQuestion"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -2681,7 +2681,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/RecallPrompt"
+                $ref: "#/components/schemas/PredefinedQuestion"
   /api/predefined-questions/{note}/export-question-generation:
     get:
       tags:
@@ -3810,6 +3810,13 @@ components:
           type: string
         othersModel:
           type: string
+    QuestionContestResult:
+      type: object
+      properties:
+        advice:
+          type: string
+        rejected:
+          type: boolean
     AnswerDTO:
       type: object
       properties:
@@ -3848,29 +3855,6 @@ components:
       - answer
       - predefinedQuestion
       - recallPromptId
-    QuestionContestResult:
-      type: object
-      properties:
-        advice:
-          type: string
-        rejected:
-          type: boolean
-    RecallPrompt:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        predefinedQuestionId:
-          type: integer
-          format: int32
-      required:
-      - id
-      - multipleChoicesQuestion
     QuestionSuggestionCreationParams:
       type: object
       properties:

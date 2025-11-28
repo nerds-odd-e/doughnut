@@ -2,10 +2,10 @@
   <div class="daisy-relative">
     <QuestionDisplay
       v-bind="{
-        multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
+        multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
       }"
       @answer="submitQuizAnswer($event)"
-      :key="recallPrompt.id"
+      :key="predefinedQuestion.id"
       :disabled="isLoading || isAnswered"
     />
 
@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type { AnswerDto, RecallPrompt } from "@generated/backend"
+import type { AnswerDto, PredefinedQuestion } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -37,8 +37,8 @@ const isAnswered = ref(false)
 const error = ref("")
 
 const props = defineProps({
-  recallPrompt: {
-    type: Object as PropType<RecallPrompt>,
+  predefinedQuestion: {
+    type: Object as PropType<PredefinedQuestion>,
     required: true,
   },
 })
@@ -61,7 +61,7 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
 
   const { data: answerResult, error: apiError } = await apiCallWithLoading(() =>
     RecallPromptController.answerQuiz({
-      path: { recallPrompt: props.recallPrompt.id },
+      path: { predefinedQuestion: props.predefinedQuestion.id },
       body: answerData,
     })
   )

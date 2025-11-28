@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -22,23 +21,20 @@ class RecallPromptController {
 
   private final RecallQuestionService recallQuestionService;
   private final AuthorizationService authorizationService;
-  private final RecallPromptRepository recallPromptRepository;
 
   @Autowired
   public RecallPromptController(
       RecallQuestionService recallQuestionService,
       TestabilitySettings testabilitySettings,
-      AuthorizationService authorizationService,
-      RecallPromptRepository recallPromptRepository) {
+      AuthorizationService authorizationService) {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallQuestionService = recallQuestionService;
-    this.recallPromptRepository = recallPromptRepository;
   }
 
   @GetMapping("/{memoryTracker}/question")
   @Transactional
-  public RecallPrompt askAQuestion(
+  public PredefinedQuestion askAQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker) {
     authorizationService.assertLoggedIn();
     return recallQuestionService.generateAQuestion(memoryTracker);
@@ -46,7 +42,7 @@ class RecallPromptController {
 
   @PostMapping("/{predefinedQuestion}/regenerate")
   @Transactional
-  public RecallPrompt regenerate(
+  public PredefinedQuestion regenerate(
       @PathVariable("predefinedQuestion") @Schema(type = "integer")
           PredefinedQuestion predefinedQuestion,
       @RequestBody QuestionContestResult contestResult)
@@ -65,14 +61,13 @@ class RecallPromptController {
     return recallQuestionService.contest(predefinedQuestion);
   }
 
-  @PostMapping("/{recallPrompt}/answer")
+  @PostMapping("/{predefinedQuestion}/answer")
   @Transactional
   public AnsweredQuestion answerQuiz(
-      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
+      @PathVariable("predefinedQuestion") @Schema(type = "integer")
+          PredefinedQuestion predefinedQuestion,
       @Valid @RequestBody AnswerDTO answerDTO) {
     authorizationService.assertLoggedIn();
-    PredefinedQuestion predefinedQuestion = recallPrompt.getPredefinedQuestion();
-    recallPromptRepository.delete(recallPrompt);
     return recallQuestionService.answerQuestion(
         predefinedQuestion,
         answerDTO,

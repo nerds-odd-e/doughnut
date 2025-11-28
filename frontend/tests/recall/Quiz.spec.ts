@@ -10,7 +10,7 @@ import helper, {
 import type { MemoryTrackerLite, SpellingResultDto } from "@generated/backend"
 
 describe("repeat page", () => {
-  const recallPrompt = makeMe.aRecallPrompt.please()
+  const recallPrompt = makeMe.aPredefinedQuestion.please()
   let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
 
   beforeEach(() => {
@@ -101,7 +101,7 @@ describe("repeat page", () => {
 
   describe("spelling questions", () => {
     it("shows spelling question input when question has no choices", async () => {
-      const recallPromptWithoutChoices = makeMe.aRecallPrompt
+      const recallPromptWithoutChoices = makeMe.aPredefinedQuestion
         .withQuestionStem("Spell the word 'cat'")
         .please()
       askAQuestionSpy.mockResolvedValue(
@@ -119,7 +119,7 @@ describe("repeat page", () => {
     })
 
     it("submits spelling answer correctly", async () => {
-      const recallPromptWithoutChoices = makeMe.aRecallPrompt
+      const recallPromptWithoutChoices = makeMe.aPredefinedQuestion
         .withQuestionStem("Spell the word 'cat'")
         .please()
       askAQuestionSpy.mockResolvedValue(

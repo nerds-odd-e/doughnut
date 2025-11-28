@@ -22,7 +22,7 @@
     <div v-else class="daisy-flex daisy-flex-col daisy-gap-4" :class="{ 'daisy-opacity-50 daisy-pointer-events-none': contesting }">
       <RecallPromptComponent
         v-if="currentQuestion"
-        :recall-prompt="currentQuestion"
+        :predefined-question="currentQuestion"
         @answered="onAnswered($event)"
       />
       <a
@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AnsweredQuestion, RecallPrompt } from "@generated/backend"
+import type { AnsweredQuestion, PredefinedQuestion } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { StorageAccessor } from "@/store/createNoteStorage"
@@ -50,8 +50,8 @@ import AnsweredQuestionComponent from "./AnsweredQuestionComponent.vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 const props = defineProps({
-  recallPrompt: {
-    type: Object as PropType<RecallPrompt>,
+  predefinedQuestion: {
+    type: Object as PropType<PredefinedQuestion>,
     required: true,
   },
   storageAccessor: {
@@ -63,11 +63,11 @@ const emit = defineEmits(["need-scroll", "answered"])
 const regenerating = ref(false)
 const contesting = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
-const currentQuestion = ref(props.recallPrompt)
+const currentQuestion = ref(props.predefinedQuestion)
 const answeredQuestion = ref<AnsweredQuestion | undefined>(undefined)
 const prevQuestions = ref<
   {
-    quizeQuestion: RecallPrompt
+    quizeQuestion: PredefinedQuestion
     badQuestionReason: string | undefined
   }[]
 >([])
@@ -80,14 +80,10 @@ const contestQuestion = async () => {
   currentQuestionLegitMessage.value = ""
   contesting.value = true
   try {
-    const predefinedQuestionId = currentQuestion.value.predefinedQuestionId
-    if (!predefinedQuestionId) {
-      throw new Error("PredefinedQuestion ID is not available")
-    }
     const { data: contestResult, error: contestError } =
       await apiCallWithLoading(() =>
         RecallPromptController.contest({
-          path: { predefinedQuestion: predefinedQuestionId },
+          path: { predefinedQuestion: currentQuestion.value.id },
         })
       )
 
@@ -98,14 +94,10 @@ const contestQuestion = async () => {
         badQuestionReason: contestResult.advice,
       })
       try {
-        const predefinedQuestionId = currentQuestion.value.predefinedQuestionId
-        if (!predefinedQuestionId) {
-          throw new Error("PredefinedQuestion ID is not available")
-        }
         const { data: regeneratedQuestion, error: regenerateError } =
           await apiCallWithLoading(() =>
             RecallPromptController.regenerate({
-              path: { predefinedQuestion: predefinedQuestionId },
+              path: { predefinedQuestion: currentQuestion.value.id },
               body: contestResult,
             })
           )

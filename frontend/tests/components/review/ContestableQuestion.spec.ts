@@ -4,12 +4,14 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
 describe("ContestableQuestion.vue", () => {
-  const mountComponent = (recallPrompt = makeMe.aRecallPrompt.please()) => {
+  const mountComponent = (
+    predefinedQuestion = makeMe.aPredefinedQuestion.please()
+  ) => {
     return helper
       .component(ContestableQuestion)
       .withRouter()
       .withStorageProps({
-        recallPrompt,
+        predefinedQuestion,
       })
       .mount()
   }

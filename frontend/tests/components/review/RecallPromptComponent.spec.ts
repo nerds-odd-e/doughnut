@@ -18,14 +18,14 @@ describe("RecallPromptComponent", () => {
   })
 
   const mountComponent = () => {
-    const recallPrompt = makeMe.aRecallPrompt
+    const predefinedQuestion = makeMe.aPredefinedQuestion
       .withQuestionStem("Test question")
       .withChoices(["A", "B", "C"])
       .please()
 
     return helper
       .component(RecallPromptComponent)
-      .withProps({ recallPrompt })
+      .withProps({ predefinedQuestion })
       .mount()
   }
 
