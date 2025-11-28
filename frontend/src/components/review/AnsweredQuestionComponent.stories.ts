@@ -49,13 +49,20 @@ const createAnsweredQuestionWithQuestion = (
 // Correctly answered question
 export const CorrectAnswer: Story = {
   args: {
-    answeredQuestion: createAnsweredQuestionWithQuestion(
-      "What is the capital of France?",
-      ["Paris", "London", "Berlin", "Madrid"],
-      0,
-      0,
-      true
-    ),
+    answeredQuestion: (() => {
+      const question = createAnsweredQuestionWithQuestion(
+        "What is the capital of France?",
+        ["Paris", "London", "Berlin", "Madrid"],
+        0,
+        0,
+        true
+      )
+      question.note = makeMe.aNote
+        .topicConstructor("France")
+        .details("France is a country in Western Europe. Paris is its capital and largest city.")
+        .please()
+      return question
+    })(),
     conversationButton: true,
   },
 }
@@ -63,13 +70,20 @@ export const CorrectAnswer: Story = {
 // Incorrectly answered question
 export const IncorrectAnswer: Story = {
   args: {
-    answeredQuestion: createAnsweredQuestionWithQuestion(
-      "What is the capital of France?",
-      ["Paris", "London", "Berlin", "Madrid"],
-      0,
-      1,
-      false
-    ),
+    answeredQuestion: (() => {
+      const question = createAnsweredQuestionWithQuestion(
+        "What is the capital of France?",
+        ["Paris", "London", "Berlin", "Madrid"],
+        0,
+        1,
+        false
+      )
+      question.note = makeMe.aNote
+        .topicConstructor("France")
+        .details("France is a country in Western Europe. Paris is its capital and largest city.")
+        .please()
+      return question
+    })(),
     conversationButton: true,
   },
 }
@@ -109,6 +123,10 @@ export const InSequence: Story = {
         true
       )
       question.recallPromptId = 1
+      question.note = makeMe.aNote
+        .topicConstructor("React")
+        .details("React is a JavaScript library for building user interfaces, particularly web applications.")
+        .please()
       return question
     })(),
     conversationButton: true,
@@ -118,13 +136,20 @@ export const InSequence: Story = {
 // Question without conversation button
 export const WithoutConversationButton: Story = {
   args: {
-    answeredQuestion: createAnsweredQuestionWithQuestion(
-      "What is 2 + 2?",
-      ["3", "4", "5", "6"],
-      1,
-      1,
-      true
-    ),
+    answeredQuestion: (() => {
+      const question = createAnsweredQuestionWithQuestion(
+        "What is 2 + 2?",
+        ["3", "4", "5", "6"],
+        1,
+        1,
+        true
+      )
+      question.note = makeMe.aNote
+        .topicConstructor("Basic Arithmetic")
+        .details("Addition is one of the four basic operations of arithmetic. 2 + 2 equals 4.")
+        .please()
+      return question
+    })(),
     conversationButton: false,
   },
 }

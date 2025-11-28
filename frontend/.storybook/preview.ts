@@ -6,7 +6,14 @@ import "../src/assets/daisyui.css"
 // Mock router for components that use vue-router
 const router = createRouter({
   history: createWebHistory("/"),
-  routes: [],
+  routes: [
+    {
+      path: "/n/:noteId",
+      name: "noteShow",
+      component: { template: "<div>Note Show Page (Mock)</div>" },
+      props: (route) => ({ noteId: Number(route.params.noteId) }),
+    },
+  ],
 })
 
 setup((app) => {
