@@ -1,1 +1,0 @@
-ALTER TABLE conversation MODIFY COLUMN message TEXT NOT NULL;

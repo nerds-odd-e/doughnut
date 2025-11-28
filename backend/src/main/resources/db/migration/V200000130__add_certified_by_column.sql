@@ -1,2 +1,0 @@
-ALTER TABLE notebook
-ADD COLUMN certified_by VARCHAR(300) DEFAULT "";

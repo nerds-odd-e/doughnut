@@ -1,1 +1,0 @@
-ALTER TABLE memory_tracker ADD COLUMN spelling BOOLEAN NOT NULL DEFAULT false;

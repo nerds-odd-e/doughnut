@@ -1,1 +1,0 @@
-ALTER TABLE notebook ADD COLUMN updated_at TIMESTAMP DEFAULT NOW();

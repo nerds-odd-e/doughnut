@@ -1,6 +1,0 @@
-CREATE TABLE player (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(255),
-    is_admin BOOLEAN DEFAULT FALSE,
-    createDate DATETIME
-);
