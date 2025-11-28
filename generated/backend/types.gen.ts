@@ -170,6 +170,12 @@ export type QuestionContestResult = {
     rejected?: boolean;
 };
 
+export type RecallPrompt = {
+    id: number;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
+    notebook?: Notebook;
+};
+
 export type AnswerDto = {
     choiceIndex?: number;
 };
@@ -186,13 +192,6 @@ export type AnsweredQuestion = {
     answer: Answer;
     answerDisplay?: string;
     recallPromptId: number;
-};
-
-export type RecallPrompt = {
-    id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
-    notebook?: Notebook;
-    predefinedQuestionId?: number;
 };
 
 export type QuestionSuggestionCreationParams = {
@@ -1312,6 +1311,33 @@ export type SetCurrentModelVersionsResponses = {
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
 
+export type RegenerateData = {
+    body: QuestionContestResult;
+    path: {
+        recallPrompt: number;
+    };
+    query?: never;
+    url: '/api/recall-prompts/{recallPrompt}/regenerate';
+};
+
+export type RegenerateErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type RegenerateError = RegenerateErrors[keyof RegenerateErrors];
+
+export type RegenerateResponses = {
+    /**
+     * OK
+     */
+    200: RecallPrompt;
+};
+
+export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
+
 export type ContestData = {
     body?: never;
     path: {
@@ -1365,33 +1391,6 @@ export type AnswerQuizResponses = {
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
-
-export type RegenerateData = {
-    body: QuestionContestResult;
-    path: {
-        predefinedQuestion: number;
-    };
-    query?: never;
-    url: '/api/recall-prompts/{predefinedQuestion}/regenerate';
-};
-
-export type RegenerateErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type RegenerateError = RegenerateErrors[keyof RegenerateErrors];
-
-export type RegenerateResponses = {
-    /**
-     * OK
-     */
-    200: RecallPrompt;
-};
-
-export type RegenerateResponse = RegenerateResponses[keyof RegenerateResponses];
 
 export type ToggleApprovalData = {
     body?: never;

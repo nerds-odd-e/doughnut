@@ -40,16 +40,17 @@ class RecallPromptController {
     return recallQuestionService.generateAQuestion(memoryTracker);
   }
 
-  @PostMapping("/{predefinedQuestion}/regenerate")
+  @PostMapping("/{recallPrompt}/regenerate")
   @Transactional
   public RecallPrompt regenerate(
-      @PathVariable("predefinedQuestion") @Schema(type = "integer")
-          PredefinedQuestion predefinedQuestion,
+      @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @RequestBody QuestionContestResult contestResult)
       throws JsonProcessingException {
     authorizationService.assertLoggedIn();
     return recallQuestionService.regenerateAQuestion(
-        contestResult, predefinedQuestion.getNote(), predefinedQuestion.getMcqWithAnswer());
+        contestResult,
+        recallPrompt.getPredefinedQuestion().getNote(),
+        recallPrompt.getPredefinedQuestion().getMcqWithAnswer());
   }
 
   @PostMapping("/{recallPrompt}/contest")

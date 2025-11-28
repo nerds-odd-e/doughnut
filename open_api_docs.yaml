@@ -584,6 +584,36 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
+  /api/recall-prompts/{recallPrompt}/regenerate:
+    post:
+      tags:
+      - recall-prompt-controller
+      operationId: regenerate
+      parameters:
+      - name: recallPrompt
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/QuestionContestResult"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/RecallPrompt"
   /api/recall-prompts/{recallPrompt}/contest:
     post:
       tags:
@@ -638,36 +668,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/AnsweredQuestion"
-  /api/recall-prompts/{predefinedQuestion}/regenerate:
-    post:
-      tags:
-      - recall-prompt-controller
-      operationId: regenerate
-      parameters:
-      - name: predefinedQuestion
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/QuestionContestResult"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallPrompt"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -3817,6 +3817,19 @@ components:
           type: string
         rejected:
           type: boolean
+    RecallPrompt:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+      required:
+      - id
+      - multipleChoicesQuestion
     AnswerDTO:
       type: object
       properties:
@@ -3855,22 +3868,6 @@ components:
       - answer
       - predefinedQuestion
       - recallPromptId
-    RecallPrompt:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-        predefinedQuestionId:
-          type: integer
-          format: int32
-      required:
-      - id
-      - multipleChoicesQuestion
     QuestionSuggestionCreationParams:
       type: object
       properties:

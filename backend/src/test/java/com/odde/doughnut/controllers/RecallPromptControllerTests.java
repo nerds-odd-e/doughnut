@@ -168,7 +168,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
             currentUser.setUser(null);
             QuestionContestResult contestResult = new QuestionContestResult();
             contestResult.advice = "test";
-            controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
+            controller.regenerate(recallPrompt, contestResult);
           });
     }
 
@@ -182,8 +182,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
-      RecallPrompt regeneratedQuestion =
-          controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
+      RecallPrompt regeneratedQuestion = controller.regenerate(recallPrompt, contestResult);
 
       Assertions.assertThat(regeneratedQuestion.getMultipleChoicesQuestion().getF0__stem())
           .contains("What is the first color in the rainbow?");
@@ -199,7 +198,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       QuestionContestResult contestResult = new QuestionContestResult();
       contestResult.advice = "test";
-      controller.regenerate(recallPrompt.getPredefinedQuestion(), contestResult);
+      controller.regenerate(recallPrompt, contestResult);
 
       // Verify chat completion call contains message with question info and contest result
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
