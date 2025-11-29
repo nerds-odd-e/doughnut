@@ -1,4 +1,5 @@
 import { client as globalClient } from "@generated/backend/client.gen"
+import { createClient, type Config } from "@generated/backend/client"
 import type { ApiStatus } from "./ApiStatusHandler"
 import ApiStatusHandler from "./ApiStatusHandler"
 import assignBadRequestProperties from "./window/assignBadRequestProperties"
@@ -7,6 +8,9 @@ import { useToast } from "vue-toastification"
 
 // Global apiStatusHandler instance (set by setupGlobalClient)
 let apiStatusHandler: ApiStatusHandler | undefined
+
+// Client that does not trigger page reload on 401 errors
+export const nonReloadingClient = createClient()
 
 type SdkResult = {
   error?: unknown
@@ -59,8 +63,7 @@ export async function apiCallWithLoading<T extends SdkResult>(
 export function setupGlobalClient(apiStatus: ApiStatus) {
   apiStatusHandler = new ApiStatusHandler(apiStatus)
 
-  // Configure global client with SDK response format
-  globalClient.setConfig({
+  const clientConfig: Config = {
     baseUrl:
       typeof window !== "undefined" && window.location.origin
         ? window.location.origin
@@ -68,7 +71,13 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
     credentials: "include",
     responseStyle: "fields",
     throwOnError: false,
-  })
+  }
+
+  // Configure global client with SDK response format
+  globalClient.setConfig(clientConfig)
+
+  // Configure non-reloading client with same settings
+  nonReloadingClient.setConfig(clientConfig)
 }
 
 /**
