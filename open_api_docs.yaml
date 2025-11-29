@@ -3848,6 +3848,9 @@ components:
         recallPromptId:
           type: integer
           format: int32
+        memoryTrackerId:
+          type: integer
+          format: int32
       required:
       - answer
       - predefinedQuestion

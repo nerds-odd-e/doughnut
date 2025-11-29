@@ -51,6 +51,7 @@ public class RecallPrompt extends AnswerableQuestionInstance {
     answerResult.predefinedQuestion = getPredefinedQuestion();
     answerResult.answerDisplay = answer.getAnswerDisplay(this.getMultipleChoicesQuestion());
     answerResult.recallPromptId = id;
+    answerResult.memoryTrackerId = memoryTracker.getId();
     return answerResult;
   }
 

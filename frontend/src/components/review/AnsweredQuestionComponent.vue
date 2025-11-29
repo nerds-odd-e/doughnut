@@ -15,6 +15,16 @@
     v-if="conversationButton"
     :recall-prompt-id="answeredQuestion.recallPromptId"
   />
+  <router-link
+    v-if="answeredQuestion.memoryTrackerId"
+    :to="{
+      name: 'memoryTrackerShow',
+      params: { memoryTrackerId: answeredQuestion.memoryTrackerId },
+    }"
+    class="daisy-link daisy-link-primary"
+  >
+    View Memory Tracker
+  </router-link>
 </template>
 
 <script setup lang="ts">

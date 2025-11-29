@@ -198,6 +198,7 @@ export type AnsweredQuestion = {
     answer: Answer;
     answerDisplay?: string;
     recallPromptId: number;
+    memoryTrackerId?: number;
 };
 
 export type QuestionSuggestionCreationParams = {
@@ -628,6 +629,7 @@ export type AnsweredQuestionWritable = {
     answer: Answer;
     answerDisplay?: string;
     recallPromptId: number;
+    memoryTrackerId?: number;
 };
 
 export type NoteCreationResultWritable = {
