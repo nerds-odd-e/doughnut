@@ -17,12 +17,13 @@ describe("circle show page", () => {
     showCircleSpy = mockSdkService("showCircle", circleNote)
   })
 
-  it("fetch API to be called ONCE on mount", async () => {
+  it("fetch API to be called ONCE on mount", () => {
     helper
       .component(CircleShowPage)
       .withRouter()
       .withStorageProps({ circleId: circleNote.id })
       .render()
+
     expect(showCircleSpy).toBeCalledWith({
       path: { circle: circleNote.id },
     })

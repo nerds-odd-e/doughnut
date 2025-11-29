@@ -18,7 +18,6 @@ vi.mock("@/composables/useAssimilationCount")
 let renderer: RenderingHelper<typeof Assimilation>
 let assimilateSpy: ReturnType<typeof mockSdkService<"assimilate">>
 let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
-const mockedGetNoteInfoCall = vi.fn()
 const mockedIncrementAssimilatedCount = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
 
@@ -34,7 +33,6 @@ beforeEach(() => {
     note: makeMe.aNoteRealm.please(),
     createdAt: "",
   })
-  mockedGetNoteInfoCall.mockResolvedValue({})
 
   vi.mocked(useRecallData).mockReturnValue({
     totalAssimilatedCount: mockedTotalAssimilatedCount,
@@ -67,7 +65,6 @@ describe("Assimilation component", () => {
 
   beforeEach(() => {
     showNoteSpy.mockResolvedValue(wrapSdkResponse(noteRealm))
-    mockedGetNoteInfoCall.mockResolvedValue({})
   })
 
   describe("normal assimilation", () => {
