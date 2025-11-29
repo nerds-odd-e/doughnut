@@ -1,34 +1,32 @@
 <template>
-  <nav class="vertical-menu">
-    <div class="menu">
-      <PopButton title="Testability">
-        <h1>Testability</h1>
-        <CheckInput
-          scope-name="testability"
-          :model-value="featureToggle"
-          @update:model-value="updateFeatureToggle"
-          field="featureToggle"
-        />
-        <TextInput
-          scope-name="testability"
-          v-model="randomSelector"
-          field="randomSelector"
-          hint="can be 'seed', 'first' or 'last'"
-          @blur="updateRandomSelector"
-        />
-        <TextInput
-          scope-name="testability"
-          v-model="seed"
-          field="seed"
-          hint="Only works when randomSelector is 'seed'"
-          @blur="updateRandomSelector"
-        />
-      </PopButton>
-      <div v-if="featureToggle" class="nav-item">
-        <em class="nav-link daisy-btn-danger">Feature Toggle is On </em>
-      </div>
-    </div>
-  </nav>
+  <div class="testability-wrapper">
+    <PopButton title="Testability" :btn-class="'testability-button'">
+      <template #button_face>
+        <span class="button-text">T</span>
+      </template>
+      <h1>Testability</h1>
+      <CheckInput
+        scope-name="testability"
+        :model-value="featureToggle"
+        @update:model-value="updateFeatureToggle"
+        field="featureToggle"
+      />
+      <TextInput
+        scope-name="testability"
+        v-model="randomSelector"
+        field="randomSelector"
+        hint="can be 'seed', 'first' or 'last'"
+        @blur="updateRandomSelector"
+      />
+      <TextInput
+        scope-name="testability"
+        v-model="seed"
+        field="seed"
+        hint="Only works when randomSelector is 'seed'"
+        @blur="updateRandomSelector"
+      />
+    </PopButton>
+  </div>
 </template>
 
 <script lang="ts">
@@ -80,21 +78,40 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.vertical-menu {
-  pointer-events: none;
+.testability-wrapper {
   position: fixed;
-  right: 0px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  width: 60px;
-  font-size: x-small;
-  top: 0px;
+  bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+}
 
-  .menu {
-    pointer-events: initial;
-    background-color: yellow;
+:deep(.testability-button) {
+  position: static !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 50% !important;
+  background-color: yellow !important;
+  color: black !important;
+  border: none !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) !important;
+  transition: background-color 0.3s !important;
+  font-weight: bold !important;
+  font-size: 20px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+
+  &:hover {
+    background-color: #e6e600 !important;
+  }
+
+  .button-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
