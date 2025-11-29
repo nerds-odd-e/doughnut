@@ -7,6 +7,7 @@ import { questionListPage } from './questionListPage'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { noteSidebar } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
+import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -331,13 +332,10 @@ export const assumeNotePage = (noteTopology?: string) => {
           }
         },
         removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
-          cy.contains('tr', type).within(() => {
-            cy.findByRole('button', {
-              name: 'remove this note from review',
-            }).click()
-          })
-          cy.findByRole('button', { name: 'OK' }).click()
-          cy.findByText('This memory tracker has been removed from tracking.')
+          cy.contains('tr', type).click()
+          cy.url().should('include', '/d/memory-trackers/')
+          cy.pageIsNotLoading()
+          return assumeMemoryTrackerPage().removeFromReview()
         },
       }
     },

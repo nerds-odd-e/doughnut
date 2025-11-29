@@ -9,6 +9,7 @@
     <MemoryTrackerPageView
       v-else-if="recallPrompts !== undefined"
       :recall-prompts="recallPrompts"
+      :memory-tracker-id="memoryTrackerId"
     />
   </ContainerPage>
 </template>

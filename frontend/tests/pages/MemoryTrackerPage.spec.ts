@@ -39,6 +39,7 @@ describe("MemoryTrackerPage", () => {
     })
     expect(memoryTrackerPageView.exists()).toBe(true)
     expect(memoryTrackerPageView.props("recallPrompts")).toEqual(recallPrompts)
+    expect(memoryTrackerPageView.props("memoryTrackerId")).toBe(memoryTrackerId)
   })
 
   it("shows loading state while fetching", async () => {

@@ -61,6 +61,7 @@ export const WithAnsweredQuestion: Story = {
         true
       ),
     ],
+    memoryTrackerId: 1,
   },
 }
 
@@ -76,6 +77,7 @@ export const WithIncorrectAnswer: Story = {
         false
       ),
     ],
+    memoryTrackerId: 1,
   },
 }
 
@@ -125,6 +127,7 @@ export const NoteWithManyAncestors: Story = {
           .please()
       })(),
     ],
+    memoryTrackerId: 1,
   },
 }
 
@@ -132,5 +135,6 @@ export const NoteWithManyAncestors: Story = {
 export const NoQuestionFound: Story = {
   args: {
     recallPrompts: [],
+    memoryTrackerId: 1,
   },
 }
