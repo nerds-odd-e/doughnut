@@ -142,6 +142,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/NotebooksPageView': RouteRecordInfo<
+      '/NotebooksPageView',
+      '/NotebooksPageView',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/NoteShowPage': RouteRecordInfo<
       '/NoteShowPage',
       '/NoteShowPage',
@@ -282,6 +289,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/NotebooksPage.vue': {
       routes:
         | '/NotebooksPage'
+      views:
+        | never
+    }
+    'src/pages/NotebooksPageView.vue': {
+      routes:
+        | '/NotebooksPageView'
       views:
         | never
     }
