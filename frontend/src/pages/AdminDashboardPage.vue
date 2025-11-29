@@ -5,31 +5,31 @@
       :class="`daisy-tab daisy-tab-lg ${activePage === 'fineTuningData' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click="activePage = 'fineTuningData'"
+      @click.prevent="setActivePage('fineTuningData')"
     >Fine Tuning Data</a>
     <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'failureReport' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click="activePage = 'failureReport'"
+      @click.prevent="setActivePage('failureReport')"
     >Failure Reports</a>
     <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'manageModel' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click="activePage = 'manageModel'"
+      @click.prevent="setActivePage('manageModel')"
     >Manage Models</a>
     <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'manageBazaar' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click="activePage = 'manageBazaar'"
+      @click.prevent="setActivePage('manageBazaar')"
     >Manage Bazaar</a>
     <a
       :class="`daisy-tab daisy-tab-lg ${activePage === 'certificateRequests' ? 'daisy-tab-active' : ''}`"
       role="button"
       href="#"
-      @click="activePage = 'certificateRequests'"
+      @click.prevent="setActivePage('certificateRequests')"
     >Certification Requests</a>
   </div>
   <div class="daisy-container daisy-mx-auto">
@@ -42,7 +42,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import FineTuningData from "../components/admin/FineTuningData.vue"
 import FailureReportList from "../components/admin/FailureReportList.vue"
 import ManageModel from "../components/admin/ManageModel.vue"
@@ -50,13 +51,39 @@ import ManageBazaar from "../components/admin/ManageBazaar.vue"
 import ContainerPage from "./commons/ContainerPage.vue"
 import CertificateRequests from "../components/admin/CertificateRequests.vue"
 
-const activePage = ref(
-  "fineTuningData" as
-    | "fineTuningData"
-    | "failureReport"
-    | "manageModel"
-    | "manageBazaar"
-    | "certificateRequests"
-    | undefined
-)
+type TabType =
+  | "fineTuningData"
+  | "failureReport"
+  | "manageModel"
+  | "manageBazaar"
+  | "certificateRequests"
+
+const route = useRoute()
+const router = useRouter()
+
+const activePage = computed({
+  get(): TabType {
+    const tab = route.query.tab as string | undefined
+    if (
+      tab === "fineTuningData" ||
+      tab === "failureReport" ||
+      tab === "manageModel" ||
+      tab === "manageBazaar" ||
+      tab === "certificateRequests"
+    ) {
+      return tab
+    }
+    return "fineTuningData"
+  },
+  set(value: TabType) {
+    router.push({
+      name: "adminDashboard",
+      query: { tab: value },
+    })
+  },
+})
+
+const setActivePage = (tab: TabType) => {
+  activePage.value = tab
+}
 </script>
