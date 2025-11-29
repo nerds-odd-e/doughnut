@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import type { SpellingResult } from "@/pages/RecallPage.vue"
+import type { SpellingResult } from "@/pages/RecallPageView.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"

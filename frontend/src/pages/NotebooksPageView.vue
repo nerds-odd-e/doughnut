@@ -1,6 +1,6 @@
 <template>
   <div class="daisy-space-y-8">
-    <section>
+    <main>
       <div class="daisy-flex daisy-items-center daisy-justify-between daisy-mb-6">
         <h2 class="daisy-text-3xl daisy-font-bold">My Notebooks</h2>
         <NotebookNewButton>Add New Notebook</NotebookNewButton>
@@ -19,7 +19,7 @@
         </svg>
         <span>You don't have any notebooks yet. Create your first notebook to get started!</span>
       </div>
-    </section>
+    </main>
     
     <div class="daisy-divider"></div>
     

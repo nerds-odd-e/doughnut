@@ -163,6 +163,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/RecallPageView': RouteRecordInfo<
+      '/RecallPageView',
+      '/RecallPageView',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/RecentPage': RouteRecordInfo<
       '/RecentPage',
       '/RecentPage',
@@ -307,6 +314,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/RecallPage.vue': {
       routes:
         | '/RecallPage'
+      views:
+        | never
+    }
+    'src/pages/RecallPageView.vue': {
+      routes:
+        | '/RecallPageView'
       views:
         | never
     }
