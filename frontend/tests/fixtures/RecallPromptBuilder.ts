@@ -15,6 +15,8 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private predefinedQuestionToUse?: PredefinedQuestion
   private answerToUse?: Answer
   private answerTimeToUse?: string
+  private questionGeneratedTimeToUse?: string
+  private isContestedToUse?: boolean
 
   withQuestionStem(stem: string) {
     this.predefinedQuestionBuilder.withQuestionStem(stem)
@@ -46,6 +48,16 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return this
   }
 
+  withQuestionGeneratedTime(questionGeneratedTime: string) {
+    this.questionGeneratedTimeToUse = questionGeneratedTime
+    return this
+  }
+
+  withIsContested(isContested: boolean) {
+    this.isContestedToUse = isContested
+    return this
+  }
+
   do(): RecallPrompt {
     const predefinedQuestion =
       this.predefinedQuestionToUse ?? this.predefinedQuestionBuilder.do()
@@ -57,6 +69,8 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
       predefinedQuestion: predefinedQuestion,
       answer: this.answerToUse,
       answerTime: this.answerTimeToUse,
+      questionGeneratedTime: this.questionGeneratedTimeToUse,
+      isContested: this.isContestedToUse,
     }
   }
 }

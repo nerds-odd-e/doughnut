@@ -3813,6 +3813,11 @@ components:
           $ref: "#/components/schemas/Notebook"
         note:
           $ref: "#/components/schemas/Note"
+        questionGeneratedTime:
+          type: string
+          format: date-time
+        isContested:
+          type: boolean
         answerTime:
           type: string
           format: date-time

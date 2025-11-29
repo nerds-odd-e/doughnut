@@ -181,6 +181,8 @@ export type RecallPrompt = {
     multipleChoicesQuestion: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: Note;
+    questionGeneratedTime?: string;
+    isContested?: boolean;
     answerTime?: string;
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
@@ -613,6 +615,8 @@ export type RecallPromptWritable = {
     multipleChoicesQuestion: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: NoteWritable;
+    questionGeneratedTime?: string;
+    isContested?: boolean;
     answerTime?: string;
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;

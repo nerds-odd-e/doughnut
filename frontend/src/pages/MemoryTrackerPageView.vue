@@ -12,11 +12,19 @@
       class="daisy-card daisy-shadow-sm daisy-mb-4"
     >
       <div class="daisy-card-body">
-        <div v-if="prompt.answerTime" class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2">
-          Answered: {{ new Date(prompt.answerTime).toLocaleString() }}
-        </div>
-        <div v-else class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2">
-          Unanswered
+        <div class="daisy-text-sm daisy-text-base-content/70 daisy-mb-2 daisy-flex daisy-gap-2 daisy-flex-wrap">
+          <span v-if="prompt.questionGeneratedTime">
+            Generated: {{ new Date(prompt.questionGeneratedTime).toLocaleString() }}
+          </span>
+          <span v-if="prompt.isContested" class="daisy-badge daisy-badge-warning">
+            Contested
+          </span>
+          <span v-if="prompt.answerTime">
+            Answered: {{ new Date(prompt.answerTime).toLocaleString() }}
+          </span>
+          <span v-else>
+            Unanswered
+          </span>
         </div>
         <QuestionDisplay
           v-if="prompt.predefinedQuestion && prompt.answer"

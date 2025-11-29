@@ -135,11 +135,51 @@ describe("MemoryTrackerPage", () => {
     expect(noteUnderQuestionComponents.length).toBe(1)
   })
 
+  it("shows question generated time", async () => {
+    const note = makeMe.aNote.please()
+    const questionGeneratedTime = new Date("2024-01-01T10:00:00Z").toISOString()
+    const recallPrompt = makeMe.aRecallPrompt.please()
+    recallPrompt.note = note
+    recallPrompt.questionGeneratedTime = questionGeneratedTime
+
+    mockSdkService("getRecallPrompts", [recallPrompt])
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Generated:")
+    expect(wrapper.text()).toContain(
+      new Date(questionGeneratedTime).toLocaleString()
+    )
+  })
+
+  it("shows contested status for contested questions", async () => {
+    const note = makeMe.aNote.please()
+    const recallPrompt = makeMe.aRecallPrompt.please()
+    recallPrompt.note = note
+    recallPrompt.isContested = true
+
+    mockSdkService("getRecallPrompts", [recallPrompt])
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Contested")
+  })
+
   it("shows answer time for answered questions", async () => {
     const note = makeMe.aNote.please()
     const answerTime = new Date("2024-01-01T12:00:00Z").toISOString()
+    const questionGeneratedTime = new Date("2024-01-01T10:00:00Z").toISOString()
     const recallPrompt = makeMe.aRecallPrompt.please()
     recallPrompt.note = note
+    recallPrompt.questionGeneratedTime = questionGeneratedTime
     recallPrompt.answerTime = answerTime
     recallPrompt.answer = {
       id: 1,
@@ -156,6 +196,10 @@ describe("MemoryTrackerPage", () => {
 
     await flushPromises()
 
+    expect(wrapper.text()).toContain("Generated:")
+    expect(wrapper.text()).toContain(
+      new Date(questionGeneratedTime).toLocaleString()
+    )
     expect(wrapper.text()).toContain("Answered:")
     expect(wrapper.text()).toContain(new Date(answerTime).toLocaleString())
   })

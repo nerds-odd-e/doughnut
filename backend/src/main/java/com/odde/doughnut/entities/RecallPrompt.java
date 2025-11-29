@@ -22,6 +22,8 @@ import lombok.EqualsAndHashCode;
   "multipleChoicesQuestion",
   "notebook",
   "note",
+  "questionGeneratedTime",
+  "isContested",
   "answerTime",
   "predefinedQuestion",
   "answer"
@@ -89,5 +91,15 @@ public class RecallPrompt extends AnswerableQuestionInstance {
   @JsonProperty("answer")
   public Answer getAnswerExposed() {
     return super.getAnswer();
+  }
+
+  @JsonProperty
+  public Timestamp getQuestionGeneratedTime() {
+    return super.getPredefinedQuestion().getCreatedAt();
+  }
+
+  @JsonProperty
+  public Boolean getIsContested() {
+    return super.getPredefinedQuestion().isContested();
   }
 }
