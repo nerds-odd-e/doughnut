@@ -43,7 +43,7 @@
 
 <script setup lang="ts">
 import type { Component } from "vue"
-import { ref } from "vue"
+import { ref, onMounted, onUnmounted } from "vue"
 
 const dropdownTrigger = ref<HTMLDetailsElement | null>(null)
 
@@ -52,6 +52,23 @@ const closeDropdown = () => {
     dropdownTrigger.value.open = false
   }
 }
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (dropdownTrigger.value && dropdownTrigger.value.open) {
+    const target = event.target as Node
+    if (!dropdownTrigger.value.contains(target)) {
+      closeDropdown()
+    }
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside)
+})
 
 defineProps<{
   name?: string
