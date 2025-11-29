@@ -16,7 +16,7 @@ export const routeMetadata: RouteMetadata[] = [
     name: "notebooks",
   },
   {
-    path: "/n/:noteId",
+    path: "/n:noteId",
     name: "noteShow",
     props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
     meta: { useNoteStorageAccessor: true },
