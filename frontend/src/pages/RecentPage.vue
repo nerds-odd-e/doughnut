@@ -7,19 +7,19 @@
         :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyAdded' ? 'daisy-tab-active' : ''}`"
         role="button"
         href="#"
-        @click="activePage = 'recentlyAdded'"
+        @click.prevent="setActivePage('recentlyAdded')"
       >Recently Added/Updated</a>
       <a
         :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyLearned' ? 'daisy-tab-active' : ''}`"
         role="button"
         href="#"
-        @click="activePage = 'recentlyLearned'"
+        @click.prevent="setActivePage('recentlyLearned')"
       >Recently Learned</a>
       <a
         :class="`daisy-tab daisy-tab-lg ${activePage === 'recentlyReviewed' ? 'daisy-tab-active' : ''}`"
         role="button"
         href="#"
-        @click="activePage = 'recentlyReviewed'"
+        @click.prevent="setActivePage('recentlyReviewed')"
       >Recently Reviewed</a>
     </div>
 
@@ -30,17 +30,39 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import RecentlyAddedNotes from "@/components/recent/RecentlyAddedNotes.vue"
 import RecentlyLearnedNotes from "@/components/recent/RecentlyLearnedNotes.vue"
 import RecentlyReviewedNotes from "@/components/recent/RecentlyReviewedNotes.vue"
 
-const activePage = ref(
-  "recentlyAdded" as
-    | "recentlyAdded"
-    | "recentlyLearned"
-    | "recentlyReviewed"
-    | undefined
-)
+type TabType = "recentlyAdded" | "recentlyLearned" | "recentlyReviewed"
+
+const route = useRoute()
+const router = useRouter()
+
+const activePage = computed({
+  get(): TabType {
+    const tab = route.query.tab as string | undefined
+    if (
+      tab === "recentlyAdded" ||
+      tab === "recentlyLearned" ||
+      tab === "recentlyReviewed"
+    ) {
+      return tab
+    }
+    return "recentlyAdded"
+  },
+  set(value: TabType) {
+    router.push({
+      name: "recent",
+      query: { tab: value },
+    })
+  },
+})
+
+const setActivePage = (tab: TabType) => {
+  activePage.value = tab
+}
 </script>
