@@ -6,12 +6,9 @@
     <div v-else-if="error" class="daisy-alert daisy-alert-error">
       Error loading answered question
     </div>
-    <div v-else-if="answeredQuestion === null" class="daisy-alert daisy-alert-info">
-      No answered question found for this memory tracker.
-    </div>
-    <AnsweredQuestionComponent
-      v-else-if="answeredQuestion"
-      v-bind="{ answeredQuestion, conversationButton: true }"
+    <MemoryTrackerPageView
+      v-else-if="answeredQuestion !== undefined"
+      :answered-question="answeredQuestion"
     />
   </ContainerPage>
 </template>
@@ -23,7 +20,7 @@ import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
+import MemoryTrackerPageView from "./MemoryTrackerPageView.vue"
 
 const props = defineProps<{
   memoryTrackerId: number
