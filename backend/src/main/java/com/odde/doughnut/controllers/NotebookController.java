@@ -136,13 +136,6 @@ class NotebookController {
     return notebook.getNoteBriefs();
   }
 
-  @GetMapping("{notebook}/notes")
-  public List<Note> getNotes(@PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
-    return notebook.getNotes();
-  }
-
   @PatchMapping("/{notebook}/ai-assistant")
   @Transactional
   public NotebookAiAssistant updateAiAssistant(

@@ -1,5 +1,4 @@
 import { findNotebookCardButton, notebookList } from './NotebookList'
-import notebookQuestionsList from './notebookQuestionsList'
 import notebookSettingsPopup from './notebookSettingsPopup'
 
 export const notebookCard = (notebook: string) => ({
@@ -15,10 +14,6 @@ export const notebookCard = (notebook: string) => ({
     findNotebookCardButton(notebook, 'Unsubscribe').click()
     cy.findByRole('button', { name: 'OK' }).click()
     cy.pageIsNotLoading()
-  },
-  openNotebookQuestions() {
-    findNotebookCardButton(notebook, 'Notebook Questions').click()
-    return notebookQuestionsList()
   },
   editNotebookSettings() {
     findNotebookCardButton(notebook, 'Edit notebook settings').click()

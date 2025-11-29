@@ -13,7 +13,6 @@ import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
 import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.testability.builders.PredefinedQuestionBuilder;
 import java.io.IOException;
 import java.time.Period;
 import java.util.List;
@@ -171,33 +170,6 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThrows(
           UnexpectedNoAccessRightException.class,
           () -> controller.moveToCircle(note.getNotebook(), makeMe.aCircle().please()));
-    }
-  }
-
-  @Nested
-  class GetNotebookQuestions {
-    Notebook notebook;
-    PredefinedQuestion predefinedQuestion;
-
-    @BeforeEach
-    void setup() {
-      currentUser.setUser(makeMe.aUser().please());
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.refresh(notebook);
-    }
-
-    @Test
-    void shouldGetEmptyListOfNotes() throws UnexpectedNoAccessRightException {
-      List<Note> result = controller.getNotes(notebook);
-      assertThat(result.get(0).getPredefinedQuestions(), hasSize(0));
-    }
-
-    @Test
-    void shouldGetListOfNotesWithQuestions() throws UnexpectedNoAccessRightException {
-      PredefinedQuestionBuilder predefinedQuestionBuilder = makeMe.aPredefinedQuestion();
-      predefinedQuestionBuilder.approvedQuestionOf(notebook.getNotes().get(0)).please();
-      List<Note> result = controller.getNotes(notebook);
-      assertThat(result.get(0).getPredefinedQuestions(), hasSize(1));
     }
   }
 

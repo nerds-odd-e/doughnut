@@ -3619,33 +3619,6 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
-export type GetNotesData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/notes';
-};
-
-export type GetNotesErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetNotesError = GetNotesErrors[keyof GetNotesErrors];
-
-export type GetNotesResponses = {
-    /**
-     * OK
-     */
-    200: Array<Note>;
-};
-
-export type GetNotesResponse = GetNotesResponses[keyof GetNotesResponses];
-
 export type DownloadNotebookDumpData = {
     body?: never;
     path: {

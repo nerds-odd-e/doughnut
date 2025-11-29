@@ -21,15 +21,6 @@
       </template>
       <NotebookMoveDialog v-bind="{ notebook }" />
     </PopButton>
-    <PopButton
-      title="Notebook Questions"
-      v-if="user?.externalIdentifier === notebook.creatorId"
-    >
-      <template #button_face>
-        <SvgRaiseHand />
-      </template>
-      <NotebookQuestionsDialog v-bind="{ notebook }" />
-    </PopButton>
     <button
       class="daisy-btn daisy-btn-ghost daisy-btn-sm"
       @click="shareNotebook()"
@@ -47,13 +38,11 @@ import usePopups from "@/components/commons/Popups/usePopups"
 import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
 import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
 import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
-import SvgRaiseHand from "@/components/svgs/SvgRaiseHand.vue"
 import type { Notebook, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
-import NotebookQuestionsDialog from "./NotebookQuestionsDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 
 const router = useRouter()

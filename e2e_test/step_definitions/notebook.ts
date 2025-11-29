@@ -119,33 +119,6 @@ When(
     })
   }
 )
-Then(
-  'I should see that there are no questions for {string} for the following notes:',
-  (notebook: string, titles: DataTable) => {
-    const notebookQuestionsPage = start
-      .routerToNotebooksPage()
-      .notebookCard(notebook)
-      .openNotebookQuestions()
-    titles.rows().forEach((title: string[]) => {
-      const titleName = title[0]!
-      notebookQuestionsPage.expectNoQuestionsForNote(titleName)
-    })
-  }
-)
-Then(
-  'I should see the following questions for the notes in the notebook {string}:',
-  (notebook: string, noteTitles: DataTable) => {
-    const notebookQuestionsPage = start
-      .routerToNotebooksPage()
-      .notebookCard(notebook)
-      .openNotebookQuestions()
-    noteTitles.rows().forEach((title: string[]) => {
-      const titleName = title[0]!
-      const question = title[1]!
-      notebookQuestionsPage.expectOnlyQuestionsForNote(titleName, question)
-    })
-  }
-)
 
 Given('following notebooks have pending approval:', (notebooks: DataTable) => {
   notebooks.raw().forEach((notebookRaw: string[]) => {
