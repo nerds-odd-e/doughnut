@@ -64,14 +64,10 @@ describe("ConversationComponent", () => {
         })
         .mount()
 
-      // Click maximize button
       await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-
       expect(wrapper.find(".subject-container").exists()).toBe(false)
 
-      // Click restore button
       await wrapper.find('[aria-label="Toggle maximize"]').trigger("click")
-
       expect(wrapper.find(".subject-container").exists()).toBe(true)
     })
   })

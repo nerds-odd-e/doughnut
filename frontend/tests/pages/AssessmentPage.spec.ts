@@ -34,7 +34,7 @@ describe("assessment page", () => {
       )
     })
 
-    it("calls API ONCE on mount", async () => {
+    it("calls API ONCE on mount", () => {
       helper
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
@@ -47,12 +47,13 @@ describe("assessment page", () => {
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })
         .render()
+
       await screen.findByText(
         assessmentQuestionInstance.multipleChoicesQuestion.f0__stem!
       )
     })
 
-    it("does not display score immediately after rendering", async () => {
+    it("does not display score immediately after rendering", () => {
       const { html } = helper
         .component(AssessmentPage)
         .withProps({ notebookId: notebook.id })

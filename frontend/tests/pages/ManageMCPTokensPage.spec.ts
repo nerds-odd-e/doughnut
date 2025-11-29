@@ -22,7 +22,6 @@ describe("ManageMCPTokensPage", () => {
       label: "",
       id: 1,
     })
-
     mockSdkService("getTokens", [])
 
     const { findByText } = helper

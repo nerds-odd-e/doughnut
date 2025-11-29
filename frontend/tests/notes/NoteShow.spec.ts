@@ -57,9 +57,10 @@ describe("note wth children", () => {
       .render()
   }
 
-  it("should call the api", async () => {
+  it("should call the api", () => {
     const showNoteSpy = mockSdkService("showNote", note)
     render(note)
+
     expect(showNoteSpy).toHaveBeenCalledWith({
       path: { note: note.id },
     })

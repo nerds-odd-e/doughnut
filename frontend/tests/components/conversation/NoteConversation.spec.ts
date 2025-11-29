@@ -14,7 +14,6 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-// Add window.performance mock
 const mockPerformance = {
   now: vi.fn(() => Date.now()),
 }
@@ -48,16 +47,13 @@ describe("NoteConversation", () => {
     return wrapper
   }
 
-  beforeEach(() => {
-    window.HTMLElement.prototype.scrollIntoView = vi.fn()
-    vi.useFakeTimers() // Use fake timers to control timing
-  })
-
   let startConversationSpy: ReturnType<
     typeof mockSdkService<"startConversationAboutNote">
   >
 
   beforeEach(() => {
+    window.HTMLElement.prototype.scrollIntoView = vi.fn()
+    vi.useFakeTimers()
     startConversationSpy = mockSdkService(
       "startConversationAboutNote",
       conversation
@@ -68,6 +64,7 @@ describe("NoteConversation", () => {
   it("calls api to start conversation and shows ConversationInner when successful", async () => {
     mockSdkService("getConversationsAboutNote", [])
     const wrapper = await mount()
+
     await wrapper.find("textarea").setValue("Hello")
     await wrapper.find("button.send-button[type='button']").trigger("click")
     await flushPromises()
@@ -77,7 +74,6 @@ describe("NoteConversation", () => {
       body: "Hello",
     })
 
-    // Verify ConversationInner is rendered with correct props
     const conversationInner = wrapper.findComponent(ConversationInner)
     expect(conversationInner.exists()).toBe(true)
     expect(conversationInner.props("conversation")).toEqual(conversation)

@@ -42,7 +42,9 @@ describe("repeat page", () => {
   it("shows completion message when nothing to review", async () => {
     const assimilatingSpy = mockSdkService("assimilating", [])
     const wrapper = renderer.currentRoute({ name: "assimilate" }).mount()
+
     await flushPromises()
+
     expect(wrapper.text()).toContain(
       "Congratulations! You've achieved your daily assimilation goal!"
     )
