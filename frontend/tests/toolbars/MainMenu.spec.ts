@@ -17,7 +17,6 @@ describe("main menu", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    // Default mocks for all tests (can be overridden in individual tests)
     mockSdkService("getAssimilationCount", {
       dueCount: 0,
       assimilatedCountOfTheDay: 0,
@@ -81,8 +80,6 @@ describe("main menu", () => {
         assimilatedCountOfTheDay: 0,
         totalUnassimilatedCount: 0,
       })
-      // No need to re-mock services already mocked in beforeEach
-      // Only override the one that's different
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -93,8 +90,6 @@ describe("main menu", () => {
     })
 
     it("does not show due count when there are no due items", async () => {
-      // No need to re-mock - beforeEach already sets dueCount to 0
-
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
@@ -108,7 +103,6 @@ describe("main menu", () => {
         assimilatedCountOfTheDay: 0,
         totalUnassimilatedCount: 0,
       })
-      // No need to re-mock other services
 
       const { rerender } = helper
         .component(MainMenu)
@@ -129,7 +123,6 @@ describe("main menu", () => {
         assimilatedCountOfTheDay: 0,
         totalUnassimilatedCount: 0,
       })
-      // No need to re-mock other services
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -147,7 +140,6 @@ describe("main menu", () => {
         recallWindowEndAt: "",
         totalAssimilatedCount: 0,
       })
-      // No need to re-mock other services
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -158,8 +150,6 @@ describe("main menu", () => {
     })
 
     it("does not show recall count when there are no items to repeat", async () => {
-      // No need to re-mock - beforeEach already sets toRepeatCount to 0
-
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
@@ -173,7 +163,6 @@ describe("main menu", () => {
         recallWindowEndAt: "",
         totalAssimilatedCount: 0,
       })
-      // No need to re-mock other services
 
       const { rerender } = helper
         .component(MainMenu)
