@@ -1,7 +1,7 @@
 <template>
-  <ol class="choices daisy-flex daisy-flex-wrap daisy-flex-row daisy-justify-start daisy-list-none daisy-p-0" v-if="choices && choices.length > 0">
+  <ol class="choices daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 daisy-list-none daisy-p-0 daisy-gap-4" v-if="choices && choices.length > 0">
     <li
-      class="choice daisy-w-[46%] daisy-min-h-[80px] daisy-m-[2%] sm:daisy-w-full"
+      class="choice daisy-min-h-[80px]"
       v-for="(choice, index) in choices"
       :key="index"
     >
@@ -74,19 +74,11 @@ export default defineComponent({
 
 <style scoped lang="sass">
 .choices
-  display: flex
-  flex-wrap: wrap
-  flex-direction: row
-  justify-content: flex-start
   list-style-type: none
   padding-left: 0
 
 .choice
-  width: 46%
   min-height: 80px
-  margin: 2%
-  @media(max-width: 500px)
-    width: 100%
 
 .is-correct
   background-color: hsl(142, 76%, 36%) !important
