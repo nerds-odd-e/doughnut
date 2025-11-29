@@ -14,6 +14,7 @@ import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.utils.TimestampOperations;
@@ -455,6 +456,98 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
           ResponseStatusException.class, () -> controller.getLastAnsweredQuestion(memoryTracker));
+    }
+  }
+
+  @Nested
+  class GetRecallPrompts {
+    @Test
+    void shouldReturnAllRecallPromptsOrderedByIdDesc()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      RecallPrompt prompt1 =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
+      RecallPrompt prompt2 =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
+      RecallPrompt prompt3 =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
+
+      List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
+
+      assertThat(prompts, hasSize(3));
+      assertThat(prompts.get(0).getId(), equalTo(prompt3.getId()));
+      assertThat(prompts.get(1).getId(), equalTo(prompt2.getId()));
+      assertThat(prompts.get(2).getId(), equalTo(prompt1.getId()));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoPrompts() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
+
+      assertThat(prompts, empty());
+    }
+
+    @Test
+    void shouldIncludeBothAnsweredAndUnansweredPrompts()
+        throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      RecallPrompt unansweredPrompt =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .please();
+      RecallPrompt answeredPrompt =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .answerChoiceIndex(0)
+              .please();
+
+      List<RecallPrompt> prompts = controller.getRecallPrompts(memoryTracker);
+
+      assertThat(prompts, hasSize(2));
+      assertThat(prompts.get(0).getId(), equalTo(answeredPrompt.getId()));
+      assertThat(prompts.get(1).getId(), equalTo(unansweredPrompt.getId()));
+    }
+
+    @Test
+    void shouldNotBeAbleToGetRecallPromptsForOthersMemoryTracker() {
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.getRecallPrompts(memoryTracker));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      assertThrows(
+          ResponseStatusException.class, () -> controller.getRecallPrompts(memoryTracker));
     }
   }
 }

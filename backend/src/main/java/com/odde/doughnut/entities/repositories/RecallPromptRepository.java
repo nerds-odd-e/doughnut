@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.RecallPrompt;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -26,4 +27,6 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       nativeQuery = true)
   Optional<RecallPrompt> findLastAnsweredByMemoryTracker(
       @Param("memoryTrackerId") Integer memoryTrackerId);
+
+  List<RecallPrompt> findAllByMemoryTrackerIdOrderByIdDesc(Integer memoryTrackerId);
 }

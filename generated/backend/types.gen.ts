@@ -170,20 +170,24 @@ export type QuestionContestResult = {
     rejected?: boolean;
 };
 
-export type RecallPrompt = {
-    id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
-    notebook?: Notebook;
-};
-
-export type AnswerDto = {
-    choiceIndex?: number;
-};
-
 export type Answer = {
     id: number;
     choiceIndex?: number;
     correct: boolean;
+};
+
+export type RecallPrompt = {
+    id: number;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
+    notebook?: Notebook;
+    note?: Note;
+    answerTime?: string;
+    predefinedQuestion?: PredefinedQuestion;
+    answer?: Answer;
+};
+
+export type AnswerDto = {
+    choiceIndex?: number;
 };
 
 export type AnsweredQuestion = {
@@ -606,6 +610,16 @@ export type SubscriptionWritable = {
     user?: User;
     notebook?: Notebook;
     fromDTO?: SubscriptionDto;
+};
+
+export type RecallPromptWritable = {
+    id: number;
+    multipleChoicesQuestion: MultipleChoicesQuestion;
+    notebook?: Notebook;
+    note?: NoteWritable;
+    answerTime?: string;
+    predefinedQuestion?: PredefinedQuestion;
+    answer?: Answer;
 };
 
 export type AnsweredQuestionWritable = {
@@ -3751,6 +3765,33 @@ export type GetSpellingQuestionResponses = {
 };
 
 export type GetSpellingQuestionResponse = GetSpellingQuestionResponses[keyof GetSpellingQuestionResponses];
+
+export type GetRecallPromptsData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/recall-prompts';
+};
+
+export type GetRecallPromptsErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type GetRecallPromptsError = GetRecallPromptsErrors[keyof GetRecallPromptsErrors];
+
+export type GetRecallPromptsResponses = {
+    /**
+     * OK
+     */
+    200: Array<RecallPrompt>;
+};
+
+export type GetRecallPromptsResponse = GetRecallPromptsResponses[keyof GetRecallPromptsResponses];
 
 export type GetLastAnsweredQuestionData = {
     body?: never;

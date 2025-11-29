@@ -130,4 +130,8 @@ public class MemoryTrackerService {
         .map(RecallPrompt::getAnsweredQuestion)
         .orElse(null);
   }
+
+  public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
+    return recallPromptRepository.findAllByMemoryTrackerIdOrderByIdDesc(memoryTracker.getId());
+  }
 }
