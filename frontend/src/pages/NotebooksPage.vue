@@ -1,11 +1,14 @@
 <template>
-  <NotebooksPageView
-    :notebooks="notebooks"
-    :subscriptions="subscriptions"
-    :user="user"
-    @notebook-updated="handleNotebookUpdated"
-    @refresh="fetchData"
-  />
+  <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined, title: 'Notebooks' }">
+    <NotebooksPageView
+      v-if="notebooks !== undefined && user !== undefined"
+      :notebooks="notebooks"
+      :subscriptions="subscriptions ?? []"
+      :user="user"
+      @notebook-updated="handleNotebookUpdated"
+      @refresh="fetchData"
+    />
+  </ContainerPage>
 </template>
 
 <script setup lang="ts">
@@ -14,6 +17,7 @@ import type { Notebook, Subscription, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import NotebooksPageView from "./NotebooksPageView.vue"
+import ContainerPage from "./commons/ContainerPage.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const subscriptions = ref<Subscription[] | undefined>(undefined)

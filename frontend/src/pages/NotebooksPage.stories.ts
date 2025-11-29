@@ -73,11 +73,11 @@ export const Empty: Story = {
   },
 }
 
-// Loading state - data not yet loaded
-export const Loading: Story = {
+// Empty state with no notebooks
+export const NoNotebooks: Story = {
   args: {
-    notebooks: undefined,
-    subscriptions: undefined,
+    notebooks: [],
+    subscriptions: [],
     user: mockUser,
   },
 }
