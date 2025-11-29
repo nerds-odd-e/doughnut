@@ -26,6 +26,9 @@
         @blur="updateRandomSelector"
       />
     </PopButton>
+    <div v-if="featureToggle" class="feature-toggle-alert">
+      <em class="daisy-btn-danger">Feature Toggle is On</em>
+    </div>
   </div>
 </template>
 
@@ -81,6 +84,13 @@ export default defineComponent({
 .testability-wrapper {
   position: fixed;
   bottom: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.feature-toggle-alert {
+  position: fixed;
+  bottom: 80px;
   left: 20px;
   z-index: 1000;
 }

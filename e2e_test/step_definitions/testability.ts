@@ -47,7 +47,7 @@ Then(
   }
 )
 
-Then('I go to the testability page to turn on the feature toggle', () => {
-  cy.findByText('Testability').click()
+When('I go to the testability page to turn on the feature toggle', () => {
+  cy.get('button[title="Testability"]').click()
   cy.formField('Feature Toggle').click()
 })
