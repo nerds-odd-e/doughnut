@@ -112,3 +112,23 @@ export const LongQuestion: Story = {
     disabled: false,
   },
 }
+
+// Question with long choice text
+export const LongChoiceText: Story = {
+  args: {
+    multipleChoicesQuestion: makeMe.aPredefinedQuestion
+      .withQuestionStem(
+        "Which of the following best describes the purpose of a RESTful API?"
+      )
+      .withChoices([
+        "A RESTful API is an architectural style for designing networked applications that uses stateless communication and standard HTTP methods to interact with resources, allowing clients to access and manipulate web resources through a uniform interface.",
+        "A RESTful API is a type of database that stores data in a structured format using tables and relationships between them.",
+        "A RESTful API is a programming language used for building web applications with a focus on object-oriented design patterns.",
+        "A RESTful API is a framework for building user interfaces that allows developers to create interactive web pages using component-based architecture.",
+      ])
+      .correctAnswerIndex(0)
+      .please().multipleChoicesQuestion,
+    correctChoiceIndex: 0,
+    disabled: false,
+  },
+}
