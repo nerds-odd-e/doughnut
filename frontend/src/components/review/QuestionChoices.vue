@@ -1,5 +1,5 @@
 <template>
-  <ol class="choices daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 daisy-list-none daisy-p-0 daisy-gap-4" v-if="choices && choices.length > 0">
+  <ol class="choices daisy-grid daisy-grid-cols-1 sm:daisy-grid-cols-2 daisy-list-none daisy-p-0 daisy-gap-4 daisy-mt-4" v-if="choices && choices.length > 0">
     <li
       class="choice daisy-min-h-[80px]"
       v-for="(choice, index) in choices"
