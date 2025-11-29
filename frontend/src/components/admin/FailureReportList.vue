@@ -59,7 +59,14 @@ export default defineComponent({
         FailureReportController.failureReports({})
       )
       if (!error) {
-        this.failureReports = reports as unknown as FailureReport[]
+        const sortedReports = (reports as unknown as FailureReport[]).sort(
+          (a, b) => {
+            const dateA = new Date(a.createDatetime).getTime()
+            const dateB = new Date(b.createDatetime).getTime()
+            return dateB - dateA
+          }
+        )
+        this.failureReports = sortedReports
       } else {
         // Error is handled by global interceptor (toast notification)
         // Extract error message for display
