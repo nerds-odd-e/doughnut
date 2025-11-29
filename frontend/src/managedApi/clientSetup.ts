@@ -24,7 +24,6 @@ type SdkResult = {
  * This function:
  * - Sets loading state synchronously before the API call
  * - Shows error toasts for failed requests
- * - Handles 401 unauthorized redirects
  *
  * @param apiCall - Function that returns a Promise with the API result (SDK format with error, response, request)
  * @returns Promise with the API result
@@ -76,13 +75,30 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
   // Configure global client with SDK response format
   globalClient.setConfig(clientConfig)
 
-  // Configure non-reloading client with same settings
+  // Add response interceptor to globalClient to handle 401 errors
+  globalClient.interceptors.response.use((response, request) => {
+    if (response.status === 401) {
+      const method = request.method
+      if (
+        method === "GET" ||
+        // eslint-disable-next-line no-alert
+        window.confirm(
+          "You are logged out. Do you want to log in (and lose the current changes)?"
+        )
+      ) {
+        loginOrRegisterAndHaltThisThread()
+      }
+    }
+    return response
+  })
+
+  // Configure non-reloading client with same settings (no 401 interceptor)
   nonReloadingClient.setConfig(clientConfig)
 }
 
 /**
  * Handles API errors from SDK result format.
- * Shows error toasts and handles special cases (401, 404, 400).
+ * Shows error toasts and handles special cases (404, 400).
  */
 function handleSdkError(result: SdkResult) {
   if (!apiStatusHandler) return
@@ -93,18 +109,8 @@ function handleSdkError(result: SdkResult) {
   const method = result.request?.method
   const errorBody = result.error
 
-  // Handle 401 unauthorized - redirect to login
   if (status === 401) {
-    if (
-      method === "GET" ||
-      // eslint-disable-next-line no-alert
-      window.confirm(
-        "You are logged out. Do you want to log in (and lose the current changes)?"
-      )
-    ) {
-      loginOrRegisterAndHaltThisThread()
-      return
-    }
+    return
   }
 
   // Extract error message
