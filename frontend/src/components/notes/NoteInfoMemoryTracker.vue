@@ -12,7 +12,7 @@
   <td>
     <span class="statistics-value">{{ new Date(localMemoryTracker.nextRecallAt).toLocaleString() }}</span>
   </td>
-  <td>
+  <td @click.stop>
     <div class="btn-group" role="group" aria-label="First group">
       <button
         class="btn"

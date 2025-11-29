@@ -16,7 +16,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="memoryTracker in memoryTrackers" :key="memoryTracker.id">
+      <tr
+        v-for="memoryTracker in memoryTrackers"
+        :key="memoryTracker.id"
+        class="clickable-row"
+        @click="navigateToMemoryTracker(memoryTracker.id)"
+      >
         <NoteInfoMemoryTracker
           :model-value="memoryTracker"
           @update:model-value="updateMemoryTracker($event)"
@@ -29,6 +34,7 @@
 <script setup lang="ts">
 import type { MemoryTracker, NoteInfo } from "@generated/backend"
 import { ref, computed } from "vue"
+import { useRouter } from "vue-router"
 import RecallSettingForm from "../review/RecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
@@ -41,6 +47,9 @@ const props = defineProps<{
 defineEmits<{
   (e: "levelChanged", value: unknown): void
 }>()
+
+// Router
+const router = useRouter()
 
 // Reactive state
 const memoryTrackers = ref(props.noteInfo.memoryTrackers ?? [])
@@ -55,10 +64,25 @@ const updateMemoryTracker = (newTracker: MemoryTracker) => {
     memoryTrackers.value[index] = newTracker
   }
 }
+
+const navigateToMemoryTracker = (memoryTrackerId: number) => {
+  router.push({
+    name: "memoryTrackerShow",
+    params: { memoryTrackerId },
+  })
+}
 </script>
 
 <style lang="scss" scoped>
 ul {
   margin-bottom: 0;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.clickable-row:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 </style>
