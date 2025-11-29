@@ -15,6 +15,10 @@ import autoprefixer from 'autoprefixer'
 import Inspector from 'unplugin-vue-inspector/vite'
 import checker from 'vite-plugin-checker'
 
+// Check if we're running tests - Vitest sets process.env.VITEST
+// This is the official and most reliable way to detect test mode
+const isTest = process.env.VITEST !== undefined
+
 const config = defineConfig({
   resolve: {
     alias: {
@@ -46,9 +50,20 @@ const config = defineConfig({
         "clearInterval",
       ],
     },
+    // Performance optimizations
+    pool: 'threads', // Use threads pool for better performance
+    // Disable coverage collection during tests (not needed for unit tests)
+    coverage: {
+      enabled: false,
+    },
+    // Optimize file parallelism
+    fileParallelism: true,
+    // Keep isolation enabled for safety (tests should be isolated)
+    isolate: true,
   },
   css: {
-    devSourcemap: true,
+    // Disable sourcemaps during tests (saves ~0.3s)
+    devSourcemap: !isTest,
     postcss: {
       plugins: [
         tailwindcss({
@@ -67,22 +82,30 @@ const config = defineConfig({
         },
       },
     }),
-    Inspector({
-      launchEditor: 'cursor',
-    }),
+    // Disable Inspector during tests (saves ~0.3s)
+    ...(isTest ? [] : [
+      Inspector({
+        launchEditor: 'cursor',
+      }),
+    ]),
     VueRouter(),
     vueJsx(),
     AutoImport({
       imports: ['vue', 'vue-router', 'vitest', VueRouterAutoImports],
-      dts: true,
+      // Disable dts generation during tests (saves ~0.3s)
+      dts: !isTest,
     }),
     Components({}),
-    checker({
-      typescript: true,
-      vueTsc: true, // This will check Vue templates
-      biome: true,  // This will use Biome for linting
-      overlay: false, // Disable overlay to prevent blocking e2e tests - errors still show in terminal
-    }),
+    // Disable checker plugin during test runs to speed up tests
+    // Linting and type checking should be done separately, not during test execution
+    ...(isTest ? [] : [
+      checker({
+        typescript: true,
+        vueTsc: true, // This will check Vue templates
+        biome: true,  // This will use Biome for linting
+        overlay: false, // Disable overlay to prevent blocking e2e tests - errors still show in terminal
+      }),
+    ]),
   ],
   server: {
     proxy: {
