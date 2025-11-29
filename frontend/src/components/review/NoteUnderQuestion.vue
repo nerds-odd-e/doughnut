@@ -1,6 +1,6 @@
 <template>
-  <div class="note-under-question">
-    <div class="note-label">Note under question</div>
+  <div class="note-under-question daisy-bg-base-200 daisy-border-base-300">
+    <div class="note-label daisy-bg-base-200 daisy-text-base-content">Note under question</div>
     <div class="breadcrumb-wrapper">
       <Breadcrumb v-bind="{ noteTopology, includingSelf: true }" />
     </div>
@@ -27,8 +27,7 @@ defineProps({
   padding: 8px 12px
   padding-top: 24px
   margin-top: 15px
-  background-color: #f9f9f9
-  border: 2px solid #e0e0e0
+  border: 2px solid
   position: relative
 
   .note-label
@@ -37,10 +36,9 @@ defineProps({
     left: 10px
     padding: 0 10px
     font-weight: 500
-    color: #666
     font-size: 0.9rem
-    background-color: #f9f9f9
     border-radius: 3px
+    z-index: 1
 
   .breadcrumb-wrapper
     width: 100%
