@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import type { NoteAccessory } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
-import {} from "@/managedApi/clientSetup"
+import { nonReloadingClient } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
 import { onMounted, ref, watch } from "vue"
 import NoteAccessoryDisplay from "./NoteAccessoryDisplay.vue"
@@ -35,6 +35,7 @@ watch(
 const fetchData = async () => {
   const { data: accessory, error } = await NoteController.showNoteAccessory({
     path: { note: noteId },
+    client: nonReloadingClient,
   })
   if (!error) {
     noteAccessory.value = accessory!
