@@ -6,6 +6,15 @@ const meta = {
   title: "Review/QuestionDisplay",
   component: QuestionDisplay,
   tags: ["autodocs"],
+  parameters: {
+    layout: "fullscreen",
+  },
+  decorators: [
+    () => ({
+      template:
+        '<div style="width: 100vw; padding: 2rem; box-sizing: border-box;"><story /></div>',
+    }),
+  ],
   argTypes: {
     multipleChoicesQuestion: {
       control: "object",
