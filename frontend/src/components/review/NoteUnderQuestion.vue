@@ -23,6 +23,7 @@ defineProps({
 <style lang="sass" scoped>
 .note-under-question
   width: 100%
+  min-width: 0
   border-radius: 5px
   padding: 8px 12px
   padding-top: 24px
@@ -42,6 +43,7 @@ defineProps({
 
   .breadcrumb-wrapper
     width: 100%
+    min-width: 0
     overflow-x: auto
     :deep(.daisy-breadcrumbs)
       max-width: none !important

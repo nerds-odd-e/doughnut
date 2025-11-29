@@ -85,7 +85,7 @@ onMounted(async () => {
           @update-user="user = $event"
         />
       </div>
-      <div class="daisy-flex-grow daisy-overflow-y-auto main-content">
+      <div class="daisy-flex-grow daisy-overflow-y-auto daisy-overflow-x-hidden main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
         <template v-else-if="userLoaded">
           <router-view v-slot="{ Component }">
@@ -120,6 +120,7 @@ $global-bar-height: 51px;
 .path-and-content {
   margin-left: $main-menu-width;
   height: 100%;
+  min-width: 0;
 }
 
 .global-bar {
@@ -151,6 +152,7 @@ $global-bar-height: 51px;
     margin-left: 0;
     margin-top: $main-menu-height-tablet;
     height: calc(100% - #{$main-menu-height-tablet});
+    min-width: 0;
   }
 
   .main-content {
@@ -166,6 +168,7 @@ $global-bar-height: 51px;
   .path-and-content {
     margin-top: $main-menu-height-mobile;
     height: calc(100% - #{$main-menu-height-mobile});
+    min-width: 0;
   }
 
   .main-content {

@@ -4,7 +4,7 @@
   </TeleportToHeadStatus>
 
   <div :class="[
-    'daisy-mx-auto',
+    'daisy-mx-auto daisy-min-w-0',
     { 'daisy-h-full daisy-min-h-full': props.fullHeight },
     { 'daisy-container daisy-mt-3': !props.fullHeight }
   ]">
