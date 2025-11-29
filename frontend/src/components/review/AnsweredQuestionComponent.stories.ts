@@ -103,7 +103,7 @@ export const NoteWithManyAncestors: Story = {
         0,
         true
       )
-      
+
       // Create a chain of 10 ancestor notes
       let currentNote = makeMe.aNote.topicConstructor("Ancestor 1").please()
       for (let i = 2; i <= 10; i++) {
@@ -112,7 +112,7 @@ export const NoteWithManyAncestors: Story = {
           .underNote(currentNote)
           .please()
       }
-      
+
       // Create the final note with all ancestors
       question.note = makeMe.aNote
         .topicConstructor("TypeScript")
