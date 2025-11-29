@@ -1,20 +1,73 @@
 <template>
-  <RecallPageView
-    v-if="toRepeat !== undefined"
-    :to-repeat="toRepeat"
-    :current-index="currentIndex"
-    :total-assimilated-count="totalAssimilatedCount ?? 0"
-    :eager-fetch-count="eagerFetchCount"
-    :storage-accessor="storageAccessor"
-    @answered-question="onAnsweredQuestion"
-    @answered-spelling="onAnsweredSpelling"
-    @just-reviewed="onJustReviewed"
-    @move-to-end="moveMemoryTrackerToEnd"
-    @load-more="loadMore"
-  />
+  <RecallProgressBar
+    v-if="isProgressBarVisible"
+    v-bind="{
+      finished,
+      toRepeatCount,
+      previousAnsweredQuestionCursor,
+    }"
+    @view-last-answered-question="viewLastAnsweredQuestion($event)"
+    @show-more="showTooltip = true"
+  >
+  </RecallProgressBar>
+
+  <div
+    v-if="showTooltip"
+    class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
+    @click="showTooltip = false"
+  >
+    <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
+      <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+      <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+    </div>
+  </div>
+
+  <template v-if="toRepeat != undefined">
+    <Quiz
+      v-if="toRepeatCount !== 0"
+      v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
+      :memory-trackers="toRepeat"
+      :current-index="currentIndex"
+      :eager-fetch-count="eagerFetchCount ?? 5"
+      :storage-accessor="storageAccessor"
+      @answered-question="onAnsweredQuestion"
+      @answered-spelling="onAnsweredSpelling"
+      @just-reviewed="onJustReviewed"
+      @move-to-end="moveMemoryTrackerToEnd"
+    />
+    <AnsweredQuestionComponent
+      v-if="currentAnsweredQuestion"
+      v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true, storageAccessor }"
+    />
+    <AnsweredSpellingQuestion
+      v-if="currentAnsweredSpelling"
+      v-bind="{ result: currentAnsweredSpelling, storageAccessor }"
+    />
+    <template v-else-if="toRepeatCount === 0">
+      <div class="daisy-alert daisy-alert-success">
+        You have finished all repetitions for this half a day!
+      </div>
+      <div>
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(3)">
+          Load more from next 3 days
+        </button>
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(7)">
+          Load more from next 7 days
+        </button>
+        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(14)">
+          Load more from next 14 days
+        </button>
+      </div>
+    </template>
+  </template>
 </template>
 
 <script setup lang="ts">
+import Quiz from "@/components/review/Quiz.vue"
+import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
+import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
+import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
+import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
 import { RecallsController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
@@ -23,17 +76,24 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import type { StorageAccessor } from "@/store/createNoteStorage"
 import { shuffle } from "es-toolkit"
 import type { PropType } from "vue"
-import { onMounted, ref, onActivated } from "vue"
+import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
-import RecallPageView from "./RecallPageView.vue"
 
+export type SpellingResult = SpellingResultDto & { type: "spelling" }
+
+export type QuestionResult = {
+  type: "question"
+  answeredQuestion: AnsweredQuestion
+}
+
+type RecallResult = QuestionResult | SpellingResult
 const {
   setToRepeatCount,
+  decrementToRepeatCount,
   recallWindowEndAt,
   setRecallWindowEndAt,
   totalAssimilatedCount,
 } = useRecallData()
-
 defineProps({
   eagerFetchCount: Number,
   storageAccessor: {
@@ -44,6 +104,35 @@ defineProps({
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const currentIndex = ref(0)
+const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
+const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
+const isProgressBarVisible = ref(true)
+const showTooltip = ref(false)
+
+const currentAnsweredQuestion = computed(() => {
+  if (previousAnsweredQuestionCursor.value === undefined) return undefined
+  const result =
+    previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
+  if (!result) return undefined
+  return result.type === "question" ? result.answeredQuestion : undefined
+})
+
+const currentAnsweredSpelling = computed(() => {
+  if (previousAnsweredQuestionCursor.value === undefined) return undefined
+  const result =
+    previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
+  if (!result) return undefined
+  return result.type === "spelling" ? result : undefined
+})
+
+const finished = computed(() => previousAnsweredQuestions.value.length)
+const toRepeatCount = computed(
+  () => (toRepeat.value?.length ?? 0) - currentIndex.value
+)
+
+const viewLastAnsweredQuestion = (cursor: number | undefined) => {
+  previousAnsweredQuestionCursor.value = cursor
+}
 
 const loadMore = async (dueInDays?: number) => {
   const { data: response, error } = await RecallsController.recalling({
@@ -66,16 +155,34 @@ const loadMore = async (dueInDays?: number) => {
   return undefined
 }
 
-const onAnsweredQuestion = () => {
+const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
   currentIndex.value += 1
+  previousAnsweredQuestions.value.push({
+    type: "question",
+    answeredQuestion: answerResult,
+  })
+  if (!answerResult.answer.correct) {
+    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
+  }
+  decrementToRepeatCount()
 }
 
-const onAnsweredSpelling = () => {
+const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
   currentIndex.value += 1
+  previousAnsweredQuestions.value.push({
+    type: "spelling",
+    ...answerResult,
+  })
+  if (!answerResult.isCorrect) {
+    viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
+  }
+  decrementToRepeatCount()
 }
 
 const onJustReviewed = () => {
   currentIndex.value += 1
+  previousAnsweredQuestions.value.push(undefined)
+  decrementToRepeatCount()
 }
 
 const moveMemoryTrackerToEnd = (index: number) => {
@@ -105,10 +212,15 @@ onMounted(() => {
 })
 
 onActivated(() => {
+  isProgressBarVisible.value = true
   const currentTime = new Date().toISOString()
   if (recallWindowEndAt.value && currentTime > recallWindowEndAt.value) {
     loadCurrentDueRecalls()
   }
+})
+
+onDeactivated(() => {
+  isProgressBarVisible.value = false
 })
 
 defineExpose({
