@@ -47,7 +47,7 @@ public class RecallQuestionService {
   }
 
   private RecallPrompt findExistingUnansweredRecallPrompt(MemoryTracker memoryTracker) {
-    return recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker).orElse(null);
+    return recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker.getId()).orElse(null);
   }
 
   private RecallPrompt generateNewRecallPrompt(MemoryTracker memoryTracker) {
