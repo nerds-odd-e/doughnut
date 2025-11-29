@@ -82,6 +82,7 @@ describe("Assimilation component", () => {
         .withStorageProps({
           note,
         })
+        .withRouter()
         .mount()
 
       await flushPromises()

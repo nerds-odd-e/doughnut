@@ -16,22 +16,6 @@
     <div class="btn-group" role="group" aria-label="First group">
       <button
         class="btn"
-        name="sad"
-        @click="selfEvaluateHandler(-5)"
-        title="reduce next repeat interval (days) by half"
-      >
-        <SvgSad />
-      </button>
-      <button
-        class="btn"
-        name="happy"
-        @click="selfEvaluateHandler(5)"
-        title="add to next repeat interval (days) by half"
-      >
-        <SvgHappy />
-      </button>
-      <button
-        class="btn"
         title="remove this note from review"
         @click="removeFromReview"
       >
@@ -49,8 +33,6 @@ import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import SvgNoReview from "../svgs/SvgNoReview.vue"
-import SvgSad from "../svgs/SvgSad.vue"
-import SvgHappy from "../svgs/SvgHappy.vue"
 
 const props = defineProps({
   modelValue: {
@@ -71,21 +53,6 @@ watch(
   },
   { immediate: true }
 )
-
-const selfEvaluateHandler = async (adjustment: number) => {
-  const { data: memoryTracker, error } = await apiCallWithLoading(() =>
-    MemoryTrackerController.selfEvaluate({
-      path: { memoryTracker: localMemoryTracker.value.id },
-      body: {
-        adjustment,
-      },
-    })
-  )
-  if (!error) {
-    localMemoryTracker.value = memoryTracker!
-    emit("update:modelValue", memoryTracker!)
-  }
-}
 
 const removeFromReview = async () => {
   if (

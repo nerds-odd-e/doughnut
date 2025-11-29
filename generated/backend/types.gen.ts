@@ -263,10 +263,6 @@ export type NotebookCertificateApproval = {
     lastApprovalTime?: string;
 };
 
-export type SelfEvaluation = {
-    adjustment?: number;
-};
-
 export type MemoryTracker = {
     id: number;
     note: Note;
@@ -2105,33 +2101,6 @@ export type RequestApprovalForNotebookResponses = {
 };
 
 export type RequestApprovalForNotebookResponse = RequestApprovalForNotebookResponses[keyof RequestApprovalForNotebookResponses];
-
-export type SelfEvaluateData = {
-    body: SelfEvaluation;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/self-evaluate';
-};
-
-export type SelfEvaluateErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type SelfEvaluateError = SelfEvaluateErrors[keyof SelfEvaluateErrors];
-
-export type SelfEvaluateResponses = {
-    /**
-     * OK
-     */
-    200: MemoryTracker;
-};
-
-export type SelfEvaluateResponse = SelfEvaluateResponses[keyof SelfEvaluateResponses];
 
 export type RemoveFromRepeatingData = {
     body?: never;

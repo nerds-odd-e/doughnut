@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -97,65 +96,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
         controller.removeFromRepeating(rp);
         assertThat(rp.getRemovedFromTracking(), is(true));
         assertThat(rp.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-      }
-    }
-  }
-
-  @Nested
-  class Evaluate {
-
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      currentUser.setUser(null);
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(makeMe.aNote().please()).inMemoryPlease();
-      SelfEvaluation selfEvaluation =
-          new SelfEvaluation() {
-            {
-              this.adjustment = 1;
-            }
-          };
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller.selfEvaluate(memoryTracker, selfEvaluation));
-    }
-
-    @Test
-    void whenTheMemoryTrackerDoesNotExist() {
-      SelfEvaluation selfEvaluation =
-          new SelfEvaluation() {
-            {
-              this.adjustment = 1;
-            }
-          };
-      assertThrows(
-          ResponseStatusException.class, () -> controller.selfEvaluate(null, selfEvaluation));
-    }
-
-    @Nested
-    class WhenThereIsAMemoryTracker {
-      MemoryTracker rp;
-
-      @BeforeEach
-      void setup() {
-        rp = makeMe.aMemoryTrackerFor(makeMe.aNote().please()).by(currentUser.getUser()).please();
-      }
-
-      @Test
-      void repeat() {
-        evaluate(1);
-        assertThat(rp.getForgettingCurveIndex(), equalTo(101));
-        assertThat(rp.getRepetitionCount(), equalTo(0));
-      }
-
-      private void evaluate(int adj) {
-        SelfEvaluation selfEvaluation =
-            new SelfEvaluation() {
-              {
-                this.adjustment = adj;
-              }
-            };
-        controller.selfEvaluate(rp, selfEvaluation);
       }
     }
   }

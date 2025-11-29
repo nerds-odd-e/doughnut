@@ -18,6 +18,7 @@ describe("note info", () => {
       .withProps({
         noteId: 123,
       })
+      .withRouter()
       .mount()
     await flushPromises()
     expect(wrapper.findAll(".statistics-value")).toHaveLength(3)

@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
@@ -14,10 +13,8 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.util.List;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/memory-trackers")
@@ -67,19 +64,6 @@ class MemoryTrackerController {
     memoryTracker.setRemovedFromTracking(true);
     memoryTracker.setLastRecalledAt(testabilitySettings.getCurrentUTCTimestamp());
     entityPersister.save(memoryTracker);
-    return memoryTracker;
-  }
-
-  @PostMapping(path = "/{memoryTracker}/self-evaluate")
-  @Transactional
-  public MemoryTracker selfEvaluate(
-      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
-      @RequestBody SelfEvaluation selfEvaluation) {
-    authorizationService.assertLoggedIn();
-    if (memoryTracker == null || memoryTracker.getId() == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The memory tracker does not exist.");
-    }
-    memoryTrackerService.updateForgettingCurve(memoryTracker, selfEvaluation.adjustment);
     return memoryTracker;
   }
 
