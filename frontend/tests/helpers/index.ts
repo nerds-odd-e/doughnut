@@ -120,7 +120,6 @@ const methodToController: Record<string, any> = {
   getSpellingQuestion: MemoryTrackerController,
   getRecentlyReviewed: MemoryTrackerController,
   getRecentMemoryTrackers: MemoryTrackerController,
-  getLastAnsweredQuestion: MemoryTrackerController,
   getRecallPrompts: MemoryTrackerController,
   createNoteViaMcp: McpNoteCreationController,
   updateLink: LinkController,

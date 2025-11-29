@@ -2992,30 +2992,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/RecallPrompt"
-  /api/memory-trackers/{memoryTracker}/last-answered-question:
-    get:
-      tags:
-      - memory-tracker-controller
-      operationId: getLastAnsweredQuestion
-      parameters:
-      - name: memoryTracker
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
   /api/memory-trackers/recently-reviewed:
     get:
       tags:

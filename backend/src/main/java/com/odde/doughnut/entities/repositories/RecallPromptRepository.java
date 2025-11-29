@@ -21,12 +21,5 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
   Optional<RecallPrompt> findUnansweredByMemoryTracker(
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
-  @Query(
-      value =
-          "SELECT * FROM recall_prompt rp WHERE rp.memory_tracker_id = :memoryTrackerId AND rp.quiz_answer_id IS NOT NULL ORDER BY rp.id DESC LIMIT 1",
-      nativeQuery = true)
-  Optional<RecallPrompt> findLastAnsweredByMemoryTracker(
-      @Param("memoryTrackerId") Integer memoryTrackerId);
-
   List<RecallPrompt> findAllByMemoryTrackerIdOrderByIdDesc(Integer memoryTrackerId);
 }

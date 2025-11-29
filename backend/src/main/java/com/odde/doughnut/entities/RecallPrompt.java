@@ -17,7 +17,15 @@ import lombok.EqualsAndHashCode;
 @Table(name = "recall_prompt")
 @Data
 @EqualsAndHashCode(callSuper = false)
-@JsonPropertyOrder({"id", "multipleChoicesQuestion", "notebook"})
+@JsonPropertyOrder({
+  "id",
+  "multipleChoicesQuestion",
+  "notebook",
+  "note",
+  "answerTime",
+  "predefinedQuestion",
+  "answer"
+})
 public class RecallPrompt extends AnswerableQuestionInstance {
   @ManyToOne
   @JoinColumn(name = "memory_tracker_id", referencedColumnName = "id")

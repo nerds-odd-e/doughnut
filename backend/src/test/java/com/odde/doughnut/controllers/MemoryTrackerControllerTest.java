@@ -11,7 +11,6 @@ import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SelfEvaluation;
 import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
-import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -381,81 +380,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
                 TimestampOperations.addHoursToTimestamp(
                     testabilitySettings.getCurrentUTCTimestamp(), 25)));
       }
-    }
-  }
-
-  @Nested
-  class GetLastAnsweredQuestion {
-    @Test
-    void shouldReturnLastAnsweredQuestion() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      makeMe
-          .aRecallPrompt()
-          .approvedQuestionOf(note)
-          .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(0)
-          .please();
-
-      AnsweredQuestion answeredQuestion = controller.getLastAnsweredQuestion(memoryTracker);
-
-      assertThat(answeredQuestion, notNullValue());
-      assertThat(answeredQuestion.note, equalTo(note));
-      assertThat(answeredQuestion.recallPromptId, notNullValue());
-    }
-
-    @Test
-    void shouldReturnNullWhenNoAnsweredQuestion() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      AnsweredQuestion answeredQuestion = controller.getLastAnsweredQuestion(memoryTracker);
-
-      assertThat(answeredQuestion, nullValue());
-    }
-
-    @Test
-    void shouldReturnMostRecentAnsweredQuestion() throws UnexpectedNoAccessRightException {
-      Note note = makeMe.aNote().please();
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      makeMe
-          .aRecallPrompt()
-          .approvedQuestionOf(note)
-          .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(0)
-          .please();
-      makeMe
-          .aRecallPrompt()
-          .approvedQuestionOf(note)
-          .forMemoryTracker(memoryTracker)
-          .answerChoiceIndex(1)
-          .please();
-
-      AnsweredQuestion answeredQuestion = controller.getLastAnsweredQuestion(memoryTracker);
-
-      assertThat(answeredQuestion, notNullValue());
-      assertThat(answeredQuestion.answer.getChoiceIndex(), equalTo(1));
-    }
-
-    @Test
-    void shouldNotBeAbleToGetLastAnsweredQuestionForOthersMemoryTracker() {
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
-      assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.getLastAnsweredQuestion(memoryTracker));
-    }
-
-    @Test
-    void shouldRequireUserToBeLoggedIn() {
-      currentUser.setUser(null);
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
-      assertThrows(
-          ResponseStatusException.class, () -> controller.getLastAnsweredQuestion(memoryTracker));
     }
   }
 

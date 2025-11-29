@@ -3,7 +3,6 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
-import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -122,13 +121,6 @@ public class MemoryTrackerService {
     Boolean correct = note.matchAnswer(spellingAnswer);
     markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
     return new SpellingResultDTO(note, spellingAnswer, correct);
-  }
-
-  public AnsweredQuestion getLastAnsweredQuestion(MemoryTracker memoryTracker) {
-    return recallPromptRepository
-        .findLastAnsweredByMemoryTracker(memoryTracker.getId())
-        .map(RecallPrompt::getAnsweredQuestion)
-        .orElse(null);
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
