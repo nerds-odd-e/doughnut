@@ -2966,6 +2966,32 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SpellingQuestion"
+  /api/memory-trackers/{memoryTracker}/recall-prompts:
+    get:
+      tags:
+      - memory-tracker-controller
+      operationId: getRecallPrompts
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecallPrompt"
   /api/memory-trackers/{memoryTracker}/last-answered-question:
     get:
       tags:
@@ -3815,25 +3841,6 @@ components:
           type: string
         rejected:
           type: boolean
-    RecallPrompt:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        multipleChoicesQuestion:
-          $ref: "#/components/schemas/MultipleChoicesQuestion"
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-      required:
-      - id
-      - multipleChoicesQuestion
-    AnswerDTO:
-      type: object
-      properties:
-        choiceIndex:
-          type: integer
-          format: int32
     Answer:
       type: object
       properties:
@@ -3848,6 +3855,34 @@ components:
       required:
       - correct
       - id
+    RecallPrompt:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        multipleChoicesQuestion:
+          $ref: "#/components/schemas/MultipleChoicesQuestion"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+        note:
+          $ref: "#/components/schemas/Note"
+        answerTime:
+          type: string
+          format: date-time
+        predefinedQuestion:
+          $ref: "#/components/schemas/PredefinedQuestion"
+        answer:
+          $ref: "#/components/schemas/Answer"
+      required:
+      - id
+      - multipleChoicesQuestion
+    AnswerDTO:
+      type: object
+      properties:
+        choiceIndex:
+          type: integer
+          format: int32
     AnsweredQuestion:
       type: object
       properties:

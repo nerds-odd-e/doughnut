@@ -1,13 +1,18 @@
 package com.odde.doughnut.services;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 import com.odde.doughnut.controllers.dto.InitialInfo;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -45,6 +50,61 @@ public class MemoryTrackerServiceTest {
 
       assertThat(memoryTrackers.get(0).getAssimilatedAt(), equalTo(day1));
       assertThat(memoryTrackers.get(0).getLastRecalledAt(), equalTo(day1));
+    }
+  }
+
+  @Nested
+  class GetAllRecallPrompts {
+    @Test
+    void shouldReturnEmptyListWhenNoPrompts() {
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+
+      List<RecallPrompt> prompts = memoryTrackerService.getAllRecallPrompts(memoryTracker);
+
+      assertThat(prompts, empty());
+    }
+
+    @Test
+    void shouldReturnAllPromptsOrderedByIdDesc() {
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+
+      RecallPrompt prompt1 =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      RecallPrompt prompt2 =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      RecallPrompt prompt3 =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+
+      List<RecallPrompt> prompts = memoryTrackerService.getAllRecallPrompts(memoryTracker);
+
+      assertThat(prompts, hasSize(3));
+      assertThat(prompts.get(0).getId(), equalTo(prompt3.getId()));
+      assertThat(prompts.get(1).getId(), equalTo(prompt2.getId()));
+      assertThat(prompts.get(2).getId(), equalTo(prompt1.getId()));
+    }
+
+    @Test
+    void shouldIncludeBothAnsweredAndUnansweredPrompts() {
+      Note note = makeMe.aNote().creatorAndOwner(user).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).by(user).please();
+
+      RecallPrompt unansweredPrompt =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      RecallPrompt answeredPrompt =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .answerChoiceIndex(0)
+              .please();
+
+      List<RecallPrompt> prompts = memoryTrackerService.getAllRecallPrompts(memoryTracker);
+
+      assertThat(prompts, hasSize(2));
+      assertThat(prompts.get(0).getId(), equalTo(answeredPrompt.getId()));
+      assertThat(prompts.get(1).getId(), equalTo(unansweredPrompt.getId()));
     }
   }
 }

@@ -13,16 +13,15 @@ vitest.mock("vue-router", () => ({
 
 describe("MemoryTrackerPage", () => {
   const memoryTrackerId = 123
-  const answeredQuestion = makeMe.anAnsweredQuestion.please()
 
-  beforeEach(() => {
-    mockSdkService("getLastAnsweredQuestion", answeredQuestion)
-  })
+  it("fetches and displays recall prompts", async () => {
+    const recallPrompt1 = makeMe.aRecallPrompt.please()
+    const recallPrompt2 = makeMe.aRecallPrompt.please()
+    const recallPrompts = [recallPrompt1, recallPrompt2]
 
-  it("fetches and displays last answered question", async () => {
-    const getLastAnsweredQuestionSpy = mockSdkService(
-      "getLastAnsweredQuestion",
-      answeredQuestion
+    const getRecallPromptsSpy = mockSdkService(
+      "getRecallPrompts",
+      recallPrompts
     )
     const wrapper = helper
       .component(MemoryTrackerPage)
@@ -31,22 +30,20 @@ describe("MemoryTrackerPage", () => {
 
     await flushPromises()
 
-    expect(getLastAnsweredQuestionSpy).toHaveBeenCalledWith({
+    expect(getRecallPromptsSpy).toHaveBeenCalledWith({
       path: { memoryTracker: memoryTrackerId },
     })
 
-    const answeredQuestionComponent = wrapper.findComponent({
-      name: "AnsweredQuestionComponent",
+    const memoryTrackerPageView = wrapper.findComponent({
+      name: "MemoryTrackerPageView",
     })
-    expect(answeredQuestionComponent.exists()).toBe(true)
-    expect(answeredQuestionComponent.props("answeredQuestion")).toEqual(
-      answeredQuestion
-    )
-    expect(answeredQuestionComponent.props("conversationButton")).toBe(true)
+    expect(memoryTrackerPageView.exists()).toBe(true)
+    expect(memoryTrackerPageView.props("recallPrompts")).toEqual(recallPrompts)
   })
 
   it("shows loading state while fetching", async () => {
-    mockSdkService("getLastAnsweredQuestion", answeredQuestion)
+    const recallPrompts = [makeMe.aRecallPrompt.please()]
+    mockSdkService("getRecallPrompts", recallPrompts)
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -61,8 +58,8 @@ describe("MemoryTrackerPage", () => {
     expect(contentLoaderAfter.exists()).toBe(false)
   })
 
-  it("shows message when no answered question exists", async () => {
-    mockSdkService("getLastAnsweredQuestion", null)
+  it("shows message when no recall prompts exist", async () => {
+    mockSdkService("getRecallPrompts", [])
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -70,18 +67,13 @@ describe("MemoryTrackerPage", () => {
 
     await flushPromises()
 
-    expect(wrapper.text()).toContain("No answered question found")
-    const answeredQuestionComponent = wrapper.findComponent({
-      name: "AnsweredQuestionComponent",
-    })
-    expect(answeredQuestionComponent.exists()).toBe(false)
+    expect(wrapper.text()).toContain("No recall prompts found")
   })
 
   it("shows error message when API call fails", async () => {
-    vi.spyOn(
-      MemoryTrackerController,
-      "getLastAnsweredQuestion"
-    ).mockResolvedValue(wrapSdkError("Error"))
+    vi.spyOn(MemoryTrackerController, "getRecallPrompts").mockResolvedValue(
+      wrapSdkError("Error")
+    )
     const wrapper = helper
       .component(MemoryTrackerPage)
       .withProps({ memoryTrackerId })
@@ -89,6 +81,98 @@ describe("MemoryTrackerPage", () => {
 
     await flushPromises()
 
-    expect(wrapper.text()).toContain("Error loading answered question")
+    expect(wrapper.text()).toContain("Error loading recall prompts")
+  })
+
+  it("displays multiple recall prompts ordered by creation time desc", async () => {
+    const note = makeMe.aNote.please()
+    const recallPrompt1 = makeMe.aRecallPrompt
+      .withQuestionStem("Question 1")
+      .please()
+    const recallPrompt2 = makeMe.aRecallPrompt
+      .withQuestionStem("Question 2")
+      .please()
+    const recallPrompt3 = makeMe.aRecallPrompt
+      .withQuestionStem("Question 3")
+      .please()
+    recallPrompt1.note = note
+    recallPrompt2.note = note
+    recallPrompt3.note = note
+    const recallPrompts = [recallPrompt3, recallPrompt2, recallPrompt1]
+
+    mockSdkService("getRecallPrompts", recallPrompts)
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Question 3")
+    expect(wrapper.text()).toContain("Question 2")
+    expect(wrapper.text()).toContain("Question 1")
+  })
+
+  it("shows note under question only once", async () => {
+    const note = makeMe.aNote.please()
+    const recallPrompt1 = makeMe.aRecallPrompt.please()
+    const recallPrompt2 = makeMe.aRecallPrompt.please()
+    recallPrompt1.note = note
+    recallPrompt2.note = note
+    const recallPrompts = [recallPrompt1, recallPrompt2]
+
+    mockSdkService("getRecallPrompts", recallPrompts)
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    const noteUnderQuestionComponents = wrapper.findAllComponents({
+      name: "NoteUnderQuestion",
+    })
+    expect(noteUnderQuestionComponents.length).toBe(1)
+  })
+
+  it("shows answer time for answered questions", async () => {
+    const note = makeMe.aNote.please()
+    const answerTime = new Date("2024-01-01T12:00:00Z").toISOString()
+    const recallPrompt = makeMe.aRecallPrompt.please()
+    recallPrompt.note = note
+    recallPrompt.answerTime = answerTime
+    recallPrompt.answer = {
+      id: 1,
+      correct: true,
+      choiceIndex: 0,
+    }
+    recallPrompt.predefinedQuestion = makeMe.aPredefinedQuestion.please()
+
+    mockSdkService("getRecallPrompts", [recallPrompt])
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Answered:")
+    expect(wrapper.text()).toContain(new Date(answerTime).toLocaleString())
+  })
+
+  it("shows unanswered status for unanswered questions", async () => {
+    const note = makeMe.aNote.please()
+    const recallPrompt = makeMe.aRecallPrompt.please()
+    recallPrompt.note = note
+
+    mockSdkService("getRecallPrompts", [recallPrompt])
+    const wrapper = helper
+      .component(MemoryTrackerPage)
+      .withProps({ memoryTrackerId })
+      .mount()
+
+    await flushPromises()
+
+    expect(wrapper.text()).toContain("Unanswered")
   })
 })

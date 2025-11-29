@@ -1,21 +1,21 @@
 <template>
   <ContainerPage
-    v-bind="{ contentLoaded: answeredQuestion !== undefined, title: 'Memory Tracker' }"
+    v-bind="{ contentLoaded: recallPrompts !== undefined, title: 'Memory Tracker' }"
   >
-    <ContentLoader v-if="answeredQuestion === undefined && !error" />
+    <ContentLoader v-if="recallPrompts === undefined && !error" />
     <div v-else-if="error" class="daisy-alert daisy-alert-error">
-      Error loading answered question
+      Error loading recall prompts
     </div>
     <MemoryTrackerPageView
-      v-else-if="answeredQuestion !== undefined"
-      :answered-question="answeredQuestion"
+      v-else-if="recallPrompts !== undefined"
+      :recall-prompts="recallPrompts"
     />
   </ContainerPage>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { AnsweredQuestion } from "@generated/backend"
+import type { RecallPrompt } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
@@ -26,19 +26,19 @@ const props = defineProps<{
   memoryTrackerId: number
 }>()
 
-const answeredQuestion = ref<AnsweredQuestion | null | undefined>(undefined)
+const recallPrompts = ref<RecallPrompt[] | undefined>(undefined)
 const error = ref(false)
 
 const fetchData = async () => {
-  const { data: question, error: fetchError } =
-    await MemoryTrackerController.getLastAnsweredQuestion({
+  const { data: prompts, error: fetchError } =
+    await MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: props.memoryTrackerId },
     })
   if (fetchError) {
     error.value = true
-    answeredQuestion.value = null
+    recallPrompts.value = []
   } else {
-    answeredQuestion.value = question ?? null
+    recallPrompts.value = prompts ?? []
   }
 }
 

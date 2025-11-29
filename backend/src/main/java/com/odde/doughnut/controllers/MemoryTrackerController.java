@@ -6,6 +6,7 @@ import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.AnsweredQuestion;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
@@ -127,5 +128,14 @@ class MemoryTrackerController {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
     return memoryTrackerService.getLastAnsweredQuestion(memoryTracker);
+  }
+
+  @GetMapping("/{memoryTracker}/recall-prompts")
+  public List<RecallPrompt> getRecallPrompts(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    return memoryTrackerService.getAllRecallPrompts(memoryTracker);
   }
 }
