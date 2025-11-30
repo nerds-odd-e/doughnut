@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
@@ -28,26 +27,6 @@ class RecallsControllerTests extends ControllerTestBase {
   RecallsController nullUserController() {
     currentUser.setUser(null);
     return controller;
-  }
-
-  @Nested
-  class Overall {
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      assertThrows(
-          ResponseStatusException.class, () -> nullUserController().overview("Asia/Shanghai"));
-    }
-
-    @Test
-    void shouldReturnCorrectRecallWindowEndTime() {
-      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
-      testabilitySettings.timeTravelTo(currentTime);
-
-      RecallStatus status = controller.overview("Asia/Shanghai");
-
-      assertEquals(
-          TimestampOperations.addHoursToTimestamp(currentTime, 24), status.getRecallWindowEndAt());
-    }
   }
 
   @Nested
@@ -125,23 +104,6 @@ class RecallsControllerTests extends ControllerTestBase {
       assertEquals(1, dueMemoryTrackers.toRepeatCount);
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
-    }
-
-    @Test
-    void shouldExcludeMemoryTrackersForDeletedNotesFromOverview() {
-      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
-      testabilitySettings.timeTravelTo(currentTime);
-      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
-      makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
-
-      deletedNote.setDeletedAt(currentTime);
-      makeMe.entityPersister.merge(deletedNote);
-
-      RecallStatus status = controller.overview("Asia/Shanghai");
-
-      assertEquals(1, status.totalAssimilatedCount);
     }
   }
 }

@@ -63,12 +63,6 @@ public class ConversationMessageController {
     return conversationService.conversationRelatedToUser(authorizationService.getCurrentUser());
   }
 
-  @GetMapping("/unread")
-  public List<ConversationMessage> getUnreadConversations() {
-    authorizationService.assertLoggedIn();
-    return conversationService.getUnreadConversations(authorizationService.getCurrentUser());
-  }
-
   @PatchMapping("/{conversationId}/read")
   public List<ConversationMessage> markConversationAsRead(
       @PathVariable("conversationId") @Schema(type = "integer") Conversation conversation)

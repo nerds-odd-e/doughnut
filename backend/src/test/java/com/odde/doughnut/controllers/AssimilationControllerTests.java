@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.odde.doughnut.controllers.dto.AssimilationCountDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -70,27 +69,6 @@ class AssimilationControllerTests extends ControllerTestBase {
           equalTo(2L));
       assertThat(memoryTrackers.stream().filter(mt -> mt.getSpelling()).count(), equalTo(1L));
       assertThat(memoryTrackers.stream().filter(mt -> !mt.getSpelling()).count(), equalTo(1L));
-    }
-  }
-
-  @Nested
-  class GetAssimilationCount {
-    @Test
-    void shouldReturnAssimilationCountsForLoggedInUser() {
-      // Create a note that needs assimilation
-      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      assertThat(note.getId(), notNullValue());
-
-      AssimilationCountDTO counts = controller.getAssimilationCount("Asia/Shanghai");
-
-      assertThat(counts.getDueCount(), equalTo(1));
-    }
-
-    @Test
-    void shouldThrowExceptionWhenUserNotLoggedIn() {
-      currentUser.setUser(null);
-      assertThrows(
-          ResponseStatusException.class, () -> controller.getAssimilationCount("Asia/Shanghai"));
     }
   }
 }

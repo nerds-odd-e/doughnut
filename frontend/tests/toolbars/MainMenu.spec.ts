@@ -17,17 +17,19 @@ describe("main menu", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    mockSdkService("getAssimilationCount", {
-      dueCount: 0,
-      assimilatedCountOfTheDay: 0,
-      totalUnassimilatedCount: 0,
+    mockSdkService("getMenuData", {
+      assimilationCount: {
+        dueCount: 0,
+        assimilatedCountOfTheDay: 0,
+        totalUnassimilatedCount: 0,
+      },
+      recallStatus: {
+        toRepeatCount: 0,
+        recallWindowEndAt: "",
+        totalAssimilatedCount: 0,
+      },
+      unreadConversations: [],
     })
-    mockSdkService("overview", {
-      toRepeatCount: 0,
-      recallWindowEndAt: "",
-      totalAssimilatedCount: 0,
-    })
-    mockSdkService("getUnreadConversations", [])
     user = makeMe.aUser.please()
   })
 
@@ -75,10 +77,18 @@ describe("main menu", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      mockSdkService("getAssimilationCount", {
-        dueCount: 5,
-        assimilatedCountOfTheDay: 0,
-        totalUnassimilatedCount: 0,
+      mockSdkService("getMenuData", {
+        assimilationCount: {
+          dueCount: 5,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        recallStatus: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        unreadConversations: [],
       })
 
       helper.component(MainMenu).withProps({ user }).render()
@@ -97,11 +107,19 @@ describe("main menu", () => {
       expect(dueCount).not.toBeInTheDocument()
     })
 
-    it("fetches due count when user changes", async () => {
-      const getAssimilationCountSpy = mockSdkService("getAssimilationCount", {
-        dueCount: 3,
-        assimilatedCountOfTheDay: 0,
-        totalUnassimilatedCount: 0,
+    it("fetches menu data when user changes", async () => {
+      const getMenuDataSpy = mockSdkService("getMenuData", {
+        assimilationCount: {
+          dueCount: 3,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        recallStatus: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        unreadConversations: [],
       })
 
       const { rerender } = helper
@@ -114,20 +132,28 @@ describe("main menu", () => {
       await rerender({ user: newUser })
       await flushPromises()
 
-      expect(getAssimilationCountSpy).toHaveBeenCalledTimes(2)
+      expect(getMenuDataSpy).toHaveBeenCalledTimes(2)
     })
 
-    it("calls getAssimilationCount with the correct timezone", async () => {
-      const getAssimilationCountSpy = mockSdkService("getAssimilationCount", {
-        dueCount: 3,
-        assimilatedCountOfTheDay: 0,
-        totalUnassimilatedCount: 0,
+    it("calls getMenuData with the correct timezone", async () => {
+      const getMenuDataSpy = mockSdkService("getMenuData", {
+        assimilationCount: {
+          dueCount: 3,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        recallStatus: {
+          toRepeatCount: 0,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        unreadConversations: [],
       })
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
 
-      expect(getAssimilationCountSpy).toHaveBeenCalledWith({
+      expect(getMenuDataSpy).toHaveBeenCalledWith({
         query: { timezone: timezoneParam() },
       })
     })
@@ -135,10 +161,18 @@ describe("main menu", () => {
 
   describe("recall count", () => {
     it("shows recall count when there are items to repeat", async () => {
-      mockSdkService("overview", {
-        toRepeatCount: 789,
-        recallWindowEndAt: "",
-        totalAssimilatedCount: 0,
+      mockSdkService("getMenuData", {
+        assimilationCount: {
+          dueCount: 0,
+          assimilatedCountOfTheDay: 0,
+          totalUnassimilatedCount: 0,
+        },
+        recallStatus: {
+          toRepeatCount: 789,
+          recallWindowEndAt: "",
+          totalAssimilatedCount: 0,
+        },
+        unreadConversations: [],
       })
 
       helper.component(MainMenu).withProps({ user }).render()
@@ -155,29 +189,6 @@ describe("main menu", () => {
 
       const recallCount = screen.queryByText("0")
       expect(recallCount).not.toBeInTheDocument()
-    })
-
-    it("fetches recall count when user changes", async () => {
-      const overviewSpy = mockSdkService("overview", {
-        toRepeatCount: 3,
-        recallWindowEndAt: "",
-        totalAssimilatedCount: 0,
-      })
-
-      const { rerender } = helper
-        .component(MainMenu)
-        .withProps({ user })
-        .render()
-      await flushPromises()
-
-      const newUser = { ...user, id: 2 }
-      await rerender({ user: newUser })
-      await flushPromises()
-
-      expect(overviewSpy).toHaveBeenCalledTimes(2)
-      expect(overviewSpy).toHaveBeenCalledWith({
-        query: { timezone: timezoneParam() },
-      })
     })
   })
 })

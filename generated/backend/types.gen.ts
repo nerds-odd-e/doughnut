@@ -455,6 +455,24 @@ export type WikidataEntityData = {
     WikipediaEnglishUrl: string;
 };
 
+export type AssimilationCountDto = {
+    dueCount?: number;
+    assimilatedCountOfTheDay?: number;
+    totalUnassimilatedCount?: number;
+};
+
+export type MenuDataDto = {
+    assimilationCount?: AssimilationCountDto;
+    recallStatus?: RecallStatus;
+    unreadConversations?: Array<ConversationMessage>;
+};
+
+export type RecallStatus = {
+    toRepeatCount: number;
+    totalAssimilatedCount: number;
+    recallWindowEndAt?: string;
+};
+
 export type CurrentUserInfo = {
     user?: User;
     externalIdentifier?: string;
@@ -471,12 +489,6 @@ export type DueMemoryTrackers = {
 export type MemoryTrackerLite = {
     memoryTrackerId?: number;
     spelling?: boolean;
-};
-
-export type RecallStatus = {
-    toRepeatCount: number;
-    totalAssimilatedCount: number;
-    recallWindowEndAt?: string;
 };
 
 export type NoteInfo = {
@@ -563,12 +575,6 @@ export type CircleForUserView = {
 
 export type UserForOtherUserView = {
     name?: string;
-};
-
-export type AssimilationCountDto = {
-    dueCount?: number;
-    assimilatedCountOfTheDay?: number;
-    totalUnassimilatedCount?: number;
 };
 
 export type DummyForGeneratingTypes = {
@@ -3256,6 +3262,33 @@ export type FetchWikidataEntityDataByIdResponses = {
 
 export type FetchWikidataEntityDataByIdResponse = FetchWikidataEntityDataByIdResponses[keyof FetchWikidataEntityDataByIdResponses];
 
+export type GetMenuDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/user/menu-data';
+};
+
+export type GetMenuDataErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type GetMenuDataError = GetMenuDataErrors[keyof GetMenuDataErrors];
+
+export type GetMenuDataResponses = {
+    /**
+     * OK
+     */
+    200: MenuDataDto;
+};
+
+export type GetMenuDataResponse = GetMenuDataResponses[keyof GetMenuDataResponses];
+
 export type GetTokensData = {
     body?: never;
     path?: never;
@@ -3362,33 +3395,6 @@ export type RecallingResponses = {
 };
 
 export type RecallingResponse = RecallingResponses[keyof RecallingResponses];
-
-export type OverviewData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/recalls/overview';
-};
-
-export type OverviewErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type OverviewError = OverviewErrors[keyof OverviewErrors];
-
-export type OverviewResponses = {
-    /**
-     * OK
-     */
-    200: RecallStatus;
-};
-
-export type OverviewResponse = OverviewResponses[keyof OverviewResponses];
 
 export type AskAQuestionData = {
     body?: never;
@@ -4034,31 +4040,6 @@ export type ExportConversationResponses = {
 
 export type ExportConversationResponse = ExportConversationResponses[keyof ExportConversationResponses];
 
-export type GetUnreadConversationsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/conversation/unread';
-};
-
-export type GetUnreadConversationsErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetUnreadConversationsError = GetUnreadConversationsErrors[keyof GetUnreadConversationsErrors];
-
-export type GetUnreadConversationsResponses = {
-    /**
-     * OK
-     */
-    200: Array<ConversationMessage>;
-};
-
-export type GetUnreadConversationsResponse = GetUnreadConversationsResponses[keyof GetUnreadConversationsResponses];
-
 export type GetConversationsOfCurrentUserData = {
     body?: never;
     path?: never;
@@ -4135,33 +4116,6 @@ export type BazaarResponses = {
 };
 
 export type BazaarResponse = BazaarResponses[keyof BazaarResponses];
-
-export type GetAssimilationCountData = {
-    body?: never;
-    path?: never;
-    query: {
-        timezone: string;
-    };
-    url: '/api/assimilation/count';
-};
-
-export type GetAssimilationCountErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetAssimilationCountError = GetAssimilationCountErrors[keyof GetAssimilationCountErrors];
-
-export type GetAssimilationCountResponses = {
-    /**
-     * OK
-     */
-    200: AssimilationCountDto;
-};
-
-export type GetAssimilationCountResponse = GetAssimilationCountResponses[keyof GetAssimilationCountResponses];
 
 export type AssimilatingData = {
     body?: never;

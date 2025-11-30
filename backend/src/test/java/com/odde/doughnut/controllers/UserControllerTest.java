@@ -2,17 +2,25 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.odde.doughnut.controllers.dto.MenuDataDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
+import com.odde.doughnut.entities.Conversation;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.utils.TimestampOperations;
+import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.server.ResponseStatusException;
 
 class UserControllerTest extends ControllerTestBase {
@@ -105,5 +113,111 @@ class UserControllerTest extends ControllerTestBase {
     makeMe.entityPersister.save(userToken2);
 
     assertThrows(ResponseStatusException.class, () -> controller.deleteToken(userToken2.getId()));
+  }
+
+  @Nested
+  class GetMenuData {
+    @Test
+    void shouldReturnAssimilationCountsForLoggedInUser() {
+      // Create a note that needs assimilation
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      assertThat(note.getId(), notNullValue());
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertThat(menuData.getAssimilationCount().getDueCount(), equalTo(1));
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUserNotLoggedIn() {
+      currentUser.setUser(null);
+      assertThrows(ResponseStatusException.class, () -> controller.getMenuData("Asia/Shanghai"));
+    }
+
+    @Test
+    void shouldReturnCorrectRecallWindowEndTime() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(
+          TimestampOperations.addHoursToTimestamp(currentTime, 24),
+          menuData.getRecallStatus().getRecallWindowEndAt());
+    }
+
+    @Test
+    void shouldExcludeMemoryTrackersForDeletedNotesFromOverview() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+      Note activeNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      Note deletedNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(activeNote).by(currentUser.getUser()).please();
+      makeMe.aMemoryTrackerFor(deletedNote).by(currentUser.getUser()).please();
+
+      deletedNote.setDeletedAt(currentTime);
+      makeMe.entityPersister.merge(deletedNote);
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(1, menuData.getRecallStatus().totalAssimilatedCount);
+    }
+
+    @Test
+    void forLoginUserOnly() {
+      currentUser.setUser(null);
+      ResponseStatusException exception =
+          assertThrows(
+              ResponseStatusException.class, () -> controller.getMenuData("Asia/Shanghai"));
+      assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
+    }
+
+    @Test
+    void getOneUnreadConversationCountOfCurrentUser() {
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
+      makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
+      makeMe.aConversationMessage(conversation).sender(makeMe.aUser().please()).please();
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(1, menuData.getUnreadConversations().size());
+    }
+
+    @Test
+    void countMessagesInsteadOfConversations() {
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
+      User sender = makeMe.aUser().please();
+      makeMe.aConversationMessage(conversation).sender(sender).please();
+      makeMe.aConversationMessage(conversation).sender(sender).please();
+      makeMe.aConversationMessage(conversation).sender(sender).please();
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(3, menuData.getUnreadConversations().size());
+    }
+
+    @Test
+    void zeroUnreadConversationCountForSender() {
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
+      makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(0, menuData.getUnreadConversations().size());
+    }
+
+    @Test
+    void getZeroUnreadConversationWhenSenderIsCurrentUser() {
+      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
+      makeMe
+          .aConversationMessage(conversation)
+          .sender(currentUser.getUser())
+          .readByReceiver()
+          .please();
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(0, menuData.getUnreadConversations().size());
+    }
   }
 }

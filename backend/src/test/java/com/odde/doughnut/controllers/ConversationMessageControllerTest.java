@@ -97,64 +97,6 @@ class ConversationMessageControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class ConversationMessageControllerUnreadCountTest {
-    Conversation conversation;
-
-    @BeforeEach
-    void setup() {
-      conversation = makeMe.aConversation().from(currentUser.getUser()).please();
-    }
-
-    @Test
-    void forLoginUserOnly() {
-      currentUser.setUser(null);
-      ResponseStatusException exception =
-          assertThrows(ResponseStatusException.class, () -> controller.getUnreadConversations());
-      assertEquals(HttpStatusCode.valueOf(401), exception.getStatusCode());
-    }
-
-    @Test
-    void getOneUnreadConversationCountOfCurrentUser() {
-      makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
-      makeMe.aConversationMessage(conversation).sender(makeMe.aUser().please()).please();
-      int conversations = controller.getUnreadConversations().size();
-      assertEquals(1, conversations);
-    }
-
-    @Test
-    void countMessagesInsteadOfConversations() {
-      User sender = makeMe.aUser().please();
-      makeMe.aConversationMessage(conversation).sender(sender).please();
-      makeMe.aConversationMessage(conversation).sender(sender).please();
-      makeMe.aConversationMessage(conversation).sender(sender).please();
-
-      int conversations = controller.getUnreadConversations().size();
-      assertEquals(3, conversations);
-    }
-
-    @Test
-    void zeroUnreadConversationCountForSender() {
-      makeMe.aConversationMessage(conversation).sender(currentUser.getUser()).please();
-
-      int conversations = controller.getUnreadConversations().size();
-      assertEquals(0, conversations);
-    }
-
-    @Test
-    void getZeroUnreadConversationWhenSenderIsCurrentUser() {
-      Conversation conversation = makeMe.aConversation().from(currentUser.getUser()).please();
-      makeMe
-          .aConversationMessage(conversation)
-          .sender(currentUser.getUser())
-          .readByReceiver()
-          .please();
-
-      int conversations = controller.getUnreadConversations().size();
-      assertEquals(0, conversations);
-    }
-  }
-
-  @Nested
   class MarkConversationAsRead {
     Conversation conversation;
 

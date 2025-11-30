@@ -100,11 +100,7 @@ import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import { useRoute } from "vue-router"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import UserProfileDialog from "./UserProfileDialog.vue"
-import {
-  AssimilationController,
-  ConversationMessageController,
-  RecallsController,
-} from "@generated/backend/sdk.gen"
+import { UserController } from "@generated/backend/sdk.gen"
 import { watch, computed, ref } from "vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import timezoneParam from "@/managedApi/window/timezoneParam"
@@ -132,34 +128,29 @@ const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
 const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
-const fetchDueCount = async () => {
-  const { data: count, error } =
-    await AssimilationController.getAssimilationCount({
-      query: { timezone: timezoneParam() },
-    })
-  if (!error && count) {
-    setDueCount(count.dueCount)
-    setAssimilatedCountOfTheDay(count.assimilatedCountOfTheDay)
-    setTotalUnassimilatedCount(count.totalUnassimilatedCount)
-  }
-}
-
-const fetchRecallCount = async () => {
-  const { data: overviewData, error } = await RecallsController.overview({
+const fetchMenuData = async () => {
+  const { data: menuData, error } = await UserController.getMenuData({
     query: { timezone: timezoneParam() },
   })
-  if (!error && overviewData) {
-    setToRepeatCount(overviewData.toRepeatCount)
-    setRecallWindowEndAt(overviewData.recallWindowEndAt)
-    setTotalAssimilatedCount(overviewData.totalAssimilatedCount)
-  }
-}
-
-const fetchUnreadMessageCount = async () => {
-  const { data: unreadConversations, error } =
-    await ConversationMessageController.getUnreadConversations({})
-  if (!error && unreadConversations !== undefined) {
-    messageCenterConversations.unreadConversations = unreadConversations
+  if (!error && menuData) {
+    if (menuData.assimilationCount) {
+      setDueCount(menuData.assimilationCount.dueCount)
+      setAssimilatedCountOfTheDay(
+        menuData.assimilationCount.assimilatedCountOfTheDay
+      )
+      setTotalUnassimilatedCount(
+        menuData.assimilationCount.totalUnassimilatedCount
+      )
+    }
+    if (menuData.recallStatus) {
+      setToRepeatCount(menuData.recallStatus.toRepeatCount)
+      setRecallWindowEndAt(menuData.recallStatus.recallWindowEndAt)
+      setTotalAssimilatedCount(menuData.recallStatus.totalAssimilatedCount)
+    }
+    if (menuData.unreadConversations !== undefined) {
+      messageCenterConversations.unreadConversations =
+        menuData.unreadConversations
+    }
   }
 }
 
@@ -167,9 +158,7 @@ watch(
   () => props.user,
   () => {
     if (props.user) {
-      fetchDueCount()
-      fetchRecallCount()
-      fetchUnreadMessageCount()
+      fetchMenuData()
     }
   },
   { immediate: true }

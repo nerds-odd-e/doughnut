@@ -2514,6 +2514,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/WikidataEntityData"
+  /api/user/menu-data:
+    get:
+      tags:
+      - user-controller
+      operationId: getMenuData
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MenuDataDTO"
   /api/user/get-tokens:
     get:
       tags:
@@ -2604,30 +2628,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DueMemoryTrackers"
-  /api/recalls/overview:
-    get:
-      tags:
-      - recalls-controller
-      operationId: overview
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/RecallStatus"
   /api/recall-prompts/{memoryTracker}/question:
     get:
       tags:
@@ -3178,26 +3178,6 @@ paths:
                 type: object
                 additionalProperties:
                   type: object
-  /api/conversation/unread:
-    get:
-      tags:
-      - conversation-message-controller
-      operationId: getUnreadConversations
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ConversationMessage"
   /api/conversation/all:
     get:
       tags:
@@ -3262,30 +3242,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BazaarNotebook"
-  /api/assimilation/count:
-    get:
-      tags:
-      - assimilation-controller
-      operationId: getAssimilationCount
-      parameters:
-      - name: timezone
-        in: query
-        required: true
-        schema:
-          type: string
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/AssimilationCountDTO"
   /api/assimilation/assimilating:
     get:
       tags:
@@ -4375,6 +4331,44 @@ components:
       required:
       - WikidataTitleInEnglish
       - WikipediaEnglishUrl
+    AssimilationCountDTO:
+      type: object
+      properties:
+        dueCount:
+          type: integer
+          format: int32
+        assimilatedCountOfTheDay:
+          type: integer
+          format: int32
+        totalUnassimilatedCount:
+          type: integer
+          format: int32
+    MenuDataDTO:
+      type: object
+      properties:
+        assimilationCount:
+          $ref: "#/components/schemas/AssimilationCountDTO"
+        recallStatus:
+          $ref: "#/components/schemas/RecallStatus"
+        unreadConversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationMessage"
+    RecallStatus:
+      type: object
+      properties:
+        toRepeatCount:
+          type: integer
+          format: int32
+        totalAssimilatedCount:
+          type: integer
+          format: int32
+        recallWindowEndAt:
+          type: string
+          format: date-time
+      required:
+      - toRepeatCount
+      - totalAssimilatedCount
     CurrentUserInfo:
       type: object
       properties:
@@ -4412,21 +4406,6 @@ components:
           format: int32
         spelling:
           type: boolean
-    RecallStatus:
-      type: object
-      properties:
-        toRepeatCount:
-          type: integer
-          format: int32
-        totalAssimilatedCount:
-          type: integer
-          format: int32
-        recallWindowEndAt:
-          type: string
-          format: date-time
-      required:
-      - toRepeatCount
-      - totalAssimilatedCount
     NoteInfo:
       type: object
       properties:
@@ -4643,18 +4622,6 @@ components:
       properties:
         name:
           type: string
-    AssimilationCountDTO:
-      type: object
-      properties:
-        dueCount:
-          type: integer
-          format: int32
-        assimilatedCountOfTheDay:
-          type: integer
-          format: int32
-        totalUnassimilatedCount:
-          type: integer
-          format: int32
     DummyForGeneratingTypes:
       type: object
       properties:

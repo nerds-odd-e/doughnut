@@ -1,19 +1,28 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.dto.MenuDataDTO;
 import com.odde.doughnut.controllers.dto.TokenConfigDTO;
 import com.odde.doughnut.controllers.dto.UserDTO;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.services.AssimilationService;
 import com.odde.doughnut.services.AuthorizationService;
+import com.odde.doughnut.services.ConversationService;
+import com.odde.doughnut.services.RecallService;
+import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
+import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
+import java.sql.Timestamp;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,14 +32,27 @@ class UserController {
   private final EntityPersister entityPersister;
   private final AuthorizationService authorizationService;
   private final UserService userService;
+  private final SubscriptionService subscriptionService;
+  private final RecallService recallService;
+  private final ConversationService conversationService;
+  private final TestabilitySettings testabilitySettings;
 
+  @Autowired
   public UserController(
       EntityPersister entityPersister,
       AuthorizationService authorizationService,
-      UserService userService) {
+      UserService userService,
+      SubscriptionService subscriptionService,
+      RecallService recallService,
+      ConversationService conversationService,
+      TestabilitySettings testabilitySettings) {
     this.entityPersister = entityPersister;
     this.authorizationService = authorizationService;
     this.userService = userService;
+    this.subscriptionService = subscriptionService;
+    this.recallService = recallService;
+    this.conversationService = conversationService;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @PostMapping("")
@@ -96,5 +118,23 @@ class UserController {
     }
 
     userService.deleteToken(tokenId);
+  }
+
+  @GetMapping("/menu-data")
+  @Transactional(readOnly = true)
+  public MenuDataDTO getMenuData(@RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    User user = authorizationService.getCurrentUser();
+    ZoneId timeZone = ZoneId.of(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+
+    var assimilationService =
+        new AssimilationService(
+            user, userService, subscriptionService, currentUTCTimestamp, timeZone);
+    var assimilationCount = assimilationService.getCounts();
+    var recallStatus = recallService.getRecallStatus(user, currentUTCTimestamp, timeZone);
+    var unreadConversations = conversationService.getUnreadConversations(user);
+
+    return new MenuDataDTO(assimilationCount, recallStatus, unreadConversations);
   }
 }

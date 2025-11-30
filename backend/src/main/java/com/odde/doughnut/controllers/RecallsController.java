@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
-import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -32,16 +31,6 @@ class RecallsController {
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.recallService = recallService;
-  }
-
-  @GetMapping("/overview")
-  @Transactional(readOnly = true)
-  public RecallStatus overview(@RequestParam(value = "timezone") String timezone) {
-    authorizationService.assertLoggedIn();
-    ZoneId timeZone = ZoneId.of(timezone);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return recallService.getRecallStatus(
-        authorizationService.getCurrentUser(), currentUTCTimestamp, timeZone);
   }
 
   @GetMapping(value = {"/recalling"})

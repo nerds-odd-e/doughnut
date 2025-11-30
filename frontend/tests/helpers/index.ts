@@ -43,6 +43,7 @@ const methodToController: Record<string, any> = {
   updateUser: UserController,
   getTokens: UserController,
   deleteToken: UserController,
+  getMenuData: UserController,
   closeAllGithubIssues: TestabilityRestController,
   triggerException: TestabilityRestController,
   timeTravelRelativeToNow: TestabilityRestController,
