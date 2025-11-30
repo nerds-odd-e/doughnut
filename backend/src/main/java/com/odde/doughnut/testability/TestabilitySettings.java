@@ -106,8 +106,8 @@ public class TestabilitySettings {
   }
 
   public boolean isOpenAiDisabled() {
-    String url = getServiceUrl("openAi");
-    return DISABLED_SENTINEL.equals(url);
+    return this.replacedServiceUrls.containsKey("openAi")
+        && DISABLED_SENTINEL.equals(this.replacedServiceUrls.get("openAi"));
   }
 
   void init() {

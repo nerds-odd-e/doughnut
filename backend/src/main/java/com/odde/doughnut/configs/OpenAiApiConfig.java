@@ -31,10 +31,13 @@ public class OpenAiApiConfig {
   public OpenAIClient getOfficialOpenAiClientNonProd(
       @Value("${spring.openai.token}") String openAiToken,
       @Autowired TestabilitySettings testabilitySettings) {
-    return OpenAIOkHttpClient.builder()
-        .apiKey(openAiToken)
-        .baseUrl(testabilitySettings.getOpenAiApiUrl())
-        .build();
+    String baseUrl = testabilitySettings.getOpenAiApiUrl();
+    // Use default URL if service is disabled (empty URL) to allow bean creation
+    // Services check isOpenAiDisabled() before using the client
+    if (baseUrl == null || baseUrl.isEmpty()) {
+      baseUrl = "https://api.openai.com/v1/";
+    }
+    return OpenAIOkHttpClient.builder().apiKey(openAiToken).baseUrl(baseUrl).build();
   }
 
   // Official OpenAI Java SDK - Prod: provide the same qualified bean without session scope for
@@ -45,9 +48,12 @@ public class OpenAiApiConfig {
   public OpenAIClient getOfficialOpenAiClientProd(
       @Value("${spring.openai.token}") String openAiToken,
       @Autowired TestabilitySettings testabilitySettings) {
-    return OpenAIOkHttpClient.builder()
-        .apiKey(openAiToken)
-        .baseUrl(testabilitySettings.getOpenAiApiUrl())
-        .build();
+    String baseUrl = testabilitySettings.getOpenAiApiUrl();
+    // Use default URL if service is disabled (empty URL) to allow bean creation
+    // Services check isOpenAiDisabled() before using the client
+    if (baseUrl == null || baseUrl.isEmpty()) {
+      baseUrl = "https://api.openai.com/v1/";
+    }
+    return OpenAIOkHttpClient.builder().apiKey(openAiToken).baseUrl(baseUrl).build();
   }
 }
