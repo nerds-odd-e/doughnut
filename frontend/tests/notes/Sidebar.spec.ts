@@ -242,25 +242,17 @@ describe("Sidebar", () => {
 
       // Before drag enter
       expect(
-        screen.queryByRole("presentation", {
-          name: "Drop position indicator",
-        })
+        screen.queryByLabelText("Drop position indicator")
       ).not.toBeInTheDocument()
 
       // After drag enter
       await fireEvent.dragEnter(dropTarget)
-      expect(
-        screen.getByRole("presentation", {
-          name: "Drop position indicator",
-        })
-      ).toBeVisible()
+      expect(screen.getByLabelText("Drop position indicator")).toBeVisible()
 
       // After drag leave
       await fireEvent.dragLeave(dropTarget)
       expect(
-        screen.queryByRole("presentation", {
-          name: "Drop position indicator",
-        })
+        screen.queryByLabelText("Drop position indicator")
       ).not.toBeInTheDocument()
     })
 
@@ -323,9 +315,7 @@ describe("Sidebar", () => {
       await fireEvent.dragEnter(dropTarget)
 
       // Check for drop indicator
-      const dropIndicator = screen.getByRole("presentation", {
-        name: "Drop position indicator",
-      })
+      const dropIndicator = screen.getByLabelText("Drop position indicator")
       expect(dropIndicator).toBeVisible()
       expect(dropIndicator).toHaveClass("drop-indicator")
 
@@ -352,9 +342,7 @@ describe("Sidebar", () => {
       await fireEvent.dragEnter(firstGenNote)
 
       // Check that drop indicator is not shown
-      const dropIndicator = screen.queryByRole("presentation", {
-        name: "Drop position indicator",
-      })
+      const dropIndicator = screen.queryByLabelText("Drop position indicator")
       expect(dropIndicator).not.toBeInTheDocument()
     })
 
@@ -373,9 +361,7 @@ describe("Sidebar", () => {
       await fireEvent.dragEnter(note)
 
       // Check that drop indicator is not shown
-      const dropIndicator = screen.queryByRole("presentation", {
-        name: "Drop position indicator",
-      })
+      const dropIndicator = screen.queryByLabelText("Drop position indicator")
       expect(dropIndicator).not.toBeInTheDocument()
     })
 
@@ -394,9 +380,7 @@ describe("Sidebar", () => {
       await fireEvent.dragStart(draggedNote)
       await fireEvent.dragEnter(dropTarget)
 
-      const dropIndicator = screen.getByRole("presentation", {
-        name: "Drop position indicator",
-      })
+      const dropIndicator = screen.getByLabelText("Drop position indicator")
       expect(dropIndicator).toBeVisible()
 
       // Multiple dragOver events shouldn't remove the indicator
@@ -431,9 +415,7 @@ describe("Sidebar", () => {
       })
       await fireEvent(dropTarget, dragOverEvent)
 
-      const dropIndicator = screen.getByRole("presentation", {
-        name: "Drop as child indicator",
-      })
+      const dropIndicator = screen.getByLabelText("Drop as child indicator")
       expect(dropIndicator).toBeVisible()
       expect(dropIndicator).toHaveClass("drop-as-child")
     })

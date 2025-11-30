@@ -49,12 +49,10 @@ describe("NoteAddQuestion", () => {
         await userEvent.type(ctrl, testCase.question[key]!)
       }
       await flushPromises()
-      const refineButton = screen.getByRole<HTMLInputElement>("button", {
-        name: /refine/i,
-      })
-      const generateButton = screen.getByRole<HTMLInputElement>("button", {
-        name: /generate/i,
-      })
+      const refineButton = screen.getByText(/refine/i) as HTMLButtonElement
+      const generateButton = screen.getByText(
+        /generate by ai/i
+      ) as HTMLButtonElement
       expect(refineButton.disabled).toBe(!testCase.expectedRefineButton)
       expect(generateButton.disabled).toBe(!testCase.expectedGenerateButton)
     })

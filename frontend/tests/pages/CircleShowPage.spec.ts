@@ -38,7 +38,7 @@ describe("circle show page", () => {
       .withStorageProps({ circleId: circleNote.id })
       .render()
     await flushPromises()
-    screen.getByRole("button", { name: moveButtonTitle })
+    screen.getByTitle(moveButtonTitle)
   })
 
   it("must not show the move button if not the creator", async () => {
@@ -51,6 +51,6 @@ describe("circle show page", () => {
       })
       .render()
     await flushPromises()
-    expect(screen.queryByRole("button", { name: moveButtonTitle })).toBeNull()
+    expect(screen.queryByTitle(moveButtonTitle)).toBeNull()
   })
 })
