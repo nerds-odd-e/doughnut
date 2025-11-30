@@ -2,36 +2,38 @@
   <div class="content">
     <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
-      <SpellingQuestionComponent
-        v-if="currentMemoryTracker?.spelling"
-        v-bind="{
-          memoryTrackerId: currentMemoryTrackerId!,
-        }"
-        @answer="onSpellingAnswer($event)"
-        :key="`spelling-${currentMemoryTrackerId}`"
-      />
-      <template v-else>
-        <div v-if="!currentRecallPrompt">
-          <JustReview
-            v-bind="{
-              memoryTrackerId: currentMemoryTrackerId,
-            }"
-            @reviewed="() => emit('just-reviewed', undefined)"
-          />
-        </div>
+      <div class="daisy-mt-5">
+        <SpellingQuestionComponent
+          v-if="currentMemoryTracker?.spelling"
+          v-bind="{
+            memoryTrackerId: currentMemoryTrackerId!,
+          }"
+          @answer="onSpellingAnswer($event)"
+          :key="`spelling-${currentMemoryTrackerId}`"
+        />
         <template v-else>
-         <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
-            <NotebookLink :notebook="currentRecallPrompt.notebook" />
+          <div v-if="!currentRecallPrompt">
+            <JustReview
+              v-bind="{
+                memoryTrackerId: currentMemoryTrackerId,
+              }"
+              @reviewed="() => emit('just-reviewed', undefined)"
+            />
           </div>
-          <ContestableQuestion
-            v-bind="{
-              recallPrompt: currentRecallPrompt,
-            }"
-            @answered="onAnswered($event)"
-            :key="currentRecallPrompt.id"
-          />
+          <template v-else>
+           <div v-if="currentRecallPrompt.notebook" class="notebook-source daisy-mb-4">
+              <NotebookLink :notebook="currentRecallPrompt.notebook" />
+            </div>
+            <ContestableQuestion
+              v-bind="{
+                recallPrompt: currentRecallPrompt,
+              }"
+              @answered="onAnswered($event)"
+              :key="currentRecallPrompt.id"
+            />
+          </template>
         </template>
-      </template>
+      </div>
     </template>
     <button
       v-if="canMoveToEnd"

@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-instruction daisy-relative daisy-mt-5" data-test="question-section">
+  <div class="quiz-instruction daisy-relative" data-test="question-section">
     <ContentLoader v-if="loading" />
     <template v-else>
       <div v-if="spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
