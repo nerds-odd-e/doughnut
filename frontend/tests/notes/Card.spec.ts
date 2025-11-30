@@ -3,8 +3,8 @@ import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
-describe("A child card of a note", () => {
-  it("render the card", async () => {
+describe("Card", () => {
+  it("renders the card with title and details", async () => {
     const note = makeMe.aNote
       .topicConstructor("this is a note")
       .details("the details")

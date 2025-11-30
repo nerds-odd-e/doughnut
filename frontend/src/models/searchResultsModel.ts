@@ -1,7 +1,6 @@
 import { reactive } from "vue"
 import type {
   NoteSearchResult,
-  NoteTopology,
   SimpleNoteSearchResult,
 } from "@generated/backend"
 
@@ -69,14 +68,14 @@ export class SearchResultsModel {
   getSearchResult(
     trimmedSearchKey: string,
     isGlobal: boolean
-  ): NoteTopology[] | undefined {
+  ): NoteSearchResult[] | undefined {
     const cachedResult = this.getCachedResult(trimmedSearchKey, isGlobal)
     const resultToUse =
       cachedResult ??
       this.state.recentResult ??
       (trimmedSearchKey !== "" ? this.state.previousSearchResult : undefined)
 
-    return resultToUse ? this.toNoteTopologies(resultToUse) : undefined
+    return resultToUse
   }
 
   getDistanceById(
@@ -161,7 +160,7 @@ export class SearchResultsModel {
       }
     }
 
-    if (hasSearchResults && searchResult!.length > 0) {
+    if (hasSearchResults && searchResult.length > 0) {
       return {
         showRecentNotes: false,
         showEmptyState: false,
@@ -172,7 +171,7 @@ export class SearchResultsModel {
     }
 
     if (!this.state.isSearchInProgress) {
-      if (hasSearchResults && searchResult!.length === 0) {
+      if (hasSearchResults && searchResult.length === 0) {
         let emptyMessage = "No matching notes found."
         if (isDropdown && !hasSearchKey) {
           emptyMessage = noteId
@@ -221,17 +220,6 @@ export class SearchResultsModel {
     const merged = this.mergeUniqueAndSortByDistance(existing, combined)
     this.setCachedResult(trimmedSearchKey, isGlobal, merged)
     this.clearPreviousResult()
-  }
-
-  private toNoteTopologies(results: NoteSearchResult[]): NoteTopology[] {
-    return results.map((r) => this.toNoteTopology(r.noteTopology))
-  }
-
-  private toNoteTopology(simple: SimpleNoteSearchResult): NoteTopology {
-    return {
-      id: simple.id,
-      titleOrPredicate: simple.titleOrPredicate,
-    } as NoteTopology
   }
 
   private mergeUniqueAndSortByDistance(

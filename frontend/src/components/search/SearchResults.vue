@@ -48,27 +48,33 @@
       <div class="result-title">{{ displayState.title }}</div>
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
-          v-for="noteTopology in searchResult"
-          :key="noteTopology.id"
-          :noteTopology="noteTopology"
+          v-for="result in searchResult"
+          :key="result.noteTopology.id"
+          :noteTopology="{
+            id: result.noteTopology.id,
+            titleOrPredicate: result.noteTopology.titleOrPredicate,
+          }"
         />
       </div>
-      <Cards
+      <SearchResultCards
         v-else
         class="search-result"
-        :noteTopologies="searchResult"
+        :search-results="searchResult"
         :columns="3"
       >
-        <template #button="{ noteTopology }">
-          <slot name="button" :note-topology="noteTopology" />
+        <template #button="{ searchResult: result }">
+          <slot name="button" :note-topology="{
+            id: result.noteTopology.id,
+            titleOrPredicate: result.noteTopology.titleOrPredicate,
+          }" />
           <small
-            v-if="distanceById[String(noteTopology.id)] != null"
+            v-if="result.distance != null"
             class="similarity-distance"
           >
-            {{ Number(distanceById[String(noteTopology.id)]).toFixed(3) }}
+            {{ Number(result.distance).toFixed(3) }}
           </small>
         </template>
-      </Cards>
+      </SearchResultCards>
     </div>
   </div>
 </template>
@@ -81,6 +87,7 @@ import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
+import SearchResultCards from "./SearchResultCards.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
 
@@ -116,10 +123,6 @@ const isGlobalSearch = computed(
 
 const searchResult = computed(() =>
   model.getSearchResult(trimmedSearchKey.value, isGlobalSearch.value)
-)
-
-const distanceById = computed(() =>
-  model.getDistanceById(trimmedSearchKey.value, isGlobalSearch.value)
 )
 
 const filteredRecentNotes = computed(() => {
