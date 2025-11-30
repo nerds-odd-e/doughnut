@@ -39,23 +39,26 @@
           </div>
         </div>
       </div>
-  <ContainerPage v-bind="{ contentLoaded: notes !== undefined }">
-    <div v-if="notes?.length === 0" class="daisy-text-center daisy-py-8">
-      <TeleportToHeadStatus>
-        Assimilated {{ assimilatedCountOfTheDay }} notes today.
-      </TeleportToHeadStatus>
-      <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
-        🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
-      </h1>
-    </div>
-    <Assimilation
-      v-if="note"
-      v-bind="{ note, storageAccessor }"
-      @initial-review-done="initialReviewDone"
-      @reload-needed="onReloadNeeded"
-      :key="note.id"
-    />
-  </ContainerPage>
+  <div class="daisy-mx-auto daisy-min-w-0 daisy-container daisy-mt-3">
+    <ContentLoader v-if="notes === undefined" />
+    <template v-else>
+      <div v-if="notes?.length === 0" class="daisy-text-center daisy-py-8">
+        <TeleportToHeadStatus>
+          Assimilated {{ assimilatedCountOfTheDay }} notes today.
+        </TeleportToHeadStatus>
+        <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
+          🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
+        </h1>
+      </div>
+      <Assimilation
+        v-if="note"
+        v-bind="{ note, storageAccessor }"
+        @initial-review-done="initialReviewDone"
+        @reload-needed="onReloadNeeded"
+        :key="note.id"
+      />
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -67,7 +70,7 @@ import {} from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
 import type { StorageAccessor } from "@/store/createNoteStorage"
-import ContainerPage from "./commons/ContainerPage.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 
