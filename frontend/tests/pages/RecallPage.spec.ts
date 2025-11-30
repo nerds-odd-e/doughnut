@@ -27,13 +27,6 @@ useRouter().currentRoute.value.name = "recall"
 let renderer: RenderingHelper<typeof RecallPage>
 let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
 
-let teleportTarget: HTMLDivElement
-
-beforeEach(() => {
-  teleportTarget = document.createElement("div")
-  teleportTarget.id = "head-status"
-  document.body.appendChild(teleportTarget)
-})
 afterEach(() => {
   document.body.innerHTML = ""
 })
@@ -108,8 +101,9 @@ describe("repeat page", () => {
     })
 
     it("shows the progress", async () => {
-      await mountPage()
-      expect(teleportTarget.textContent).toContain("0/3")
+      const wrapper = await mountPage()
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+      expect(globalBar.text()).toContain("0/3")
       expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: firstMemoryTrackerId },
@@ -133,7 +127,8 @@ describe("repeat page", () => {
         query: { successful: true },
       })
       await flushPromises()
-      expect(teleportTarget.textContent).toContain("1/3")
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+      expect(globalBar.text()).toContain("1/3")
       expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: secondMemoryTrackerId },

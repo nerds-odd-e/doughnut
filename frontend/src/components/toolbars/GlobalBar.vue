@@ -1,6 +1,8 @@
 <template>
   <nav class="daisy-navbar daisy-max-w-full daisy-flex daisy-justify-between">
-    <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto" id="head-status" />
+    <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto">
+      <slot />
+    </div>
     <div class="daisy-join daisy-join-horizontal daisy-flex-none">
       <PopButton v-if="user" title="search note">
         <template #button_face>
@@ -29,7 +31,4 @@ const user = inject<Ref<User | undefined>>("currentUser")
 </script>
 
 <style scoped lang="scss">
-.daisy-navbar {
-  min-height: 100%;
-}
 </style>

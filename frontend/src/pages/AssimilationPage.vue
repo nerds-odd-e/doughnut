@@ -1,4 +1,7 @@
 <template>
+      <GlobalBar v-if="notes?.length === 0">
+        Assimilated {{ assimilatedCountOfTheDay }} notes today.
+      </GlobalBar>
       <div class="progress-container daisy-relative">
         <div
           :class="`daisy-progress-bar daisy-w-full daisy-bg-gray-500 daisy-h-[25px] daisy-rounded-lg daisy-relative daisy-cursor-help ${false ? 'daisy-h-[5px]' : ''}`"
@@ -43,9 +46,6 @@
     <ContentLoader v-if="notes === undefined" />
     <template v-else>
       <div v-if="notes?.length === 0" class="daisy-text-center daisy-py-8">
-        <TeleportToHeadStatus>
-          Assimilated {{ assimilatedCountOfTheDay }} notes today.
-        </TeleportToHeadStatus>
         <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
           🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
         </h1>
@@ -70,7 +70,7 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 defineEmits(["update-reviewing"])
 

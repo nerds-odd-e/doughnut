@@ -1,7 +1,7 @@
 <template>
-  <TeleportToHeadStatus v-if="title">
+  <GlobalBar v-if="title">
     <h2 class="fs-4 daisy-text-2xl">{{ title }}</h2>
-  </TeleportToHeadStatus>
+  </GlobalBar>
 
   <div :class="[
     'daisy-mx-auto daisy-min-w-0',
@@ -17,7 +17,7 @@
 
 <script setup lang="ts">
 import ContentLoader from "@/components/commons/ContentLoader.vue"
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 interface Props {
   title?: string

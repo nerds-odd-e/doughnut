@@ -3,13 +3,53 @@
     Instead of using a daisy-drawer, we're using a responsive layout with a sidebar that
     is either a static column on md+ screens or an overlay on smaller screens.
   -->
-  <div class="daisy-h-full daisy-relative daisy-flex">
+  <div class="daisy-flex daisy-flex-col daisy-h-full">
+    <GlobalBar>
+      <button
+        role="button"
+        class="daisy-btn daisy-btn-sm daisy-btn-ghost"
+        :class="{ 'sidebar-expanded': sidebarOpened }"
+        title="toggle sidebar"
+        @click="sidebarOpened = !sidebarOpened"
+      >
+        <div class="daisy-w-4 daisy-h-4">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="w-4 h-4"
+          >
+            <template v-if="sidebarOpened">
+              <path d="M19 12H5M12 19l-7-7 7-7"/>
+            </template>
+            <template v-else>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="6" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </template>
+          </svg>
+        </div>
+      </button>
+      <BreadcrumbWithCircle
+        v-if="noteRealm"
+        v-bind="{
+          fromBazaar: noteRealm?.fromBazaar,
+          circle: noteRealm.notebook?.circle,
+          noteTopology: noteRealm?.note.noteTopology,
+        }"
+      />
+    </GlobalBar>
     <!-- Overlay mask for mobile -->
     <div
       v-if="!isMdOrLarger && sidebarOpened"
       class="daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-z-30"
       @click="sidebarOpened = false"
     ></div>
+    <div class="daisy-h-full daisy-relative daisy-flex daisy-flex-1 daisy-min-h-0">
 
     <!-- Sidebar -->
     <aside
@@ -38,9 +78,7 @@
         v-bind="{
           noteId,
           expandChildren: true,
-          onToggleSidebar: () => sidebarOpened = !sidebarOpened,
           isMinimized: isContentMinimized,
-          isSidebarExpanded: sidebarOpened,
         }"
       >
         <template #note-conversation="{ noteRealm }">
@@ -58,6 +96,7 @@
         </template>
       </NoteShow>
     </main>
+    </div>
   </div>
 </template>
 
@@ -69,6 +108,8 @@ import NoteShow from "../components/notes/NoteShow.vue"
 import NoteSidebar from "../components/notes/NoteSidebar.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import GlobalBar from "../components/toolbars/GlobalBar.vue"
+import BreadcrumbWithCircle from "../components/toolbars/BreadcrumbWithCircle.vue"
 
 const router = useRouter()
 const route = useRoute()

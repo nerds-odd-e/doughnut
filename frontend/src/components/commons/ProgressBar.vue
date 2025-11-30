@@ -1,5 +1,5 @@
 <template>
-  <TeleportToHeadStatus v-if="title">
+  <GlobalBar v-if="title">
     <div class="daisy-flex-shrink-0">
       <slot name="buttons" />
     </div>
@@ -18,11 +18,11 @@
         </span>
       </div>
     </div>
-  </TeleportToHeadStatus>
+  </GlobalBar>
 </template>
 
 <script setup lang="ts">
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 defineProps({
   finished: { type: Number, required: true },

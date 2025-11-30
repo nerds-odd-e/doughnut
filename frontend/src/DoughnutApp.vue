@@ -6,7 +6,6 @@ import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import type { ApiStatus } from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient, nonReloadingClient } from "./managedApi/clientSetup"
-import GlobalBar from "./components/toolbars/GlobalBar.vue"
 import LoadingThinBar from "./components/commons/LoadingThinBar.vue"
 import type { User } from "@generated/backend"
 import {
@@ -67,9 +66,6 @@ onMounted(async () => {
       />
     </div>
     <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
-      <div class="daisy-sticky daisy-top-0 daisy-z-100 global-bar">
-        <GlobalBar />
-      </div>
       <div class="daisy-flex-grow daisy-overflow-y-auto daisy-overflow-x-hidden main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
         <template v-else-if="userLoaded">
@@ -94,7 +90,6 @@ onMounted(async () => {
 $main-menu-width: 90px;
 $main-menu-height-tablet: 70px;
 $main-menu-height-mobile: 55px;
-$global-bar-height: 51px;
 
 .main-menu {
   height: 100%;
@@ -108,19 +103,8 @@ $global-bar-height: 51px;
   min-width: 0;
 }
 
-.global-bar {
-  height: $global-bar-height;
-  max-width: 100vw;
-}
-
-@media (min-width: theme('screens.lg')) {
-  .global-bar {
-    max-width: calc(100vw - #{$main-menu-width});
-  }
-}
-
 .main-content {
-  height: calc(100% - #{$global-bar-height});
+  height: 100%;
 }
 
 @media (max-width: theme('screens.lg')) {
@@ -141,7 +125,7 @@ $global-bar-height: 51px;
   }
 
   .main-content {
-    height: calc(100% - #{$global-bar-height});
+    height: 100%;
   }
 }
 
@@ -157,7 +141,7 @@ $global-bar-height: 51px;
   }
 
   .main-content {
-    height: calc(100% - #{$global-bar-height});
+    height: 100%;
   }
 }
 </style>

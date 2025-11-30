@@ -2,47 +2,6 @@
   <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
     <NoteRealmLoader v-bind="{ noteId }" :key="reloadKey">
       <template #default="{ noteRealm }">
-        <TeleportToHeadStatus>
-          <button
-            v-if="onToggleSidebar"
-            role="button"
-            class="daisy-btn daisy-btn-sm daisy-btn-ghost"
-            :class="{ 'sidebar-expanded': isSidebarExpanded }"
-            title="toggle sidebar"
-            @click="(e: MouseEvent) => onToggleSidebar?.(e)"
-          >
-          <div class="daisy-w-4 daisy-h-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="w-4 h-4"
-            >
-              <template v-if="isSidebarExpanded">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </template>
-              <template v-else>
-                <line x1="3" y1="6" x2="21" y2="6"></line>
-                <line x1="6" y1="12" x2="21" y2="12"></line>
-                <line x1="3" y1="18" x2="21" y2="18"></line>
-              </template>
-            </svg>
-          </div>
-          </button>
-          <BreadcrumbWithCircle
-            v-if="noteRealm"
-            v-bind="{
-              fromBazaar: noteRealm?.fromBazaar,
-              circle: noteRealm.notebook?.circle,
-              noteTopology: noteRealm?.note.noteTopology,
-            }"
-          />
-        </TeleportToHeadStatus>
-
         <ContentLoader v-if="!noteRealm" />
         <template v-else>
           <template v-if="!isMinimized">
@@ -142,16 +101,12 @@ import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
 import LinkOfNote from "../links/LinkOfNote.vue"
 import { reverseLabel } from "../../models/linkTypeOptions"
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
-import BreadcrumbWithCircle from "../../components/toolbars/BreadcrumbWithCircle.vue"
 
 defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
-  onToggleSidebar: { type: Function, required: false },
   isMinimized: { type: Boolean, default: false },
-  isSidebarExpanded: { type: Boolean, default: false },
 })
 
 const currentUser = inject<Ref<User | undefined>>("currentUser")
