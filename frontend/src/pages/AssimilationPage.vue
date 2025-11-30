@@ -43,9 +43,14 @@
     <ContentLoader v-if="notes === undefined" />
     <template v-else>
       <div v-if="notes?.length === 0" class="daisy-text-center daisy-py-8">
-        <TeleportToHeadStatus>
-          Assimilated {{ assimilatedCountOfTheDay }} notes today.
-        </TeleportToHeadStatus>
+        <GlobalBar
+          v-if="apiStatus && currentUser"
+          v-bind="{ apiStatus, user: currentUser }"
+        >
+          <template #status>
+            Assimilated {{ assimilatedCountOfTheDay }} notes today.
+          </template>
+        </GlobalBar>
         <h1 class="celebration-message daisy-text-3xl daisy-font-bold daisy-text-slate-700 daisy-my-4">
           🎉 Congratulations! You've achieved your daily assimilation goal! 🎯
         </h1>
@@ -62,15 +67,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue"
-import type { Note } from "@generated/backend"
+import { computed, inject, onMounted, ref, type Ref } from "vue"
+import type { Note, User } from "@generated/backend"
 import { AssimilationController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 
 defineEmits(["update-reviewing"])
 
@@ -120,6 +126,8 @@ const onReloadNeeded = () => {
 }
 
 const showTooltip = ref(false)
+const currentUser = inject<Ref<User | undefined>>("currentUser")
+const apiStatus = inject<Ref<ApiStatus>>("apiStatus")
 </script>
 
 <style lang="scss" scoped>

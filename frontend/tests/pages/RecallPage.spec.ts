@@ -11,6 +11,7 @@ import helper, {
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -26,17 +27,6 @@ useRouter().currentRoute.value.name = "recall"
 
 let renderer: RenderingHelper<typeof RecallPage>
 let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
-
-let teleportTarget: HTMLDivElement
-
-beforeEach(() => {
-  teleportTarget = document.createElement("div")
-  teleportTarget.id = "head-status"
-  document.body.appendChild(teleportTarget)
-})
-afterEach(() => {
-  document.body.innerHTML = ""
-})
 
 beforeEach(() => {
   vitest.resetAllMocks()
@@ -108,8 +98,10 @@ describe("repeat page", () => {
     })
 
     it("shows the progress", async () => {
-      await mountPage()
-      expect(teleportTarget.textContent).toContain("0/3")
+      const wrapper = await mountPage()
+      const globalBar = wrapper.findComponent(GlobalBar)
+      expect(globalBar.exists()).toBe(true)
+      expect(globalBar.text()).toContain("0/3")
       expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: firstMemoryTrackerId },
@@ -133,7 +125,8 @@ describe("repeat page", () => {
         query: { successful: true },
       })
       await flushPromises()
-      expect(teleportTarget.textContent).toContain("1/3")
+      const globalBar = wrapper.findComponent(GlobalBar)
+      expect(globalBar.text()).toContain("1/3")
       expect(askAQuestionSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           path: { memoryTracker: secondMemoryTrackerId },

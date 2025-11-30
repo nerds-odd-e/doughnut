@@ -1,6 +1,8 @@
 <template>
   <nav class="daisy-navbar daisy-max-w-full daisy-flex daisy-justify-between">
-    <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto" id="head-status" />
+    <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto">
+      <slot name="status" />
+    </div>
     <div class="daisy-join daisy-join-horizontal daisy-flex-none">
       <PopButton v-if="user" title="search note">
         <template #button_face>

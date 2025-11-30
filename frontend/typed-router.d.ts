@@ -86,13 +86,6 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
-    '/commons/TeleportToHeadStatus': RouteRecordInfo<
-      '/commons/TeleportToHeadStatus',
-      '/commons/TeleportToHeadStatus',
-      Record<never, never>,
-      Record<never, never>,
-      | never
-    >,
     '/FailureReportPage': RouteRecordInfo<
       '/FailureReportPage',
       '/FailureReportPage',
@@ -248,12 +241,6 @@ declare module 'vue-router/auto-routes' {
     'src/pages/commons/ContainerPage.vue': {
       routes:
         | '/commons/ContainerPage'
-      views:
-        | never
-    }
-    'src/pages/commons/TeleportToHeadStatus.vue': {
-      routes:
-        | '/commons/TeleportToHeadStatus'
       views:
         | never
     }

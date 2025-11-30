@@ -8,6 +8,7 @@ import createNoteStorage from "@/store/createNoteStorage"
 import routes from "@/routes/routes"
 import type { User } from "@generated/backend"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 
 interface NoteStorageProps {
   [key: string]: unknown
@@ -32,6 +33,7 @@ class RenderingHelper<T = DefineComponent> {
       },
       provide: {
         currentUser: ref<User | undefined>(),
+        apiStatus: ref<ApiStatus>({ states: [] }),
       },
       stubs: {
         "router-view": true,

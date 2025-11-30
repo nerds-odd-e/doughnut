@@ -1,28 +1,36 @@
 <template>
-  <TeleportToHeadStatus v-if="title">
-    <div class="daisy-flex-shrink-0">
-      <slot name="buttons" />
-    </div>
-    <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
-      <div
-        :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
-        v-if="toRepeatCount !== null"
-      >
-        <span
-          class="progress"
-          :style="`width: ${(finished * 100) / (finished + toRepeatCount)}%`"
-        >
-        </span>
-        <span class="progress-text">
-          {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
-        </span>
+  <GlobalBar
+    v-if="title && apiStatus"
+    v-bind="{ apiStatus, user: currentUser }"
+  >
+    <template #status>
+      <div class="daisy-flex-shrink-0">
+        <slot name="buttons" />
       </div>
-    </div>
-  </TeleportToHeadStatus>
+      <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
+        <div
+          :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
+          v-if="toRepeatCount !== null"
+        >
+          <span
+            class="progress"
+            :style="`width: ${(finished * 100) / (finished + toRepeatCount)}%`"
+          >
+          </span>
+          <span class="progress-text">
+            {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
+          </span>
+        </div>
+      </div>
+    </template>
+  </GlobalBar>
 </template>
 
 <script setup lang="ts">
-import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
+import { inject, type Ref } from "vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import type { User } from "@generated/backend"
+import type { ApiStatus } from "@/managedApi/ApiStatusHandler"
 
 defineProps({
   finished: { type: Number, required: true },
@@ -36,6 +44,9 @@ defineSlots<{
   default?: () => Element | Element[]
   buttons?: () => Element | Element[]
 }>()
+
+const currentUser = inject<Ref<User | undefined>>("currentUser")
+const apiStatus = inject<Ref<ApiStatus>>("apiStatus")
 </script>
 
 <style lang="scss" scoped>
