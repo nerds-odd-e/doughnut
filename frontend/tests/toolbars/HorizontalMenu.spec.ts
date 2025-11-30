@@ -4,6 +4,7 @@ import { screen, fireEvent } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
+import { markRaw } from "vue"
 import SvgNote from "@/components/svgs/SvgNote.vue"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
@@ -38,19 +39,19 @@ const createMockNavItems = (
       {
         name: "notebooks",
         label: "Note",
-        icon: SvgNote,
+        icon: markRaw(SvgNote),
         isActive: activeItemName === "notebooks",
       },
       {
         name: "assimilate",
         label: "Assimilate",
-        icon: SvgAssimilate,
+        icon: markRaw(SvgAssimilate),
         isActive: activeItemName === "assimilate",
       },
       {
         name: "recall",
         label: "Recall",
-        icon: SvgCalendarCheck,
+        icon: markRaw(SvgCalendarCheck),
         isActive: activeItemName === "recall",
       },
     ],
@@ -58,19 +59,19 @@ const createMockNavItems = (
       {
         name: "circles",
         label: "Circles",
-        icon: SvgPeople,
+        icon: markRaw(SvgPeople),
         isActive: activeItemName === "circles",
       },
       {
         name: "bazaar",
         label: "Bazaar",
-        icon: SvgShop,
+        icon: markRaw(SvgShop),
         isActive: activeItemName === "bazaar",
       },
       {
         name: "messageCenter",
         label: "Messages",
-        icon: SvgChat,
+        icon: markRaw(SvgChat),
         isActive: activeItemName === "messageCenter",
       },
     ],

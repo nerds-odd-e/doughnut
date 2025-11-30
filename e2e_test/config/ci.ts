@@ -7,6 +7,8 @@ export default defineConfig({
   env: {
     TAGS: 'not @ignore',
   },
+  viewportWidth: 1200,
+  viewportHeight: 800,
   video: false,
   watchForFileChanges: false,
   e2e: {
