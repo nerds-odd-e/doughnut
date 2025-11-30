@@ -58,7 +58,8 @@
 <script setup lang="ts">
 import type { User } from "@generated/backend"
 import type { PropType, Component, Ref } from "vue"
-import { ref, computed, onMounted, onUnmounted } from "vue"
+import { ref, computed, onMounted, onUnmounted, watch } from "vue"
+import { useRoute } from "vue-router"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
@@ -126,6 +127,16 @@ const handleFocusLoss = () => {
     }
   }, 0)
 }
+
+const route = useRoute()
+
+// Watch for route changes and collapse menu
+watch(
+  () => route.fullPath,
+  () => {
+    collapseMenu()
+  }
+)
 
 onMounted(() => {
   document.addEventListener("click", handleClickOutside)
@@ -229,16 +240,24 @@ onUnmounted(() => {
 .expand-button {
   flex-shrink: 0;
   min-width: fit-content;
-  padding: 0.5rem;
+  height: 100%;
+  padding: 0 0.5rem;
   margin-left: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.3s ease;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  transition: background-color 0.2s ease;
 }
 
 .expand-button:hover {
-  transform: scale(1.1);
+  background-color: hsl(var(--bc) / 0.1);
+}
+
+.expand-button:active {
+  background-color: hsl(var(--bc) / 0.15);
 }
 
 .daisy-dropdown {

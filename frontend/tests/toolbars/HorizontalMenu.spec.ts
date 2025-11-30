@@ -4,7 +4,7 @@ import { screen, fireEvent } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 import { beforeEach, vi, describe, it, expect } from "vitest"
-import { markRaw } from "vue"
+import { markRaw, reactive } from "vue"
 import SvgNote from "@/components/svgs/SvgNote.vue"
 import SvgAssimilate from "@/components/svgs/SvgAssimilate.vue"
 import SvgCalendarCheck from "@/components/svgs/SvgCalendarCheck.vue"
@@ -13,9 +13,13 @@ import SvgShop from "@/components/svgs/SvgShop.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import type { Component } from "vue"
 
-const useRouteValue = { name: "" }
+const useRouteValue = reactive({ name: "", fullPath: "/" })
 vi.mock("vue-router", () => ({
   useRoute: () => useRouteValue,
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+  }),
 }))
 
 type NavigationItemType = {
@@ -87,6 +91,8 @@ describe("HorizontalMenu", () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    useRouteValue.name = ""
+    useRouteValue.fullPath = "/"
     user = makeMe.aUser.please()
   })
 
@@ -398,6 +404,68 @@ describe("HorizontalMenu", () => {
       // Navigation items should not be visible
       expect(screen.queryByLabelText("Note")).not.toBeInTheDocument()
       expect(screen.queryByLabelText("Assimilate")).not.toBeInTheDocument()
+    })
+  })
+
+  describe("route change behavior", () => {
+    it("collapses menu when route changes", async () => {
+      const navItems = createMockNavItems("assimilate")
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Expand the menu first
+      const expandButton = screen.getByLabelText("Toggle menu")
+      await fireEvent.click(expandButton)
+
+      let menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-expanded")
+
+      // Simulate route change by updating the mocked route fullPath
+      useRouteValue.fullPath = "/d/recall"
+      useRouteValue.name = "recall"
+
+      // Wait for watcher to process
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-collapsed")
+    })
+
+    it("collapses menu when route changes even if already collapsed", async () => {
+      const navItems = createMockNavItems("assimilate")
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Menu should start collapsed
+      let menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-collapsed")
+
+      // Simulate route change
+      useRouteValue.fullPath = "/d/notebooks"
+      useRouteValue.name = "notebooks"
+
+      // Wait for watcher to process
+      await new Promise((resolve) => setTimeout(resolve, 10))
+
+      // Menu should still be collapsed
+      menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-collapsed")
     })
   })
 })
