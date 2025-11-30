@@ -32,10 +32,21 @@ const user = inject<Ref<User | undefined>>("currentUser")
 
 <style scoped lang="scss">
 $collapsed-menu-width: 130px;
+$main-menu-height-tablet: 70px;
+$main-menu-height-mobile: 55px;
 
 @media (max-width: theme('screens.lg')) {
   .daisy-navbar {
     padding-left: $collapsed-menu-width;
+    height: $main-menu-height-tablet;
+    min-height: $main-menu-height-tablet;
+  }
+}
+
+@media (max-width: theme('screens.md')) {
+  .daisy-navbar {
+    height: $main-menu-height-mobile;
+    min-height: $main-menu-height-mobile;
   }
 }
 </style>
