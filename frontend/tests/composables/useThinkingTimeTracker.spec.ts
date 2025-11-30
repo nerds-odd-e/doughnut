@@ -5,16 +5,28 @@ import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
 
 describe("useThinkingTimeTracker", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>
+  let rafCallbacks: Array<FrameRequestCallback> = []
 
   beforeEach(() => {
     vi.useFakeTimers()
     performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
+    rafCallbacks = []
+    global.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback)
+      return 1
+    }) as unknown as typeof requestAnimationFrame
   })
 
   afterEach(() => {
     vi.useRealTimers()
     vi.restoreAllMocks()
   })
+
+  const flushRAF = () => {
+    const callbacks = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks.forEach((cb) => cb(performance.now()))
+  }
 
   it("starts timer after nextTick and requestAnimationFrame", async () => {
     const TestComponent = defineComponent({
@@ -28,7 +40,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     vi.advanceTimersByTime(1000)
     performanceNowSpy.mockReturnValue(1000)
@@ -49,7 +61,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     performanceNowSpy.mockReturnValue(1000)
     vi.advanceTimersByTime(1000)
@@ -76,7 +88,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     performanceNowSpy.mockReturnValue(1000)
     vi.advanceTimersByTime(1000)
@@ -109,7 +121,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     performanceNowSpy.mockReturnValue(1000)
     vi.advanceTimersByTime(1000)
@@ -135,7 +147,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     performanceNowSpy.mockReturnValue(1000)
     vi.advanceTimersByTime(1000)
@@ -166,7 +178,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     performanceNowSpy.mockReturnValue(1000)
     vi.advanceTimersByTime(1000)
@@ -189,7 +201,7 @@ describe("useThinkingTimeTracker", () => {
 
     const wrapper = mount(TestComponent)
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => requestAnimationFrame(resolve))
+    flushRAF()
 
     performanceNowSpy.mockReturnValue(1234.567)
     vi.advanceTimersByTime(1234.567)

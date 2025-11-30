@@ -1,7 +1,15 @@
 import { flushPromises } from "@vue/test-utils"
+import { vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"
 import makeMe from "@tests/fixtures/makeMe"
+
+const mockedPush = vi.fn()
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: mockedPush,
+  }),
+}))
 
 describe("MemoryTrackerPageView", () => {
   beforeEach(() => {
