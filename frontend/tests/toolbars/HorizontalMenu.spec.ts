@@ -232,6 +232,60 @@ describe("HorizontalMenu", () => {
       expect(menuWrapper).not.toHaveClass("is-collapsed")
     })
 
+    it("expands menu when clicking on active item when collapsed", async () => {
+      const navItems = createMockNavItems("assimilate")
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Menu should start collapsed
+      let menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-collapsed")
+
+      // Click on the active item (which is visible when collapsed)
+      const activeItem = screen.getByLabelText("Assimilate")
+      await fireEvent.click(activeItem)
+
+      // Menu should now be expanded
+      menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-expanded")
+    })
+
+    it("expands menu when clicking anywhere in menu content when collapsed", async () => {
+      const navItems = createMockNavItems("assimilate")
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Menu should start collapsed
+      let menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-collapsed")
+
+      // Click on the menu content area
+      const menuContent = document.querySelector(".menu-content")
+      if (menuContent) {
+        await fireEvent.click(menuContent)
+      }
+
+      // Menu should now be expanded
+      menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-expanded")
+    })
+
     it("collapses menu when expand button is clicked again", async () => {
       const navItems = createMockNavItems("assimilate")
       helper
@@ -365,7 +419,7 @@ describe("HorizontalMenu", () => {
       expect(loginButton).toBeInTheDocument()
     })
 
-    it("login button is always visible when no user (collapsed state)", () => {
+    it("login button is always visible when no user and menu is expanded", () => {
       const navItems = createMockNavItems()
       helper
         .component(HorizontalMenu)
@@ -378,12 +432,17 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      // Menu should be collapsed but login button visible
+      // Menu should be expanded when no user
       const menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      expect(menuWrapper).toHaveClass("is-expanded")
+      expect(menuWrapper).not.toHaveClass("is-collapsed")
 
       const loginButton = screen.getByLabelText("Login via Github")
       expect(loginButton).toBeInTheDocument()
+
+      // Chevron should not be visible when no user
+      const expandButton = screen.queryByLabelText("Toggle menu")
+      expect(expandButton).not.toBeInTheDocument()
     })
   })
 

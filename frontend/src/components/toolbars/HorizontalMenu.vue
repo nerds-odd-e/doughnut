@@ -4,24 +4,28 @@
       ref="menuRef"
       tabindex="0"
       class="menu-wrapper daisy-flex daisy-flex-col daisy-h-full"
-      :class="{ 'is-expanded': isExpanded, 'is-collapsed': !isExpanded }"
+      :class="{ 'is-expanded': shouldShowExpanded, 'is-collapsed': !shouldShowExpanded }"
       @blur="handleFocusLoss"
     >
-      <div class="menu-content daisy-flex daisy-flex-row daisy-items-center">
+      <div
+        class="menu-content daisy-flex daisy-flex-row daisy-items-center"
+        :class="{ 'clickable-when-collapsed': !shouldShowExpanded && user }"
+        @click="handleMenuContentClick"
+      >
         <!-- Login button: always visible when no user -->
         <LoginButton v-if="!user" />
 
         <!-- User menu content -->
         <template v-if="user">
           <!-- Collapsed state: show only active item (not on home page) -->
-          <template v-if="!isExpanded && hasActiveItem && !isHomePage && activeItem">
+          <template v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem">
             <li class="daisy-menu-item active-item-only">
               <NavigationItem v-bind="{ ...activeItem }" />
             </li>
           </template>
 
           <!-- Expanded state: show all items -->
-          <ul v-if="isExpanded" class="top-menu daisy-menu daisy-flex-1">
+          <ul v-if="shouldShowExpanded" class="top-menu daisy-menu daisy-flex-1">
             <template v-if="!isHomePage">
               <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
                 <NavigationItem v-bind="{ ...item }" />
@@ -42,10 +46,12 @@
           </ul>
         </template>
 
-        <!-- Expand button: always visible -->
+        <!-- Expand button: only visible when user is logged in -->
         <button
+          v-if="user"
           class="expand-button daisy-btn daisy-btn-ghost daisy-btn-sm"
-          @click="toggleExpanded"
+          :class="{ 'is-expanded': shouldShowExpanded }"
+          @click.stop="toggleExpanded"
           aria-label="Toggle menu"
         >
           <SvgChevronRight />
@@ -96,6 +102,11 @@ const props = defineProps({
 const isExpanded = ref(false)
 const menuRef: Ref<HTMLElement | null> = ref(null)
 
+// When no user, always show expanded menu (just login button)
+const shouldShowExpanded = computed(() => {
+  return !props.user || isExpanded.value
+})
+
 const activeItem = computed(() => {
   const allItems = [...props.upperNavItems, ...props.lowerNavItems]
   return allItems.find((item) => item.isActive)
@@ -109,8 +120,19 @@ const toggleExpanded = () => {
   isExpanded.value = !isExpanded.value
 }
 
+const expandMenu = () => {
+  isExpanded.value = true
+}
+
 const collapseMenu = () => {
   isExpanded.value = false
+}
+
+const handleMenuContentClick = () => {
+  // When collapsed and user is logged in, clicking anywhere expands the menu
+  if (!shouldShowExpanded.value && props.user) {
+    expandMenu()
+  }
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -249,7 +271,17 @@ onUnmounted(() => {
   border-radius: 0;
   border: none;
   background: transparent;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease, transform 0.3s ease;
+
+  :deep(svg) {
+    transition: transform 0.3s ease;
+  }
+}
+
+.expand-button.is-expanded {
+  :deep(svg) {
+    transform: rotate(180deg);
+  }
 }
 
 .expand-button:hover {
@@ -258,6 +290,10 @@ onUnmounted(() => {
 
 .expand-button:active {
   background-color: hsl(var(--bc) / 0.15);
+}
+
+.clickable-when-collapsed {
+  cursor: pointer;
 }
 
 .daisy-dropdown {
