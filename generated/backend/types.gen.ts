@@ -174,6 +174,7 @@ export type Answer = {
     id: number;
     choiceIndex?: number;
     correct: boolean;
+    thinkingTimeMs?: number;
 };
 
 export type RecallPrompt = {
@@ -190,6 +191,7 @@ export type RecallPrompt = {
 
 export type AnswerDto = {
     choiceIndex?: number;
+    thinkingTimeMs?: number;
 };
 
 export type AnsweredQuestion = {

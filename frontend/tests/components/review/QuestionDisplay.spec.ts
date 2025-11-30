@@ -1,10 +1,22 @@
 import { flushPromises } from "@vue/test-utils"
+import { vi, beforeEach, afterEach } from "vitest"
 import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/review/QuestionDisplay.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import markdownizer from "@/components/form/markdownizer"
 
 describe("QuestionDisplay", () => {
+  let performanceNowSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    vi.useFakeTimers()
+    performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+  })
   it("renders multiple choice question when choices are provided", async () => {
     const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
       .withStem("What is the capital of France?")
@@ -76,5 +88,69 @@ describe("QuestionDisplay", () => {
         markdownizer.markdownToHtml(choice)
       )
     })
+  })
+
+  it("includes thinking time in answer submission", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({ multipleChoicesQuestion })
+      .mount()
+
+    await flushPromises()
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+
+    performanceNowSpy.mockReturnValue(5000)
+    vi.advanceTimersByTime(5000)
+
+    const choiceButton = wrapper.find("li.choice button")
+    await choiceButton.trigger("click")
+    await flushPromises()
+
+    const emitted = wrapper.emitted("answer")
+    expect(emitted).toBeTruthy()
+    expect(emitted?.[0]?.[0]).toHaveProperty("thinkingTimeMs")
+    const answerData = emitted?.[0]?.[0] as { thinkingTimeMs?: number }
+    expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(5000)
+  })
+
+  it("only records thinking time once per submission", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+    const wrapper = helper
+      .component(QuestionDisplay)
+      .withProps({ multipleChoicesQuestion })
+      .mount()
+
+    await flushPromises()
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+
+    performanceNowSpy.mockReturnValue(1000)
+    vi.advanceTimersByTime(1000)
+
+    const choiceButton = wrapper.find("li.choice button")
+    await choiceButton.trigger("click")
+    await flushPromises()
+
+    const emitted = wrapper.emitted("answer")
+    expect(emitted).toBeTruthy()
+    const firstAnswerData = emitted?.[0]?.[0] as { thinkingTimeMs?: number }
+    const firstTime = firstAnswerData?.thinkingTimeMs
+
+    await choiceButton.trigger("click")
+    await flushPromises()
+
+    const secondEmitted = wrapper.emitted("answer")
+    const secondAnswerData = secondEmitted?.[1]?.[0] as {
+      thinkingTimeMs?: number
+    }
+    expect(secondAnswerData?.thinkingTimeMs).toBe(firstTime)
   })
 })

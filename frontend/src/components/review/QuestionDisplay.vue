@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue"
 import type { PropType } from "vue"
 import type {
   Answer,
@@ -21,6 +22,7 @@ import type {
 } from "@generated/backend"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
+import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
 
 defineProps({
   multipleChoicesQuestion: {
@@ -34,7 +36,14 @@ defineProps({
 
 const emits = defineEmits(["answer"])
 
+const { start, stop } = useThinkingTimeTracker()
+
+onMounted(() => {
+  start()
+})
+
 const submitAnswer = async (answerData: AnswerDto) => {
-  emits("answer", answerData)
+  const thinkingTimeMs = stop()
+  emits("answer", { ...answerData, thinkingTimeMs })
 }
 </script>

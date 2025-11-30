@@ -40,6 +40,9 @@
             <span v-else>
               Unanswered
             </span>
+            <span v-if="prompt.answer?.thinkingTimeMs">
+              Thinking time: {{ formatThinkingTime(prompt.answer.thinkingTimeMs) }}
+            </span>
           </div>
           <QuestionDisplay
             v-if="prompt.predefinedQuestion && prompt.answer"
@@ -129,6 +132,19 @@ const getAnswerDisplay = (prompt: RecallPrompt): string => {
     return question.f1__choices[choiceIndex] || ""
   }
   return ""
+}
+
+const formatThinkingTime = (ms: number): string => {
+  if (ms < 1000) {
+    return `${ms}ms`
+  }
+  const seconds = ms / 1000
+  if (seconds < 60) {
+    return `${seconds.toFixed(1)}s`
+  }
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  return `${minutes}m ${remainingSeconds}s`
 }
 
 const removeFromReview = async () => {

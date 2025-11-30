@@ -25,6 +25,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @NotNull
   private Boolean correct;
 
+  @Column(name = "thinking_time_ms")
+  @Setter
+  private Integer thinkingTimeMs;
+
   @JsonIgnore
   String getAnswerDisplay(@NotNull MultipleChoicesQuestion bareQuestion) {
     if (getChoiceIndex() != null) {

@@ -86,6 +86,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void shouldSaveThinkingTimeMs() {
+      answerDTO.setThinkingTimeMs(5000);
+      AnsweredQuestion answerResult = controller.answerQuiz(recallPrompt, answerDTO);
+      assertThat(answerResult.answer.getThinkingTimeMs(), equalTo(5000));
+    }
+
+    @Test
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();

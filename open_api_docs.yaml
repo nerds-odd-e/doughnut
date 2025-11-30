@@ -3754,6 +3754,9 @@ components:
           format: int32
         correct:
           type: boolean
+        thinkingTimeMs:
+          type: integer
+          format: int32
       required:
       - correct
       - id
@@ -3788,6 +3791,9 @@ components:
       type: object
       properties:
         choiceIndex:
+          type: integer
+          format: int32
+        thinkingTimeMs:
           type: integer
           format: int32
     AnsweredQuestion:
