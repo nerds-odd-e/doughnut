@@ -101,14 +101,6 @@ const setError = (errs: unknown) => {
   }
 }
 
-const isNavigation = (newValue: string | undefined): newValue is string => {
-  return (
-    newValue !== undefined &&
-    newValue !== localValue.value &&
-    newValue !== lastSavedValue.value
-  )
-}
-
 const handleNavigation = (newValue: string) => {
   changer.cancel()
   version.value = savedVersion.value
@@ -117,19 +109,30 @@ const handleNavigation = (newValue: string) => {
 }
 
 const updateToPropValue = (newValue: string | undefined) => {
-  if (newValue !== undefined) {
-    localValue.value = newValue
-    lastSavedValue.value = newValue
-  }
+  // Convert undefined to empty string for localValue (which is a string ref)
+  const valueToSet = newValue ?? ""
+  localValue.value = valueToSet
+  lastSavedValue.value = valueToSet
 }
 
 const handlePropChange = (newValue: string | undefined) => {
   if (version.value !== savedVersion.value) {
-    if (newValue !== undefined && pendingSaveValues.has(newValue)) {
+    // Convert undefined to empty string for comparison
+    const normalizedNewValue = newValue ?? ""
+    if (
+      normalizedNewValue !== "" &&
+      pendingSaveValues.has(normalizedNewValue)
+    ) {
       return
     }
-    if (isNavigation(newValue)) {
-      handleNavigation(newValue)
+    // Check if this is navigation (value changed from current or last saved)
+    const normalizedCurrentValue = localValue.value ?? ""
+    const normalizedLastSaved = lastSavedValue.value ?? ""
+    if (
+      normalizedNewValue !== normalizedCurrentValue &&
+      normalizedNewValue !== normalizedLastSaved
+    ) {
+      handleNavigation(normalizedNewValue)
       return
     }
     return

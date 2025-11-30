@@ -1,5 +1,5 @@
 <template>
-  <div class="header" :class="previousAnsweredQuestionCursor ? 'repeat-paused' : ''">
+  <div class="header" :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''">
     <ProgressBar
       v-bind="{ title: `Recalling: `, finished, toRepeatCount }"
       @resume="$emit('viewLastAnsweredQuestion', undefined)"
@@ -87,7 +87,5 @@ defineEmits(["viewLastAnsweredQuestion", "showMore", "moveToEnd"])
 }
 .repeat-paused {
   background-color: rgba(50, 150, 50, 0.8);
-  padding: 5px;
-  border-radius: 10px;
 }
 </style>

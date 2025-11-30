@@ -258,4 +258,37 @@ describe("NoteEditableDetails", () => {
 
     expect(detailsEl.value).toBe("Second edit")
   })
+
+  it("should clear details when switching from a note with details to a note without details (undefined)", async () => {
+    const firstNoteId = 1
+    const secondNoteId = 2
+
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withCleanStorage()
+      .withProps({
+        noteId: firstNoteId,
+        noteDetails: "This is the first note's details",
+        readonly: false,
+        asMarkdown: true,
+      })
+      .mount()
+
+    await flushPromises()
+
+    const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+    expect(detailsEl.value).toBe("This is the first note's details")
+
+    // Switch to a note with undefined details
+    await wrapper.setProps({
+      noteId: secondNoteId,
+      noteDetails: undefined,
+    })
+    await flushPromises()
+
+    // The bug: details should be cleared but they're still showing
+    // This test should fail because the old details are still displayed
+    expect(detailsEl.value).not.toContain("This is the first note's details")
+    expect(detailsEl.value).toBe("")
+  })
 })
