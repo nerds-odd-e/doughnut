@@ -11,17 +11,23 @@ Feature: Repetition Quiz
       | medical  |                                | true                 | English      |
 
   @usingMockedOpenAiService
-  Scenario Outline: AI generated question
+  Scenario: AI generated question - incorrect answer
     Given OpenAI generates this question:
       | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
     And I learned one note "sedition" on day 1
     When I am recalling my note on day 2
     Then I should be asked "What is the meaning of sedition?"
-    When I choose answer "<answer>"
-    Then I should see that my answer <result>
+    When I choose answer "to sleep"
+    Then I should see that my MCQ answer "to sleep" is incorrect
 
-    Examples:
-      | answer             | result                          |
-      | to sleep           | "to sleep" is incorrect         |
-      | to incite violence | is correct as the last question |
+  @usingMockedOpenAiService
+  Scenario: AI generated question - correct answer
+    Given OpenAI generates this question:
+      | Question Stem                    | Correct Choice     | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is the meaning of sedition? | to incite violence | to sleep           | Open Water Diver   |
+    And I learned one note "sedition" on day 1
+    When I am recalling my note on day 2
+    Then I should be asked "What is the meaning of sedition?"
+    When I choose answer "to incite violence"
+    Then I should see that my answer is correct as the last question

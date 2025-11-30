@@ -10,7 +10,6 @@
       answer: answeredQuestion.answer,
     }"
   />
-  <AnswerResult v-bind="{ answeredQuestion }" />
   <ConversationButton
     v-if="conversationButton"
     :recall-prompt-id="answeredQuestion.recallPromptId"
@@ -32,7 +31,6 @@ import type { AnsweredQuestion } from "@generated/backend"
 import type { PropType } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 import ConversationButton from "./ConversationButton.vue"
-import AnswerResult from "./AnswerResult.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 
 const { answeredQuestion, conversationButton } = defineProps({

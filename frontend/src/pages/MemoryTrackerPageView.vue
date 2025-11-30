@@ -60,18 +60,6 @@
               disabled: true,
             }"
           />
-          <AnswerResult
-            v-if="prompt.answer && prompt.predefinedQuestion && prompt.note"
-            v-bind="{
-              answeredQuestion: {
-                answer: prompt.answer,
-                predefinedQuestion: prompt.predefinedQuestion,
-                note: prompt.note,
-                recallPromptId: prompt.id,
-                answerDisplay: getAnswerDisplay(prompt),
-              },
-            }"
-          />
           <ConversationButton
             v-if="prompt.answer"
             :recall-prompt-id="prompt.id"
@@ -88,7 +76,6 @@ import type { RecallPrompt } from "@generated/backend"
 import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/review/NoteUnderQuestion.vue"
 import QuestionDisplay from "@/components/review/QuestionDisplay.vue"
-import AnswerResult from "@/components/review/AnswerResult.vue"
 import ConversationButton from "@/components/review/ConversationButton.vue"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -116,23 +103,6 @@ const { popups } = usePopups()
 const firstPromptNote = computed(() => {
   return props.recallPrompts[0]?.note
 })
-
-const getAnswerDisplay = (prompt: RecallPrompt): string => {
-  if (!prompt.answer) {
-    return ""
-  }
-  const question =
-    prompt.predefinedQuestion?.multipleChoicesQuestion ??
-    prompt.multipleChoicesQuestion
-  if (!question) {
-    return ""
-  }
-  const choiceIndex = prompt.answer.choiceIndex
-  if (choiceIndex !== undefined && question.f1__choices) {
-    return question.f1__choices[choiceIndex] || ""
-  }
-  return ""
-}
 
 const formatThinkingTime = (ms: number): string => {
   if (ms < 1000) {

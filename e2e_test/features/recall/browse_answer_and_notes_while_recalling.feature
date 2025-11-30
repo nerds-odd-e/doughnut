@@ -31,10 +31,10 @@ Feature: Browse answers and notes while recalling
     Given I am recalling my note on day 2
     And I skip one question
     And I type my answer "riot"
-    And I should see that my answer "riot" is incorrect
+    And I should see that my spelling answer "riot" is incorrect
     When I visit all my notebooks
     And I go to the recalls page
-    Then I should see that my answer "riot" is incorrect
+    Then I should see that my spelling answer "riot" is incorrect
 
   Scenario: I can remove a note from further recalls
     Given I am recalling my note on day 2
