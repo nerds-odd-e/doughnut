@@ -3,7 +3,7 @@ import { mainMenu } from './mainMenu'
 export const navigateToMyCircles = () => {
   mainMenu()
   cy.get('.main-menu').within(() => {
-    cy.findByRole('button', { name: 'Circles' }).click()
+    cy.findByRole('link', { name: 'Circles' }).click()
   })
 
   return assumeMyCirclesPage()
