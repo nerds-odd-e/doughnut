@@ -92,23 +92,28 @@ $main-menu-height-tablet: 70px;
 $main-menu-height-mobile: 55px;
 
 .app-container {
-  height: 100vh; // Default to viewport height for desktop
+  height: 100vh; // Default to viewport height for desktop (vertical menu)
+  display: flex;
+  overflow: hidden; // Prevent scrolling on desktop
 }
 
 .main-menu {
   height: 100%;
   width: $main-menu-width;
-  position: fixed;
+  position: fixed; // Sticky for vertical menu on desktop
+  flex-shrink: 0;
 }
 
 .path-and-content {
   margin-left: $main-menu-width;
   height: 100%;
   min-width: 0;
+  flex: 1;
 }
 
 .main-content {
   height: 100%;
+  overflow-y: auto; // Only content area scrolls on desktop
 }
 
 @media (max-width: theme('screens.lg')) {
