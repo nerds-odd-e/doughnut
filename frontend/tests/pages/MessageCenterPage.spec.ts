@@ -43,11 +43,12 @@ describe("MessageCenterPage", () => {
     })
 
     it("should highlight the selected conversation", async () => {
-      const { findAllByRole } = helper
+      const { container } = helper
         .component(MessageCenterPage)
         .withStorageProps({ conversationId: conversations[1]?.id })
         .render()
-      const listItems = await findAllByRole("listitem")
+      await flushPromises()
+      const listItems = container.querySelectorAll("li.daisy-menu-item")
       expect(listItems).toHaveLength(2)
 
       expect(listItems[1]).toHaveClass("daisy-active")
@@ -55,11 +56,12 @@ describe("MessageCenterPage", () => {
     })
 
     it("should highlight the selected conversation", async () => {
-      const { findAllByRole } = helper
+      const { container } = helper
         .component(MessageCenterPage)
         .withStorageProps({})
         .render()
-      const listItems = await findAllByRole("listitem")
+      await flushPromises()
+      const listItems = container.querySelectorAll("li.daisy-menu-item")
       expect(listItems).toHaveLength(2)
 
       // Initially, no conversation should be highlighted

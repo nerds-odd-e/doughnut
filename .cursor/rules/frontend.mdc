@@ -288,7 +288,12 @@ if (error) {
    - Avoid testing implementation details
    - Use data-testid for test selectors
 
-2. **Mocking SDK Services**
+2. **Avoid `xxxByRole` Queries (Performance Optimization)**
+   - **DO NOT use `getByRole`, `findByRole`, `queryByRole`, `getAllByRole`, etc.** - they are slow due to expensive visibility checks
+   - **Note**: Testing Library officially recommends `getByRole` as the top priority for accessibility, but this project prioritizes test performance
+   - Use faster alternatives: `getByText`, `getByLabelText`, `getByTitle`, or `querySelector`/`querySelectorAll`
+
+3. **Mocking SDK Services**
    - Use `mockSdkService` from `@tests/helpers` for type-safe mocking
    - Automatically wraps responses in the standard format `{ data, error, request, response }`
    - Returns a spy that can be reconfigured in tests
@@ -324,7 +329,7 @@ if (error) {
    })
    ```
 
-2. **Component Props**
+4. **Component Props**
    - Use `helper.component(ComponentName).withStorageProps` if the component requires a prop `storageAccessor`. Do not need to pass a `storageAccessor` any more because the helper will add it to the props
    - If the component doesn't require `storageAccessor` in the props then just use 'withProps' instead of 'withStorageProps'
    - Test prop changes and their effects
@@ -337,7 +342,7 @@ if (error) {
    await wrapper.setProps({ value: newValue })
    ```
 
-4. **Data Builder Pattern**
+5. **Data Builder Pattern**
    - Use makeMe factory for creating test data
    - Builders handle complex object creation
    - Example:
@@ -348,11 +353,11 @@ if (error) {
      .please()
    ```
 
-5. "mount" vs "render"
+6. "mount" vs "render"
    - the test helper can either mount or render the component. "render" will call the testing-library render and mount will call the vuejs test util mount.
    - In either style testing, the test should avoid finding VueJS component in the render or mount result, so that the test can be more end to end.
 
-6. **Avoid If-Conditions in Tests**
+7. **Avoid If-Conditions in Tests**
    - Tests must be deterministic - they should always execute the same way
    - Use assertions instead of if-conditions to ensure tests fail clearly when expectations aren't met
    - Use sequential async operations instead of loops where possible

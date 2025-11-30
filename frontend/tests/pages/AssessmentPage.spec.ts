@@ -106,9 +106,9 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       await flushPromises()
-      ;(await wrapper.findByRole("button", { name: "answer1" })).click()
+      ;(await wrapper.findByText("answer1")).click()
       await flushPromises()
-      ;(await wrapper.findByRole("button", { name: "answer3" })).click()
+      ;(await wrapper.findByText("answer3")).click()
       await flushPromises()
 
       expect(submitAssessmentResultSpy).toBeCalledWith({

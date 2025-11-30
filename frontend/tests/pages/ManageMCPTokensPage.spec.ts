@@ -29,10 +29,10 @@ describe("ManageMCPTokensPage", () => {
       .withRouter(router)
       .render()
 
-    const addButton = await screen.findByRole("button", {
-      name: "Generate Token",
-    })
-    addButton.click()
+    const addButtons = await screen.findAllByText("Generate Token")
+    const addButton = addButtons.find((el) => el.tagName === "BUTTON")
+    expect(addButton).toBeDefined()
+    addButton!.click()
 
     const submitButton = await screen.findByText("Submit")
     submitButton.click()
