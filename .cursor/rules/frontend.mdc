@@ -19,6 +19,8 @@ alwaysApply: false
 
 **For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
 
+### Running All Tests
+
 **Cloud Agent:**
 ```bash
 pnpm frontend:test
@@ -28,6 +30,22 @@ pnpm frontend:test
 ```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
+
+### Running a Single Test File
+
+```bash
+CURSOR_DEV=true nix develop -c pnpm -C frontend test tests/path/to/TestFile.spec.ts
+```
+
+**Running a specific test case within a file:**
+```bash
+CURSOR_DEV=true nix develop -c pnpm -C frontend test -t "test name pattern"
+```
+
+**Note:** The test file path is relative to the `frontend/` directory.
+
+**IMPORTANT: In most situations, you should run all unit tests instead of a selected file only.** Running all tests ensures you catch any regressions or side effects your changes might have introduced. Only run a single test file when you're actively debugging a specific test or iterating on a specific component.
+
 
 ## Linting and Type Checking
 
