@@ -4,7 +4,7 @@
       <NoteNewButton
         v-if="!readonly"
         button-title="Add Child Note"
-        v-bind="{ referenceNote: note, insertMode: 'as-child', storageAccessor }"
+        v-bind="{ referenceNote: note, insertMode: 'as-child' }"
       >
         <SvgAddChild />
       </NoteNewButton>
@@ -12,7 +12,7 @@
       <NoteNewButton
         v-if="!readonly && note.parentId"
         button-title="Add Next Sibling Note"
-        v-bind="{ referenceNote: note, insertMode: 'after', storageAccessor }"
+        v-bind="{ referenceNote: note, insertMode: 'after' }"
       >
         <SvgAddSibling />
       </NoteNewButton>
@@ -23,7 +23,7 @@
         </template>
         <template #default="{ closer }">
           <LinkNoteDialog
-            v-bind="{ note, storageAccessor }"
+            v-bind="{ note }"
             @close-dialog="closer"
           />
         </template>
@@ -50,7 +50,6 @@
         <template #default="{ closer }">
           <WikidataAssociationForNoteDialog
             :note="note"
-            :storage-accessor="storageAccessor"
             @close-dialog="closer"
           />
         </template>
@@ -90,7 +89,7 @@
               btn-class="daisy-w-full"
               title="Generate Image with DALL-E"
             >
-              <AIGenerateImageDialog v-bind="{ note, storageAccessor }" />
+              <AIGenerateImageDialog v-bind="{ note }" />
             </PopButton>
           </li>
 
@@ -153,7 +152,7 @@
           <li>
             <NoteDeleteButton
               class="daisy-w-full"
-              v-bind="{ noteId: note.id, storageAccessor }"
+              v-bind="{ noteId: note.id }"
             />
           </li>
         </ul>
@@ -162,7 +161,7 @@
   </nav>
   <NoteAudioTools
     v-if="!readonly && audioTools"
-    v-bind="{ note, storageAccessor }"
+    v-bind="{ note }"
     @close-dialog="audioTools = false"
   />
 
@@ -170,7 +169,6 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { Note } from "@generated/backend"
 import type { NoteAccessory } from "@generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
@@ -199,8 +197,7 @@ import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialo
 import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "./NoteExportDialog.vue"
 
-const { storageAccessor, note } = defineProps<{
-  storageAccessor: StorageAccessor
+const { note } = defineProps<{
   note: Note
   asMarkdown?: boolean
   conversationButton?: boolean

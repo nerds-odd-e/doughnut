@@ -23,14 +23,12 @@
 import type { User } from "@generated/backend"
 import { type ApiStatus } from "@/managedApi/ApiStatusHandler"
 import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const storageAccessor = useStorageAccessor()
 
 defineProps({
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
   apiStatus: { type: Object as PropType<ApiStatus>, required: true },
   user: { type: Object as PropType<User> },
 })

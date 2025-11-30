@@ -10,10 +10,8 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 
 defineProps<{
   note: Note
-  storageAccessor: StorageAccessor
 }>()
 </script> 

@@ -21,13 +21,14 @@ import type { NoteDetailsCompletion, Note } from "@generated/backend"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { Suggestion } from "@/models/suggestions"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const storageAccessor = useStorageAccessor()
 
 const props = defineProps<{
   suggestion: Suggestion
   note?: Note
-  storageAccessor?: StorageAccessor
 }>()
 
 const emit = defineEmits<{
@@ -96,21 +97,21 @@ const formattedContent = computed(() => {
 })
 
 const handleAccept = async () => {
-  if (!props.suggestion || !props.note || !props.storageAccessor) return
+  if (!props.suggestion || !props.note) return
 
   try {
     isProcessing.value = true
     switch (props.suggestion.suggestionType) {
       case "completion": {
         const content = props.suggestion.content
-        await props.storageAccessor
+        await storageAccessor.value
           .storedApi()
           .completeDetails(props.note.id, content)
         break
       }
       case "title": {
         const content = props.suggestion.content
-        await props.storageAccessor
+        await storageAccessor.value
           .storedApi()
           .updateTextField(props.note.id, "edit title", content)
         break

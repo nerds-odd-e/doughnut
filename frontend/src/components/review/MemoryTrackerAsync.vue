@@ -5,7 +5,6 @@
       v-bind="{
         noteId: memoryTracker.note.id,
         expandChildren: false,
-        storageAccessor,
       }"
     />
   </main>
@@ -17,13 +16,11 @@ import ContentLoader from "@/components/commons/ContentLoader.vue"
 import type { MemoryTracker } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import NoteShow from "../notes/NoteShow.vue"
 
 // Props definition
 const props = defineProps<{
   memoryTrackerId: number
-  storageAccessor: StorageAccessor
 }>()
 
 // Setup state

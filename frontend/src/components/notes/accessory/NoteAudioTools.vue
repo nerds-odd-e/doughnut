@@ -79,7 +79,6 @@
 
 <script setup lang="ts">
 import { ref, type PropType } from "vue"
-import type { StorageAccessor } from "../../../store/createNoteStorage"
 import { createAudioRecorder } from "../../../models/audio/audioRecorder"
 import { createWakeLocker } from "../../../models/wakeLocker"
 import type { Note } from "@generated/backend"
@@ -90,12 +89,12 @@ import SvgAudioInput from "@/components/svgs/SvgAudioInput.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import FullScreen from "@/components/common/FullScreen.vue"
 
-const { note, storageAccessor } = defineProps({
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const storageAccessor = useStorageAccessor()
+
+const { note } = defineProps({
   note: { type: Object as PropType<Note>, required: true },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 
 const emit = defineEmits(["closeDialog"])
@@ -121,7 +120,7 @@ const updateTopicIfSuggested = async (noteId: number) => {
     })
   )
   if (!error && suggestedTopic?.title) {
-    await storageAccessor
+    await storageAccessor.value
       .storedApi()
       .updateTextField(noteId, "edit title", suggestedTopic.title)
   }
@@ -162,7 +161,7 @@ const processAudio = async (chunk: AudioChunk): Promise<string | undefined> => {
       throw new Error("Failed to process audio")
     }
 
-    await storageAccessor
+    await storageAccessor.value
       .storedApi()
       .completeDetails(note.id, response.completionFromAudio)
 

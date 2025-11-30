@@ -3,7 +3,6 @@
     v-if="memoryTrackerId"
     v-bind="{
       memoryTrackerId,
-      storageAccessor,
     }"
   />
   <SelfEvaluateButtons
@@ -12,43 +11,32 @@
   />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { StorageAccessor } from "@/store/createNoteStorage"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
 import MemoryTrackerAsync from "./MemoryTrackerAsync.vue"
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
 
-export default defineComponent({
-  props: {
-    memoryTrackerId: Number,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: {
-    MemoryTrackerAsync,
-    SelfEvaluateButtons,
-  },
-  emits: ["reviewed"],
-  methods: {
-    async justReivew(successful: boolean) {
-      if (this.memoryTrackerId === undefined) {
-        return
-      }
-      const { error } = await apiCallWithLoading(() =>
-        MemoryTrackerController.markAsRepeated({
-          path: { memoryTracker: this.memoryTrackerId! },
-          query: { successful },
-        })
-      )
-      if (!error) {
-        this.$emit("reviewed")
-      }
-    },
-  },
+const props = defineProps({
+  memoryTrackerId: Number,
 })
+
+const emit = defineEmits<{
+  reviewed: []
+}>()
+
+const justReivew = async (successful: boolean) => {
+  if (props.memoryTrackerId === undefined) {
+    return
+  }
+  const { error } = await apiCallWithLoading(() =>
+    MemoryTrackerController.markAsRepeated({
+      path: { memoryTracker: props.memoryTrackerId! },
+      query: { successful },
+    })
+  )
+  if (!error) {
+    emit("reviewed")
+  }
+}
 </script>

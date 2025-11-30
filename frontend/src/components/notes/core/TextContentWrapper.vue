@@ -13,9 +13,11 @@
 import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
-import { type StorageAccessor } from "../../../store/createNoteStorage"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-const { storageAccessor, field, value } = defineProps({
+const storageAccessor = useStorageAccessor()
+
+const { field, value } = defineProps({
   field: {
     type: String as PropType<"edit title" | "edit details">,
     required: true,
@@ -23,10 +25,6 @@ const { storageAccessor, field, value } = defineProps({
   value: {
     type: String,
     required: false,
-  },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
   },
 })
 
@@ -41,7 +39,7 @@ const changerInner = async (
 ) => {
   pendingSaveValues.add(newValue)
   try {
-    await storageAccessor
+    await storageAccessor.value
       .storedApi()
       .updateTextField(noteId, field, newValue)
       .catch(errorHander)

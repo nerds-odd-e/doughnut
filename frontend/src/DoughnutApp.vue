@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import type { Ref } from "vue"
 import { computed, onMounted, provide, ref } from "vue"
-import { useRoute } from "vue-router"
 import Popups from "./components/commons/Popups/Popups.vue"
 import TestMenu from "./components/commons/TestMenu.vue"
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
-import createNoteStorage from "./store/createNoteStorage"
 import type { ApiStatus } from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient, nonReloadingClient } from "./managedApi/clientSetup"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
@@ -17,11 +15,6 @@ import {
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
 
-interface RouteViewProps {
-  storageAccessor?: typeof storageAccessor.value
-  [key: string]: unknown
-}
-
 const apiStatus: Ref<ApiStatus> = ref({
   states: [],
 })
@@ -30,8 +23,6 @@ setupGlobalClient(apiStatus.value)
 const user = ref<User | undefined>()
 provide("currentUser", user)
 
-const storageAccessor = ref(createNoteStorage())
-const $route = useRoute()
 const externalIdentifier = ref<string | undefined>()
 const featureToggle = ref(false)
 const environment = ref("production")
@@ -39,15 +30,6 @@ const userLoaded = ref(false)
 
 const newUser = computed(() => {
   return !user.value && !!externalIdentifier.value
-})
-
-const routeViewProps = computed(() => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const props: RouteViewProps = {}
-  if ($route.meta.useNoteStorageAccessor) {
-    props.storageAccessor = storageAccessor.value
-  }
-  return props
 })
 
 onMounted(async () => {
@@ -85,7 +67,7 @@ onMounted(async () => {
     <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
       <div class="daisy-sticky daisy-top-0 daisy-z-100 global-bar">
         <GlobalBar
-          v-bind="{ storageAccessor, user, apiStatus }"
+          v-bind="{ user, apiStatus }"
           @update-user="user = $event"
         />
       </div>
@@ -94,7 +76,7 @@ onMounted(async () => {
         <template v-else-if="userLoaded">
           <router-view v-slot="{ Component }">
             <KeepAlive :include="['RecallPage']">
-              <component v-bind="routeViewProps" :is="Component" />
+              <component :is="Component" />
             </KeepAlive>
           </router-view>
         </template>

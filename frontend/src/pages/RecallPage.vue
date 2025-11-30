@@ -29,7 +29,6 @@
       :memory-trackers="toRepeat"
       :current-index="currentIndex"
       :eager-fetch-count="eagerFetchCount ?? 5"
-      :storage-accessor="storageAccessor"
       @answered-question="onAnsweredQuestion"
       @answered-spelling="onAnsweredSpelling"
       @just-reviewed="onJustReviewed"
@@ -37,11 +36,11 @@
     />
     <AnsweredQuestionComponent
       v-if="currentAnsweredQuestion"
-      v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true, storageAccessor }"
+      v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true }"
     />
     <AnsweredSpellingQuestion
       v-if="currentAnsweredSpelling"
-      v-bind="{ result: currentAnsweredSpelling, storageAccessor }"
+      v-bind="{ result: currentAnsweredSpelling }"
     />
     <template v-else-if="toRepeatCount === 0">
       <div class="daisy-alert daisy-alert-success">
@@ -73,9 +72,7 @@ import { RecallsController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import { shuffle } from "es-toolkit"
-import type { PropType } from "vue"
 import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
@@ -94,12 +91,9 @@ const {
   setRecallWindowEndAt,
   totalAssimilatedCount,
 } = useRecallData()
+
 defineProps({
   eagerFetchCount: Number,
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)

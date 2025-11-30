@@ -32,18 +32,15 @@ import LinkTypeSelect from "./LinkTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"
 import usePopups from "../commons/Popups/usePopups"
-import type { StorageAccessor } from "../../store/createNoteStorage"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const { popups } = usePopups()
+const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
   targetNoteTopology: {
     type: Object as PropType<NoteTopology>,
-    required: true,
-  },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
     required: true,
   },
 })
@@ -71,7 +68,7 @@ const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
 
   try {
     if (linkType !== "no link") {
-      await props.storageAccessor
+      await storageAccessor.value
         .storedApi()
         .createLink(props.note.id, props.targetNoteTopology.id, {
           linkType: formData.value.linkType,

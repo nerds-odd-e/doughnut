@@ -10,38 +10,28 @@
   </button>
 </template>
 
-<script lang="ts">
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
-import type { StorageAccessor } from "../../store/createNoteStorage"
+<script setup lang="ts">
+import { computed } from "vue"
+import { useRouter } from "vue-router"
 import SvgUndo from "../svgs/SvgUndo.vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-export default defineComponent({
-  components: {
-    SvgUndo,
-  },
-  props: {
-    noteId: Number,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  computed: {
-    history() {
-      return this.storageAccessor.peekUndo()
-    },
-    undoTitle() {
-      if (this.history) {
-        return `undo ${this.history.type}`
-      }
-      return "undo"
-    },
-  },
-  methods: {
-    undoDelete() {
-      this.storageAccessor.storedApi().undo(this.$router)
-    },
-  },
+const router = useRouter()
+const storageAccessor = useStorageAccessor()
+
+defineProps({
+  noteId: Number,
 })
+
+const history = computed(() => storageAccessor.value.peekUndo())
+const undoTitle = computed(() => {
+  if (history.value) {
+    return `undo ${history.value.type}`
+  }
+  return "undo"
+})
+
+const undoDelete = () => {
+  storageAccessor.value.storedApi().undo(router)
+}
 </script>

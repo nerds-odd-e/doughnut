@@ -6,7 +6,6 @@
       :conversation="conversation"
       :conversations="conversations"
       :user="user"
-      :storage-accessor="storageAccessor"
       :allow-new-conversation="true"
       :initial-ai-reply="initialAiReply"
       :is-maximized="isMaximized"
@@ -42,7 +41,6 @@ import ConversationTemplate from "@/components/conversations/ConversationTemplat
 import ConversationInner from "./ConversationInner.vue"
 import { inject, ref, type Ref, onMounted } from "vue"
 import type { Conversation, User } from "@generated/backend"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "../commons/ContentLoader.vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -54,7 +52,6 @@ const conversations = ref<Conversation[]>([])
 
 const props = defineProps<{
   noteId: number
-  storageAccessor: StorageAccessor
   isMaximized?: boolean
 }>()
 const emit = defineEmits(["submitted", "close-dialog", "toggle-maximize"])

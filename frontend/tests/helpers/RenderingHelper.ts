@@ -7,9 +7,9 @@ import { createRouter, createWebHistory } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import routes from "@/routes/routes"
 import type { User } from "@generated/backend"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 interface NoteStorageProps {
-  storageAccessor?: ReturnType<typeof createNoteStorage>
   [key: string]: unknown
 }
 class RenderingHelper<T = DefineComponent> {
@@ -45,8 +45,10 @@ class RenderingHelper<T = DefineComponent> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   withStorageProps(props: Partial<NoteStorageProps>) {
+    // Reset the singleton for each test
+    const storageAccessor = useStorageAccessor()
+    storageAccessor.value = createNoteStorage()
     return this.withProps({
-      storageAccessor: createNoteStorage(),
       ...props,
     })
   }

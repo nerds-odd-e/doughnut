@@ -5,7 +5,7 @@
     </template>
     <template #default="{ closer }">
       <NoteNewDialog
-        v-bind="{ referenceNote, insertMode, storageAccessor }"
+        v-bind="{ referenceNote, insertMode }"
         @close-dialog="closer"
       />
     </template>
@@ -13,7 +13,6 @@
 </template>
 
 <script setup lang="ts">
-import type { StorageAccessor } from "../../../store/createNoteStorage"
 import type { Note } from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
 import PopButton from "../../commons/Popups/PopButton.vue"
@@ -23,6 +22,5 @@ defineProps<{
   referenceNote: Note
   insertMode: InsertMode
   buttonTitle: string
-  storageAccessor: StorageAccessor
 }>()
 </script>

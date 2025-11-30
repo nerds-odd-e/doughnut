@@ -6,6 +6,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { fireEvent } from "@testing-library/vue"
 import createNoteStorage from "@/store/createNoteStorage"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 function isBefore(node1: Node, node2: Node) {
   return !!(
@@ -15,7 +16,7 @@ function isBefore(node1: Node, node2: Node) {
 }
 
 describe("Sidebar", () => {
-  const storageAccessor = createNoteStorage()
+  const storageAccessor = useStorageAccessor()
   const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please()
   const firstGeneration = makeMe.aNoteRealm
     .topicConstructor("first gen")
@@ -30,17 +31,10 @@ describe("Sidebar", () => {
     .under(firstGeneration)
     .please()
 
-  storageAccessor.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
-  storageAccessor.refOfNoteRealm(firstGeneration.id).value = firstGeneration
-  storageAccessor.refOfNoteRealm(firstGenerationSibling.id).value =
-    firstGenerationSibling
-  storageAccessor.refOfNoteRealm(secondGeneration.id).value = secondGeneration
-
   const render = (n: NoteRealm) => {
     return helper
       .component(Sidebar)
       .withProps({
-        storageAccessor,
         activeNoteRealm: n,
       })
       .render()
@@ -48,6 +42,17 @@ describe("Sidebar", () => {
 
   let isIntersecting = false
   let observerDisconnected = false
+
+  beforeEach(() => {
+    storageAccessor.value = createNoteStorage()
+    storageAccessor.value.refOfNoteRealm(topNoteRealm.id).value = topNoteRealm
+    storageAccessor.value.refOfNoteRealm(firstGeneration.id).value =
+      firstGeneration
+    storageAccessor.value.refOfNoteRealm(firstGenerationSibling.id).value =
+      firstGenerationSibling
+    storageAccessor.value.refOfNoteRealm(secondGeneration.id).value =
+      secondGeneration
+  })
 
   beforeEach(() => {
     isIntersecting = false

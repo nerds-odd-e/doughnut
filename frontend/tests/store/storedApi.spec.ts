@@ -2,13 +2,17 @@ import type { Router } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
 import { mockSdkService } from "@tests/helpers"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please()
-  const storageAccessor = createNoteStorage()
+  const storageAccessor = useStorageAccessor()
   const routerReplace = vitest.fn()
   const router = { replace: routerReplace } as unknown as Router
-  const sa = storageAccessor.storedApi()
+
+  beforeEach(() => {
+    storageAccessor.value = createNoteStorage()
+  })
 
   describe("delete note", () => {
     let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
@@ -18,6 +22,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should call the api", async () => {
+      const sa = storageAccessor.value.storedApi()
       await sa.deleteNote(router, note.id)
       expect(deleteNoteSpy).toHaveBeenCalledTimes(1)
       expect(deleteNoteSpy).toHaveBeenCalledWith({ path: { note: note.id } })
@@ -35,15 +40,17 @@ describe("storedApiCollection", () => {
     beforeEach(() => {
       updateNoteDetailsSpy = mockSdkService("updateNoteDetails", note)
       showNoteSpy = mockSdkService("showNote", note)
-      noteRef = storageAccessor.refOfNoteRealm(note.id)
+      noteRef = storageAccessor.value.refOfNoteRealm(note.id)
     })
 
     it("should do nothing when no completion value is provided", async () => {
+      const sa = storageAccessor.value.storedApi()
       await sa.completeDetails(note.id)
       expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
     })
 
     it("should update note details with completion", async () => {
+      const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello " } }
 
       await sa.completeDetails(note.id, {
@@ -60,6 +67,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should delete characters before adding completion", async () => {
+      const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello world" } }
 
       await sa.completeDetails(note.id, {
@@ -76,6 +84,7 @@ describe("storedApiCollection", () => {
     })
 
     it("should load note first if not in storage", async () => {
+      const sa = storageAccessor.value.storedApi()
       noteRef.value = undefined
 
       await sa.completeDetails(note.id, {

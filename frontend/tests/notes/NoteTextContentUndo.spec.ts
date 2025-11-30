@@ -3,13 +3,15 @@ import { flushPromises } from "@vue/test-utils"
 import createNoteStorage from "@/store/createNoteStorage"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
-    const histories = createNoteStorage()
+    const storageAccessor = useStorageAccessor()
+    storageAccessor.value = createNoteStorage()
 
     const noteRealm = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()
-    histories.refreshNoteRealm(noteRealm)
+    storageAccessor.value.refreshNoteRealm(noteRealm)
 
     const updatedTitle = "updated"
     const wrapper = helper
@@ -17,7 +19,6 @@ describe("undo editing", () => {
       .withProps({
         readonly: false,
         note: noteRealm.note,
-        storageAccessor: histories,
       })
       .mount()
 
@@ -27,6 +28,8 @@ describe("undo editing", () => {
     titleEl.dispatchEvent(new Event("blur"))
     await flushPromises()
 
-    expect(histories.peekUndo()).toMatchObject({ type: "edit title" })
+    expect(storageAccessor.value.peekUndo()).toMatchObject({
+      type: "edit title",
+    })
   })
 })

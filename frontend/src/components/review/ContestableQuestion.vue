@@ -38,7 +38,6 @@
 import type { AnsweredQuestion, RecallPrompt } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
 import { ref } from "vue"
 import RecallPromptComponent from "./RecallPromptComponent.vue"
@@ -46,10 +45,6 @@ import QuestionDisplay from "./QuestionDisplay.vue"
 const props = defineProps({
   recallPrompt: {
     type: Object as PropType<RecallPrompt>,
-    required: true,
-  },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
     required: true,
   },
 })

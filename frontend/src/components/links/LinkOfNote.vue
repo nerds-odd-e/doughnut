@@ -11,38 +11,26 @@
   </span>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { Note } from "@generated/backend"
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
+import { computed } from "vue"
 import { colors } from "../../colors"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import LinkNob from "./LinkNob.vue"
 
-export default defineComponent({
-  props: {
-    note: { type: Object as PropType<Note>, required: true },
-    reverse: Boolean,
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: { NoteTitleComponent, LinkNob },
-  computed: {
-    noteTopology() {
-      return this.reverse
-        ? this.note.noteTopology.parentOrSubjectNoteTopology!
-        : this.note.noteTopology.objectNoteTopology!
-    },
-    fontColor() {
-      return this.reverse ? colors.target : colors.source
-    },
-    colors() {
-      return colors
-    },
-  },
+const props = defineProps<{
+  note: Note
+  reverse?: boolean
+}>()
+
+const noteTopology = computed(() => {
+  return props.reverse
+    ? props.note.noteTopology.parentOrSubjectNoteTopology!
+    : props.note.noteTopology.objectNoteTopology!
+})
+
+const fontColor = computed(() => {
+  return props.reverse ? colors.target : colors.source
 })
 </script>
 

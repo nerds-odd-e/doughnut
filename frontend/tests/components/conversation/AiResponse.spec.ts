@@ -147,10 +147,10 @@ const setupTestData = () => {
   return { note, noteRealm, conversation }
 }
 
-const mountComponent = (conversation, storageAccessor) => {
+const mountComponent = (conversation) => {
   return helper
     .component(AiResponse)
-    .withProps({ conversation, aiReplyTrigger: 0, storageAccessor })
+    .withProps({ conversation, aiReplyTrigger: 0 })
     .mount()
 }
 
@@ -183,15 +183,17 @@ const submitMessageAndSimulateRunResponse = async (wrapper, toolCallChunk) => {
   await submitMessageAndSimulateToolCallChunk(wrapper, toolCallChunk)
 }
 
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
 describe("ConversationInner", () => {
   let wrapper
   let note
   let noteRealm
   let conversation
-  let storageAccessor
+  const storageAccessor = useStorageAccessor()
 
   beforeEach(() => {
-    storageAccessor = createNoteStorage()
+    storageAccessor.value = createNoteStorage()
     resetInstance()
     mockShowNote()
 
@@ -200,7 +202,7 @@ describe("ConversationInner", () => {
     noteRealm = testData.noteRealm
     conversation = testData.conversation
 
-    wrapper = mountComponent(conversation, storageAccessor)
+    wrapper = mountComponent(conversation)
   })
 
   afterEach(() => {
@@ -295,7 +297,7 @@ describe("ConversationInner", () => {
     it("formats completion suggestion correctly based on existing content", async () => {
       // Test empty note details
       noteRealm.note.details = ""
-      storageAccessor.refreshNoteRealm(noteRealm)
+      storageAccessor.value.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
@@ -307,7 +309,7 @@ describe("ConversationInner", () => {
 
       // Test with existing note details
       noteRealm.note.details = "Existing content"
-      storageAccessor.refreshNoteRealm(noteRealm)
+      storageAccessor.value.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
@@ -322,7 +324,7 @@ describe("ConversationInner", () => {
 
     it("formats completion suggestion with strikethrough for deleted content", async () => {
       noteRealm.note.details = "Hello world"
-      storageAccessor.refreshNoteRealm(noteRealm)
+      storageAccessor.value.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
@@ -340,7 +342,7 @@ describe("ConversationInner", () => {
 
     it("handles strikethrough when deleteFromEnd is larger than existing content", async () => {
       noteRealm.note.details = "Short\ntext"
-      storageAccessor.refreshNoteRealm(noteRealm)
+      storageAccessor.value.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
@@ -406,7 +408,7 @@ describe("ConversationInner", () => {
 
     it("handles completion with character deletion", async () => {
       noteRealm.note.details = "Hello world"
-      storageAccessor.refreshNoteRealm(noteRealm)
+      storageAccessor.value.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
@@ -434,7 +436,7 @@ describe("ConversationInner", () => {
 
     it("handles over-deletion by removing all content", async () => {
       noteRealm.note.details = "Hello world"
-      storageAccessor.refreshNoteRealm(noteRealm)
+      storageAccessor.value.refreshNoteRealm(noteRealm)
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
@@ -475,7 +477,7 @@ describe("ConversationInner", () => {
           .forAnsweredQuestion(answeredQuestion)
           .please()
 
-        const wrapper = mountComponent(conversation, storageAccessor)
+        const wrapper = mountComponent(conversation)
 
         // Simulate completion suggestion
         await submitMessageAndSimulateRunResponse(

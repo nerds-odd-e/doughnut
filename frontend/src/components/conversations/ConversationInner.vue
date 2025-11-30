@@ -46,7 +46,6 @@
 
       <AiResponse
         :conversation="conversation"
-        :storageAccessor="storageAccessor"
         :aiReplyTrigger="aiReplyTrigger"
         @ai-response-done="onAiResponseDone"
         @scroll-to="scrollIndex = $event"
@@ -68,21 +67,18 @@ import type {
 } from "@generated/backend"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
 import ScrollTo from "@/components/commons/ScrollTo.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import SvgMissingAvatar from "@/components/svgs/SvgMissingAvatar.vue"
 import ConversationTemplate from "./ConversationTemplate.vue"
 import markdownizer from "../form/markdownizer"
 
-const { conversation, user, initialAiReply, storageAccessor, isMaximized } =
-  defineProps<{
-    conversation: Conversation
-    conversations?: Conversation[]
-    user: User
-    storageAccessor: StorageAccessor
-    allowNewConversation?: boolean
-    initialAiReply?: boolean
-    isMaximized?: boolean
-  }>()
+const { conversation, user, initialAiReply, isMaximized } = defineProps<{
+  conversation: Conversation
+  conversations?: Conversation[]
+  user: User
+  allowNewConversation?: boolean
+  initialAiReply?: boolean
+  isMaximized?: boolean
+}>()
 
 const emit = defineEmits<{
   (e: "conversation-fetched", conversationId: number): void

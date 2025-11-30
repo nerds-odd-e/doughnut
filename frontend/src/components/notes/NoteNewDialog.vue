@@ -46,25 +46,25 @@ import type {
   NoteCreationDto,
 } from "@generated/backend"
 import type { InsertMode } from "@/models/InsertMode"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import { ref, computed } from "vue"
 import SearchResults from "../search/SearchResults.vue"
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue"
 import WikidataSearchByLabel from "./WikidataSearchByLabel.vue"
 import { useRouter } from "vue-router"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const router = useRouter()
+const storageAccessor = useStorageAccessor()
 
 // Props
 const props = defineProps<{
   referenceNote: Note
   insertMode: InsertMode
-  storageAccessor: StorageAccessor
 }>()
 
 const noteRealm = computed(
-  () => props.storageAccessor.refOfNoteRealm(props.referenceNote.id).value
+  () => storageAccessor.value.refOfNoteRealm(props.referenceNote.id).value
 )
 const notebookId = computed(() => noteRealm.value?.notebook?.id)
 
@@ -103,7 +103,7 @@ const processForm = async () => {
   noteFormErrors.value.wikidataId = undefined
   noteFormErrors.value.newTitle = undefined
 
-  const api = props.storageAccessor.storedApi()
+  const api = storageAccessor.value.storedApi()
   try {
     if (props.insertMode === "as-child") {
       await api.createNote(router, props.referenceNote.id, creationData.value)

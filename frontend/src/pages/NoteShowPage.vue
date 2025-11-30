@@ -26,7 +26,6 @@
         v-if="noteRealm"
         v-bind="{
           noteRealm,
-          storageAccessor,
         }"
       />
     </aside>
@@ -39,7 +38,6 @@
         v-bind="{
           noteId,
           expandChildren: true,
-          storageAccessor,
           onToggleSidebar: () => sidebarOpened = !sidebarOpened,
           isMinimized: isContentMinimized,
           isSidebarExpanded: sidebarOpened,
@@ -52,7 +50,6 @@
           >
             <NoteConversation
               :note-id="noteRealm.id"
-              :storage-accessor="storageAccessor"
               :is-maximized="isContentMinimized"
               @close-dialog="handleCloseConversation"
               @toggle-maximize="toggleMaximize"
@@ -72,22 +69,18 @@ import { useRoute, useRouter } from "vue-router"
 import NoteShow from "../components/notes/NoteShow.vue"
 import NoteSidebar from "../components/notes/NoteSidebar.vue"
 import NoteConversation from "../components/conversations/NoteConversation.vue"
-
-import type { StorageAccessor } from "../store/createNoteStorage"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const router = useRouter()
 const route = useRoute()
+const storageAccessor = useStorageAccessor()
 
 const props = defineProps({
   noteId: { type: Number, required: true },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 
 const noteRealm = computed(() => {
-  return props.storageAccessor.refOfNoteRealm(props.noteId).value
+  return storageAccessor.value.refOfNoteRealm(props.noteId).value
 })
 
 const sidebarOpened = ref(false)

@@ -35,7 +35,6 @@
             v-if="currentConversation && user"
             :conversation="currentConversation"
             :user="user"
-            :storageAccessor="storageAccessor"
             @conversation-fetched="handleConversationFetched"
             @conversation-changed="handleConversationChanged"
           />
@@ -50,15 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  onMounted,
-  ref,
-  computed,
-  type PropType,
-  watch,
-  inject,
-  type Ref,
-} from "vue"
+import { onMounted, ref, computed, watch, inject, type Ref } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
@@ -66,14 +57,9 @@ import ConversationComponent from "@/components/conversations/ConversationCompon
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import type { Conversation, User } from "@generated/backend"
 import { messageCenterConversations } from "@/store/messageStore"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
 
 const props = defineProps({
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
   conversationId: { type: Number, required: false },
 })
 

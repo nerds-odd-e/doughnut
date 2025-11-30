@@ -9,7 +9,6 @@
       v-bind="{
         note,
         activeNoteRealm,
-        storageAccessor,
         expandedIds,
         onToggleExpand: toggleChildren,
         draggedNote,
@@ -29,19 +28,20 @@
 
 <script setup lang="ts">
 import type { Note, NoteRealm } from "@generated/backend"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import SidebarNoteItem from "./SidebarNoteItem.vue"
 import { ref, watch } from "vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const storageAccessor = useStorageAccessor()
 
 interface Props {
   noteId: number
   activeNoteRealm: NoteRealm
-  storageAccessor: StorageAccessor
 }
 
 const props = defineProps<Props>()
 
-const noteRealm = props.storageAccessor
+const noteRealm = storageAccessor.value
   .storedApi()
   .getNoteRealmRefAndLoadWhenNeeded(props.noteId)
 
@@ -152,7 +152,7 @@ const handleDrop = async (event: DragEvent, targetNote: Note) => {
     return
 
   try {
-    await props.storageAccessor
+    await storageAccessor.value
       .storedApi()
       .moveAfter(draggedNote.value.id, targetNote.id, dropMode.value)
 

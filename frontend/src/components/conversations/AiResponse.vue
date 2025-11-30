@@ -16,7 +16,6 @@
       v-if="currentSuggestion"
       :suggestion="currentSuggestion"
       :note="currentNote"
-      :storageAccessor="storageAccessor"
       @resolved="handleToolCallResolved"
       @rejected="handleToolCallRejected"
     />
@@ -39,7 +38,6 @@ import { ref, computed, watch } from "vue"
 import type { Conversation } from "@generated/backend"
 import type { ToolCallResult } from "@/models/aiReplyState"
 import SvgRobot from "@/components/svgs/SvgRobot.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import markdownizer from "../form/markdownizer"
 import {
   createAiReplyStates,
@@ -49,9 +47,8 @@ import ToolCallHandler from "./ToolCallHandler.vue"
 import { type Suggestion } from "@/models/suggestions"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
 
-const { conversation, storageAccessor, aiReplyTrigger } = defineProps<{
+const { conversation, aiReplyTrigger } = defineProps<{
   conversation: Conversation
-  storageAccessor: StorageAccessor
   aiReplyTrigger: number
 }>()
 

@@ -9,7 +9,7 @@
   />
   <LinkNoteFinalize
     v-if="targetNoteTopology && note"
-    v-bind="{ targetNoteTopology, note, storageAccessor }"
+    v-bind="{ targetNoteTopology, note }"
     @success="$emit('closeDialog')"
     @go-back="targetNoteTopology = undefined"
   />
@@ -21,14 +21,14 @@ import type { Note } from "@generated/backend"
 import type { NoteTopology } from "@generated/backend"
 import LinkNoteFinalize from "./LinkNoteFinalize.vue"
 import SearchNote from "../search/SearchNote.vue"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const { popups } = usePopups()
+const storageAccessor = useStorageAccessor()
 
-const { note, storageAccessor } = defineProps<{
+const { note } = defineProps<{
   note?: Note
-  storageAccessor: StorageAccessor
 }>()
 
 const emit = defineEmits<{
@@ -38,7 +38,7 @@ const emit = defineEmits<{
 const targetNoteTopology = ref<NoteTopology | undefined>(undefined)
 
 const noteRealm = computed(() =>
-  note ? storageAccessor.refOfNoteRealm(note.id).value : undefined
+  note ? storageAccessor.value.refOfNoteRealm(note.id).value : undefined
 )
 const notebookId = computed(() => noteRealm.value?.notebook?.id)
 
@@ -46,7 +46,7 @@ async function moveUnder(targetNoteTopology: NoteTopology) {
   if (!(await popups.confirm("Move note under target note?"))) {
     return
   }
-  storageAccessor
+  storageAccessor.value
     .storedApi()
     .moveNote(note!.id, targetNoteTopology.id, {
       asFirstChild: false,

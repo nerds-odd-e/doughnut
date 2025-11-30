@@ -23,14 +23,15 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { LinkCreation, NoteTopology } from "@generated/backend"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import LinkTypeSelect from "./LinkTypeSelect.vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const storageAccessor = useStorageAccessor()
 
 // Props definition
 const props = defineProps<{
   noteTopology: NoteTopology
-  storageAccessor: StorageAccessor
 }>()
 
 // Emits definition
@@ -47,7 +48,7 @@ const linkFormErrors = ref<{ linkType?: string }>({ linkType: undefined })
 
 // Methods
 const updateLink = () => {
-  props.storageAccessor
+  storageAccessor.value
     .storedApi()
     .updateLink(props.noteTopology.id, formData.value)
     .then(() => emit("closeDialog"))

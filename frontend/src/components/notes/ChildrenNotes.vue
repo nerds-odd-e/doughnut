@@ -33,7 +33,6 @@
 import type { PropType } from "vue"
 import { ref } from "vue"
 import type { Note } from "@generated/backend"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import Cards from "./Cards.vue"
 import SvgCollapse from "../svgs/SvgCollapse.vue"
 import SvgExpand from "../svgs/SvgExpand.vue"
@@ -42,10 +41,6 @@ const props = defineProps({
   notes: { type: Array as PropType<Note[]>, required: true },
   expandChildren: { type: Boolean, required: true },
   readonly: { type: Boolean, required: true },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 
 const internalExpandChildren = ref(props.expandChildren)

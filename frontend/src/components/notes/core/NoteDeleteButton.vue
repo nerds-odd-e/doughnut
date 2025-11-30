@@ -4,37 +4,23 @@
   </button>
 </template>
 
-<script lang="ts">
-import type { PropType } from "vue"
-import { defineComponent } from "vue"
-import type { StorageAccessor } from "../../../store/createNoteStorage"
+<script setup lang="ts">
+import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import SvgRemove from "../../svgs/SvgRemove.vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-export default defineComponent({
-  setup() {
-    return {
-      ...usePopups(),
-    }
-  },
-  props: {
-    noteId: { type: Number, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: true,
-    },
-  },
-  components: {
-    SvgRemove,
-  },
-  methods: {
-    async deleteNote() {
-      if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        await this.storageAccessor
-          .storedApi()
-          .deleteNote(this.$router, this.noteId)
-      }
-    },
-  },
+const router = useRouter()
+const { popups } = usePopups()
+const storageAccessor = useStorageAccessor()
+
+const props = defineProps({
+  noteId: { type: Number, required: true },
 })
+
+const deleteNote = async () => {
+  if (await popups.confirm(`Confirm to delete this note?`)) {
+    await storageAccessor.value.storedApi().deleteNote(router, props.noteId)
+  }
+}
 </script>

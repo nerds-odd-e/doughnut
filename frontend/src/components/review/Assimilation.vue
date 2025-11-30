@@ -2,7 +2,7 @@
   <ContainerPage>
     <main>
       <NoteShow
-        v-bind="{ noteId: note.id, storageAccessor, expandChildren: false }"
+        v-bind="{ noteId: note.id, expandChildren: false }"
       />
     </main>
     <NoteInfoBar
@@ -22,7 +22,6 @@ import type { Note } from "@generated/backend"
 import { AssimilationController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
@@ -34,7 +33,6 @@ import { useAssimilationCount } from "@/composables/useAssimilationCount"
 // Props
 const { note } = defineProps<{
   note: Note
-  storageAccessor: StorageAccessor
 }>()
 
 // Emits

@@ -6,7 +6,6 @@
       v-bind="{
         noteId: headNoteId,
         activeNoteRealm: activeNoteRealm,
-        storageAccessor,
       }"
       :key="headNoteId"
     />
@@ -17,15 +16,10 @@
 import type { PropType } from "vue"
 import { computed } from "vue"
 import type { NoteRealm } from "@generated/backend"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import SidebarInner from "./SidebarInner.vue"
 
 const props = defineProps({
   activeNoteRealm: { type: Object as PropType<NoteRealm> },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 
 const headNoteId = computed(() => {

@@ -43,7 +43,6 @@
       v-bind="{
         noteId: noteRealm.id,
         activeNoteRealm,
-        storageAccessor,
       }"
       :key="noteRealm.id"
     />
@@ -56,12 +55,13 @@ import ScrollTo from "@/components/commons/ScrollTo.vue"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
 import SidebarInner from "./SidebarInner.vue"
 import { computed } from "vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+
+const storageAccessor = useStorageAccessor()
 
 interface Props {
   note: Note
   activeNoteRealm: NoteRealm
-  storageAccessor: StorageAccessor
   expandedIds: number[]
   onToggleExpand: (noteId: number) => void
   draggedNote: Note | null
@@ -78,13 +78,13 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const noteRealm = props.storageAccessor.refOfNoteRealmWithFallback(props.note)
+const noteRealm = storageAccessor.value.refOfNoteRealmWithFallback(props.note)
 const isExpanded = computed(() =>
   props.expandedIds.some((id) => id === props.note.id)
 )
 
 const childrenCount = computed(() => {
-  const noteRef = props.storageAccessor.refOfNoteRealm(props.note.id)
+  const noteRef = storageAccessor.value.refOfNoteRealm(props.note.id)
   if (!noteRef.value) return undefined
   return noteRef.value.children?.length ?? undefined
 })

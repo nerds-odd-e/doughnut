@@ -19,20 +19,21 @@ import type {
   WikidataSearchEntity,
   WikidataAssociationCreation,
 } from "@generated/backend"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import WikidataAssociationDialog from "./WikidataAssociationDialog.vue"
 import { WikidataController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { calculateNewTitle } from "@/utils/wikidataTitleActions"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 interface WikidataIdError {
   wikidataId: string
 }
 
+const storageAccessor = useStorageAccessor()
+
 const props = defineProps<{
   note: Note
-  storageAccessor: StorageAccessor
 }>()
 
 const emit = defineEmits<{
@@ -51,7 +52,7 @@ const saveWikidataId = async (wikidataId: string) => {
     const associationData: WikidataAssociationCreation = {
       wikidataId,
     }
-    await props.storageAccessor
+    await storageAccessor.value
       .storedApi()
       .updateWikidataId(props.note.id, associationData)
     emit("closeDialog")
@@ -139,7 +140,7 @@ const handleSelectedForEdit = async (
       const currentTitle = props.note.noteTopology.titleOrPredicate || ""
       const newTitle = calculateNewTitle(currentTitle, entity, titleAction)
 
-      await props.storageAccessor
+      await storageAccessor.value
         .storedApi()
         .updateTextField(props.note.id, "edit title", newTitle)
     }

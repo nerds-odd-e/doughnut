@@ -6,7 +6,6 @@
         v-if="conversation.subject?.note?.id"
         v-bind="{
           noteId: conversation.subject?.note?.id,
-          storageAccessor,
           expandChildren: false,
           noConversationButton: true,
         }"
@@ -22,7 +21,6 @@
         v-bind="{
           answeredQuestion: conversation.subject.answeredQuestion,
           conversationButton: false,
-          storageAccessor,
         }"
       />
     </div>
@@ -34,7 +32,6 @@
           conversation,
           conversations,
           user,
-          storageAccessor,
           isMaximized
         }"
         @conversation-fetched="emit('conversation-fetched', $event)"
@@ -51,7 +48,6 @@ import type { User, Conversation } from "@generated/backend"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
@@ -61,7 +57,6 @@ import ConversationInner from "@/components/conversations/ConversationInner.vue"
 const props = defineProps<{
   conversation: Conversation
   user: User
-  storageAccessor: StorageAccessor
 }>()
 
 const emit = defineEmits<{

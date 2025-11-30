@@ -9,60 +9,46 @@
   <button class="daisy-btn daisy-btn-secondary" @click="askForImage">Ask again</button>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import type { Note } from "@generated/backend"
 import { AiController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import type { PropType } from "vue"
-import { defineComponent } from "vue"
+import { ref, computed, onMounted } from "vue"
 import TextInput from "../form/TextInput.vue"
 
-export default defineComponent({
-  props: {
-    note: { type: Object as PropType<Note>, required: true },
-    storageAccessor: {
-      type: Object as PropType<StorageAccessor>,
-      required: false,
-    },
-  },
-  components: {
-    TextInput,
-  },
-  data() {
-    return {
-      prompt: this.note.noteTopology.titleOrPredicate,
-      b64Json: undefined as string | undefined,
-      promptError: undefined as string | undefined,
-    }
-  },
-  computed: {
-    imageSrc() {
-      if (!this.b64Json) {
-        return undefined
-      }
-      return `data:image/png;base64,${this.b64Json}`
-    },
-  },
-  methods: {
-    async askForImage() {
-      const { data: imageResult, error } = await apiCallWithLoading(() =>
-        AiController.generateImage({
-          body: this.prompt,
-        })
-      )
-      if (!error) {
-        this.b64Json = imageResult!.b64encoded
-        this.promptError = undefined
-      } else {
-        // Error is handled by global interceptor (toast notification)
-        this.promptError = "There is a problem"
-      }
-    },
-  },
-  mounted() {
-    this.askForImage()
-  },
+const props = defineProps({
+  note: { type: Object as PropType<Note>, required: true },
+})
+
+const prompt = ref(props.note.noteTopology.titleOrPredicate)
+const b64Json = ref<string | undefined>(undefined)
+const promptError = ref<string | undefined>(undefined)
+
+const imageSrc = computed(() => {
+  if (!b64Json.value) {
+    return undefined
+  }
+  return `data:image/png;base64,${b64Json.value}`
+})
+
+const askForImage = async () => {
+  const { data: imageResult, error } = await apiCallWithLoading(() =>
+    AiController.generateImage({
+      body: prompt.value,
+    })
+  )
+  if (!error) {
+    b64Json.value = imageResult!.b64encoded
+    promptError.value = undefined
+  } else {
+    // Error is handled by global interceptor (toast notification)
+    promptError.value = "There is a problem"
+  }
+}
+
+onMounted(() => {
+  askForImage()
 })
 </script>
 

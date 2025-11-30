@@ -1,7 +1,6 @@
 <template>
   <TextContentWrapper
     :value="noteTopology.titleOrPredicate"
-    :storage-accessor="storageAccessor"
     field="edit title"
   >
     <template #default="{ value, update, blur, errors }">
@@ -22,17 +21,12 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { NoteTopology } from "@generated/backend"
-import { type StorageAccessor } from "../../../store/createNoteStorage"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import SeamlessTextEditor from "../../form/SeamlessTextEditor.vue"
 
 defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   readonly: { type: Boolean, default: true },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
 })
 </script>
 

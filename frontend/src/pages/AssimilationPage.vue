@@ -52,7 +52,7 @@
       </div>
       <Assimilation
         v-if="note"
-        v-bind="{ note, storageAccessor }"
+        v-bind="{ note }"
         @initial-review-done="initialReviewDone"
         @reload-needed="onReloadNeeded"
         :key="note.id"
@@ -69,17 +69,10 @@ import { AssimilationController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import Assimilation from "@/components/review/Assimilation.vue"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import TeleportToHeadStatus from "@/pages/commons/TeleportToHeadStatus.vue"
 
-defineProps({
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
-})
 defineEmits(["update-reviewing"])
 
 const { setDueCount, assimilatedCountOfTheDay, totalUnassimilatedCount } =

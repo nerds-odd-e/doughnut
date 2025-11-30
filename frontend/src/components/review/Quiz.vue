@@ -15,9 +15,8 @@
           <JustReview
             v-bind="{
               memoryTrackerId: currentMemoryTrackerId,
-              storageAccessor,
             }"
-            @reviewed="(result) => emit('just-reviewed', result)"
+            @reviewed="() => emit('just-reviewed', undefined)"
           />
         </div>
         <template v-else>
@@ -27,7 +26,6 @@
           <ContestableQuestion
             v-bind="{
               recallPrompt: currentRecallPrompt,
-              storageAccessor,
             }"
             @answered="onAnswered($event)"
             :key="currentRecallPrompt.id"
@@ -74,7 +72,6 @@ import {
   RecallPromptController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import type { StorageAccessor } from "@/store/createNoteStorage"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
 import SpellingQuestionComponent from "./SpellingQuestionComponent.vue"
@@ -85,7 +82,6 @@ interface QuizProps {
   memoryTrackers: MemoryTrackerLite[]
   currentIndex: number
   eagerFetchCount: number
-  storageAccessor: StorageAccessor
 }
 
 const props = defineProps<QuizProps>()

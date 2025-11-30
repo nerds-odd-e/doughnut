@@ -1,6 +1,6 @@
 <template>
   <div class="note-show-container daisy-flex daisy-flex-col daisy-h-full">
-    <NoteRealmLoader v-bind="{ noteId, storageAccessor }" :key="reloadKey">
+    <NoteRealmLoader v-bind="{ noteId }" :key="reloadKey">
       <template #default="{ noteRealm }">
         <TeleportToHeadStatus>
           <button
@@ -50,7 +50,6 @@
               v-if="currentUser"
               v-bind="{
                 note: noteRealm.note,
-                storageAccessor,
                 asMarkdown,
                 conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
@@ -68,7 +67,6 @@
                     note: noteRealm.note,
                     asMarkdown,
                     readonly: readonly(noteRealm),
-                    storageAccessor,
                   }"
                 />
                 <NoteAccessoryAsync
@@ -91,7 +89,7 @@
                   </p>
                 </NoteRecentUpdateIndicator>
                 <ChildrenNotes
-                  v-bind="{ expandChildren, readonly: readonly(noteRealm), storageAccessor }"
+                  v-bind="{ expandChildren, readonly: readonly(noteRealm) }"
                   :notes="noteRealm.children ?? []"
                 />
               </div>
@@ -112,7 +110,7 @@
                       <LinkOfNote
                         class="link-multi"
                         :key="link.id"
-                        v-bind="{ note: link, storageAccessor }"
+                        v-bind="{ note: link }"
                         :reverse="true"
                       />
                     </div>
@@ -133,13 +131,12 @@
 </template>
 
 <script setup lang="ts">
-import { inject, ref, type PropType, type Ref } from "vue"
+import { inject, ref, type Ref } from "vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import NoteRealmLoader from "./NoteRealmLoader.vue"
 import type { NoteAccessory, NoteRealm, User } from "@generated/backend"
 import NoteTextContent from "./core/NoteTextContent.vue"
 import ChildrenNotes from "./ChildrenNotes.vue"
-import type { StorageAccessor } from "../../store/createNoteStorage"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
@@ -152,10 +149,6 @@ defineProps({
   noteId: { type: Number, required: true },
   expandChildren: { type: Boolean, required: true },
   noConversationButton: { type: Boolean, default: false },
-  storageAccessor: {
-    type: Object as PropType<StorageAccessor>,
-    required: true,
-  },
   onToggleSidebar: { type: Function, required: false },
   isMinimized: { type: Boolean, default: false },
   isSidebarExpanded: { type: Boolean, default: false },
