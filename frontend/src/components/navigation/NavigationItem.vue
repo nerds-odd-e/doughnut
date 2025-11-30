@@ -45,6 +45,16 @@
 import type { Component } from "vue"
 import { ref, onMounted, onUnmounted } from "vue"
 
+const props = defineProps<{
+  name?: string
+  label: string
+  icon: Component
+  isActive: boolean
+  badge?: number
+  badgeClass?: string
+  hasDropdown?: boolean
+}>()
+
 const dropdownTrigger = ref<HTMLDetailsElement | null>(null)
 
 const closeDropdown = () => {
@@ -62,23 +72,18 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
+// Only register click-outside listener for dropdown items
 onMounted(() => {
-  document.addEventListener("click", handleClickOutside)
+  if (props.hasDropdown) {
+    document.addEventListener("click", handleClickOutside)
+  }
 })
 
 onUnmounted(() => {
-  document.removeEventListener("click", handleClickOutside)
+  if (props.hasDropdown) {
+    document.removeEventListener("click", handleClickOutside)
+  }
 })
-
-defineProps<{
-  name?: string
-  label: string
-  icon: Component
-  isActive: boolean
-  badge?: number
-  badgeClass?: string
-  hasDropdown?: boolean
-}>()
 </script>
 
 <style lang="scss" scoped>
