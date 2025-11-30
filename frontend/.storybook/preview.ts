@@ -4,6 +4,9 @@ import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "../src/routes/routeMetadata"
 import "../src/assets/daisyui.css"
+import { ref } from "vue"
+import type { User } from "@generated/backend"
+import makeMe from "../tests/fixtures/makeMe"
 
 // Reuse route metadata from production code without importing page components
 // This eliminates duplication - route definitions are defined once in routeMetadata.ts
@@ -22,6 +25,9 @@ const router = createRouter({
 
 setup((app) => {
   app.use(router)
+  // Provide mock currentUser for components that need it (e.g., GlobalBar search button)
+  const mockUser: User = makeMe.aUser.please()
+  app.provide("currentUser", ref<User | undefined>(mockUser))
 })
 
 const preview: Preview = {
