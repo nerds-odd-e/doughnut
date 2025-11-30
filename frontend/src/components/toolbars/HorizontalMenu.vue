@@ -197,8 +197,23 @@ onUnmounted(() => {
   border-top-right-radius: 1rem;
   border-bottom-right-radius: 1rem;
   margin-right: 0.5rem; // Add space on the right to show rounded border
-  overflow: hidden; // Ensure rounded corners are visible
+  overflow: visible; // Allow dropdowns to overflow
   // Background color comes from daisy-bg-neutral class
+}
+
+// Create a pseudo-element for the background with rounded corners
+.menu-wrapper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: hsl(var(--n)); // Match the neutral background
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  z-index: -1; // Behind the content
+  pointer-events: none; // Don't block interactions
 }
 
 .menu-content {
