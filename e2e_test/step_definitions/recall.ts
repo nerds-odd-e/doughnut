@@ -151,13 +151,19 @@ Then(
   }
 )
 
-Then('I should see that my MCQ answer {string} is incorrect', (answer: string) => {
-  start.assumeAnsweredQuestionPage().expectMCQAnswerToBeIncorrect(answer)
-})
+Then(
+  'I should see that my MCQ answer {string} is incorrect',
+  (answer: string) => {
+    start.assumeAnsweredQuestionPage().expectMCQAnswerToBeIncorrect(answer)
+  }
+)
 
-Then('I should see that my spelling answer {string} is incorrect', (answer: string) => {
-  start.assumeAnsweredQuestionPage().expectSpellingAnswerToBeIncorrect(answer)
-})
+Then(
+  'I should see that my spelling answer {string} is incorrect',
+  (answer: string) => {
+    start.assumeAnsweredQuestionPage().expectSpellingAnswerToBeIncorrect(answer)
+  }
+)
 
 Then('I should see that my answer is correct as the last question', () => {
   start.assumeAnsweredQuestionPage().expectLastAnswerToBeCorrect()
