@@ -10,7 +10,6 @@
           'daisy-w-full daisy-h-full daisy-flex daisy-justify-center daisy-items-center',
           'daisy-rounded-lg daisy-bg-base-200 daisy-p-4',
           'choice-button',
-          'hover:daisy-bg-base-300',
           'focus:daisy-outline-none focus:daisy-ring-2 focus:daisy-ring-primary',
           'disabled:daisy-opacity-65 daisy-transition-colors',
           {
@@ -103,4 +102,9 @@ button, a, input
   -webkit-user-select: text
   -moz-user-select: text
   -ms-user-select: text
+
+.choice-button
+  @media (hover: hover)
+    &:hover:not(:disabled)
+      background-color: hsl(var(--b3)) !important
 </style>
