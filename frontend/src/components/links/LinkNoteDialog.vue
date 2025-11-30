@@ -3,7 +3,7 @@
   <h3 v-else>Searching</h3>
   <SearchNote
     v-if="!targetNoteTopology"
-    v-bind="{ noteId: note?.id }"
+    v-bind="{ noteId: note?.id, notebookId: notebookId }"
     @selected="targetNoteTopology = $event"
     @moveUnder="moveUnder($event)"
   />
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import type { Note } from "@generated/backend"
 import type { NoteTopology } from "@generated/backend"
 import LinkNoteFinalize from "./LinkNoteFinalize.vue"
@@ -36,6 +36,11 @@ const emit = defineEmits<{
 }>()
 
 const targetNoteTopology = ref<NoteTopology | undefined>(undefined)
+
+const noteRealm = computed(() =>
+  note ? storageAccessor.refOfNoteRealm(note.id).value : undefined
+)
+const notebookId = computed(() => noteRealm.value?.notebook?.id)
 
 async function moveUnder(targetNoteTopology: NoteTopology) {
   if (!(await popups.confirm("Move note under target note?"))) {

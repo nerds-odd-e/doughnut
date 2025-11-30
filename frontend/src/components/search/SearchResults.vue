@@ -32,6 +32,7 @@
         class="search-result"
         :noteTopologies="filteredRecentNotes"
         :columns="3"
+        :notebook-id="notebookId"
       >
         <template #button="{ noteTopology }">
           <slot name="button" :note-topology="noteTopology" />
@@ -61,6 +62,7 @@
         class="search-result"
         :search-results="searchResult"
         :columns="3"
+        :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
           <slot name="button" :note-topology="{
@@ -95,6 +97,7 @@ const props = defineProps({
   noteId: Number,
   inputSearchKey: { type: String, required: true },
   isDropdown: { type: Boolean, default: false },
+  notebookId: { type: Number, default: undefined },
 })
 
 defineSlots<{
@@ -132,7 +135,8 @@ const filteredRecentNotes = computed(() => {
   return notes.map((note) => ({
     id: note.id,
     titleOrPredicate: note.titleOrPredicate,
-  })) as NoteTopology[]
+    notebookId: note.notebookId,
+  })) as (NoteTopology & { notebookId: number })[]
 })
 
 const displayState = computed(() =>

@@ -7,7 +7,7 @@
       placeholder="Search"
       v-focus
     />
-    <SearchResults v-bind="{ noteId, inputSearchKey }">
+    <SearchResults v-bind="{ noteId, inputSearchKey, notebookId }">
       <template v-if="noteId" #button="{ noteTopology }">
         <div class="daisy-join daisy-join-horizontal">
           <button
@@ -36,6 +36,7 @@ import type { NoteTopology } from "@generated/backend"
 
 defineProps<{
   noteId?: number
+  notebookId?: number
 }>()
 
 const emit = defineEmits<{

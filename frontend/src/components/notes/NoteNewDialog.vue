@@ -22,7 +22,8 @@
               v-bind="{
                 noteId: referenceNote.id,
                 inputSearchKey: effectiveSearchKey,
-                isDropdown: true
+                isDropdown: true,
+                notebookId: notebookId
               }"
               class="title-search-results"
             />
@@ -61,6 +62,11 @@ const props = defineProps<{
   insertMode: InsertMode
   storageAccessor: StorageAccessor
 }>()
+
+const noteRealm = computed(
+  () => props.storageAccessor.refOfNoteRealm(props.referenceNote.id).value
+)
+const notebookId = computed(() => noteRealm.value?.notebook?.id)
 
 // Emits
 const emit = defineEmits<{

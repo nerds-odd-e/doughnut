@@ -1,5 +1,9 @@
 <template>
-  <div role="card" class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all">
+  <div
+    role="card"
+    class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all"
+    :class="{ 'different-notebook-border': isDifferentNotebook }"
+  >
     <div class="daisy-card-body daisy-p-4">
       <router-link
         :to="{ name: 'noteShow', params: { noteId: searchResult.noteTopology.id } }"
@@ -19,9 +23,24 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { NoteSearchResult } from "@generated/backend"
+import { computed } from "vue"
 
-defineProps({
+const props = defineProps({
   searchResult: { type: Object as PropType<NoteSearchResult>, required: true },
+  notebookId: { type: Number, default: undefined },
+})
+
+const isDifferentNotebook = computed(() => {
+  if (props.notebookId === undefined) {
+    return false
+  }
+  return props.searchResult.noteTopology.notebookId !== props.notebookId
 })
 </script>
+
+<style scoped>
+.different-notebook-border {
+  border: 2px solid hsl(var(--p) / 0.5);
+}
+</style>
 

@@ -9,7 +9,7 @@
     'lg:daisy-grid-cols-2': columns === 2,
   }">
     <div v-for="noteTopology in noteTopologies" :key="noteTopology.id">
-      <Card v-bind="{ noteTopology: noteTopology }">
+      <Card v-bind="{ noteTopology: noteTopology, notebookId: notebookId }">
         <template #button v-if="$slots.button">
           <slot name="button" :note-topology="noteTopology" />
         </template>
@@ -26,5 +26,6 @@ import Card from "./Card.vue"
 defineProps({
   noteTopologies: { type: Array as PropType<NoteTopology[]>, required: true },
   columns: { type: Number, default: 4 },
+  notebookId: { type: Number, default: undefined },
 })
 </script>

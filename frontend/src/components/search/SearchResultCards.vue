@@ -5,7 +5,7 @@
     'lg:daisy-grid-cols-3': columns === 3,
   }">
     <div v-for="searchResult in searchResults" :key="searchResult.noteTopology.id">
-      <SearchResultCard v-bind="{ searchResult: searchResult }">
+      <SearchResultCard v-bind="{ searchResult: searchResult, notebookId: notebookId }">
         <template #button v-if="$slots.button">
           <slot name="button" :search-result="searchResult" />
         </template>
@@ -25,6 +25,7 @@ defineProps({
     required: true,
   },
   columns: { type: Number, default: 3 },
+  notebookId: { type: Number, default: undefined },
 })
 </script>
 

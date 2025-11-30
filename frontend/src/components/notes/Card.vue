@@ -1,5 +1,9 @@
 <template>
-  <div role="card" class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all">
+  <div
+    role="card"
+    class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all"
+    :class="{ 'different-notebook-border': isDifferentNotebook }"
+  >
     <slot name="cardHeader" />
       <div class="daisy-card-body daisy-p-4">
     <router-link
@@ -24,8 +28,26 @@
 import type { PropType } from "vue"
 import type { NoteTopology } from "@generated/backend"
 import NoteTitleWithLink from "./NoteTitleWithLink.vue"
+import { computed } from "vue"
 
-defineProps({
-  noteTopology: { type: Object as PropType<NoteTopology>, required: true },
+const props = defineProps({
+  noteTopology: {
+    type: Object as PropType<NoteTopology & { notebookId?: number }>,
+    required: true,
+  },
+  notebookId: { type: Number, default: undefined },
+})
+
+const isDifferentNotebook = computed(() => {
+  if (props.notebookId === undefined || !props.noteTopology.notebookId) {
+    return false
+  }
+  return props.noteTopology.notebookId !== props.notebookId
 })
 </script>
+
+<style scoped>
+.different-notebook-border {
+  border: 2px solid hsl(var(--p) / 0.5);
+}
+</style>
