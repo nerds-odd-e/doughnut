@@ -58,7 +58,7 @@ onMounted(async () => {
 <template>
   <Popups />
   <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
-  <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
+  <div class="daisy-flex daisy-bg-base-100 daisy-text-base-content app-container">
     <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000]">
       <MainMenu
         :user="user"
@@ -91,6 +91,10 @@ $main-menu-width: 90px;
 $main-menu-height-tablet: 70px;
 $main-menu-height-mobile: 55px;
 
+.app-container {
+  height: 100vh; // Default to viewport height for desktop
+}
+
 .main-menu {
   height: 100%;
   width: $main-menu-width;
@@ -108,29 +112,30 @@ $main-menu-height-mobile: 55px;
 }
 
 @media (max-width: theme('screens.lg')) {
-  .daisy-flex {
-    position: relative;
+  .app-container {
+    height: auto; // Remove fixed height to allow page scrolling
+    min-height: 100vh; // But maintain minimum viewport height
+    flex-direction: column;
+    overflow-y: auto; // Make entire page scrollable
   }
 
   .main-menu {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
     width: auto;
     height: $main-menu-height-tablet;
+    align-self: flex-start; // Align to left, not full width
     z-index: 200;
   }
 
   .path-and-content {
     margin-left: 0;
-    margin-top: 0;
+    margin-top: calc(-1 * $main-menu-height-tablet); // Negative margin to overlap menu
     width: 100%;
-    height: 100%;
     min-width: 0;
   }
 
   .main-content {
-    height: 100%;
+    overflow-y: visible; // Let parent handle scrolling
   }
 }
 
@@ -140,13 +145,13 @@ $main-menu-height-mobile: 55px;
   }
 
   .path-and-content {
+    margin-top: calc(-1 * $main-menu-height-mobile); // Negative margin to overlap menu
     width: 100%;
-    height: 100%;
     min-width: 0;
   }
 
   .main-content {
-    height: 100%;
+    overflow-y: visible; // Let parent handle scrolling
   }
 }
 </style>

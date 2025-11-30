@@ -184,7 +184,7 @@ onUnmounted(() => {
 .sidebar-container {
   height: auto;
   display: block;
-  width: 100%;
+  width: auto; // Not full width, only as wide as content
 }
 
 .menu-wrapper {
