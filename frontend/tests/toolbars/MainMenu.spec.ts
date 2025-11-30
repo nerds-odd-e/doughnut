@@ -1,6 +1,5 @@
 import MainMenu from "@/components/toolbars/MainMenu.vue"
 import type { User } from "@generated/backend"
-import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -34,41 +33,56 @@ describe("main menu", () => {
   })
 
   it("shows assimilate link in main menu", () => {
-    helper.component(MainMenu).withProps({ user }).render()
+    const { getByRole } = helper
+      .component(MainMenu)
+      .withProps({ user })
+      .render()
 
-    const assimilateLink = screen.getByRole("button", { name: "Assimilate" })
+    const assimilateLink = getByRole("button", { name: "Assimilate" })
     expect(assimilateLink).toBeInTheDocument()
   })
 
   it("highlights the note link when on notebooks page", () => {
     useRouteValue.name = "notebooks"
 
-    helper.component(MainMenu).withProps({ user }).render()
+    const { getByRole } = helper
+      .component(MainMenu)
+      .withProps({ user })
+      .render()
 
-    const noteLink = screen.getByRole("button", { name: "Note" })
+    const noteLink = getByRole("button", { name: "Note" })
     expect(noteLink.querySelector(".daisy-text-primary")).toBeInTheDocument()
   })
 
   it("shows note link in main menu", () => {
-    helper.component(MainMenu).withProps({ user }).render()
+    const { getByRole } = helper
+      .component(MainMenu)
+      .withProps({ user })
+      .render()
 
-    const noteLink = screen.getByRole("button", { name: "Note" })
+    const noteLink = getByRole("button", { name: "Note" })
     expect(noteLink).toBeInTheDocument()
   })
 
   it("highlights the circles link when on circle show page", () => {
     useRouteValue.name = "circleShow"
 
-    helper.component(MainMenu).withProps({ user }).render()
+    const { getByRole } = helper
+      .component(MainMenu)
+      .withProps({ user })
+      .render()
 
-    const circlesLink = screen.getByRole("button", { name: "Circles" })
+    const circlesLink = getByRole("button", { name: "Circles" })
     expect(circlesLink.querySelector(".daisy-text-primary")).toBeInTheDocument()
   })
 
   it("shows assimilate link in both main menu and dropdown menu", () => {
-    helper.component(MainMenu).withProps({ user }).render()
+    const { getByRole } = helper
+      .component(MainMenu)
+      .withProps({ user })
+      .render()
 
-    const mainMenuAssimilateLink = screen.getByRole("button", {
+    const mainMenuAssimilateLink = getByRole("button", {
       name: "Assimilate",
     })
 
@@ -91,19 +105,25 @@ describe("main menu", () => {
         unreadConversations: [],
       })
 
-      helper.component(MainMenu).withProps({ user }).render()
+      const { getByText } = helper
+        .component(MainMenu)
+        .withProps({ user })
+        .render()
       await flushPromises()
 
-      const dueCount = screen.getByText("5")
+      const dueCount = getByText("5")
       expect(dueCount).toBeInTheDocument()
       expect(dueCount).toHaveClass("due-count")
     })
 
     it("does not show due count when there are no due items", async () => {
-      helper.component(MainMenu).withProps({ user }).render()
+      const { queryByText } = helper
+        .component(MainMenu)
+        .withProps({ user })
+        .render()
       await flushPromises()
 
-      const dueCount = screen.queryByText("0")
+      const dueCount = queryByText("0")
       expect(dueCount).not.toBeInTheDocument()
     })
 
@@ -175,19 +195,25 @@ describe("main menu", () => {
         unreadConversations: [],
       })
 
-      helper.component(MainMenu).withProps({ user }).render()
+      const { getByText } = helper
+        .component(MainMenu)
+        .withProps({ user })
+        .render()
       await flushPromises()
 
-      const recallCount = screen.getByText("789")
+      const recallCount = getByText("789")
       expect(recallCount).toBeInTheDocument()
       expect(recallCount).toHaveClass("recall-count")
     })
 
     it("does not show recall count when there are no items to repeat", async () => {
-      helper.component(MainMenu).withProps({ user }).render()
+      const { queryByText } = helper
+        .component(MainMenu)
+        .withProps({ user })
+        .render()
       await flushPromises()
 
-      const recallCount = screen.queryByText("0")
+      const recallCount = queryByText("0")
       expect(recallCount).not.toBeInTheDocument()
     })
   })

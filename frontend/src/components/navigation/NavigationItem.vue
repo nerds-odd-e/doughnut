@@ -9,6 +9,7 @@
     <router-link
       v-if="name && !hasDropdown"
       :to="{ name: name }"
+      :aria-label="label"
       class="daisy-flex daisy-flex-col daisy-items-center"
     >
       <div class="icon-container">
