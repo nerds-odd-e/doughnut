@@ -160,8 +160,11 @@ describe("repeat page", () => {
       vm.currentIndex = 2
       await wrapper.vm.$nextTick()
 
-      const quiz = wrapper.findComponent({ name: "Quiz" })
-      expect(quiz.vm.canMoveToEnd).toBe(false)
+      // Button should not be visible when on last item
+      const moveToEndButton = wrapper.find(
+        'button[title="Move to end of list"]'
+      )
+      expect(moveToEndButton.exists()).toBe(false)
     })
   })
 

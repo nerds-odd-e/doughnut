@@ -45,6 +45,7 @@
             v-if="canMoveToEnd && previousAnsweredQuestionCursor === undefined"
             class="btn large-btn"
             title="Move to end of list"
+            aria-label="Move to end of list"
             @click="$emit('moveToEnd', currentIndex)"
           >
             <SvgSkip />
