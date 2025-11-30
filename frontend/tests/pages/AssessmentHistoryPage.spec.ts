@@ -1,9 +1,15 @@
-import { describe, it, beforeEach } from "vitest"
+import { describe, it, beforeEach, vi } from "vitest"
 import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificateHistoryPage.vue"
 import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { nextTick } from "vue"
 import type { AssessmentAttempt } from "@generated/backend"
+
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+  }),
+}))
 
 describe("assessment and certificate history page", () => {
   const user = makeMe.aUser.please()

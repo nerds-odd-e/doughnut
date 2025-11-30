@@ -1,58 +1,60 @@
 <template>
-  <ContainerPage
-    v-bind="{
-      fullHeight: true,
-      contentLoaded: conversations !== undefined,
-      title: 'Message Center',
-    }"
-  >
-    <h2 v-if="!conversations?.length" class="info-heading">
-      There is no conversation currently.
-    </h2>
+  <div class="message-center-page daisy-h-full daisy-flex daisy-flex-col">
+    <GlobalBar>
+      <h2 class="fs-4 daisy-text-2xl">Message Center</h2>
+    </GlobalBar>
 
-    <template v-else>
-      <div class="message-center-container">
-        <div class="sidebar" :class="{ 'hide-on-mobile': !showSidebarOnMobile }">
-          <ul class="daisy-menu">
-            <li
-              v-for="conversation in conversations"
-              :key="conversation.id"
-              class="daisy-menu-item"
-              :class="{ 'daisy-active': conversationId === conversation.id }"
-              @click="selectConversation(conversation)"
-            >
-              <div>{{ conversationTopic(conversation) }}</div>
-              <div>{{ conversationPartner(conversation) }}</div>
-            </li>
-          </ul>
-        </div>
+    <div class="daisy-flex-1 daisy-min-h-0 daisy-mx-auto daisy-min-w-0 daisy-w-full">
+      <ContentLoader v-if="conversations === undefined" />
+      <template v-else>
+        <h2 v-if="!conversations?.length" class="info-heading">
+          There is no conversation currently.
+        </h2>
 
-        <div class="conversation" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
-          <div class="mobile-back-button" @click="backToList">
-            <span>&larr; Back to conversations</span>
+        <div v-else class="message-center-container">
+          <div class="sidebar" :class="{ 'hide-on-mobile': !showSidebarOnMobile }">
+            <ul class="daisy-menu">
+              <li
+                v-for="conversation in conversations"
+                :key="conversation.id"
+                class="daisy-menu-item"
+                :class="{ 'daisy-active': conversationId === conversation.id }"
+                @click="selectConversation(conversation)"
+              >
+                <div>{{ conversationTopic(conversation) }}</div>
+                <div>{{ conversationPartner(conversation) }}</div>
+              </li>
+            </ul>
           </div>
-          <ConversationComponent
-            v-if="currentConversation && user"
-            :conversation="currentConversation"
-            :user="user"
-            @conversation-fetched="handleConversationFetched"
-            @conversation-changed="handleConversationChanged"
-          />
-          <div v-else class="no-conversation-message">
-            <SvgChat class="large-svg-message" />
-            <h2 class="info-heading">No conversation selected</h2>
+
+          <div class="conversation" :class="{ 'hide-on-mobile': !showMainContentOnMobile }">
+            <div class="mobile-back-button" @click="backToList">
+              <span>&larr; Back to conversations</span>
+            </div>
+            <ConversationComponent
+              v-if="currentConversation && user"
+              :conversation="currentConversation"
+              :user="user"
+              @conversation-fetched="handleConversationFetched"
+              @conversation-changed="handleConversationChanged"
+            />
+            <div v-else class="no-conversation-message">
+              <SvgChat class="large-svg-message" />
+              <h2 class="info-heading">No conversation selected</h2>
+            </div>
           </div>
         </div>
-      </div>
-    </template>
-  </ContainerPage>
+      </template>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, computed, watch, inject, type Ref } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
-import ContainerPage from "@/pages/commons/ContainerPage.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 import ConversationComponent from "@/components/conversations/ConversationComponent.vue"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import type { Conversation, User } from "@generated/backend"
@@ -156,10 +158,16 @@ const handleConversationChanged = (conversationId: number) => {
 </script>
 
 <style scoped lang="scss">
+.message-center-page {
+  display: flex;
+  flex-direction: column;
+}
+
 .message-center-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .sidebar {
@@ -259,5 +267,3 @@ const handleConversationChanged = (conversationId: number) => {
   }
 }
 </style>
-
-ai-chat
