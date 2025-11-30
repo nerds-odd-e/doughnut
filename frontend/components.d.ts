@@ -13,6 +13,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
+    AccountMenuItem: typeof import('./src/components/toolbars/AccountMenuItem.vue')['default']
     AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
     AiResponse: typeof import('./src/components/conversations/AiResponse.vue')['default']
     AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
@@ -50,6 +51,7 @@ declare module 'vue' {
     FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
     FullScreen: typeof import('./src/components/common/FullScreen.vue')['default']
     GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
+    HorizontalMenu: typeof import('./src/components/toolbars/HorizontalMenu.vue')['default']
     ImageFormBody: typeof import('./src/components/notes/accessory/ImageFormBody.vue')['default']
     InputWithType: typeof import('./src/components/form/InputWithType.vue')['default']
     JsonExportSection: typeof import('./src/components/commons/JsonExportSection.vue')['default']
@@ -252,6 +254,7 @@ declare module 'vue' {
     ToolCallHandler: typeof import('./src/components/conversations/ToolCallHandler.vue')['default']
     UrlFormBody: typeof import('./src/components/notes/accessory/UrlFormBody.vue')['default']
     UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
+    VerticalMenu: typeof import('./src/components/toolbars/VerticalMenu.vue')['default']
     Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
     WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
     WikidataAssociationForNoteDialog: typeof import('./src/components/notes/WikidataAssociationForNoteDialog.vue')['default']
@@ -262,6 +265,7 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const AcceptRejectButtons: typeof import('./src/components/commons/AcceptRejectButtons.vue')['default']
+  const AccountMenuItem: typeof import('./src/components/toolbars/AccountMenuItem.vue')['default']
   const AIGenerateImageDialog: typeof import('./src/components/notes/AIGenerateImageDialog.vue')['default']
   const AiResponse: typeof import('./src/components/conversations/AiResponse.vue')['default']
   const AnsweredQuestionComponent: typeof import('./src/components/review/AnsweredQuestionComponent.vue')['default']
@@ -299,6 +303,7 @@ declare global {
   const FineTuningData: typeof import('./src/components/admin/FineTuningData.vue')['default']
   const FullScreen: typeof import('./src/components/common/FullScreen.vue')['default']
   const GlobalBar: typeof import('./src/components/toolbars/GlobalBar.vue')['default']
+  const HorizontalMenu: typeof import('./src/components/toolbars/HorizontalMenu.vue')['default']
   const ImageFormBody: typeof import('./src/components/notes/accessory/ImageFormBody.vue')['default']
   const InputWithType: typeof import('./src/components/form/InputWithType.vue')['default']
   const JsonExportSection: typeof import('./src/components/commons/JsonExportSection.vue')['default']
@@ -501,6 +506,7 @@ declare global {
   const ToolCallHandler: typeof import('./src/components/conversations/ToolCallHandler.vue')['default']
   const UrlFormBody: typeof import('./src/components/notes/accessory/UrlFormBody.vue')['default']
   const UserProfileDialog: typeof import('./src/components/toolbars/UserProfileDialog.vue')['default']
+  const VerticalMenu: typeof import('./src/components/toolbars/VerticalMenu.vue')['default']
   const Waveform: typeof import('./src/components/notes/accessory/Waveform.vue')['default']
   const WikidataAssociationDialog: typeof import('./src/components/notes/WikidataAssociationDialog.vue')['default']
   const WikidataAssociationForNoteDialog: typeof import('./src/components/notes/WikidataAssociationForNoteDialog.vue')['default']

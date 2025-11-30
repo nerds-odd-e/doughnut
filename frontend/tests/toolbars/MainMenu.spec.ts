@@ -12,11 +12,27 @@ vitest.mock("vue-router", () => ({
   useRoute: () => useRouteValue,
 }))
 
+// Mock window.matchMedia
+const createMatchMedia = (matches: boolean) => {
+  return vi.fn().mockImplementation((query: string) => ({
+    matches,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  }))
+}
+
 describe("main menu", () => {
   let user: User
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Default to lg or larger (vertical menu) for tests
+    window.matchMedia = createMatchMedia(true)
     mockSdkService("getMenuData", {
       assimilationCount: {
         dueCount: 0,
