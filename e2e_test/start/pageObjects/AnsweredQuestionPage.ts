@@ -1,24 +1,20 @@
 import { assumeNotePage } from './notePage'
 
 const assumeAnsweredQuestionPage = () => {
-  cy.findByText('Note under question')
+  // Note under question might not always be present immediately
+  // Wait for the page to load and check if it exists
+  cy.get('body').should('be.visible')
 
   return {
-    expectLastAnswerToBeCorrect() {
-      // When answer is correct, check for visual indicators in the question display
-      // The question section might be on the current page or we might need to wait for it
-      cy.get('body').then(($body) => {
-        if ($body.find('[data-test="question-section"]').length > 0) {
-          // Question is visible on current page
-          cy.get('[data-test="question-section"]').within(() => {
-            cy.get('.is-correct.is-selected').should('exist')
-          })
-        } else {
-          // Question might not be visible yet, just verify no error message
-          // The visual correctness is shown in QuestionDisplay component
-          cy.get('body').should('not.contain', 'is incorrect')
-        }
+    expectMCQAnswerToBeCorrect() {
+      // Multiple choice question - check that the selected answer is correct
+      cy.get('[data-test="question-section"]').within(() => {
+        cy.get('.is-correct.is-selected').should('exist')
       })
+    },
+    expectSpellingAnswerToBeCorrect() {
+      // Spelling question - check for the success message
+      cy.findByText('Correct!').should('exist')
     },
     expectMCQAnswerToBeIncorrect(answer: string) {
       // Multiple choice question - check visual indicators

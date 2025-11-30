@@ -166,7 +166,19 @@ Then(
 )
 
 Then('I should see that my answer is correct as the last question', () => {
-  start.assumeAnsweredQuestionPage().expectLastAnswerToBeCorrect()
+  // When answer is correct, navigate to the last answered question first
+  // (correct answers don't automatically show the question)
+  const page = start.assumeAnsweredQuestionPage().goToLastAnsweredQuestion()
+  // Detect question type and use appropriate method
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-test="question-section"]').length > 0) {
+      // MCQ question
+      page.expectMCQAnswerToBeCorrect()
+    } else {
+      // Spelling question - check for success message
+      page.expectSpellingAnswerToBeCorrect()
+    }
+  })
 })
 
 Then('I should see that my answer is correct', () => {
@@ -174,10 +186,17 @@ Then('I should see that my answer is correct', () => {
 })
 
 Then('I should see that my last answer is correct', () => {
-  start
-    .assumeAnsweredQuestionPage()
-    .goToLastAnsweredQuestion()
-    .expectLastAnswerToBeCorrect()
+  const page = start.assumeAnsweredQuestionPage().goToLastAnsweredQuestion()
+  // Detect question type and use appropriate method
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-test="question-section"]').length > 0) {
+      // MCQ question
+      page.expectMCQAnswerToBeCorrect()
+    } else {
+      // Spelling question - check for success message
+      page.expectSpellingAnswerToBeCorrect()
+    }
+  })
 })
 
 Then(
