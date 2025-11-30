@@ -20,7 +20,9 @@
           <!-- Collapsed state: show only active item (not on home page) -->
           <template v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem">
             <li class="daisy-menu-item active-item-only">
-              <NavigationItem v-bind="{ ...activeItem }" />
+              <div @click.capture.stop.prevent="handleActiveItemClick" class="active-item-wrapper">
+                <NavigationItem v-bind="{ ...activeItem }" />
+              </div>
             </li>
           </template>
 
@@ -135,6 +137,15 @@ const handleMenuContentClick = () => {
   }
 }
 
+const handleActiveItemClick = (event: MouseEvent) => {
+  // When collapsed, clicking the active item should expand the menu, not navigate
+  if (!shouldShowExpanded.value && props.user) {
+    event.preventDefault()
+    event.stopPropagation()
+    expandMenu()
+  }
+}
+
 const handleClickOutside = (event: MouseEvent) => {
   if (menuRef.value && !menuRef.value.contains(event.target as Node)) {
     collapseMenu()
@@ -233,6 +244,14 @@ onUnmounted(() => {
   min-width: fit-content;
   display: flex;
   align-items: center;
+}
+
+.active-item-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 
 .top-menu {
