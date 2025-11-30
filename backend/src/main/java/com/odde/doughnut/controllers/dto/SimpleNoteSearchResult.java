@@ -9,18 +9,16 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NoteSearchResult {
+public class SimpleNoteSearchResult {
   @NotNull
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private SimpleNoteSearchResult noteTopology;
+  private Integer id;
 
-  private Float distance;
+  @NotNull
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private Integer notebookId;
 
-  public SimpleNoteSearchResult getNoteTopology() {
-    return this.noteTopology;
-  }
-
-  public Float getDistance() {
-    return this.distance;
-  }
+  @NotNull
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String titleOrPredicate;
 }

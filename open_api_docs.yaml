@@ -2799,7 +2799,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteTopology"
+                  $ref: "#/components/schemas/SimpleNoteSearchResult"
   /api/notebooks:
     get:
       tags:
@@ -3913,12 +3913,27 @@ components:
       type: object
       properties:
         noteTopology:
-          $ref: "#/components/schemas/NoteTopology"
+          $ref: "#/components/schemas/SimpleNoteSearchResult"
         distance:
           type: number
           format: float
       required:
       - noteTopology
+    SimpleNoteSearchResult:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        notebookId:
+          type: integer
+          format: int32
+        titleOrPredicate:
+          type: string
+      required:
+      - id
+      - notebookId
+      - titleOrPredicate
     RecallSetting:
       type: object
       properties:

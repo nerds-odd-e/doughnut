@@ -1,5 +1,9 @@
 import { reactive } from "vue"
-import type { NoteSearchResult, NoteTopology } from "@generated/backend"
+import type {
+  NoteSearchResult,
+  NoteTopology,
+  SimpleNoteSearchResult,
+} from "@generated/backend"
 
 export interface DisplayState {
   showRecentNotes: boolean
@@ -19,18 +23,18 @@ export class SearchResultsModel {
     },
     recentResult: undefined as NoteSearchResult[] | undefined,
     previousSearchResult: undefined as NoteSearchResult[] | undefined,
-    recentNotes: [] as NoteTopology[],
+    recentNotes: [] as SimpleNoteSearchResult[],
   })
 
   get isSearchInProgress(): boolean {
     return this.state.isSearchInProgress
   }
 
-  get recentNotes(): NoteTopology[] {
+  get recentNotes(): SimpleNoteSearchResult[] {
     return this.state.recentNotes
   }
 
-  set recentNotes(notes: NoteTopology[]) {
+  set recentNotes(notes: SimpleNoteSearchResult[]) {
     this.state.recentNotes = notes
   }
 
@@ -220,9 +224,14 @@ export class SearchResultsModel {
   }
 
   private toNoteTopologies(results: NoteSearchResult[]): NoteTopology[] {
-    return results.map((r) =>
-      "noteTopology" in r ? r.noteTopology : (r as unknown as NoteTopology)
-    )
+    return results.map((r) => this.toNoteTopology(r.noteTopology))
+  }
+
+  private toNoteTopology(simple: SimpleNoteSearchResult): NoteTopology {
+    return {
+      id: simple.id,
+      titleOrPredicate: simple.titleOrPredicate,
+    } as NoteTopology
   }
 
   private mergeUniqueAndSortByDistance(

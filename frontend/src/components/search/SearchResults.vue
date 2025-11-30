@@ -123,10 +123,13 @@ const distanceById = computed(() =>
 )
 
 const filteredRecentNotes = computed(() => {
-  if (props.noteId) {
-    return model.recentNotes.filter((note) => note.id !== props.noteId)
-  }
-  return model.recentNotes
+  const notes = props.noteId
+    ? model.recentNotes.filter((note) => note.id !== props.noteId)
+    : model.recentNotes
+  return notes.map((note) => ({
+    id: note.id,
+    titleOrPredicate: note.titleOrPredicate,
+  })) as NoteTopology[]
 })
 
 const displayState = computed(() =>

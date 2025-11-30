@@ -2,6 +2,7 @@ package com.odde.doughnut.services.search;
 
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
 import com.odde.doughnut.controllers.dto.SearchTerm;
+import com.odde.doughnut.controllers.dto.SimpleNoteSearchResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteEmbeddingJdbcRepository;
@@ -109,7 +110,8 @@ public class NoteSearchService {
     return orderedIds.stream()
         .map(id -> idToNote.get(id))
         .filter(java.util.Objects::nonNull)
-        .map(n -> new NoteSearchResult(n.getNoteTopology(), noteIdToDistance.get(n.getId())))
+        .map(
+            n -> new NoteSearchResult(toSimpleNoteSearchResult(n), noteIdToDistance.get(n.getId())))
         .toList();
   }
 
@@ -191,7 +193,7 @@ public class NoteSearchService {
     List<NoteSearchResult> results =
         exactMatches.stream()
             .filter(note -> !note.getId().equals(avoidNoteId))
-            .map(note -> new NoteSearchResult(note.getNoteTopology(), /* distance= */ 0.0f))
+            .map(note -> new NoteSearchResult(toSimpleNoteSearchResult(note), /* distance= */ 0.0f))
             .collect(Collectors.toList());
 
     int remainingSlots = exactMatches.isEmpty() ? 20 : 20 + exactMatches.size();
@@ -201,7 +203,9 @@ public class NoteSearchService {
           filteredPartialMatches.stream()
               .limit(remainingSlots)
               .filter(note -> !note.getId().equals(avoidNoteId))
-              .map(note -> new NoteSearchResult(note.getNoteTopology(), /* distance= */ 0.9f))
+              .map(
+                  note ->
+                      new NoteSearchResult(toSimpleNoteSearchResult(note), /* distance= */ 0.9f))
               .collect(Collectors.toList()));
     }
 
@@ -214,5 +218,10 @@ public class NoteSearchService {
 
   private String getPattern(SearchTerm searchTerm) {
     return "%" + searchTerm.getTrimmedSearchKey() + "%";
+  }
+
+  private SimpleNoteSearchResult toSimpleNoteSearchResult(Note note) {
+    return new SimpleNoteSearchResult(
+        note.getId(), note.getNotebook().getId(), note.getTopicConstructor());
   }
 }
