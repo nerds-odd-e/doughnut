@@ -31,9 +31,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 </script>
 
 <style scoped lang="scss">
-$collapsed-menu-width: 130px;
-$main-menu-height-tablet: 70px;
-$main-menu-height-mobile: 55px;
+@import "@/assets/menu-variables.scss";
 
 @media (max-width: theme('screens.lg')) {
   .daisy-navbar {

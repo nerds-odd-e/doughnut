@@ -87,9 +87,7 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-$main-menu-width: 90px;
-$main-menu-height-tablet: 70px;
-$main-menu-height-mobile: 55px;
+@import "@/assets/menu-variables.scss";
 
 .app-container {
   height: 100vh; // Default to viewport height for desktop (vertical menu)

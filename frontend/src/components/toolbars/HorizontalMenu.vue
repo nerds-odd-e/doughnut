@@ -47,18 +47,18 @@
         />
       </ul>
         </template>
-
-        <!-- Expand button: only visible when user is logged in -->
-        <button
-          v-if="user"
-          class="expand-button daisy-btn daisy-btn-ghost daisy-btn-sm"
-          :class="{ 'is-expanded': shouldShowExpanded }"
-          @click.stop="toggleExpanded"
-          aria-label="Toggle menu"
-        >
-          <SvgChevronRight />
-        </button>
       </div>
+
+      <!-- Expand button: only visible when user is logged in, always aligned to right -->
+      <button
+        v-if="user"
+        class="expand-button daisy-btn daisy-btn-ghost daisy-btn-sm"
+        :class="{ 'is-expanded': shouldShowExpanded }"
+        @click.stop="toggleExpanded"
+        aria-label="Toggle menu"
+      >
+        <SvgChevronRight />
+      </button>
     </div>
   </div>
 </template>
@@ -181,6 +181,8 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@import "@/assets/menu-variables.scss";
+
 .sidebar-container {
   height: auto;
   display: block;
@@ -199,6 +201,8 @@ onUnmounted(() => {
   margin-right: 0.5rem; // Add space on the right to show rounded border
   overflow: visible; // Allow dropdowns to overflow
   // Background color comes from daisy-bg-neutral class
+  flex-direction: row; // Ensure horizontal layout
+  flex-wrap: nowrap; // Prevent wrapping
 }
 
 // Create a pseudo-element for the background with rounded corners
@@ -217,7 +221,8 @@ onUnmounted(() => {
 }
 
 .menu-content {
-  width: 100%;
+  flex: 1; // Take available space but allow chevron to fit
+  min-width: 0; // Allow shrinking
   transition: all 0.3s ease;
   align-items: center;
   min-height: 100%;
@@ -226,21 +231,12 @@ onUnmounted(() => {
 
 .menu-wrapper.is-collapsed {
   width: auto;
-}
-
-.menu-content {
-  width: 100%;
-  transition: all 0.3s ease;
-  align-items: center;
-  min-height: 100%;
-  display: flex;
+  min-width: $collapsed-menu-width;
 }
 
 .is-collapsed .menu-content {
+  flex: 0 0 auto; // Don't grow when collapsed, just fit content
   width: auto;
-}
-
-.is-collapsed .menu-content {
   justify-content: flex-start;
 }
 
@@ -312,7 +308,6 @@ onUnmounted(() => {
   min-width: fit-content;
   height: 100%;
   padding: 0 0.5rem;
-  margin-left: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -320,6 +315,7 @@ onUnmounted(() => {
   border: none;
   background: transparent;
   transition: background-color 0.2s ease, transform 0.3s ease;
+  margin-left: auto; // Push to the rightmost position
 
   :deep(svg) {
     transition: transform 0.3s ease;
