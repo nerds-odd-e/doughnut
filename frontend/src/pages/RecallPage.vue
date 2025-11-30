@@ -5,9 +5,12 @@
       finished,
       toRepeatCount,
       previousAnsweredQuestionCursor,
+      canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
+      currentIndex,
     }"
     @view-last-answered-question="viewLastAnsweredQuestion($event)"
     @show-more="showTooltip = true"
+    @move-to-end="moveMemoryTrackerToEnd($event)"
   >
   </RecallProgressBar>
 
@@ -32,7 +35,6 @@
       @answered-question="onAnsweredQuestion"
       @answered-spelling="onAnsweredSpelling"
       @just-reviewed="onJustReviewed"
-      @move-to-end="moveMemoryTrackerToEnd"
     />
     <AnsweredQuestionComponent
       v-if="currentAnsweredQuestion"

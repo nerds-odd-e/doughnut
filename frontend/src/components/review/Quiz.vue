@@ -35,27 +35,6 @@
       </template>
       </div>
     </template>
-    <button
-      v-if="canMoveToEnd"
-      class="daisy-btn daisy-btn-ghost daisy-btn-circle"
-      title="Move to end of list"
-      @click="moveToEnd"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <polyline points="19 12 12 19 5 12"></polyline>
-      </svg>
-    </button>
   </div>
 </template>
 
@@ -93,7 +72,6 @@ const emit = defineEmits<{
   (e: "answered-question", result: AnsweredQuestion): void
   (e: "answered-spelling", result: SpellingResultDto): void
   (e: "just-reviewed", result: AnsweredQuestion | undefined): void
-  (e: "moveToEnd", currentIndex: number): void
 }>()
 
 // Composable for question fetching logic
@@ -204,27 +182,6 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
 
 const onAnswered = (answerResult: AnsweredQuestion) => {
   emit("answered-question", answerResult)
-}
-
-const canMoveToEnd = computed(() => {
-  return props.currentIndex < (props.memoryTrackers?.length ?? 0) - 1
-})
-
-const moveToEnd = () => {
-  // Pre-mark the next question (which will become the new current question
-  // after moving current item to end) as fetched (even if undefined) to prevent
-  // showing the loader while fetching. This must happen before the emit to
-  // ensure the cache is updated before the watcher fires.
-  const nextIndex = props.currentIndex + 1
-  const nextMemoryTracker = memoryTrackerAt(nextIndex)
-  const nextMemoryTrackerId = nextMemoryTracker?.memoryTrackerId
-  if (
-    nextMemoryTrackerId !== undefined &&
-    !(nextMemoryTrackerId in recallPromptCache.value)
-  ) {
-    recallPromptCache.value[nextMemoryTrackerId] = undefined
-  }
-  emit("moveToEnd", props.currentIndex)
 }
 
 // Watchers
