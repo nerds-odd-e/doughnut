@@ -176,7 +176,7 @@ Then('I should see that my answer is correct', () => {
   // leave empty for now
 })
 
-Then('I should see that my last answer is correct', () => {
+Then('I should see that my last answer to spelling question is correct', () => {
   start
     .assumeAnsweredQuestionPage()
     .goToLastAnsweredQuestion()
