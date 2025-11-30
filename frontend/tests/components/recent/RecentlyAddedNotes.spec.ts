@@ -1,20 +1,26 @@
 import RecentlyAddedNotes from "@/components/recent/RecentlyAddedNotes.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, { mockSdkService } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
+import type { NoteTopology } from "@generated/backend"
 
 describe("RecentlyAddedNotes", () => {
-  const mockNotes = [
-    makeMe.aNoteRealm
-      .topicConstructor("Note 1")
-      .createdAt("2024-01-01T00:00:00Z")
-      .updatedAt("2024-01-02T00:00:00Z")
-      .please(),
-    makeMe.aNoteRealm
-      .topicConstructor("Note 2")
-      .createdAt("2024-01-03T00:00:00Z")
-      .updatedAt("2024-01-04T00:00:00Z")
-      .please(),
+  const mockNotes: NoteTopology[] = [
+    {
+      id: 1,
+      titleOrPredicate: "Note 1",
+      shortDetails: undefined,
+      linkType: undefined,
+      objectNoteTopology: undefined,
+      parentOrSubjectNoteTopology: undefined,
+    },
+    {
+      id: 2,
+      titleOrPredicate: "Note 2",
+      shortDetails: undefined,
+      linkType: undefined,
+      objectNoteTopology: undefined,
+      parentOrSubjectNoteTopology: undefined,
+    },
   ]
 
   beforeEach(() => {
@@ -30,8 +36,10 @@ describe("RecentlyAddedNotes", () => {
     // Verify API was called
     expect(getRecentNotesSpy).toBeCalled()
 
-    // Verify notes are displayed
-    const rows = wrapper.findAll("tbody tr")
-    expect(rows).toHaveLength(2)
+    // Verify notes are displayed in Cards component
+    const cards = wrapper.findAll('[role="card"]')
+    expect(cards).toHaveLength(2)
+    expect(wrapper.text()).toContain("Note 1")
+    expect(wrapper.text()).toContain("Note 2")
   })
 })

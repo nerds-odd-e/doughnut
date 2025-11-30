@@ -2799,7 +2799,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/NoteRealm"
+                  $ref: "#/components/schemas/NoteTopology"
   /api/notebooks:
     get:
       tags:

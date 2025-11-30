@@ -197,10 +197,10 @@ class NoteController {
   }
 
   @GetMapping("/recent")
-  public List<NoteRealm> getRecentNotes() throws UnexpectedNoAccessRightException {
+  public List<NoteTopology> getRecentNotes() throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     return noteService.findRecentNotesByUser(authorizationService.getCurrentUser().getId()).stream()
-        .map(note -> note.toNoteRealm(authorizationService.getCurrentUser()))
+        .map(Note::getNoteTopology)
         .toList();
   }
 

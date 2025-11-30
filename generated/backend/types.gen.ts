@@ -3586,7 +3586,7 @@ export type GetRecentNotesResponses = {
     /**
      * OK
      */
-    200: Array<NoteRealm>;
+    200: Array<NoteTopology>;
 };
 
 export type GetRecentNotesResponse = GetRecentNotesResponses[keyof GetRecentNotesResponses];

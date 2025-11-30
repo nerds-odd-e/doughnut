@@ -22,15 +22,15 @@
       <div class="result-title">{{ displayState.title }}</div>
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
-          v-for="note in filteredRecentNotes"
-          :key="note.id"
-          :noteTopology="note.note.noteTopology"
+          v-for="noteTopology in filteredRecentNotes"
+          :key="noteTopology.id"
+          :noteTopology="noteTopology"
         />
       </div>
       <Cards
         v-else
         class="search-result"
-        :noteTopologies="filteredRecentNotes.map((n) => n.note.noteTopology)"
+        :noteTopologies="filteredRecentNotes"
         :columns="3"
       >
         <template #button="{ noteTopology }">

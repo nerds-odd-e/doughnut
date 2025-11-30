@@ -1,9 +1,5 @@
 import { reactive } from "vue"
-import type {
-  NoteSearchResult,
-  NoteRealm,
-  NoteTopology,
-} from "@generated/backend"
+import type { NoteSearchResult, NoteTopology } from "@generated/backend"
 
 export interface DisplayState {
   showRecentNotes: boolean
@@ -23,18 +19,18 @@ export class SearchResultsModel {
     },
     recentResult: undefined as NoteSearchResult[] | undefined,
     previousSearchResult: undefined as NoteSearchResult[] | undefined,
-    recentNotes: [] as NoteRealm[],
+    recentNotes: [] as NoteTopology[],
   })
 
   get isSearchInProgress(): boolean {
     return this.state.isSearchInProgress
   }
 
-  get recentNotes(): NoteRealm[] {
+  get recentNotes(): NoteTopology[] {
     return this.state.recentNotes
   }
 
-  set recentNotes(notes: NoteRealm[]) {
+  set recentNotes(notes: NoteTopology[]) {
     this.state.recentNotes = notes
   }
 

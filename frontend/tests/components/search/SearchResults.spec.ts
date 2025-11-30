@@ -6,27 +6,27 @@ import helper, {
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import type { NoteRealm, NoteSearchResult } from "@generated/backend"
+import type { NoteTopology, NoteSearchResult } from "@generated/backend"
 
 // Test fixtures
-const recentNotes = [
+const recentNotes: NoteTopology[] = [
   {
     id: 1,
-    note: {
-      id: 1,
-      noteTopology: { id: 1, titleOrPredicate: "Recent Note 1" },
-      updatedAt: new Date().toISOString(),
-    },
+    titleOrPredicate: "Recent Note 1",
+    shortDetails: undefined,
+    linkType: undefined,
+    objectNoteTopology: undefined,
+    parentOrSubjectNoteTopology: undefined,
   },
   {
     id: 2,
-    note: {
-      id: 2,
-      noteTopology: { id: 2, titleOrPredicate: "Recent Note 2" },
-      updatedAt: new Date().toISOString(),
-    },
+    titleOrPredicate: "Recent Note 2",
+    shortDetails: undefined,
+    linkType: undefined,
+    objectNoteTopology: undefined,
+    parentOrSubjectNoteTopology: undefined,
   },
-] as NoteRealm[]
+]
 
 const searchResult = (
   id: number,
@@ -367,17 +367,17 @@ describe("SearchResults.vue", () => {
     })
 
     it("excludes current node from recent notes", async () => {
-      const recentNotesWithCurrent = [
+      const recentNotesWithCurrent: NoteTopology[] = [
         {
           id: 999,
-          note: {
-            id: 999,
-            noteTopology: { id: 999, titleOrPredicate: "Current Note" },
-            updatedAt: new Date().toISOString(),
-          },
+          titleOrPredicate: "Current Note",
+          shortDetails: undefined,
+          linkType: undefined,
+          objectNoteTopology: undefined,
+          parentOrSubjectNoteTopology: undefined,
         },
         ...recentNotes,
-      ] as NoteRealm[]
+      ]
 
       mockSdkService("getRecentNotes", recentNotesWithCurrent)
       setupSearchMocks()
