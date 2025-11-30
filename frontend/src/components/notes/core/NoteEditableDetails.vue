@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"

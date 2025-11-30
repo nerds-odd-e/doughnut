@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
 import { ref, watch, computed, onMounted, onBeforeUnmount } from "vue"
 
 import { useRoute, useRouter } from "vue-router"

@@ -62,7 +62,6 @@
 </template>
 
 <script setup lang="ts">
-import type { PropType } from "vue"
 import { computed, onMounted, ref } from "vue"
 import type { Note } from "@generated/backend"
 import { AssimilationController } from "@generated/backend/sdk.gen"
