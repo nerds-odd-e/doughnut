@@ -42,7 +42,7 @@ defineSlots<{
 .daisy-progress-bar {
   width: 100%;
   background-color: gray;
-  height: 25px;
+  height: 2.5rem;
   border-radius: 10px;
   position: relative;
 

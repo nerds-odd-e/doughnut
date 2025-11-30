@@ -6,7 +6,7 @@
       @showMore="$emit('showMore')"
     >
       <template #buttons>
-        <div class="btn-group btn-group-sm">
+        <div class="btn-group">
           <template v-if="previousAnsweredQuestionCursor !== undefined">
             <button
               class="btn large-btn"
@@ -63,9 +63,11 @@ defineEmits(["viewLastAnsweredQuestion", "showMore"])
 
 <style lang="scss" scoped>
 .large-btn {
+  padding: 0.75rem 1rem;
+  min-height: 2.5rem;
   svg {
-    width: 25px;
-    height: 25px;
+    width: 32px;
+    height: 32px;
   }
   &:disabled {
     opacity: 0.5;
