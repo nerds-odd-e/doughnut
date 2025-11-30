@@ -125,6 +125,7 @@ $main-menu-height-mobile: 55px;
     height: $main-menu-height-tablet;
     align-self: flex-start; // Align to left, not full width
     z-index: 200;
+    background-color: transparent; // Remove parent background so menu-wrapper background shows
   }
 
   .path-and-content {
@@ -142,6 +143,7 @@ $main-menu-height-mobile: 55px;
 @media (max-width: theme('screens.md')) {
   .main-menu {
     height: $main-menu-height-mobile;
+    background-color: transparent; // Remove parent background so menu-wrapper background shows
   }
 
   .path-and-content {

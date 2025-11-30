@@ -3,7 +3,7 @@
     <div
       ref="menuRef"
       tabindex="0"
-      class="menu-wrapper daisy-flex daisy-flex-col daisy-h-full"
+      class="menu-wrapper daisy-flex daisy-flex-col daisy-h-full daisy-bg-neutral"
       :class="{ 'is-expanded': shouldShowExpanded, 'is-collapsed': !shouldShowExpanded }"
       @blur="handleFocusLoss"
     >
@@ -185,6 +185,7 @@ onUnmounted(() => {
   height: auto;
   display: block;
   width: auto; // Not full width, only as wide as content
+  background-color: transparent; // Make transparent so menu-wrapper background shows
 }
 
 .menu-wrapper {
@@ -193,6 +194,19 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   width: 100%;
+  border-top-right-radius: 1rem;
+  border-bottom-right-radius: 1rem;
+  margin-right: 0.5rem; // Add space on the right to show rounded border
+  overflow: hidden; // Ensure rounded corners are visible
+  // Background color comes from daisy-bg-neutral class
+}
+
+.menu-content {
+  width: 100%;
+  transition: all 0.3s ease;
+  align-items: center;
+  min-height: 100%;
+  display: flex;
 }
 
 .menu-wrapper.is-collapsed {
