@@ -55,7 +55,6 @@ export const assumeNoteTargetSearchDialog = () => {
     },
     linkTopLevelNoteToTargetAs(toNoteTopic: string, linkType: string) {
       this.linkToTargetAs(toNoteTopic, linkType)
-      cy.findByRole('button', { name: 'OK' }).click()
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {
