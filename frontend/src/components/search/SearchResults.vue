@@ -254,10 +254,8 @@ watch(
 onMounted(() => {
   searchTerm.value.allMyNotebooksAndSubscriptions = true
   searchTerm.value.searchKey = props.inputSearchKey
-  if (props.inputSearchKey.trim() === "" && props.noteId && props.isDropdown) {
-    model.clearRecentResult()
-    fetchRecentNotes()
-  }
+  // Note: fetchRecentNotes() is called by the watch on searchTerm.value
+  // when the search key is empty and noteId is set, so we don't need to call it here
 })
 
 onBeforeUnmount(() => {

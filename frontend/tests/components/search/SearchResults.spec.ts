@@ -311,6 +311,21 @@ describe("SearchResults.vue", () => {
       expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
     })
 
+    it("calls getRecentNotes only once on mount when isDropdown is true and noteId is set (like in NoteNewDialog)", async () => {
+      const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
+      setupSearchMocks()
+      getRecentNotesSpy.mockClear()
+
+      mountSearchResults({
+        inputSearchKey: "",
+        isDropdown: true,
+        noteId: 999,
+      })
+      await flushPromises()
+
+      expect(getRecentNotesSpy).toHaveBeenCalledTimes(1)
+    })
+
     it("switches back to recent notes when search key is cleared", async () => {
       vi.useFakeTimers()
       setupSearchMocks([searchResult(3, "Search Result")])
