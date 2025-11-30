@@ -108,19 +108,24 @@ $main-menu-height-mobile: 55px;
 }
 
 @media (max-width: theme('screens.lg')) {
+  .daisy-flex {
+    position: relative;
+  }
+
   .main-menu {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100%;
+    width: auto;
     height: $main-menu-height-tablet;
     z-index: 200;
   }
 
   .path-and-content {
     margin-left: 0;
-    margin-top: $main-menu-height-tablet;
-    height: calc(100% - #{$main-menu-height-tablet});
+    margin-top: 0;
+    width: 100%;
+    height: 100%;
     min-width: 0;
   }
 
@@ -135,8 +140,8 @@ $main-menu-height-mobile: 55px;
   }
 
   .path-and-content {
-    margin-top: $main-menu-height-mobile;
-    height: calc(100% - #{$main-menu-height-mobile});
+    width: 100%;
+    height: 100%;
     min-width: 0;
   }
 

@@ -140,6 +140,7 @@ onUnmounted(() => {
 .sidebar-container {
   height: auto;
   display: block;
+  width: 100%;
 }
 
 .menu-wrapper {
@@ -147,6 +148,11 @@ onUnmounted(() => {
   outline: none;
   display: flex;
   align-items: center;
+  width: 100%;
+}
+
+.menu-wrapper.is-collapsed {
+  width: auto;
 }
 
 .menu-content {
@@ -154,6 +160,11 @@ onUnmounted(() => {
   transition: all 0.3s ease;
   align-items: center;
   min-height: 100%;
+  display: flex;
+}
+
+.is-collapsed .menu-content {
+  width: auto;
 }
 
 .is-collapsed .menu-content {

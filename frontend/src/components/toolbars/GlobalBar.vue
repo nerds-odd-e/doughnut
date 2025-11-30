@@ -31,4 +31,11 @@ const user = inject<Ref<User | undefined>>("currentUser")
 </script>
 
 <style scoped lang="scss">
+$collapsed-menu-width: 130px;
+
+@media (max-width: theme('screens.lg')) {
+  .daisy-navbar {
+    padding-left: $collapsed-menu-width;
+  }
+}
 </style>

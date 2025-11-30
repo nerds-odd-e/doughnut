@@ -85,14 +85,14 @@ export default defineComponent({
   position: fixed;
   bottom: 20px;
   left: 20px;
-  z-index: 1000;
+  z-index: 99999;
 }
 
 .feature-toggle-alert {
   position: fixed;
   bottom: 80px;
   left: 20px;
-  z-index: 1000;
+  z-index: 99999;
 }
 
 :deep(.testability-button) {
