@@ -1,5 +1,6 @@
 import MainMenu from "@/components/toolbars/MainMenu.vue"
 import type { User } from "@generated/backend"
+import { screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -33,58 +34,44 @@ describe("main menu", () => {
   })
 
   it("shows assimilate link in main menu", () => {
-    const { getByRole } = helper
-      .component(MainMenu)
-      .withProps({ user })
-      .render()
+    helper.component(MainMenu).withProps({ user }).render()
 
-    const assimilateLink = getByRole("button", { name: "Assimilate" })
+    const assimilateLink = screen.getByLabelText("Assimilate")
     expect(assimilateLink).toBeInTheDocument()
+    expect(assimilateLink.tagName).toBe("A")
   })
 
   it("highlights the note link when on notebooks page", () => {
     useRouteValue.name = "notebooks"
 
-    const { getByRole } = helper
-      .component(MainMenu)
-      .withProps({ user })
-      .render()
+    helper.component(MainMenu).withProps({ user }).render()
 
-    const noteLink = getByRole("button", { name: "Note" })
-    expect(noteLink.querySelector(".daisy-text-primary")).toBeInTheDocument()
+    const noteLink = screen.getByLabelText("Note")
+    const navItem = noteLink.closest(".nav-item")
+    expect(navItem).toHaveClass("daisy-text-primary")
   })
 
   it("shows note link in main menu", () => {
-    const { getByRole } = helper
-      .component(MainMenu)
-      .withProps({ user })
-      .render()
+    helper.component(MainMenu).withProps({ user }).render()
 
-    const noteLink = getByRole("button", { name: "Note" })
+    const noteLink = screen.getByLabelText("Note")
     expect(noteLink).toBeInTheDocument()
   })
 
   it("highlights the circles link when on circle show page", () => {
     useRouteValue.name = "circleShow"
 
-    const { getByRole } = helper
-      .component(MainMenu)
-      .withProps({ user })
-      .render()
+    helper.component(MainMenu).withProps({ user }).render()
 
-    const circlesLink = getByRole("button", { name: "Circles" })
-    expect(circlesLink.querySelector(".daisy-text-primary")).toBeInTheDocument()
+    const circlesLink = screen.getByLabelText("Circles")
+    const navItem = circlesLink.closest(".nav-item")
+    expect(navItem).toHaveClass("daisy-text-primary")
   })
 
   it("shows assimilate link in both main menu and dropdown menu", () => {
-    const { getByRole } = helper
-      .component(MainMenu)
-      .withProps({ user })
-      .render()
+    helper.component(MainMenu).withProps({ user }).render()
 
-    const mainMenuAssimilateLink = getByRole("button", {
-      name: "Assimilate",
-    })
+    const mainMenuAssimilateLink = screen.getByLabelText("Assimilate")
 
     expect(mainMenuAssimilateLink).toBeInTheDocument()
   })

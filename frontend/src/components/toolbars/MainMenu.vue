@@ -3,18 +3,18 @@
     <div class="daisy-flex daisy-flex-col daisy-h-full">
       <ul v-if="user" class="top-menu daisy-menu daisy-w-full daisy-flex-1">
         <template v-if="!isHomePage">
-          <li v-for="item in upperNavItems" role="button" :aria-label="item.label" :title="item.label" :key="item.name" class="daisy-menu-item">
+          <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
           <NavigationItem v-bind="{ ...item }" />
         </li>
         </template>
 
         <template v-if="!isHomePage">
-          <li v-for="item in lowerNavItems" role="button" :aria-label="item.label" :title="item.label" :key="item.name" class="daisy-menu-item">
+          <li v-for="item in lowerNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
           <NavigationItem v-bind="{ ...item, to: item.name }" />
         </li>
         </template>
 
-        <li class="daisy-menu-item" role="button" aria-label="Account">
+        <li class="daisy-menu-item">
           <NavigationItem
             label="Account"
             :icon="SvgMissingAvatar"
