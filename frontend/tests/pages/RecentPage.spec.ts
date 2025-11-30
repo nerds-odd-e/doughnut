@@ -22,30 +22,18 @@ describe("RecentPage.vue", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mockRoute.query = {}
-    mockSdkService("getRecentNotes", [])
     mockSdkService("getRecentMemoryTrackers", [])
     mockSdkService("getRecentlyReviewed", [])
   })
 
   describe("Tab Navigation", () => {
-    it("shows Recently Added/Updated tab by default when no query parameter", () => {
+    it("shows Recently Learned tab by default when no query parameter", () => {
       const wrapper = helper.component(RecentPage).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Added/Updated")
+      expect(activeTab.text()).toBe("Recently Learned")
       expect(
-        wrapper.findComponent({ name: "RecentlyAddedNotes" }).exists()
-      ).toBe(true)
-    })
-
-    it("shows Recently Added/Updated tab when query parameter is recentlyAdded", () => {
-      mockRoute.query = { tab: "recentlyAdded" }
-      const wrapper = helper.component(RecentPage).mount()
-
-      const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Added/Updated")
-      expect(
-        wrapper.findComponent({ name: "RecentlyAddedNotes" }).exists()
+        wrapper.findComponent({ name: "RecentlyLearnedNotes" }).exists()
       ).toBe(true)
     })
 
@@ -71,29 +59,15 @@ describe("RecentPage.vue", () => {
       ).toBe(true)
     })
 
-    it("defaults to Recently Added/Updated tab when query parameter is invalid", () => {
+    it("defaults to Recently Learned tab when query parameter is invalid", () => {
       mockRoute.query = { tab: "invalidTab" }
       const wrapper = helper.component(RecentPage).mount()
 
       const activeTab = wrapper.find(".daisy-tab-active")
-      expect(activeTab.text()).toBe("Recently Added/Updated")
+      expect(activeTab.text()).toBe("Recently Learned")
       expect(
-        wrapper.findComponent({ name: "RecentlyAddedNotes" }).exists()
+        wrapper.findComponent({ name: "RecentlyLearnedNotes" }).exists()
       ).toBe(true)
-    })
-
-    it("updates route when Recently Added/Updated tab is clicked", async () => {
-      const wrapper = helper.component(RecentPage).mount()
-
-      const tab = wrapper
-        .findAll(".daisy-tab")
-        .find((el) => el.text() === "Recently Added/Updated")
-      await tab?.trigger("click")
-
-      expect(mockPush).toHaveBeenCalledWith({
-        name: "recent",
-        query: { tab: "recentlyAdded" },
-      })
     })
 
     it("updates route when Recently Learned tab is clicked", async () => {
