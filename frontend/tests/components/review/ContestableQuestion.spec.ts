@@ -8,7 +8,8 @@ describe("ContestableQuestion.vue", () => {
     return helper
       .component(ContestableQuestion)
       .withRouter()
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         recallPrompt,
       })
       .mount()

@@ -35,7 +35,7 @@ beforeEach(() => {
   })
   showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
   mockShowNoteAccessory()
-  renderer = helper.component(AssimilationPage).withStorageProps({})
+  renderer = helper.component(AssimilationPage).withCleanStorage().withProps({})
 })
 
 describe("repeat page", () => {

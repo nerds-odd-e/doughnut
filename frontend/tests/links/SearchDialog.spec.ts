@@ -16,7 +16,11 @@ describe("LinkNoteDialog", () => {
     mockSdkService("semanticSearchWithin", [])
   })
   it("Search at the top level with no note", async () => {
-    helper.component(LinkNoteDialog).withStorageProps({ note: null }).render()
+    helper
+      .component(LinkNoteDialog)
+      .withCleanStorage()
+      .withProps({ note: null })
+      .render()
     await screen.findByText("Searching")
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")
@@ -25,7 +29,11 @@ describe("LinkNoteDialog", () => {
 
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
-    helper.component(LinkNoteDialog).withStorageProps({ note }).render()
+    helper
+      .component(LinkNoteDialog)
+      .withCleanStorage()
+      .withProps({ note })
+      .render()
     ;(await screen.findByLabelText("All My Circles")).click()
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")

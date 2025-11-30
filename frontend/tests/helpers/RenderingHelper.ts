@@ -43,14 +43,11 @@ class RenderingHelper<T = DefineComponent> {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  withStorageProps(props: Partial<NoteStorageProps>) {
+  withCleanStorage() {
     // Reset the singleton for each test
     const storageAccessor = useStorageAccessor()
     storageAccessor.value = createNoteStorage()
-    return this.withProps({
-      ...props,
-    })
+    return this
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

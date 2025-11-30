@@ -39,7 +39,8 @@ describe("NoteConversation", () => {
     const wrapper = helper
       .component(NoteConversation)
       .withCurrentUser(user)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId: note.id,
       })
       .mount()

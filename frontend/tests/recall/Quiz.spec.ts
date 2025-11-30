@@ -45,7 +45,8 @@ describe("repeat page", () => {
     const wrapper = helper
       .component(Quiz)
       .withRouter()
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         memoryTrackers,
         currentIndex: 0,
         eagerFetchCount,

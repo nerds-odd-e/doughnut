@@ -13,7 +13,8 @@ describe("Edit Suggested Question", () => {
     beforeEach(() => {
       wrapper = helper
         .component(SuggestedQuestionEdit)
-        .withStorageProps({ modelValue: suggestedQuestion })
+        .withCleanStorage()
+        .withProps({ modelValue: suggestedQuestion })
         .mount()
     })
 

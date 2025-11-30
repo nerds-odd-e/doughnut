@@ -176,7 +176,8 @@ describe("NoteAudioTools", () => {
 
     wrapper = helper
       .component(NoteAudioTools)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         note,
       })
       .mount()
@@ -551,7 +552,8 @@ describe("NoteAudioTools", () => {
       const note = makeMe.aNote.topicConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
-        .withStorageProps({ note })
+        .withCleanStorage()
+        .withProps({ note })
         .mount()
 
       const suggestTitleSpy = mockSdkService("suggestTitle", {
@@ -573,7 +575,8 @@ describe("NoteAudioTools", () => {
       const note = makeMe.aNote.topicConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
-        .withStorageProps({ note })
+        .withCleanStorage()
+        .withProps({ note })
         .mount()
 
       const suggestTitleSpy = mockSdkService("suggestTitle", { title: "" })
@@ -829,7 +832,8 @@ describe("NoteAudioTools", () => {
     it("displays error message in fullscreen overlay when errors exist", async () => {
       wrapper = helper
         .component(NoteAudioTools)
-        .withStorageProps({ note })
+        .withCleanStorage()
+        .withProps({ note })
         .mount({ attachTo: document.body })
 
       const advancedButton = findButtonByTitle(wrapper, "Advanced Options")
@@ -868,7 +872,8 @@ describe("NoteAudioTools", () => {
       const noteWithShortContent = makeMe.aNote.details(shortContent).please()
       wrapper = helper
         .component(NoteAudioTools)
-        .withStorageProps({ note: noteWithShortContent })
+        .withCleanStorage()
+        .withProps({ note: noteWithShortContent })
         .mount()
 
       await wrapper.vm.processAudio({
@@ -888,7 +893,8 @@ describe("NoteAudioTools", () => {
       const noteWithLongContent = makeMe.aNote.details(longContent).please()
       wrapper = helper
         .component(NoteAudioTools)
-        .withStorageProps({ note: noteWithLongContent })
+        .withCleanStorage()
+        .withProps({ note: noteWithLongContent })
         .mount()
 
       await wrapper.vm.processAudio({
@@ -908,7 +914,8 @@ describe("NoteAudioTools", () => {
       const noteWithNullContent = makeMe.aNote.details(undefined).please()
       wrapper = helper
         .component(NoteAudioTools)
-        .withStorageProps({ note: noteWithNullContent })
+        .withCleanStorage()
+        .withProps({ note: noteWithNullContent })
         .mount()
 
       await wrapper.vm.processAudio({

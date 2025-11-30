@@ -25,7 +25,8 @@ describe("NoteEditableDetails", () => {
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId: firstNoteId,
         noteDetails: "First note details",
         readonly: false,
@@ -78,7 +79,8 @@ describe("NoteEditableDetails", () => {
   it("should update displayed details when navigating to a different note with no unsaved changes", async () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId: 1,
         noteDetails: "First note details",
         readonly: false,
@@ -104,7 +106,8 @@ describe("NoteEditableDetails", () => {
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId,
         noteDetails,
         readonly: false,
@@ -142,7 +145,8 @@ describe("NoteEditableDetails", () => {
 
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId: firstNoteId,
         noteDetails: "First note details",
         readonly: false,
@@ -170,7 +174,8 @@ describe("NoteEditableDetails", () => {
     const noteId = 1
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId,
         noteDetails: "Original details",
         readonly: false,
@@ -225,7 +230,8 @@ describe("NoteEditableDetails", () => {
 
     const wrapper = helper
       .component(NoteEditableDetails)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId,
         noteDetails: "Original",
         readonly: false,

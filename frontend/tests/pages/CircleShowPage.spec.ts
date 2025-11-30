@@ -21,7 +21,8 @@ describe("circle show page", () => {
     helper
       .component(CircleShowPage)
       .withRouter()
-      .withStorageProps({ circleId: circleNote.id })
+      .withCleanStorage()
+      .withProps({ circleId: circleNote.id })
       .render()
 
     expect(showCircleSpy).toBeCalledWith({
@@ -35,7 +36,8 @@ describe("circle show page", () => {
       .component(CircleShowPage)
       .withRouter()
       .withCurrentUser(currentUser)
-      .withStorageProps({ circleId: circleNote.id })
+      .withCleanStorage()
+      .withProps({ circleId: circleNote.id })
       .render()
     await flushPromises()
     screen.getByTitle(moveButtonTitle)
@@ -46,7 +48,8 @@ describe("circle show page", () => {
       .component(CircleShowPage)
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         circleId: circleNote.id,
       })
       .render()

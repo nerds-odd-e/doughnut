@@ -16,7 +16,8 @@ describe("in place edit on title", () => {
   ): VueWrapper<ComponentPublicInstance> => {
     return helper
       .component(NoteTextContent)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         readonly,
         note: n,
       })

@@ -76,7 +76,8 @@ describe("Assimilation component", () => {
       ]
       assimilateSpy.mockResolvedValue(wrapSdkResponse(returnedTrackers))
       const wrapper = renderer
-        .withStorageProps({
+        .withCleanStorage()
+        .withProps({
           note,
         })
         .withRouter()

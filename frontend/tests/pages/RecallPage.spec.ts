@@ -48,7 +48,8 @@ beforeEach(() => {
   mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
   renderer = helper
     .component(RecallPage)
-    .withStorageProps({ eagerFetchCount: 1 })
+    .withCleanStorage()
+    .withProps({ eagerFetchCount: 1 })
 })
 
 describe("repeat page", () => {

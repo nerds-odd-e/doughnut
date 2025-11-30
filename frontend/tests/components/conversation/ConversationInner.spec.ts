@@ -60,7 +60,8 @@ const setupTestData = () => {
 const mountComponent = (conversation, user) => {
   return helper
     .component(ConversationInner)
-    .withStorageProps({ conversation, user })
+    .withCleanStorage()
+    .withProps({ conversation, user })
     .mount()
 }
 

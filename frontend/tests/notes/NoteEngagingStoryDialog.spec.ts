@@ -11,7 +11,8 @@ const createWrapper = async () => {
   })
   const wrapper = helper
     .component(AIGenerateImageDialog)
-    .withStorageProps({ note: note.note })
+    .withCleanStorage()
+    .withProps({ note: note.note })
     .mount()
   await flushPromises()
   return { wrapper, generateImageSpy }

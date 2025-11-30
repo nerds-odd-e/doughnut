@@ -26,7 +26,8 @@ describe("new/updated pink banner", () => {
     const wrapper = helper
       .component(NoteShow)
       .withRouter()
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId: note.id,
         expandChildren: true,
       })
@@ -50,7 +51,8 @@ describe("note wth children", () => {
     helper
       .component(NoteShow)
       .withRouter()
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         noteId: n.id,
         expandChildren: true,
       })

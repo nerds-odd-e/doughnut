@@ -53,7 +53,8 @@ describe("adding new note", () => {
     searchForLinkTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
     helper
       .component(NoteNewDialog)
-      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .withCleanStorage()
+      .withProps({ referenceNote: note, insertMode: "as-child" })
       .mount()
 
     // Wait a bit to ensure any potential search would have been triggered
@@ -70,7 +71,8 @@ describe("adding new note", () => {
     )
     const wrapper = helper
       .component(NoteNewDialog)
-      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .withCleanStorage()
+      .withProps({ referenceNote: note, insertMode: "as-child" })
       .mount()
 
     // First, change the title to something else (this marks it as edited)
@@ -99,7 +101,8 @@ describe("adding new note", () => {
     )
     const wrapper = helper
       .component(NoteNewDialog)
-      .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+      .withCleanStorage()
+      .withProps({ referenceNote: note, insertMode: "as-child" })
       .mount()
     await wrapper.find("input#note-title").setValue("myth")
 
@@ -119,7 +122,8 @@ describe("adding new note", () => {
     beforeEach(async () => {
       wrapper = helper
         .component(NoteNewDialog)
-        .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+        .withCleanStorage()
+        .withProps({ referenceNote: note, insertMode: "as-child" })
         .mount({ attachTo: document.body })
       await wrapper.find("input#note-title").setValue("note title")
       vi.clearAllTimers()
@@ -150,7 +154,8 @@ describe("adding new note", () => {
       searchWikidataSpy = mockSdkService("searchWikidata", [])
       wrapper = helper
         .component(NoteNewDialog)
-        .withStorageProps({ referenceNote: note, insertMode: "as-child" })
+        .withCleanStorage()
+        .withProps({ referenceNote: note, insertMode: "as-child" })
         .mount({ attachTo: document.body })
     })
 

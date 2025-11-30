@@ -19,7 +19,11 @@ describe("MessageCenterPage", () => {
       "getConversationsOfCurrentUser",
       []
     )
-    helper.component(MessageCenterPage).withStorageProps({}).render()
+    helper
+      .component(MessageCenterPage)
+      .withCleanStorage()
+      .withProps({})
+      .render()
     expect(getConversationsSpy).toBeCalledTimes(1)
   })
 
@@ -28,7 +32,8 @@ describe("MessageCenterPage", () => {
     mockSdkService("getConversationsOfCurrentUser", [conversation])
     const { findByText } = helper
       .component(MessageCenterPage)
-      .withStorageProps({})
+      .withCleanStorage()
+      .withProps({})
       .render()
     await findByText("No conversation selected")
   })
@@ -45,7 +50,8 @@ describe("MessageCenterPage", () => {
     it("should highlight the selected conversation", async () => {
       const { container } = helper
         .component(MessageCenterPage)
-        .withStorageProps({ conversationId: conversations[1]?.id })
+        .withCleanStorage()
+        .withProps({ conversationId: conversations[1]?.id })
         .render()
       await flushPromises()
       const listItems = container.querySelectorAll("li.daisy-menu-item")
@@ -58,7 +64,8 @@ describe("MessageCenterPage", () => {
     it("should highlight the selected conversation", async () => {
       const { container } = helper
         .component(MessageCenterPage)
-        .withStorageProps({})
+        .withCleanStorage()
+        .withProps({})
         .render()
       await flushPromises()
       const listItems = container.querySelectorAll("li.daisy-menu-item")

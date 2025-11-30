@@ -42,7 +42,8 @@ describe("WikidataAssociationForNoteDialog", () => {
   const mountDialog = (note: ReturnType<typeof makeMe.aNote.please>) => {
     return helper
       .component(WikidataAssociationForNoteDialog)
-      .withStorageProps({ note })
+      .withCleanStorage()
+      .withProps({ note })
       .mount({ attachTo: document.body })
   }
 

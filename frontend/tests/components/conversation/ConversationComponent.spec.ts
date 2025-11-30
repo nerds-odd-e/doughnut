@@ -32,7 +32,8 @@ describe("ConversationComponent", () => {
     mockSdkService("showNote", makeMe.aNoteRealm.please())
     wrapper = helper
       .component(ConversationComponent)
-      .withStorageProps({
+      .withCleanStorage()
+      .withProps({
         conversation,
         user,
       })
@@ -58,7 +59,8 @@ describe("ConversationComponent", () => {
       mockSdkService("getConversationMessages", [])
       const wrapper = helper
         .component(ConversationComponent)
-        .withStorageProps({
+        .withCleanStorage()
+        .withProps({
           conversation,
           user,
         })

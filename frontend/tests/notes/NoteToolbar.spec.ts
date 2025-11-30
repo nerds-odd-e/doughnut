@@ -8,7 +8,8 @@ it("displays menu items when dropdown is open", async () => {
   const wrapper = helper
     .component(NoteToolbar)
     .withRouter()
-    .withStorageProps({
+    .withCleanStorage()
+    .withProps({
       note: noteRealm.note,
     })
     .mount()

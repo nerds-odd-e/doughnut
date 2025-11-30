@@ -29,7 +29,8 @@ describe("all in note show page", () => {
 
       helper
         .component(NoteShowPage)
-        .withStorageProps({ noteId: noteRealm.id })
+        .withCleanStorage()
+        .withProps({ noteId: noteRealm.id })
         .withRouter(router)
         .render()
 
@@ -53,7 +54,8 @@ describe("all in note show page", () => {
       const wrapper = helper
         .component(NoteShowPage)
         .withCurrentUser(makeMe.aUser.please())
-        .withStorageProps({ noteId: note.id })
+        .withCleanStorage()
+        .withProps({ noteId: note.id })
         .withRouter(router)
         .mount()
 
@@ -77,7 +79,8 @@ describe("all in note show page", () => {
       const wrapper = helper
         .component(NoteShowPage)
         .withCurrentUser(makeMe.aUser.please())
-        .withStorageProps({ noteId: note.id })
+        .withCleanStorage()
+        .withProps({ noteId: note.id })
         .withRouter(router)
         .mount()
 
@@ -112,7 +115,8 @@ describe("all in note show page", () => {
       const wrapper = helper
         .component(NoteShowPage)
         .withCurrentUser(makeMe.aUser.please())
-        .withStorageProps({ noteId: note.id })
+        .withCleanStorage()
+        .withProps({ noteId: note.id })
         .withRouter(router)
         .mount()
 
