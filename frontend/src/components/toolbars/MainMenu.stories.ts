@@ -53,25 +53,12 @@ const meta = {
 
       return {
         components: { story },
-        template: "<story />",
+        template:
+          '<div style="width: 200px; height: 100vh; background: #f5f5f5;"><story /></div>',
         beforeUnmount() {
           // Restore original method when story unmounts
           UserController.getMenuData = originalGetMenuData
         },
-      }
-    },
-    // Default container for vertical layout stories (can be skipped with skipDefaultContainer parameter)
-    (story, context) => {
-      if (context.parameters.skipDefaultContainer) {
-        return {
-          components: { story },
-          template: "<story />",
-        }
-      }
-      return {
-        components: { story },
-        template:
-          '<div style="width: 200px; height: 100vh; background: #f5f5f5;"><story /></div>',
       }
     },
   ],
@@ -233,22 +220,4 @@ export const WithUnreadMessages: Story = {
       }
     },
   ],
-}
-
-export const NarrowHorizontal: Story = {
-  args: {
-    user: makeMe.aUser.please(),
-  },
-  decorators: [
-    // Narrow container for horizontal layout (replaces the default wide container)
-    // The 800px width is below the lg breakpoint (1024px), triggering horizontal layout
-    (story) => ({
-      components: { story },
-      template:
-        '<div style="width: 800px; max-width: 100%; background: #f5f5f5; padding: 1rem;"><story /></div>',
-    }),
-  ],
-  parameters: {
-    skipDefaultContainer: true,
-  },
 }
