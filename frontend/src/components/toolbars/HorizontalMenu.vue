@@ -28,24 +28,24 @@
 
           <!-- Expanded state: show all items -->
           <ul v-if="shouldShowExpanded" class="top-menu daisy-menu daisy-flex-1">
-            <template v-if="!isHomePage">
-              <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
-                <NavigationItem v-bind="{ ...item }" />
-              </li>
-            </template>
+        <template v-if="!isHomePage">
+          <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
+            <NavigationItem v-bind="{ ...item }" />
+          </li>
+        </template>
 
-            <template v-if="!isHomePage">
-              <li v-for="item in lowerNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
-                <NavigationItem v-bind="{ ...item, to: item.name }" />
-              </li>
-            </template>
+        <template v-if="!isHomePage">
+          <li v-for="item in lowerNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
+            <NavigationItem v-bind="{ ...item, to: item.name }" />
+          </li>
+        </template>
 
-            <AccountMenuItem
-              :user="user"
-              :show-user-settings-dialog="showUserSettingsDialog"
-              :logout="logout"
-            />
-          </ul>
+        <AccountMenuItem
+          :user="user"
+          :show-user-settings-dialog="showUserSettingsDialog"
+          :logout="logout"
+        />
+      </ul>
         </template>
 
         <!-- Expand button: only visible when user is logged in -->

@@ -10,8 +10,11 @@ export function useBreakpoint() {
 
   onMounted(() => {
     // Match CSS @media (max-width: theme('screens.lg'))
-    // lg breakpoint is 1024px, so min-width: 1024px means lg or larger
-    mediaQuery = window.matchMedia("(min-width: 1024px)")
+    // CSS uses max-width: 1024px for tablet, so we need min-width: 1025px for desktop
+    // This ensures at exactly 1024px, both JS and CSS treat it as tablet
+    // Read the actual breakpoint from CSS custom property or use 1025px to match CSS behavior
+    const lgBreakpoint = 1024
+    mediaQuery = window.matchMedia(`(min-width: ${lgBreakpoint + 1}px)`)
     isLgOrLarger.value = mediaQuery.matches
 
     // Modern browsers support addEventListener
