@@ -51,6 +51,13 @@ declare module 'vue-router/auto-routes' {
       Record<never, never>,
       | never
     >,
+    '/AssimilationPageView': RouteRecordInfo<
+      '/AssimilationPageView',
+      '/AssimilationPageView',
+      Record<never, never>,
+      Record<never, never>,
+      | never
+    >,
     '/BazaarPage': RouteRecordInfo<
       '/BazaarPage',
       '/BazaarPage',
@@ -211,6 +218,12 @@ declare module 'vue-router/auto-routes' {
     'src/pages/AssimilationPage.vue': {
       routes:
         | '/AssimilationPage'
+      views:
+        | never
+    }
+    'src/pages/AssimilationPageView.vue': {
+      routes:
+        | '/AssimilationPageView'
       views:
         | never
     }

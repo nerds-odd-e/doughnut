@@ -4,6 +4,9 @@ import type { Meta, StoryObj } from "@storybook/vue3"
 import { createRouter, createWebHistory } from "vue-router"
 import type { RouteRecordRaw } from "vue-router"
 import { routeMetadata } from "../../src/routes/routeMetadata"
+import { ref } from "vue"
+import type { User } from "@generated/backend"
+import makeMe from "../fixtures/makeMe"
 
 // Mock router for components that use vue-router (same as Storybook preview)
 const mockRoutes: RouteRecordRaw[] = routeMetadata.map((metadata) => ({
@@ -85,10 +88,14 @@ describe("All Storybook Stories", () => {
           }
 
           const args = storyObj.args || {}
+          const mockUser = makeMe.aUser.please()
           render(Component, {
             props: args,
             global: {
               plugins: [router],
+              provide: {
+                currentUser: ref<User | undefined>(mockUser),
+              },
             },
           })
         })
