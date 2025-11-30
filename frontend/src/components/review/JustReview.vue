@@ -1,14 +1,16 @@
 <template>
-  <MemoryTrackerAsync
-    v-if="memoryTrackerId"
-    v-bind="{
-      memoryTrackerId,
-    }"
-  />
-  <SelfEvaluateButtons
-    @self-evaluated-memory-state="justReivew($event)"
-    :key="memoryTrackerId"
-  />
+  <div data-test="question-section">
+    <MemoryTrackerAsync
+      v-if="memoryTrackerId"
+      v-bind="{
+        memoryTrackerId,
+      }"
+    />
+    <SelfEvaluateButtons
+      @self-evaluated-memory-state="justReivew($event)"
+      :key="memoryTrackerId"
+    />
+  </div>
 </template>
 
 <script setup lang="ts">

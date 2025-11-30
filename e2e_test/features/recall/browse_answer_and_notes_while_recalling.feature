@@ -21,7 +21,7 @@ Feature: Browse answers and notes while recalling
     When I am recalling my note on day 2
     And I skip one question
     And I type my answer "sedition"
-    Then I should see that my last answer is correct
+    Then I should see that my last answer to spelling question is correct
     And I should see the memory tracker info of note "sedition"
       | type     | Repetition Count |
       | normal   |                0 |

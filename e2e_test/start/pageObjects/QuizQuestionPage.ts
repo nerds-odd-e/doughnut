@@ -4,6 +4,7 @@ const assumeQuestionPage = (stem?: string) => {
   }
   const question = () => (stem ? cy.findByText(stem).parent().parent() : cy)
   const getQuestionSection = () => cy.get('[data-test="question-section"]')
+
   return {
     getQuestionSection,
     getStemText() {
@@ -54,6 +55,7 @@ const assumeQuestionPage = (stem?: string) => {
     },
     skipQuestion() {
       cy.pageIsNotLoading()
+      getQuestionSection().should('exist')
       cy.findByRole('button', { name: 'Move to end of list' }).click()
     },
     answerFirstOption() {
