@@ -201,3 +201,79 @@ export const WithActiveItem: Story = {
     logout: noop,
   },
 }
+
+export const CollapsedWithActiveItem: Story = {
+  args: {
+    user: makeMe.aUser.please(),
+    upperNavItems: [
+      {
+        name: "notebooks",
+        label: "Note",
+        icon: SvgNote,
+        isActive: false,
+      },
+      {
+        name: "assimilate",
+        label: "Assimilate",
+        icon: SvgAssimilate,
+        isActive: true,
+        badge: 5,
+        badgeClass: "due-count",
+      },
+      {
+        name: "recall",
+        label: "Recall",
+        icon: SvgCalendarCheck,
+        isActive: false,
+      },
+    ],
+    lowerNavItems: defaultNavItems.lowerNavItems,
+    isHomePage: false,
+    showUserSettingsDialog: noop,
+    logout: noop,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Menu starts collapsed, showing only the active item (Assimilate) and the expand button.",
+      },
+    },
+  },
+}
+
+export const CollapsedWithoutActiveItem: Story = {
+  args: {
+    user: makeMe.aUser.please(),
+    ...defaultNavItems,
+    isHomePage: false,
+    showUserSettingsDialog: noop,
+    logout: noop,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Menu starts collapsed with no active item, showing only the expand button.",
+      },
+    },
+  },
+}
+
+export const Expanded: Story = {
+  args: {
+    user: makeMe.aUser.please(),
+    ...defaultNavItems,
+    isHomePage: false,
+    showUserSettingsDialog: noop,
+    logout: noop,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Menu in expanded state showing all navigation items. Click the expand button to toggle.",
+      },
+    },
+  },
+}

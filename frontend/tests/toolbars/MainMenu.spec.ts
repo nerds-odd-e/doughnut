@@ -1,6 +1,6 @@
 import MainMenu from "@/components/toolbars/MainMenu.vue"
 import type { User } from "@generated/backend"
-import { screen } from "@testing-library/vue"
+import { screen, fireEvent } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
@@ -49,43 +49,73 @@ describe("main menu", () => {
     user = makeMe.aUser.please()
   })
 
-  it("shows assimilate link in main menu", () => {
+  it("shows assimilate link in main menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
+
+    // If HorizontalMenu is used, expand it first
+    const expandButton = screen.queryByLabelText("Toggle menu")
+    if (expandButton) {
+      await fireEvent.click(expandButton)
+    }
 
     const assimilateLink = screen.getByLabelText("Assimilate")
     expect(assimilateLink).toBeInTheDocument()
     expect(assimilateLink.tagName).toBe("A")
   })
 
-  it("highlights the note link when on notebooks page", () => {
+  it("highlights the note link when on notebooks page", async () => {
     useRouteValue.name = "notebooks"
 
     helper.component(MainMenu).withProps({ user }).render()
+
+    // If HorizontalMenu is used, expand it first
+    const expandButton = screen.queryByLabelText("Toggle menu")
+    if (expandButton) {
+      await fireEvent.click(expandButton)
+    }
 
     const noteLink = screen.getByLabelText("Note")
     const navItem = noteLink.closest(".nav-item")
     expect(navItem).toHaveClass("daisy-text-primary")
   })
 
-  it("shows note link in main menu", () => {
+  it("shows note link in main menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
+
+    // If HorizontalMenu is used, expand it first
+    const expandButton = screen.queryByLabelText("Toggle menu")
+    if (expandButton) {
+      await fireEvent.click(expandButton)
+    }
 
     const noteLink = screen.getByLabelText("Note")
     expect(noteLink).toBeInTheDocument()
   })
 
-  it("highlights the circles link when on circle show page", () => {
+  it("highlights the circles link when on circle show page", async () => {
     useRouteValue.name = "circleShow"
 
     helper.component(MainMenu).withProps({ user }).render()
+
+    // If HorizontalMenu is used, expand it first
+    const expandButton = screen.queryByLabelText("Toggle menu")
+    if (expandButton) {
+      await fireEvent.click(expandButton)
+    }
 
     const circlesLink = screen.getByLabelText("Circles")
     const navItem = circlesLink.closest(".nav-item")
     expect(navItem).toHaveClass("daisy-text-primary")
   })
 
-  it("shows assimilate link in both main menu and dropdown menu", () => {
+  it("shows assimilate link in both main menu and dropdown menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
+
+    // If HorizontalMenu is used, expand it first
+    const expandButton = screen.queryByLabelText("Toggle menu")
+    if (expandButton) {
+      await fireEvent.click(expandButton)
+    }
 
     const mainMenuAssimilateLink = screen.getByLabelText("Assimilate")
 
