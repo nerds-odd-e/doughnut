@@ -6,26 +6,22 @@ import helper, {
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import type { NoteTopology, NoteSearchResult } from "@generated/backend"
+import type {
+  NoteSearchResult,
+  SimpleNoteSearchResult,
+} from "@generated/backend"
+import makeMe from "@tests/fixtures/makeMe"
 
 // Test fixtures
-const recentNotes: NoteTopology[] = [
-  {
-    id: 1,
-    titleOrPredicate: "Recent Note 1",
-    shortDetails: undefined,
-    linkType: undefined,
-    objectNoteTopology: undefined,
-    parentOrSubjectNoteTopology: undefined,
-  },
-  {
-    id: 2,
-    titleOrPredicate: "Recent Note 2",
-    shortDetails: undefined,
-    linkType: undefined,
-    objectNoteTopology: undefined,
-    parentOrSubjectNoteTopology: undefined,
-  },
+const recentNotes: SimpleNoteSearchResult[] = [
+  makeMe.aSimpleNoteSearchResult
+    .id(1)
+    .titleOrPredicate("Recent Note 1")
+    .please(),
+  makeMe.aSimpleNoteSearchResult
+    .id(2)
+    .titleOrPredicate("Recent Note 2")
+    .please(),
 ]
 
 const searchResult = (
@@ -34,7 +30,10 @@ const searchResult = (
   distance?: number
 ): NoteSearchResult =>
   ({
-    noteTopology: { id, titleOrPredicate: title },
+    noteTopology: makeMe.aSimpleNoteSearchResult
+      .id(id)
+      .titleOrPredicate(title)
+      .please(),
     distance,
   }) as NoteSearchResult
 
@@ -367,15 +366,11 @@ describe("SearchResults.vue", () => {
     })
 
     it("excludes current node from recent notes", async () => {
-      const recentNotesWithCurrent: NoteTopology[] = [
-        {
-          id: 999,
-          titleOrPredicate: "Current Note",
-          shortDetails: undefined,
-          linkType: undefined,
-          objectNoteTopology: undefined,
-          parentOrSubjectNoteTopology: undefined,
-        },
+      const recentNotesWithCurrent: SimpleNoteSearchResult[] = [
+        makeMe.aSimpleNoteSearchResult
+          .id(999)
+          .titleOrPredicate("Current Note")
+          .please(),
         ...recentNotes,
       ]
 
