@@ -1,27 +1,24 @@
 <template>
-  <ContainerPage>
-    <main>
-      <NoteShow
-        v-bind="{ noteId: note.id, expandChildren: false }"
-      />
-    </main>
-    <NoteInfoBar
-      :note-id="note.id"
-      :key="note.id"
-      @level-changed="$emit('reloadNeeded')"
+  <main>
+    <NoteShow
+      v-bind="{ noteId: note.id, expandChildren: false }"
     />
-    <AssimilationButtons
-      :key="buttonKey"
-      @assimilate="processForm"
-    />
-  </ContainerPage>
+  </main>
+  <NoteInfoBar
+    :note-id="note.id"
+    :key="note.id"
+    @level-changed="$emit('reloadNeeded')"
+  />
+  <AssimilationButtons
+    :key="buttonKey"
+    @assimilate="processForm"
+  />
 </template>
 
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
 import { AssimilationController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import ContainerPage from "@/pages/commons/ContainerPage.vue"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
