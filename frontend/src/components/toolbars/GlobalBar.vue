@@ -35,7 +35,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 
 @media (max-width: theme('screens.lg')) {
   .daisy-navbar {
-    padding-left: $collapsed-menu-width;
+    padding-left: $collapsed-menu-width-tablet;
     height: $main-menu-height-tablet;
     min-height: $main-menu-height-tablet;
   }
@@ -43,6 +43,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 
 @media (max-width: theme('screens.md')) {
   .daisy-navbar {
+    padding-left: $collapsed-menu-width-mobile;
     height: $main-menu-height-mobile;
     min-height: $main-menu-height-mobile;
   }

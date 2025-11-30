@@ -231,7 +231,13 @@ onUnmounted(() => {
 
 .menu-wrapper.is-collapsed {
   width: auto;
-  min-width: $collapsed-menu-width;
+  min-width: $collapsed-menu-width-tablet;
+}
+
+@media (max-width: theme('screens.md')) {
+  .menu-wrapper.is-collapsed {
+    min-width: $collapsed-menu-width-mobile;
+  }
 }
 
 .is-collapsed .menu-content {
