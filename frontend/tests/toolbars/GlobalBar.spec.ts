@@ -35,13 +35,7 @@ describe("global bar", () => {
   })
 
   it("fetch API to be called ONCE", async () => {
-    helper
-      .component(GlobalBar)
-      .withProps({
-        user,
-        apiStatus: { states: [] },
-      })
-      .render()
+    helper.component(GlobalBar).withCurrentUser(user).render()
 
     expect(screen.queryByTitle("undo")).toBeNull()
   })
@@ -49,13 +43,7 @@ describe("global bar", () => {
   it("show undo when there is something to undo", async () => {
     const note = makeMe.aNote.please()
     noteEditingHistory.deleteNote(note.id)
-    helper
-      .component(GlobalBar)
-      .withProps({
-        user,
-        apiStatus: { states: [] },
-      })
-      .render()
+    helper.component(GlobalBar).withCurrentUser(user).render()
 
     expect(await screen.findByTitle("undo delete note")).not.toBeDisabled()
   })

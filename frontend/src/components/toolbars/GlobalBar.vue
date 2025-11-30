@@ -15,24 +15,17 @@
       </PopButton>
       <NoteUndoButton v-bind="{ storageAccessor }" />
     </div>
-    <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
   </nav>
 </template>
 
 <script setup lang="ts">
+import type { Ref } from "vue"
 import type { User } from "@generated/backend"
-import { type ApiStatus } from "@/managedApi/ApiStatusHandler"
-import LoadingThinBar from "@/components/commons/LoadingThinBar.vue"
-import type { PropType } from "vue"
+import { inject } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
-
-defineProps({
-  apiStatus: { type: Object as PropType<ApiStatus>, required: true },
-  user: { type: Object as PropType<User> },
-})
-defineEmits(["updateUser"])
+const user = inject<Ref<User | undefined>>("currentUser")
 </script>
 
 <style scoped lang="scss">

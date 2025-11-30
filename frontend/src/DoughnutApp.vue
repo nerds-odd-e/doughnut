@@ -7,6 +7,7 @@ import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 import type { ApiStatus } from "./managedApi/ApiStatusHandler"
 import { setupGlobalClient, nonReloadingClient } from "./managedApi/clientSetup"
 import GlobalBar from "./components/toolbars/GlobalBar.vue"
+import LoadingThinBar from "./components/commons/LoadingThinBar.vue"
 import type { User } from "@generated/backend"
 import {
   CurrentUserInfoController,
@@ -57,6 +58,7 @@ onMounted(async () => {
 
 <template>
   <Popups />
+  <LoadingThinBar v-if="user && apiStatus.states.length > 0" />
   <div class="daisy-flex daisy-h-dvh daisy-bg-base-100 daisy-text-base-content">
     <div class="main-menu daisy-flex daisy-bg-neutral daisy-text-neutral-content daisy-z-[10000]">
       <MainMenu
@@ -66,10 +68,7 @@ onMounted(async () => {
     </div>
     <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
       <div class="daisy-sticky daisy-top-0 daisy-z-100 global-bar">
-        <GlobalBar
-          v-bind="{ user, apiStatus }"
-          @update-user="user = $event"
-        />
+        <GlobalBar />
       </div>
       <div class="daisy-flex-grow daisy-overflow-y-auto daisy-overflow-x-hidden main-content">
         <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
