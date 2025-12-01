@@ -58,7 +58,7 @@ public interface MemoryTrackerRepository extends CrudRepository<MemoryTracker, I
               + "   AND rp.last_recalled_at IS NOT NULL "
               + "   AND rp.removed_from_tracking IS FALSE "
               + "   AND n.deleted_at IS NULL "
-              + " ORDER BY rp.last_recalled_at DESC LIMIT 100",
+              + " ORDER BY rp.last_recalled_at DESC LIMIT 500",
       nativeQuery = true)
   List<MemoryTracker> findLast100ReviewedByUser(Integer userId);
 
