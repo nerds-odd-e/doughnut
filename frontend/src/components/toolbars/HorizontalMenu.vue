@@ -146,8 +146,42 @@ const handleActiveItemClick = (event: MouseEvent) => {
   }
 }
 
+const isClickWithinAccountDropdown = (target: Node | null): boolean => {
+  if (!target) return false
+  let element = target as HTMLElement | null
+  while (element) {
+    // Check if the element is within a details dropdown (account menu uses details element)
+    if (element.tagName === "DETAILS" && element.closest(".menu-wrapper")) {
+      return true
+    }
+    // Check if the element is within the dropdown content
+    if (element.classList?.contains("daisy-dropdown-content")) {
+      return true
+    }
+    // Check if the element is the account menu item or within it
+    if (element.getAttribute?.("aria-label") === "Account") {
+      return true
+    }
+    // Check if parent is the account menu item
+    const accountMenuItem = element.closest?.('li[class*="menu-item"]')
+    if (accountMenuItem) {
+      const navItem = accountMenuItem.querySelector('[aria-label="Account"]')
+      if (navItem) {
+        return true
+      }
+    }
+    element = element.parentElement
+  }
+  return false
+}
+
 const handleClickOutside = (event: MouseEvent) => {
-  if (menuRef.value && !menuRef.value.contains(event.target as Node)) {
+  const target = event.target as Node
+  // Don't collapse if clicking on account dropdown or its content
+  if (isClickWithinAccountDropdown(target)) {
+    return
+  }
+  if (menuRef.value && !menuRef.value.contains(target)) {
     collapseMenu()
   }
 }
@@ -155,7 +189,16 @@ const handleClickOutside = (event: MouseEvent) => {
 const handleFocusLoss = () => {
   // Use setTimeout to allow click events to process first
   setTimeout(() => {
-    if (menuRef.value && document.activeElement !== menuRef.value) {
+    const activeElement = document.activeElement
+    // Don't collapse if focus is within the account dropdown
+    if (activeElement && isClickWithinAccountDropdown(activeElement)) {
+      return
+    }
+    if (menuRef.value && activeElement !== menuRef.value) {
+      // Check if active element is still within the menu or its dropdowns
+      if (activeElement && menuRef.value.contains(activeElement)) {
+        return
+      }
       collapseMenu()
     }
   }, 0)
