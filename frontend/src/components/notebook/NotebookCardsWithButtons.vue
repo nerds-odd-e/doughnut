@@ -3,8 +3,12 @@
     <div
       v-for="notebook in notebooks"
       :key="notebook.id"
+      role="card"
+      class="daisy-card"
+      :class="{ 'subscribed-notebook': isSubscribed }"
+      data-cy="notebook-card"
     >
-      <NotebookCard :notebook="notebook" :is-subscribed="isSubscribed">
+      <NotebookCard :notebook="notebook">
         <template #cardHeader>
           <span class="daisy-flex daisy-justify-end daisy-p-0">
             <slot :notebook="notebook" />
@@ -24,3 +28,15 @@ defineProps<{
   isSubscribed?: boolean
 }>()
 </script>
+
+<style scoped>
+.daisy-card.subscribed-notebook .notebook-card {
+  background: linear-gradient(to right, oklch(var(--p) / 0.2) 0%, oklch(var(--p) / 0.1) 5%);
+  border: 1px solid oklch(var(--p) / 0.4);
+}
+
+.daisy-card.subscribed-notebook .notebook-binding {
+  background: oklch(var(--p));
+  border-right: 1px solid oklch(var(--p) / 0.7);
+}
+</style>
