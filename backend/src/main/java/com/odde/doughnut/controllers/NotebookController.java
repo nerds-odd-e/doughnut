@@ -12,14 +12,12 @@ import com.odde.doughnut.services.BazaarService;
 import com.odde.doughnut.services.NotebookIndexingService;
 import com.odde.doughnut.services.NotebookService;
 import com.odde.doughnut.services.ObsidianFormatService;
-import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -126,14 +124,6 @@ class NotebookController {
     notebook.setOwnership(circle.getOwnership());
     entityPersister.save(notebook);
     return notebook;
-  }
-
-  @GetMapping("/{notebook}/dump")
-  public List<BareNote> downloadNotebookDump(
-      @PathVariable("notebook") @Schema(type = "integer") Notebook notebook)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertAuthorization(notebook);
-    return notebook.getNoteBriefs();
   }
 
   @PatchMapping("/{notebook}/ai-assistant")

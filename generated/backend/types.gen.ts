@@ -3619,33 +3619,6 @@ export type MyNotebooksResponses = {
 
 export type MyNotebooksResponse = MyNotebooksResponses[keyof MyNotebooksResponses];
 
-export type DownloadNotebookDumpData = {
-    body?: never;
-    path: {
-        notebook: number;
-    };
-    query?: never;
-    url: '/api/notebooks/{notebook}/dump';
-};
-
-export type DownloadNotebookDumpErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type DownloadNotebookDumpError = DownloadNotebookDumpErrors[keyof DownloadNotebookDumpErrors];
-
-export type DownloadNotebookDumpResponses = {
-    /**
-     * OK
-     */
-    200: Array<BareNote>;
-};
-
-export type DownloadNotebookDumpResponse = DownloadNotebookDumpResponses[keyof DownloadNotebookDumpResponses];
-
 export type GetAllPendingRequestData = {
     body?: never;
     path?: never;

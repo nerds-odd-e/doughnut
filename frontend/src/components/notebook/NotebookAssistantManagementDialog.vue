@@ -13,11 +13,6 @@
     </button>
   </form>
 
-  <div class="daisy-mt-4">
-    <button @click.prevent="downloadNotebookDump" class="daisy-btn daisy-btn-success">
-      Download Notebook Dump
-    </button>
-  </div>
 </template>
 
 <script setup lang="ts">
@@ -27,7 +22,6 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import type { PropType } from "vue"
 import { ref, watch } from "vue"
-import { saveAs } from "file-saver"
 import TextInput from "../form/TextInput.vue"
 
 const props = defineProps({
@@ -59,18 +53,6 @@ const updateAiInstructions = async () => {
   )
   if (!error) {
     showSuccessToast("Notebook AI assistant settings updated successfully")
-  }
-}
-
-const downloadNotebookDump = async () => {
-  const { data: notes, error } = await NotebookController.downloadNotebookDump({
-    path: { notebook: props.notebook.id },
-  })
-  if (!error && notes) {
-    const blob = new Blob([JSON.stringify(notes, null, 2)], {
-      type: "application/json",
-    })
-    saveAs(blob, "notebook-dump.json")
   }
 }
 </script>

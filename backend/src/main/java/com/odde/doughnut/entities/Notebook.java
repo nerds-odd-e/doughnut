@@ -4,14 +4,11 @@ import static com.odde.doughnut.controllers.dto.ApiError.ErrorType.ASSESSMENT_SE
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.exceptions.ApiException;
-import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.utils.Randomizer;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -101,25 +98,6 @@ public class Notebook extends EntityIdentifiedByIdOnly {
   // database
   public void addNoteInMemoryToSupportUnitTestOnly(Note note) {
     this.notes.add(note);
-  }
-
-  @JsonIgnore
-  public String getNotebookDump() {
-    List<BareNote> noteBriefs = getNoteBriefs();
-    return new ObjectMapperConfig().objectMapper().valueToTree(noteBriefs).toPrettyString();
-  }
-
-  @JsonIgnore
-  public List<BareNote> getNoteBriefs() {
-    List<BareNote> noteBriefs =
-        notes.stream()
-            .sorted(
-                Comparator.comparing(Note::getParentId, Comparator.nullsFirst(Integer::compare))
-                    .thenComparing(Note::getSiblingOrder, Comparator.nullsFirst(Long::compare)))
-            .map(n -> BareNote.fromNoteWithoutTruncate(n))
-            .toList();
-    ;
-    return noteBriefs;
   }
 
   public String getCreatorId() {

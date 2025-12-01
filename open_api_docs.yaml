@@ -2818,32 +2818,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NotebooksViewedByUser"
-  /api/notebooks/{notebook}/dump:
-    get:
-      tags:
-      - notebook-controller
-      operationId: downloadNotebookDump
-      parameters:
-      - name: notebook
-        in: path
-        required: true
-        schema:
-          type: integer
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/BareNote"
   /api/notebook_certificate_approvals/get-all-pending-request:
     get:
       tags:

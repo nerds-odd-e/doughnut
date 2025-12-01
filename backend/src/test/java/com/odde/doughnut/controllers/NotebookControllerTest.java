@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -12,7 +11,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.EmbeddingService;
-import com.odde.doughnut.services.graphRAG.BareNote;
 import java.io.IOException;
 import java.time.Period;
 import java.util.List;
@@ -131,31 +129,6 @@ class NotebookControllerTest extends ControllerTestBase {
       assertThat(
           note.getNotebook().getNotebookSettings().getCertificateExpiry(),
           equalTo(Period.parse("P2Y3M")));
-    }
-  }
-
-  @Nested
-  class DownloadNotebookDump {
-    private Notebook notebook;
-
-    @BeforeEach
-    void setup() {
-      notebook = makeMe.aNotebook().creatorAndOwner(currentUser.getUser()).please();
-      makeMe.refresh(notebook);
-    }
-
-    @Test
-    void whenNotAuthorized() {
-      User anotherUser = makeMe.aUser().please();
-      currentUser.setUser(anotherUser);
-      assertThrows(
-          UnexpectedNoAccessRightException.class, () -> controller.downloadNotebookDump(notebook));
-    }
-
-    @Test
-    void whenAuthorized() throws UnexpectedNoAccessRightException {
-      List<BareNote> noteBriefs = controller.downloadNotebookDump(notebook);
-      assertThat(noteBriefs, hasSize(1));
     }
   }
 
