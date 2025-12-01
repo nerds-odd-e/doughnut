@@ -26,26 +26,40 @@
         </div>
       </router-link>
     </div>
-    <div class="notebook-toolbar daisy-mb-4">
-      <div class="daisy-btn-group daisy-btn-group-sm">
+    
+    <!-- Notebook Management Section -->
+    <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-my-4">
+      <h4 class="daisy-text-lg">Notebook Management</h4>
+      <p class="daisy-text-sm daisy-text-base-content/60">
+        Manage your notebook's organization and sharing settings.
+      </p>
+      <div class="daisy-flex daisy-gap-2">
         <PopButton
           title="Move to ..."
           v-if="user?.externalIdentifier === notebook.creatorId"
+          btnClass="daisy-btn daisy-btn-outline daisy-btn-sm"
         >
           <template #button_face>
-            <SvgMoveToCircle />
+            <div class="daisy-flex daisy-items-center daisy-gap-2">
+              <SvgMoveToCircle />
+              <span>Move to ...</span>
+            </div>
           </template>
           <NotebookMoveDialog v-bind="{ notebook }" />
         </PopButton>
         <button
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
           @click="shareNotebook()"
           title="Share notebook to bazaar"
         >
-          <SvgBazaarShare />
+          <div class="daisy-flex daisy-items-center daisy-gap-2">
+            <SvgBazaarShare />
+            <span>Share notebook to bazaar</span>
+          </div>
         </button>
       </div>
     </div>
+    
     <CheckInput
       scope-name="notebook"
       field="skipMemoryTrackingEntirely"
