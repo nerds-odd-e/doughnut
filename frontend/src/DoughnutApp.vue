@@ -134,7 +134,6 @@ onMounted(async () => {
 
   .path-and-content {
     margin-left: 0;
-    padding-top: $main-menu-height-tablet; // Add padding to account for fixed menu
     width: 100%;
     min-width: 0;
     height: 100%; // Full height for proper page calculations
@@ -153,7 +152,6 @@ onMounted(async () => {
   }
 
   .path-and-content {
-    padding-top: $main-menu-height-mobile; // Add padding to account for fixed menu
     width: 100%;
     min-width: 0;
     height: 100%; // Full height for proper page calculations
