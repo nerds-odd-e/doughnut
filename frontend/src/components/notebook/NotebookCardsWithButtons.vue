@@ -31,7 +31,22 @@ defineProps<{
 
 <style scoped>
 .daisy-card {
-  height: 200px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.daisy-card :deep(.notebook-card) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.daisy-card :deep(.notebook-card > a) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .daisy-card.subscribed-notebook .notebook-card {
