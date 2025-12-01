@@ -29,6 +29,11 @@ const myNotebooksPage = () => {
     subscribedNotebooks() {
       return subscribedNotebooks()
     },
+    expectNotebookNotToExist(noteTopology: string) {
+      cy.get('main').within(() =>
+        cy.findCardTitle(noteTopology).should('not.exist')
+      )
+    },
   }
 }
 

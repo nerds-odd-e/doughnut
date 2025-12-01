@@ -305,12 +305,7 @@ Then(
 Then(
   'I should not see note {string} at the top level of all my notes',
   (noteTopology: string) => {
-    cy.get('.path-and-content').within(() => {
-      cy.findByText('Notebooks')
-    })
-    cy.get('main').within(() =>
-      cy.findCardTitle(noteTopology).should('not.exist')
-    )
+    start.routerToNotebooksPage().expectNotebookNotToExist(noteTopology)
   }
 )
 
