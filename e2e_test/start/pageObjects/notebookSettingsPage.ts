@@ -1,4 +1,4 @@
-const notebookSettingsPopup = () => {
+const notebookSettingsPage = () => {
   const clickButton = (name: string) =>
     cy.findByRole('button', { name }).click()
   const assertButtonExists = (name: string) =>
@@ -70,4 +70,5 @@ const notebookSettingsPopup = () => {
   }
 }
 
-export default notebookSettingsPopup
+export default notebookSettingsPage
+

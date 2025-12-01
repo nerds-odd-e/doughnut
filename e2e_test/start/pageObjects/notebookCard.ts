@@ -1,5 +1,5 @@
 import { findNotebookCardButton, notebookList } from './NotebookList'
-import notebookSettingsPopup from './notebookSettingsPopup'
+import notebookSettingsPage from './notebookSettingsPage'
 
 export const notebookCard = (notebook: string) => ({
   ...notebookList(),
@@ -17,7 +17,7 @@ export const notebookCard = (notebook: string) => ({
   },
   editNotebookSettings() {
     findNotebookCardButton(notebook, 'Edit notebook settings').click()
-    return notebookSettingsPopup()
+    return notebookSettingsPage()
   },
   exportForObsidian() {
     return this.editNotebookSettings().exportForObsidian()
