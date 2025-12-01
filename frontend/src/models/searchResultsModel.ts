@@ -1,8 +1,5 @@
 import { reactive } from "vue"
-import type {
-  NoteSearchResult,
-  SimpleNoteSearchResult,
-} from "@generated/backend"
+import type { NoteSearchResult } from "@generated/backend"
 
 export interface DisplayState {
   showRecentNotes: boolean
@@ -22,18 +19,18 @@ export class SearchResultsModel {
     },
     recentResult: undefined as NoteSearchResult[] | undefined,
     previousSearchResult: undefined as NoteSearchResult[] | undefined,
-    recentNotes: [] as SimpleNoteSearchResult[],
+    recentNotes: [] as NoteSearchResult[],
   })
 
   get isSearchInProgress(): boolean {
     return this.state.isSearchInProgress
   }
 
-  get recentNotes(): SimpleNoteSearchResult[] {
+  get recentNotes(): NoteSearchResult[] {
     return this.state.recentNotes
   }
 
-  set recentNotes(notes: SimpleNoteSearchResult[]) {
+  set recentNotes(notes: NoteSearchResult[]) {
     this.state.recentNotes = notes
   }
 
@@ -90,7 +87,7 @@ export class SearchResultsModel {
       this.state.previousSearchResult ??
       []
     list.forEach((r) => {
-      const id = String(r.noteSearchResult.id as number)
+      const id = String(r.noteTopology.id as number)
       const d = r.distance
       if (d != null) map[id] = d
     })
@@ -227,7 +224,7 @@ export class SearchResultsModel {
     incoming: NoteSearchResult[]
   ): NoteSearchResult[] {
     const byId = new Map<number, NoteSearchResult>()
-    const getId = (r: NoteSearchResult) => r.noteSearchResult.id as number
+    const getId = (r: NoteSearchResult) => r.noteTopology.id as number
 
     const chooseBetter = (a: NoteSearchResult, b: NoteSearchResult) => {
       const da = a.distance ?? Infinity

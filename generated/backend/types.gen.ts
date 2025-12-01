@@ -247,14 +247,9 @@ export type SearchTerm = {
 };
 
 export type NoteSearchResult = {
-    noteSearchResult: SimpleNoteSearchResult;
-    distance?: number;
-};
-
-export type SimpleNoteSearchResult = {
-    id: number;
+    noteTopology: NoteTopology;
     notebookId: number;
-    titleOrPredicate: string;
+    distance?: number;
 };
 
 export type RecallSetting = {
@@ -3594,7 +3589,7 @@ export type GetRecentNotesResponses = {
     /**
      * OK
      */
-    200: Array<SimpleNoteSearchResult>;
+    200: Array<NoteSearchResult>;
 };
 
 export type GetRecentNotesResponse = GetRecentNotesResponses[keyof GetRecentNotesResponses];

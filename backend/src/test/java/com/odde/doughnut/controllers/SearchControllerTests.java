@@ -52,7 +52,7 @@ class SearchControllerTests extends ControllerTestBase {
 
       assertThat(result, hasSize(2));
       assertThat(
-          result.stream().map(r -> r.getNoteSearchResult().getTitleOrPredicate()).toList(),
+          result.stream().map(r -> r.getNoteTopology().getTitleOrPredicate()).toList(),
           containsInAnyOrder("Java Programming", "JavaScript Basics"));
       // partial matches should have distance 0.9 for now
       assertThat(result.stream().allMatch(r -> r.getDistance().equals(0.9f)), is(true));
@@ -73,12 +73,12 @@ class SearchControllerTests extends ControllerTestBase {
       assertThat(result, hasSize(greaterThanOrEqualTo(2)));
       assertThat(
           result.stream()
-              .filter(r -> r.getNoteSearchResult().getTitleOrPredicate().equals("Java"))
+              .filter(r -> r.getNoteTopology().getTitleOrPredicate().equals("Java"))
               .allMatch(r -> r.getDistance().equals(0.0f)),
           is(true));
       assertThat(
           result.stream()
-              .filter(r -> !r.getNoteSearchResult().getTitleOrPredicate().equals("Java"))
+              .filter(r -> !r.getNoteTopology().getTitleOrPredicate().equals("Java"))
               .allMatch(r -> r.getDistance().equals(0.9f)),
           is(true));
     }
@@ -157,7 +157,7 @@ class SearchControllerTests extends ControllerTestBase {
       // note itself
       assertThat(result, hasSize(greaterThanOrEqualTo(2)));
       assertThat(
-          result.stream().map(r -> r.getNoteSearchResult().getTitleOrPredicate()).toList(),
+          result.stream().map(r -> r.getNoteTopology().getTitleOrPredicate()).toList(),
           hasItems("Child Java Note", "Unrelated Java Note"));
     }
 

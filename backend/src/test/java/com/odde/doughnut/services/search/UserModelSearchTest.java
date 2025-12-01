@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.NoteSearchResult;
+import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.controllers.dto.SearchTerm;
-import com.odde.doughnut.controllers.dto.SimpleNoteSearchResult;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
@@ -60,13 +60,9 @@ public class UserModelSearchTest {
   void theSearchIsCaseInsensitive() {
     Note anotherNote = makeMe.aNote("Some Note").under(note).please();
     searchTerm.setSearchKey("not");
-    SimpleNoteSearchResult expected =
-        new SimpleNoteSearchResult(
-            anotherNote.getId(),
-            anotherNote.getNotebook().getId(),
-            anotherNote.getTopicConstructor());
+    NoteTopology expected = anotherNote.getNoteTopology();
     assertThat(
-        search().stream().map(NoteSearchResult::getNoteSearchResult).toList(), contains(expected));
+        search().stream().map(NoteSearchResult::getNoteTopology).toList(), contains(expected));
   }
 
   @Test
@@ -131,8 +127,7 @@ public class UserModelSearchTest {
       searchTerm.setSearchKey(commonPhrase);
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
-      List<SimpleNoteSearchResult> actual =
-          search().stream().map(NoteSearchResult::getNoteSearchResult).toList();
+      List<NoteTopology> actual = search().stream().map(NoteSearchResult::getNoteTopology).toList();
       assertThat(actual, hasSize(expectedCount));
       assertThat(
           actual,
@@ -142,30 +137,11 @@ public class UserModelSearchTest {
 
     Object[] expectedNotes(
         boolean expectOtherNotebooks, boolean expectSubscription, boolean expectCircleNote) {
-      List<SimpleNoteSearchResult> result = new ArrayList<>();
-      result.add(
-          new SimpleNoteSearchResult(
-              noteInTheSameNotebook.getId(),
-              noteInTheSameNotebook.getNotebook().getId(),
-              noteInTheSameNotebook.getTopicConstructor()));
-      if (expectOtherNotebooks)
-        result.add(
-            new SimpleNoteSearchResult(
-                noteFromMyOtherNotebook.getId(),
-                noteFromMyOtherNotebook.getNotebook().getId(),
-                noteFromMyOtherNotebook.getTopicConstructor()));
-      if (expectSubscription)
-        result.add(
-            new SimpleNoteSearchResult(
-                subscribedBazaarNote.getId(),
-                subscribedBazaarNote.getNotebook().getId(),
-                subscribedBazaarNote.getTopicConstructor()));
-      if (expectCircleNote)
-        result.add(
-            new SimpleNoteSearchResult(
-                circleNote.getId(),
-                circleNote.getNotebook().getId(),
-                circleNote.getTopicConstructor()));
+      List<NoteTopology> result = new ArrayList<>();
+      result.add(noteInTheSameNotebook.getNoteTopology());
+      if (expectOtherNotebooks) result.add(noteFromMyOtherNotebook.getNoteTopology());
+      if (expectSubscription) result.add(subscribedBazaarNote.getNoteTopology());
+      if (expectCircleNote) result.add(circleNote.getNoteTopology());
       return result.toArray();
     }
   }

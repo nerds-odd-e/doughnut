@@ -16,7 +16,7 @@ import NotebookBuilder from "./NotebookBuilder"
 import PredefinedQuestionBuilder from "./PredefinedQuestionBuilder"
 import RecallPromptBuilder from "./RecallPromptBuilder"
 import SuggestedQuestionForFineTuningBuilder from "./SuggestedQuestionForFineTuningBuilder"
-import SimpleNoteSearchResultBuilder from "./SimpleNoteSearchResultBuilder"
+import NoteSearchResultBuilder from "./NoteSearchResultBuilder"
 import UserBuilder from "./UserBuilder"
 import WikidataEntityBuilder from "./WikidataEntityBuilder"
 import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder"
@@ -106,8 +106,8 @@ class MakeMe {
     return new MultipleChoicesQuestionBuilder()
   }
 
-  static get aSimpleNoteSearchResult(): SimpleNoteSearchResultBuilder {
-    return new SimpleNoteSearchResultBuilder()
+  static get aNoteSearchResult(): NoteSearchResultBuilder {
+    return new NoteSearchResultBuilder()
   }
 }
 

@@ -23,8 +23,8 @@
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
           v-for="result in filteredRecentNotes"
-          :key="result.noteSearchResult.id"
-          :noteTopology="result.noteSearchResult"
+          :key="result.noteTopology.id"
+          :noteTopology="result.noteTopology"
         />
       </div>
       <SearchResultCards
@@ -35,7 +35,7 @@
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
-          <slot name="button" :note-topology="result.noteSearchResult" />
+          <slot name="button" :note-topology="result.noteTopology" />
         </template>
       </SearchResultCards>
     </div>
@@ -50,11 +50,8 @@
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
           v-for="result in searchResult"
-          :key="result.noteSearchResult.id"
-          :noteTopology="{
-            id: result.noteSearchResult.id,
-            titleOrPredicate: result.noteSearchResult.titleOrPredicate,
-          }"
+          :key="result.noteTopology.id"
+          :noteTopology="result.noteTopology"
         />
       </div>
       <SearchResultCards
@@ -65,10 +62,7 @@
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
-          <slot name="button" :note-topology="{
-            id: result.noteSearchResult.id,
-            titleOrPredicate: result.noteSearchResult.titleOrPredicate,
-          }" />
+          <slot name="button" :note-topology="result.noteTopology" />
           <small
             v-if="result.distance != null"
             class="similarity-distance"
@@ -82,11 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import type {
-  SearchTerm,
-  NoteTopology,
-  NoteSearchResult,
-} from "@generated/backend"
+import type { SearchTerm, NoteTopology } from "@generated/backend"
 import { NoteController, SearchController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
@@ -132,16 +122,9 @@ const searchResult = computed(() =>
 )
 
 const filteredRecentNotes = computed(() => {
-  const notes = props.noteId
-    ? model.recentNotes.filter((note) => note.id !== props.noteId)
+  return props.noteId
+    ? model.recentNotes.filter((note) => note.noteTopology.id !== props.noteId)
     : model.recentNotes
-  return notes.map((note) => ({
-    noteSearchResult: {
-      id: note.id,
-      titleOrPredicate: note.titleOrPredicate,
-      notebookId: note.notebookId,
-    },
-  })) as NoteSearchResult[]
 })
 
 const displayState = computed(() =>

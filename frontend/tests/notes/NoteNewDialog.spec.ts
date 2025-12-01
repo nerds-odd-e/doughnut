@@ -67,7 +67,9 @@ describe("adding new note", () => {
 
   it("searches when user edits title back to 'Untitled'", async () => {
     searchForLinkTargetWithinSpy.mockResolvedValue(
-      wrapSdkResponse([{ noteSearchResult: note.noteTopology, distance: 0.9 }])
+      wrapSdkResponse([
+        { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
+      ])
     )
     const wrapper = helper
       .component(NoteNewDialog)
@@ -97,7 +99,9 @@ describe("adding new note", () => {
 
   it("search for duplicate", async () => {
     searchForLinkTargetWithinSpy.mockResolvedValue(
-      wrapSdkResponse([{ noteSearchResult: note.noteTopology, distance: 0.9 }])
+      wrapSdkResponse([
+        { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
+      ])
     )
     const wrapper = helper
       .component(NoteNewDialog)

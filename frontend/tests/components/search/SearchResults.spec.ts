@@ -6,21 +6,20 @@ import helper, {
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import { nextTick } from "vue"
-import type {
-  NoteSearchResult,
-  SimpleNoteSearchResult,
-} from "@generated/backend"
+import type { NoteSearchResult } from "@generated/backend"
 import makeMe from "@tests/fixtures/makeMe"
 
 // Test fixtures
-const recentNotes: SimpleNoteSearchResult[] = [
-  makeMe.aSimpleNoteSearchResult
+const recentNotes: NoteSearchResult[] = [
+  makeMe.aNoteSearchResult
     .id(1)
     .titleOrPredicate("Recent Note 1")
+    .distance(null)
     .please(),
-  makeMe.aSimpleNoteSearchResult
+  makeMe.aNoteSearchResult
     .id(2)
     .titleOrPredicate("Recent Note 2")
+    .distance(null)
     .please(),
 ]
 
@@ -29,13 +28,11 @@ const searchResult = (
   title: string,
   distance?: number
 ): NoteSearchResult =>
-  ({
-    noteSearchResult: makeMe.aSimpleNoteSearchResult
-      .id(id)
-      .titleOrPredicate(title)
-      .please(),
-    distance,
-  }) as NoteSearchResult
+  makeMe.aNoteSearchResult
+    .id(id)
+    .titleOrPredicate(title)
+    .distance(distance)
+    .please()
 
 // Test helpers
 function setupSearchMocks(
@@ -366,10 +363,11 @@ describe("SearchResults.vue", () => {
     })
 
     it("excludes current node from recent notes", async () => {
-      const recentNotesWithCurrent: SimpleNoteSearchResult[] = [
-        makeMe.aSimpleNoteSearchResult
+      const recentNotesWithCurrent: NoteSearchResult[] = [
+        makeMe.aNoteSearchResult
           .id(999)
           .titleOrPredicate("Current Note")
+          .distance(null)
           .please(),
         ...recentNotes,
       ]

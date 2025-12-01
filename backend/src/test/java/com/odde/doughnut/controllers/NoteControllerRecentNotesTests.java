@@ -44,8 +44,8 @@ class NoteControllerRecentNotesTests extends ControllerTestBase {
 
     var recentNotes = controller.getRecentNotes();
     assertThat(recentNotes, hasSize(2));
-    assertThat(recentNotes.get(0).getId(), equalTo(note2.getId()));
-    assertThat(recentNotes.get(1).getId(), equalTo(note1.getId()));
+    assertThat(recentNotes.get(0).getNoteTopology().getId(), equalTo(note2.getId()));
+    assertThat(recentNotes.get(1).getNoteTopology().getId(), equalTo(note1.getId()));
   }
 
   @Test

@@ -5,19 +5,11 @@
     :class="{ 'different-notebook-border daisy-border-primary': isDifferentNotebook }"
   >
     <div class="daisy-card-body daisy-p-4">
-      <router-link
-        :to="{ name: 'noteShow', params: { noteId: searchResult.noteSearchResult.id } }"
-        class="daisy-no-underline"
-      >
-        <h5 class="daisy-card-title">
-          <NoteTitleComponent
-            :note-topology="{
-              id: searchResult.noteSearchResult.id,
-              titleOrPredicate: searchResult.noteSearchResult.titleOrPredicate,
-            }"
-          />
-        </h5>
-      </router-link>
+      <h5 class="daisy-card-title">
+        <NoteTitleWithLink
+          :note-topology="searchResult.noteTopology"
+        />
+      </h5>
       <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
         <slot name="button" :search-result="searchResult" />
       </div>
@@ -29,7 +21,7 @@
 import type { PropType } from "vue"
 import type { NoteSearchResult } from "@generated/backend"
 import { computed } from "vue"
-import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
+import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 const props = defineProps({
   searchResult: { type: Object as PropType<NoteSearchResult>, required: true },
@@ -40,7 +32,7 @@ const isDifferentNotebook = computed(() => {
   if (props.notebookId === undefined) {
     return false
   }
-  return props.searchResult.noteSearchResult.notebookId !== props.notebookId
+  return props.searchResult.notebookId !== props.notebookId
 })
 </script>
 

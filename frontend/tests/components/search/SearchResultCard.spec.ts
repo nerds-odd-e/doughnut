@@ -6,13 +6,11 @@ import type { NoteSearchResult } from "@generated/backend"
 
 describe("SearchResultCard", () => {
   it("renders the card with title", async () => {
-    const searchResult: NoteSearchResult = {
-      noteSearchResult: makeMe.aSimpleNoteSearchResult
-        .id(1)
-        .titleOrPredicate("Test Note")
-        .notebookId(10)
-        .please(),
-    }
+    const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .id(1)
+      .titleOrPredicate("Test Note")
+      .notebookId(10)
+      .please()
 
     helper.component(SearchResultCard).withProps({ searchResult }).render()
 
@@ -20,13 +18,11 @@ describe("SearchResultCard", () => {
   })
 
   it("does not add border when notebookId is not provided", async () => {
-    const searchResult: NoteSearchResult = {
-      noteSearchResult: makeMe.aSimpleNoteSearchResult
-        .id(1)
-        .titleOrPredicate("Test Note")
-        .notebookId(10)
-        .please(),
-    }
+    const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .id(1)
+      .titleOrPredicate("Test Note")
+      .notebookId(10)
+      .please()
 
     const wrapper = helper
       .component(SearchResultCard)
@@ -38,13 +34,11 @@ describe("SearchResultCard", () => {
   })
 
   it("does not add border when notebookId matches", async () => {
-    const searchResult: NoteSearchResult = {
-      noteSearchResult: makeMe.aSimpleNoteSearchResult
-        .id(1)
-        .titleOrPredicate("Test Note")
-        .notebookId(10)
-        .please(),
-    }
+    const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .id(1)
+      .titleOrPredicate("Test Note")
+      .notebookId(10)
+      .please()
 
     const wrapper = helper
       .component(SearchResultCard)
@@ -56,13 +50,11 @@ describe("SearchResultCard", () => {
   })
 
   it("adds border when notebookId does not match", async () => {
-    const searchResult: NoteSearchResult = {
-      noteSearchResult: makeMe.aSimpleNoteSearchResult
-        .id(1)
-        .titleOrPredicate("Test Note")
-        .notebookId(10)
-        .please(),
-    }
+    const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
+      .id(1)
+      .titleOrPredicate("Test Note")
+      .notebookId(10)
+      .please()
 
     const wrapper = helper
       .component(SearchResultCard)
