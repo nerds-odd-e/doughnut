@@ -192,6 +192,7 @@ describe("repeat page", () => {
         note,
         answer: "test answer",
         isCorrect: false,
+        memoryTrackerId: 123,
       }
 
       const mockedAnswerSpellingCall = mockSdkService(
@@ -226,6 +227,13 @@ describe("repeat page", () => {
       })
       expect(noteShow.exists()).toBe(true)
       expect(noteShow.props("noteId")).toBe(42)
+
+      // Verify View Memory Tracker link is displayed
+      const viewMemoryTrackerLink = answeredSpellingQuestion.findComponent({
+        name: "ViewMemoryTrackerLink",
+      })
+      expect(viewMemoryTrackerLink.exists()).toBe(true)
+      expect(viewMemoryTrackerLink.props("memoryTrackerId")).toBe(123)
     })
   })
 })

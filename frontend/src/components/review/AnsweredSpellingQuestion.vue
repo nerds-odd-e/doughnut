@@ -5,6 +5,10 @@
     </strong>
   </div>
   <NoteUnderQuestion v-bind="{ noteTopology: result.note.noteTopology }" />
+  <ViewMemoryTrackerLink
+    v-if="result.memoryTrackerId"
+    :memory-tracker-id="result.memoryTrackerId"
+  />
   <NoteShow
     :note-id="result.note.id"
     :expand-children="false"
@@ -16,6 +20,7 @@ import type { PropType } from "vue"
 import type { SpellingResult } from "@/pages/RecallPage.vue"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
+import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 
 defineProps({
   result: {

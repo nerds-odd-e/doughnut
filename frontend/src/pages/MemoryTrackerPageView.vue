@@ -20,6 +20,7 @@
     <div v-else>
       <div v-if="firstPromptNote" class="daisy-mb-6">
         <NoteUnderQuestion v-bind="{ noteTopology: firstPromptNote.noteTopology }" />
+        <ViewMemoryTrackerLink :memory-tracker-id="memoryTrackerId" />
       </div>
       <div
         v-for="prompt in recallPrompts"
@@ -77,6 +78,7 @@ import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/review/NoteUnderQuestion.vue"
 import QuestionDisplay from "@/components/review/QuestionDisplay.vue"
 import ConversationButton from "@/components/review/ConversationButton.vue"
+import ViewMemoryTrackerLink from "@/components/review/ViewMemoryTrackerLink.vue"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"

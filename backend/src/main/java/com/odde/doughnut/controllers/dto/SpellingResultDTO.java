@@ -8,10 +8,12 @@ public class SpellingResultDTO {
   @NotNull @Getter private final Note note;
   @Getter private final String answer;
   @Getter private final Boolean isCorrect;
+  @Getter private final Integer memoryTrackerId;
 
-  public SpellingResultDTO(Note note, String answer, Boolean isCorrect) {
+  public SpellingResultDTO(Note note, String answer, Boolean isCorrect, Integer memoryTrackerId) {
     this.note = note;
     this.answer = answer;
     this.isCorrect = isCorrect;
+    this.memoryTrackerId = memoryTrackerId;
   }
 }

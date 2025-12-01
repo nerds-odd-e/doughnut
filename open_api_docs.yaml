@@ -4012,6 +4012,9 @@ components:
           type: string
         isCorrect:
           type: boolean
+        memoryTrackerId:
+          type: integer
+          format: int32
       required:
       - note
     McpNoteAddDTO:

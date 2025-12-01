@@ -295,6 +295,7 @@ export type SpellingResultDto = {
     note: Note;
     answer?: string;
     isCorrect?: boolean;
+    memoryTrackerId?: number;
 };
 
 export type McpNoteAddDto = {
@@ -677,6 +678,7 @@ export type SpellingResultDtoWritable = {
     note: NoteWritable;
     answer?: string;
     isCorrect?: boolean;
+    memoryTrackerId?: number;
 };
 
 export type ConversationWritable = {

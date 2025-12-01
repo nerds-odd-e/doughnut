@@ -1,6 +1,10 @@
 <template>
   <div v-if="note">
     <NoteUnderQuestion v-bind="{ noteTopology: note.noteTopology }" />
+    <ViewMemoryTrackerLink
+      v-if="answeredQuestion.memoryTrackerId"
+      :memory-tracker-id="answeredQuestion.memoryTrackerId"
+    />
   </div>
   <QuestionDisplay
     v-if="answeredQuestion.predefinedQuestion"
@@ -14,16 +18,6 @@
     v-if="conversationButton"
     :recall-prompt-id="answeredQuestion.recallPromptId"
   />
-  <router-link
-    v-if="answeredQuestion.memoryTrackerId"
-    :to="{
-      name: 'memoryTrackerShow',
-      params: { memoryTrackerId: answeredQuestion.memoryTrackerId },
-    }"
-    class="daisy-link daisy-link-primary"
-  >
-    View Memory Tracker
-  </router-link>
 </template>
 
 <script setup lang="ts">
@@ -32,6 +26,7 @@ import type { PropType } from "vue"
 import QuestionDisplay from "./QuestionDisplay.vue"
 import ConversationButton from "./ConversationButton.vue"
 import NoteUnderQuestion from "./NoteUnderQuestion.vue"
+import ViewMemoryTrackerLink from "./ViewMemoryTrackerLink.vue"
 
 const { answeredQuestion, conversationButton } = defineProps({
   answeredQuestion: {

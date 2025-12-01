@@ -120,7 +120,7 @@ public class MemoryTrackerService {
     Note note = memoryTracker.getNote();
     Boolean correct = note.matchAnswer(spellingAnswer);
     markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
-    return new SpellingResultDTO(note, spellingAnswer, correct);
+    return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
   }
 
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
