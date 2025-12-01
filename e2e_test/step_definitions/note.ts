@@ -305,7 +305,6 @@ Then(
 Then(
   'I should not see note {string} at the top level of all my notes',
   (noteTopology: string) => {
-    cy.pageIsNotLoading()
     cy.get('.path-and-content').within(() => {
       cy.findByText('Notebooks')
     })
