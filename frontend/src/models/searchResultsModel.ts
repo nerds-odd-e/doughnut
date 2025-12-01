@@ -90,7 +90,7 @@ export class SearchResultsModel {
       this.state.previousSearchResult ??
       []
     list.forEach((r) => {
-      const id = String(r.noteTopology.id as number)
+      const id = String(r.noteSearchResult.id as number)
       const d = r.distance
       if (d != null) map[id] = d
     })
@@ -227,7 +227,7 @@ export class SearchResultsModel {
     incoming: NoteSearchResult[]
   ): NoteSearchResult[] {
     const byId = new Map<number, NoteSearchResult>()
-    const getId = (r: NoteSearchResult) => r.noteTopology.id as number
+    const getId = (r: NoteSearchResult) => r.noteSearchResult.id as number
 
     const chooseBetter = (a: NoteSearchResult, b: NoteSearchResult) => {
       const da = a.distance ?? Infinity

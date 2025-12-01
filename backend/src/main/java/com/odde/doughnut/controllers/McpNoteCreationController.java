@@ -86,7 +86,7 @@ public class McpNoteCreationController {
     if (results.isEmpty()) {
       throw new UnexpectedNoAccessRightException();
     }
-    int parentId = results.get(0).getNoteTopology().getId();
+    int parentId = results.get(0).getNoteSearchResult().getId();
     Optional<Note> parentNoteObj = noteService.findById(parentId);
 
     return parentNoteObj.orElseGet(Note::new);

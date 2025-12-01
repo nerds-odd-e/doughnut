@@ -4,7 +4,7 @@
     'md:daisy-grid-cols-3': columns === 3,
     'lg:daisy-grid-cols-3': columns === 3,
   }">
-    <div v-for="searchResult in searchResults" :key="searchResult.noteTopology.id">
+    <div v-for="searchResult in searchResults" :key="searchResult.noteSearchResult.id">
       <SearchResultCard v-bind="{ searchResult: searchResult, notebookId: notebookId }">
         <template #button v-if="$slots.button">
           <slot name="button" :search-result="searchResult" />

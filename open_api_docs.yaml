@@ -3912,13 +3912,13 @@ components:
     NoteSearchResult:
       type: object
       properties:
-        noteTopology:
+        noteSearchResult:
           $ref: "#/components/schemas/SimpleNoteSearchResult"
         distance:
           type: number
           format: float
       required:
-      - noteTopology
+      - noteSearchResult
     SimpleNoteSearchResult:
       type: object
       properties:

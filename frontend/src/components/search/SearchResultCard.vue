@@ -6,11 +6,16 @@
   >
     <div class="daisy-card-body daisy-p-4">
       <router-link
-        :to="{ name: 'noteShow', params: { noteId: searchResult.noteTopology.id } }"
+        :to="{ name: 'noteShow', params: { noteId: searchResult.noteSearchResult.id } }"
         class="daisy-no-underline"
       >
         <h5 class="daisy-card-title">
-          {{ searchResult.noteTopology.titleOrPredicate }}
+          <NoteTitleComponent
+            :note-topology="{
+              id: searchResult.noteSearchResult.id,
+              titleOrPredicate: searchResult.noteSearchResult.titleOrPredicate,
+            }"
+          />
         </h5>
       </router-link>
       <div class="daisy-card-actions daisy-justify-end" v-if="$slots.button">
@@ -24,6 +29,7 @@
 import type { PropType } from "vue"
 import type { NoteSearchResult } from "@generated/backend"
 import { computed } from "vue"
+import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 
 const props = defineProps({
   searchResult: { type: Object as PropType<NoteSearchResult>, required: true },
@@ -34,7 +40,7 @@ const isDifferentNotebook = computed(() => {
   if (props.notebookId === undefined) {
     return false
   }
-  return props.searchResult.noteTopology.notebookId !== props.notebookId
+  return props.searchResult.noteSearchResult.notebookId !== props.notebookId
 })
 </script>
 

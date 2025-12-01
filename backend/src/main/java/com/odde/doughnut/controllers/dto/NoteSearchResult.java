@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 public class NoteSearchResult {
   @NotNull
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private SimpleNoteSearchResult noteTopology;
+  private SimpleNoteSearchResult noteSearchResult;
 
   private Float distance;
 
-  public SimpleNoteSearchResult getNoteTopology() {
-    return this.noteTopology;
+  public SimpleNoteSearchResult getNoteSearchResult() {
+    return this.noteSearchResult;
   }
 
   public Float getDistance() {

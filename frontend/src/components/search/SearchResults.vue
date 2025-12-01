@@ -23,8 +23,8 @@
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
           v-for="result in filteredRecentNotes"
-          :key="result.noteTopology.id"
-          :noteTopology="result.noteTopology"
+          :key="result.noteSearchResult.id"
+          :noteTopology="result.noteSearchResult"
         />
       </div>
       <SearchResultCards
@@ -35,7 +35,7 @@
         :notebook-id="notebookId"
       >
         <template #button="{ searchResult: result }">
-          <slot name="button" :note-topology="result.noteTopology" />
+          <slot name="button" :note-topology="result.noteSearchResult" />
         </template>
       </SearchResultCards>
     </div>
@@ -50,10 +50,10 @@
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
           v-for="result in searchResult"
-          :key="result.noteTopology.id"
+          :key="result.noteSearchResult.id"
           :noteTopology="{
-            id: result.noteTopology.id,
-            titleOrPredicate: result.noteTopology.titleOrPredicate,
+            id: result.noteSearchResult.id,
+            titleOrPredicate: result.noteSearchResult.titleOrPredicate,
           }"
         />
       </div>
@@ -66,8 +66,8 @@
       >
         <template #button="{ searchResult: result }">
           <slot name="button" :note-topology="{
-            id: result.noteTopology.id,
-            titleOrPredicate: result.noteTopology.titleOrPredicate,
+            id: result.noteSearchResult.id,
+            titleOrPredicate: result.noteSearchResult.titleOrPredicate,
           }" />
           <small
             v-if="result.distance != null"
@@ -136,7 +136,7 @@ const filteredRecentNotes = computed(() => {
     ? model.recentNotes.filter((note) => note.id !== props.noteId)
     : model.recentNotes
   return notes.map((note) => ({
-    noteTopology: {
+    noteSearchResult: {
       id: note.id,
       titleOrPredicate: note.titleOrPredicate,
       notebookId: note.notebookId,

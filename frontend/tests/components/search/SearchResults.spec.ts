@@ -30,7 +30,7 @@ const searchResult = (
   distance?: number
 ): NoteSearchResult =>
   ({
-    noteTopology: makeMe.aSimpleNoteSearchResult
+    noteSearchResult: makeMe.aSimpleNoteSearchResult
       .id(id)
       .titleOrPredicate(title)
       .please(),

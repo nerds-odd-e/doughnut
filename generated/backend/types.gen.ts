@@ -248,7 +248,7 @@ export type SearchTerm = {
 };
 
 export type NoteSearchResult = {
-    noteTopology: SimpleNoteSearchResult;
+    noteSearchResult: SimpleNoteSearchResult;
     distance?: number;
 };
 

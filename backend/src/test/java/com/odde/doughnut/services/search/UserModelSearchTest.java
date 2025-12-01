@@ -66,7 +66,7 @@ public class UserModelSearchTest {
             anotherNote.getNotebook().getId(),
             anotherNote.getTopicConstructor());
     assertThat(
-        search().stream().map(NoteSearchResult::getNoteTopology).toList(), contains(expected));
+        search().stream().map(NoteSearchResult::getNoteSearchResult).toList(), contains(expected));
   }
 
   @Test
@@ -132,7 +132,7 @@ public class UserModelSearchTest {
       searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
       searchTerm.setAllMyCircles(allMyCircle);
       List<SimpleNoteSearchResult> actual =
-          search().stream().map(NoteSearchResult::getNoteTopology).toList();
+          search().stream().map(NoteSearchResult::getNoteSearchResult).toList();
       assertThat(actual, hasSize(expectedCount));
       assertThat(
           actual,
