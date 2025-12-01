@@ -1,6 +1,13 @@
 <template>
+  <GlobalBar>
+    <button
+      class="daisy-btn daisy-btn-sm daisy-btn-ghost"
+      @click="goToNotebooks"
+    >
+      Back to Notebooks
+    </button>
+  </GlobalBar>
   <div class="daisy-container daisy-mx-auto daisy-p-4">
-    <h3>Edit notebook settings</h3>
     <CheckInput
       scope-name="notebook"
       field="skipMemoryTrackingEntirely"
@@ -87,11 +94,13 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import { ref } from "vue"
+import { useRouter } from "vue-router"
 import type { Notebook, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import NotebookCertificateRequest from "@/components/notebook/NotebookCertificateRequest.vue"
@@ -115,6 +124,11 @@ const emit = defineEmits<{
 }>()
 
 const { showSuccessToast } = useToast()
+const router = useRouter()
+
+const goToNotebooks = () => {
+  router.push({ name: "notebooks" })
+}
 
 // Form data
 const {

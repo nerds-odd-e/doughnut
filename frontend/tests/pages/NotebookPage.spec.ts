@@ -18,7 +18,10 @@ describe("NotebookPage.spec", () => {
       .component(NotebookPage)
       .withRouter()
       .withCurrentUser(makeMe.aUser.please())
-      .withProps({ notebookId: notebook.id })
+      .currentRoute({
+        name: "notebookEdit",
+        params: { notebookId: String(notebook.id) },
+      })
       .render()
     await flushPromises()
     const input = screen.getByLabelText(/Number Of Questions In Assessment/i)

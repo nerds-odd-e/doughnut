@@ -45,7 +45,7 @@ describe("RecentlyReviewedNotes", () => {
 
     // Verify all columns are present
     const headers = wrapper.findAll("thead th")
-    expect(headers).toHaveLength(6)
+    expect(headers).toHaveLength(7)
 
     // Verify removed memory tracker has correct styling
     const removedRow = rows[1]

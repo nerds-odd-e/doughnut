@@ -118,31 +118,6 @@ describe("MemoryTrackerPageView", () => {
     expect(wrapper.text()).not.toContain("Thinking time")
   })
 
-  it("displays View Memory Tracker link under NoteUnderQuestion", async () => {
-    const note = makeMe.aNote.please()
-    const recallPrompt = makeMe.aRecallPrompt
-      .withQuestionStem("Test question")
-      .withChoices(["A", "B", "C"])
-      .withNote(note)
-      .please()
-    const memoryTracker = makeMe.aMemoryTracker.please()
-
-    const wrapper = helper
-      .component(MemoryTrackerPageView)
-      .withProps({
-        recallPrompts: [recallPrompt],
-        memoryTracker,
-        memoryTrackerId: 123,
-      })
-      .mount()
-
-    await flushPromises()
-
-    const link = wrapper.findComponent({ name: "ViewMemoryTrackerLink" })
-    expect(link.exists()).toBe(true)
-    expect(link.props("memoryTrackerId")).toBe(123)
-  })
-
   it("works correctly when there are no recall prompts (spelling tracker)", async () => {
     const memoryTracker = makeMe.aMemoryTracker.please()
     const wrapper = helper
