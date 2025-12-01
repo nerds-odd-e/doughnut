@@ -79,6 +79,22 @@ describe("main menu", () => {
     expect(navItem).toHaveClass("daisy-text-primary")
   })
 
+  it("highlights the note link when on notebook edit page", async () => {
+    useRouteValue.name = "notebookEdit"
+
+    helper.component(MainMenu).withProps({ user }).render()
+
+    // If HorizontalMenu is used, expand it first
+    const expandButton = screen.queryByLabelText("Toggle menu")
+    if (expandButton) {
+      await fireEvent.click(expandButton)
+    }
+
+    const noteLink = screen.getByLabelText("Note")
+    const navItem = noteLink.closest(".nav-item")
+    expect(navItem).toHaveClass("daisy-text-primary")
+  })
+
   it("shows note link in main menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
 
