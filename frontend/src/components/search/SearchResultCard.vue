@@ -2,7 +2,7 @@
   <div
     role="card"
     class="daisy-card daisy-bg-base-100 daisy-shadow-xl hover:daisy-shadow-2xl hover:daisy-bg-base-300 daisy-transition-all"
-    :class="{ 'different-notebook-border': isDifferentNotebook }"
+    :class="{ 'different-notebook-border daisy-border-primary': isDifferentNotebook }"
   >
     <div class="daisy-card-body daisy-p-4">
       <router-link
@@ -40,7 +40,8 @@ const isDifferentNotebook = computed(() => {
 
 <style scoped>
 .different-notebook-border {
-  border: 2px solid hsl(var(--p) / 0.5);
+  border-width: 1px !important;
+  border-style: solid !important;
 }
 </style>
 
