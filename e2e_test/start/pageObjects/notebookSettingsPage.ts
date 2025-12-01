@@ -12,8 +12,8 @@ const notebookSettingsPage = () => {
     },
 
     skipMemoryTracking() {
-      cy.formField('Skip Memory Tracking Entirely').check()
-      clickButton('Update')
+      cy.formField('Skip Memory Tracking').check()
+      clickButton('Update Settings')
       cy.pageIsNotLoading()
     },
     requestForNotebookApproval() {
@@ -31,7 +31,7 @@ const notebookSettingsPage = () => {
       certificateExpiry?: string
     }) {
       if (settings.numberOfQuestion !== undefined) {
-        cy.formField('Number Of Questions In Assessment').assignFieldValue(
+        cy.formField('Number of Questions in Assessment').assignFieldValue(
           `${settings.numberOfQuestion}`
         )
       }
@@ -41,7 +41,7 @@ const notebookSettingsPage = () => {
         )
       }
 
-      clickButton('Update')
+      clickButton('Update Settings')
       cy.pageIsNotLoading()
     },
     updateAiAssistantInstructions(instruction: string) {
