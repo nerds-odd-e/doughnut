@@ -65,17 +65,15 @@ onMounted(async () => {
         @update-user="user = $event"
       />
     </div>
-    <div class="daisy-flex daisy-flex-col daisy-flex-grow path-and-content">
-      <div class="daisy-flex-grow daisy-overflow-y-auto daisy-overflow-x-hidden main-content">
-        <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
-        <template v-else-if="userLoaded">
-          <router-view v-slot="{ Component }">
-            <KeepAlive :include="['RecallPage']">
-              <component :is="Component" />
-            </KeepAlive>
-          </router-view>
-        </template>
-      </div>
+    <div class="daisy-flex daisy-flex-col daisy-flex-grow daisy-overflow-y-auto daisy-overflow-x-hidden main-content">
+      <UserNewRegisterPage v-if="newUser" @update-user="user = $event" />
+      <template v-else-if="userLoaded">
+        <router-view v-slot="{ Component }">
+          <KeepAlive :include="['RecallPage']">
+            <component :is="Component" />
+          </KeepAlive>
+        </router-view>
+      </template>
     </div>
   </div>
   <TestMenu
@@ -102,15 +100,11 @@ onMounted(async () => {
   flex-shrink: 0;
 }
 
-.path-and-content {
+.main-content {
   margin-left: $main-menu-width;
   height: 100%;
   min-width: 0;
   flex: 1;
-}
-
-.main-content {
-  height: 100%;
   overflow-y: auto; // Only content area scrolls on desktop
 }
 
@@ -132,15 +126,11 @@ onMounted(async () => {
     background-color: transparent; // Remove parent background so menu-wrapper background shows
   }
 
-  .path-and-content {
+  .main-content {
     margin-left: 0;
     width: 100%;
     min-width: 0;
     height: 100%; // Full height for proper page calculations
-  }
-
-  .main-content {
-    height: 100%; // Full height for pages with sidebars
     overflow-y: auto; // Allow content area to scroll independently
   }
 }
@@ -151,14 +141,10 @@ onMounted(async () => {
     background-color: transparent; // Remove parent background so menu-wrapper background shows
   }
 
-  .path-and-content {
+  .main-content {
     width: 100%;
     min-width: 0;
     height: 100%; // Full height for proper page calculations
-  }
-
-  .main-content {
-    height: 100%; // Full height for pages with sidebars
     overflow-y: auto; // Allow content area to scroll independently
   }
 }

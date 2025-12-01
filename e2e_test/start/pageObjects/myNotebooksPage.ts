@@ -8,9 +8,8 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { subscribedNotebooks } from './subscribedNotebooks'
 
 const myNotebooksPage = () => {
-  cy.get('.path-and-content').within(() => {
-    cy.findByText('Notebooks')
-  })
+  cy.findByText('Notebooks', { selector: 'h2' })
+
   return {
     ...notebookList(),
     navigateToPath(notePath: NotePath) {
