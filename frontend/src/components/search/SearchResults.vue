@@ -22,22 +22,22 @@
       <div class="result-title">{{ displayState.title }}</div>
       <div v-if="isDropdown" class="dropdown-list">
         <NoteTitleWithLink
-          v-for="noteTopology in filteredRecentNotes"
-          :key="noteTopology.id"
-          :noteTopology="noteTopology"
+          v-for="result in filteredRecentNotes"
+          :key="result.noteTopology.id"
+          :noteTopology="result.noteTopology"
         />
       </div>
-      <Cards
+      <SearchResultCards
         v-else
         class="search-result"
-        :noteTopologies="filteredRecentNotes"
+        :search-results="filteredRecentNotes"
         :columns="3"
         :notebook-id="notebookId"
       >
-        <template #button="{ noteTopology }">
-          <slot name="button" :note-topology="noteTopology" />
+        <template #button="{ searchResult: result }">
+          <slot name="button" :note-topology="result.noteTopology" />
         </template>
-      </Cards>
+      </SearchResultCards>
     </div>
 
     <div v-if="displayState.showEmptyState" :class="displayState.containerClass">
@@ -82,13 +82,16 @@
 </template>
 
 <script setup lang="ts">
-import type { SearchTerm, NoteTopology } from "@generated/backend"
+import type {
+  SearchTerm,
+  NoteTopology,
+  NoteSearchResult,
+} from "@generated/backend"
 import { NoteController, SearchController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import { debounce } from "mini-debounce"
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue"
 import CheckInput from "../form/CheckInput.vue"
-import Cards from "../notes/Cards.vue"
 import SearchResultCards from "./SearchResultCards.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 import { SearchResultsModel } from "@/models/searchResultsModel"
@@ -133,10 +136,12 @@ const filteredRecentNotes = computed(() => {
     ? model.recentNotes.filter((note) => note.id !== props.noteId)
     : model.recentNotes
   return notes.map((note) => ({
-    id: note.id,
-    titleOrPredicate: note.titleOrPredicate,
-    notebookId: note.notebookId,
-  })) as (NoteTopology & { notebookId: number })[]
+    noteTopology: {
+      id: note.id,
+      titleOrPredicate: note.titleOrPredicate,
+      notebookId: note.notebookId,
+    },
+  })) as NoteSearchResult[]
 })
 
 const displayState = computed(() =>
