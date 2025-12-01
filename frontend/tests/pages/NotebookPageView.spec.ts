@@ -1,10 +1,10 @@
 import type { Notebook } from "@generated/backend"
-import NotebookEditDialog from "@/components/notebook/NotebookEditDialog.vue"
+import NotebookPageView from "@/pages/NotebookPageView.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach } from "vitest"
 
-describe("NotebookEditDialog.spec", () => {
+describe("NotebookPageView.spec", () => {
   beforeEach(() => {
     mockSdkService("getApprovalForNotebook", { approval: undefined })
   })
@@ -15,7 +15,7 @@ describe("NotebookEditDialog.spec", () => {
 
   it("Renders the default certificate expiry", async () => {
     const wrapper = helper
-      .component(NotebookEditDialog)
+      .component(NotebookPageView)
       .withRouter()
       .withProps({ notebook })
       .mount()
@@ -27,7 +27,7 @@ describe("NotebookEditDialog.spec", () => {
   })
   it("The certificate expiry field is editable", async () => {
     const wrapper = helper
-      .component(NotebookEditDialog)
+      .component(NotebookPageView)
       .withRouter()
       .withProps({ notebook })
       .mount()

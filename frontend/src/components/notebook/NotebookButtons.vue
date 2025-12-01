@@ -1,17 +1,13 @@
 <template>
   <div class="daisy-btn-group daisy-btn-group-sm daisy-flex daisy-align-items-center daisy-flex-wrap">
     <BazaarNotebookButtons v-if="notebook.circle" :notebook="notebook" :logged-in="true" />
-    <PopButton title="Edit notebook settings">
-      <template #button_face>
-        <SvgEditNotebook />
-      </template>
-      <template #default="{ closer }">
-        <NotebookEditDialog 
-          v-bind="{ notebook, user, closer }" 
-          @notebook-updated="(updatedNotebook) => emit('notebook-updated', updatedNotebook)"
-        />
-      </template>
-    </PopButton>
+    <button
+      class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+      @click="editNotebookSettings"
+      title="Edit notebook settings"
+    >
+      <SvgEditNotebook />
+    </button>
     <PopButton
       title="Move to ..."
       v-if="user?.externalIdentifier === notebook.creatorId"
@@ -41,7 +37,6 @@ import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
 import type { Notebook, User } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
-import NotebookEditDialog from "./NotebookEditDialog.vue"
 import NotebookMoveDialog from "./NotebookMoveDialog.vue"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 
@@ -56,6 +51,13 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "notebook-updated", notebook: Notebook): void
 }>()
+
+const editNotebookSettings = () => {
+  router.push({
+    name: "notebookEdit",
+    params: { notebookId: props.notebook.id },
+  })
+}
 
 const shareNotebook = async () => {
   if (await popups.confirm(`Confirm to share?`)) {

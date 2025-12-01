@@ -1,6 +1,6 @@
 <template>
   <h4 class="daisy-text-lg">Request to obtain certificate from assessment</h4>
-  <ContentLoader v-if="loaded === false" />
+  <ContentLoader v-if="approval === undefined && !loaded" />
   <div v-else>
     <button :class="approvalButtonClasses" :disabled="isApprovalButtonDisabled" @click="requestNotebookApproval">
       {{ approvalButtonText }}
@@ -10,28 +10,31 @@
 
 <script setup lang="ts">
 import type { PropType } from "vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import type { Notebook, NotebookCertificateApproval } from "@generated/backend"
 import { NotebookCertificateApprovalController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import ContentLoader from "@/components/commons/ContentLoader.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
+  approval: {
+    type: Object as PropType<NotebookCertificateApproval | undefined>,
+    required: false,
+  },
+  loaded: { type: Boolean, default: false },
 })
 
-const loaded = ref(false)
-const approval = ref<NotebookCertificateApproval | undefined>()
+const approval = ref<NotebookCertificateApproval | undefined>(props.approval)
 
-onMounted(async () => {
-  const { data: dto, error } =
-    await NotebookCertificateApprovalController.getApprovalForNotebook({
-      path: { notebook: props.notebook.id },
-    })
-  if (!error) {
-    approval.value = dto!.approval
-    loaded.value = true
-  }
-})
+// Update approval when prop changes
+watch(
+  () => props.approval,
+  (newApproval) => {
+    approval.value = newApproval
+  },
+  { immediate: true }
+)
 
 const approvalButtonText = computed(() => {
   if (approval.value === undefined || approval.value === null) {

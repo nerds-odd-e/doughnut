@@ -17,6 +17,7 @@ import RecentPage from "@/pages/RecentPage.vue"
 import CirclesPage from "@/pages/CirclesPage.vue"
 import ManageMCPTokensPage from "@/pages/ManageMCPTokensPage.vue"
 import MemoryTrackerPage from "@/pages/MemoryTrackerPage.vue"
+import NotebookPage from "@/pages/NotebookPage.vue"
 import { routeMetadata } from "./routeMetadata"
 
 // Please start most of the path with "/d/"
@@ -43,6 +44,7 @@ const componentMap: Record<string, unknown> = {
   circles: CirclesPage,
   manageMCPTokens: ManageMCPTokensPage,
   memoryTrackerShow: MemoryTrackerPage,
+  notebookEdit: NotebookPage,
 }
 
 // Combine route metadata with components

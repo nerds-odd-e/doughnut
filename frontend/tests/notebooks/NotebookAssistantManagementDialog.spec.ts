@@ -3,7 +3,6 @@ import { saveAs } from "file-saver"
 import NotebookAssistantManagementDialog from "@/components/notebook/NotebookAssistantManagementDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
-import type { NotebookAiAssistant } from "@generated/backend"
 
 vitest.mock("file-saver", () => ({ saveAs: vitest.fn() }))
 
@@ -12,7 +11,6 @@ describe("NotebookAssistantManagementDialog.vue", () => {
   const notebook = makeMe.aNotebook.please()
   const mockedDump = vitest.fn()
   const mockedUpdateAiAssistant = vitest.fn()
-  const mockedGetAiAssistant = vitest.fn()
   const originalCreateObjectURL = URL.createObjectURL
   const originalRevokeObjectURL = URL.revokeObjectURL
 
@@ -28,15 +26,12 @@ describe("NotebookAssistantManagementDialog.vue", () => {
     mockSdkServiceWithImplementation("updateAiAssistant", async (options) => {
       return await mockedUpdateAiAssistant(options)
     })
-    mockSdkServiceWithImplementation("getAiAssistant", async (options) => {
-      return await mockedGetAiAssistant(options)
-    })
-    mockedGetAiAssistant.mockResolvedValue(undefined) // default to no existing settings
     mockedDump.mockResolvedValue([])
     wrapper = helper
       .component(NotebookAssistantManagementDialog)
       .withProps({
         notebook,
+        additionalInstructions: "",
       })
       .mount()
   })
@@ -91,10 +86,9 @@ describe("NotebookAssistantManagementDialog.vue", () => {
 
   describe("Component Initialization", () => {
     it("loads empty settings when no assistant exists", async () => {
-      mockedGetAiAssistant.mockResolvedValue(undefined)
       wrapper = helper
         .component(NotebookAssistantManagementDialog)
-        .withProps({ notebook })
+        .withProps({ notebook, additionalInstructions: "" })
         .mount()
       await flushPromises()
 
@@ -104,19 +98,9 @@ describe("NotebookAssistantManagementDialog.vue", () => {
 
     it("loads existing settings when assistant exists", async () => {
       const existingInstructions = "Existing instructions"
-      const mockAssistant: Partial<NotebookAiAssistant> = {
-        additionalInstructionsToAi: existingInstructions,
-        id: 1,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      mockedGetAiAssistant.mockResolvedValue(
-        mockAssistant as NotebookAiAssistant
-      )
-
       wrapper = helper
         .component(NotebookAssistantManagementDialog)
-        .withProps({ notebook })
+        .withProps({ notebook, additionalInstructions: existingInstructions })
         .mount()
       await flushPromises()
 

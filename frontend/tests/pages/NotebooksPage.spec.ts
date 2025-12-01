@@ -141,7 +141,7 @@ describe("Notebooks Page", () => {
       expect(notebookButtons.exists()).toBe(false)
     })
 
-    it("should handle event from nested NotebookEditDialog through NotebookButtons", async () => {
+    it("should handle event from NotebookButtons", async () => {
       const originalNotebook = {
         ...makeMe.aNotebook.please(),
         title: "Before Update",
@@ -171,7 +171,7 @@ describe("Notebooks Page", () => {
       // Verify initial state
       expect(vm.notebooks?.[0]?.title).toBe("Before Update")
 
-      // Simulate event propagating from NotebookEditDialog through NotebookButtons
+      // Simulate event from NotebookButtons
       const notebookButtons = wrapper.findComponent({ name: "NotebookButtons" })
       notebookButtons.vm.$emit("notebook-updated", updatedNotebook)
       await flushPromises()

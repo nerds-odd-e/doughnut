@@ -24,19 +24,29 @@
 import type { Notebook } from "@generated/backend"
 import { NotebookController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { useToast } from "@/composables/useToast"
 import type { PropType } from "vue"
-import { ref, onMounted } from "vue"
+import { ref, watch } from "vue"
 import { saveAs } from "file-saver"
 import TextInput from "../form/TextInput.vue"
 
 const props = defineProps({
   notebook: { type: Object as PropType<Notebook>, required: true },
-  closer: { type: Function as PropType<() => void>, required: false },
+  additionalInstructions: { type: String, default: "" },
 })
 
-const additionalInstruction = ref("")
+const additionalInstruction = ref(props.additionalInstructions)
 
-const emit = defineEmits(["close"])
+const { showSuccessToast } = useToast()
+
+// Update when prop changes
+watch(
+  () => props.additionalInstructions,
+  (newInstructions) => {
+    additionalInstruction.value = newInstructions
+  },
+  { immediate: true }
+)
 
 const updateAiInstructions = async () => {
   const { error } = await apiCallWithLoading(() =>
@@ -48,10 +58,7 @@ const updateAiInstructions = async () => {
     })
   )
   if (!error) {
-    // Success - handled by global interceptor
-    if (props.closer) {
-      props.closer()
-    }
+    showSuccessToast("Notebook AI assistant settings updated successfully")
   }
 }
 
@@ -66,19 +73,6 @@ const downloadNotebookDump = async () => {
     saveAs(blob, "notebook-dump.json")
   }
 }
-
-const loadCurrentSettings = async () => {
-  const { data: assistant, error } = await NotebookController.getAiAssistant({
-    path: { notebook: props.notebook.id },
-  })
-  if (!error && assistant) {
-    additionalInstruction.value = assistant.additionalInstructionsToAi || ""
-  }
-}
-
-onMounted(async () => {
-  await loadCurrentSettings()
-})
 </script>
 
 <style scoped>
