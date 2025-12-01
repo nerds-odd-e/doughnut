@@ -18,8 +18,4 @@ public class NoteTopology {
   public int getId() {
     return this.id;
   }
-
-  public String getTitle() {
-    return this.titleOrPredicate;
-  }
 }

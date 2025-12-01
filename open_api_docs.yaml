@@ -3658,8 +3658,6 @@ components:
           $ref: "#/components/schemas/NoteTopology"
         parentOrSubjectNoteTopology:
           $ref: "#/components/schemas/NoteTopology"
-        title:
-          type: string
       required:
       - id
       - titleOrPredicate
