@@ -31,27 +31,13 @@ describe("circle show page", () => {
   })
 
   const moveButtonTitle = "Move to ..."
-  it("shows the move notebook button", async () => {
+  it("does not show the move notebook button on circle page (moved to settings)", async () => {
     helper
       .component(CircleShowPage)
       .withRouter()
       .withCurrentUser(currentUser)
       .withCleanStorage()
       .withProps({ circleId: circleNote.id })
-      .render()
-    await flushPromises()
-    screen.getByTitle(moveButtonTitle)
-  })
-
-  it("must not show the move button if not the creator", async () => {
-    helper
-      .component(CircleShowPage)
-      .withRouter()
-      .withCurrentUser(makeMe.aUser.please())
-      .withCleanStorage()
-      .withProps({
-        circleId: circleNote.id,
-      })
       .render()
     await flushPromises()
     expect(screen.queryByTitle(moveButtonTitle)).toBeNull()

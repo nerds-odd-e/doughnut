@@ -67,6 +67,16 @@ const notebookSettingsPage = () => {
       cy.pageIsNotLoading()
       return this
     },
+    shareNotebookToBazaar() {
+      cy.findByRole('button', { name: 'Share notebook to bazaar' }).click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      cy.pageIsNotLoading()
+      return this
+    },
+    moveNotebookToCircle() {
+      cy.findByRole('button', { name: 'Move to ...' }).click()
+      return this
+    },
   }
 }
 

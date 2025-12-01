@@ -8,7 +8,44 @@
     </button>
   </GlobalBar>
   <div class="daisy-container daisy-mx-auto daisy-p-4">
-    <NotebookCard :notebook="notebook" />
+    <div class="notebook-head-note-wrapper">
+      <div class="daisy-px-4 daisy-pt-4 daisy-text-sm daisy-text-base-content/60">
+        Head note of notebook:
+      </div>
+      <router-link
+        :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
+        class="no-underline"
+      >
+        <div class="daisy-p-4">
+          <h5 class="daisy-text-lg daisy-font-semibold">
+            {{ notebook.title }}
+          </h5>
+          <p v-if="notebook.shortDetails" class="note-short-details">
+            {{ notebook.shortDetails }}
+          </p>
+        </div>
+      </router-link>
+    </div>
+    <div class="notebook-toolbar daisy-mb-4">
+      <div class="daisy-btn-group daisy-btn-group-sm">
+        <PopButton
+          title="Move to ..."
+          v-if="user?.externalIdentifier === notebook.creatorId"
+        >
+          <template #button_face>
+            <SvgMoveToCircle />
+          </template>
+          <NotebookMoveDialog v-bind="{ notebook }" />
+        </PopButton>
+        <button
+          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+          @click="shareNotebook()"
+          title="Share notebook to bazaar"
+        >
+          <SvgBazaarShare />
+        </button>
+      </div>
+    </div>
     <CheckInput
       scope-name="notebook"
       field="skipMemoryTrackingEntirely"
@@ -102,7 +139,11 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import NotebookCard from "@/components/notebooks/NotebookCard.vue"
+import PopButton from "@/components/commons/Popups/PopButton.vue"
+import usePopups from "@/components/commons/Popups/usePopups"
+import SvgBazaarShare from "@/components/svgs/SvgBazaarShare.vue"
+import SvgMoveToCircle from "@/components/svgs/SvgMoveToCircle.vue"
+import NotebookMoveDialog from "@/components/notebook/NotebookMoveDialog.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import NotebookCertificateRequest from "@/components/notebook/NotebookCertificateRequest.vue"
@@ -127,9 +168,23 @@ const emit = defineEmits<{
 
 const { showSuccessToast } = useToast()
 const router = useRouter()
+const { popups } = usePopups()
 
 const goToNotebooks = () => {
   router.push({ name: "notebooks" })
+}
+
+const shareNotebook = async () => {
+  if (await popups.confirm(`Confirm to share?`)) {
+    const { error } = await apiCallWithLoading(() =>
+      NotebookController.shareNotebook({
+        path: { notebook: props.notebook.id },
+      })
+    )
+    if (!error) {
+      await router.push({ name: "notebooks" })
+    }
+  }
 }
 
 // Form data
@@ -234,4 +289,17 @@ const updateIndexNotebook = async () => {
   isIndexing.value = false
 }
 </script>
+
+<style scoped>
+.notebook-head-note-wrapper {
+  background: oklch(var(--b2) / 0.8);
+  border-radius: 3px;
+  margin-bottom: 1rem;
+}
+
+.note-short-details {
+  color: oklch(var(--bc) / 0.6);
+  line-height: 2rem;
+}
+</style>
 

@@ -4,8 +4,7 @@ import notebookSettingsPage from './notebookSettingsPage'
 export const notebookCard = (notebook: string) => ({
   ...notebookList(),
   shareNotebookToBazaar() {
-    findNotebookCardButton(notebook, 'Share notebook to bazaar').click()
-    cy.findByRole('button', { name: 'OK' }).click()
+    return this.editNotebookSettings().shareNotebookToBazaar()
   },
   updateSubscription() {
     findNotebookCardButton(notebook, 'Edit subscription').click()
