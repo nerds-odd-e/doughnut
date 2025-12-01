@@ -98,18 +98,21 @@ export function setupGlobalClient(apiStatus: ApiStatus) {
 
 /**
  * Handles API errors from SDK result format.
- * Shows error toasts and handles special cases (404, 400).
+ * Shows error toasts and handles special cases (401, 404, 400).
+ * 401 and 404 errors are handled silently (no toast).
  */
 function handleSdkError(result: SdkResult) {
   if (!apiStatusHandler) return
   if (!result.error) return
 
   const status = result.response?.status
-  const url = result.response?.url
-  const method = result.request?.method
   const errorBody = result.error
 
   if (status === 401) {
+    return
+  }
+
+  if (status === 404) {
     return
   }
 
@@ -126,19 +129,10 @@ function handleSdkError(result: SdkResult) {
     msg = errorBody
   }
 
-  // For 404 errors, include endpoint details for better debugging
-  if (status === 404) {
-    const enhancedMsg = `[404 Not Found] ${method || "UNKNOWN"} ${url || "UNKNOWN"}\n\n${msg}`
-    msg = enhancedMsg
-  }
-
   // Show error toast
   const toast = useToast()
-  // For 404 errors, show longer timeout and make it more visible
-  const timeout = status === 404 ? 15000 : 3000 // 15 seconds for 404, 3 seconds for others
   toast.error(msg, {
-    timeout,
-    closeOnClick: false, // Prevent accidental dismissal for 404 errors
+    timeout: 3000,
     pauseOnFocusLoss: true,
     pauseOnHover: true,
   })

@@ -51,7 +51,7 @@ describe("clientSetup", () => {
       expect(mockToast.error).not.toHaveBeenCalled()
     })
 
-    it("enhances 404 errors with method and URL for wrapped calls", async () => {
+    it("does NOT show error toast for 404 errors in wrapped calls", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 404,
@@ -62,13 +62,7 @@ describe("clientSetup", () => {
       )
 
       expect(error).toBeDefined()
-      expect(mockToast.error).toHaveBeenCalledWith(
-        expect.stringContaining("[404 Not Found]"),
-        expect.objectContaining({
-          timeout: 15000,
-          closeOnClick: false,
-        })
-      )
+      expect(mockToast.error).not.toHaveBeenCalled()
     })
 
     it("does NOT show 404 errors for non-wrapped (silent) calls", async () => {
@@ -83,7 +77,7 @@ describe("clientSetup", () => {
       expect(mockToast.error).not.toHaveBeenCalled()
     })
 
-    it("uses shorter timeout for non-404 errors in wrapped calls", async () => {
+    it("uses 3 second timeout for non-404 errors in wrapped calls", async () => {
       fetchMock.mockResponse(JSON.stringify({}), {
         url: `${baseUrl}/api/user`,
         status: 500,
