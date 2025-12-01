@@ -61,6 +61,7 @@ export const WithAnsweredQuestion: Story = {
         true
       ),
     ],
+    memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
 }
@@ -77,6 +78,7 @@ export const WithIncorrectAnswer: Story = {
         false
       ),
     ],
+    memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
 }
@@ -127,6 +129,7 @@ export const NoteWithManyAncestors: Story = {
           .please()
       })(),
     ],
+    memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
 }
@@ -135,6 +138,7 @@ export const NoteWithManyAncestors: Story = {
 export const NoQuestionFound: Story = {
   args: {
     recallPrompts: [],
+    memoryTracker: makeMe.aMemoryTracker.please(),
     memoryTrackerId: 1,
   },
 }

@@ -27,11 +27,13 @@ describe("MemoryTrackerPageView", () => {
         thinkingTimeMs: 5234,
       })
       .please()
+    const memoryTracker = makeMe.aMemoryTracker.please()
 
     const wrapper = helper
       .component(MemoryTrackerPageView)
       .withProps({
         recallPrompts: [recallPrompt],
+        memoryTracker,
         memoryTrackerId: 1,
       })
       .mount()
@@ -52,11 +54,13 @@ describe("MemoryTrackerPageView", () => {
         thinkingTimeMs: 500,
       })
       .please()
+    const memoryTracker = makeMe.aMemoryTracker.please()
 
     const wrapper = helper
       .component(MemoryTrackerPageView)
       .withProps({
         recallPrompts: [recallPrompt],
+        memoryTracker,
         memoryTrackerId: 1,
       })
       .mount()
@@ -77,11 +81,13 @@ describe("MemoryTrackerPageView", () => {
         thinkingTimeMs: 125000,
       })
       .please()
+    const memoryTracker = makeMe.aMemoryTracker.please()
 
     const wrapper = helper
       .component(MemoryTrackerPageView)
       .withProps({
         recallPrompts: [recallPrompt],
+        memoryTracker,
         memoryTrackerId: 1,
       })
       .mount()
@@ -96,11 +102,13 @@ describe("MemoryTrackerPageView", () => {
       .withQuestionStem("Test question")
       .withChoices(["A", "B", "C"])
       .please()
+    const memoryTracker = makeMe.aMemoryTracker.please()
 
     const wrapper = helper
       .component(MemoryTrackerPageView)
       .withProps({
         recallPrompts: [recallPrompt],
+        memoryTracker,
         memoryTrackerId: 1,
       })
       .mount()
@@ -117,11 +125,13 @@ describe("MemoryTrackerPageView", () => {
       .withChoices(["A", "B", "C"])
       .withNote(note)
       .please()
+    const memoryTracker = makeMe.aMemoryTracker.please()
 
     const wrapper = helper
       .component(MemoryTrackerPageView)
       .withProps({
         recallPrompts: [recallPrompt],
+        memoryTracker,
         memoryTrackerId: 123,
       })
       .mount()
@@ -134,10 +144,12 @@ describe("MemoryTrackerPageView", () => {
   })
 
   it("works correctly when there are no recall prompts (spelling tracker)", async () => {
+    const memoryTracker = makeMe.aMemoryTracker.please()
     const wrapper = helper
       .component(MemoryTrackerPageView)
       .withProps({
         recallPrompts: [],
+        memoryTracker,
         memoryTrackerId: 456,
       })
       .mount()

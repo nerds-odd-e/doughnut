@@ -3,6 +3,49 @@
     This memory tracker has been removed from tracking.
   </div>
   <div v-else>
+    <div v-if="memoryTracker" class="daisy-card daisy-shadow-sm daisy-mb-6">
+      <div class="daisy-card-body">
+        <h2 class="daisy-card-title daisy-text-lg daisy-mb-4">Memory Tracker Information</h2>
+        <div class="daisy-grid daisy-grid-cols-2 daisy-gap-4 daisy-text-sm">
+          <div>
+            <span class="daisy-font-semibold">Assimilated Time:</span>
+            <span class="daisy-ml-2">
+              {{ memoryTracker.assimilatedAt ? new Date(memoryTracker.assimilatedAt).toLocaleString() : 'N/A' }}
+            </span>
+          </div>
+          <div>
+            <span class="daisy-font-semibold">Last Recall Time:</span>
+            <span class="daisy-ml-2">
+              {{ memoryTracker.lastRecalledAt ? new Date(memoryTracker.lastRecalledAt).toLocaleString() : 'N/A' }}
+            </span>
+          </div>
+          <div>
+            <span class="daisy-font-semibold">Next Recall Time:</span>
+            <span class="daisy-ml-2">
+              {{ new Date(memoryTracker.nextRecallAt).toLocaleString() }}
+            </span>
+          </div>
+          <div>
+            <span class="daisy-font-semibold">Forgetting Curve Index:</span>
+            <span class="daisy-ml-2">
+              {{ memoryTracker.forgettingCurveIndex ?? 'N/A' }}
+            </span>
+          </div>
+          <div>
+            <span class="daisy-font-semibold">Repetition Count:</span>
+            <span class="daisy-ml-2">
+              {{ memoryTracker.repetitionCount ?? 'N/A' }}
+            </span>
+          </div>
+          <div>
+            <span class="daisy-font-semibold">Spelling:</span>
+            <span class="daisy-ml-2">
+              {{ memoryTracker.spelling ? 'Yes' : 'No' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="daisy-mb-4 daisy-flex daisy-justify-end">
       <button
         class="daisy-btn daisy-btn-secondary"
@@ -73,7 +116,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from "vue"
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt, MemoryTracker } from "@generated/backend"
 import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/review/NoteUnderQuestion.vue"
 import QuestionDisplay from "@/components/review/QuestionDisplay.vue"
@@ -87,6 +130,10 @@ import SvgNoReview from "@/components/svgs/SvgNoReview.vue"
 const props = defineProps({
   recallPrompts: {
     type: Array as PropType<RecallPrompt[]>,
+    required: true,
+  },
+  memoryTracker: {
+    type: Object as PropType<MemoryTracker>,
     required: true,
   },
   memoryTrackerId: {

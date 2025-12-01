@@ -12,7 +12,6 @@
         <th>Repetition Count</th>
         <th>Forgetting Curve Index</th>
         <th>Next Recall</th>
-        <th>Actions</th>
       </tr>
     </thead>
     <tbody>

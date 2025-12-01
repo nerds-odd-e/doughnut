@@ -1,14 +1,15 @@
 <template>
   <ContainerPage
-    v-bind="{ contentLoaded: recallPrompts !== undefined, title: 'Memory Tracker' }"
+    v-bind="{ contentLoaded: error || (recallPrompts !== undefined && memoryTracker !== undefined), title: 'Memory Tracker' }"
   >
-    <ContentLoader v-if="recallPrompts === undefined && !error" />
-    <div v-else-if="error" class="daisy-alert daisy-alert-error">
-      Error loading recall prompts
+    <div v-if="error" class="daisy-alert daisy-alert-error">
+      Error loading memory tracker data
     </div>
+    <ContentLoader v-else-if="recallPrompts === undefined || memoryTracker === undefined" />
     <MemoryTrackerPageView
-      v-else-if="recallPrompts !== undefined"
+      v-else-if="recallPrompts !== undefined && memoryTracker !== undefined"
       :recall-prompts="recallPrompts"
+      :memory-tracker="memoryTracker"
       :memory-tracker-id="memoryTrackerId"
     />
   </ContainerPage>
@@ -16,7 +17,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import type { RecallPrompt } from "@generated/backend"
+import type { RecallPrompt, MemoryTracker } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import ContainerPage from "@/pages/commons/ContainerPage.vue"
@@ -28,18 +29,24 @@ const props = defineProps<{
 }>()
 
 const recallPrompts = ref<RecallPrompt[] | undefined>(undefined)
+const memoryTracker = ref<MemoryTracker | undefined>(undefined)
 const error = ref(false)
 
 const fetchData = async () => {
-  const { data: prompts, error: fetchError } =
-    await MemoryTrackerController.getRecallPrompts({
+  const [promptsResult, trackerResult] = await Promise.all([
+    MemoryTrackerController.getRecallPrompts({
       path: { memoryTracker: props.memoryTrackerId },
-    })
-  if (fetchError) {
+    }),
+    MemoryTrackerController.showMemoryTracker({
+      path: { memoryTracker: props.memoryTrackerId },
+    }),
+  ])
+
+  if (promptsResult.error || trackerResult.error) {
     error.value = true
-    recallPrompts.value = []
   } else {
-    recallPrompts.value = prompts ?? []
+    recallPrompts.value = promptsResult.data ?? []
+    memoryTracker.value = trackerResult.data
   }
 }
 
