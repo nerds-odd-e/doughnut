@@ -116,14 +116,15 @@ onMounted(async () => {
 
 @media (max-width: theme('screens.lg')) {
   .app-container {
-    height: auto; // Remove fixed height to allow page scrolling
-    min-height: 100vh; // But maintain minimum viewport height
+    height: 100vh; // Keep fixed height for proper page height calculations
     flex-direction: column;
-    overflow-y: auto; // Make entire page scrollable
+    overflow: hidden; // Prevent container scrolling
   }
 
   .main-menu {
-    position: relative;
+    position: fixed; // Fixed at top, always visible
+    top: 0;
+    left: 0;
     width: auto;
     height: $main-menu-height-tablet;
     align-self: flex-start; // Align to left, not full width
@@ -133,13 +134,15 @@ onMounted(async () => {
 
   .path-and-content {
     margin-left: 0;
-    margin-top: calc(-1 * $main-menu-height-tablet); // Negative margin to overlap menu
+    padding-top: $main-menu-height-tablet; // Add padding to account for fixed menu
     width: 100%;
     min-width: 0;
+    height: 100%; // Full height for proper page calculations
   }
 
   .main-content {
-    overflow-y: visible; // Let parent handle scrolling
+    height: 100%; // Full height for pages with sidebars
+    overflow-y: auto; // Allow content area to scroll independently
   }
 }
 
@@ -150,13 +153,15 @@ onMounted(async () => {
   }
 
   .path-and-content {
-    margin-top: calc(-1 * $main-menu-height-mobile); // Negative margin to overlap menu
+    padding-top: $main-menu-height-mobile; // Add padding to account for fixed menu
     width: 100%;
     min-width: 0;
+    height: 100%; // Full height for proper page calculations
   }
 
   .main-content {
-    overflow-y: visible; // Let parent handle scrolling
+    height: 100%; // Full height for pages with sidebars
+    overflow-y: auto; // Allow content area to scroll independently
   }
 }
 </style>
