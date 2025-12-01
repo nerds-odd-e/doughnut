@@ -1,4 +1,7 @@
 <template>
+  <GlobalBar>
+    <h2 class="fs-4 daisy-text-2xl">Notebooks</h2>
+  </GlobalBar>
   <main class="daisy-mb-8">
     <div class="daisy-flex daisy-items-center daisy-justify-between daisy-mb-6">
       <h2 class="daisy-text-2xl daisy-font-bold">My Notebooks</h2>
@@ -43,6 +46,7 @@ import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue"
 import NotebookCardsWithButtons from "@/components/notebook/NotebookCardsWithButtons.vue"
 import NotebookButtons from "@/components/notebook/NotebookButtons.vue"
 import SubscriptionNoteButtons from "@/components/subscriptions/SubscriptionNoteButtons.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 defineProps({
   notebooks: {

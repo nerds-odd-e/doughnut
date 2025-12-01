@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined, title: 'Notebooks' }">
+  <ContainerPage v-bind="{ contentLoaded: notebooks !== undefined }">
     <NotebooksPageView
       v-if="notebooks !== undefined && user !== undefined"
       :notebooks="notebooks"
