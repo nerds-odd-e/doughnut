@@ -7,8 +7,9 @@
       Back to Notebooks
     </button>
   </GlobalBar>
-  <div class="daisy-container daisy-mx-auto daisy-p-4">
-    <div class="notebook-head-note-wrapper">
+  <div class="daisy-container daisy-mx-auto daisy-p-4 daisy-max-w-6xl">
+    <!-- Head Note Section -->
+    <div class="notebook-head-note-wrapper daisy-mb-6">
       <div class="daisy-px-4 daisy-pt-4 daisy-text-sm daisy-text-base-content/60">
         Head note of notebook:
       </div>
@@ -28,12 +29,14 @@
     </div>
     
     <!-- Notebook Management Section -->
-    <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-my-4">
-      <h4 class="daisy-text-lg">Notebook Management</h4>
-      <p class="daisy-text-sm daisy-text-base-content/60">
-        Manage your notebook's organization and sharing settings.
-      </p>
-      <div class="daisy-flex daisy-gap-2">
+    <section class="settings-section daisy-mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Notebook Management</h4>
+        <p class="section-description">
+          Manage your notebook's organization and sharing settings.
+        </p>
+      </div>
+      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
         <PopButton
           title="Move to ..."
           v-if="user?.externalIdentifier === notebook.creatorId"
@@ -58,42 +61,83 @@
           </div>
         </button>
       </div>
-    </div>
+    </section>
     
-    <CheckInput
-      scope-name="notebook"
-      field="skipMemoryTrackingEntirely"
-      v-model="formData.skipMemoryTrackingEntirely"
-      :error-message="errors.skipMemoryTrackingEntirely"
-    />
-    <TextInput
-      scope-name="notebook"
-      field="numberOfQuestionsInAssessment"
-      v-model="formData.numberOfQuestionsInAssessment"
-      :error-message="errors.numberOfQuestionsInAssessment"
-    />
-    <TextInput
-      scope-name="notebook"
-      field="certificateExpiry"
-      hint="Format (1y 1m 1d)"
-      v-model="formData.certificateExpiry"
-      :error-message="errors.certificateExpiry"
-    />
-    <button class="daisy-btn daisy-btn-primary daisy-mt-2" @click="processForm">
-      Update
-    </button>
-    <hr/>
-    <div>
+    <!-- Notebook Settings Section -->
+    <section class="settings-section daisy-mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Notebook Settings</h4>
+        <p class="section-description">
+          Configure memory tracking, assessment, and certificate settings for this notebook.
+        </p>
+      </div>
+      <div class="settings-grid">
+        <div class="settings-item">
+          <CheckInput
+            scope-name="notebook"
+            field="skipMemoryTrackingEntirely"
+            title="Skip Memory Tracking"
+            v-model="formData.skipMemoryTrackingEntirely"
+            :error-message="errors.skipMemoryTrackingEntirely"
+          />
+          <p class="field-hint">
+            When enabled, notes in this notebook will not be included in memory tracking and review sessions.
+          </p>
+        </div>
+        <div class="settings-item">
+          <TextInput
+            scope-name="notebook"
+            field="numberOfQuestionsInAssessment"
+            title="Number of Questions in Assessment"
+            v-model="formData.numberOfQuestionsInAssessment"
+            :error-message="errors.numberOfQuestionsInAssessment"
+          />
+          <p class="field-hint">
+            The number of questions to include in certificate assessments for this notebook.
+          </p>
+        </div>
+        <div class="settings-item">
+          <TextInput
+            scope-name="notebook"
+            field="certificateExpiry"
+            title="Certificate Expiry"
+            hint="Format: 1y 1m 1d"
+            v-model="formData.certificateExpiry"
+            :error-message="errors.certificateExpiry"
+          />
+          <p class="field-hint">
+            How long certificates issued for this notebook remain valid. Use format like "1y" for 1 year, "6m" for 6 months, or "1y 2m 3d" for combined periods.
+          </p>
+        </div>
+      </div>
+      <button class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-mt-4" @click="processForm">
+        Update Settings
+      </button>
+    </section>
+
+    <!-- Certificate Request Section -->
+    <section class="settings-section daisy-mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Certificate Request</h4>
+        <p class="section-description">
+          Request approval to obtain a certificate from assessment completion.
+        </p>
+      </div>
       <NotebookCertificateRequest 
         v-bind="{ notebook, approval, loaded: approvalLoaded }" 
       />
-    </div>
+    </section>
 
-    <!-- Obsidian Import/Export Section -->
-    <div class="daisy-flex daisy-flex-col daisy-gap-2 daisy-my-4">
-      <h4 class="daisy-text-lg">Obsidian Integration</h4>
-      <div class="daisy-flex daisy-gap-2">
-        <label class="daisy-btn daisy-btn-sm daisy-btn-outline">
+    <!-- Obsidian Integration Section -->
+    <section class="settings-section daisy-mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Obsidian Integration</h4>
+        <p class="section-description">
+          Import notes from Obsidian vaults or export this notebook for use in Obsidian.
+        </p>
+      </div>
+      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+        <label class="daisy-btn daisy-btn-outline daisy-btn-sm">
           Import from Obsidian
           <input
             type="file"
@@ -103,27 +147,39 @@
             @change="handleObsidianImport"
           />
         </label>
-        <button class="daisy-btn daisy-btn-sm daisy-btn-outline" @click="exportForObsidian">
+        <button class="daisy-btn daisy-btn-outline daisy-btn-sm" @click="exportForObsidian">
           Export for Obsidian
         </button>
       </div>
-    </div>
+    </section>
 
     <!-- Admin Section -->
     <template v-if="user?.admin">
-      <hr/>
-      <NotebookAssistantManagementDialog 
-        :notebook="notebook" 
-        :additional-instructions="additionalInstructions"
-      />
+      <section class="settings-section daisy-mb-6">
+        <div class="section-header">
+          <h4 class="section-title">Assistant Management</h4>
+          <p class="section-description">
+            Configure AI assistant settings and instructions for this notebook.
+          </p>
+        </div>
+        <NotebookAssistantManagementDialog 
+          :notebook="notebook" 
+          :additional-instructions="additionalInstructions"
+        />
+      </section>
     </template>
 
     <!-- Notebook Indexing Section -->
-    <div class="daisy-mt-4">
-      <h4 class="daisy-text-lg daisy-mb-2">Notebook Indexing</h4>
-      <div class="daisy-flex daisy-gap-2">
+    <section class="settings-section daisy-mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Notebook Indexing</h4>
+        <p class="section-description">
+          Manage the search index for this notebook. Reset to rebuild from scratch, or update to index new content.
+        </p>
+      </div>
+      <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
         <button
-          class="daisy-btn daisy-btn-secondary"
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
           @click="reindexNotebook"
           :disabled="isIndexing"
         >
@@ -131,7 +187,7 @@
           <span v-else>Reset notebook index</span>
         </button>
         <button
-          class="daisy-btn daisy-btn-secondary"
+          class="daisy-btn daisy-btn-outline daisy-btn-sm"
           @click="updateIndexNotebook"
           :disabled="isIndexing"
         >
@@ -139,7 +195,7 @@
           <span v-else>Update index</span>
         </button>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
@@ -307,13 +363,63 @@ const updateIndexNotebook = async () => {
 <style scoped>
 .notebook-head-note-wrapper {
   background: oklch(var(--b2) / 0.8);
-  border-radius: 3px;
-  margin-bottom: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
 }
 
 .note-short-details {
   color: oklch(var(--bc) / 0.6);
-  line-height: 2rem;
+  line-height: 1.6;
+  margin-top: 0.5rem;
+}
+
+.settings-section {
+  background: oklch(var(--b1));
+  border: 1px solid oklch(var(--b3));
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.section-header {
+  margin-bottom: 1.25rem;
+}
+
+.section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: oklch(var(--bc));
+}
+
+.section-description {
+  font-size: 0.875rem;
+  color: oklch(var(--bc) / 0.7);
+  line-height: 1.5;
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.settings-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-hint {
+  font-size: 0.75rem;
+  color: oklch(var(--bc) / 0.6);
+  line-height: 1.4;
+  margin-top: 0.25rem;
 }
 </style>
 
