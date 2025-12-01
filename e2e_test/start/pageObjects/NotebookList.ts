@@ -5,15 +5,12 @@ export const notebookList = () => {
   cy.pageIsNotLoading()
   return {
     expectNotebookCards: (notebooks: Record<string, string>[]) => {
-      cy.get('.notebook-card .daisy-card-title').should(
-        'have.length',
-        notebooks.length
-      )
+      cy.get('.notebook-card h5').should('have.length', notebooks.length)
       notebooks.forEach((elem) => {
         for (const propName in elem) {
           if (propName === 'Title') {
             cy.findByText(elem[propName]!, {
-              selector: '.notebook-card .daisy-card-title',
+              selector: '.notebook-card h5',
             })
           } else {
             cy.findByText(elem[propName]!)
@@ -23,7 +20,7 @@ export const notebookList = () => {
     },
     expectNotebooks: (notebooks: string) => {
       cy.pageIsNotLoading()
-      cy.get('.notebook-card .daisy-card-title').then(($els) => {
+      cy.get('.notebook-card h5').then(($els) => {
         const cardTitles = Array.from($els, (el) => el.innerText)
         expect(cardTitles).to.deep.eq(commonSenseSplit(notebooks, ','))
       })
@@ -32,7 +29,7 @@ export const notebookList = () => {
       cy.pageIsNotLoading()
       cy.get('.notebook-card').should('be.visible')
       cy.findByText(notebook, {
-        selector: '.notebook-card .daisy-card-title',
+        selector: '.notebook-card h5',
       })
         .should('be.visible')
         .parents('.notebook-card')
@@ -48,7 +45,7 @@ export const findNotebookCardButton = (notebook: string, name: string) => {
     cy.get('.notebook-card').should('be.visible')
     // Find the card that contains the notebook title and store it as an alias
     cy.findByText(notebook, {
-      selector: '.notebook-card .daisy-card-title',
+      selector: '.notebook-card h5',
     })
       .should('be.visible')
       .parents('.daisy-card')

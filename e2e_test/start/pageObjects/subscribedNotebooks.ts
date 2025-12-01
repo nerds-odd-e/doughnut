@@ -11,7 +11,7 @@ export const subscribedNotebooks = () => {
     expectNotebook(notebookTitle: string) {
       getContainer().within(() => {
         cy.findByText(notebookTitle, {
-          selector: '.notebook-card .daisy-card-title',
+          selector: '.notebook-card h5',
         }).should(($el) => {
           expect(
             $el.length,
@@ -23,7 +23,7 @@ export const subscribedNotebooks = () => {
     expectNotebookNotPresent(notebookTitle: string) {
       getContainer().then(($container) => {
         cy.wrap($container)
-          .find('.notebook-card .daisy-card-title')
+          .find('.notebook-card h5')
           .should(($titles) => {
             const titles = Array.from($titles, (el) => el.textContent)
             expect(
@@ -36,7 +36,7 @@ export const subscribedNotebooks = () => {
     openNotebook(notebookTitle: string) {
       getContainer().within(() => {
         cy.findByText(notebookTitle, {
-          selector: '.notebook-card .daisy-card-title',
+          selector: '.notebook-card h5',
         }).click()
       })
     },

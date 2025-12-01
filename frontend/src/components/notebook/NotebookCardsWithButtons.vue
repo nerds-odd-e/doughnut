@@ -30,6 +30,10 @@ defineProps<{
 </script>
 
 <style scoped>
+.daisy-card {
+  height: 200px;
+}
+
 .daisy-card.subscribed-notebook .notebook-card {
   background: linear-gradient(to right, oklch(var(--p) / 0.2) 0%, oklch(var(--p) / 0.1) 5%);
   border: 1px solid oklch(var(--p) / 0.4);

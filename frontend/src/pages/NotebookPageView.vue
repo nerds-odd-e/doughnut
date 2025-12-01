@@ -8,6 +8,7 @@
     </button>
   </GlobalBar>
   <div class="daisy-container daisy-mx-auto daisy-p-4">
+    <NotebookCard :notebook="notebook" />
     <CheckInput
       scope-name="notebook"
       field="skipMemoryTrackingEntirely"
@@ -101,6 +102,7 @@ import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { useToast } from "@/composables/useToast"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import NotebookCard from "@/components/notebooks/NotebookCard.vue"
 import CheckInput from "@/components/form/CheckInput.vue"
 import TextInput from "@/components/form/TextInput.vue"
 import NotebookCertificateRequest from "@/components/notebook/NotebookCertificateRequest.vue"
