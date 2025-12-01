@@ -57,7 +57,9 @@ export const mcpAgentActions = () => {
         const searchResult = JSON.parse(responseText)
 
         // Check if noteSearchResult exists and has id
-        if (!(searchResult.noteSearchResult && searchResult.noteSearchResult.id)) {
+        if (
+          !(searchResult.noteSearchResult && searchResult.noteSearchResult.id)
+        ) {
           throw new Error(`Invalid search result structure: ${responseText}`)
         }
 
