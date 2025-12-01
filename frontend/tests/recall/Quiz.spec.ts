@@ -176,4 +176,77 @@ describe("repeat page", () => {
       await flushPromises()
     })
   })
+
+  describe("spelling memory trackers", () => {
+    it("should not call askAQuestion for spelling memory trackers", async () => {
+      const memoryTrackers = [
+        createMemoryTrackerLite(1, true), // spelling tracker
+        createMemoryTrackerLite(2, false), // normal tracker
+        createMemoryTrackerLite(3, true), // spelling tracker
+      ]
+      helper
+        .component(Quiz)
+        .withRouter()
+        .withCleanStorage()
+        .withProps({
+          memoryTrackers,
+          currentIndex: 0,
+          eagerFetchCount: 3,
+        })
+        .mount()
+      await flushPromises()
+
+      // Should only call askAQuestion for the non-spelling tracker (id: 2)
+      expect(askAQuestionSpy).toHaveBeenCalledTimes(1)
+      expect(askAQuestionSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { memoryTracker: 2 },
+        })
+      )
+    })
+
+    it("should not call askAQuestion when all trackers are spelling", async () => {
+      const memoryTrackers = [
+        createMemoryTrackerLite(1, true),
+        createMemoryTrackerLite(2, true),
+      ]
+      helper
+        .component(Quiz)
+        .withRouter()
+        .withCleanStorage()
+        .withProps({
+          memoryTrackers,
+          currentIndex: 0,
+          eagerFetchCount: 2,
+        })
+        .mount()
+      await flushPromises()
+
+      // Should not call askAQuestion at all
+      expect(askAQuestionSpy).not.toHaveBeenCalled()
+    })
+
+    it("should mark spelling trackers as fetched immediately", async () => {
+      const memoryTrackers = [createMemoryTrackerLite(1, true)]
+      const wrapper = helper
+        .component(Quiz)
+        .withRouter()
+        .withCleanStorage()
+        .withProps({
+          memoryTrackers,
+          currentIndex: 0,
+          eagerFetchCount: 1,
+        })
+        .mount()
+      await flushPromises()
+
+      // Should show spelling question component, not ContentLoader
+      expect(
+        wrapper.findComponent({ name: "SpellingQuestionComponent" }).exists()
+      ).toBe(true)
+      expect(wrapper.findComponent({ name: "ContentLoader" }).exists()).toBe(
+        false
+      )
+    })
+  })
 })
