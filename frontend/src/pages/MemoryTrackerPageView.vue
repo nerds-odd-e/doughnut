@@ -57,14 +57,13 @@
         <span>Remove from Review</span>
       </button>
     </div>
+    <div v-if="memoryTracker.note" class="daisy-mb-6">
+      <NoteUnderQuestion v-bind="{ noteTopology: memoryTracker.note.noteTopology }" />
+    </div>
     <div v-if="recallPrompts.length === 0" class="daisy-alert daisy-alert-info">
       No recall prompts found for this memory tracker.
     </div>
     <div v-else>
-      <div v-if="firstPromptNote" class="daisy-mb-6">
-        <NoteUnderQuestion v-bind="{ noteTopology: firstPromptNote.noteTopology }" />
-        <ViewMemoryTrackerLink :memory-tracker-id="memoryTrackerId" />
-      </div>
       <div
         v-for="prompt in recallPrompts"
         :key="prompt.id"
@@ -115,13 +114,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import type { RecallPrompt, MemoryTracker } from "@generated/backend"
 import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/review/NoteUnderQuestion.vue"
 import QuestionDisplay from "@/components/review/QuestionDisplay.vue"
 import ConversationButton from "@/components/review/ConversationButton.vue"
-import ViewMemoryTrackerLink from "@/components/review/ViewMemoryTrackerLink.vue"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "@/components/commons/Popups/usePopups"
@@ -148,10 +146,6 @@ const emit = defineEmits<{
 
 const removedFromTracking = ref(false)
 const { popups } = usePopups()
-
-const firstPromptNote = computed(() => {
-  return props.recallPrompts[0]?.note
-})
 
 const formatThinkingTime = (ms: number): string => {
   if (ms < 1000) {

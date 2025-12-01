@@ -9,6 +9,7 @@
           <th>Next Recall</th>
           <th>Recall Count</th>
           <th>Curve Index</th>
+          <th>Spelling</th>
           <th>Status</th>
         </tr>
       </thead>
@@ -24,6 +25,7 @@
           <td>{{ new Date(point.nextRecallAt!).toLocaleString() }}</td>
           <td>{{ point.repetitionCount }}</td>
           <td>{{ point.forgettingCurveIndex }}</td>
+          <td>{{ point.spelling ? 'Yes' : 'No' }}</td>
           <td>{{ point.removedFromTracking ? 'Removed' : 'Active' }}</td>
         </tr>
       </tbody>
