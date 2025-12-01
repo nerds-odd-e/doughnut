@@ -91,6 +91,11 @@ const useQuestionFetching = (props: QuizProps) => {
       const memoryTrackerId = memoryTracker?.memoryTrackerId
       if (memoryTrackerId === undefined) break
 
+      // Skip spelling memory trackers - they don't need AI-generated questions
+      if (memoryTracker?.spelling) {
+        continue
+      }
+
       const cachedValue = recallPromptCache.value[memoryTrackerId]
       if (cachedValue !== undefined) continue
 
@@ -149,6 +154,11 @@ const isCurrentMemoryTrackerFetching = computed(() => {
 })
 const currentQuestionFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
+  const memoryTracker = currentMemoryTracker.value
+  // Spelling trackers don't need recall prompts, so they're always "fetched"
+  if (memoryTracker?.spelling) {
+    return true
+  }
   return (
     memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
   )

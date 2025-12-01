@@ -37,6 +37,11 @@ public class RecallQuestionService {
   }
 
   public RecallPrompt generateAQuestion(MemoryTracker memoryTracker) {
+    // Spelling memory trackers should not have AI-generated questions
+    if (Boolean.TRUE.equals(memoryTracker.getSpelling())) {
+      return null;
+    }
+
     // First check if there's an existing unanswered recall prompt for this note and memory tracker
     RecallPrompt existingPrompt = findExistingUnansweredRecallPrompt(memoryTracker);
     if (existingPrompt != null) {
