@@ -1,12 +1,10 @@
 <template>
   <GlobalBar>
-    <h2 class="fs-4 daisy-text-2xl">Notebooks</h2>
+    <template #right>
+      <NotebookNewButton v-if="user">Add New Notebook</NotebookNewButton>
+    </template>
   </GlobalBar>
   <main class="daisy-mb-8">
-    <div class="daisy-flex daisy-items-center daisy-justify-between daisy-mb-6">
-      <h2 class="daisy-text-2xl daisy-font-bold">My Notebooks</h2>
-      <NotebookNewButton>Add New Notebook</NotebookNewButton>
-    </div>
     <NotebookCardsWithButtons v-if="notebooks.length > 0" :notebooks="notebooks">
       <template #default="{ notebook }">
         <NotebookButtons 

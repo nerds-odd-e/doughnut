@@ -8,7 +8,7 @@ import noteCreationForm from './noteForms/noteCreationForm'
 import { subscribedNotebooks } from './subscribedNotebooks'
 
 const myNotebooksPage = () => {
-  cy.findByText('Notebooks', { selector: 'h2' })
+  cy.findByText('Add New Notebook')
 
   return {
     ...notebookList(),

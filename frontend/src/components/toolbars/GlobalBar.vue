@@ -4,6 +4,7 @@
       <slot />
     </div>
     <div class="daisy-join daisy-join-horizontal daisy-flex-none">
+      <slot name="right" />
       <PopButton v-if="user" title="search note">
         <template #button_face>
           <SvgSearch />
