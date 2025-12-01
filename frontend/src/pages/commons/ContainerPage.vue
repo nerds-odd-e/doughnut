@@ -3,11 +3,7 @@
     <h2 class="fs-4 daisy-text-2xl">{{ title }}</h2>
   </GlobalBar>
 
-  <div :class="[
-    'daisy-mx-auto daisy-min-w-0',
-    { 'daisy-h-full daisy-min-h-full': props.fullHeight },
-    { 'daisy-container daisy-mt-3': !props.fullHeight }
-  ]">
+  <div class="daisy-mx-auto daisy-min-w-0 daisy-container daisy-mt-3">
     <ContentLoader v-if="!contentLoaded" />
     <template v-else>
       <slot />
@@ -22,11 +18,9 @@ import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 interface Props {
   title?: string
   contentLoaded?: boolean
-  fullHeight?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  fullHeight: false,
+withDefaults(defineProps<Props>(), {
   contentLoaded: true,
 })
 </script>
