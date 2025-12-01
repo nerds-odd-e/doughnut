@@ -56,12 +56,12 @@ export const mcpAgentActions = () => {
         const responseText = responseData.content[0]?.text || ''
         const searchResult = JSON.parse(responseText)
 
-        // Check if noteTopology exists and has id
-        if (!(searchResult.noteTopology && searchResult.noteTopology.id)) {
+        // Check if noteSearchResult exists and has id
+        if (!(searchResult.noteSearchResult && searchResult.noteSearchResult.id)) {
           throw new Error(`Invalid search result structure: ${responseText}`)
         }
 
-        const noteId = searchResult.noteTopology.id
+        const noteId = searchResult.noteSearchResult.id
 
         cy.task('callMcpToolWithParams', {
           apiName: 'get_note_graph',
