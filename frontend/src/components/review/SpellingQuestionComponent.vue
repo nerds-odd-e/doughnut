@@ -32,6 +32,7 @@ import {} from "@/managedApi/clientSetup"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"
+import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
 
 const props = defineProps({
   memoryTrackerId: {
@@ -44,6 +45,8 @@ const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
 const spellingQuestion = ref<SpellingQuestion>()
 const loading = ref(true)
+
+const { start, stop } = useThinkingTimeTracker()
 
 const fetchSpellingQuestion = async () => {
   loading.value = true
@@ -58,10 +61,12 @@ const fetchSpellingQuestion = async () => {
 }
 
 const submitAnswer = () => {
-  emits("answer", { spellingAnswer: spellingAnswer.value })
+  const thinkingTimeMs = stop()
+  emits("answer", { spellingAnswer: spellingAnswer.value, thinkingTimeMs })
 }
 
 onMounted(() => {
   fetchSpellingQuestion()
+  start()
 })
 </script>

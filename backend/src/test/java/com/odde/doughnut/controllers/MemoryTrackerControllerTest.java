@@ -260,6 +260,15 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldAcceptThinkingTimeMs() {
+      answerDTO.setThinkingTimeMs(5000);
+      SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
+      assertTrue(answerResult.getIsCorrect());
+      // Thinking time is accepted in the DTO but not stored for spelling answers
+      // (unlike multiple choice questions which create Answer entities)
+    }
+
+    @Test
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();

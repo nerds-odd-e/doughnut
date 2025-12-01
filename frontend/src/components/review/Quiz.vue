@@ -172,7 +172,10 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
   const { data: answerResult, error } = await apiCallWithLoading(() =>
     MemoryTrackerController.answerSpelling({
       path: { memoryTracker: currentMemoryTrackerId.value! },
-      body: { spellingAnswer: answerData.spellingAnswer! },
+      body: {
+        spellingAnswer: answerData.spellingAnswer!,
+        thinkingTimeMs: answerData.thinkingTimeMs,
+      },
     })
   )
   if (!error) {

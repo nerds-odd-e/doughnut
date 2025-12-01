@@ -288,6 +288,7 @@ export type MemoryTracker = {
 
 export type AnswerSpellingDto = {
     spellingAnswer?: string;
+    thinkingTimeMs?: number;
 };
 
 export type SpellingResultDto = {

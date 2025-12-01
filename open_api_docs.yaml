@@ -4000,6 +4000,9 @@ components:
       properties:
         spellingAnswer:
           type: string
+        thinkingTimeMs:
+          type: integer
+          format: int32
     SpellingResultDTO:
       type: object
       properties:
