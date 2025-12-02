@@ -25,6 +25,6 @@ public class YoungerSiblingRelationshipHandler extends RelationshipHandler {
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    focus.getYoungerSiblings().add(addedNote.getUriAndTitle());
+    focus.getYoungerSiblings().add(addedNote.getUri());
   }
 }

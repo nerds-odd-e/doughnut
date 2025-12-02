@@ -37,6 +37,6 @@ public class ChildRelationshipHandler extends RelationshipHandler {
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    focus.getChildren().add(addedNote.getUriAndTitle());
+    focus.getChildren().add(addedNote.getUri());
   }
 }

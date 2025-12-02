@@ -1,20 +1,27 @@
 package com.odde.doughnut.services.graphRAG;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.entities.Note;
 import lombok.Getter;
 
+@JsonPropertyOrder({"uri", "title"})
 public class UriAndTitle {
-  @Getter private final Note note;
+  @Getter @JsonIgnore private final Note note;
 
   private UriAndTitle(Note note) {
     this.note = note;
   }
 
-  @JsonValue
-  @Override
-  public String toString() {
-    return String.format("[%s](%s)", note.getTopicConstructor(), "/n" + note.getId());
+  @JsonProperty("uri")
+  public String getUri() {
+    return note.getUri();
+  }
+
+  @JsonProperty("title")
+  public String getTitle() {
+    return note.getTopicConstructor();
   }
 
   public static UriAndTitle fromNote(Note note) {

@@ -8,18 +8,18 @@ import lombok.Getter;
 
 @Getter
 public class FocusNote extends BareNote {
-  private final List<UriAndTitle> contextualPath = new ArrayList<>();
-  private final List<UriAndTitle> children = new ArrayList<>();
-  private final List<UriAndTitle> priorSiblings = new ArrayList<>();
-  private final List<UriAndTitle> youngerSiblings = new ArrayList<>();
-  private final List<UriAndTitle> inboundReferences = new ArrayList<>();
+  private final List<String> contextualPath = new ArrayList<>();
+  private final List<String> children = new ArrayList<>();
+  private final List<String> priorSiblings = new ArrayList<>();
+  private final List<String> youngerSiblings = new ArrayList<>();
+  private final List<String> inboundReferences = new ArrayList<>();
 
   private FocusNote(Note note) {
     super(note, note.getDetails(), RelationshipToFocusNote.Self);
 
     // Add contextual path (unique to FocusNote)
     if (note.getParent() != null) {
-      note.getAncestors().forEach(ancestor -> contextualPath.add(UriAndTitle.fromNote(ancestor)));
+      note.getAncestors().forEach(ancestor -> contextualPath.add(ancestor.getUri()));
     }
   }
 

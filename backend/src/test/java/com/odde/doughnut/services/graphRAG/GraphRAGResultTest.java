@@ -39,7 +39,10 @@ class GraphRAGResultTest {
 
     // Assert
     assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(true));
-    assertThat(jsonNode.get(PARENT_URI_AND_TITLE).asText(), containsString("Parent Note"));
+    JsonNode parentUriAndTitle = jsonNode.get(PARENT_URI_AND_TITLE);
+    assertThat(parentUriAndTitle.isObject(), is(true));
+    assertThat(parentUriAndTitle.get("title").asText(), containsString("Parent Note"));
+    assertThat(parentUriAndTitle.has("uri"), is(true));
   }
 
   @Nested
@@ -65,7 +68,9 @@ class GraphRAGResultTest {
       // Assert
       assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(false));
       assertThat(jsonNode.has("subjectUriAndTitle"), is(true));
-      assertThat(jsonNode.get("subjectUriAndTitle").asText(), containsString("Parent Note"));
+      JsonNode subjectUriAndTitle = jsonNode.get("subjectUriAndTitle");
+      assertThat(subjectUriAndTitle.isObject(), is(true));
+      assertThat(subjectUriAndTitle.get("title").asText(), containsString("Parent Note"));
     }
 
     @Test
@@ -153,7 +158,9 @@ class GraphRAGResultTest {
 
       // Assert
       assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(true));
-      assertThat(jsonNode.get(PARENT_URI_AND_TITLE).asText(), containsString("Parent Note"));
+      JsonNode parentUriAndTitle = jsonNode.get(PARENT_URI_AND_TITLE);
+      assertThat(parentUriAndTitle.isObject(), is(true));
+      assertThat(parentUriAndTitle.get("title").asText(), containsString("Parent Note"));
 
       // Assert property order
       assertThat(jsonString, startsWith("{\"uri\":"));

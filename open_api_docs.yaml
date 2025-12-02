@@ -4437,15 +4437,15 @@ components:
         uri:
           type: string
         subjectUriAndTitle:
-          type: string
+          $ref: "#/components/schemas/UriAndTitle"
         predicate:
           type: string
         title:
           type: string
         objectUriAndTitle:
-          type: string
+          $ref: "#/components/schemas/UriAndTitle"
         parentUriAndTitle:
-          type: string
+          $ref: "#/components/schemas/UriAndTitle"
         relationToFocusNote:
           type: string
           enum:
@@ -4478,15 +4478,15 @@ components:
         uri:
           type: string
         subjectUriAndTitle:
-          type: string
+          $ref: "#/components/schemas/UriAndTitle"
         predicate:
           type: string
         title:
           type: string
         objectUriAndTitle:
-          type: string
+          $ref: "#/components/schemas/UriAndTitle"
         parentUriAndTitle:
-          type: string
+          $ref: "#/components/schemas/UriAndTitle"
         relationToFocusNote:
           type: string
           enum:
@@ -4542,6 +4542,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BareNote"
+    UriAndTitle:
+      type: object
+      properties:
+        uri:
+          type: string
+        title:
+          type: string
     NotebooksViewedByUser:
       type: object
       properties:

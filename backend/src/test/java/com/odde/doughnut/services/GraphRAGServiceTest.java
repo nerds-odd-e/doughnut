@@ -175,7 +175,7 @@ public class GraphRAGServiceTest {
 
       // Should be in both object and children lists of focus note
       assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
-      assertThat(result.getFocusNote().getChildren(), contains(object));
+      assertThat(result.getFocusNote().getChildren(), contains(object.getUri()));
 
       // But should appear only once in related notes
       assertThat(result.getRelatedNotes(), hasSize(3)); // parent and child/object
@@ -257,7 +257,9 @@ public class GraphRAGServiceTest {
     void shouldIncludeChildrenInFocusNoteList() {
       GraphRAGResult result = graphRAGService.retrieve(parent, 1000);
 
-      assertThat(result.getFocusNote().getChildren(), containsInAnyOrder(child1, child2));
+      assertThat(
+          result.getFocusNote().getChildren(),
+          containsInAnyOrder(child1.getUri(), child2.getUri()));
     }
 
     @Test
@@ -279,7 +281,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(parent, 2);
 
       // Only child1 should be in focus note's children list
-      assertThat(result.getFocusNote().getChildren(), contains(child1));
+      assertThat(result.getFocusNote().getChildren(), contains(child1.getUri()));
 
       // Only child1 should be in related notes
       List<BareNote> childNotes =
@@ -323,7 +325,8 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       assertThat(
-          result.getFocusNote().getYoungerSiblings(), contains(youngerSibling1, youngerSibling2));
+          result.getFocusNote().getYoungerSiblings(),
+          contains(youngerSibling1.getUri(), youngerSibling2.getUri()));
     }
 
     @Test
@@ -365,8 +368,8 @@ public class GraphRAGServiceTest {
         assertThat(relatedNotes, hasSize(3));
 
         // Should have one child and one younger sibling
-        assertThat(result.getFocusNote().getChildren(), containsInAnyOrder(child1));
-        assertThat(result.getFocusNote().getYoungerSiblings(), contains(youngerSibling1));
+        assertThat(result.getFocusNote().getChildren(), containsInAnyOrder(child1.getUri()));
+        assertThat(result.getFocusNote().getYoungerSiblings(), contains(youngerSibling1.getUri()));
 
         assertThat(
             relatedNotes.stream()
@@ -405,10 +408,8 @@ public class GraphRAGServiceTest {
 
       // Should be in contextual path in order from root to parent
       assertThat(
-          result.getFocusNote().getContextualPath().stream()
-              .map(UriAndTitle::getNote)
-              .collect(Collectors.toList()),
-          contains(grandParent, parent));
+          result.getFocusNote().getContextualPath(),
+          contains(grandParent.getUri(), parent.getUri()));
     }
 
     @Test
@@ -459,7 +460,9 @@ public class GraphRAGServiceTest {
     void shouldIncludePriorSiblingsInFocusNoteListInOrder() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      assertThat(result.getFocusNote().getPriorSiblings(), contains(priorSibling1, priorSibling2));
+      assertThat(
+          result.getFocusNote().getPriorSiblings(),
+          contains(priorSibling1.getUri(), priorSibling2.getUri()));
     }
 
     @Test
@@ -504,7 +507,7 @@ public class GraphRAGServiceTest {
       assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
 
       // Child should still be in children list
-      assertThat(result.getFocusNote().getChildren(), contains(UriAndTitle.fromNote(reifiedChild)));
+      assertThat(result.getFocusNote().getChildren(), contains(reifiedChild.getUri()));
     }
 
     @Nested
@@ -538,7 +541,8 @@ public class GraphRAGServiceTest {
         // Should have three children
         assertThat(
             result.getFocusNote().getChildren(),
-            containsInAnyOrder(regularChild1, regularChild2, reifiedChild));
+            containsInAnyOrder(
+                regularChild1.getUri(), regularChild2.getUri(), reifiedChild.getUri()));
 
         // Verify relationships in order
         assertThat(
@@ -563,7 +567,11 @@ public class GraphRAGServiceTest {
         // Verify related notes include all children and the reified child object
         assertThat(
             result.getFocusNote().getChildren(),
-            containsInAnyOrder(regularChild1, regularChild2, regularChild3, reifiedChild));
+            containsInAnyOrder(
+                regularChild1.getUri(),
+                regularChild2.getUri(),
+                regularChild3.getUri(),
+                reifiedChild.getUri()));
 
         // Verify the reified child object is included
         assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
@@ -632,10 +640,8 @@ public class GraphRAGServiceTest {
 
       // Verify inbound reference notes are in focus note's list
       assertThat(
-          result.getFocusNote().getInboundReferences().stream()
-              .map(UriAndTitle::getNote)
-              .collect(Collectors.toList()),
-          containsInAnyOrder(inboundReferenceNote1, inboundReferenceNote2));
+          result.getFocusNote().getInboundReferences(),
+          containsInAnyOrder(inboundReferenceNote1.getUri(), inboundReferenceNote2.getUri()));
 
       // Verify inbound reference notes are in related notes
       assertRelatedNotesContain(

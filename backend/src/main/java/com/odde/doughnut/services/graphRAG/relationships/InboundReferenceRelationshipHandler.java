@@ -45,6 +45,6 @@ public class InboundReferenceRelationshipHandler extends RelationshipHandler {
 
   @Override
   public void afterHandledSuccessfully(FocusNote focus, BareNote addedNote) {
-    focus.getInboundReferences().add(addedNote.getUriAndTitle());
+    focus.getInboundReferences().add(addedNote.getUri());
   }
 }
