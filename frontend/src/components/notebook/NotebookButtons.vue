@@ -6,14 +6,14 @@
       @click="editNotebookSettings"
       title="Edit notebook settings"
     >
-      <SvgEditNotebook />
+      <SvgNotebook />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRouter } from "vue-router"
-import SvgEditNotebook from "@/components/svgs/SvgEditNotebook.vue"
+import SvgNotebook from "@/components/svgs/SvgNotebook.vue"
 import type { Notebook, User } from "@generated/backend"
 import BazaarNotebookButtons from "@/components/bazaar/BazaarNotebookButtons.vue"
 
