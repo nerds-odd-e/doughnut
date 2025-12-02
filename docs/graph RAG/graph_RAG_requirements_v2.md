@@ -238,7 +238,7 @@ Map discovery paths to relationship types:
 | `[InboundReference, Subject]` | `SubjectOfInboundReference` |
 | `[Parent, Parent, ...]` (ancestors) | `AncestorInContextualPath` |
 | `[Object, Parent, ...]` (object ancestors) | `AncestorInObjectContextualPath` |
-| `[Parent, Sibling]` (parent's sibling) | `SiblingOfParent` |
+| `[Parent, Sibling]` (parent's sibling) | `SiblingOfParent` (siblings surrounding the parent in `siblingOrder` are prioritized) |
 | `[Object, Parent, Sibling]` | `SiblingOfParentOfObject` |
 | `[Parent, Sibling, Child]` | `ChildOfSiblingOfParent` |
 | `[Object, Parent, Sibling, Child]` | `ChildOfSiblingOfParentOfObject` |
