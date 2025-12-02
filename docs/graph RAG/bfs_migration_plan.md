@@ -380,15 +380,13 @@ When a note can be reached via multiple paths:
 - All tests passing (791 tests, 24 disabled for depth 2+)
 
 ### Step 4 ⏳ NOT STARTED
-- ⏳ Step 4.1: DepthQueryService extended for depth 2
+- ⏳ Step 4.1: DepthQueryService extended for depth 2 integrated into NoteGraphServic3
 - ⏳ Step 4.2: Sibling relationship types (PriorSibling, YoungerSibling)
 - ⏳ Step 4.3: Contextual path relationships (AncestorInContextualPath, AncestorInObjectContextualPath)
 - ⏳ Step 4.4: Object of reified child (ObjectOfReifiedChild)
 - ⏳ Step 4.5: Subject of inbound reference (SubjectOfInboundReference)
 - ⏳ Step 4.6: Parent siblings (SiblingOfParent, SiblingOfParentOfObject)
-- ⏳ Step 4.7: Depth 2 traversal integrated into NoteGraphService
-- ⏳ Step 4.8: Additional children/inbound refs from focus note at depth 2
-- ⏳ All depth 2 tests passing
+- ⏳ Step 4.7: Additional children/inbound refs from focus note at depth 2
 
 ### Step 5 ⏳ NOT STARTED
 - ⏳ Depth 3 relationships fetched correctly
