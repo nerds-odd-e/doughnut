@@ -96,6 +96,7 @@ onUnmounted(() => {
   position: relative;
   max-width: 700px;
   max-height: 100vh;
+  max-height: 100dvh;
   overflow: auto;
   margin: 0px auto;
   padding: 20px 30px;
@@ -107,6 +108,7 @@ onUnmounted(() => {
 .modal-sidebar {
   position: relative;
   height: 100vh;
+  height: 100dvh;
   overflow: auto;
   padding: 0px 0px;
   background-color: #fff;

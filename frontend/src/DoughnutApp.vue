@@ -89,6 +89,7 @@ onMounted(async () => {
 
 .app-container {
   height: 100vh; // Default to viewport height for desktop (vertical menu)
+  height: 100dvh; // Dynamic viewport height for mobile devices
   display: flex;
   overflow: hidden; // Prevent scrolling on desktop
 }
@@ -111,6 +112,7 @@ onMounted(async () => {
 @media (max-width: theme('screens.lg')) {
   .app-container {
     height: 100vh; // Keep fixed height for proper page height calculations
+    height: 100dvh; // Dynamic viewport height for mobile devices
     flex-direction: column;
     overflow: hidden; // Prevent container scrolling
   }

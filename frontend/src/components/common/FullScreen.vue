@@ -116,6 +116,7 @@ onUnmounted(async () => {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   background-color: black;
   z-index: 9999;
   display: flex;

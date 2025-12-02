@@ -197,6 +197,7 @@ onUnmounted(() => {
 
 .upper-half {
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 2rem;
   background: linear-gradient(to bottom, #ffffff, #f5f5f5);
 }
@@ -267,6 +268,7 @@ onUnmounted(() => {
 
 .lower-half {
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 2rem;
   background: linear-gradient(to bottom, #f5f5f5, #ffffff);
 }
