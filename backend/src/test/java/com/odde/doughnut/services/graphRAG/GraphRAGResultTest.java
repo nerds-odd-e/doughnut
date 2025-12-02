@@ -112,6 +112,8 @@ class GraphRAGResultTest {
     assertThat(
         jsonNode::fieldNames,
         containsInAnyOrder("uri", "title", "details", "relationToFocusNote", "createdAt"));
+    // detailsTruncated should not be present when details are not truncated
+    assertThat(jsonNode.has("detailsTruncated"), is(false));
   }
 
   @Test
@@ -194,6 +196,53 @@ class GraphRAGResultTest {
       assertThat(jsonNode.has("updatedAt"), is(false));
       // Timestamps are serialized as ISO strings when WRITE_DATES_AS_TIMESTAMPS is disabled
       assertThat(jsonNode.get("createdAt").asText(), is(not(emptyString())));
+    }
+  }
+
+  @Nested
+  class DetailsTruncationTest {
+    @Test
+    void shouldNotIncludeDetailsTruncatedWhenDetailsAreNotTruncated() throws Exception {
+      // Arrange - details shorter than truncation limit
+      Note note = makeMe.aNote().titleConstructor("Short Note").details("Short details").please();
+      BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
+
+      // Act
+      JsonNode jsonNode = objectMapper.valueToTree(bareNote);
+
+      // Assert
+      assertThat(jsonNode.has("detailsTruncated"), is(false));
+      assertThat(jsonNode.get("details").asText(), is("Short details"));
+    }
+
+    @Test
+    void shouldIncludeDetailsTruncatedAsTrueWhenDetailsAreTruncated() throws Exception {
+      // Arrange - create details longer than truncation limit (500 bytes)
+      String longDetails = "x".repeat(600); // 600 characters should exceed 500 bytes
+      Note note = makeMe.aNote().titleConstructor("Long Note").details(longDetails).please();
+      BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
+
+      // Act
+      JsonNode jsonNode = objectMapper.valueToTree(bareNote);
+
+      // Assert
+      assertThat(jsonNode.has("detailsTruncated"), is(true));
+      assertThat(jsonNode.get("detailsTruncated").asBoolean(), is(true));
+      assertThat(jsonNode.get("details").asText(), endsWith("..."));
+    }
+
+    @Test
+    void shouldNotIncludeDetailsTruncatedForFocusNote() throws Exception {
+      // Arrange
+      Note note = makeMe.aNote().titleConstructor("Focus Note").details("Some details").please();
+      FocusNote focusNote = FocusNote.fromNote(note);
+
+      // Act
+      JsonNode jsonNode = objectMapper.valueToTree(focusNote);
+
+      // Assert - FocusNote uses fromNoteWithoutTruncate internally, so detailsTruncated should be
+      // null
+      assertThat(jsonNode.has("detailsTruncated"), is(false));
     }
   }
 }

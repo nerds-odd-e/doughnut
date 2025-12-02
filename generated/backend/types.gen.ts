@@ -511,6 +511,7 @@ export type BareNote = {
     parentUriAndTitle?: UriAndTitle;
     relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
     details?: string;
+    detailsTruncated?: boolean;
     createdAt?: string;
 };
 
@@ -523,6 +524,7 @@ export type FocusNote = {
     parentUriAndTitle?: UriAndTitle;
     relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
     details?: string;
+    detailsTruncated?: boolean;
     createdAt?: string;
     contextualPath?: Array<string>;
     children?: Array<string>;

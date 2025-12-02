@@ -4469,6 +4469,8 @@ components:
           - InboundReferenceToObjectOfReifiedChild
         details:
           type: string
+        detailsTruncated:
+          type: boolean
         createdAt:
           type: string
           format: date-time
@@ -4510,6 +4512,8 @@ components:
           - InboundReferenceToObjectOfReifiedChild
         details:
           type: string
+        detailsTruncated:
+          type: boolean
         createdAt:
           type: string
           format: date-time

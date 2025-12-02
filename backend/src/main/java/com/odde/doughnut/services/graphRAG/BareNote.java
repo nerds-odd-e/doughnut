@@ -21,17 +21,21 @@ import lombok.Getter;
   "parentUriAndTitle",
   "relationToFocusNote",
   "details",
+  "detailsTruncated",
   "createdAt"
 })
 public class BareNote {
   private final Note note;
   @Getter private final String details;
   @Getter private final RelationshipToFocusNote relationToFocusNote;
+  private final Boolean detailsTruncated;
 
-  protected BareNote(Note note, String details, RelationshipToFocusNote relation) {
+  protected BareNote(
+      Note note, String details, RelationshipToFocusNote relation, Boolean detailsTruncated) {
     this.note = note;
     this.details = details;
     this.relationToFocusNote = relation;
+    this.detailsTruncated = detailsTruncated;
   }
 
   @JsonIgnore
@@ -73,27 +77,33 @@ public class BareNote {
         : null;
   }
 
+  @JsonProperty("detailsTruncated")
+  public Boolean getDetailsTruncated() {
+    return detailsTruncated;
+  }
+
   @JsonProperty("createdAt")
   public java.sql.Timestamp getCreatedAt() {
     return note.getCreatedAt();
   }
 
   public static BareNote fromNote(Note note, RelationshipToFocusNote relation) {
-    return new BareNote(note, truncateDetails(note.getDetails()), relation);
+    TruncationResult result = truncateDetails(note.getDetails());
+    return new BareNote(note, result.truncatedDetails, relation, result.wasTruncated);
   }
 
   public static BareNote fromNoteWithoutTruncate(Note note) {
-    return new BareNote(note, note.getDetails(), null);
+    return new BareNote(note, note.getDetails(), null, null);
   }
 
-  private static String truncateDetails(String details) {
+  private static TruncationResult truncateDetails(String details) {
     if (details == null) {
-      return null;
+      return new TruncationResult(null, null);
     }
 
     byte[] bytes = details.getBytes(StandardCharsets.UTF_8);
     if (bytes.length <= RELATED_NOTE_DETAILS_TRUNCATE_LENGTH) {
-      return details;
+      return new TruncationResult(details, null);
     }
 
     // Binary search to find the right character position
@@ -110,7 +120,17 @@ public class BareNote {
       }
     }
 
-    return details.substring(0, low) + "...";
+    return new TruncationResult(details.substring(0, low) + "...", true);
+  }
+
+  private static class TruncationResult {
+    final String truncatedDetails;
+    final Boolean wasTruncated;
+
+    TruncationResult(String truncatedDetails, Boolean wasTruncated) {
+      this.truncatedDetails = truncatedDetails;
+      this.wasTruncated = wasTruncated;
+    }
   }
 
   @Override
