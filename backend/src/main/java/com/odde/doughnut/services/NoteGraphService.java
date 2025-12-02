@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.DepthQueryService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.graphRAG.GraphRAGResultBuilder;
@@ -32,6 +33,16 @@ public class NoteGraphService {
         continue; // Skip if not parent or object
       }
       builder.addNoteToRelatedNotes(note, relationship);
+    }
+
+    // Step 2.2: Fetch inbound references at depth 1
+    var inboundReferences = depthQueryService.queryDepth1InboundReferences(focusNote);
+    for (Note note : inboundReferences) {
+      BareNote addedNote =
+          builder.addNoteToRelatedNotes(note, RelationshipToFocusNote.InboundReference);
+      if (addedNote != null) {
+        builder.getFocusNote().getInboundReferences().add(note.getUri());
+      }
     }
 
     return builder.build();

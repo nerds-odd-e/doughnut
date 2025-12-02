@@ -652,8 +652,7 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
-    void shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough() {
+    void shouldIncludeInboundReferenceNotesWhenBudgetIsEnough() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
       // Verify inbound reference notes are in focus note's list
@@ -667,6 +666,12 @@ public class NoteGraphServiceTest {
           RelationshipToFocusNote.InboundReference,
           inboundReferenceNote1,
           inboundReferenceNote2);
+    }
+
+    @Test
+    @Disabled("Step 2.2: Not yet implemented - subjects of inbound references")
+    void shouldIncludeInboundReferenceSubjectsWhenBudgetIsEnough() {
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
       // Verify inbound reference subjects are in related notes
       assertRelatedNotesContain(
@@ -677,7 +682,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldNotIncludeInboundReferenceSubjectsWhenBudgetIsLimited() {
       // Set budget to only allow inbound reference notes
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 3);

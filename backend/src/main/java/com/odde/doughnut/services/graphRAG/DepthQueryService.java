@@ -2,6 +2,7 @@ package com.odde.doughnut.services.graphRAG;
 
 import com.odde.doughnut.entities.Note;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class DepthQueryService {
@@ -14,5 +15,11 @@ public class DepthQueryService {
       result.add(focusNote.getTargetNote());
     }
     return result;
+  }
+
+  public List<Note> queryDepth1InboundReferences(Note focusNote) {
+    List<Note> inboundRefs = new ArrayList<>(focusNote.getInboundReferences());
+    Collections.shuffle(inboundRefs);
+    return inboundRefs;
   }
 }
