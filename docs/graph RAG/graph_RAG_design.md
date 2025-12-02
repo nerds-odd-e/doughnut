@@ -48,27 +48,35 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
 
 ## Priorities
 
-The system uses a layered priority approach:
+The system uses a layered priority approach with configurable notes-before-switching thresholds:
 
-1. **Core Context** (Priority 1)
-   - Parent and Object relationships
+1. **Core Context** (Priority 1) - 3 notes before switching
+   - `ParentRelationshipHandler`: Parent relationship
+   - `ObjectRelationshipHandler`: Object relationship (for reification notes)
+   - `AncestorInContextualPathRelationshipHandler`: Ancestors in contextual path
    - Essential for understanding the note's immediate context
 
-2. **Direct Relations** (Priority 2)
-   - Children, Siblings (Prior/Younger)
-   - Inbound References
-   - Ancestors in Contextual Paths
+2. **Direct Relations** (Priority 2) - 3 notes before switching
+   - `ChildRelationshipHandler`: Direct children (dynamically adds ObjectOfReifiedChild handlers to Priority 3)
+   - `PriorSiblingRelationshipHandler`: Prior siblings
+   - `YoungerSiblingRelationshipHandler`: Younger siblings
+   - `InboundReferenceRelationshipHandler`: Inbound references (dynamically adds SubjectOfInboundReference to Priority 3, InboundReferenceContextualPath to Priority 4)
+   - `AncestorInObjectContextualPathRelationshipHandler`: Ancestors in object's contextual path
+   - `SiblingOfParentRelationshipHandler`: Siblings of parent (dynamically adds ChildOfSiblingOfParent to Priority 4)
+   - `SiblingOfParentOfObjectRelationshipHandler`: Siblings of parent of object (dynamically adds ChildOfSiblingOfParentOfObject to Priority 4)
 
-3. **Extended Relations** (Priority 3)
-   - Objects of Reified Children
-   - Siblings of Parent/Parent of Object
-   - Subjects of Inbound References
+3. **Extended Relations** (Priority 3) - 2 notes before switching
+   - Dynamically populated by Priority 2 handlers:
+   - `ObjectOfReifiedChildRelationshipHandler`: Objects of reified children (dynamically adds InboundReferenceToObjectOfReifiedChild to Priority 4)
+   - `SubjectOfInboundReferenceRelationshipHandler`: Subjects of inbound references (dynamically adds SiblingOfSubjectOfInboundReference to Priority 4)
 
-4. **Distant Relations** (Priority 4)
-   - Children of Parent's Siblings
-   - Children of Object's Parent's Siblings
-   - Inbound Reference Context (Contextual Path and Siblings of Reference Subjects)
-   - Inbound References to Objects of Reified Children
+4. **Distant Relations** (Priority 4) - 2 notes before switching
+   - Dynamically populated by Priority 2 and Priority 3 handlers:
+   - `ChildOfSiblingOfParentRelationshipHandler`: Children of parent's siblings (cousins)
+   - `ChildOfSiblingOfParentOfObjectRelationshipHandler`: Children of object's parent's siblings
+   - `InboundReferenceContextualPathRelationshipHandler`: Contextual path of inbound references
+   - `SiblingOfSubjectOfInboundReferenceRelationshipHandler`: Siblings of subjects of inbound references
+   - `InboundReferenceToObjectOfReifiedChildHandler`: Inbound references to objects of reified children
 
 ## Retrieval Algorithm
 
@@ -85,8 +93,10 @@ The system uses a layered priority approach:
 
 2. **Priority-Based Processing**
    - For each priority layer:
-     - Process a fixed number of notes before moving to next layer
-     - Return to higher priority layers periodically
+     - Process handlers in order, retrieving one note per handler per iteration
+     - After processing the configured number of notes (3 for Priority 1-2, 2 for Priority 3-4), yield to next layer
+     - Lower priority layers can dynamically add new handlers to higher priority layers
+     - Return to higher priority layers periodically when lower layers complete or hit limits
      - Continue until budget exhausted or no more notes to process
 
 3. **Relationship Handler Processing**
@@ -105,18 +115,20 @@ The system uses a layered priority approach:
 
 ## Relationship Dependencies
 
-The system manages complex relationship dependencies:
+The system manages complex relationship dependencies through dynamic handler injection:
 
-- **Direct Dependencies**
-  - Child → ObjectOfReifiedChild
-  - Parent → SiblingOfParent
-  - Object → SiblingOfParentOfObject
-  - ObjectOfReifiedChild → InboundReferenceToObjectOfReifiedChild
+- **Priority 2 → Priority 3 Dependencies**
+  - `ChildRelationshipHandler` → adds `ObjectOfReifiedChildRelationshipHandler` (when child is reified)
+  - `InboundReferenceRelationshipHandler` → adds `SubjectOfInboundReferenceRelationshipHandler`
 
-- **Indirect Dependencies**
-  - SiblingOfParent → ChildOfSiblingOfParent
-  - SiblingOfParentOfObject → ChildOfSiblingOfParentOfObject
-  - InboundReference → InboundReferenceContextualPath, SiblingOfSubjectOfInboundReference
+- **Priority 2 → Priority 4 Dependencies**
+  - `InboundReferenceRelationshipHandler` → adds `InboundReferenceContextualPathRelationshipHandler`
+  - `SiblingOfParentRelationshipHandler` → adds `ChildOfSiblingOfParentRelationshipHandler`
+  - `SiblingOfParentOfObjectRelationshipHandler` → adds `ChildOfSiblingOfParentOfObjectRelationshipHandler`
+
+- **Priority 3 → Priority 4 Dependencies**
+  - `ObjectOfReifiedChildRelationshipHandler` → adds `InboundReferenceToObjectOfReifiedChildHandler`
+  - `SubjectOfInboundReferenceRelationshipHandler` → adds `SiblingOfSubjectOfInboundReferenceRelationshipHandler`
 
 ## Implementation Considerations
 
