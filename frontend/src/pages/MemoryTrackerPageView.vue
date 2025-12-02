@@ -1,8 +1,18 @@
 <template>
-  <div v-if="removedFromTracking" class="daisy-alert daisy-alert-danger">
-    This memory tracker has been removed from tracking.
+  <div v-if="isSkipped" class="daisy-alert daisy-alert-warning daisy-mb-4">
+    <div class="daisy-flex daisy-items-center daisy-justify-between">
+      <span>This memory tracker is currently skipped and will not appear in review sessions.</span>
+      <button
+        class="daisy-btn daisy-btn-sm daisy-btn-primary"
+        title="Re-enable this memory tracker"
+        aria-label="Re-enable this memory tracker"
+        @click="reEnable"
+      >
+        Re-enable
+      </button>
+    </div>
   </div>
-  <div v-else>
+  <div>
     <div v-if="memoryTracker" class="daisy-card daisy-shadow-sm daisy-mb-6">
       <div class="daisy-card-body">
         <h2 class="daisy-card-title daisy-text-lg daisy-mb-4">Memory Tracker Information</h2>
@@ -57,6 +67,7 @@
         <span>Delete Unanswered Prompts</span>
       </button>
       <button
+        v-if="!isSkipped"
         class="daisy-btn daisy-btn-secondary"
         title="remove this note from review"
         aria-label="remove this note from review"
@@ -123,7 +134,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { computed } from "vue"
 import type { RecallPrompt, MemoryTracker } from "@generated/backend"
 import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/review/NoteUnderQuestion.vue"
@@ -154,8 +165,11 @@ const emit = defineEmits<{
   (e: "refresh"): void
 }>()
 
-const removedFromTracking = ref(false)
 const { popups } = usePopups()
+
+const isSkipped = computed(() => {
+  return props.memoryTracker.removedFromTracking === true
+})
 
 const formatThinkingTime = (ms: number): string => {
   if (ms < 1000) {
@@ -207,10 +221,21 @@ const removeFromReview = async () => {
     })
   )
   if (!error && memoryTracker) {
-    removedFromTracking.value = memoryTracker.removedFromTracking ?? false
-    if (removedFromTracking.value) {
+    if (memoryTracker.removedFromTracking) {
       emit("removedFromTracking")
     }
+    emit("refresh")
+  }
+}
+
+const reEnable = async () => {
+  const { data: memoryTracker, error } = await apiCallWithLoading(() =>
+    MemoryTrackerController.reEnable({
+      path: { memoryTracker: props.memoryTrackerId },
+    })
+  )
+  if (!error && memoryTracker) {
+    emit("refresh")
   }
 }
 </script>

@@ -1401,6 +1401,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/MemoryTracker"
+  /api/memory-trackers/{memoryTracker}/re-enable:
+    post:
+      tags:
+      - memory-tracker-controller
+      operationId: reEnable
+      parameters:
+      - name: memoryTracker
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/MemoryTracker"
   /api/memory-trackers/{memoryTracker}/answer-spelling:
     post:
       tags:

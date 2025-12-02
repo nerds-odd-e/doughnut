@@ -97,6 +97,22 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
         assertThat(rp.getRemovedFromTracking(), is(true));
         assertThat(rp.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
       }
+
+      @Test
+      void reEnableShouldSetRemovedFromTrackingToFalse() throws UnexpectedNoAccessRightException {
+        rp.setRemovedFromTracking(true);
+        makeMe.entityPersister.merge(rp);
+        controller.reEnable(rp);
+        assertThat(rp.getRemovedFromTracking(), is(false));
+      }
+
+      @Test
+      void shouldNotBeAbleToReEnableOthersMemoryTracker() {
+        rp = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+        rp.setRemovedFromTracking(true);
+        makeMe.entityPersister.merge(rp);
+        assertThrows(UnexpectedNoAccessRightException.class, () -> controller.reEnable(rp));
+      }
     }
   }
 

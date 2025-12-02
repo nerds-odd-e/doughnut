@@ -67,6 +67,18 @@ class MemoryTrackerController {
     return memoryTracker;
   }
 
+  @PostMapping(path = "/{memoryTracker}/re-enable")
+  @Transactional
+  public MemoryTracker reEnable(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    memoryTracker.setRemovedFromTracking(false);
+    entityPersister.save(memoryTracker);
+    return memoryTracker;
+  }
+
   @PatchMapping(path = "/{memoryTracker}/mark-as-repeated")
   @Transactional
   public MemoryTracker markAsRepeated(
