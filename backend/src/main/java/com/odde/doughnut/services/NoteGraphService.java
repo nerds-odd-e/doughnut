@@ -6,6 +6,7 @@ import com.odde.doughnut.services.graphRAG.CandidateNote;
 import com.odde.doughnut.services.graphRAG.DepthQueryService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.graphRAG.GraphRAGResultBuilder;
+import com.odde.doughnut.services.graphRAG.InboundReferenceSelectionService;
 import com.odde.doughnut.services.graphRAG.RelationshipTypeDerivationService;
 import com.odde.doughnut.services.graphRAG.RelevanceScoringService;
 import com.odde.doughnut.services.graphRAG.TokenCountingStrategy;
@@ -18,18 +19,19 @@ import java.util.Map;
 
 public class NoteGraphService {
   private static final int CHILD_CAP_MULTIPLIER = 2;
-  private static final int INBOUND_CAP_MULTIPLIER = 2;
 
   private final TokenCountingStrategy tokenCountingStrategy;
   private final DepthQueryService depthQueryService;
   private final RelationshipTypeDerivationService relationshipTypeDerivationService;
   private final RelevanceScoringService relevanceScoringService;
+  private final InboundReferenceSelectionService inboundReferenceSelectionService;
 
   public NoteGraphService(TokenCountingStrategy tokenCountingStrategy) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     this.depthQueryService = new DepthQueryService();
     this.relationshipTypeDerivationService = new RelationshipTypeDerivationService();
     this.relevanceScoringService = new RelevanceScoringService();
+    this.inboundReferenceSelectionService = new InboundReferenceSelectionService();
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
@@ -58,14 +60,13 @@ public class NoteGraphService {
       }
     }
 
-    // Step 3.1: Fetch and apply per-depth caps for inbound references at depth 1
+    // Step 3.3: Fetch and apply per-depth caps for inbound references at depth 1
     var allInboundReferences = depthQueryService.queryDepth1InboundReferences(focusNote);
     int currentDepth = 1;
-    int inboundCap = calculateInboundCap(focusNote, currentDepth, depthFetched);
     int alreadyEmitted = inboundEmitted.getOrDefault(focusNote, 0);
-    int remainingBudget = Math.max(0, inboundCap - alreadyEmitted);
     var selectedInboundReferences =
-        allInboundReferences.subList(0, Math.min(remainingBudget, allInboundReferences.size()));
+        inboundReferenceSelectionService.selectInboundReferences(
+            focusNote, currentDepth, depthFetched, alreadyEmitted, allInboundReferences);
     for (Note note : selectedInboundReferences) {
       depthFetched.putIfAbsent(note, 1);
       RelationshipToFocusNote relationship =
@@ -123,11 +124,5 @@ public class NoteGraphService {
   private int calculateChildCap(Note parent, int currentDepth, Map<Note, Integer> depthFetched) {
     int parentDepthFetched = depthFetched.getOrDefault(parent, currentDepth);
     return CHILD_CAP_MULTIPLIER * (currentDepth - parentDepthFetched);
-  }
-
-  // Step 3.1: Calculate inbound reference cap for a target note at a given depth
-  private int calculateInboundCap(Note target, int currentDepth, Map<Note, Integer> depthFetched) {
-    int targetDepthFetched = depthFetched.getOrDefault(target, currentDepth);
-    return INBOUND_CAP_MULTIPLIER * (currentDepth - targetDepthFetched);
   }
 }
