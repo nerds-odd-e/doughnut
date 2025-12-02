@@ -16,10 +16,21 @@ The migration will be done incrementally, maintaining test compatibility at each
 - **Step 2.3**: ✅ **COMPLETED** - Add children for depth 1
 - **Step 2.4**: ✅ **COMPLETED** - Add relationship type derivation for depth 1
 - **Step 2.5**: ✅ **COMPLETED** - Add scoring for depth 1
-- **Step 3**: ⏳ **IN PROGRESS** - Complete depth 1 features (per-depth caps, selection logic, enhanced scoring)
+- **Step 3**: ✅ **COMPLETED** - Complete depth 1 features (per-depth caps, selection logic, enhanced scoring)
+  - **Step 3.1**: ✅ **COMPLETED** - Per-depth caps for children and inbound references
   - **Step 3.2**: ✅ **COMPLETED** - Children selection logic (ordered sibling locality)
+  - **Step 3.3**: ✅ **COMPLETED** - Inbound reference selection logic (random with caps)
+  - **Step 3.4**: ✅ **COMPLETED** - Enhanced scoring (depth, recency, jitter)
   - **Step 3.5**: ✅ **COMPLETED** - Update focus note's relationship lists dynamically
-- **Step 4**: ⏳ **NOT STARTED** - Depth 2 implementation
+- **Step 4**: ⏳ **NOT STARTED** - Depth 2 implementation (broken down into 8 incremental sub-steps)
+  - **Step 4.1**: ⏳ **NOT STARTED** - Extend DepthQueryService for depth 2
+  - **Step 4.2**: ⏳ **NOT STARTED** - Add sibling relationship types (PriorSibling, YoungerSibling)
+  - **Step 4.3**: ⏳ **NOT STARTED** - Add contextual path relationships
+  - **Step 4.4**: ⏳ **NOT STARTED** - Add object of reified child (ObjectOfReifiedChild)
+  - **Step 4.5**: ⏳ **NOT STARTED** - Add subject of inbound reference (SubjectOfInboundReference)
+  - **Step 4.6**: ⏳ **NOT STARTED** - Add parent siblings (SiblingOfParent, SiblingOfParentOfObject)
+  - **Step 4.7**: ⏳ **NOT STARTED** - Integrate depth 2 traversal into NoteGraphService
+  - **Step 4.8**: ⏳ **NOT STARTED** - Handle additional children/inbound refs from focus note at depth 2
 - **Step 5**: ⏳ **NOT STARTED** - Depth 3 implementation with scoring and selection
 
 ## Step 1: Create NoteGraphService Skeleton ✅ COMPLETED
@@ -28,186 +39,151 @@ Created `NoteGraphService` with minimal implementation and copied all tests from
 
 ---
 
-## Step 2: Implement Depth 1 (Incremental)
+## Step 2: Implement Depth 1 ✅ COMPLETED
 
-Depth 1 implementation is broken down into incremental, verifiable sub-steps.
+Depth 1 implementation completed in 5 incremental sub-steps:
+- **Step 2.1**: Parent and object only
+- **Step 2.2**: Inbound references
+- **Step 2.3**: Children
+- **Step 2.4**: Relationship type derivation
+- **Step 2.5**: Basic scoring (relationship type weight only)
 
-### Step 2.1: Basic Depth 1 - Parent and Object Only ✅ COMPLETED
-
-Implemented `DepthQueryService.queryDepth1ParentAndObject()` and added parent/object to related notes. 4 tests re-enabled, 10 total passing.
-
----
-
-### Step 2.2: Add Inbound References for Depth 1 ✅ COMPLETED
-
-Implemented `DepthQueryService.queryDepth1InboundReferences()` and added inbound references to related notes with correct relationship types.
+All tests passing (782 tests, 24 disabled for depth 2+).
 
 ---
 
-### Step 2.3: Add Children for Depth 1 ✅ COMPLETED
+## Step 3: Complete Depth 1 Features ✅ COMPLETED
 
-Implemented `DepthQueryService.queryDepth1Children()` and added children to related notes and focus note's children list with correct relationship types.
+Depth 1 features completed in 5 incremental sub-steps:
+- **Step 3.1**: Per-depth caps for children and inbound references
+- **Step 3.2**: Children selection logic (ordered sibling locality)
+- **Step 3.3**: Inbound reference selection logic (random with caps)
+- **Step 3.4**: Enhanced scoring (depth, recency, jitter)
+- **Step 3.5**: Update focus note's relationship lists dynamically
 
----
-
-### Step 2.4: Add Relationship Type Derivation for Depth 1 ✅ COMPLETED
-
-Created `RelationshipTypeDerivationService` to derive relationship types (Parent, Object, Child, InboundReference) for depth 1 notes.
-
----
-
-### Step 2.5: Add Scoring for Depth 1 ✅ COMPLETED
-
-Created `CandidateNote` class and `RelevanceScoringService` with basic scoring (relationship type weight only). Notes are scored, sorted, and selected by budget. Added 3 new tests for scoring behavior. All tests passing (782 tests, 24 disabled for depth 2+).
+All tests passing (791 tests, 24 disabled for depth 2+).
 
 ---
 
-## Step 3: Complete Depth 1 Features
+## Step 4: Implement Depth 2 (Incremental)
 
-### Step 3.2: Children Selection Logic (Ordered Sibling Locality) ✅ COMPLETED
+Depth 2 implementation is broken down into incremental, verifiable sub-steps.
 
-Created `ChildrenSelectionService` implementing ordered sibling locality selection:
-- **Case A (first time)**: Selects a random contiguous block of children when no children have been selected yet
-- **Case B (subsequent)**: Prefers children closest to already-picked ones (nearby siblings), with shuffling to break ties
+### Step 4.1: Extend DepthQueryService for Depth 2 ⏳ NOT STARTED
 
-Updated `NoteGraphService` to track `pickedChildIndices` per parent and use `ChildrenSelectionService` instead of simple sequential selection. This provides diversity through random starting positions while maintaining sibling locality. All backend unit tests passing (791 tests, 24 disabled for depth 2+).
+Extend `DepthQueryService` to query relationships from depth 1 notes:
+- Method: `List<Note> queryDepth2FromSourceNotes(List<Note> sourceNotes)` or similar
+- Fetch all relationships from source notes:
+  - Parents of source notes
+  - Objects of source notes (if reification)
+  - Children of source notes (ordered by `siblingOrder`)
+  - Inbound references of source notes (random via shuffle)
+- Track which source note led to each candidate (for relationship type derivation)
+- Return candidates grouped by relationship type or with source note tracking
+
+**Test milestone**: Can fetch depth 2 relationships from depth 1 notes.
 
 ---
 
-### Step 3.5: Update Focus Note's Relationship Lists Dynamically ✅ COMPLETED
+### Step 4.2: Add Sibling Relationship Types (PriorSibling, YoungerSibling) ⏳ NOT STARTED
 
-Updated `NoteGraphService` to dynamically update the focus note's relationship lists when adding notes to related notes. When `PriorSibling` or `YoungerSibling` notes are added, they are also added to the focus note's `priorSiblings` and `youngerSiblings` lists. This prepares the code for when depth 2 features (siblings) are implemented. All backend unit tests passing (791 tests, 24 disabled for depth 2+).
+Extend `RelationshipTypeDerivationService` to derive sibling relationships:
+- Detect siblings via path: `[Parent, Sibling]`
+- Determine `PriorSibling` vs `YoungerSibling` based on `siblingOrder` relative to focus note
+- Update focus note's `priorSiblings` and `youngerSiblings` lists when siblings are added
+- Handle sibling detection logic (compare siblingOrder values)
+
+**Test milestone**: Re-enable `shouldIncludePriorSiblingsInRelatedNotes` and `shouldIncludeYoungerSiblingsInRelatedNotes`.
 
 ---
 
-### Objectives
-- Implement remaining depth 1 features:
-  - Step 3.1 Per-depth caps for children and inbound references
-  - Step 3.2 Children selection logic (ordered sibling locality)
-  - Step 3.3 Inbound reference selection logic (random with caps)
-  - Step 3.4 Enhanced scoring (depth, recency, jitter)
-  - Step 3.5 Update focus note's relationship lists dynamically
+### Step 4.3: Add Contextual Path Relationships ⏳ NOT STARTED
 
-### Tasks
-1. **Create `ChildrenSelectionService`**
-   - Method: `List<Note> selectChildren(Note parent, int remainingBudget, Set<Integer> pickedIndices, List<Note> allChildren)`
-   - Implement Case A: Random contiguous block (first time)
-   - Implement Case B: Prefer nearby siblings (already picked some)
-   - Apply per-depth cap: `child_cap(p, d) = 2 * (d - depth_fetched[p])`
-   - Track `pickedChildIndices` and `childrenEmitted`
+Extend relationship type derivation for contextual paths:
+- `[Parent, Parent, ...]` → `AncestorInContextualPath` (non-parent ancestors)
+- `[Object, Parent, ...]` → `AncestorInObjectContextualPath` (object's ancestors)
+- Track discovery paths to identify ancestor chains
+- Handle multiple parent hops correctly
 
-2. **Create `InboundReferenceSelectionService`**
-   - Method: `List<Note> selectInboundReferences(Note target, int remainingBudget, int alreadyEmitted)`
-   - Apply per-depth cap: `inbound_cap(p, d) = 2 * (d - depth_fetched[p])`
-   - Random selection (use `ORDER BY RAND()` in SQL or shuffle in memory)
-   - Track `inboundEmitted`
+**Test milestone**: Re-enable `shouldIncludeNonParentAncestorsInRelatedNotes` and `shouldIncludeObjectContextualPathInRelatedNotes`.
 
-3. **Create `RelevanceScoringService`**
-   - Enhanced scoring with all dimensions:
-     - Relationship type weight
-     - Depth bonus (depth 1 → 1.0)
-     - Recency bonus (exponential decay)
-     - Jitter (random component)
+---
 
-4. **Create tracking structures**
-   - `Map<Note, Integer> depthFetched` (focus note = 0)
-   - `Map<Note, List<RelationshipType>> discoveryPath` (focus note = empty list)
-   - `Map<Note, Set<Integer>> pickedChildIndices` (for children selection)
-   - `Map<Note, Integer> childrenEmitted` (for per-depth caps)
-   - `Map<Note, Integer> inboundEmitted` (for per-depth caps)
+### Step 4.4: Add Object of Reified Child (ObjectOfReifiedChild) ⏳ NOT STARTED
 
-5. **Update `DepthTraversalService`**
-   - Integrate children selection service
-   - Integrate inbound reference selection service
-   - Apply per-depth caps
-   - Update focus note's relationship lists dynamically
+Extend relationship type derivation for reified child objects:
+- `[Child, Object]` → `ObjectOfReifiedChild`
+- Detect when a child is a reification (has targetNote)
+- Derive the object note's relationship type correctly
 
-6. **Update tests**
-   - Re-enable remaining depth 1 tests:
-     - `shouldIncludeYoungerSiblingsInRelatedNotes`
-     - `shouldIncludePriorSiblingsInRelatedNotes`
-     - `shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough` (complete)
-     - Tests for per-depth caps
-     - Tests for children selection logic
+**Test milestone**: Re-enable `shouldIncludeChildObjectInRelatedNotes`.
+
+---
+
+### Step 4.5: Add Subject of Inbound Reference (SubjectOfInboundReference) ⏳ NOT STARTED
+
+Extend relationship type derivation for inbound reference subjects:
+- `[InboundReference, Subject]` → `SubjectOfInboundReference`
+- Track that an inbound reference note's parent is the subject
+- Derive relationship type for the subject note
+
+**Test milestone**: Re-enable `shouldIncludeInboundReferenceSubjectsWhenBudgetIsEnough`.
+
+---
+
+### Step 4.6: Add Parent Siblings (SiblingOfParent, SiblingOfParentOfObject) ⏳ NOT STARTED
+
+Extend relationship type derivation for parent's siblings:
+- `[Parent, Sibling]` (parent's sibling, not focus note's sibling) → `SiblingOfParent`
+- `[Object, Parent, Sibling]` → `SiblingOfParentOfObject`
+- Distinguish between focus note's siblings (Step 4.2) and parent's siblings
+- Handle sibling order detection for parent's siblings
+
+**Test milestone**: Re-enable `shouldIncludeParentSiblingsInRelatedNotes`.
+
+---
+
+### Step 4.7: Integrate Depth 2 Traversal into NoteGraphService ⏳ NOT STARTED
+
+Update `NoteGraphService` to process depth 2:
+- After depth 1 processing, get all notes from depth 1 as source notes
+- Call `DepthQueryService` for depth 2
+- Apply per-depth caps for children and inbound references from depth 1 notes
+- Apply children selection logic (ordered sibling locality) for each parent
+- Apply inbound reference selection logic (random) for each target
+- Derive relationship types using extended `RelationshipTypeDerivationService`
+- Track shortest discovery path (if note discovered via multiple paths)
+- Add candidates to global pool
+- Update focus note's relationship lists (siblings, etc.)
+
+**Test milestone**: Depth 2 candidates are discovered and added to the candidate pool.
+
+---
+
+### Step 4.8: Handle Additional Children and Inbound Refs from Focus Note at Depth 2 ⏳ NOT STARTED
+
+Implement additional children and inbound refs from focus note at depth 2:
+- At depth 2, also fetch additional children from focus note (subject to per-depth caps)
+- At depth 2, also fetch additional inbound refs from focus note (subject to per-depth caps)
+- Apply per-depth caps: focus note at depth 0 → depth 2 cap = 2 * (2 - 0) = 4 children total
+- Use children selection logic to maintain sibling locality
+- Use inbound reference selection logic for random selection
+
+**Test milestone**: Focus note can expand more children/inbound refs at depth 2, respecting caps.
+
+---
 
 ### Configuration Constants
 - `MAX_DEPTH = 3`
-- `MAX_TOTAL_CANDIDATES = 200`
 - `CHILD_CAP_MULTIPLIER = 2`
 - `INBOUND_CAP_MULTIPLIER = 2`
-- `W_RELATIONSHIP = 100.0`
-- `W_DEPTH = 20.0`
-- `W_RECENCY = 5.0`
-- `JITTER_RANGE = 0.5`
 
 ### Deliverables
-- `ChildrenSelectionService.java`
-- `InboundReferenceSelectionService.java`
-- `RelevanceScoringService.java` (enhanced)
-- Per-depth caps implemented
-- Children selection logic working
-- Inbound reference selection logic working
-- Enhanced scoring working
-- All depth 1 tests passing
-
----
-
-## Step 4: Implement Depth 2
-
-### Objectives
-- Fetch relationships from depth 1 notes
-- Apply per-depth caps for children and inbound references from depth 1 notes
-- Derive relationship types for depth 2 notes (siblings, cousins, etc.)
-- Handle additional children and inbound refs from focus note (subject to caps)
-
-### Tasks
-1. **Extend `DepthQueryService`**
-   - Method: `DepthQueryResult queryDepthN(List<Note> sourceNotes, int depth)`
-   - Single SQL query to fetch all relationships from source notes:
-     - Parents of source notes
-     - Objects of source notes (if reification)
-     - Children of source notes (ordered by `siblingOrder`)
-     - Inbound references of source notes (random)
-   - Track which source note led to each candidate
-
-2. **Extend relationship type derivation**
-   - Add depth 2 relationship mappings:
-     - `[Parent, Sibling]` → `PriorSibling` or `YoungerSibling`
-     - `[Child, Object]` → `ObjectOfReifiedChild`
-     - `[InboundReference, Subject]` → `SubjectOfInboundReference`
-     - `[Parent, Parent, ...]` → `AncestorInContextualPath`
-     - `[Object, Parent, ...]` → `AncestorInObjectContextualPath`
-     - `[Parent, Sibling]` (parent's sibling) → `SiblingOfParent`
-     - `[Object, Parent, Sibling]` → `SiblingOfParentOfObject`
-
-3. **Update `DepthTraversalService`**
-   - Process depth 2:
-     - Get all notes from depth 1 as source notes
-     - Call `DepthQueryService.queryDepthN()` for depth 2
-     - Apply children selection for each parent (with per-depth caps)
-     - Apply inbound reference selection for each target (with per-depth caps)
-     - Also fetch additional children/inbound refs from focus note (if caps allow)
-     - Derive relationship types
-     - Track shortest discovery path (if note discovered via multiple paths)
-     - Add candidates to global pool
-     - Update focus note's relationship lists
-
-4. **Handle sibling detection**
-   - Detect prior vs younger siblings based on `siblingOrder`
-   - Update focus note's `priorSiblings` and `youngerSiblings` lists
-
-5. **Update tests**
-   - Re-enable depth 2 tests:
-     - `shouldIncludeNonParentAncestorsInRelatedNotes`
-     - `shouldIncludeObjectContextualPathInRelatedNotes`
-     - `shouldIncludeParentSiblingsInRelatedNotes`
-     - `shouldIncludeChildObjectInRelatedNotes` (ObjectOfReifiedChild)
-     - `shouldIncludeInboundReferenceSubjectsWhenBudgetIsEnough`
-
-### Deliverables
-- Extended `DepthQueryService` for depth N
-- Extended relationship type derivation
-- Depth 2 traversal working
+- Extended `DepthQueryService` for depth 2
+- Extended `RelationshipTypeDerivationService` for depth 2 relationship types
+- Depth 2 traversal integrated into `NoteGraphService`
+- Per-depth caps applied for depth 2
+- Children and inbound reference selection logic working for depth 2
 - All depth 2 tests passing
 
 ---
@@ -364,15 +340,9 @@ When a note can be reached via multiple paths:
 
 ### Test Categories
 1. **Focus Note Tests** - ✅ Passing (Step 1)
-2. **Depth 1 Basic Tests** - Should pass after Step 2.1 (parent/object)
-3. **Depth 1 Inbound Ref Tests** - Should pass after Step 2.2
-4. **Depth 1 Children Tests** - Should pass after Step 2.3
-5. **Depth 1 Relationship Type Tests** - Should pass after Step 2.4
-6. **Depth 1 Scoring Tests** - Should pass after Step 2.5
-7. **Depth 1 Complete Tests** - Should pass after Step 3 (per-depth caps, selection logic)
-8. **Depth 2 Tests** - Should pass after Step 4
-9. **Depth 3 Tests** - Should pass after Step 5
-10. **Scoring and Selection Tests** - New tests for Step 5
+2. **Depth 1 Tests** - ✅ Passing (Steps 2 & 3)
+3. **Depth 2 Tests** - ⏳ Should pass after Step 4
+4. **Depth 3 Tests** - ⏳ Should pass after Step 5
 
 ---
 
@@ -401,34 +371,23 @@ When a note can be reached via multiple paths:
 ### Step 1 ✅ COMPLETED
 - `NoteGraphService` created, tests copied, 6 passing, 32 disabled
 
-### Step 2.1 ✅ COMPLETED
-- `DepthQueryService` created, parent/object added to related notes, 10 tests passing
+### Step 2 ✅ COMPLETED
+- Depth 1 fully implemented (parent, object, children, inbound refs, relationship types, basic scoring)
+- All tests passing (782 tests, 24 disabled for depth 2+)
 
-### Step 2.2 ✅ COMPLETED
-- Inbound references added to related notes
-
-### Step 2.3 ✅ COMPLETED
-- Children added to related notes and focus note's children list
-
-### Step 2.4 ✅ COMPLETED
-- `RelationshipTypeDerivationService` created for depth 1 relationship types
-
-### Step 2.5 ✅ COMPLETED
-- `CandidateNote` and `RelevanceScoringService` created, scoring implemented, 3 new tests added, all tests passing (782 tests, 24 disabled)
-
-### Step 3 ⏳ IN PROGRESS
-- ✅ Per-depth caps implemented (Step 3.1)
-- ✅ Children selection logic working (ordered sibling locality) (Step 3.2)
-- ✅ Inbound reference selection logic working (random with caps) (Step 3.3)
-- ✅ Enhanced scoring working (depth, recency, jitter) (Step 3.4)
-- ✅ Tracking structures initialized
-- ✅ Focus note's relationship lists updated dynamically (Step 3.5)
-- ✅ All depth 1 tests passing (791 tests, 24 disabled for depth 2+)
+### Step 3 ✅ COMPLETED
+- Per-depth caps, selection logic, enhanced scoring, and relationship list updates implemented
+- All tests passing (791 tests, 24 disabled for depth 2+)
 
 ### Step 4 ⏳ NOT STARTED
-- ⏳ Depth 2 relationships fetched correctly
-- ⏳ Extended relationship types derived
-- ⏳ Sibling detection working
+- ⏳ Step 4.1: DepthQueryService extended for depth 2
+- ⏳ Step 4.2: Sibling relationship types (PriorSibling, YoungerSibling)
+- ⏳ Step 4.3: Contextual path relationships (AncestorInContextualPath, AncestorInObjectContextualPath)
+- ⏳ Step 4.4: Object of reified child (ObjectOfReifiedChild)
+- ⏳ Step 4.5: Subject of inbound reference (SubjectOfInboundReference)
+- ⏳ Step 4.6: Parent siblings (SiblingOfParent, SiblingOfParentOfObject)
+- ⏳ Step 4.7: Depth 2 traversal integrated into NoteGraphService
+- ⏳ Step 4.8: Additional children/inbound refs from focus note at depth 2
 - ⏳ All depth 2 tests passing
 
 ### Step 5 ⏳ NOT STARTED
