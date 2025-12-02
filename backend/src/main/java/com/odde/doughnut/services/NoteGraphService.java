@@ -45,6 +45,15 @@ public class NoteGraphService {
       }
     }
 
+    // Step 2.3: Fetch children at depth 1
+    var children = depthQueryService.queryDepth1Children(focusNote);
+    for (Note child : children) {
+      BareNote addedNote = builder.addNoteToRelatedNotes(child, RelationshipToFocusNote.Child);
+      if (addedNote != null) {
+        builder.getFocusNote().getChildren().add(child.getUri());
+      }
+    }
+
     return builder.build();
   }
 }

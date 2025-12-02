@@ -22,4 +22,9 @@ public class DepthQueryService {
     Collections.shuffle(inboundRefs);
     return inboundRefs;
   }
+
+  public List<Note> queryDepth1Children(Note focusNote) {
+    // Children are already ordered by siblingOrder via @OrderBy annotation
+    return new ArrayList<>(focusNote.getChildren());
+  }
 }
