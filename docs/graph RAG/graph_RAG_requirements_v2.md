@@ -261,14 +261,16 @@ Map discovery paths to relationship types:
 
 After BFS-style discovery, we have a pool of candidate notes (with `depth_fetched`, `discovery_path`, and relationship types). The next step is to assign each candidate a **`relevanceScore`** and then select as many as fit into the token budget.
 
+> **Implementation Status**: As of Step 2.5, only basic relationship type scoring is implemented (all depth 1 types get equal weight). The full scoring system with depth bonus, recency, and jitter will be implemented in Step 3.
+
 ### 8.1 Scoring Dimensions
 
 Each candidate note gets a scalar score computed from several dimensions:
 
-* **Relationship type** to the focus note (strongest signal)
-* **Graph distance** (`distanceFromFocus` = depth where first discovered)
-* **Recency** (based on `createdAt`)
-* **Light randomness** (jitter) to break ties and avoid overly deterministic outputs
+* **Relationship type** to the focus note (strongest signal) ✅ *Implemented (Step 2.5)*
+* **Graph distance** (`distanceFromFocus` = depth where first discovered) ⏳ *Planned (Step 3)*
+* **Recency** (based on `createdAt`) ⏳ *Planned (Step 3)*
+* **Light randomness** (jitter) to break ties and avoid overly deterministic outputs ⏳ *Planned (Step 3)*
 
 Implementation as a weighted sum:
 
