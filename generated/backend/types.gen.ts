@@ -2153,6 +2153,33 @@ export type RemoveFromRepeatingResponses = {
 
 export type RemoveFromRepeatingResponse = RemoveFromRepeatingResponses[keyof RemoveFromRepeatingResponses];
 
+export type ReEnableData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/re-enable';
+};
+
+export type ReEnableErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type ReEnableError = ReEnableErrors[keyof ReEnableErrors];
+
+export type ReEnableResponses = {
+    /**
+     * OK
+     */
+    200: MemoryTracker;
+};
+
+export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
+
 export type AnswerSpellingData = {
     body: AnswerSpellingDto;
     path: {

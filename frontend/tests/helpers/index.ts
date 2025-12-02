@@ -114,6 +114,7 @@ const methodToController: Record<string, any> = {
   getApprovalForNotebook: NotebookCertificateApprovalController,
   selfEvaluate: MemoryTrackerController,
   removeFromRepeating: MemoryTrackerController,
+  reEnable: MemoryTrackerController,
   answerSpelling: MemoryTrackerController,
   markAsRepeated: MemoryTrackerController,
   showMemoryTracker: MemoryTrackerController,

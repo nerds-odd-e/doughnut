@@ -347,4 +347,173 @@ describe("MemoryTrackerPageView", () => {
       await flushPromises()
     })
   })
+
+  describe("skipped memory tracker", () => {
+    it("shows skipped indicator at the top when memory tracker is skipped", async () => {
+      const memoryTracker = makeMe.aMemoryTracker
+        .removedFromTracking(true)
+        .please()
+      const recallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Test question")
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [recallPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).toContain(
+        "This memory tracker is currently skipped and will not appear in review sessions."
+      )
+    })
+
+    it("shows re-enable button when memory tracker is skipped", async () => {
+      const memoryTracker = makeMe.aMemoryTracker
+        .removedFromTracking(true)
+        .please()
+      const recallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Test question")
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [recallPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const reEnableButton = wrapper.find(
+        'button[title="Re-enable this memory tracker"]'
+      )
+      expect(reEnableButton.exists()).toBe(true)
+      expect(reEnableButton.text()).toContain("Re-enable")
+    })
+
+    it("shows recall prompts even when memory tracker is skipped", async () => {
+      const memoryTracker = makeMe.aMemoryTracker
+        .removedFromTracking(true)
+        .please()
+      const recallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Test question")
+        .withChoices(["A", "B", "C"])
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [recallPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Test question")
+      expect(wrapper.text()).toContain("A")
+      expect(wrapper.text()).toContain("B")
+      expect(wrapper.text()).toContain("C")
+    })
+
+    it("hides remove from review button when memory tracker is skipped", async () => {
+      const memoryTracker = makeMe.aMemoryTracker
+        .removedFromTracking(true)
+        .please()
+      const recallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Test question")
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [recallPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const removeButton = wrapper.find(
+        'button[title="remove this note from review"]'
+      )
+      expect(removeButton.exists()).toBe(false)
+    })
+
+    it("calls re-enable endpoint and emits refresh when re-enable button is clicked", async () => {
+      const memoryTracker = makeMe.aMemoryTracker
+        .removedFromTracking(true)
+        .please()
+      const recallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Test question")
+        .please()
+
+      const reEnableSpy = mockSdkService("reEnable", {
+        ...memoryTracker,
+        removedFromTracking: false,
+      })
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [recallPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const reEnableButton = wrapper.find(
+        'button[title="Re-enable this memory tracker"]'
+      )
+      expect(reEnableButton.exists()).toBe(true)
+      await reEnableButton.trigger("click")
+      await flushPromises()
+
+      expect(reEnableSpy).toHaveBeenCalledWith({
+        path: { memoryTracker: 1 },
+      })
+      expect(wrapper.emitted("refresh")).toBeTruthy()
+      expect(wrapper.emitted("refresh")?.length).toBe(1)
+    })
+
+    it("does not show skipped indicator when memory tracker is not skipped", async () => {
+      const memoryTracker = makeMe.aMemoryTracker
+        .removedFromTracking(false)
+        .please()
+      const recallPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Test question")
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [recallPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).not.toContain(
+        "This memory tracker is currently skipped"
+      )
+      const reEnableButton = wrapper.find(
+        'button[title="Re-enable this memory tracker"]'
+      )
+      expect(reEnableButton.exists()).toBe(false)
+    })
+  })
 })
