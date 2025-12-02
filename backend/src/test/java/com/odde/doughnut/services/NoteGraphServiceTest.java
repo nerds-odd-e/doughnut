@@ -1031,4 +1031,97 @@ public class NoteGraphServiceTest {
           equalTo(2L));
     }
   }
+
+  @Nested
+  class PerDepthCaps {
+    @Test
+    void shouldLimitChildrenAtDepth1ToPerDepthCap() {
+      // Focus note at depth 0, so at depth 1: cap = 2 * (1 - 0) = 2 children
+      Note focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 1").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 2").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 3").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 4").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 5").please();
+
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
+
+      // Should only have 2 children in related notes (per-depth cap at depth 1)
+      List<BareNote> childNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
+              .collect(Collectors.toList());
+
+      assertThat(childNotes, hasSize(2));
+      // Should also only have 2 children in focus note's children list
+      assertThat(result.getFocusNote().getChildren(), hasSize(2));
+    }
+
+    @Test
+    void shouldLimitInboundReferencesAtDepth1ToPerDepthCap() {
+      // Focus note at depth 0, so at depth 1: cap = 2 * (1 - 0) = 2 inbound refs
+      Note focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+      Note refParent1 = makeMe.aNote().titleConstructor("Ref Parent 1").please();
+      Note refParent2 = makeMe.aNote().titleConstructor("Ref Parent 2").please();
+      makeMe.aReification().between(refParent1, focusNote).please();
+      makeMe.aReification().between(refParent2, focusNote).please();
+      makeMe
+          .aReification()
+          .between(makeMe.aNote().titleConstructor("Ref Parent 3").please(), focusNote)
+          .please();
+      makeMe
+          .aReification()
+          .between(makeMe.aNote().titleConstructor("Ref Parent 4").please(), focusNote)
+          .please();
+      makeMe
+          .aReification()
+          .between(makeMe.aNote().titleConstructor("Ref Parent 5").please(), focusNote)
+          .please();
+
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
+
+      // Should only have 2 inbound refs in related notes (per-depth cap at depth 1)
+      List<BareNote> inboundRefNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.InboundReference)
+              .collect(Collectors.toList());
+
+      assertThat(inboundRefNotes, hasSize(2));
+      // Should also only have 2 inbound refs in focus note's inbound references list
+      assertThat(result.getFocusNote().getInboundReferences(), hasSize(2));
+    }
+
+    @Test
+    void shouldApplyPerDepthCapEvenWhenBudgetIsEnough() {
+      // Even with large budget, per-depth caps should limit children and inbound refs
+      Note focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 1").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 2").please();
+      makeMe.aNote().under(focusNote).titleConstructor("Child 3").please();
+      Note refParent1 = makeMe.aNote().titleConstructor("Ref Parent 1").please();
+      Note refParent2 = makeMe.aNote().titleConstructor("Ref Parent 2").please();
+      makeMe.aReification().between(refParent1, focusNote).please();
+      makeMe.aReification().between(refParent2, focusNote).please();
+      makeMe
+          .aReification()
+          .between(makeMe.aNote().titleConstructor("Ref Parent 3").please(), focusNote)
+          .please();
+
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 10000);
+
+      // Should only have 2 children (per-depth cap)
+      List<BareNote> childNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Child)
+              .collect(Collectors.toList());
+      assertThat(childNotes, hasSize(2));
+
+      // Should only have 2 inbound refs (per-depth cap)
+      List<BareNote> inboundRefNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.InboundReference)
+              .collect(Collectors.toList());
+      assertThat(inboundRefNotes, hasSize(2));
+    }
+  }
 }

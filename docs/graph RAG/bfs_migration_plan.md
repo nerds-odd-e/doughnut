@@ -64,11 +64,11 @@ Created `CandidateNote` class and `RelevanceScoringService` with basic scoring (
 
 ### Objectives
 - Implement remaining depth 1 features:
-  - 3.1 Per-depth caps for children and inbound references
-  - 3.2 Children selection logic (ordered sibling locality)
-  - 3.3 Inbound reference selection logic (random with caps)
-  - 3.4 Enhanced scoring (depth, recency, jitter)
-  - 3.5 Update focus note's relationship lists dynamically
+  - Step 3.1 Per-depth caps for children and inbound references
+  - Step 3.2 Children selection logic (ordered sibling locality)
+  - Step 3.3 Inbound reference selection logic (random with caps)
+  - Step 3.4 Enhanced scoring (depth, recency, jitter)
+  - Step 3.5 Update focus note's relationship lists dynamically
 
 ### Tasks
 1. **Create `ChildrenSelectionService`**

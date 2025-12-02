@@ -12,9 +12,14 @@ import com.odde.doughnut.services.graphRAG.TokenCountingStrategy;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NoteGraphService {
+  private static final int CHILD_CAP_MULTIPLIER = 2;
+  private static final int INBOUND_CAP_MULTIPLIER = 2;
+
   private final TokenCountingStrategy tokenCountingStrategy;
   private final DepthQueryService depthQueryService;
   private final RelationshipTypeDerivationService relationshipTypeDerivationService;
@@ -31,12 +36,21 @@ public class NoteGraphService {
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes, tokenCountingStrategy);
 
+    // Step 3.1: Initialize tracking structures
+    Map<Note, Integer> depthFetched = new HashMap<>();
+    Map<Note, Integer> childrenEmitted = new HashMap<>();
+    Map<Note, Integer> inboundEmitted = new HashMap<>();
+
+    // Focus note is at depth 0
+    depthFetched.put(focusNote, 0);
+
     // Step 2.5: Collect all candidates first
     List<CandidateNote> candidates = new ArrayList<>();
 
     // Step 2.1: Fetch parent and object at depth 1
     var depth1Notes = depthQueryService.queryDepth1ParentAndObject(focusNote);
     for (Note note : depth1Notes) {
+      depthFetched.put(note, 1);
       RelationshipToFocusNote relationship =
           relationshipTypeDerivationService.deriveRelationshipType(note, focusNote);
       if (relationship != null) {
@@ -44,25 +58,40 @@ public class NoteGraphService {
       }
     }
 
-    // Step 2.2: Fetch inbound references at depth 1
-    var inboundReferences = depthQueryService.queryDepth1InboundReferences(focusNote);
-    for (Note note : inboundReferences) {
+    // Step 3.1: Fetch and apply per-depth caps for inbound references at depth 1
+    var allInboundReferences = depthQueryService.queryDepth1InboundReferences(focusNote);
+    int currentDepth = 1;
+    int inboundCap = calculateInboundCap(focusNote, currentDepth, depthFetched);
+    int alreadyEmitted = inboundEmitted.getOrDefault(focusNote, 0);
+    int remainingBudget = Math.max(0, inboundCap - alreadyEmitted);
+    var selectedInboundReferences =
+        allInboundReferences.subList(0, Math.min(remainingBudget, allInboundReferences.size()));
+    for (Note note : selectedInboundReferences) {
+      depthFetched.putIfAbsent(note, 1);
       RelationshipToFocusNote relationship =
           relationshipTypeDerivationService.deriveRelationshipType(note, focusNote);
       if (relationship != null) {
         candidates.add(new CandidateNote(note, relationship, 1));
       }
     }
+    inboundEmitted.put(focusNote, alreadyEmitted + selectedInboundReferences.size());
 
-    // Step 2.3: Fetch children at depth 1
-    var children = depthQueryService.queryDepth1Children(focusNote);
-    for (Note child : children) {
+    // Step 3.1: Fetch and apply per-depth caps for children at depth 1
+    var allChildren = depthQueryService.queryDepth1Children(focusNote);
+    int childCap = calculateChildCap(focusNote, currentDepth, depthFetched);
+    int childrenAlreadyEmitted = childrenEmitted.getOrDefault(focusNote, 0);
+    int childrenRemainingBudget = Math.max(0, childCap - childrenAlreadyEmitted);
+    var selectedChildren =
+        allChildren.subList(0, Math.min(childrenRemainingBudget, allChildren.size()));
+    for (Note child : selectedChildren) {
+      depthFetched.putIfAbsent(child, 1);
       RelationshipToFocusNote relationship =
           relationshipTypeDerivationService.deriveRelationshipType(child, focusNote);
       if (relationship != null) {
         candidates.add(new CandidateNote(child, relationship, 1));
       }
     }
+    childrenEmitted.put(focusNote, childrenAlreadyEmitted + selectedChildren.size());
 
     // Step 2.5: Score all candidates
     for (CandidateNote candidate : candidates) {
@@ -88,5 +117,17 @@ public class NoteGraphService {
     }
 
     return builder.build();
+  }
+
+  // Step 3.1: Calculate child cap for a parent note at a given depth
+  private int calculateChildCap(Note parent, int currentDepth, Map<Note, Integer> depthFetched) {
+    int parentDepthFetched = depthFetched.getOrDefault(parent, currentDepth);
+    return CHILD_CAP_MULTIPLIER * (currentDepth - parentDepthFetched);
+  }
+
+  // Step 3.1: Calculate inbound reference cap for a target note at a given depth
+  private int calculateInboundCap(Note target, int currentDepth, Map<Note, Integer> depthFetched) {
+    int targetDepthFetched = depthFetched.getOrDefault(target, currentDepth);
+    return INBOUND_CAP_MULTIPLIER * (currentDepth - targetDepthFetched);
   }
 }
