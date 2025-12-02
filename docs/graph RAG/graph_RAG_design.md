@@ -2,7 +2,7 @@
 
 ## Concepts
 
-In Doughnut, notes are atomic knowledge points organized hierarchically within notebooks. Each note (except root notes) has a parent and contains a title, details, and a unique URI. The title and URI are commonly represented as markdown links `[title](uri)`.
+In Doughnut, notes are atomic knowledge points organized hierarchically within notebooks. Each note (except root notes) has a parent and contains a title, details, and a unique URI. In the Graph RAG system, notes are represented as JSON objects with separate `uri` and `title` fields.
 
 A note becomes a reification when it links to an object note, with its parent becoming the subject and its title serving as the predicate. Reification notes can still contain details, and their object notes may come from different notebooks.
 
@@ -21,15 +21,24 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
 
 ### Core Components
 - **BareNote**: Basic note representation containing:
-  - URI and title
+  - URI (string)
+  - Title or predicate (string, depending on note type)
   - Details (truncated for non-focus notes)
-  - Parent and object references
+  - Parent and object references as `UriAndTitle` objects
   - Relationship to focus note
+
+- **UriAndTitle**: Object representation of a note reference containing:
+  - `uri` (string): The note's URI
+  - `title` (string): The note's title
 
 - **FocusNote**: Extended note representation including:
   - All BareNote fields (untruncated)
-  - Contextual path
-  - Lists of related notes (children, siblings, inbound references)
+  - Contextual path: `List<String>` of ancestor URIs
+  - Lists of related note URIs: `List<String>` for:
+    - `children`: Direct child note URIs
+    - `priorSiblings`: Prior sibling note URIs
+    - `youngerSiblings`: Younger sibling note URIs
+    - `inboundReferences`: Inbound reference note URIs
 
 - **RelationshipToFocusNote**: Enumeration of possible relationships:
   - Direct: Self, Parent, Object, Child
@@ -103,7 +112,7 @@ The system uses a layered priority approach with configurable notes-before-switc
    - Each handler manages a specific relationship type
    - Handlers retrieve notes in relevance order
    - Track processed notes to avoid duplicates
-   - Update focus note's relationship lists dynamically
+   - Update focus note's relationship lists dynamically with note URIs
 
 4. **Budget Management**
    - Track remaining tokens
@@ -135,9 +144,11 @@ The system manages complex relationship dependencies through dynamic handler inj
 - Use priority layers to manage relationship processing order
 - Implement flexible token counting strategies
 - Handle dynamic relationship discovery
-- Maintain relationship consistency in focus note
+- Maintain relationship consistency in focus note (URIs stored as strings)
 - Support efficient note deduplication
 - Enable extensibility for new relationship types
+- `UriAndTitle` serializes as JSON object with `uri` and `title` fields
+- `FocusNote` relationship lists store URIs as strings for efficient serialization
 
 ## Usage Guidelines
 
