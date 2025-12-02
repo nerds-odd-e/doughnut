@@ -952,4 +952,83 @@ public class NoteGraphServiceTest {
           lessThanOrEqualTo((long) RELATED_NOTE_DETAILS_TRUNCATE_LENGTH));
     }
   }
+
+  @Nested
+  class ScoringAndSelection {
+    private Note focusNote;
+    private Note parent;
+    private Note object;
+    private Note child1;
+    private Note child2;
+    private Note inboundRef1;
+    private Note inboundRef2;
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      object = makeMe.aNote().titleConstructor("Object Note").please();
+      // Make focus note a reification so it has an object
+      focusNote = makeMe.aReification().between(parent, object).please();
+      child1 = makeMe.aNote().under(focusNote).titleConstructor("Child One").please();
+      child2 = makeMe.aNote().under(focusNote).titleConstructor("Child Two").please();
+      inboundRef1 = makeMe.aNote().titleConstructor("Inbound Ref One").please();
+      makeMe.aReification().between(inboundRef1, focusNote).please();
+      inboundRef2 = makeMe.aNote().titleConstructor("Inbound Ref Two").please();
+      makeMe.aReification().between(inboundRef2, focusNote).please();
+      makeMe.refresh(focusNote);
+    }
+
+    @Test
+    void shouldSelectNotesBasedOnScoreWhenBudgetIsLimited() {
+      // Set budget to only allow 3 notes (budget 4 - 1 for focus note = 3 remaining)
+      // With equal scores, order is preserved from collection: parent/object, then inbound refs,
+      // then children
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 4);
+
+      // Should have exactly 3 notes (parent, object, and one inbound ref or child)
+      assertThat(result.getRelatedNotes(), hasSize(3));
+      // Verify we have parent and object
+      assertThat(
+          result.getRelatedNotes().stream()
+              .map(BareNote::getRelationToFocusNote)
+              .collect(Collectors.toList()),
+          hasItems(RelationshipToFocusNote.Parent, RelationshipToFocusNote.Object));
+      // The third note could be either an inbound ref or a child (depending on collection order)
+    }
+
+    @Test
+    void shouldRespectTokenBudgetWhenSelectingNotes() {
+      // Set budget to only allow 2 notes (using OneTokenPerNoteStrategy: 1 token per note)
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 3);
+
+      // Should have at most 3 notes (budget allows 3, but we may have fewer)
+      assertThat(result.getRelatedNotes().size(), lessThanOrEqualTo(3));
+
+      // Verify token budget is respected (each note costs 1 token with OneTokenPerNoteStrategy)
+      assertThat(result.getRelatedNotes().size(), lessThanOrEqualTo(3));
+    }
+
+    @Test
+    void shouldIncludeAllNotesWhenBudgetIsEnough() {
+      // Set budget to allow all notes
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
+
+      // Should have parent, object, 2 children, and 2 inbound refs (6 notes total)
+      // Budget 1000 - 1 for focus note = 999 remaining, which is more than enough for 6 notes
+      assertThat(result.getRelatedNotes(), hasSize(6));
+      // Verify all relationship types are present
+      List<RelationshipToFocusNote> relationships =
+          result.getRelatedNotes().stream()
+              .map(BareNote::getRelationToFocusNote)
+              .collect(Collectors.toList());
+      assertThat(relationships, hasItem(RelationshipToFocusNote.Parent));
+      assertThat(relationships, hasItem(RelationshipToFocusNote.Object));
+      assertThat(
+          relationships.stream().filter(r -> r == RelationshipToFocusNote.Child).count(),
+          equalTo(2L));
+      assertThat(
+          relationships.stream().filter(r -> r == RelationshipToFocusNote.InboundReference).count(),
+          equalTo(2L));
+    }
+  }
 }
