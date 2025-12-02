@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.CandidateNote;
+import com.odde.doughnut.services.graphRAG.ChildrenSelectionService;
 import com.odde.doughnut.services.graphRAG.DepthQueryService;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.graphRAG.GraphRAGResultBuilder;
@@ -14,8 +15,10 @@ import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class NoteGraphService {
   private static final int CHILD_CAP_MULTIPLIER = 2;
@@ -25,6 +28,7 @@ public class NoteGraphService {
   private final RelationshipTypeDerivationService relationshipTypeDerivationService;
   private final RelevanceScoringService relevanceScoringService;
   private final InboundReferenceSelectionService inboundReferenceSelectionService;
+  private final ChildrenSelectionService childrenSelectionService;
 
   public NoteGraphService(TokenCountingStrategy tokenCountingStrategy) {
     this.tokenCountingStrategy = tokenCountingStrategy;
@@ -32,6 +36,7 @@ public class NoteGraphService {
     this.relationshipTypeDerivationService = new RelationshipTypeDerivationService();
     this.relevanceScoringService = new RelevanceScoringService();
     this.inboundReferenceSelectionService = new InboundReferenceSelectionService();
+    this.childrenSelectionService = new ChildrenSelectionService();
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
@@ -42,6 +47,7 @@ public class NoteGraphService {
     Map<Note, Integer> depthFetched = new HashMap<>();
     Map<Note, Integer> childrenEmitted = new HashMap<>();
     Map<Note, Integer> inboundEmitted = new HashMap<>();
+    Map<Note, Set<Integer>> pickedChildIndices = new HashMap<>();
 
     // Focus note is at depth 0
     depthFetched.put(focusNote, 0);
@@ -77,13 +83,24 @@ public class NoteGraphService {
     }
     inboundEmitted.put(focusNote, alreadyEmitted + selectedInboundReferences.size());
 
-    // Step 3.1: Fetch and apply per-depth caps for children at depth 1
+    // Step 3.2: Fetch and apply per-depth caps for children at depth 1 with ordered sibling
+    // locality
     var allChildren = depthQueryService.queryDepth1Children(focusNote);
     int childCap = calculateChildCap(focusNote, currentDepth, depthFetched);
     int childrenAlreadyEmitted = childrenEmitted.getOrDefault(focusNote, 0);
     int childrenRemainingBudget = Math.max(0, childCap - childrenAlreadyEmitted);
+    Set<Integer> pickedIndices =
+        new HashSet<>(pickedChildIndices.getOrDefault(focusNote, new HashSet<>()));
     var selectedChildren =
-        allChildren.subList(0, Math.min(childrenRemainingBudget, allChildren.size()));
+        childrenSelectionService.selectChildren(
+            focusNote, childrenRemainingBudget, pickedIndices, allChildren);
+    // Update picked indices with newly selected children
+    for (int i = 0; i < allChildren.size(); i++) {
+      if (selectedChildren.contains(allChildren.get(i))) {
+        pickedIndices.add(i);
+      }
+    }
+    pickedChildIndices.put(focusNote, pickedIndices);
     for (Note child : selectedChildren) {
       depthFetched.putIfAbsent(child, 1);
       RelationshipToFocusNote relationship =

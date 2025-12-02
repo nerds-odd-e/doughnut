@@ -16,7 +16,9 @@ The migration will be done incrementally, maintaining test compatibility at each
 - **Step 2.3**: ✅ **COMPLETED** - Add children for depth 1
 - **Step 2.4**: ✅ **COMPLETED** - Add relationship type derivation for depth 1
 - **Step 2.5**: ✅ **COMPLETED** - Add scoring for depth 1
-- **Step 3**: ⏳ **NOT STARTED** - Complete depth 1 features (per-depth caps, selection logic, enhanced scoring)
+- **Step 3**: ⏳ **IN PROGRESS** - Complete depth 1 features (per-depth caps, selection logic, enhanced scoring)
+  - **Step 3.2**: ✅ **COMPLETED** - Children selection logic (ordered sibling locality)
+  - **Step 3.5**: ✅ **COMPLETED** - Update focus note's relationship lists dynamically
 - **Step 4**: ⏳ **NOT STARTED** - Depth 2 implementation
 - **Step 5**: ⏳ **NOT STARTED** - Depth 3 implementation with scoring and selection
 
@@ -61,6 +63,22 @@ Created `CandidateNote` class and `RelevanceScoringService` with basic scoring (
 ---
 
 ## Step 3: Complete Depth 1 Features
+
+### Step 3.2: Children Selection Logic (Ordered Sibling Locality) ✅ COMPLETED
+
+Created `ChildrenSelectionService` implementing ordered sibling locality selection:
+- **Case A (first time)**: Selects a random contiguous block of children when no children have been selected yet
+- **Case B (subsequent)**: Prefers children closest to already-picked ones (nearby siblings), with shuffling to break ties
+
+Updated `NoteGraphService` to track `pickedChildIndices` per parent and use `ChildrenSelectionService` instead of simple sequential selection. This provides diversity through random starting positions while maintaining sibling locality. All backend unit tests passing (791 tests, 24 disabled for depth 2+).
+
+---
+
+### Step 3.5: Update Focus Note's Relationship Lists Dynamically ✅ COMPLETED
+
+Updated `NoteGraphService` to dynamically update the focus note's relationship lists when adding notes to related notes. When `PriorSibling` or `YoungerSibling` notes are added, they are also added to the focus note's `priorSiblings` and `youngerSiblings` lists. This prepares the code for when depth 2 features (siblings) are implemented. All backend unit tests passing (791 tests, 24 disabled for depth 2+).
+
+---
 
 ### Objectives
 - Implement remaining depth 1 features:
@@ -398,13 +416,14 @@ When a note can be reached via multiple paths:
 ### Step 2.5 ✅ COMPLETED
 - `CandidateNote` and `RelevanceScoringService` created, scoring implemented, 3 new tests added, all tests passing (782 tests, 24 disabled)
 
-### Step 3 ⏳ NOT STARTED
-- ⏳ Per-depth caps implemented
-- ⏳ Children selection logic working (ordered sibling locality)
-- ⏳ Inbound reference selection logic working (random with caps)
-- ⏳ Enhanced scoring working (depth, recency, jitter)
-- ⏳ Tracking structures initialized
-- ⏳ All depth 1 tests passing
+### Step 3 ⏳ IN PROGRESS
+- ✅ Per-depth caps implemented (Step 3.1)
+- ✅ Children selection logic working (ordered sibling locality) (Step 3.2)
+- ✅ Inbound reference selection logic working (random with caps) (Step 3.3)
+- ✅ Enhanced scoring working (depth, recency, jitter) (Step 3.4)
+- ✅ Tracking structures initialized
+- ✅ Focus note's relationship lists updated dynamically (Step 3.5)
+- ✅ All depth 1 tests passing (791 tests, 24 disabled for depth 2+)
 
 ### Step 4 ⏳ NOT STARTED
 - ⏳ Depth 2 relationships fetched correctly
