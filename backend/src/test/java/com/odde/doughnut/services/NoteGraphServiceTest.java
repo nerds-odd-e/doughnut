@@ -89,7 +89,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludeParentInRelatedNotesWhenBudgetAllows() {
       GraphRAGResult result = noteGraphService.retrieve(note, 1000);
 
@@ -108,7 +107,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldTruncateParentDetailsInRelatedNotes() {
       String longDetails = "a".repeat(2000);
       parent.setDetails(longDetails);
@@ -142,7 +140,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludeObjectInRelatedNotes() {
       GraphRAGResult result = noteGraphService.retrieve(note, 1000);
 
@@ -156,7 +153,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldKeepObjectInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
       GraphRAGResult result = noteGraphService.retrieve(note, 2); // Only enough for parent
 

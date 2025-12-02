@@ -8,161 +8,301 @@ This document outlines the step-by-step migration plan from the current priority
 
 The migration will be done incrementally, maintaining test compatibility at each step. We'll create a new `NoteGraphService` alongside the existing `GraphRAGService` to allow gradual migration and comparison.
 
-## Step 1: Create NoteGraphService Skeleton
+## Current Status
+
+- **Step 1**: ✅ **COMPLETED** - NoteGraphService skeleton created, all tests copied, 6 tests passing, 32 tests disabled
+- **Step 2.1**: ✅ **COMPLETED** - Basic depth 1 (parent and object only), 10 tests passing, 28 tests disabled
+- **Step 2.2**: ⏳ **NOT STARTED** - Add inbound references for depth 1
+- **Step 2.3**: ⏳ **NOT STARTED** - Add children for depth 1
+- **Step 2.4**: ⏳ **NOT STARTED** - Add relationship type derivation for depth 1
+- **Step 2.5**: ⏳ **NOT STARTED** - Add scoring for depth 1
+- **Step 3**: ⏳ **NOT STARTED** - Complete depth 1 features (per-depth caps, selection logic, enhanced scoring)
+- **Step 4**: ⏳ **NOT STARTED** - Depth 2 implementation
+- **Step 5**: ⏳ **NOT STARTED** - Depth 3 implementation with scoring and selection
+
+## Step 1: Create NoteGraphService Skeleton ✅ COMPLETED
 
 ### Objectives
-- Create new `NoteGraphService` with same signature as `GraphRAGService`
-- Copy all tests from `GraphRAGServiceTest` to `NoteGraphServiceTest`
-- Implement minimal functionality to build empty result
-- Disable all failing tests (mark with `@Disabled`)
+- ✅ Create new `NoteGraphService` with same signature as `GraphRAGService`
+- ✅ Copy all tests from `GraphRAGServiceTest` to `NoteGraphServiceTest`
+- ✅ Implement minimal functionality to build empty result
+- ✅ Disable all failing tests (mark with `@Disabled`)
 
 ### Tasks
-1. **Create `NoteGraphService` class**
-   - Location: `backend/src/main/java/com/odde/doughnut/services/NoteGraphService.java`
-   - Signature: `public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes)`
-   - Dependencies: `TokenCountingStrategy`
-   - Implementation: Use `GraphRAGResultBuilder` to create result with only focus note (no related notes)
+1. **Create `NoteGraphService` class** ✅
+   - Location: `backend/src/main/java/com/odde/doughnut/services/NoteGraphService.java` ✅
+   - Signature: `public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes)` ✅
+   - Dependencies: `TokenCountingStrategy` ✅
+   - Implementation: Use `GraphRAGResultBuilder` to create result with only focus note (no related notes) ✅
 
-2. **Create `NoteGraphServiceTest` class**
-   - Location: `backend/src/test/java/com/odde/doughnut/services/NoteGraphServiceTest.java`
-   - Copy all test methods from `GraphRAGServiceTest`
-   - Change service instantiation to use `NoteGraphService`
-   - Run tests and disable all failing ones with `@Disabled("Step 1: Not yet implemented")`
+2. **Create `NoteGraphServiceTest` class** ✅
+   - Location: `backend/src/test/java/com/odde/doughnut/services/NoteGraphServiceTest.java` ✅
+   - Copy all test methods from `GraphRAGServiceTest` ✅
+   - Change service instantiation to use `NoteGraphService` ✅
+   - Run tests and disable all failing ones with `@Disabled("Step 1-2: Not yet implemented - related notes retrieval")` ✅
 
-3. **Expected Test Results**
-   - Tests that only check focus note structure should pass
-   - All tests that check related notes should fail and be disabled
-   - Tests that check focus note details truncation should pass
+3. **Expected Test Results** ✅
+   - ✅ Tests that only check focus note structure should pass (6 tests passing)
+   - ✅ All tests that check related notes should fail and be disabled (32 tests disabled)
+   - ✅ Tests that check focus note details truncation should pass
 
-### Deliverables
-- `NoteGraphService.java` (minimal implementation)
-- `NoteGraphServiceTest.java` (all tests copied, failing ones disabled)
-- All disabled tests documented with step number
+### Deliverables ✅
+- ✅ `NoteGraphService.java` (minimal implementation) - Uses `GraphRAGResultBuilder` to build result with only focus note
+- ✅ `NoteGraphServiceTest.java` (all tests copied, failing ones disabled) - 38 total tests, 6 passing, 32 disabled
+- ✅ All disabled tests documented with step number ("Step 1-2: Not yet implemented - related notes retrieval")
+
+### Current Status
+- **6 tests passing**: Focus note structure tests (zero budget, details truncation, parent/object in focus note, contextual path)
+- **32 tests disabled**: All tests that require related notes retrieval functionality
+- **All backend unit tests**: Passing (failing tests properly disabled)
 
 ---
 
-## Step 2: Implement Depth 0 (Focus Note)
+## Step 2: Implement Depth 1 (Incremental)
 
-### Objectives
-- Ensure focus note is properly initialized
-- Populate focus note's contextual path
-- Set up tracking structures for BFS traversal
+Depth 1 implementation is broken down into incremental, verifiable sub-steps.
 
-### Tasks
-1. **Create core data structures**
-   - `CandidateNote` class:
-     - Fields: `Note note`, `int depthFetched`, `List<RelationshipType> discoveryPath`, `RelationshipToFocusNote relationshipType`
-     - Internal fields: `double relevanceScore`, `int distanceFromFocus`
-   - `DepthQueryResult` class:
-     - Fields: `Map<Note, CandidateNote> candidates`, `Set<Note> sourceNotes`
-   - `DepthTraversalService` class (skeleton):
-     - Fields: `Note focusNote`, `int maxDepth`, `int maxTotalCandidates`, `TokenCountingStrategy tokenCountingStrategy`
-     - Method: `List<CandidateNote> traverse()` (returns empty list for now)
+### Step 2.1: Basic Depth 1 - Parent and Object Only ✅ COMPLETED
 
-2. **Initialize focus note in `NoteGraphService`**
-   - Create `FocusNote` from focus note
-   - Populate contextual path (ancestors)
-   - Initialize tracking maps:
-     - `Map<Note, Integer> depthFetched` (focus note = 0)
-     - `Map<Note, List<RelationshipType>> discoveryPath` (focus note = empty list)
-     - `Map<Note, Set<Integer>> pickedChildIndices` (for children selection)
-     - `Map<Note, Integer> childrenEmitted` (for per-depth caps)
-     - `Map<Note, Integer> inboundEmitted` (for per-depth caps)
+#### Objectives
+- ✅ Fetch parent and object relationships at depth 1
+- ✅ Add them to related notes
+- ✅ Relationship type derivation implemented (Parent and Object)
+- ⏳ No scoring yet (add all that fit in budget)
+- ⏳ No children or inbound references yet
+
+#### Tasks
+1. **Create basic data structures** ✅
+   - ✅ `DepthQueryService` (basic):
+     - Method: `List<Note> queryDepth1ParentAndObject(Note focusNote)`
+     - Returns parent and object notes from focus note
+     - ⏳ `CandidateNote` class deferred (not needed yet)
+
+2. **Update `NoteGraphService`** ✅
+   - ✅ Call `DepthQueryService.queryDepth1ParentAndObject()`
+   - ✅ Add parent and object to related notes (if they exist and fit in budget)
+   - ✅ Use relationship types `Parent` and `Object`
+
+3. **Update tests** ✅
+   - ✅ Re-enabled and verified:
+     - ✅ `shouldIncludeParentInRelatedNotesWhenBudgetAllows`
+     - ✅ `shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall` (already passing)
+     - ✅ `shouldTruncateParentDetailsInRelatedNotes`
+     - ✅ `shouldIncludeObjectInRelatedNotes`
+     - ✅ `shouldKeepObjectInFocusNoteEvenWhenBudgetOnlyAllowsParent`
+
+#### Deliverables ✅
+- ✅ `DepthQueryService.java` (basic version with parent/object query)
+- ✅ Parent and object appear in related notes with correct relationship types
+- ✅ Tests passing for parent and object (4 tests re-enabled, 10 total passing, 28 still disabled)
+
+---
+
+### Step 2.2: Add Inbound References for Depth 1
+
+#### Objectives
+- Fetch inbound references at depth 1
+- Add them to related notes
+- Still no relationship type derivation or scoring
+
+#### Tasks
+1. **Extend `DepthQueryService`**
+   - Method: `List<Note> queryDepth1InboundReferences(Note focusNote)`
+   - SQL query to fetch inbound references (random order)
+   - Return list of notes
+
+2. **Update `NoteGraphService`**
+   - Call `DepthQueryService.queryDepth1InboundReferences()`
+   - Add inbound references to related notes (if they fit in budget)
+   - No per-depth caps yet (add all that fit)
 
 3. **Update tests**
-   - Re-enable tests that only check focus note initialization
-   - Tests to re-enable:
-     - `shouldRetrieveJustTheFocusNoteWithZeroBudget`
-     - `shouldNotTruncateFocusNoteDetailsEvenIfItIsVeryLong`
-     - `shouldIncludeAncestorsInContextualPathInOrder` (from WhenNoteHasContextualPath)
+   - Re-enable and verify:
+     - `shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough` (partial - only inbound refs, not subjects yet)
+     - `shouldNotIncludeInboundReferenceSubjectsWhenBudgetIsLimited` (should pass - subjects not implemented yet)
 
-### Deliverables
-- `CandidateNote.java`
-- `DepthQueryResult.java`
-- `DepthTraversalService.java` (skeleton)
-- Focus note initialization working
-- Contextual path populated correctly
+#### Deliverables
+- Extended `DepthQueryService` with inbound references query
+- Inbound references appear in related notes
+- Tests passing for inbound references
 
 ---
 
-## Step 3: Implement Depth 1
+### Step 2.3: Add Children for Depth 1
+
+#### Objectives
+- Fetch children at depth 1
+- Add them to related notes
+- Still no relationship type derivation, scoring, or per-depth caps
+
+#### Tasks
+1. **Extend `DepthQueryService`**
+   - Method: `List<Note> queryDepth1Children(Note focusNote)`
+   - SQL query to fetch children (ordered by `siblingOrder`)
+   - Return list of notes
+
+2. **Update `NoteGraphService`**
+   - Call `DepthQueryService.queryDepth1Children()`
+   - Add children to related notes (if they fit in budget)
+   - No selection logic yet (add all that fit, in order)
+
+3. **Update focus note's children list**
+   - Update `result.getFocusNote().getChildren()` with selected children URIs
+
+4. **Update tests**
+   - Re-enable and verify:
+     - `shouldIncludeChildrenInFocusNoteList`
+     - `shouldIncludeChildrenInRelatedNotes`
+     - `shouldOnlyIncludeChildrenThatFitInBudget`
+
+#### Deliverables
+- Extended `DepthQueryService` with children query
+- Children appear in related notes and focus note's children list
+- Tests passing for children
+
+---
+
+### Step 2.4: Add Relationship Type Derivation for Depth 1
+
+#### Objectives
+- Derive relationship types for depth 1 notes
+- Map discovery paths to relationship types
+
+#### Tasks
+1. **Create relationship type derivation**
+   - Method: `RelationshipToFocusNote deriveRelationshipType(Note note, Note focusNote)`
+   - Simple mapping for depth 1:
+     - If note is parent → `Parent`
+     - If note is object → `Object`
+     - If note is child → `Child`
+     - If note is inbound reference → `InboundReference`
+
+2. **Update `CandidateNote`**
+   - Add field: `RelationshipToFocusNote relationshipType`
+   - Set relationship type when creating candidate
+
+3. **Update `NoteGraphService`**
+   - Set relationship type for each candidate
+   - Include relationship type in related notes output
+
+4. **Update tests**
+   - Verify relationship types are correct:
+     - Parent notes have `Parent` relationship type
+     - Object notes have `Object` relationship type
+     - Children have `Child` relationship type
+     - Inbound references have `InboundReference` relationship type
+
+#### Deliverables
+- Relationship type derivation logic
+- All depth 1 notes have correct relationship types
+- Tests verify relationship types
+
+---
+
+### Step 2.5: Add Scoring for Depth 1
+
+#### Objectives
+- Implement basic scoring for depth 1 notes
+- Use scores to order notes (higher score = more relevant)
+- Still simple scoring (relationship type only, no depth/recency/jitter yet)
+
+#### Tasks
+1. **Create basic scoring**
+   - Method: `double calculateScore(CandidateNote candidate)`
+   - Simple scoring: relationship type weight only
+   - Relationship type weights:
+     - `Parent`, `Object`, `Child`, `InboundReference`: 10.0 (all equal for now)
+
+2. **Update `CandidateNote`**
+   - Calculate and store `relevanceScore`
+
+3. **Update `NoteGraphService`**
+   - Score all candidates
+   - Sort by score (descending)
+   - Select top candidates that fit in budget
+
+4. **Update tests**
+   - Verify notes are ordered by score
+   - Verify token budget is respected
+
+#### Deliverables
+- Basic scoring implementation
+- Notes ordered by relevance score
+- Token budget respected in selection
+- Tests passing
+
+---
+
+## Step 3: Complete Depth 1 Features
 
 ### Objectives
-- Fetch and process depth 1 relationships: parent, children, object, inbound references
-- Apply per-depth caps for children and inbound references
-- Implement children selection logic (ordered sibling locality)
-- Implement inbound reference selection logic (random)
-- Add candidates to global pool
-- Derive relationship types for depth 1 notes
+- Implement remaining depth 1 features:
+  - Per-depth caps for children and inbound references
+  - Children selection logic (ordered sibling locality)
+  - Inbound reference selection logic (random with caps)
+  - Enhanced scoring (depth, recency, jitter)
+  - Update focus note's relationship lists dynamically
 
 ### Tasks
-1. **Create `DepthQueryService`**
-   - Method: `DepthQueryResult queryDepth1(Note focusNote)`
-   - Single SQL query to fetch:
-     - Parent (if exists)
-     - Object (if exists, for reification notes)
-     - Children (ordered by `siblingOrder`)
-     - Inbound references (random order)
-   - Return `DepthQueryResult` with all candidates marked as depth 1
-
-2. **Create `ChildrenSelectionService`**
+1. **Create `ChildrenSelectionService`**
    - Method: `List<Note> selectChildren(Note parent, int remainingBudget, Set<Integer> pickedIndices, List<Note> allChildren)`
    - Implement Case A: Random contiguous block (first time)
    - Implement Case B: Prefer nearby siblings (already picked some)
    - Apply per-depth cap: `child_cap(p, d) = 2 * (d - depth_fetched[p])`
    - Track `pickedChildIndices` and `childrenEmitted`
 
-3. **Create `InboundReferenceSelectionService`**
+2. **Create `InboundReferenceSelectionService`**
    - Method: `List<Note> selectInboundReferences(Note target, int remainingBudget, int alreadyEmitted)`
    - Apply per-depth cap: `inbound_cap(p, d) = 2 * (d - depth_fetched[p])`
    - Random selection (use `ORDER BY RAND()` in SQL or shuffle in memory)
    - Track `inboundEmitted`
 
-4. **Create relationship type derivation logic**
-   - Method: `RelationshipToFocusNote deriveRelationshipType(List<RelationshipType> discoveryPath)`
-   - Map discovery paths to relationship types:
-     - `[Parent]` → `Parent`
-     - `[Child]` → `Child`
-     - `[Object]` → `Object`
-     - `[InboundReference]` → `InboundReference`
+3. **Create `RelevanceScoringService`**
+   - Enhanced scoring with all dimensions:
+     - Relationship type weight
+     - Depth bonus (depth 1 → 1.0)
+     - Recency bonus (exponential decay)
+     - Jitter (random component)
+
+4. **Create tracking structures**
+   - `Map<Note, Integer> depthFetched` (focus note = 0)
+   - `Map<Note, List<RelationshipType>> discoveryPath` (focus note = empty list)
+   - `Map<Note, Set<Integer>> pickedChildIndices` (for children selection)
+   - `Map<Note, Integer> childrenEmitted` (for per-depth caps)
+   - `Map<Note, Integer> inboundEmitted` (for per-depth caps)
 
 5. **Update `DepthTraversalService`**
-   - Implement depth 1 processing:
-     - Call `DepthQueryService.queryDepth1()`
-     - Apply children selection for focus note's children
-     - Apply inbound reference selection for focus note's inbound refs
-     - Derive relationship types
-     - Add candidates to global pool
-     - Update focus note's relationship lists (children, inboundReferences)
+   - Integrate children selection service
+   - Integrate inbound reference selection service
+   - Apply per-depth caps
+   - Update focus note's relationship lists dynamically
 
-6. **Update `NoteGraphService`**
-   - Call `DepthTraversalService.traverse()` for depth 1
-   - For now, skip scoring and selection (add all depth 1 candidates to result)
-
-7. **Update tests**
-   - Re-enable depth 1 tests:
-     - `shouldIncludeParentInRelatedNotesWhenBudgetAllows`
-     - `shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall`
-     - `shouldTruncateParentDetailsInRelatedNotes`
-     - `shouldIncludeObjectInRelatedNotes`
-     - `shouldIncludeChildrenInRelatedNotes`
-     - `shouldOnlyIncludeChildrenThatFitInBudget`
+6. **Update tests**
+   - Re-enable remaining depth 1 tests:
      - `shouldIncludeYoungerSiblingsInRelatedNotes`
      - `shouldIncludePriorSiblingsInRelatedNotes`
-     - `shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough`
+     - `shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough` (complete)
+     - Tests for per-depth caps
+     - Tests for children selection logic
 
 ### Configuration Constants
 - `MAX_DEPTH = 3`
 - `MAX_TOTAL_CANDIDATES = 200`
 - `CHILD_CAP_MULTIPLIER = 2`
 - `INBOUND_CAP_MULTIPLIER = 2`
+- `W_RELATIONSHIP = 100.0`
+- `W_DEPTH = 20.0`
+- `W_RECENCY = 5.0`
+- `JITTER_RANGE = 0.5`
 
 ### Deliverables
-- `DepthQueryService.java`
 - `ChildrenSelectionService.java`
 - `InboundReferenceSelectionService.java`
-- Relationship type derivation logic
-- Depth 1 traversal working
+- `RelevanceScoringService.java` (enhanced)
+- Per-depth caps implemented
+- Children selection logic working
+- Inbound reference selection logic working
+- Enhanced scoring working
 - All depth 1 tests passing
 
 ---
@@ -378,11 +518,16 @@ When a note can be reached via multiple paths:
 - Add new tests for BFS-specific features (scoring, depth caps, etc.)
 
 ### Test Categories
-1. **Focus Note Tests** - Should pass after Step 2
-2. **Depth 1 Tests** - Should pass after Step 3
-3. **Depth 2 Tests** - Should pass after Step 4
-4. **Depth 3 Tests** - Should pass after Step 5
-5. **Scoring and Selection Tests** - New tests for Step 5
+1. **Focus Note Tests** - ✅ Passing (Step 1)
+2. **Depth 1 Basic Tests** - Should pass after Step 2.1 (parent/object)
+3. **Depth 1 Inbound Ref Tests** - Should pass after Step 2.2
+4. **Depth 1 Children Tests** - Should pass after Step 2.3
+5. **Depth 1 Relationship Type Tests** - Should pass after Step 2.4
+6. **Depth 1 Scoring Tests** - Should pass after Step 2.5
+7. **Depth 1 Complete Tests** - Should pass after Step 3 (per-depth caps, selection logic)
+8. **Depth 2 Tests** - Should pass after Step 4
+9. **Depth 3 Tests** - Should pass after Step 5
+10. **Scoring and Selection Tests** - New tests for Step 5
 
 ---
 
@@ -408,36 +553,58 @@ When a note can be reached via multiple paths:
 
 ## Success Criteria
 
-### Step 1
+### Step 1 ✅ COMPLETED
 - ✅ `NoteGraphService` created with same signature
-- ✅ All tests copied and failing ones disabled
+- ✅ All tests copied and failing ones disabled (38 tests total: 6 passing, 32 disabled)
 - ✅ Focus note structure tests pass
 
-### Step 2
-- ✅ Focus note initialized correctly
-- ✅ Contextual path populated
-- ✅ Tracking structures initialized
+### Step 2.1 ✅ COMPLETED
+- ✅ `DepthQueryService` created with `queryDepth1ParentAndObject` method
+- ✅ Parent and object fetched and added to related notes with correct relationship types
+- ✅ Tests for parent and object passing (4 tests re-enabled: `shouldIncludeParentInRelatedNotesWhenBudgetAllows`, `shouldTruncateParentDetailsInRelatedNotes`, `shouldIncludeObjectInRelatedNotes`, `shouldKeepObjectInFocusNoteEvenWhenBudgetOnlyAllowsParent`)
+- ✅ 10 tests passing, 28 tests disabled
 
-### Step 3
-- ✅ Depth 1 relationships fetched correctly
-- ✅ Per-depth caps applied
-- ✅ Children and inbound reference selection working
-- ✅ Relationship types derived correctly
-- ✅ All depth 1 tests passing
+### Step 2.2 ⏳ NOT STARTED
+- ⏳ Inbound references fetched and added to related notes
+- ⏳ Tests for inbound references passing
 
-### Step 4
-- ✅ Depth 2 relationships fetched correctly
-- ✅ Extended relationship types derived
-- ✅ Sibling detection working
-- ✅ All depth 2 tests passing
+### Step 2.3 ⏳ NOT STARTED
+- ⏳ Children fetched and added to related notes
+- ⏳ Focus note's children list updated
+- ⏳ Tests for children passing
 
-### Step 5
-- ✅ Depth 3 relationships fetched correctly
-- ✅ Scoring system implemented
-- ✅ Final selection working
-- ✅ All tests passing
-- ✅ Token budget respected
-- ✅ Global candidate cap respected
+### Step 2.4 ⏳ NOT STARTED
+- ⏳ Relationship type derivation implemented
+- ⏳ All depth 1 notes have correct relationship types
+- ⏳ Tests verify relationship types
+
+### Step 2.5 ⏳ NOT STARTED
+- ⏳ Basic scoring implemented
+- ⏳ Notes ordered by relevance score
+- ⏳ Token budget respected
+- ⏳ Tests verify scoring and ordering
+
+### Step 3 ⏳ NOT STARTED
+- ⏳ Per-depth caps implemented
+- ⏳ Children selection logic working (ordered sibling locality)
+- ⏳ Inbound reference selection logic working (random with caps)
+- ⏳ Enhanced scoring working (depth, recency, jitter)
+- ⏳ Tracking structures initialized
+- ⏳ All depth 1 tests passing
+
+### Step 4 ⏳ NOT STARTED
+- ⏳ Depth 2 relationships fetched correctly
+- ⏳ Extended relationship types derived
+- ⏳ Sibling detection working
+- ⏳ All depth 2 tests passing
+
+### Step 5 ⏳ NOT STARTED
+- ⏳ Depth 3 relationships fetched correctly
+- ⏳ Scoring system implemented (enhanced from Step 3)
+- ⏳ Final selection working
+- ⏳ All tests passing
+- ⏳ Token budget respected
+- ⏳ Global candidate cap respected
 
 ---
 
