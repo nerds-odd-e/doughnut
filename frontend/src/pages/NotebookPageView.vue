@@ -10,14 +10,14 @@
   <div class="daisy-container daisy-mx-auto daisy-p-4 daisy-max-w-6xl">
     <!-- Head Note Section -->
     <div class="notebook-head-note-wrapper daisy-mb-6">
-      <div class="daisy-px-4 daisy-pt-4 daisy-text-sm daisy-text-base-content/60">
+      <div class="daisy-text-sm daisy-text-base-content/60">
         Head note of notebook:
       </div>
       <router-link
         :to="{ name: 'noteShow', params: { noteId: notebook.headNoteId } }"
         class="no-underline"
       >
-        <div class="daisy-p-4">
+        <div>
           <h5 class="daisy-text-lg daisy-font-semibold">
             {{ notebook.title }}
           </h5>
@@ -365,6 +365,7 @@ const updateIndexNotebook = async () => {
   background: oklch(var(--b2) / 0.8);
   border-radius: 8px;
   margin-bottom: 1.5rem;
+  padding: 1.5rem;
 }
 
 .note-short-details {
