@@ -108,11 +108,15 @@ public class NoteGraphService {
       BareNote addedNote =
           builder.addNoteToRelatedNotes(candidate.getNote(), candidate.getRelationshipType());
       if (addedNote != null) {
-        // Update focus note's relationship lists
+        // Step 3.5: Update focus note's relationship lists dynamically
         if (candidate.getRelationshipType() == RelationshipToFocusNote.Child) {
           builder.getFocusNote().getChildren().add(candidate.getNote().getUri());
         } else if (candidate.getRelationshipType() == RelationshipToFocusNote.InboundReference) {
           builder.getFocusNote().getInboundReferences().add(candidate.getNote().getUri());
+        } else if (candidate.getRelationshipType() == RelationshipToFocusNote.PriorSibling) {
+          builder.getFocusNote().getPriorSiblings().add(candidate.getNote().getUri());
+        } else if (candidate.getRelationshipType() == RelationshipToFocusNote.YoungerSibling) {
+          builder.getFocusNote().getYoungerSiblings().add(candidate.getNote().getUri());
         }
       }
     }
