@@ -4222,6 +4222,31 @@ export type DeleteTokenResponses = {
     200: unknown;
 };
 
+export type DeleteUnansweredRecallPromptsData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/recall-prompts/unanswered';
+};
+
+export type DeleteUnansweredRecallPromptsErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type DeleteUnansweredRecallPromptsError = DeleteUnansweredRecallPromptsErrors[keyof DeleteUnansweredRecallPromptsErrors];
+
+export type DeleteUnansweredRecallPromptsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type DeleteFailureReportsData = {
     body: Array<number>;
     path?: never;

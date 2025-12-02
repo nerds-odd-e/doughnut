@@ -112,4 +112,14 @@ class MemoryTrackerController {
     authorizationService.assertReadAuthorization(memoryTracker);
     return memoryTrackerService.getAllRecallPrompts(memoryTracker);
   }
+
+  @DeleteMapping("/{memoryTracker}/recall-prompts/unanswered")
+  @Transactional
+  public void deleteUnansweredRecallPrompts(
+      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    memoryTrackerService.deleteUnansweredRecallPrompts(memoryTracker);
+  }
 }

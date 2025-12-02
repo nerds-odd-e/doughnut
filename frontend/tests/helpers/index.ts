@@ -121,6 +121,7 @@ const methodToController: Record<string, any> = {
   getRecentlyReviewed: MemoryTrackerController,
   getRecentMemoryTrackers: MemoryTrackerController,
   getRecallPrompts: MemoryTrackerController,
+  deleteUnansweredRecallPrompts: MemoryTrackerController,
   createNoteViaMcp: McpNoteCreationController,
   updateLink: LinkController,
   moveNote: LinkController,

@@ -1,8 +1,8 @@
 import { flushPromises } from "@vue/test-utils"
-import { vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import MemoryTrackerPageView from "@/pages/MemoryTrackerPageView.vue"
 import makeMe from "@tests/fixtures/makeMe"
+import usePopups from "@/components/commons/Popups/usePopups"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({
@@ -132,5 +132,219 @@ describe("MemoryTrackerPageView", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("No recall prompts found")
+  })
+
+  describe("delete unanswered prompts", () => {
+    it("shows delete button when there are unanswered prompts", async () => {
+      const unansweredPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question")
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [unansweredPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Delete Unanswered Prompts")
+    })
+
+    it("does not show delete button when all prompts are answered", async () => {
+      const answeredPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Answered question")
+        .withAnswer({
+          id: 1,
+          choiceIndex: 0,
+          correct: true,
+        })
+        .withAnswerTime(new Date().toISOString())
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [answeredPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(false)
+    })
+
+    it("does not show delete button when there are no prompts", async () => {
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).not.toContain("Delete Unanswered Prompts")
+    })
+
+    it("calls delete endpoint and emits refresh when confirmed", async () => {
+      const unansweredPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question")
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      const deleteSpy = mockSdkService(
+        "deleteUnansweredRecallPrompts",
+        undefined
+      )
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [unansweredPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(true)
+      await deleteButton.trigger("click")
+      await flushPromises()
+      usePopups().popups.done(true)
+      await flushPromises()
+
+      expect(deleteSpy).toHaveBeenCalledWith({
+        path: { memoryTracker: 1 },
+      })
+      expect(wrapper.emitted("refresh")).toBeTruthy()
+      expect(wrapper.emitted("refresh")?.length).toBe(1)
+    })
+
+    it("shows confirmation dialog when delete button is clicked", async () => {
+      const unansweredPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question")
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [unansweredPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(true)
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      // Verify confirmation dialog is shown
+      const popups = usePopups().popups.peek()
+      expect(popups?.length).toBe(1)
+      expect(popups?.[0]?.type).toBe("confirm")
+      // Clean up
+      usePopups().popups.done(false)
+      await flushPromises()
+    })
+
+    it("shows correct count in confirmation message for single prompt", async () => {
+      const unansweredPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question")
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [unansweredPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(true)
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups?.length).toBe(1)
+      expect(popups?.[0]?.message).toBe(
+        "Are you sure you want to delete 1 unanswered recall prompt?"
+      )
+      usePopups().popups.done(false)
+      await flushPromises()
+    })
+
+    it("shows correct count in confirmation message for multiple prompts", async () => {
+      const unansweredPrompt1 = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question 1")
+        .please()
+      const unansweredPrompt2 = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question 2")
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [unansweredPrompt1, unansweredPrompt2],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(true)
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups?.length).toBe(1)
+      expect(popups?.[0]?.message).toBe(
+        "Are you sure you want to delete 2 unanswered recall prompts?"
+      )
+      usePopups().popups.done(false)
+      await flushPromises()
+    })
   })
 })
