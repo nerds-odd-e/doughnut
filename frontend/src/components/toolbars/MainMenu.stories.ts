@@ -54,7 +54,7 @@ const meta = {
       return {
         components: { story },
         template:
-          '<div style="width: 200px; height: 100vh; background: #f5f5f5;"><story /></div>',
+          '<div style="width: 200px; height: 100vh; height: 100dvh; background: #f5f5f5;"><story /></div>',
         beforeUnmount() {
           // Restore original method when story unmounts
           UserController.getMenuData = originalGetMenuData
@@ -116,7 +116,7 @@ export const WithDueCount: Story = {
       return {
         components: { story },
         template:
-          '<div style="width: 200px; height: 100vh; background: #f5f5f5;"><story /></div>',
+          '<div style="width: 200px; height: 100vh; height: 100dvh; background: #f5f5f5;"><story /></div>',
         beforeUnmount() {
           UserController.getMenuData = originalGetMenuData
         },
@@ -162,7 +162,7 @@ export const WithRecallCount: Story = {
       return {
         components: { story },
         template:
-          '<div style="width: 200px; height: 100vh; background: #f5f5f5;"><story /></div>',
+          '<div style="width: 200px; height: 100vh; height: 100dvh; background: #f5f5f5;"><story /></div>',
         beforeUnmount() {
           UserController.getMenuData = originalGetMenuData
         },
@@ -213,7 +213,7 @@ export const WithUnreadMessages: Story = {
       return {
         components: { story },
         template:
-          '<div style="width: 200px; height: 100vh; background: #f5f5f5;"><story /></div>',
+          '<div style="width: 200px; height: 100vh; height: 100dvh; background: #f5f5f5;"><story /></div>',
         beforeUnmount() {
           UserController.getMenuData = originalGetMenuData
         },
