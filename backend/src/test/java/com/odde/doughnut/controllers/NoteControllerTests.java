@@ -89,6 +89,33 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.refresh(currentUser.getUser());
       assertThat(controller.getNoteInfo(note).getNote().getId(), equalTo(note.getId()));
     }
+
+    @Test
+    void shouldIncludeSkippedMemoryTrackersInNoteInfo() throws UnexpectedNoAccessRightException {
+      User otherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
+      makeMe
+          .aSubscription()
+          .forUser(currentUser.getUser())
+          .forNotebook(note.getNotebook())
+          .please();
+      makeMe.refresh(currentUser.getUser());
+
+      makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+      makeMe
+          .aMemoryTrackerFor(note)
+          .by(currentUser.getUser())
+          .spelling()
+          .removedFromTracking()
+          .please();
+
+      NoteInfo noteInfo = controller.getNoteInfo(note);
+      assertThat(noteInfo.getMemoryTrackers(), hasSize(2));
+      assertThat(
+          noteInfo.getMemoryTrackers().stream()
+              .anyMatch(mt -> Boolean.TRUE.equals(mt.getRemovedFromTracking())),
+          is(true));
+    }
   }
 
   @Nested
