@@ -20,6 +20,7 @@ import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
+import { applyPatch } from "diff"
 
 export interface StoredApi {
   getNoteRealmRefAndReloadPosition(
@@ -356,7 +357,7 @@ export default class StoredApiCollection implements StoredApi {
   }
 
   async completeDetails(noteId: Doughnut.ID, value?: NoteDetailsCompletion) {
-    if (!value) return
+    if (!value || !value.patch) return
 
     let currentNote = this.storage.refOfNoteRealm(noteId).value?.note
     if (!currentNote) {
@@ -364,10 +365,17 @@ export default class StoredApiCollection implements StoredApi {
     }
 
     const old = currentNote?.details ?? ""
-    const deleteCount = Math.min(value.deleteFromEnd ?? 0, old.length)
-    const newContent =
-      old.slice(0, old.length - deleteCount) + (value.completion ?? "")
-    await this.updateTextField(noteId, "edit details", newContent)
+    try {
+      const result = applyPatch(old, value.patch)
+      if (result === false) {
+        throw new Error("Failed to apply patch to note details")
+      }
+      await this.updateTextField(noteId, "edit details", result)
+    } catch (error) {
+      throw new Error(
+        `Failed to apply patch to note details: ${error instanceof Error ? error.message : String(error)}`
+      )
+    }
   }
 
   private async undoInner() {

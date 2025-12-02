@@ -4160,14 +4160,10 @@ components:
     NoteDetailsCompletion:
       type: object
       properties:
-        deleteFromEnd:
-          type: integer
-          format: int32
-        completion:
+        patch:
           type: string
       required:
-      - completion
-      - deleteFromEnd
+      - patch
     TextFromAudioWithCallInfo:
       type: object
       properties:

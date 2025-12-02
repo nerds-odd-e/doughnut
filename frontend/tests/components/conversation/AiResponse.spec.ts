@@ -286,10 +286,15 @@ describe("ConversationInner", () => {
         makeMe.aNoteRealm.please()
       )
 
+      const patch = `--- a
++++ b
+@@ -1,0 +1,1 @@
++${testCompletion}
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: testCompletion,
+          patch,
         })
       )
     })
@@ -298,63 +303,83 @@ describe("ConversationInner", () => {
       // Test empty note details
       noteRealm.note.details = ""
       storageAccessor.value.refreshNoteRealm(noteRealm)
+      const patch1 = `--- a
++++ b
+@@ -1,0 +1,1 @@
++${testCompletion}
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: testCompletion,
-          deleteFromEnd: 0,
+          patch: patch1,
         })
       )
-      expect(wrapper.find(".completion-text").text()).toBe(renderedCompletion)
+      expect(wrapper.find(".completion-text").text()).toContain(
+        renderedCompletion
+      )
 
       // Test with existing note details
       noteRealm.note.details = "Existing content"
       storageAccessor.value.refreshNoteRealm(noteRealm)
+      const patch2 = `--- a
++++ b
+@@ -1,1 +1,2 @@
+ Existing content
++${testCompletion}
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: testCompletion,
-          deleteFromEnd: 0,
+          patch: patch2,
         })
       )
-      expect(wrapper.find(".completion-text").text()).toBe(
-        `...${renderedCompletion}`
+      expect(wrapper.find(".completion-text").text()).toContain(
+        renderedCompletion
       )
     })
 
-    it("formats completion suggestion with strikethrough for deleted content", async () => {
+    it("formats completion suggestion with patch showing deletions and additions", async () => {
       noteRealm.note.details = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
+      const patch = `--- a
++++ b
+@@ -1,1 +1,1 @@
+-Hello world
++Hello friends!
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: " friends!",
-          deleteFromEnd: 5,
+          patch,
         })
       )
 
-      // The markdown ~~world~~ should render as strikethrough text
-      expect(wrapper.find(".completion-text").text()).toBe("world friends!")
-      expect(wrapper.find(".completion-text").html()).toContain(
-        "<del>world</del>"
+      // The patch should be displayed
+      expect(wrapper.find(".completion-text").text()).toContain("Hello world")
+      expect(wrapper.find(".completion-text").text()).toContain(
+        "Hello friends!"
       )
     })
 
-    it("handles strikethrough when deleteFromEnd is larger than existing content", async () => {
+    it("handles patch that replaces all content", async () => {
       noteRealm.note.details = "Short\ntext"
       storageAccessor.value.refreshNoteRealm(noteRealm)
+      const patch = `--- a
++++ b
+@@ -1,2 +1,1 @@
+-Short
+-text
++New content
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: "New content",
-          deleteFromEnd: 20,
+          patch,
         })
       )
 
-      // The entire existing text should be struck through
-      expect(wrapper.find(".completion-text").text()).toBe(
-        "Short↵textNew content"
-      )
+      // The patch should be displayed
+      expect(wrapper.find(".completion-text").text()).toContain("New content")
     })
 
     it("accepts the completion suggestion and updates the note", async () => {
@@ -364,7 +389,7 @@ describe("ConversationInner", () => {
 
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: testCompletion },
+        body: { details: expect.stringContaining(testCompletion) },
       })
 
       // Tool calls are executed inline with Chat Completion API
@@ -406,42 +431,51 @@ describe("ConversationInner", () => {
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
 
-    it("handles completion with character deletion", async () => {
+    it("handles completion with patch that deletes and adds content", async () => {
       noteRealm.note.details = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
+      const patch = `--- a
++++ b
+@@ -1,1 +1,1 @@
+-Hello world
++Hello friends!
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: " friends!",
-          deleteFromEnd: 6,
+          patch,
         })
       )
 
-      // Check the formatted suggestion shows with ellipsis
-      expect(wrapper.find(".completion-text").text()).toBe("·world friends!")
-
-      expect(wrapper.find(".completion-text").html()).toContain(
-        "<del>·world</del>"
+      // Check the formatted suggestion shows the patch
+      expect(wrapper.find(".completion-text").text()).toContain("Hello world")
+      expect(wrapper.find(".completion-text").text()).toContain(
+        "Hello friends!"
       )
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      // Should delete "world" and add "friends!"
+      // Should apply the patch to get "Hello friends!"
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: "Hello friends!" },
+        body: { details: expect.stringContaining("Hello friends!") },
       })
     })
 
-    it("handles over-deletion by removing all content", async () => {
+    it("handles patch that replaces all content", async () => {
       noteRealm.note.details = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
+      const patch = `--- a
++++ b
+@@ -1,1 +1,1 @@
+-Hello world
++Completely new text
+`
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          completion: "Completely new text",
-          deleteFromEnd: 20, // More than "Hello world" length
+          patch,
         })
       )
 

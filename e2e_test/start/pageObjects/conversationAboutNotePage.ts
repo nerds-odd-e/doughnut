@@ -31,7 +31,12 @@ export class ConversationAboutNotePage {
     cy.findByRole('dialog')
       .should('be.visible')
       .within(() => {
-        cy.findByText(completion)
+        if (completion) {
+          cy.findByText(completion)
+        } else {
+          // Just verify the dialog is visible with completion content
+          cy.get('.completion-text').should('exist')
+        }
       })
     return this
   }

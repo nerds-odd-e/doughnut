@@ -68,15 +68,29 @@ const suggestionContentClass = computed(() => {
 })
 
 const formatCompletionSuggestion = (completion: NoteDetailsCompletion) => {
-  const currentDetails = props.note?.details?.trim() || ""
-  if (!currentDetails) return completion.completion
+  if (!completion.patch) return ""
 
-  if (!completion.deleteFromEnd) return `...${completion.completion}`
-
-  const textToDelete =
-    currentDetails.slice(-completion.deleteFromEnd) || currentDetails
-  const strikeThroughText = textToDelete.replace(/ /g, "·").replace(/\n/g, "↵")
-  return `~~${strikeThroughText}~~${completion.completion}`
+  // Display the patch in a readable format
+  // Convert unified diff format to a more readable display
+  const patchLines = completion.patch.split("\n")
+  let formatted = "```diff\n"
+  for (const line of patchLines) {
+    if (
+      line.startsWith("---") ||
+      line.startsWith("+++") ||
+      line.startsWith("@@")
+    ) {
+      formatted += `${line}\n`
+    } else if (line.startsWith("-")) {
+      formatted += `-${line.slice(1)}\n`
+    } else if (line.startsWith("+")) {
+      formatted += `+${line.slice(1)}\n`
+    } else {
+      formatted += `${line}\n`
+    }
+  }
+  formatted += "```"
+  return formatted
 }
 
 const formattedContent = computed(() => {

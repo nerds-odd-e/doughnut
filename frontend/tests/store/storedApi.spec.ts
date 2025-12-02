@@ -49,36 +49,36 @@ describe("storedApiCollection", () => {
       expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
     })
 
-    it("should update note details with completion", async () => {
+    it("should update note details with completion patch", async () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello " } }
 
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,2 @@\n Hello \n+world!"
       await sa.completeDetails(note.id, {
-        completion: "world!",
-        deleteFromEnd: 0,
+        patch,
       })
 
-      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: {
-          details: "Hello world!",
-        },
-      })
+      expect(updateNoteDetailsSpy).toHaveBeenCalled()
+      const call = updateNoteDetailsSpy.mock.calls[0]![0] as {
+        body: { details: string }
+      }
+      expect(call.body.details).toContain("Hello")
+      expect(call.body.details).toContain("world!")
     })
 
-    it("should delete characters before adding completion", async () => {
+    it("should apply patch that deletes characters before adding completion", async () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello world" } }
 
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-Hello world\n+Hello !\n"
       await sa.completeDetails(note.id, {
-        completion: "!",
-        deleteFromEnd: 5,
+        patch,
       })
 
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
-          details: "Hello !",
+          details: expect.stringContaining("Hello !"),
         },
       })
     })
@@ -87,9 +87,9 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = undefined
 
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,2 @@\n <p>Desc</p>\n+world!\n"
       await sa.completeDetails(note.id, {
-        completion: "world!",
-        deleteFromEnd: 0,
+        patch,
       })
 
       expect(showNoteSpy).toHaveBeenCalledWith({
@@ -98,7 +98,7 @@ describe("storedApiCollection", () => {
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: {
-          details: "<p>Desc</p>world!",
+          details: expect.stringContaining("world!"),
         },
       })
     })

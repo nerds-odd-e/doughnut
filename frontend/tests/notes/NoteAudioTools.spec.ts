@@ -459,7 +459,7 @@ describe("NoteAudioTools", () => {
     const flushButton = findButtonByTitle(wrapper, "Flush Audio")
 
     type AudioResponse = {
-      completionFromAudio: { completion: string; deleteFromEnd: number }
+      completionFromAudio: { patch: string }
       endTimestamp: string
     }
 
@@ -484,7 +484,7 @@ describe("NoteAudioTools", () => {
 
     // Resolve the processing
     resolveProcess!({
-      completionFromAudio: { completion: "test", deleteFromEnd: 0 },
+      completionFromAudio: { patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+test\n" },
       endTimestamp: "00:00:37,270",
     })
     await processPromise2
@@ -543,7 +543,9 @@ describe("NoteAudioTools", () => {
       vi.clearAllMocks()
       updateNoteTitleSpy = mockSdkService("updateNoteTitle", {} as never)
       mockSdkService("audioToText", {
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text\n",
+        },
         endTimestamp: "00:00:00,000",
       })
     })
@@ -594,7 +596,9 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text\n",
+        },
         endTimestamp: "00:00:37,270",
       })
     })
@@ -605,12 +609,16 @@ describe("NoteAudioTools", () => {
 
     it("stores and reuses thread context between calls", async () => {
       const mockResponse1 = {
-        completionFromAudio: { completion: "text1", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text1\n",
+        },
         endTimestamp: "00:00:37,270",
       }
 
       const mockResponse2 = {
-        completionFromAudio: { completion: "text2", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text2\n",
+        },
         endTimestamp: "00:00:47,270",
       }
 
@@ -639,7 +647,9 @@ describe("NoteAudioTools", () => {
 
     it("maintains thread context even after errors", async () => {
       const mockResponse = {
-        completionFromAudio: { completion: "text1", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text1\n",
+        },
         endTimestamp: "00:00:37,270",
       }
 
@@ -672,7 +682,9 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text\n",
+        },
         endTimestamp: "00:00:37,270",
       })
     })
@@ -747,7 +759,9 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text\n",
+        },
         endTimestamp: "00:00:37,270",
       })
     })
@@ -775,7 +789,7 @@ describe("NoteAudioTools", () => {
 
   it("should handle returned timestamp from audio processing", async () => {
     const mockResponse = {
-      completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+      completionFromAudio: { patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text\n" },
       endTimestamp: "00:00:37,270",
     }
 
@@ -858,7 +872,9 @@ describe("NoteAudioTools", () => {
 
     beforeEach(() => {
       audioToTextMock = mockSdkService("audioToText", {
-        completionFromAudio: { completion: "text", deleteFromEnd: 0 },
+        completionFromAudio: {
+          patch: "--- a\n+++ b\n@@ -1,0 +1,1 @@\n+text\n",
+        },
         endTimestamp: "00:00:37,270",
       })
     })
