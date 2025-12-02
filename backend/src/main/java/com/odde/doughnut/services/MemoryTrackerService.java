@@ -126,4 +126,10 @@ public class MemoryTrackerService {
   public List<RecallPrompt> getAllRecallPrompts(MemoryTracker memoryTracker) {
     return recallPromptRepository.findAllByMemoryTrackerIdOrderByIdDesc(memoryTracker.getId());
   }
+
+  public void deleteUnansweredRecallPrompts(MemoryTracker memoryTracker) {
+    List<RecallPrompt> unansweredPrompts =
+        recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId());
+    unansweredPrompts.forEach(entityPersister::remove);
+  }
 }

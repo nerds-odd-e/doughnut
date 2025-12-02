@@ -403,4 +403,89 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       assertThrows(ResponseStatusException.class, () -> controller.getRecallPrompts(memoryTracker));
     }
   }
+
+  @Nested
+  class DeleteUnansweredRecallPrompts {
+    @Test
+    void shouldDeleteAllUnansweredRecallPrompts() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      RecallPrompt unansweredPrompt1 =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      RecallPrompt unansweredPrompt2 =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      RecallPrompt answeredPrompt =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .answerChoiceIndex(0)
+              .please();
+
+      controller.deleteUnansweredRecallPrompts(memoryTracker);
+
+      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      assertThat(remainingPrompts, hasSize(1));
+      assertThat(remainingPrompts.get(0).getId(), equalTo(answeredPrompt.getId()));
+    }
+
+    @Test
+    void shouldDeleteNothingWhenAllPromptsAreAnswered() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      RecallPrompt answeredPrompt1 =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .answerChoiceIndex(0)
+              .please();
+      RecallPrompt answeredPrompt2 =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .answerChoiceIndex(0)
+              .please();
+
+      controller.deleteUnansweredRecallPrompts(memoryTracker);
+
+      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      assertThat(remainingPrompts, hasSize(2));
+      assertThat(remainingPrompts, containsInAnyOrder(answeredPrompt1, answeredPrompt2));
+    }
+
+    @Test
+    void shouldDeleteNothingWhenNoPromptsExist() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      controller.deleteUnansweredRecallPrompts(memoryTracker);
+
+      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      assertThat(remainingPrompts, empty());
+    }
+
+    @Test
+    void shouldNotBeAbleToDeleteRecallPromptsForOthersMemoryTracker() {
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      assertThrows(
+          UnexpectedNoAccessRightException.class,
+          () -> controller.deleteUnansweredRecallPrompts(memoryTracker));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
+      assertThrows(
+          ResponseStatusException.class,
+          () -> controller.deleteUnansweredRecallPrompts(memoryTracker));
+    }
+  }
 }

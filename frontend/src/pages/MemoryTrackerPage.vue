@@ -11,6 +11,7 @@
       :recall-prompts="recallPrompts"
       :memory-tracker="memoryTracker"
       :memory-tracker-id="memoryTrackerId"
+      @refresh="fetchData"
     />
   </ContainerPage>
 </template>

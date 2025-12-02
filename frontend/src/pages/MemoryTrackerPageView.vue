@@ -46,7 +46,16 @@
         </div>
       </div>
     </div>
-    <div class="daisy-mb-4 daisy-flex daisy-justify-end">
+    <div class="daisy-mb-4 daisy-flex daisy-justify-end daisy-gap-2">
+      <button
+        v-if="hasUnansweredPrompts"
+        class="daisy-btn daisy-btn-error"
+        title="delete all unanswered recall prompts"
+        aria-label="delete all unanswered recall prompts"
+        @click="deleteUnansweredPrompts"
+      >
+        <span>Delete Unanswered Prompts</span>
+      </button>
       <button
         class="daisy-btn daisy-btn-secondary"
         title="remove this note from review"
@@ -114,7 +123,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import type { RecallPrompt, MemoryTracker } from "@generated/backend"
 import type { PropType } from "vue"
 import NoteUnderQuestion from "@/components/review/NoteUnderQuestion.vue"
@@ -142,6 +151,7 @@ const props = defineProps({
 
 const emit = defineEmits<{
   (e: "removedFromTracking"): void
+  (e: "refresh"): void
 }>()
 
 const removedFromTracking = ref(false)
@@ -158,6 +168,29 @@ const formatThinkingTime = (ms: number): string => {
   const minutes = Math.floor(seconds / 60)
   const remainingSeconds = Math.floor(seconds % 60)
   return `${minutes}m ${remainingSeconds}s`
+}
+
+const hasUnansweredPrompts = computed(() => {
+  return props.recallPrompts.some((prompt) => !prompt.answer)
+})
+
+const deleteUnansweredPrompts = async () => {
+  const unansweredCount = props.recallPrompts.filter((p) => !p.answer).length
+  if (
+    !(await popups.confirm(
+      `Are you sure you want to delete ${unansweredCount} unanswered recall prompt${unansweredCount !== 1 ? "s" : ""}?`
+    ))
+  ) {
+    return
+  }
+  const { error } = await apiCallWithLoading(() =>
+    MemoryTrackerController.deleteUnansweredRecallPrompts({
+      path: { memoryTracker: props.memoryTrackerId },
+    })
+  )
+  if (!error) {
+    emit("refresh")
+  }
 }
 
 const removeFromReview = async () => {
