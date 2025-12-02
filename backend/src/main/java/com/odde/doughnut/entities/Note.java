@@ -371,7 +371,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   public String getGraphRAGDescription(ObjectMapper objectMapper) {
     GraphRAGService graphRAGService =
         new GraphRAGService(new CharacterBasedTokenCountingStrategy());
-    GraphRAGResult retrieve = graphRAGService.retrieve(this, 3000);
+    GraphRAGResult retrieve = graphRAGService.retrieve(this, 2500);
     String prettyString;
     try {
       prettyString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(retrieve);
