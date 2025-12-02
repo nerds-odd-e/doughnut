@@ -58,9 +58,10 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "1.8.0",
-    "@badeball/cypress-cucumber-preprocessor": "^23.2.1",
+    "@badeball/cypress-cucumber-preprocessor": "^24.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.7",
     "@biomejs/biome": "2.3.8",
+    "@cucumber/cucumber": "^12.3.0",
     "@hey-api/openapi-ts": "0.88.0",
     "@mbtest/mountebank": "2.9.2",
     "@modelcontextprotocol/sdk": "^1.23.0",
@@ -84,7 +85,6 @@
     "wait-on": "^9.0.3"
   },
   "dependencies": {
-    "@cucumber/cucumber": "^12.2.0",
     "vue-toastification": "2.0.0-rc.5"
   },
   "pnpm": {
