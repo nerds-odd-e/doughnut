@@ -537,7 +537,6 @@ export type GraphRagResult = {
 };
 
 export type UriAndTitle = {
-    note?: Note;
     uri?: string;
     title?: string;
 };
@@ -701,46 +700,6 @@ export type NoteInfoWritable = {
     note: NoteRealmWritable;
     createdAt: string;
     recallSetting?: RecallSetting;
-};
-
-export type BareNoteWritable = {
-    uri?: string;
-    subjectUriAndTitle?: UriAndTitleWritable;
-    predicate?: string;
-    title?: string;
-    objectUriAndTitle?: UriAndTitleWritable;
-    parentUriAndTitle?: UriAndTitleWritable;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
-    details?: string;
-    createdAt?: string;
-};
-
-export type FocusNoteWritable = {
-    uri?: string;
-    subjectUriAndTitle?: UriAndTitleWritable;
-    predicate?: string;
-    title?: string;
-    objectUriAndTitle?: UriAndTitleWritable;
-    parentUriAndTitle?: UriAndTitleWritable;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild';
-    details?: string;
-    createdAt?: string;
-    contextualPath?: Array<string>;
-    children?: Array<string>;
-    priorSiblings?: Array<string>;
-    youngerSiblings?: Array<string>;
-    inboundReferences?: Array<string>;
-};
-
-export type GraphRagResultWritable = {
-    focusNote?: FocusNoteWritable;
-    relatedNotes?: Array<BareNoteWritable>;
-};
-
-export type UriAndTitleWritable = {
-    note?: NoteWritable;
-    uri?: string;
-    title?: string;
 };
 
 export type NotebooksViewedByUserWritable = {
