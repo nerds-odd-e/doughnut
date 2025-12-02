@@ -32,7 +32,7 @@ const user = inject<Ref<User | undefined>>("currentUser")
 </script>
 
 <style scoped lang="scss">
-@import "@/assets/menu-variables.scss";
+@use "@/assets/menu-variables.scss" as *;
 
 @media (max-width: theme('screens.lg')) {
   .daisy-navbar {

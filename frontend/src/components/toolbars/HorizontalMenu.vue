@@ -224,7 +224,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-@import "@/assets/menu-variables.scss";
+@use "@/assets/menu-variables.scss" as *;
 
 .sidebar-container {
   height: auto;

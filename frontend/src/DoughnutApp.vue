@@ -85,7 +85,7 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="scss">
-@import "@/assets/menu-variables.scss";
+@use "@/assets/menu-variables.scss" as *;
 
 .app-container {
   height: 100vh; // Default to viewport height for desktop (vertical menu)
