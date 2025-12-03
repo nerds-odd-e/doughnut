@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class NoteGraphService {
   private static final int CHILD_CAP_MULTIPLIER = 2;
@@ -43,19 +44,37 @@ public class NoteGraphService {
     GraphRAGResultBuilder builder =
         new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes, tokenCountingStrategy);
 
-    // Step 3.1: Initialize tracking structures
+    // Initialize tracking structures
     Map<Note, Integer> depthFetched = new HashMap<>();
     Map<Note, Integer> childrenEmitted = new HashMap<>();
     Map<Note, Integer> inboundEmitted = new HashMap<>();
     Map<Note, Set<Integer>> pickedChildIndices = new HashMap<>();
 
-    // Focus note is at depth 0
     depthFetched.put(focusNote, 0);
-
-    // Step 2.5: Collect all candidates first
     List<CandidateNote> candidates = new ArrayList<>();
 
-    // Step 2.1: Fetch parent and object at depth 1
+    // Process depth 1
+    processDepth1(
+        focusNote, depthFetched, childrenEmitted, inboundEmitted, pickedChildIndices, candidates);
+
+    // Process depth 2
+    processDepth2(
+        focusNote, depthFetched, childrenEmitted, inboundEmitted, pickedChildIndices, candidates);
+
+    // Score, sort, and select candidates
+    scoreAndSelectCandidates(candidates, builder);
+
+    return builder.build();
+  }
+
+  private void processDepth1(
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      Map<Note, Integer> childrenEmitted,
+      Map<Note, Integer> inboundEmitted,
+      Map<Note, Set<Integer>> pickedChildIndices,
+      List<CandidateNote> candidates) {
+    // Process parent and object
     var depth1Notes = depthQueryService.queryDepth1ParentAndObject(focusNote);
     for (Note note : depth1Notes) {
       depthFetched.put(note, 1);
@@ -66,52 +85,30 @@ public class NoteGraphService {
       }
     }
 
-    // Step 3.3: Fetch and apply per-depth caps for inbound references at depth 1
-    var allInboundReferences = depthQueryService.queryDepth1InboundReferences(focusNote);
-    int currentDepth = 1;
-    int alreadyEmitted = inboundEmitted.getOrDefault(focusNote, 0);
-    var selectedInboundReferences =
-        inboundReferenceSelectionService.selectInboundReferences(
-            focusNote, currentDepth, depthFetched, alreadyEmitted, allInboundReferences);
-    for (Note note : selectedInboundReferences) {
-      depthFetched.putIfAbsent(note, 1);
-      RelationshipToFocusNote relationship =
-          relationshipTypeDerivationService.deriveRelationshipType(note, focusNote);
-      if (relationship != null) {
-        candidates.add(new CandidateNote(note, relationship, 1));
-      }
-    }
-    inboundEmitted.put(focusNote, alreadyEmitted + selectedInboundReferences.size());
+    // Process inbound references
+    processInboundReferences(
+        focusNote, focusNote, null, 1, depthFetched, inboundEmitted, candidates);
 
-    // Step 3.2: Fetch and apply per-depth caps for children at depth 1 with ordered sibling
-    // locality
-    var allChildren = depthQueryService.queryDepth1Children(focusNote);
-    int childCap = calculateChildCap(focusNote, currentDepth, depthFetched);
-    int childrenAlreadyEmitted = childrenEmitted.getOrDefault(focusNote, 0);
-    int childrenRemainingBudget = Math.max(0, childCap - childrenAlreadyEmitted);
-    Set<Integer> pickedIndices =
-        new HashSet<>(pickedChildIndices.getOrDefault(focusNote, new HashSet<>()));
-    var selectedChildren =
-        childrenSelectionService.selectChildren(
-            focusNote, childrenRemainingBudget, pickedIndices, allChildren);
-    // Update picked indices with newly selected children
-    for (int i = 0; i < allChildren.size(); i++) {
-      if (selectedChildren.contains(allChildren.get(i))) {
-        pickedIndices.add(i);
-      }
-    }
-    pickedChildIndices.put(focusNote, pickedIndices);
-    for (Note child : selectedChildren) {
-      depthFetched.putIfAbsent(child, 1);
-      RelationshipToFocusNote relationship =
-          relationshipTypeDerivationService.deriveRelationshipType(child, focusNote);
-      if (relationship != null) {
-        candidates.add(new CandidateNote(child, relationship, 1));
-      }
-    }
-    childrenEmitted.put(focusNote, childrenAlreadyEmitted + selectedChildren.size());
+    // Process children
+    processChildren(
+        focusNote,
+        focusNote,
+        null,
+        1,
+        depthFetched,
+        childrenEmitted,
+        pickedChildIndices,
+        candidates);
+  }
 
-    // Step 4.1: Depth 2 traversal - collect all depth 1 notes as source notes
+  private void processDepth2(
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      Map<Note, Integer> childrenEmitted,
+      Map<Note, Integer> inboundEmitted,
+      Map<Note, Set<Integer>> pickedChildIndices,
+      List<CandidateNote> candidates) {
+    // Collect all depth 1 notes as source notes
     List<Note> depth1SourceNotes = new ArrayList<>();
     Map<Note, RelationshipToFocusNote> depth1NoteToRelationship = new HashMap<>();
     for (CandidateNote candidate : candidates) {
@@ -121,169 +118,246 @@ public class NoteGraphService {
       }
     }
 
-    // Step 4.1: Process depth 2 relationships from each depth 1 source note
+    // Process depth 2 relationships from each depth 1 source note
     for (Note depth1Note : depth1SourceNotes) {
       RelationshipToFocusNote depth1Relationship = depth1NoteToRelationship.get(depth1Note);
 
-      // Step 4.1: Process parent of depth 1 note
-      // Step 4.3: Process parent chain recursively for contextual paths
+      // Process parent chain for contextual paths
       List<RelationshipToFocusNote> pathPrefix = new ArrayList<>();
       pathPrefix.add(depth1Relationship);
       processParentChainForContextualPath(
           depth1Note, pathPrefix, focusNote, depthFetched, candidates, 2);
 
-      // Step 4.1: Process object of depth 1 note (if reification)
-      if (depth1Note.getTargetNote() != null
-          && !depthFetched.containsKey(depth1Note.getTargetNote())) {
-        Note objectNote = depth1Note.getTargetNote();
-        depthFetched.put(objectNote, 2);
-        List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
-        discoveryPath.add(depth1Relationship);
-        discoveryPath.add(RelationshipToFocusNote.Object);
-        RelationshipToFocusNote relationship =
-            relationshipTypeDerivationService.deriveRelationshipType(
-                objectNote, focusNote, discoveryPath);
-        if (relationship != null) {
-          candidates.add(new CandidateNote(objectNote, relationship, 2, discoveryPath));
-          // Step 4.3: Process object's parent chain recursively for contextual paths
-          List<RelationshipToFocusNote> objectPathPrefix = new ArrayList<>();
-          objectPathPrefix.add(RelationshipToFocusNote.Object);
-          processParentChainForContextualPath(
-              objectNote, objectPathPrefix, focusNote, depthFetched, candidates, 2);
-        }
-      }
+      // Process object of depth 1 note (if reification)
+      processObjectOfNote(depth1Note, depth1Relationship, focusNote, depthFetched, candidates, 2);
 
-      // Step 4.1: Process children of depth 1 note with per-depth caps and selection logic
-      List<Note> allDepth2Children = depthQueryService.queryDepth1Children(depth1Note);
-      int depth2ChildCap = calculateChildCap(depth1Note, 2, depthFetched);
-      int depth2ChildrenAlreadyEmitted = childrenEmitted.getOrDefault(depth1Note, 0);
-      int depth2ChildrenRemainingBudget =
-          Math.max(0, depth2ChildCap - depth2ChildrenAlreadyEmitted);
-      // Step 4.2: If this is the focus note's parent, ensure we select enough children
-      // to get all siblings after filtering out the focus note
-      if (depth1Note.equals(focusNote.getParent()) && allDepth2Children.contains(focusNote)) {
-        // Count how many siblings we need (all children except focus note)
-        int numberOfSiblings = allDepth2Children.size() - 1;
-        // We need to select at least (numberOfSiblings + 1) children to get all siblings
-        // (numberOfSiblings siblings + focus note)
-        int neededBudget = numberOfSiblings + 1;
-        depth2ChildrenRemainingBudget =
-            Math.max(
-                depth2ChildrenRemainingBudget, Math.min(neededBudget, allDepth2Children.size()));
-      }
-      Set<Integer> depth2PickedIndices =
-          new HashSet<>(pickedChildIndices.getOrDefault(depth1Note, new HashSet<>()));
-      var selectedDepth2Children =
-          childrenSelectionService.selectChildren(
-              depth1Note, depth2ChildrenRemainingBudget, depth2PickedIndices, allDepth2Children);
+      // Process children
+      processChildren(
+          depth1Note,
+          focusNote,
+          depth1Relationship,
+          2,
+          depthFetched,
+          childrenEmitted,
+          pickedChildIndices,
+          candidates);
 
-      // Update picked indices (including focus note if it was selected, for tracking purposes)
-      for (int i = 0; i < allDepth2Children.size(); i++) {
-        if (selectedDepth2Children.contains(allDepth2Children.get(i))) {
-          depth2PickedIndices.add(i);
-        }
-      }
-      pickedChildIndices.put(depth1Note, depth2PickedIndices);
+      // Process inbound references
+      processInboundReferences(
+          depth1Note, focusNote, depth1Relationship, 2, depthFetched, inboundEmitted, candidates);
+    }
+  }
 
-      // Step 4.2: Filter out focus note from selected children (it's already at depth 0)
-      // This ensures siblings are properly processed without the focus note taking up a slot
-      selectedDepth2Children =
-          selectedDepth2Children.stream()
-              .filter(child -> !child.equals(focusNote))
-              .collect(java.util.stream.Collectors.toList());
+  private void processChildren(
+      Note parentNote,
+      Note focusNote,
+      RelationshipToFocusNote parentRelationship,
+      int depth,
+      Map<Note, Integer> depthFetched,
+      Map<Note, Integer> childrenEmitted,
+      Map<Note, Set<Integer>> pickedChildIndices,
+      List<CandidateNote> candidates) {
+    List<Note> allChildren = depthQueryService.queryDepth1Children(parentNote);
+    int childCap = calculateChildCap(parentNote, depth, depthFetched);
+    int childrenAlreadyEmitted = childrenEmitted.getOrDefault(parentNote, 0);
+    int childrenRemainingBudget = Math.max(0, childCap - childrenAlreadyEmitted);
 
-      for (Note child : selectedDepth2Children) {
-        if (!depthFetched.containsKey(child)) {
-          depthFetched.put(child, 2);
-          List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
-          discoveryPath.add(depth1Relationship);
-          discoveryPath.add(RelationshipToFocusNote.Child);
-          RelationshipToFocusNote relationship =
-              relationshipTypeDerivationService.deriveRelationshipType(
-                  child, focusNote, discoveryPath);
-          if (relationship != null) {
-            candidates.add(new CandidateNote(child, relationship, 2, discoveryPath));
-          }
-        }
-        // Step 4.4: Process object of reified child (if child is a reification)
-        if (child.getTargetNote() != null && !depthFetched.containsKey(child.getTargetNote())) {
-          Note objectNote = child.getTargetNote();
-          depthFetched.put(objectNote, 2);
-          List<RelationshipToFocusNote> objectDiscoveryPath = new ArrayList<>();
-          objectDiscoveryPath.add(depth1Relationship);
-          objectDiscoveryPath.add(RelationshipToFocusNote.Child);
-          objectDiscoveryPath.add(RelationshipToFocusNote.Object);
-          RelationshipToFocusNote objectRelationship =
-              relationshipTypeDerivationService.deriveRelationshipType(
-                  objectNote, focusNote, objectDiscoveryPath);
-          if (objectRelationship != null) {
-            candidates.add(
-                new CandidateNote(objectNote, objectRelationship, 2, objectDiscoveryPath));
-          }
-        }
-      }
-      childrenEmitted.put(depth1Note, depth2ChildrenAlreadyEmitted + selectedDepth2Children.size());
-
-      // Step 4.1: Process inbound references of depth 1 note with per-depth caps and selection
-      // logic
-      List<Note> allDepth2InboundRefs = depthQueryService.queryDepth1InboundReferences(depth1Note);
-      int depth2InboundAlreadyEmitted = inboundEmitted.getOrDefault(depth1Note, 0);
-      var selectedDepth2InboundRefs =
-          inboundReferenceSelectionService.selectInboundReferences(
-              depth1Note, 2, depthFetched, depth2InboundAlreadyEmitted, allDepth2InboundRefs);
-
-      for (Note inboundRef : selectedDepth2InboundRefs) {
-        if (!depthFetched.containsKey(inboundRef)) {
-          depthFetched.put(inboundRef, 2);
-          List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
-          discoveryPath.add(depth1Relationship);
-          discoveryPath.add(RelationshipToFocusNote.InboundReference);
-          RelationshipToFocusNote relationship =
-              relationshipTypeDerivationService.deriveRelationshipType(
-                  inboundRef, focusNote, discoveryPath);
-          if (relationship != null) {
-            candidates.add(new CandidateNote(inboundRef, relationship, 2, discoveryPath));
-          }
-        }
-      }
-      inboundEmitted.put(
-          depth1Note, depth2InboundAlreadyEmitted + selectedDepth2InboundRefs.size());
+    // Special handling for focus note's parent to ensure all siblings are selected
+    if (parentNote.equals(focusNote.getParent()) && allChildren.contains(focusNote)) {
+      int numberOfSiblings = allChildren.size() - 1;
+      int neededBudget = numberOfSiblings + 1;
+      childrenRemainingBudget =
+          Math.max(childrenRemainingBudget, Math.min(neededBudget, allChildren.size()));
     }
 
-    // Step 2.5: Score all candidates
+    Set<Integer> pickedIndices =
+        new HashSet<>(pickedChildIndices.getOrDefault(parentNote, new HashSet<>()));
+    var selectedChildren =
+        childrenSelectionService.selectChildren(
+            parentNote, childrenRemainingBudget, pickedIndices, allChildren);
+
+    // Update picked indices
+    for (int i = 0; i < allChildren.size(); i++) {
+      if (selectedChildren.contains(allChildren.get(i))) {
+        pickedIndices.add(i);
+      }
+    }
+    pickedChildIndices.put(parentNote, pickedIndices);
+
+    // Filter out focus note from selected children at depth 2
+    if (depth == 2) {
+      selectedChildren =
+          selectedChildren.stream()
+              .filter(child -> !child.equals(focusNote))
+              .collect(Collectors.toList());
+    }
+
+    // Add children as candidates
+    for (Note child : selectedChildren) {
+      if (!depthFetched.containsKey(child)) {
+        depthFetched.put(child, depth);
+        RelationshipToFocusNote relationship;
+        List<RelationshipToFocusNote> discoveryPath = null;
+        if (depth == 1) {
+          // Depth 1: use simple relationship derivation
+          relationship = relationshipTypeDerivationService.deriveRelationshipType(child, focusNote);
+        } else {
+          // Depth 2+: use discovery path
+          discoveryPath = createDiscoveryPath(parentRelationship, RelationshipToFocusNote.Child);
+          relationship =
+              relationshipTypeDerivationService.deriveRelationshipType(
+                  child, focusNote, discoveryPath);
+        }
+        if (relationship != null) {
+          if (discoveryPath != null) {
+            candidates.add(new CandidateNote(child, relationship, depth, discoveryPath));
+          } else {
+            candidates.add(new CandidateNote(child, relationship, depth));
+          }
+        }
+      }
+      // Process object of reified child
+      processObjectOfReifiedChild(
+          child, parentRelationship, focusNote, depthFetched, candidates, depth);
+    }
+
+    childrenEmitted.put(parentNote, childrenAlreadyEmitted + selectedChildren.size());
+  }
+
+  private void processInboundReferences(
+      Note targetNote,
+      Note focusNote,
+      RelationshipToFocusNote targetRelationship,
+      int depth,
+      Map<Note, Integer> depthFetched,
+      Map<Note, Integer> inboundEmitted,
+      List<CandidateNote> candidates) {
+    List<Note> allInboundRefs = depthQueryService.queryDepth1InboundReferences(targetNote);
+    int alreadyEmitted = inboundEmitted.getOrDefault(targetNote, 0);
+    var selectedInboundRefs =
+        inboundReferenceSelectionService.selectInboundReferences(
+            targetNote, depth, depthFetched, alreadyEmitted, allInboundRefs);
+
+    for (Note inboundRef : selectedInboundRefs) {
+      if (!depthFetched.containsKey(inboundRef)) {
+        depthFetched.put(inboundRef, depth);
+        RelationshipToFocusNote relationship;
+        List<RelationshipToFocusNote> discoveryPath = null;
+        if (depth == 1) {
+          // Depth 1: use simple relationship derivation
+          relationship =
+              relationshipTypeDerivationService.deriveRelationshipType(inboundRef, focusNote);
+        } else {
+          // Depth 2+: use discovery path
+          discoveryPath =
+              createDiscoveryPath(targetRelationship, RelationshipToFocusNote.InboundReference);
+          relationship =
+              relationshipTypeDerivationService.deriveRelationshipType(
+                  inboundRef, focusNote, discoveryPath);
+        }
+        if (relationship != null) {
+          if (discoveryPath != null) {
+            candidates.add(new CandidateNote(inboundRef, relationship, depth, discoveryPath));
+          } else {
+            candidates.add(new CandidateNote(inboundRef, relationship, depth));
+          }
+        }
+      }
+    }
+
+    inboundEmitted.put(targetNote, alreadyEmitted + selectedInboundRefs.size());
+  }
+
+  private void processObjectOfNote(
+      Note note,
+      RelationshipToFocusNote noteRelationship,
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      List<CandidateNote> candidates,
+      int depth) {
+    if (note.getTargetNote() == null || depthFetched.containsKey(note.getTargetNote())) {
+      return;
+    }
+
+    Note objectNote = note.getTargetNote();
+    depthFetched.put(objectNote, depth);
+    List<RelationshipToFocusNote> discoveryPath =
+        createDiscoveryPath(noteRelationship, RelationshipToFocusNote.Object);
+    RelationshipToFocusNote relationship =
+        relationshipTypeDerivationService.deriveRelationshipType(
+            objectNote, focusNote, discoveryPath);
+    if (relationship != null) {
+      candidates.add(new CandidateNote(objectNote, relationship, depth, discoveryPath));
+      // Process object's parent chain recursively for contextual paths
+      List<RelationshipToFocusNote> objectPathPrefix = new ArrayList<>();
+      objectPathPrefix.add(RelationshipToFocusNote.Object);
+      processParentChainForContextualPath(
+          objectNote, objectPathPrefix, focusNote, depthFetched, candidates, depth);
+    }
+  }
+
+  private void processObjectOfReifiedChild(
+      Note child,
+      RelationshipToFocusNote parentRelationship,
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      List<CandidateNote> candidates,
+      int depth) {
+    if (child.getTargetNote() == null || depthFetched.containsKey(child.getTargetNote())) {
+      return;
+    }
+
+    Note objectNote = child.getTargetNote();
+    depthFetched.put(objectNote, depth);
+    List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+    if (parentRelationship != null) {
+      discoveryPath.add(parentRelationship);
+    }
+    discoveryPath.add(RelationshipToFocusNote.Child);
+    discoveryPath.add(RelationshipToFocusNote.Object);
+    RelationshipToFocusNote relationship =
+        relationshipTypeDerivationService.deriveRelationshipType(
+            objectNote, focusNote, discoveryPath);
+    if (relationship != null) {
+      candidates.add(new CandidateNote(objectNote, relationship, depth, discoveryPath));
+    }
+  }
+
+  private List<RelationshipToFocusNote> createDiscoveryPath(
+      RelationshipToFocusNote parentRelationship, RelationshipToFocusNote currentRelationship) {
+    List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+    if (parentRelationship != null) {
+      discoveryPath.add(parentRelationship);
+    }
+    discoveryPath.add(currentRelationship);
+    return discoveryPath;
+  }
+
+  private void scoreAndSelectCandidates(
+      List<CandidateNote> candidates, GraphRAGResultBuilder builder) {
+    // Score all candidates
     for (CandidateNote candidate : candidates) {
       double score = relevanceScoringService.calculateScore(candidate);
       candidate.setRelevanceScore(score);
     }
 
-    // Step 2.5: Sort by score (descending)
+    // Sort by score (descending)
     candidates.sort(Comparator.comparing(CandidateNote::getRelevanceScore).reversed());
 
-    // Step 2.5: Select top candidates that fit in budget
-    // Step 4.2: Collect siblings separately to sort by siblingOrder before adding to focus note
+    // Collect siblings separately to sort by siblingOrder before adding to focus note
     List<CandidateNote> priorSiblings = new ArrayList<>();
     List<CandidateNote> youngerSiblings = new ArrayList<>();
 
+    // Select top candidates that fit in budget
     for (CandidateNote candidate : candidates) {
       BareNote addedNote =
           builder.addNoteToRelatedNotes(candidate.getNote(), candidate.getRelationshipType());
       if (addedNote != null) {
-        // Step 3.5: Update focus note's relationship lists dynamically
-        if (candidate.getRelationshipType() == RelationshipToFocusNote.Child) {
-          builder.getFocusNote().getChildren().add(candidate.getNote().getUri());
-        } else if (candidate.getRelationshipType() == RelationshipToFocusNote.InboundReference) {
-          builder.getFocusNote().getInboundReferences().add(candidate.getNote().getUri());
-        } else if (candidate.getRelationshipType() == RelationshipToFocusNote.PriorSibling) {
-          // Step 4.2: Collect prior siblings to sort by siblingOrder
-          priorSiblings.add(candidate);
-        } else if (candidate.getRelationshipType() == RelationshipToFocusNote.YoungerSibling) {
-          // Step 4.2: Collect younger siblings to sort by siblingOrder
-          youngerSiblings.add(candidate);
-        }
+        updateFocusNoteRelationships(candidate, builder, priorSiblings, youngerSiblings);
       }
     }
 
-    // Step 4.2: Sort siblings by siblingOrder and add to focus note's lists
+    // Sort siblings by siblingOrder and add to focus note's lists
     priorSiblings.sort(Comparator.comparing(c -> c.getNote().getSiblingOrder()));
     for (CandidateNote candidate : priorSiblings) {
       builder.getFocusNote().getPriorSiblings().add(candidate.getNote().getUri());
@@ -293,23 +367,30 @@ public class NoteGraphService {
     for (CandidateNote candidate : youngerSiblings) {
       builder.getFocusNote().getYoungerSiblings().add(candidate.getNote().getUri());
     }
-
-    return builder.build();
   }
 
-  // Step 3.1: Calculate child cap for a parent note at a given depth
+  private void updateFocusNoteRelationships(
+      CandidateNote candidate,
+      GraphRAGResultBuilder builder,
+      List<CandidateNote> priorSiblings,
+      List<CandidateNote> youngerSiblings) {
+    RelationshipToFocusNote relationshipType = candidate.getRelationshipType();
+    if (relationshipType == RelationshipToFocusNote.Child) {
+      builder.getFocusNote().getChildren().add(candidate.getNote().getUri());
+    } else if (relationshipType == RelationshipToFocusNote.InboundReference) {
+      builder.getFocusNote().getInboundReferences().add(candidate.getNote().getUri());
+    } else if (relationshipType == RelationshipToFocusNote.PriorSibling) {
+      priorSiblings.add(candidate);
+    } else if (relationshipType == RelationshipToFocusNote.YoungerSibling) {
+      youngerSiblings.add(candidate);
+    }
+  }
+
   private int calculateChildCap(Note parent, int currentDepth, Map<Note, Integer> depthFetched) {
     int parentDepthFetched = depthFetched.getOrDefault(parent, currentDepth);
     return CHILD_CAP_MULTIPLIER * (currentDepth - parentDepthFetched);
   }
 
-  // Step 4.1: Calculate inbound cap for a target note at a given depth
-  private int calculateInboundCap(Note target, int currentDepth, Map<Note, Integer> depthFetched) {
-    int targetDepthFetched = depthFetched.getOrDefault(target, currentDepth);
-    return 2 * (currentDepth - targetDepthFetched); // INBOUND_CAP_MULTIPLIER = 2
-  }
-
-  // Step 4.3: Process parent chain recursively for contextual paths
   private void processParentChainForContextualPath(
       Note currentNote,
       List<RelationshipToFocusNote> pathPrefix,
