@@ -14,7 +14,7 @@ describe("SpellingQuestionDisplay", () => {
     const recallPrompt = makeMe.aRecallPrompt
       .withQuestionType("SPELLING")
       .please()
-    mockSdkService("getSpellingQuestion", recallPrompt)
+    mockSdkService("askAQuestion", recallPrompt)
     const memoryTracker = makeMe.aMemoryTracker.please()
     // Add clozeDescription method to note for stem computation
     if (memoryTracker.note) {

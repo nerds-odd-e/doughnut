@@ -19,10 +19,6 @@ describe("repeat page", () => {
     mockSdkService("showNote", makeMe.aNoteRealm.please())
     mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
     askAQuestionSpy = mockSdkService("askAQuestion", recallPrompt)
-    const spellingRecallPrompt = makeMe.aRecallPrompt
-      .withQuestionType("SPELLING")
-      .please()
-    mockSdkService("getSpellingQuestion", spellingRecallPrompt)
   })
 
   afterEach(() => {
@@ -133,7 +129,7 @@ describe("repeat page", () => {
       const spellingRecallPrompt = makeMe.aRecallPrompt
         .withQuestionType("SPELLING")
         .please()
-      mockSdkService("getSpellingQuestion", spellingRecallPrompt)
+      askAQuestionSpy.mockResolvedValue(wrapSdkResponse(spellingRecallPrompt))
       const memoryTracker = makeMe.aMemoryTracker.please()
       // Add clozeDescription method to note for stem computation
       if (memoryTracker.note) {
@@ -165,10 +161,9 @@ describe("repeat page", () => {
       await flushPromises()
 
       expect(mockedAnswerSpelling).toHaveBeenCalledWith({
-        path: { memoryTracker: 1 },
+        path: { recallPrompt: spellingRecallPrompt.id },
         body: {
           spellingAnswer: "cat",
-          recallPromptId: spellingRecallPrompt.id,
         },
       })
 

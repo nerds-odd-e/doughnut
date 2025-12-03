@@ -3,12 +3,16 @@ package com.odde.doughnut.controllers;
 import static com.odde.doughnut.controllers.dto.Randomization.RandomStrategy.first;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.*;
+import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
+import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
@@ -295,137 +299,151 @@ class RecallPromptControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class GenerateRandomQuestion {
-    @Test
-    void itMustPersistTheQuestionGenerated() {
-      MCQWithAnswer jsonQuestion =
-          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
+  class AnswerSpelling {
+    Note answerNote;
+    MemoryTracker memoryTracker;
+    RecallPrompt recallPrompt;
+    AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
 
-      // Mock the chat completion API calls
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
-
-      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-      // another note is needed, otherwise the note will be the only note in the notebook, and the
-      // question cannot be generated.
-      makeMe.aNote().under(note).please();
-      MemoryTracker rp = makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      RecallPrompt recallPrompt = controller.askAQuestion(rp);
-
-      assertThat(recallPrompt.getId(), notNullValue());
-    }
-
-    @Test
-    void shouldReuseExistingUnansweredRecallPrompt() {
-      // Create a note and memory tracker
-      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-      makeMe.aNote().under(note).please(); // Add another note to the notebook
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      // Create an existing unanswered recall prompt for the note with the same memory tracker
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      RecallPrompt existingPrompt =
+    @BeforeEach
+    void setup() throws UnexpectedNoAccessRightException {
+      answerNote = makeMe.aNote().rememberSpelling().please();
+      memoryTracker =
           makeMe
-              .aRecallPrompt()
-              .ofAIGeneratedQuestion(mcqWithAnswer, note)
-              .forMemoryTracker(memoryTracker)
+              .aMemoryTrackerFor(answerNote)
+              .by(currentUser.getUser())
+              .forgettingCurveAndNextRecallAt(200)
+              .spelling()
               .please();
-
-      // Ask for a question for the memory tracker
-      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
-
-      // Verify that the existing prompt was returned
-      assertThat(returnedPrompt.getId(), equalTo(existingPrompt.getId()));
-
-      // Verify that no new prompt was created
-      long count =
-          makeMe
-              .entityPersister
-              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
-              .getSingleResult();
-      assertThat(count, equalTo(1L));
+      recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
     }
 
     @Test
-    void shouldGenerateNewPromptWhenExistingPromptsHaveAnswers() {
-      // Mock the chat completion API calls
-      MCQWithAnswer jsonQuestion =
-          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
-
-      // Create a note and memory tracker
-      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-      makeMe.aNote().under(note).please(); // Add another note to the notebook
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
-
-      // Create an existing recall prompt with an answer
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      RecallPrompt existingPrompt =
-          makeMe
-              .aRecallPrompt()
-              .ofAIGeneratedQuestion(mcqWithAnswer, note)
-              .answerChoiceIndex(0) // Add an answer
-              .please();
-
-      // Ask for a question for the memory tracker
-      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
-
-      // Verify that a new prompt was returned
-      assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
-
-      // Verify that a new prompt was created
-      long count =
-          makeMe
-              .entityPersister
-              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
-              .getSingleResult();
-      assertThat(count, equalTo(2L));
+    void answerOneOfTheTitles() throws UnexpectedNoAccessRightException {
+      makeMe.theNote(answerNote).titleConstructor("this / that").please();
+      answerDTO.setSpellingAnswer("this");
+      assertTrue(controller.answerSpelling(recallPrompt, answerDTO).getIsCorrect());
+      // Create a new recall prompt for the second answer
+      RecallPrompt secondRecallPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+      AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
+      secondAnswerDTO.setSpellingAnswer("that");
+      assertTrue(controller.answerSpelling(secondRecallPrompt, secondAnswerDTO).getIsCorrect());
     }
 
     @Test
-    void shouldNotReuseContestedQuestions() {
-      // Mock the chat completion API calls
-      MCQWithAnswer jsonQuestion =
-          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
+    void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
+      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+      SpellingResultDTO answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      assertTrue(answerResult.getIsCorrect());
+      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+    }
 
-      // Create a note and memory tracker
-      Note note = makeMe.aNote().details("description long enough.").rememberSpelling().please();
-      makeMe.aNote().under(note).please(); // Add another note to the notebook
-      MemoryTracker memoryTracker =
-          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+    @Test
+    void shouldAcceptThinkingTimeMs() throws UnexpectedNoAccessRightException {
+      answerDTO.setThinkingTimeMs(5000);
+      SpellingResultDTO answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+      assertTrue(answerResult.getIsCorrect());
+      RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
+      Answer answer = reloadedPrompt.getAnswer();
+      assertNotNull(answer);
+      assertThat(answer.getThinkingTimeMs(), equalTo(5000));
+      assertThat(answer.getSpellingAnswer(), equalTo(answerDTO.getSpellingAnswer()));
+      assertTrue(answer.getCorrect());
+    }
 
-      // Create an existing unanswered recall prompt with a contested question
-      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
-      PredefinedQuestion contestedQuestion =
-          makeMe.aPredefinedQuestion().ofAIGeneratedQuestion(mcqWithAnswer, note).please();
-      contestedQuestion.setContested(true);
-      makeMe.entityPersister.save(contestedQuestion);
-      RecallPrompt existingPrompt = makeMe.aRecallPrompt().please();
-      existingPrompt.setPredefinedQuestion(contestedQuestion);
-      makeMe.entityPersister.save(existingPrompt);
+    @Test
+    void shouldCreateAnswerEntityForSpellingQuestion() throws UnexpectedNoAccessRightException {
+      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+      answerDTO.setThinkingTimeMs(3000);
+      controller.answerSpelling(recallPrompt, answerDTO);
 
-      // Mock the AI to generate a new question
-      MCQWithAnswer newQuestion =
-          makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(newQuestion);
+      RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
+      Answer answer = reloadedPrompt.getAnswer();
+      assertNotNull(answer);
+      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTopicConstructor()));
+      assertThat(answer.getThinkingTimeMs(), equalTo(3000));
+      assertTrue(answer.getCorrect());
+    }
 
-      // Ask for a question for the memory tracker
-      RecallPrompt returnedPrompt = controller.askAQuestion(memoryTracker);
+    @Test
+    void shouldNotAllowAnsweringTwice() throws UnexpectedNoAccessRightException {
+      controller.answerSpelling(recallPrompt, answerDTO);
+      assertThrows(
+          IllegalArgumentException.class, () -> controller.answerSpelling(recallPrompt, answerDTO));
+    }
 
-      // Verify that a new prompt was returned
-      assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
-      assertThat(returnedPrompt.getPredefinedQuestion().isContested(), equalTo(false));
+    @Test
+    void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      controller.answerSpelling(recallPrompt, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+    }
 
-      // Verify that a new prompt was created
-      long count =
-          makeMe
-              .entityPersister
-              .createQuery("SELECT COUNT(rp) FROM RecallPrompt rp", Long.class)
-              .getSingleResult();
-      assertThat(count, equalTo(2L));
+    @Test
+    void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      controller.answerSpelling(recallPrompt, answerDTO);
+      assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+      assertThat(
+          memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+      AnswerSpellingDTO answer = new AnswerSpellingDTO();
+      currentUser.setUser(null);
+      assertThrows(
+          ResponseStatusException.class, () -> controller.answerSpelling(recallPrompt, answer));
+    }
+
+    @Test
+    void shouldValidateRecallPromptIsSpellingType() {
+      RecallPrompt mcqPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
+      AnswerSpellingDTO answer = new AnswerSpellingDTO();
+      answer.setSpellingAnswer(answerNote.getTopicConstructor());
+      assertThrows(
+          IllegalArgumentException.class, () -> controller.answerSpelling(mcqPrompt, answer));
+    }
+
+    @Nested
+    class WrongAnswer {
+      @BeforeEach
+      void setup() {
+        answerDTO.setSpellingAnswer("wrong");
+      }
+
+      @Test
+      void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
+        SpellingResultDTO answerResult = controller.answerSpelling(recallPrompt, answerDTO);
+        assertFalse(answerResult.getIsCorrect());
+        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      }
+
+      @Test
+      void shouldNotChangeTheLastRecalledAtTime() throws UnexpectedNoAccessRightException {
+        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+        Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
+        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+        controller.answerSpelling(recallPrompt, answerDTO);
+        assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
+        assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
+      }
+
+      @Test
+      void shouldRepeatTheNextDay() throws UnexpectedNoAccessRightException {
+        controller.answerSpelling(recallPrompt, answerDTO);
+        assertThat(
+            memoryTracker.getNextRecallAt(),
+            lessThan(
+                TimestampOperations.addHoursToTimestamp(
+                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
+      }
     }
   }
 

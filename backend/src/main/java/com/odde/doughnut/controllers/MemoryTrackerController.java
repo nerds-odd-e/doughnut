@@ -1,16 +1,14 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.MemoryTrackerService;
+import com.odde.doughnut.services.RecallQuestionService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -24,26 +22,32 @@ class MemoryTrackerController {
   private final TestabilitySettings testabilitySettings;
 
   private final AuthorizationService authorizationService;
+  private final RecallQuestionService recallQuestionService;
 
   public MemoryTrackerController(
       EntityPersister entityPersister,
       TestabilitySettings testabilitySettings,
       AuthorizationService authorizationService,
-      MemoryTrackerService memoryTrackerService) {
+      MemoryTrackerService memoryTrackerService,
+      RecallQuestionService recallQuestionService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.authorizationService = authorizationService;
     this.memoryTrackerService = memoryTrackerService;
+    this.recallQuestionService = recallQuestionService;
   }
 
-  @GetMapping("/{memoryTracker}/spelling-question")
+  @GetMapping("/{memoryTracker}/question")
   @Transactional
-  public RecallPrompt getSpellingQuestion(
+  public RecallPrompt askAQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
-    return memoryTrackerService.getSpellingQuestion(memoryTracker);
+    if (Boolean.TRUE.equals(memoryTracker.getSpelling())) {
+      return memoryTrackerService.getSpellingQuestion(memoryTracker);
+    }
+    return recallQuestionService.generateAQuestion(memoryTracker);
   }
 
   @GetMapping("/{memoryTracker}")
@@ -99,31 +103,6 @@ class MemoryTrackerController {
     authorizationService.assertLoggedIn();
     return memoryTrackerService.findLast100ReviewedByUser(
         authorizationService.getCurrentUser().getId());
-  }
-
-  @PostMapping("/{memoryTracker}/answer-spelling")
-  @Transactional
-  public SpellingResultDTO answerSpelling(
-      @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
-      @Valid @RequestBody AnswerSpellingDTO answerDTO)
-      throws UnexpectedNoAccessRightException {
-    authorizationService.assertLoggedIn();
-    authorizationService.assertReadAuthorization(memoryTracker);
-    RecallPrompt recallPrompt =
-        answerDTO.getRecallPromptId() != null
-            ? entityPersister.find(RecallPrompt.class, answerDTO.getRecallPromptId())
-            : null;
-    if (recallPrompt == null) {
-      throw new IllegalArgumentException("Recall prompt ID is required");
-    }
-    if (!recallPrompt.getMemoryTracker().getId().equals(memoryTracker.getId())) {
-      throw new IllegalArgumentException("Recall prompt does not belong to the memory tracker");
-    }
-    return memoryTrackerService.answerSpelling(
-        recallPrompt,
-        answerDTO,
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp());
   }
 
   @GetMapping("/{memoryTracker}/recall-prompts")
