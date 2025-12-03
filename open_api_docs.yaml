@@ -2933,7 +2933,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/SpellingQuestion"
+                $ref: "#/components/schemas/RecallPrompt"
   /api/memory-trackers/{memoryTracker}/recall-prompts:
     get:
       tags:
@@ -3782,6 +3782,11 @@ components:
         id:
           type: integer
           format: int32
+        questionType:
+          type: string
+          enum:
+          - MCQ
+          - SPELLING
         multipleChoicesQuestion:
           $ref: "#/components/schemas/MultipleChoicesQuestion"
         notebook:
@@ -3802,6 +3807,7 @@ components:
           $ref: "#/components/schemas/Answer"
       required:
       - id
+      - questionType
     AnswerDTO:
       type: object
       properties:
@@ -4005,6 +4011,9 @@ components:
         spellingAnswer:
           type: string
         thinkingTimeMs:
+          type: integer
+          format: int32
+        recallPromptId:
           type: integer
           format: int32
     SpellingResultDTO:
@@ -4591,13 +4600,6 @@ components:
       properties:
         approval:
           $ref: "#/components/schemas/NotebookCertificateApproval"
-    SpellingQuestion:
-      type: object
-      properties:
-        stem:
-          type: string
-        notebook:
-          $ref: "#/components/schemas/Notebook"
     FailureReport:
       type: object
       properties:

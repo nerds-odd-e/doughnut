@@ -17,6 +17,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
   private answerTimeToUse?: string
   private questionGeneratedTimeToUse?: string
   private isContestedToUse?: boolean
+  private questionTypeToUse?: string
 
   withQuestionStem(stem: string) {
     this.predefinedQuestionBuilder.withQuestionStem(stem)
@@ -58,11 +59,17 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
     return this
   }
 
+  withQuestionType(questionType: string) {
+    this.questionTypeToUse = questionType
+    return this
+  }
+
   do(): RecallPrompt {
     const predefinedQuestion =
       this.predefinedQuestionToUse ?? this.predefinedQuestionBuilder.do()
     return {
       id: generateId(),
+      questionType: (this.questionTypeToUse ?? "MCQ") as "MCQ" | "SPELLING",
       multipleChoicesQuestion: predefinedQuestion.multipleChoicesQuestion,
       notebook: new NotebookBuilder().do(),
       note: this.noteToUse,

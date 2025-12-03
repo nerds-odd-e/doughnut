@@ -8,10 +8,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
@@ -35,7 +35,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   @Nested
   class GetSpellingQuestion {
     @Test
-    void shouldReturnClozedDetailsAsQuestionStem() throws UnexpectedNoAccessRightException {
+    void shouldReturnSpellingRecallPrompt() throws UnexpectedNoAccessRightException {
       Note note =
           makeMe
               .aNote("moon")
@@ -44,8 +44,10 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .please();
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
 
-      SpellingQuestion question = controller.getSpellingQuestion(memoryTracker);
-      assertThat(question.getStem(), equalTo("<p>partner of earth</p>\n"));
+      RecallPrompt recallPrompt = controller.getSpellingQuestion(memoryTracker);
+      assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.SPELLING));
+      assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
+      assertThat(recallPrompt.getAnswerableMCQ(), nullValue());
     }
 
     @Test
@@ -243,10 +245,11 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
   class answerSpellingQuestion {
     Note answerNote;
     MemoryTracker memoryTracker;
+    RecallPrompt recallPrompt;
     AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
 
     @BeforeEach
-    void setup() {
+    void setup() throws UnexpectedNoAccessRightException {
       answerNote = makeMe.aNote().rememberSpelling().please();
       memoryTracker =
           makeMe
@@ -255,11 +258,13 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
               .forgettingCurveAndNextRecallAt(200)
               .spelling()
               .please();
+      recallPrompt = controller.getSpellingQuestion(memoryTracker);
       answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+      answerDTO.setRecallPromptId(recallPrompt.getId());
     }
 
     @Test
-    void answerOneOfTheTitles() {
+    void answerOneOfTheTitles() throws UnexpectedNoAccessRightException {
       makeMe.theNote(answerNote).titleConstructor("this / that").please();
       answerDTO.setSpellingAnswer("this");
       assertTrue(controller.answerSpelling(memoryTracker, answerDTO).getIsCorrect());
@@ -268,7 +273,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldValidateTheAnswerAndUpdateMemoryTracker() {
+    void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
       Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
       SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
       assertTrue(answerResult.getIsCorrect());
@@ -276,7 +281,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldAcceptThinkingTimeMs() {
+    void shouldAcceptThinkingTimeMs() throws UnexpectedNoAccessRightException {
       answerDTO.setThinkingTimeMs(5000);
       SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
       assertTrue(answerResult.getIsCorrect());
@@ -285,7 +290,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldNoteIncreaseIndexIfRepeatImmediately() {
+    void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerSpelling(memoryTracker, answerDTO);
@@ -293,7 +298,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldIncreaseTheIndex() {
+    void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
       Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerSpelling(memoryTracker, answerDTO);
@@ -305,9 +310,28 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
+      answer.setRecallPromptId(recallPrompt.getId());
       currentUser.setUser(null);
       assertThrows(
           ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
+    }
+
+    @Test
+    void shouldRequireRecallPromptId() {
+      AnswerSpellingDTO answer = new AnswerSpellingDTO();
+      answer.setSpellingAnswer(answerNote.getTopicConstructor());
+      assertThrows(
+          IllegalArgumentException.class, () -> controller.answerSpelling(memoryTracker, answer));
+    }
+
+    @Test
+    void shouldValidateRecallPromptIsSpellingType() {
+      RecallPrompt mcqPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
+      AnswerSpellingDTO answer = new AnswerSpellingDTO();
+      answer.setSpellingAnswer(answerNote.getTopicConstructor());
+      answer.setRecallPromptId(mcqPrompt.getId());
+      assertThrows(
+          IllegalArgumentException.class, () -> controller.answerSpelling(memoryTracker, answer));
     }
 
     @Nested
@@ -318,7 +342,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       }
 
       @Test
-      void shouldValidateTheWrongAnswer() {
+      void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
         SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
@@ -327,7 +351,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       }
 
       @Test
-      void shouldNotChangeTheLastRecalledAtTime() {
+      void shouldNotChangeTheLastRecalledAtTime() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
         Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
@@ -337,7 +361,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       }
 
       @Test
-      void shouldRepeatTheNextDay() {
+      void shouldRepeatTheNextDay() throws UnexpectedNoAccessRightException {
         controller.answerSpelling(memoryTracker, answerDTO);
         assertThat(
             memoryTracker.getNextRecallAt(),

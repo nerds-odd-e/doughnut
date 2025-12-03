@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -132,5 +133,28 @@ public class MemoryTrackerService {
     List<RecallPrompt> unansweredPrompts =
         recallPromptRepository.findAllUnansweredByMemoryTrackerId(memoryTracker.getId());
     unansweredPrompts.forEach(entityPersister::remove);
+  }
+
+  public RecallPrompt getSpellingQuestion(MemoryTracker memoryTracker) {
+    RecallPrompt recallPrompt = new RecallPrompt();
+    recallPrompt.setMemoryTracker(memoryTracker);
+    recallPrompt.setQuestionType(QuestionType.SPELLING);
+    return entityPersister.save(recallPrompt);
+  }
+
+  public SpellingResultDTO answerSpelling(
+      RecallPrompt recallPrompt,
+      AnswerSpellingDTO answerSpellingDTO,
+      User user,
+      Timestamp currentUTCTimestamp) {
+    if (recallPrompt.getQuestionType() != QuestionType.SPELLING) {
+      throw new IllegalArgumentException("Recall prompt must be of type SPELLING");
+    }
+    MemoryTracker memoryTracker = recallPrompt.getMemoryTracker();
+    String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
+    Note note = memoryTracker.getNote();
+    Boolean correct = note.matchAnswer(spellingAnswer);
+    markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
+    return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
   }
 }
