@@ -120,4 +120,23 @@ describe("SpellingQuestionDisplay", () => {
     expect(answerData?.spellingAnswer).toBe("cat")
     expect(answerData?.recallPromptId).toBeDefined()
   })
+
+  it("focuses the input when component is rendered", async () => {
+    const focusSpy = vi.spyOn(HTMLInputElement.prototype, "focus")
+
+    const wrapper = helper
+      .component(SpellingQuestionComponent)
+      .withProps({ memoryTrackerId: 1 })
+      .mount()
+
+    await flushPromises()
+
+    const input = wrapper.find("input[placeholder='put your answer here']")
+    expect(input.exists()).toBe(true)
+    // The v-focus directive should focus the input after nextTick
+    await flushPromises()
+    expect(focusSpy).toHaveBeenCalled()
+
+    focusSpy.mockRestore()
+  })
 })

@@ -1,4 +1,4 @@
-import { createApp } from "vue"
+import { createApp, nextTick } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import Toast from "vue-toastification/dist/index.mjs"
 import "vue-toastification/dist/index.css"
@@ -36,10 +36,28 @@ app.use(Toast, {
 
 app.directive("focus", {
   mounted(el) {
-    const input = el.querySelector("input, textarea")
-    if (input) {
-      input.focus()
+    const focusInput = () => {
+      const input = el.querySelector("input, textarea")
+      if (input) {
+        ;(input as HTMLInputElement | HTMLTextAreaElement).focus()
+      }
     }
+    // Use nextTick to ensure DOM is fully rendered
+    nextTick(() => {
+      focusInput()
+    })
+  },
+  updated(el) {
+    const focusInput = () => {
+      const input = el.querySelector("input, textarea")
+      if (input) {
+        ;(input as HTMLInputElement | HTMLTextAreaElement).focus()
+      }
+    }
+    // Use nextTick to ensure DOM is fully rendered after update
+    nextTick(() => {
+      focusInput()
+    })
   },
 })
 

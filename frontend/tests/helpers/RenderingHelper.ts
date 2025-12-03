@@ -1,7 +1,7 @@
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
-import { ref, type DefineComponent } from "vue"
+import { ref, nextTick, type DefineComponent } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
 import createNoteStorage from "@/store/createNoteStorage"
@@ -25,9 +25,29 @@ class RenderingHelper<T = DefineComponent> {
     this.global = {
       plugins: [],
       directives: {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
-        focus() {
-          // noop
+        focus: {
+          mounted(el: HTMLElement) {
+            const focusInput = () => {
+              const input = el.querySelector("input, textarea")
+              if (input) {
+                ;(input as HTMLInputElement | HTMLTextAreaElement).focus()
+              }
+            }
+            nextTick(() => {
+              focusInput()
+            })
+          },
+          updated(el: HTMLElement) {
+            const focusInput = () => {
+              const input = el.querySelector("input, textarea")
+              if (input) {
+                ;(input as HTMLInputElement | HTMLTextAreaElement).focus()
+              }
+            }
+            nextTick(() => {
+              focusInput()
+            })
+          },
         },
       },
       provide: {
