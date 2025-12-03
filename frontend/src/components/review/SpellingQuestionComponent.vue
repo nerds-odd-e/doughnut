@@ -1,24 +1,29 @@
 <template>
-  <div class="quiz-instruction daisy-relative" data-test="question-section">
+  <div class="quiz-instruction daisy-relative daisy-h-full daisy-flex daisy-flex-col" data-test="question-section">
     <ContentLoader v-if="loading" />
     <template v-else>
-      <div v-if="spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
-        <NotebookLink :notebook="spellingQuestion.notebook" />
+      <div class="daisy-flex-1 daisy-overflow-y-auto daisy-pb-4">
+        <div v-if="spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
+          <NotebookLink :notebook="spellingQuestion.notebook" />
+        </div>
+        <QuestionStem :stem="spellingQuestion?.stem" />
       </div>
-      <QuestionStem :stem="spellingQuestion?.stem" />
-      <form @submit.prevent="submitAnswer">
+      <form @submit.prevent="submitAnswer" class="daisy-sticky daisy-bottom-0 daisy-bg-base-100 daisy-pt-4 daisy-pb-4">
         <TextInput
           scope-name="memory_tracker"
           field="answer"
           v-model="spellingAnswer"
           placeholder="put your answer here"
           v-focus
-        />
-        <input
-          type="submit"
-          value="Answer"
-          class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-w-full"
-        />
+        >
+          <template #input_append>
+            <input
+              type="submit"
+              value="Answer"
+              class="daisy-btn daisy-btn-primary daisy-btn-lg"
+            />
+          </template>
+        </TextInput>
       </form>
     </template>
   </div>
