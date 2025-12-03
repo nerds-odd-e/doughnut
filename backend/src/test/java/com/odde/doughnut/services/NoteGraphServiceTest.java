@@ -719,6 +719,11 @@ public class NoteGraphServiceTest {
           makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 1").please();
       parentSibling2 =
           makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 2").please();
+      // Refresh entities to ensure all relationships and children are loaded in the persistence
+      // context
+      // This prevents race conditions when tests run in parallel
+      makeMe.refresh(grandParent);
+      makeMe.refresh(parent);
       focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
     }
 
