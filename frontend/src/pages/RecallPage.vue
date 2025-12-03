@@ -1,35 +1,25 @@
 <template>
-  <GlobalBar
-    v-if="isProgressBarVisible"
-    :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''"
-  >
-    <RecallProgressBar
-      v-bind="{
-        finished,
-        toRepeatCount,
-        previousAnsweredQuestionCursor,
-        canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
-        currentIndex,
-      }"
-      @view-last-answered-question="viewLastAnsweredQuestion($event)"
-      @show-more="showTooltip = true"
-      @move-to-end="moveMemoryTrackerToEnd($event)"
+  <div class="recall-page daisy-h-full daisy-flex daisy-flex-col">
+    <GlobalBar
+      v-if="isProgressBarVisible"
+      :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''"
     >
-    </RecallProgressBar>
-  </GlobalBar>
+      <RecallProgressBar
+        v-bind="{
+          finished,
+          toRepeatCount,
+          previousAnsweredQuestionCursor,
+          canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
+          currentIndex,
+        }"
+        @view-last-answered-question="viewLastAnsweredQuestion($event)"
+        @show-more="showTooltip = true"
+        @move-to-end="moveMemoryTrackerToEnd($event)"
+      >
+      </RecallProgressBar>
+    </GlobalBar>
 
-  <div
-    v-if="showTooltip"
-    class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
-    @click="showTooltip = false"
-  >
-    <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
-      <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-      <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
-    </div>
-  </div>
-
-  <div class="page-content daisy-h-[calc(100vh-55px)] md:daisy-h-[calc(100vh-70px)] daisy-overflow-y-auto">
+    <div class="daisy-flex-1 daisy-min-h-0 daisy-overflow-y-auto">
     <template v-if="toRepeat != undefined">
       <Quiz
         v-if="toRepeatCount !== 0"
@@ -65,7 +55,19 @@
           </button>
         </div>
       </template>
-    </template>
+      </template>
+    </div>
+
+    <div
+      v-if="showTooltip"
+      class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
+      @click="showTooltip = false"
+    >
+      <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
+        <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+        <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+      </div>
+    </div>
   </div>
 </template>
 

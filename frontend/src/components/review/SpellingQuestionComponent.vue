@@ -20,7 +20,7 @@
             <input
               type="submit"
               value="Answer"
-              class="daisy-btn daisy-btn-primary daisy-btn-lg"
+              class="daisy-btn daisy-btn-primary daisy-btn"
             />
           </template>
         </TextInput>
