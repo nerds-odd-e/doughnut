@@ -8,7 +8,9 @@ const assumeMemoryTrackerPage = () => {
         .should('be.visible')
         .click()
       cy.findByRole('button', { name: 'OK' }).click()
-      cy.findByText('This memory tracker has been removed from tracking.')
+      cy.findByText(
+        'This memory tracker is currently skipped and will not appear in review sessions.'
+      )
     },
   }
 }

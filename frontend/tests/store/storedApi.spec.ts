@@ -38,6 +38,7 @@ describe("storedApiCollection", () => {
     let noteRef
 
     beforeEach(() => {
+      vi.clearAllMocks()
       updateNoteDetailsSpy = mockSdkService("updateNoteDetails", note)
       showNoteSpy = mockSdkService("showNote", note)
       noteRef = storageAccessor.value.refOfNoteRealm(note.id)
@@ -53,7 +54,7 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello " } }
 
-      const patch = "--- a\n+++ b\n@@ -1,1 +1,2 @@\n Hello \n+world!\n"
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-Hello \n+Hello world!\n"
       await sa.completeDetails(note.id, {
         patch,
       })
@@ -87,7 +88,8 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = undefined
 
-      const patch = "--- a\n+++ b\n@@ -1,1 +1,2 @@\n <p>Desc</p>\n+world!\n"
+      const patch =
+        "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-<p>Desc</p>\n+<p>Desc</p>world!\n"
       await sa.completeDetails(note.id, {
         patch,
       })
@@ -101,6 +103,56 @@ describe("storedApiCollection", () => {
           details: "<p>Desc</p>world!",
         },
       })
+    })
+
+    it("should throw error for invalid patch format that doesn't start with '--- ' or contain '@@'", async () => {
+      const sa = storageAccessor.value.storedApi()
+      noteRef.value = { ...note, note: { details: "It is a" } }
+
+      const invalidPatch = "-It is a\n+It is a bustling metropolis"
+      await expect(
+        sa.completeDetails(note.id, {
+          patch: invalidPatch,
+        })
+      ).rejects.toThrow(
+        "Invalid patch format: patch must be in unified diff format"
+      )
+
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+    })
+
+    it("should throw error when patch doesn't change the content", async () => {
+      const sa = storageAccessor.value.storedApi()
+      noteRef.value = { ...note, note: { details: "It is a" } }
+
+      // This patch has valid format but replaces content with itself (no change)
+      const noChangePatch =
+        "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-It is a\n+It is a\n"
+      await expect(
+        sa.completeDetails(note.id, {
+          patch: noChangePatch,
+        })
+      ).rejects.toThrow(
+        "Patch did not modify the content: patch format may be invalid or patch has no effect"
+      )
+
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+    })
+
+    it("should throw error when patch format is completely invalid", async () => {
+      const sa = storageAccessor.value.storedApi()
+      noteRef.value = { ...note, note: { details: "It is a" } }
+
+      const invalidPatch = "just some random text"
+      await expect(
+        sa.completeDetails(note.id, {
+          patch: invalidPatch,
+        })
+      ).rejects.toThrow(
+        "Invalid patch format: patch must be in unified diff format"
+      )
+
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
     })
   })
 })

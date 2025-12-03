@@ -20,7 +20,7 @@ import type { Ref } from "vue"
 import type { Router } from "vue-router"
 import NoteEditingHistory from "./NoteEditingHistory"
 import type NoteStorage from "./NoteStorage"
-import { applyPatch } from "diff"
+import { applyPatch, parsePatch } from "diff"
 
 export interface StoredApi {
   getNoteRealmRefAndReloadPosition(
@@ -366,13 +366,35 @@ export default class StoredApiCollection implements StoredApi {
 
     const old = currentNote?.details ?? ""
     try {
+      // Validate patch format using parsePatch - it returns empty hunks for invalid formats
+      const parsedPatches = parsePatch(value.patch)
+      const hasValidHunks =
+        parsedPatches.length > 0 &&
+        parsedPatches.some((patch) => patch.hunks && patch.hunks.length > 0)
+      if (!hasValidHunks) {
+        throw new Error(
+          "Invalid patch format: patch must be in unified diff format"
+        )
+      }
+
       const result = applyPatch(old, value.patch)
       if (result === false) {
-        throw new Error("Failed to apply patch")
+        throw new Error("Failed to apply patch: patch format is invalid")
       }
+
+      // Check if patch actually changed anything (this catches cases where invalid patches return unchanged content)
+      if (result === old) {
+        throw new Error(
+          "Patch did not modify the content: patch format may be invalid or patch has no effect"
+        )
+      }
+
       await this.updateTextField(noteId, "edit details", result)
     } catch (error) {
-      console.error("Error applying patch:", error)
+      // Re-throw with original error message for better user feedback
+      if (error instanceof Error) {
+        throw error
+      }
       throw new Error("Failed to apply patch to note details")
     }
   }

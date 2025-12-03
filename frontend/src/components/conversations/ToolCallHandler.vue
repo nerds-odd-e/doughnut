@@ -23,8 +23,10 @@ import AcceptRejectButtons from "@/components/commons/AcceptRejectButtons.vue"
 import markdownizer from "../form/markdownizer"
 import type { Suggestion } from "@/models/suggestions"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useToast } from "@/composables/useToast"
 
 const storageAccessor = useStorageAccessor()
+const { showErrorToast } = useToast()
 
 const props = defineProps<{
   suggestion: Suggestion
@@ -119,6 +121,9 @@ const handleAccept = async () => {
     }
     emit("resolved", { status: "accepted" })
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to apply patch"
+    showErrorToast(errorMessage)
     emit("rejected", error as Error)
   } finally {
     isProcessing.value = false

@@ -317,29 +317,6 @@ describe("aiReplyState", () => {
 
       await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk2))
 
-      // Third chunk: arguments complete
-      const chunk3 = {
-        choices: [
-          {
-            index: 0,
-            delta: {
-              tool_calls: [
-                {
-                  index: 0,
-                  id: null,
-                  function: {
-                    arguments: "}",
-                  },
-                },
-              ],
-            },
-            finish_reason: null,
-          },
-        ],
-      }
-
-      await states["chat.completion.chunk"]?.handleEvent(JSON.stringify(chunk3))
-
       // Final chunk: finish_reason triggers processing
       const chunk4 = {
         choices: [
@@ -478,7 +455,7 @@ describe("aiReplyState", () => {
                   {
                     index: 0,
                     function: {
-                      arguments: '"This is a',
+                      arguments: '"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+This is a',
                     },
                   },
                 ],
@@ -514,7 +491,7 @@ describe("aiReplyState", () => {
                   {
                     index: 0,
                     function: {
-                      arguments: ' completion"}',
+                      arguments: ' completion\\n"}',
                     },
                   },
                 ],

@@ -274,7 +274,6 @@ describe("ConversationInner", () => {
   })
 
   describe("Tool Call Handling", () => {
-    const testCompletion = "**bold completion**"
     const testPatch = "--- a\n+++ b\n@@ -0,0 +1 @@\n+**bold completion**\n"
     let updateNoteDetailsSpy: ReturnType<
       typeof mockSdkService<"updateNoteDetails">
@@ -305,7 +304,9 @@ describe("ConversationInner", () => {
           patch: emptyPatch,
         })
       )
-      expect(wrapper.find(".completion-text").html()).toContain("```diff")
+      // Markdown is rendered to HTML, so check for the diff content instead
+      expect(wrapper.find(".completion-text").html()).toContain("--- a")
+      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
 
       // Test with existing note details
       noteRealm.note.details = "Existing content"
@@ -318,7 +319,9 @@ describe("ConversationInner", () => {
           patch: appendPatch,
         })
       )
-      expect(wrapper.find(".completion-text").html()).toContain("```diff")
+      // Markdown is rendered to HTML, so check for the diff content instead
+      expect(wrapper.find(".completion-text").html()).toContain("--- a")
+      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
     })
 
     it("formats completion suggestion with diff format", async () => {
@@ -334,7 +337,9 @@ describe("ConversationInner", () => {
       )
 
       // The diff should be displayed in a code block
-      expect(wrapper.find(".completion-text").html()).toContain("```diff")
+      // Markdown is rendered to HTML, so check for the diff content instead
+      expect(wrapper.find(".completion-text").html()).toContain("--- a")
+      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
       expect(wrapper.find(".completion-text").html()).toContain("-Hello world")
       expect(wrapper.find(".completion-text").html()).toContain(
         "+Hello  friends!"
@@ -354,7 +359,9 @@ describe("ConversationInner", () => {
       )
 
       // The diff should show the replacement
-      expect(wrapper.find(".completion-text").html()).toContain("```diff")
+      // Markdown is rendered to HTML, so check for the diff content instead
+      expect(wrapper.find(".completion-text").html()).toContain("--- a")
+      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
       expect(wrapper.find(".completion-text").html()).toContain("+New content")
     })
 
@@ -365,9 +372,10 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
+      // The patch adds content with a newline at the end
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: testCompletion },
+        body: { details: "**bold completion**\n" },
       })
 
       // Tool calls are executed inline with Chat Completion API
@@ -422,7 +430,9 @@ describe("ConversationInner", () => {
       )
 
       // Check the formatted suggestion shows the diff
-      expect(wrapper.find(".completion-text").html()).toContain("```diff")
+      // Markdown is rendered to HTML, so check for the diff content instead
+      expect(wrapper.find(".completion-text").html()).toContain("--- a")
+      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()

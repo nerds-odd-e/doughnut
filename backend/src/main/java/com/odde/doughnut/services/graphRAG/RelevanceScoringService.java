@@ -14,6 +14,7 @@ public class RelevanceScoringService {
   // Relationship type weights
   private static final double CORE_CONTEXT_WEIGHT = 10.0;
   private static final double STRUCTURAL_CONTEXT_WEIGHT = 5.0;
+  private static final double SOFT_REMOTE_CONTEXT_WEIGHT = 2.0;
 
   private static final Map<RelationshipToFocusNote, Double> RELATIONSHIP_WEIGHTS =
       Map.ofEntries(
@@ -40,10 +41,11 @@ public class RelevanceScoringService {
           Map.entry(
               RelationshipToFocusNote.SiblingOfSubjectOfInboundReference,
               STRUCTURAL_CONTEXT_WEIGHT),
-          // Soft/remote context (lowest) - Note: GrandChild and RemotelyRelated not yet in enum
           Map.entry(
               RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild,
-              STRUCTURAL_CONTEXT_WEIGHT));
+              STRUCTURAL_CONTEXT_WEIGHT),
+          // Soft/remote context (lowest)
+          Map.entry(RelationshipToFocusNote.RemotelyRelated, SOFT_REMOTE_CONTEXT_WEIGHT));
 
   private final Random random = new Random();
 
@@ -60,7 +62,7 @@ public class RelevanceScoringService {
   }
 
   private double getRelationshipWeight(RelationshipToFocusNote relationshipType) {
-    return RELATIONSHIP_WEIGHTS.getOrDefault(relationshipType, CORE_CONTEXT_WEIGHT);
+    return RELATIONSHIP_WEIGHTS.getOrDefault(relationshipType, SOFT_REMOTE_CONTEXT_WEIGHT);
   }
 
   private double calculateDepthBonus(int depth) {
