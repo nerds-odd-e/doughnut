@@ -37,6 +37,7 @@ class MemoryTrackerController {
   }
 
   @GetMapping("/{memoryTracker}/spelling-question")
+  @Transactional
   public RecallPrompt getSpellingQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {

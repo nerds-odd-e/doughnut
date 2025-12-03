@@ -187,6 +187,12 @@ export type RecallPrompt = {
     answerTime?: string;
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
+    spellingQuestion?: SpellingQuestion;
+};
+
+export type SpellingQuestion = {
+    stem?: string;
+    notebook?: Notebook;
 };
 
 export type AnswerDto = {
@@ -635,6 +641,7 @@ export type RecallPromptWritable = {
     answerTime?: string;
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
+    spellingQuestion?: SpellingQuestion;
 };
 
 export type AnsweredQuestionWritable = {

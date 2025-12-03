@@ -3,8 +3,8 @@
     <ContentLoader v-if="loading" />
     <template v-else>
       <div class="daisy-flex-1 daisy-overflow-y-auto daisy-pb-4">
-        <div v-if="recallPrompt?.notebook" class="notebook-source daisy-mb-4">
-          <NotebookLink :notebook="recallPrompt.notebook" />
+        <div v-if="recallPrompt?.spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
+          <NotebookLink :notebook="recallPrompt.spellingQuestion.notebook" />
         </div>
         <QuestionStem :stem="stem" />
       </div>
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue"
-import type { RecallPrompt, MemoryTracker } from "@generated/backend"
+import type { RecallPrompt } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import TextInput from "../form/TextInput.vue"
@@ -49,15 +49,12 @@ const props = defineProps({
 const emits = defineEmits(["answer"])
 const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
-const memoryTracker = ref<MemoryTracker>()
 const loading = ref(true)
 
 const { start, stop } = useThinkingTimeTracker()
 
 const stem = computed(() => {
-  if (!memoryTracker.value?.note) return ""
-  // @ts-expect-error - clozeDescription is a method on Note, not a property
-  return memoryTracker.value.note.clozeDescription?.clozeDetails?.() || ""
+  return recallPrompt.value?.spellingQuestion?.stem || ""
 })
 
 const fetchSpellingQuestion = async () => {
@@ -68,12 +65,6 @@ const fetchSpellingQuestion = async () => {
     })
   if (!promptError && prompt) {
     recallPrompt.value = prompt
-    const { data: tracker } = await MemoryTrackerController.showMemoryTracker({
-      path: { memoryTracker: props.memoryTrackerId },
-    })
-    if (tracker) {
-      memoryTracker.value = tracker
-    }
   }
   loading.value = false
 }

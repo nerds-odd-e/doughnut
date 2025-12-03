@@ -3805,9 +3805,18 @@ components:
           $ref: "#/components/schemas/PredefinedQuestion"
         answer:
           $ref: "#/components/schemas/Answer"
+        spellingQuestion:
+          $ref: "#/components/schemas/SpellingQuestion"
       required:
       - id
       - questionType
+    SpellingQuestion:
+      type: object
+      properties:
+        stem:
+          type: string
+        notebook:
+          $ref: "#/components/schemas/Notebook"
     AnswerDTO:
       type: object
       properties:

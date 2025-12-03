@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
@@ -28,7 +29,8 @@ import lombok.EqualsAndHashCode;
   "isContested",
   "answerTime",
   "predefinedQuestion",
-  "answer"
+  "answer",
+  "spellingQuestion"
 })
 public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @ManyToOne
@@ -146,5 +148,16 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public PredefinedQuestion getPredefinedQuestion() {
     return getAnswerableMCQ() != null ? getAnswerableMCQ().getPredefinedQuestion() : null;
+  }
+
+  @JsonProperty
+  public SpellingQuestion getSpellingQuestion() {
+    if (questionType != QuestionType.SPELLING) {
+      return null;
+    }
+    Note note = memoryTracker.getNote();
+    String stem = note.getClozeDescription().clozeDetails();
+    Notebook notebook = note.getNotebook();
+    return new SpellingQuestion(stem, notebook);
   }
 }
