@@ -1,18 +1,28 @@
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, vi } from "vitest"
 import helper from "@tests/helpers"
 import ViewMemoryTrackerLink from "@/components/review/ViewMemoryTrackerLink.vue"
 
+const mockedPush = vi.fn()
+vitest.mock("vue-router", () => ({
+  useRouter: () => ({
+    push: mockedPush,
+  }),
+}))
+
 describe("ViewMemoryTrackerLink", () => {
-  it("renders a link to the memory tracker page", () => {
+  it("renders a button that navigates to the memory tracker page", async () => {
+    mockedPush.mockClear()
     const wrapper = helper
       .component(ViewMemoryTrackerLink)
       .withProps({ memoryTrackerId: 123 })
       .mount()
 
-    const link = wrapper.find("a.router-link")
-    expect(link.exists()).toBe(true)
-    expect(link.text()).toBe("View Memory Tracker")
-    expect(JSON.parse(link.attributes("to")!)).toMatchObject({
+    const button = wrapper.find("button")
+    expect(button.exists()).toBe(true)
+    expect(button.text()).toBe("View Memory Tracker")
+
+    await button.trigger("click")
+    expect(mockedPush).toHaveBeenCalledWith({
       name: "memoryTrackerShow",
       params: { memoryTrackerId: 123 },
     })
@@ -24,10 +34,9 @@ describe("ViewMemoryTrackerLink", () => {
       .withProps({ memoryTrackerId: 456 })
       .mount()
 
-    const link = wrapper.find("a")
-    expect(link.classes()).toContain("daisy-link")
-    expect(link.classes()).toContain("daisy-link-primary")
-    expect(link.classes()).toContain("daisy-mt-4")
-    expect(link.classes()).toContain("daisy-inline-block")
+    const button = wrapper.find("button")
+    expect(button.classes()).toContain("daisy-btn")
+    expect(button.classes()).toContain("daisy-btn-primary")
+    expect(button.classes()).toContain("daisy-mt-4")
   })
 })
