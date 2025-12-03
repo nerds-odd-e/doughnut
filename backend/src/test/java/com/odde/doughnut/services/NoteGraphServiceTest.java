@@ -520,7 +520,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludeChildObjectInRelatedNotes() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 

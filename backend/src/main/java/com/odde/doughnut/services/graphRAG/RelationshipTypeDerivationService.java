@@ -82,8 +82,18 @@ public class RelationshipTypeDerivationService {
       }
     }
 
+    // Step 4.4: Detect object of reified child via path [Child, Object]
+    // When we go from focus note to a child, then to the object of that child (if it's a
+    // reification),
+    // that object note is ObjectOfReifiedChild
+    if (discoveryPath.size() == 2
+        && discoveryPath.get(0) == RelationshipToFocusNote.Child
+        && discoveryPath.get(1) == RelationshipToFocusNote.Object) {
+      return RelationshipToFocusNote.ObjectOfReifiedChild;
+    }
+
     // For step 4.1, default to RemotelyRelated - other specific types will be added in later steps
-    // (steps 4.4-4.6 will add specific relationship type derivation based on discovery path)
+    // (steps 4.5-4.6 will add specific relationship type derivation based on discovery path)
     return RelationshipToFocusNote.RemotelyRelated;
   }
 

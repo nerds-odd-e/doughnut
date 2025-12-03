@@ -205,6 +205,22 @@ public class NoteGraphService {
             candidates.add(new CandidateNote(child, relationship, 2, discoveryPath));
           }
         }
+        // Step 4.4: Process object of reified child (if child is a reification)
+        if (child.getTargetNote() != null && !depthFetched.containsKey(child.getTargetNote())) {
+          Note objectNote = child.getTargetNote();
+          depthFetched.put(objectNote, 2);
+          List<RelationshipToFocusNote> objectDiscoveryPath = new ArrayList<>();
+          objectDiscoveryPath.add(depth1Relationship);
+          objectDiscoveryPath.add(RelationshipToFocusNote.Child);
+          objectDiscoveryPath.add(RelationshipToFocusNote.Object);
+          RelationshipToFocusNote objectRelationship =
+              relationshipTypeDerivationService.deriveRelationshipType(
+                  objectNote, focusNote, objectDiscoveryPath);
+          if (objectRelationship != null) {
+            candidates.add(
+                new CandidateNote(objectNote, objectRelationship, 2, objectDiscoveryPath));
+          }
+        }
       }
       childrenEmitted.put(depth1Note, depth2ChildrenAlreadyEmitted + selectedDepth2Children.size());
 
