@@ -1,8 +1,8 @@
 <template>
-  <div class="content">
+  <div class="content daisy-h-full">
     <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
-      <div class="daisy-mt-5">
+      <div class="daisy-mt-5 daisy-h-full">
       <SpellingQuestionComponent
         v-if="currentMemoryTracker?.spelling"
         v-bind="{
