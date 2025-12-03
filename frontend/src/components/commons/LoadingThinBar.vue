@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar-overlap loading-bar">
-    <ContentLoader :height="15" :speed="2" primary-color="#888"></ContentLoader>
+    <ContentLoader :height="2" :speed="2" primary-color="#888"></ContentLoader>
   </div>
 </template>
 
@@ -13,8 +13,9 @@ import { ContentLoader } from "vue-content-loader"
   position: fixed;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 5px;
+  right: 0;
+  width: 100vw;
+  height: 2px;
   z-index: 2147483647;
 
   svg {
