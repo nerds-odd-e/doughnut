@@ -101,10 +101,11 @@ const useQuestionFetching = (props: QuizProps) => {
 
       fetchingMemoryTrackerIds.value.add(memoryTrackerId)
       try {
-        const { data: question, error } =
-          await RecallPromptController.askAQuestion({
+        const { data: question, error } = await apiCallWithLoading(() =>
+          RecallPromptController.askAQuestion({
             path: { memoryTracker: memoryTrackerId },
           })
+        )
         if (!error) {
           recallPromptCache.value[memoryTrackerId] = question!
         } else {
