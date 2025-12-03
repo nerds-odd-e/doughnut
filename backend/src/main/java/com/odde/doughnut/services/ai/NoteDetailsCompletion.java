@@ -6,18 +6,14 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
-@JsonClassDescription("Text completion for the details of the note of focus")
+@JsonClassDescription(
+    "Text completion for the details of the note of focus. Provide a unified diff (text format) showing the changes to apply to the existing note details. The diff should use standard unified diff format with lines prefixed by '-' for deletions, '+' for additions, and ' ' (space) for unchanged context lines.")
 @NoArgsConstructor
 @AllArgsConstructor
 public class NoteDetailsCompletion {
 
   @JsonPropertyDescription(
-      "A non-negative integer (zero or positive) representing the number of characters to delete from the end of the existing note details before appending the completion. Use this to remove trailing spaces, new lines, empty paragraphs, incomplete words, or punctuation when needed. If set to 0, no deletion occurs. If 'deleteFromEnd' exceeds the length of the existing details, all existing content will be deleted. Characters are counted as Unicode code points.")
+      "A unified diff (text format) representing the changes to apply to the existing note details. The diff should be in the standard unified diff format with lines starting with '-' for deletions, '+' for additions, and ' ' for unchanged context lines. The diff should show how to transform the current note details into the completed version. The patch should be provided as plain text in unified diff format.")
   @JsonProperty(required = true)
-  public Integer deleteFromEnd;
-
-  @JsonPropertyDescription(
-      "The completion text to be appended to the existing note details after the specified deletion. Begin the completion with necessary whitespace or new lines to properly connect it to the existing details. If 'deleteFromEnd' removes part of a word, start the completion with the complete word to ensure continuity. The 'completion' should be provided in Markdown format. For example, if the existing details end with 'runni' and 'deleteFromEnd' is 5, the 'completion' should start with 'running'.")
-  @JsonProperty(required = true)
-  public String completion;
+  public String patch;
 }

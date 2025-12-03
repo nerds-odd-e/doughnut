@@ -53,9 +53,9 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello " } }
 
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,2 @@\n Hello \n+world!\n"
       await sa.completeDetails(note.id, {
-        completion: "world!",
-        deleteFromEnd: 0,
+        patch,
       })
 
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
@@ -70,9 +70,9 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = { ...note, note: { details: "Hello world" } }
 
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-Hello world\n+Hello !\n"
       await sa.completeDetails(note.id, {
-        completion: "!",
-        deleteFromEnd: 5,
+        patch,
       })
 
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
@@ -87,9 +87,9 @@ describe("storedApiCollection", () => {
       const sa = storageAccessor.value.storedApi()
       noteRef.value = undefined
 
+      const patch = "--- a\n+++ b\n@@ -1,1 +1,2 @@\n <p>Desc</p>\n+world!\n"
       await sa.completeDetails(note.id, {
-        completion: "world!",
-        deleteFromEnd: 0,
+        patch,
       })
 
       expect(showNoteSpy).toHaveBeenCalledWith({
