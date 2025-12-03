@@ -67,7 +67,9 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   public void buildAssessmentQuestionInstance(PredefinedQuestion predefinedQuestion) {
     AssessmentQuestionInstance assessmentQuestionInstance = new AssessmentQuestionInstance();
     assessmentQuestionInstance.setAssessmentAttempt(this);
-    assessmentQuestionInstance.setPredefinedQuestion(predefinedQuestion);
+    AnswerableMCQ answerableMCQ = new AnswerableMCQ();
+    answerableMCQ.setPredefinedQuestion(predefinedQuestion);
+    assessmentQuestionInstance.setAnswerableMCQ(answerableMCQ);
     getAssessmentQuestionInstances().add(assessmentQuestionInstance);
   }
 

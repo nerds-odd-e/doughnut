@@ -105,7 +105,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
     void shouldNotBeAbleToAnswerTheSameQuestionTwice() {
       AnswerDTO answerDTO1 = new AnswerDTO();
       answerDTO1.setChoiceIndex(0);
-      assessmentQuestionInstance.buildAnswer(answerDTO1);
+      assessmentQuestionInstance.getAnswerableMCQ().buildAnswer(answerDTO1);
       assertThrows(
           QuestionAnswerException.class,
           () -> controller.answerQuestion(assessmentQuestionInstance, answerDTO));
@@ -142,7 +142,7 @@ public class AssessmentControllerTests extends ControllerTestBase {
               aqi -> {
                 Answer answer = new Answer();
                 answer.setCorrect(true);
-                aqi.setAnswer(answer);
+                aqi.getAnswerableMCQ().setAnswer(answer);
               });
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
@@ -166,9 +166,21 @@ public class AssessmentControllerTests extends ControllerTestBase {
       correctAnswer.setCorrect(true);
       Answer wrongAnswer = new Answer();
       wrongAnswer.setCorrect(false);
-      assessmentAttempt.getAssessmentQuestionInstances().get(0).setAnswer(correctAnswer);
-      assessmentAttempt.getAssessmentQuestionInstances().get(1).setAnswer(correctAnswer);
-      assessmentAttempt.getAssessmentQuestionInstances().get(2).setAnswer(wrongAnswer);
+      assessmentAttempt
+          .getAssessmentQuestionInstances()
+          .get(0)
+          .getAnswerableMCQ()
+          .setAnswer(correctAnswer);
+      assessmentAttempt
+          .getAssessmentQuestionInstances()
+          .get(1)
+          .getAnswerableMCQ()
+          .setAnswer(correctAnswer);
+      assessmentAttempt
+          .getAssessmentQuestionInstances()
+          .get(2)
+          .getAnswerableMCQ()
+          .setAnswer(wrongAnswer);
 
       AssessmentAttempt assessmentResult = controller.submitAssessmentResult(assessmentAttempt);
 

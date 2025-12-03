@@ -11,10 +11,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-@MappedSuperclass
+@Entity
+@Table(name = "answerable_mcq")
 @Data
 @EqualsAndHashCode(callSuper = false)
-public abstract class AnswerableQuestionInstance extends EntityIdentifiedByIdOnly {
+public class AnswerableMCQ extends EntityIdentifiedByIdOnly {
   @OneToOne
   @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
   @NotNull

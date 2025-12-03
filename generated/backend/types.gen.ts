@@ -178,7 +178,7 @@ export type Answer = {
 
 export type RecallPrompt = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: Note;
     questionGeneratedTime?: string;
@@ -186,6 +186,7 @@ export type RecallPrompt = {
     answerTime?: string;
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
+    questionType: 'MCQ';
 };
 
 export type AnswerDto = {
@@ -319,7 +320,7 @@ export type SseEmitter = {
 
 export type AssessmentQuestionInstance = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     answer?: Answer;
 };
 
@@ -629,7 +630,7 @@ export type SubscriptionWritable = {
 
 export type RecallPromptWritable = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: NoteWritable;
     questionGeneratedTime?: string;
@@ -637,6 +638,7 @@ export type RecallPromptWritable = {
     answerTime?: string;
     predefinedQuestion?: PredefinedQuestion;
     answer?: Answer;
+    questionType: 'MCQ';
 };
 
 export type AnsweredQuestionWritable = {

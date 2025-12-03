@@ -83,8 +83,11 @@ public class RecallQuestionService {
   private RecallPrompt createARecallPromptFromQuestion(
       PredefinedQuestion question, MemoryTracker memoryTracker) {
     RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setPredefinedQuestion(question);
     recallPrompt.setMemoryTracker(memoryTracker);
+    recallPrompt.setQuestionType(RecallPrompt.QuestionType.MCQ);
+    AnswerableMCQ answerableMCQ = new AnswerableMCQ();
+    answerableMCQ.setPredefinedQuestion(question);
+    recallPrompt.setAnswerableMCQ(answerableMCQ);
     return entityPersister.save(recallPrompt);
   }
 
@@ -94,7 +97,12 @@ public class RecallQuestionService {
 
   public AnsweredQuestion answerQuestion(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
-    Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
+    AnswerableMCQ answerableMCQ = recallPrompt.getAnswerableMCQ();
+    if (answerableMCQ == null) {
+      // This should not happen in normal flow, but handle it gracefully
+      throw new IllegalStateException("RecallPrompt must have an AnswerableMCQ to answer");
+    }
+    Answer answer = answerService.createAnswerForQuestion(answerableMCQ, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();

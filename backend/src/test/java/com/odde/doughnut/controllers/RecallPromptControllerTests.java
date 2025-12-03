@@ -404,7 +404,8 @@ class RecallPromptControllerTests extends ControllerTestBase {
       contestedQuestion.setContested(true);
       makeMe.entityPersister.save(contestedQuestion);
       RecallPrompt existingPrompt = makeMe.aRecallPrompt().please();
-      existingPrompt.setPredefinedQuestion(contestedQuestion);
+      com.odde.doughnut.entities.AnswerableMCQ answerableMCQ = existingPrompt.getAnswerableMCQ();
+      answerableMCQ.setPredefinedQuestion(contestedQuestion);
       makeMe.entityPersister.save(existingPrompt);
 
       // Mock the AI to generate a new question

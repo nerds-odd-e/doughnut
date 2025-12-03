@@ -67,6 +67,7 @@ class RecallPromptBuilder extends Builder<RecallPrompt> {
       notebook: new NotebookBuilder().do(),
       note: this.noteToUse,
       predefinedQuestion: predefinedQuestion,
+      questionType: "MCQ" as const,
       answer: this.answerToUse,
       answerTime: this.answerTimeToUse,
       questionGeneratedTime: this.questionGeneratedTimeToUse,

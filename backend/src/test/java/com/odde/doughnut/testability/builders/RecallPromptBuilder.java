@@ -3,6 +3,7 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.PredefinedQuestion;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -23,10 +24,15 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
       entity = new RecallPrompt();
-      entity.setPredefinedQuestion(predefinedQuestionBuilder.please(needPersist));
+      PredefinedQuestion predefinedQuestion = predefinedQuestionBuilder.please(needPersist);
+      com.odde.doughnut.entities.AnswerableMCQ answerableMCQ =
+          new com.odde.doughnut.entities.AnswerableMCQ();
+      answerableMCQ.setPredefinedQuestion(predefinedQuestion);
+      entity.setAnswerableMCQ(answerableMCQ);
+      entity.setQuestionType(RecallPrompt.QuestionType.MCQ);
     }
-    if (answerDTO != null) {
-      entity.buildAnswer(answerDTO);
+    if (answerDTO != null && entity.getAnswerableMCQ() != null) {
+      entity.getAnswerableMCQ().buildAnswer(answerDTO);
     }
     // Set MemoryTracker if not already set
     if (entity.getMemoryTracker() == null && memoryTracker == null) {

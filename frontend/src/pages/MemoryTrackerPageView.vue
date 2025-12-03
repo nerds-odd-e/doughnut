@@ -117,7 +117,7 @@
             }"
           />
           <QuestionDisplay
-            v-else
+            v-else-if="prompt.multipleChoicesQuestion"
             v-bind="{
               multipleChoicesQuestion: prompt.multipleChoicesQuestion,
               disabled: true,
