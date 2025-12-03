@@ -31,6 +31,10 @@ public class Answer extends EntityIdentifiedByIdOnly {
   @Setter
   private Integer thinkingTimeMs;
 
+  @Column(name = "spelling_answer")
+  @Setter
+  private String spellingAnswer;
+
   @JsonIgnore
   String getAnswerDisplay(@NotNull MultipleChoicesQuestion bareQuestion) {
     if (getChoiceIndex() != null) {

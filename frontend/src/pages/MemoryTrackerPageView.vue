@@ -107,8 +107,28 @@
               Thinking time: {{ formatThinkingTime(prompt.answer.thinkingTimeMs) }}
             </span>
           </div>
-          <div v-if="prompt.questionType === 'SPELLING'" class="daisy-alert daisy-alert-info">
-            This is a spelling question. Details are not needed.
+          <div v-if="prompt.questionType === 'SPELLING'">
+            <div v-if="prompt.answer" class="daisy-space-y-2">
+              <div class="daisy-flex daisy-items-center daisy-gap-2">
+                <span class="daisy-font-semibold">Your answer:</span>
+                <span>{{ prompt.answer.spellingAnswer }}</span>
+              </div>
+              <div class="daisy-flex daisy-items-center daisy-gap-2">
+                <span class="daisy-font-semibold">Result:</span>
+                <span
+                  :class="{
+                    'daisy-badge-success': prompt.answer.correct,
+                    'daisy-badge-error': !prompt.answer.correct,
+                  }"
+                  class="daisy-badge"
+                >
+                  {{ prompt.answer.correct ? 'Correct' : 'Incorrect' }}
+                </span>
+              </div>
+            </div>
+            <div v-else class="daisy-alert daisy-alert-info">
+              This is a spelling question. Details are not needed.
+            </div>
           </div>
           <QuestionDisplay
             v-else-if="prompt.predefinedQuestion && prompt.answer"

@@ -174,6 +174,7 @@ export type Answer = {
     choiceIndex?: number;
     correct: boolean;
     thinkingTimeMs?: number;
+    spellingAnswer?: string;
 };
 
 export type RecallPrompt = {
