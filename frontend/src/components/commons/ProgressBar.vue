@@ -1,29 +1,25 @@
 <template>
-  <GlobalBar v-if="title">
-    <div class="daisy-flex-shrink-0">
-      <slot name="buttons" />
-    </div>
-    <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
-      <div
-        :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
-        v-if="toRepeatCount !== null"
+  <div class="daisy-flex-shrink-0">
+    <slot name="buttons" />
+  </div>
+  <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
+    <div
+      :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
+      v-if="toRepeatCount !== null"
+    >
+      <span
+        class="progress"
+        :style="`width: ${(finished * 100) / (finished + toRepeatCount)}%`"
       >
-        <span
-          class="progress"
-          :style="`width: ${(finished * 100) / (finished + toRepeatCount)}%`"
-        >
-        </span>
-        <span class="progress-text">
-          {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
-        </span>
-      </div>
+      </span>
+      <span class="progress-text">
+        {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
+      </span>
     </div>
-  </GlobalBar>
+  </div>
 </template>
 
 <script setup lang="ts">
-import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-
 defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },

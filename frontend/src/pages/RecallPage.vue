@@ -1,18 +1,22 @@
 <template>
-  <RecallProgressBar
+  <GlobalBar
     v-if="isProgressBarVisible"
-    v-bind="{
-      finished,
-      toRepeatCount,
-      previousAnsweredQuestionCursor,
-      canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
-      currentIndex,
-    }"
-    @view-last-answered-question="viewLastAnsweredQuestion($event)"
-    @show-more="showTooltip = true"
-    @move-to-end="moveMemoryTrackerToEnd($event)"
+    :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''"
   >
-  </RecallProgressBar>
+    <RecallProgressBar
+      v-bind="{
+        finished,
+        toRepeatCount,
+        previousAnsweredQuestionCursor,
+        canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
+        currentIndex,
+      }"
+      @view-last-answered-question="viewLastAnsweredQuestion($event)"
+      @show-more="showTooltip = true"
+      @move-to-end="moveMemoryTrackerToEnd($event)"
+    >
+    </RecallProgressBar>
+  </GlobalBar>
 
   <div
     v-if="showTooltip"
@@ -68,6 +72,7 @@ import Quiz from "@/components/review/Quiz.vue"
 import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
 import { RecallsController } from "@generated/backend/sdk.gen"
@@ -224,3 +229,9 @@ defineExpose({
   currentIndex,
 })
 </script>
+
+<style lang="scss" scoped>
+.repeat-paused {
+  background-color: rgba(50, 150, 50, 0.8);
+}
+</style>
