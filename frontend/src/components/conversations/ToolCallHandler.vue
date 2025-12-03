@@ -70,15 +70,9 @@ const suggestionContentClass = computed(() => {
 })
 
 const formatCompletionSuggestion = (completion: NoteDetailsCompletion) => {
-  if (!completion.patch) return ""
+  if (!completion.details) return ""
 
-  // Display the patch in a readable format
-  // Escape markdown special characters in the patch for display
-  const escapedPatch = completion.patch
-    .replace(/\n/g, "\n")
-    .replace(/```/g, "\\`\\`\\`")
-
-  return `\`\`\`diff\n${escapedPatch}\n\`\`\``
+  return completion.details
 }
 
 const formattedContent = computed(() => {

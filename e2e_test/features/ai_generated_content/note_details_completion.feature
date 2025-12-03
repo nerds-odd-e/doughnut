@@ -16,8 +16,8 @@ Feature: Note details completion
 
   Scenario: Completing Note Details Using OpenAI and accepting
     Given OpenAI will reply below for user messages:
-      | user message                      | response type   | assistant reply                                                                                    |
-      | Please complete the note details. | requires action | {"patch": "--- a\\n+++ b\\n@@ -1,1 +1,1 @@\\n-It is a\\n+It is a vigorous city.\\n"} |
+      | user message                      | response type   | assistant reply                                                      |
+      | Please complete the note details. | requires action | {"details": "It is a vigorous city."} |
     When I request to complete the details for the note "Taipei"
     Then I should see the suggested completion in the chat dialog
     When I accept the suggested completion
@@ -25,8 +25,8 @@ Feature: Note details completion
 
   Scenario: Completing Note Details Using OpenAI and rejecting
     Given OpenAI will reply below for user messages:
-      | user message                      | response type   | assistant reply                                                                                    |
-      | Please complete the note details. | requires action | {"patch": "--- a\\n+++ b\\n@@ -1,1 +1,1 @@\\n-It is a\\n+It is a vigorous city.\\n"} |
+      | user message                      | response type   | assistant reply                                                      |
+      | Please complete the note details. | requires action | {"details": "It is a vigorous city."} |
     When I request to complete the details for the note "Taipei"
     Then I should see the suggested completion in the chat dialog
     When I reject the suggested completion

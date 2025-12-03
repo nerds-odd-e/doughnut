@@ -274,7 +274,7 @@ describe("ConversationInner", () => {
   })
 
   describe("Tool Call Handling", () => {
-    const testPatch = "--- a\n+++ b\n@@ -0,0 +1 @@\n+**bold completion**\n"
+    const testDetails = "**bold completion**"
     let updateNoteDetailsSpy: ReturnType<
       typeof mockSdkService<"updateNoteDetails">
     >
@@ -288,7 +288,7 @@ describe("ConversationInner", () => {
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch: testPatch,
+          details: testDetails,
         })
       )
     })
@@ -297,72 +297,67 @@ describe("ConversationInner", () => {
       // Test empty note details
       noteRealm.note.details = ""
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const emptyPatch = "--- a\n+++ b\n@@ -0,0 +1 @@\n+**bold completion**\n"
+      const emptyDetails = "**bold completion**"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch: emptyPatch,
+          details: emptyDetails,
         })
       )
-      // Markdown is rendered to HTML, so check for the diff content instead
-      expect(wrapper.find(".completion-text").html()).toContain("--- a")
-      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
+      // Markdown is rendered to HTML, so check for the rendered content
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "<strong>bold completion</strong>"
+      )
 
       // Test with existing note details
       noteRealm.note.details = "Existing content"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const appendPatch =
-        "--- a\n+++ b\n@@ -1,1 +1,2 @@\n Existing content\n+**bold completion**\n"
+      const newDetails = "Existing content\n**bold completion**"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch: appendPatch,
+          details: newDetails,
         })
       )
-      // Markdown is rendered to HTML, so check for the diff content instead
-      expect(wrapper.find(".completion-text").html()).toContain("--- a")
-      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
+      // Markdown is rendered to HTML, so check for the rendered content
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "Existing content"
+      )
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "<strong>bold completion</strong>"
+      )
     })
 
-    it("formats completion suggestion with diff format", async () => {
+    it("formats completion suggestion with details", async () => {
       noteRealm.note.details = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const patch =
-        "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-Hello world\n+Hello  friends!\n"
+      const details = "Hello  friends!"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch,
+          details,
         })
       )
 
-      // The diff should be displayed in a code block
-      // Markdown is rendered to HTML, so check for the diff content instead
-      expect(wrapper.find(".completion-text").html()).toContain("--- a")
-      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
-      expect(wrapper.find(".completion-text").html()).toContain("-Hello world")
+      // The details should be displayed (markdown renders double spaces as single)
       expect(wrapper.find(".completion-text").html()).toContain(
-        "+Hello  friends!"
+        "Hello friends!"
       )
     })
 
-    it("handles diff when replacing all content", async () => {
+    it("handles replacement when replacing all content", async () => {
       noteRealm.note.details = "Short\ntext"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const patch =
-        "--- a\n+++ b\n@@ -1,2 +1,1 @@\n-Short\n-text\n+New content\n"
+      const details = "New content"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch,
+          details,
         })
       )
 
-      // The diff should show the replacement
-      // Markdown is rendered to HTML, so check for the diff content instead
-      expect(wrapper.find(".completion-text").html()).toContain("--- a")
-      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
-      expect(wrapper.find(".completion-text").html()).toContain("+New content")
+      // The details should show the replacement
+      expect(wrapper.find(".completion-text").html()).toContain("New content")
     })
 
     it("accepts the completion suggestion and updates the note", async () => {
@@ -372,10 +367,10 @@ describe("ConversationInner", () => {
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      // The patch adds content with a newline at the end
+      // The details should replace the content
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
-        body: { details: "**bold completion**\n" },
+        body: { details: "**bold completion**" },
       })
 
       // Tool calls are executed inline with Chat Completion API
@@ -417,42 +412,40 @@ describe("ConversationInner", () => {
       expect(wrapper.find(".completion-text").exists()).toBe(false)
     })
 
-    it("handles completion with character deletion", async () => {
+    it("handles completion with replacement", async () => {
       noteRealm.note.details = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const patch =
-        "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-Hello world\n+Hello  friends!\n"
+      const details = "Hello  friends!"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch,
+          details,
         })
       )
 
-      // Check the formatted suggestion shows the diff
-      // Markdown is rendered to HTML, so check for the diff content instead
-      expect(wrapper.find(".completion-text").html()).toContain("--- a")
-      expect(wrapper.find(".completion-text").html()).toContain("+++ b")
+      // Check the formatted suggestion shows the details (markdown renders double spaces as single)
+      expect(wrapper.find(".completion-text").html()).toContain(
+        "Hello friends!"
+      )
       // Accept the suggestion
       await wrapper.find('button[class*="btn-primary"]').trigger("click")
       await flushPromises()
 
-      // Should apply the patch to get "Hello  friends!"
+      // Should replace with "Hello  friends!"
       expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
         path: { note: note.id },
         body: { details: "Hello  friends!" },
       })
     })
 
-    it("handles over-deletion by removing all content", async () => {
+    it("handles replacement by removing all content", async () => {
       noteRealm.note.details = "Hello world"
       storageAccessor.value.refreshNoteRealm(noteRealm)
-      const patch =
-        "--- a\n+++ b\n@@ -1,1 +1,1 @@\n-Hello world\n+Completely new text\n"
+      const details = "Completely new text"
       await submitMessageAndSimulateRunResponse(
         wrapper,
         createToolCallChunk("NoteDetailsCompletion", {
-          patch,
+          details,
         })
       )
 
@@ -491,11 +484,11 @@ describe("ConversationInner", () => {
         const wrapper = mountComponent(conversation)
 
         // Simulate completion suggestion
-        const patch = "--- a\n+++ b\n@@ -0,0 +1 @@\n+test completion\n"
+        const details = "test completion"
         await submitMessageAndSimulateRunResponse(
           wrapper,
           createToolCallChunk("NoteDetailsCompletion", {
-            patch,
+            details,
           })
         )
 

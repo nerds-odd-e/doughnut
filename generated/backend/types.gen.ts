@@ -365,7 +365,7 @@ export type AudioUploadDto = {
 };
 
 export type NoteDetailsCompletion = {
-    patch: string;
+    details: string;
 };
 
 export type TextFromAudioWithCallInfo = {

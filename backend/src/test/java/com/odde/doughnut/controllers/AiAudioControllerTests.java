@@ -46,8 +46,8 @@ class AiAudioControllerTests {
   }
 
   private void setupMocks() {
-    String patch = "--- a\n+++ b\n@@ -0,0 +1 @@\n+test123\n";
-    NoteDetailsCompletion completion = new NoteDetailsCompletion(patch);
+    String details = "test123";
+    NoteDetailsCompletion completion = new NoteDetailsCompletion(details);
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
     openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(completion);
     mockTranscriptionSrtResponse("test transcription");
@@ -95,7 +95,7 @@ class AiAudioControllerTests {
               .audioToText(audioUploadDTO)
               .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
               .orElseThrow();
-      assertEquals("--- a\n+++ b\n@@ -0,0 +1 @@\n+test123\n", result.patch);
+      assertEquals("test123", result.details);
     }
 
     @Test
@@ -105,7 +105,7 @@ class AiAudioControllerTests {
               .audioToText(audioUploadDTO)
               .map(TextFromAudioWithCallInfo::getCompletionFromAudio)
               .orElseThrow();
-      assertThat(resp.patch, equalTo("--- a\n+++ b\n@@ -0,0 +1 @@\n+test123\n"));
+      assertThat(resp.details, equalTo("test123"));
     }
 
     @Test

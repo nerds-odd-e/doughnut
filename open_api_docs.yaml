@@ -4182,10 +4182,10 @@ components:
     NoteDetailsCompletion:
       type: object
       properties:
-        patch:
+        details:
           type: string
       required:
-      - patch
+      - details
     TextFromAudioWithCallInfo:
       type: object
       properties:
