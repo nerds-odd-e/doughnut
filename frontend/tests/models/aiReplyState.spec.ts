@@ -53,7 +53,7 @@ describe("aiReplyState", () => {
                   type: "function",
                   function: {
                     name: "NoteDetailsCompletion",
-                    arguments: '{"completion":',
+                    arguments: '{"patch":',
                   },
                 },
               ],
@@ -75,7 +75,8 @@ describe("aiReplyState", () => {
                 {
                   index: 0,
                   function: {
-                    arguments: '"test content"}',
+                    arguments:
+                      '"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+test content\\n"}',
                   },
                 },
               ],
@@ -102,7 +103,7 @@ describe("aiReplyState", () => {
 
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { completion: "test content" },
+        content: { patch: "--- a\n+++ b\n@@ -0,0 +1 @@\n+test content\n" },
         toolCallId: "call-1",
       })
       // Tool calls are executed inline with Chat Completion API
@@ -179,7 +180,8 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   function: {
                     name: "NoteDetailsCompletion",
-                    arguments: '{"completion":"test"}',
+                    arguments:
+                      '{"patch":"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+test\\n"}',
                   },
                 },
               ],
@@ -279,7 +281,7 @@ describe("aiReplyState", () => {
                   type: "function",
                   function: {
                     name: "NoteDetailsCompletion",
-                    arguments: '{"completion":',
+                    arguments: '{"patch":',
                   },
                 },
               ],
@@ -302,7 +304,8 @@ describe("aiReplyState", () => {
                   index: 0,
                   id: null, // id can be null in subsequent chunks
                   function: {
-                    arguments: '"test content"',
+                    arguments:
+                      '"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+test content\\n"}',
                   },
                 },
               ],
@@ -353,7 +356,7 @@ describe("aiReplyState", () => {
       // Verify the accumulated arguments were parsed correctly
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { completion: "test content" },
+        content: { patch: "--- a\n+++ b\n@@ -0,0 +1 @@\n+test content\n" },
         toolCallId: "call-123",
       })
     })
@@ -375,7 +378,8 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   function: {
                     name: "NoteDetailsCompletion",
-                    arguments: '{"completion":"first"}',
+                    arguments:
+                      '{"patch":"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+first\\n"}',
                   },
                 },
               ],
@@ -428,7 +432,7 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(2)
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { completion: "first" },
+        content: { patch: "--- a\n+++ b\n@@ -0,0 +1 @@\n+first\n" },
         toolCallId: "call-1",
       })
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
@@ -456,7 +460,7 @@ describe("aiReplyState", () => {
                     id: "call-frag",
                     function: {
                       name: "NoteDetailsCompletion",
-                      arguments: '{"completion":',
+                      arguments: '{"patch":',
                     },
                   },
                 ],
@@ -539,7 +543,9 @@ describe("aiReplyState", () => {
       // Verify the complete arguments were parsed correctly
       expect(mockContext.handleSuggestion).toHaveBeenCalledWith({
         suggestionType: "completion",
-        content: { completion: "This is a long completion" },
+        content: {
+          patch: "--- a\n+++ b\n@@ -0,0 +1 @@\n+This is a long completion\n",
+        },
         toolCallId: "call-frag",
       })
     })
@@ -561,7 +567,8 @@ describe("aiReplyState", () => {
                   id: "call-1",
                   function: {
                     name: "NoteDetailsCompletion",
-                    arguments: '{"completion":"first"}',
+                    arguments:
+                      '{"patch":"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+first\\n"}',
                   },
                 },
               ],
@@ -586,7 +593,8 @@ describe("aiReplyState", () => {
                   id: "call-2",
                   function: {
                     name: "NoteDetailsCompletion",
-                    arguments: '{"completion":"second"}',
+                    arguments:
+                      '{"patch":"--- a\\n+++ b\\n@@ -0,0 +1 @@\\n+second\\n"}',
                   },
                 },
               ],
@@ -602,7 +610,7 @@ describe("aiReplyState", () => {
       expect(mockContext.handleSuggestion).toHaveBeenCalledTimes(2)
       expect(mockContext.handleSuggestion).toHaveBeenNthCalledWith(2, {
         suggestionType: "completion",
-        content: { completion: "second" },
+        content: { patch: "--- a\n+++ b\n@@ -0,0 +1 @@\n+second\n" },
         toolCallId: "call-2",
       })
     })

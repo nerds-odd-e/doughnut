@@ -166,12 +166,9 @@ Given(
   }
 )
 
-Then(
-  'I should see the suggested completion {string} in the chat dialog',
-  (completion: string) => {
-    start.assumeConversationAboutNotePage().shouldShowCompletion(completion)
-  }
-)
+Then('I should see the suggested completion in the chat dialog', () => {
+  start.assumeConversationAboutNotePage().shouldShowCompletion()
+})
 
 When('I accept the suggested completion', () => {
   start.assumeConversationAboutNotePage().acceptCompletion()
