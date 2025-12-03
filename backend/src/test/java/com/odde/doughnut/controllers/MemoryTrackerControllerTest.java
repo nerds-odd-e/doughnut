@@ -47,7 +47,7 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       RecallPrompt recallPrompt = controller.getSpellingQuestion(memoryTracker);
       assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.SPELLING));
       assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
-      assertThat(recallPrompt.getAnswerableMCQ(), nullValue());
+      assertThat(recallPrompt.getPredefinedQuestion(), nullValue());
     }
 
     @Test

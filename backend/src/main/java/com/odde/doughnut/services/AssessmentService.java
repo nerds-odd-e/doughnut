@@ -122,7 +122,7 @@ public class AssessmentService {
 
   public AssessmentQuestionInstance answerQuestion(
       AssessmentQuestionInstance assessmentQuestionInstance, AnswerDTO answerDTO) {
-    answerService.createAnswerForQuestion(assessmentQuestionInstance.getAnswerableMCQ(), answerDTO);
+    answerService.createAnswerForQuestion(assessmentQuestionInstance, answerDTO);
     return assessmentQuestionInstance;
   }
 }

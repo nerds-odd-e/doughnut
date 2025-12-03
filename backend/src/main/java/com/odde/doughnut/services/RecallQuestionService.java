@@ -82,26 +82,20 @@ public class RecallQuestionService {
 
   private RecallPrompt createARecallPromptFromQuestion(
       PredefinedQuestion question, MemoryTracker memoryTracker) {
-    AnswerableMCQ answerableMCQ = new AnswerableMCQ();
-    answerableMCQ.setPredefinedQuestion(question);
-    entityPersister.save(answerableMCQ);
-
     RecallPrompt recallPrompt = new RecallPrompt();
-    recallPrompt.setAnswerableMCQ(answerableMCQ);
+    recallPrompt.setPredefinedQuestion(question);
     recallPrompt.setMemoryTracker(memoryTracker);
     recallPrompt.setQuestionType(QuestionType.MCQ);
     return entityPersister.save(recallPrompt);
   }
 
   public QuestionContestResult contest(RecallPrompt recallPrompt) {
-    return predefinedQuestionService.contest(
-        recallPrompt.getAnswerableMCQ().getPredefinedQuestion());
+    return predefinedQuestionService.contest(recallPrompt.getPredefinedQuestion());
   }
 
   public AnsweredQuestion answerQuestion(
       RecallPrompt recallPrompt, AnswerDTO answerDTO, User user, Timestamp currentUTCTimestamp) {
-    Answer answer =
-        answerService.createAnswerForQuestion(recallPrompt.getAnswerableMCQ(), answerDTO);
+    Answer answer = answerService.createAnswerForQuestion(recallPrompt, answerDTO);
     memoryTrackerService.updateMemoryTrackerAfterAnsweringQuestion(
         user, currentUTCTimestamp, answer.getCorrect(), recallPrompt);
     return recallPrompt.getAnsweredQuestion();

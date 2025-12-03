@@ -8,6 +8,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "assessment_question_instance")
@@ -21,28 +23,36 @@ public class AssessmentQuestionInstance extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private AssessmentAttempt assessmentAttempt;
 
-  @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "answerable_mcq_id", referencedColumnName = "id")
+  @ManyToOne
+  @JoinColumn(name = "predefined_question_id", referencedColumnName = "id")
   @NotNull
   @JsonIgnore
-  private AnswerableMCQ answerableMCQ;
+  private PredefinedQuestion predefinedQuestion;
+
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "quiz_answer_id", referencedColumnName = "id")
+  @Getter
+  @Setter
+  @JsonIgnore
+  Answer answer;
 
   @JsonProperty
   public Answer getAnswer() {
-    return answerableMCQ.getAnswer();
+    return answer;
   }
 
   @JsonProperty
   public MultipleChoicesQuestion getMultipleChoicesQuestion() {
-    return answerableMCQ.getMultipleChoicesQuestion();
+    return predefinedQuestion.getMultipleChoicesQuestion();
   }
 
   @JsonIgnore
   public PredefinedQuestion getPredefinedQuestion() {
-    return answerableMCQ.getPredefinedQuestion();
+    return predefinedQuestion;
   }
 
   public Answer buildAnswer(com.odde.doughnut.controllers.dto.AnswerDTO answerDTO) {
-    return answerableMCQ.buildAnswer(answerDTO);
+    this.answer = Answer.buildAnswer(answerDTO, predefinedQuestion, answer);
+    return answer;
   }
 }
