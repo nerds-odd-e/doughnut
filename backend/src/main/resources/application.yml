@@ -127,6 +127,14 @@ spring:
   config:
     activate:
       on-profile: prod
+  logging:
+    level:
+      root: INFO
+      org.springframework: INFO
+      org.springframework.web: INFO
+      com.odde.doughnut: INFO
+      org.hibernate: WARN
+      com.zaxxer.hikari: WARN
   resources:
     cache:
       cachecontrol:
