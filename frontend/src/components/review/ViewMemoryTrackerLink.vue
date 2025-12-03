@@ -1,21 +1,29 @@
 <template>
-  <router-link
-    :to="{
-      name: 'memoryTrackerShow',
-      params: { memoryTrackerId },
-    }"
-    class="daisy-link daisy-link-primary daisy-mt-4 daisy-inline-block"
+  <button
+    @click="navigateToMemoryTracker"
+    class="daisy-btn daisy-btn-primary daisy-mt-4"
   >
     View Memory Tracker
-  </router-link>
+  </button>
 </template>
 
 <script setup lang="ts">
-defineProps({
+import { useRouter } from "vue-router"
+
+const props = defineProps({
   memoryTrackerId: {
     type: Number,
     required: true,
   },
 })
+
+const router = useRouter()
+
+function navigateToMemoryTracker() {
+  router.push({
+    name: "memoryTrackerShow",
+    params: { memoryTrackerId: props.memoryTrackerId },
+  })
+}
 </script>
 

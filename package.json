@@ -27,7 +27,7 @@
     "storybook": "pnpm frontend:storybook",
     "backend:format": "backend/gradlew -p backend spotlessApply || exit 1",
     "backend:lint": "backend/gradlew -p backend lint",
-    "backend:test_only": "backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel",
+    "backend:test_only": "backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache",
     "backend:test": "pnpm backend:format && (backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test || (echo 'Migration failed! 💀' && exit 1)) && pnpm backend:test_only",
     "backend:verify": "pnpm backend:test",
     "backend:generateOpenAPIDocs": "backend/gradlew -p backend generateOpenAPIDocs -Dspring.profiles.active=test --build-cache",
