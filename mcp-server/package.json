@@ -11,7 +11,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
-    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/mcp-server.bundle.mjs --format=esm",
+    "bundle": "pnpm exec esbuild src/index.ts --bundle --platform=node --outfile=./dist/mcp-server.bundle.mjs --format=esm --packages=external --external:@modelcontextprotocol/sdk --external:express --external:express-rate-limit",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "format": "biome check --write src/"

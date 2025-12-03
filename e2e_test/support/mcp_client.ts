@@ -44,16 +44,27 @@ class McpClient {
       'dist',
       'mcp-server.bundle.mjs'
     )
+    const mcpServerNodeModules = path.join(
+      repoRoot,
+      'mcp-server',
+      'node_modules'
+    )
     if (!fs.existsSync(bundlePath)) {
       throw new Error(
         `MCP server bundle not found at ${bundlePath}. Please build it first: \n  CURSOR_DEV=true nix develop -c pnpm mcp-server:bundle`
       )
     }
     // Let the SDK spawn the process: pass command as array ['node', bundlePath]
+    // Set NODE_PATH so external packages (like @modelcontextprotocol/sdk and express) can be resolved
+    const nodePath = process.env.NODE_PATH
+      ? `${process.env.NODE_PATH}:${mcpServerNodeModules}`
+      : mcpServerNodeModules
     this.transport = new StdioClientTransport({
       command: process.execPath,
       args: [bundlePath],
       env: {
+        ...process.env,
+        NODE_PATH: nodePath,
         DOUGHNUT_API_BASE_URL: baseUrl,
         DOUGHNUT_API_AUTH_TOKEN: mcpToken,
       },
