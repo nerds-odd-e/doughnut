@@ -23,13 +23,13 @@ The migration will be done incrementally, maintaining test compatibility at each
   - **Step 3.4**: ✅ **COMPLETED** - Enhanced scoring (depth, recency, jitter)
   - **Step 3.5**: ✅ **COMPLETED** - Update focus note's relationship lists dynamically
 - **Step 4**: ⏳ **NOT STARTED** - Depth 2 implementation (broken down into 8 incremental sub-steps)
-  - **Step 4.1**: ⏳ **NOT STARTED** - Extend DepthQueryService for depth 2
+  - **Step 4.1**: ⏳ **NOT STARTED** - Integrate basic depth 2 traversal (fully e2e verifiable)
   - **Step 4.2**: ⏳ **NOT STARTED** - Add sibling relationship types (PriorSibling, YoungerSibling)
   - **Step 4.3**: ⏳ **NOT STARTED** - Add contextual path relationships
   - **Step 4.4**: ⏳ **NOT STARTED** - Add object of reified child (ObjectOfReifiedChild)
   - **Step 4.5**: ⏳ **NOT STARTED** - Add subject of inbound reference (SubjectOfInboundReference)
   - **Step 4.6**: ⏳ **NOT STARTED** - Add parent siblings (SiblingOfParent, SiblingOfParentOfObject)
-  - **Step 4.7**: ⏳ **NOT STARTED** - Integrate depth 2 traversal into NoteGraphService
+  - **Step 4.7**: ⏳ **NOT STARTED** - Track discovery paths for relationship type derivation
   - **Step 4.8**: ⏳ **NOT STARTED** - Handle additional children/inbound refs from focus note at depth 2
 - **Step 5**: ⏳ **NOT STARTED** - Depth 3 implementation with scoring and selection
 
@@ -69,19 +69,28 @@ All tests passing (791 tests, 24 disabled for depth 2+).
 
 Depth 2 implementation is broken down into incremental, verifiable sub-steps.
 
-### Step 4.1: Extend DepthQueryService for Depth 2 ⏳ NOT STARTED
+### Step 4.1: Integrate Basic Depth 2 Traversal ⏳ NOT STARTED
 
-Extend `DepthQueryService` to query relationships from depth 1 notes:
-- Method: `List<Note> queryDepth2FromSourceNotes(List<Note> sourceNotes)` or similar
-- Fetch all relationships from source notes:
-  - Parents of source notes
-  - Objects of source notes (if reification)
-  - Children of source notes (ordered by `siblingOrder`)
-  - Inbound references of source notes (random via shuffle)
-- Track which source note led to each candidate (for relationship type derivation)
-- Return candidates grouped by relationship type or with source note tracking
+Integrate basic depth 2 traversal into `NoteGraphService`:
+- Extend `DepthQueryService` to query relationships from depth 1 notes:
+  - Method: `List<Note> queryDepth2FromSourceNotes(List<Note> sourceNotes)` or similar
+  - Fetch all relationships from source notes:
+    - Parents of source notes
+    - Objects of source notes (if reification)
+    - Children of source notes (ordered by `siblingOrder`)
+    - Inbound references of source notes (random via shuffle)
+- Integrate into `NoteGraphService.retrieve()`:
+  - After depth 1 processing, collect all depth 1 notes as source notes
+  - Call `DepthQueryService.queryDepth2FromSourceNotes()` for depth 2
+  - Apply per-depth caps for children and inbound references from depth 1 notes
+  - Apply children selection logic (ordered sibling locality) for each parent
+  - Apply inbound reference selection logic (random) for each target
+  - Use basic relationship type derivation (default to `RemotelyRelated` for now, specific types will come in steps 4.2-4.6)
+  - Track discovery paths (simple path tracking: `[Parent, Child]`, `[Child, Parent]`, etc.)
+  - Add depth 2 candidates to global pool with `depthFetched = 2`
+  - Score and select depth 2 candidates along with depth 1 candidates
 
-**Test milestone**: Can fetch depth 2 relationships from depth 1 notes.
+**Test milestone**: Depth 2 notes are discovered and appear in `retrieve()` results. Add test: `shouldDiscoverDepth2NotesFromDepth1SourceNotes` that verifies depth 2 notes (e.g., parent's parent, child's child) appear in related notes when budget allows.
 
 ---
 
@@ -143,20 +152,16 @@ Extend relationship type derivation for parent's siblings:
 
 ---
 
-### Step 4.7: Integrate Depth 2 Traversal into NoteGraphService ⏳ NOT STARTED
+### Step 4.7: Track Discovery Paths for Relationship Type Derivation ⏳ NOT STARTED
 
-Update `NoteGraphService` to process depth 2:
-- After depth 1 processing, get all notes from depth 1 as source notes
-- Call `DepthQueryService` for depth 2
-- Apply per-depth caps for children and inbound references from depth 1 notes
-- Apply children selection logic (ordered sibling locality) for each parent
-- Apply inbound reference selection logic (random) for each target
-- Derive relationship types using extended `RelationshipTypeDerivationService`
-- Track shortest discovery path (if note discovered via multiple paths)
-- Add candidates to global pool
-- Update focus note's relationship lists (siblings, etc.)
+Enhance relationship type derivation with proper discovery path tracking:
+- Track discovery paths as lists of relationship types: `[Parent, Child]`, `[Child, Parent]`, etc.
+- When a note is discovered via multiple paths, keep the shortest path
+- Update `RelationshipTypeDerivationService` to accept discovery path as parameter
+- Use discovery paths to derive relationship types in steps 4.2-4.6
+- Handle path priority: shortest path wins, then prefer higher priority relationship types
 
-**Test milestone**: Depth 2 candidates are discovered and added to the candidate pool.
+**Test milestone**: Discovery paths are correctly tracked and used for relationship type derivation. Verify that notes discovered via multiple paths use the shortest path.
 
 ---
 
@@ -380,13 +385,14 @@ When a note can be reached via multiple paths:
 - All tests passing (791 tests, 24 disabled for depth 2+)
 
 ### Step 4 ⏳ NOT STARTED
-- ⏳ Step 4.1: DepthQueryService extended for depth 2 integrated into NoteGraphServic3
+- ⏳ Step 4.1: Basic depth 2 traversal integrated into NoteGraphService (fully e2e verifiable)
 - ⏳ Step 4.2: Sibling relationship types (PriorSibling, YoungerSibling)
 - ⏳ Step 4.3: Contextual path relationships (AncestorInContextualPath, AncestorInObjectContextualPath)
 - ⏳ Step 4.4: Object of reified child (ObjectOfReifiedChild)
 - ⏳ Step 4.5: Subject of inbound reference (SubjectOfInboundReference)
 - ⏳ Step 4.6: Parent siblings (SiblingOfParent, SiblingOfParentOfObject)
-- ⏳ Step 4.7: Additional children/inbound refs from focus note at depth 2
+- ⏳ Step 4.7: Track discovery paths for relationship type derivation
+- ⏳ Step 4.8: Additional children/inbound refs from focus note at depth 2
 
 ### Step 5 ⏳ NOT STARTED
 - ⏳ Depth 3 relationships fetched correctly
