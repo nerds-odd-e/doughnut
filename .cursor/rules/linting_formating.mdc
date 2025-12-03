@@ -27,16 +27,10 @@ This project uses multiple linting tools to ensure code quality:
 
 ## Running Linting
 
-**For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
+**For command execution details, see the `cloud-agent-setup` rule.**
 
 ### Lint All Code
 
-**Cloud Agent:**
-```bash
-pnpm lint:all
-```
-
-**Local Development:**
 ```bash
 CURSOR_DEV=true nix develop -c pnpm lint:all
 ```
@@ -68,8 +62,9 @@ The OpenAPI specification (`open_api_docs.yaml`) is validated using Redocly CLI.
 1. **DO NOT** edit `open_api_docs.yaml` directly - it is auto-generated
 2. **Fix the issue** in the backend Java controller that generates the problematic endpoint
 3. **Regenerate** the OpenAPI spec:
-   - **Cloud Agent**: `pnpm generateTypeScript`
-   - **Local Development**: `CURSOR_DEV=true nix develop -c pnpm generateTypeScript`
+   ```bash
+   CURSOR_DEV=true nix develop -c pnpm generateTypeScript
+   ```
 4. **Verify** by running `pnpm openapi:lint` again
 
 ### Common OpenAPI Issues
