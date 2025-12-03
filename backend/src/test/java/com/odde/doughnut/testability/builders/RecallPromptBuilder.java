@@ -1,8 +1,11 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.entities.AnswerableMCQ;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.PredefinedQuestion;
+import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -23,14 +26,24 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
       entity = new RecallPrompt();
-      entity.setPredefinedQuestion(predefinedQuestionBuilder.please(needPersist));
+      PredefinedQuestion predefinedQuestion = predefinedQuestionBuilder.please(needPersist);
+      AnswerableMCQ answerableMCQ = new AnswerableMCQ();
+      answerableMCQ.setPredefinedQuestion(predefinedQuestion);
+      if (needPersist) {
+        makeMe.entityPersister.save(answerableMCQ);
+      }
+      entity.setAnswerableMCQ(answerableMCQ);
+      entity.setQuestionType(QuestionType.MCQ);
     }
     if (answerDTO != null) {
-      entity.buildAnswer(answerDTO);
+      entity.getAnswerableMCQ().buildAnswer(answerDTO);
     }
     // Set MemoryTracker if not already set
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
-      Note note = entity.getPredefinedQuestion().getNote();
+      Note note =
+          entity.getAnswerableMCQ() != null
+              ? entity.getAnswerableMCQ().getPredefinedQuestion().getNote()
+              : null;
       if (note != null && note.getCreator() != null) {
         // Find existing memory tracker for this note and user, or create one
         List<MemoryTracker> trackers =

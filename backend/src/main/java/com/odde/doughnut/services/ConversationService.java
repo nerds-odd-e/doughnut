@@ -105,8 +105,12 @@ public class ConversationService {
     }
 
     RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();
-    if (recallPrompt != null) {
-      return recallPrompt.getPredefinedQuestion().getNote().getTopicConstructor();
+    if (recallPrompt != null && recallPrompt.getAnswerableMCQ() != null) {
+      return recallPrompt
+          .getAnswerableMCQ()
+          .getPredefinedQuestion()
+          .getNote()
+          .getTopicConstructor();
     }
 
     return "Unknown Subject";

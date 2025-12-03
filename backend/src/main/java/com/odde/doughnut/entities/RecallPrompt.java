@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -28,27 +29,42 @@ import lombok.EqualsAndHashCode;
   "predefinedQuestion",
   "answer"
 })
-public class RecallPrompt extends AnswerableQuestionInstance {
+public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @ManyToOne
   @JoinColumn(name = "memory_tracker_id", referencedColumnName = "id")
   @NotNull
   @JsonIgnore
   private MemoryTracker memoryTracker;
 
+  @ManyToOne
+  @JoinColumn(name = "answerable_mcq_id", referencedColumnName = "id")
+  @JsonIgnore
+  private AnswerableMCQ answerableMCQ;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "question_type")
+  @NotNull
+  @JsonIgnore
+  private QuestionType questionType;
+
   public Notebook getNotebook() {
-    return getPredefinedQuestion().getNote().getNotebook();
+    if (getAnswerableMCQ() == null) {
+      return null;
+    }
+    return getAnswerableMCQ().getPredefinedQuestion().getNote().getNotebook();
   }
 
   @JsonIgnore
   public AnsweredQuestion getAnsweredQuestion() {
-    if (answer == null) {
+    if (getAnswerableMCQ() == null || getAnswerableMCQ().getAnswer() == null) {
       return null;
     }
 
+    Answer answer = getAnswerableMCQ().getAnswer();
     AnsweredQuestion answerResult = new AnsweredQuestion();
     answerResult.answer = answer;
-    answerResult.note = getPredefinedQuestion().getNote();
-    answerResult.predefinedQuestion = getPredefinedQuestion();
+    answerResult.note = getAnswerableMCQ().getPredefinedQuestion().getNote();
+    answerResult.predefinedQuestion = getAnswerableMCQ().getPredefinedQuestion();
     answerResult.answerDisplay = answer.getAnswerDisplay(this.getMultipleChoicesQuestion());
     answerResult.recallPromptId = id;
     answerResult.memoryTrackerId = memoryTracker.getId();
@@ -57,50 +73,77 @@ public class RecallPrompt extends AnswerableQuestionInstance {
 
   @JsonIgnore
   public String getQuestionDetails() {
+    if (getAnswerableMCQ() == null) {
+      return "{}";
+    }
     ObjectMapper mapper = new ObjectMapperConfig().objectMapper();
     ObjectNode questionDetails = mapper.createObjectNode();
-    MCQWithAnswer mcqWithAnswer = getPredefinedQuestion().getMcqWithAnswer();
+    MCQWithAnswer mcqWithAnswer = getAnswerableMCQ().getPredefinedQuestion().getMcqWithAnswer();
     questionDetails.set(
         "originalQuestionDefinition", mapper.convertValue(mcqWithAnswer, ObjectNode.class));
-    if (getAnswer() != null) {
-      questionDetails.put("userAnswer", getAnswer().getChoiceIndex());
-      questionDetails.put(
-          "userAnswerWasMarkedAs", getAnswer().getCorrect() ? "correct" : "incorrect");
+    if (getAnswerableMCQ().getAnswer() != null) {
+      Answer answer = getAnswerableMCQ().getAnswer();
+      questionDetails.put("userAnswer", answer.getChoiceIndex());
+      questionDetails.put("userAnswerWasMarkedAs", answer.getCorrect() ? "correct" : "incorrect");
     }
     return questionDetails.toPrettyString();
   }
 
   @JsonProperty
   public Timestamp getAnswerTime() {
-    Answer answer = getAnswer();
-    if (answer != null) {
-      return answer.getCreatedAt();
+    if (getAnswerableMCQ() != null && getAnswerableMCQ().getAnswer() != null) {
+      return getAnswerableMCQ().getAnswer().getCreatedAt();
     }
     return null;
   }
 
   @JsonProperty
   public Note getNote() {
-    return super.getPredefinedQuestion().getNote();
+    if (getAnswerableMCQ() == null) {
+      return null;
+    }
+    return getAnswerableMCQ().getPredefinedQuestion().getNote();
   }
 
   @JsonProperty("predefinedQuestion")
   public PredefinedQuestion getPredefinedQuestionExposed() {
-    return super.getPredefinedQuestion();
+    if (getAnswerableMCQ() == null) {
+      return null;
+    }
+    return getAnswerableMCQ().getPredefinedQuestion();
   }
 
   @JsonProperty("answer")
   public Answer getAnswerExposed() {
-    return super.getAnswer();
+    return getAnswerableMCQ() != null ? getAnswerableMCQ().getAnswer() : null;
   }
 
   @JsonProperty
   public Timestamp getQuestionGeneratedTime() {
-    return super.getPredefinedQuestion().getCreatedAt();
+    if (getAnswerableMCQ() == null) {
+      return null;
+    }
+    return getAnswerableMCQ().getPredefinedQuestion().getCreatedAt();
   }
 
   @JsonProperty
   public Boolean getIsContested() {
-    return super.getPredefinedQuestion().isContested();
+    if (getAnswerableMCQ() == null) {
+      return null;
+    }
+    return getAnswerableMCQ().getPredefinedQuestion().isContested();
+  }
+
+  @JsonProperty
+  public MultipleChoicesQuestion getMultipleChoicesQuestion() {
+    if (getAnswerableMCQ() == null) {
+      return null;
+    }
+    return getAnswerableMCQ().getMultipleChoicesQuestion();
+  }
+
+  @JsonIgnore
+  public PredefinedQuestion getPredefinedQuestion() {
+    return getAnswerableMCQ() != null ? getAnswerableMCQ().getPredefinedQuestion() : null;
   }
 }

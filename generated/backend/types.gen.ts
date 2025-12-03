@@ -178,7 +178,7 @@ export type Answer = {
 
 export type RecallPrompt = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: Note;
     questionGeneratedTime?: string;
@@ -319,7 +319,7 @@ export type SseEmitter = {
 
 export type AssessmentQuestionInstance = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     answer?: Answer;
 };
 
@@ -629,7 +629,7 @@ export type SubscriptionWritable = {
 
 export type RecallPromptWritable = {
     id: number;
-    multipleChoicesQuestion: MultipleChoicesQuestion;
+    multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: NoteWritable;
     questionGeneratedTime?: string;

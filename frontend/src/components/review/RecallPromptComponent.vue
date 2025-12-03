@@ -1,6 +1,7 @@
 <template>
   <div class="daisy-relative">
     <QuestionDisplay
+      v-if="recallPrompt.multipleChoicesQuestion"
       v-bind="{
         multipleChoicesQuestion: recallPrompt.multipleChoicesQuestion,
       }"

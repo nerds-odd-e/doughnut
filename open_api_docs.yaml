@@ -3802,7 +3802,6 @@ components:
           $ref: "#/components/schemas/Answer"
       required:
       - id
-      - multipleChoicesQuestion
     AnswerDTO:
       type: object
       properties:
@@ -4093,7 +4092,6 @@ components:
           $ref: "#/components/schemas/Answer"
       required:
       - id
-      - multipleChoicesQuestion
     Conversation:
       type: object
       properties:

@@ -49,7 +49,7 @@ describe("assessment page", () => {
         .render()
 
       await screen.findByText(
-        assessmentQuestionInstance.multipleChoicesQuestion.f0__stem!
+        assessmentQuestionInstance.multipleChoicesQuestion?.f0__stem!
       )
     })
 

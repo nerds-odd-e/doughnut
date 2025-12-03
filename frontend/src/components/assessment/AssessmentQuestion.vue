@@ -1,5 +1,6 @@
 <template>
   <QuestionDisplay
+    v-if="localAssessmentQuestionInstance.multipleChoicesQuestion"
     v-bind="{
       multipleChoicesQuestion: localAssessmentQuestionInstance.multipleChoicesQuestion,
       answer: localAssessmentQuestionInstance.answer,
