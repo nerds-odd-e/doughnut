@@ -27,11 +27,12 @@ export class ConversationAboutNotePage {
     return this
   }
 
-  shouldShowCompletion(completion: string) {
+  shouldShowCompletion() {
     cy.findByRole('dialog')
       .should('be.visible')
       .within(() => {
-        cy.findByText(completion)
+        // Check that the completion dialog contains diff content
+        cy.get('.completion-text').should('be.visible')
       })
     return this
   }

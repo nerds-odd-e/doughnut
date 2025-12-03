@@ -116,12 +116,13 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
     return new InstructionAndSchema(
         """
             You convert SRT-format audio transcriptions into coherent paragraphs with proper punctuation, formatted in Markdown. Guidelines:
-              •	Output only function calls to append the processed text to existing note details, adding necessary whitespace or a new line at the beginning.
+              •	Output only function calls with a unified diff showing how to append the processed text to existing note details, adding necessary whitespace or a new line at the beginning.
               •	Do not translate the text unless requested.
               • Do not interpret the text. Do not use reported speech.
               •	Leave unclear parts unchanged.
               •	Do not add any information not present in the transcription.
               •	The transcription may be truncated; do not add new lines or whitespace at the end.
+              •	Provide the diff in unified diff format (text format) with lines prefixed by '-' for deletions, '+' for additions, and ' ' (space) for context.
 
              Here's the new transcription from audio:
              ------------

@@ -68,15 +68,15 @@ const suggestionContentClass = computed(() => {
 })
 
 const formatCompletionSuggestion = (completion: NoteDetailsCompletion) => {
-  const currentDetails = props.note?.details?.trim() || ""
-  if (!currentDetails) return completion.completion
+  if (!completion.patch) return ""
 
-  if (!completion.deleteFromEnd) return `...${completion.completion}`
+  // Display the patch in a readable format
+  // Escape markdown special characters in the patch for display
+  const escapedPatch = completion.patch
+    .replace(/\n/g, "\n")
+    .replace(/```/g, "\\`\\`\\`")
 
-  const textToDelete =
-    currentDetails.slice(-completion.deleteFromEnd) || currentDetails
-  const strikeThroughText = textToDelete.replace(/ /g, "·").replace(/\n/g, "↵")
-  return `~~${strikeThroughText}~~${completion.completion}`
+  return `\`\`\`diff\n${escapedPatch}\n\`\`\``
 }
 
 const formattedContent = computed(() => {
