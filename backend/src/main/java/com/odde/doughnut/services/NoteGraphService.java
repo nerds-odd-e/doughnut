@@ -126,19 +126,11 @@ public class NoteGraphService {
       RelationshipToFocusNote depth1Relationship = depth1NoteToRelationship.get(depth1Note);
 
       // Step 4.1: Process parent of depth 1 note
-      if (depth1Note.getParent() != null && !depthFetched.containsKey(depth1Note.getParent())) {
-        Note parentNote = depth1Note.getParent();
-        depthFetched.put(parentNote, 2);
-        List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
-        discoveryPath.add(depth1Relationship);
-        discoveryPath.add(RelationshipToFocusNote.Parent);
-        RelationshipToFocusNote relationship =
-            relationshipTypeDerivationService.deriveRelationshipType(
-                parentNote, focusNote, discoveryPath);
-        if (relationship != null) {
-          candidates.add(new CandidateNote(parentNote, relationship, 2, discoveryPath));
-        }
-      }
+      // Step 4.3: Process parent chain recursively for contextual paths
+      List<RelationshipToFocusNote> pathPrefix = new ArrayList<>();
+      pathPrefix.add(depth1Relationship);
+      processParentChainForContextualPath(
+          depth1Note, pathPrefix, focusNote, depthFetched, candidates, 2);
 
       // Step 4.1: Process object of depth 1 note (if reification)
       if (depth1Note.getTargetNote() != null
@@ -153,6 +145,11 @@ public class NoteGraphService {
                 objectNote, focusNote, discoveryPath);
         if (relationship != null) {
           candidates.add(new CandidateNote(objectNote, relationship, 2, discoveryPath));
+          // Step 4.3: Process object's parent chain recursively for contextual paths
+          List<RelationshipToFocusNote> objectPathPrefix = new ArrayList<>();
+          objectPathPrefix.add(RelationshipToFocusNote.Object);
+          processParentChainForContextualPath(
+              objectNote, objectPathPrefix, focusNote, depthFetched, candidates, 2);
         }
       }
 
@@ -294,5 +291,35 @@ public class NoteGraphService {
   private int calculateInboundCap(Note target, int currentDepth, Map<Note, Integer> depthFetched) {
     int targetDepthFetched = depthFetched.getOrDefault(target, currentDepth);
     return 2 * (currentDepth - targetDepthFetched); // INBOUND_CAP_MULTIPLIER = 2
+  }
+
+  // Step 4.3: Process parent chain recursively for contextual paths
+  private void processParentChainForContextualPath(
+      Note currentNote,
+      List<RelationshipToFocusNote> pathPrefix,
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      List<CandidateNote> candidates,
+      int depth) {
+    Note parentNote = currentNote.getParent();
+    if (parentNote == null || depthFetched.containsKey(parentNote)) {
+      return;
+    }
+
+    depthFetched.put(parentNote, depth);
+    List<RelationshipToFocusNote> discoveryPath = new ArrayList<>(pathPrefix);
+    discoveryPath.add(RelationshipToFocusNote.Parent);
+    RelationshipToFocusNote relationship =
+        relationshipTypeDerivationService.deriveRelationshipType(
+            parentNote, focusNote, discoveryPath);
+    if (relationship != null) {
+      candidates.add(new CandidateNote(parentNote, relationship, depth, discoveryPath));
+      // Continue processing parent chain if this is a contextual path ancestor
+      if (relationship == RelationshipToFocusNote.AncestorInContextualPath
+          || relationship == RelationshipToFocusNote.AncestorInObjectContextualPath) {
+        processParentChainForContextualPath(
+            parentNote, discoveryPath, focusNote, depthFetched, candidates, depth);
+      }
+    }
   }
 }

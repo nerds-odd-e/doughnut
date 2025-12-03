@@ -201,7 +201,6 @@ public class NoteGraphServiceTest {
       }
 
       @Test
-      @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
       void shouldIncludeObjectContextualPathInRelatedNotes() {
         GraphRAGResult result = noteGraphService.retrieve(note, 1000);
 
@@ -433,7 +432,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludeNonParentAncestorsInRelatedNotes() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 

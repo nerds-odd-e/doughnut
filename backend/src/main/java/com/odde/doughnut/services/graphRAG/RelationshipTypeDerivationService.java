@@ -38,14 +38,33 @@ public class RelationshipTypeDerivationService {
    */
   public RelationshipToFocusNote deriveRelationshipType(
       Note note, Note focusNote, List<RelationshipToFocusNote> discoveryPath) {
-    if (discoveryPath == null || discoveryPath.size() != 2) {
+    if (discoveryPath == null || discoveryPath.isEmpty()) {
       return RelationshipToFocusNote.RemotelyRelated;
+    }
+
+    // Step 4.3: Detect contextual path ancestors
+    // [Parent, Parent, ...] → AncestorInContextualPath (non-parent ancestors)
+    if (discoveryPath.get(0) == RelationshipToFocusNote.Parent
+        && discoveryPath.size() >= 2
+        && allAreParent(discoveryPath.subList(1, discoveryPath.size()))) {
+      // This is an ancestor in the contextual path (not the direct parent)
+      return RelationshipToFocusNote.AncestorInContextualPath;
+    }
+
+    // Step 4.3: Detect object contextual path ancestors
+    // [Object, Parent, ...] → AncestorInObjectContextualPath (object's ancestors)
+    if (discoveryPath.get(0) == RelationshipToFocusNote.Object
+        && discoveryPath.size() >= 2
+        && allAreParent(discoveryPath.subList(1, discoveryPath.size()))) {
+      // This is an ancestor in the object's contextual path
+      return RelationshipToFocusNote.AncestorInObjectContextualPath;
     }
 
     // Step 4.2: Detect siblings via path [Parent, Child]
     // When we go from focus note to parent, then to a child of the parent,
     // that child is a sibling of the focus note if they share the same parent
-    if (discoveryPath.get(0) == RelationshipToFocusNote.Parent
+    if (discoveryPath.size() == 2
+        && discoveryPath.get(0) == RelationshipToFocusNote.Parent
         && discoveryPath.get(1) == RelationshipToFocusNote.Child) {
       // Check if the note is a sibling of the focus note (same parent)
       if (note.getParent() != null
@@ -64,7 +83,17 @@ public class RelationshipTypeDerivationService {
     }
 
     // For step 4.1, default to RemotelyRelated - other specific types will be added in later steps
-    // (steps 4.3-4.6 will add specific relationship type derivation based on discovery path)
+    // (steps 4.4-4.6 will add specific relationship type derivation based on discovery path)
     return RelationshipToFocusNote.RemotelyRelated;
+  }
+
+  /**
+   * Checks if all elements in the list are Parent relationship type.
+   *
+   * @param path The path segment to check
+   * @return true if all elements are Parent, false otherwise
+   */
+  private boolean allAreParent(List<RelationshipToFocusNote> path) {
+    return path.stream().allMatch(r -> r == RelationshipToFocusNote.Parent);
   }
 }
