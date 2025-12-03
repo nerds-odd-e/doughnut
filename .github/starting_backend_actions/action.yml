@@ -29,7 +29,7 @@ runs:
   using: "composite"
   steps:
     - name: Set up JDK
-      uses: actions/setup-java@v4
+      uses: actions/setup-java@v5
       with:
         java-version: ${{ inputs.java_version }}
         distribution: "zulu"
@@ -45,7 +45,7 @@ runs:
         mysql -uroot -e "FLUSH PRIVILEGES"
       shell: bash
     - name: Setup pnpm & install deps
-      uses: pnpm/action-setup@v3
+      uses: pnpm/action-setup@v4
       with:
         version: ${{ inputs.pnpm_version }}
         run_install: |
