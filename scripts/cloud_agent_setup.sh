@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 #
 # Setup script for Cursor Cloud Agent environment
-# This script installs Java 24 and MySQL for running backend unit tests
+# This script installs Java 25 and MySQL for running backend unit tests
 # without relying on Nix
 
 set -e
 
 echo "==> Setting up Cursor Cloud Agent environment..."
 
-# Install Java 24 if not already installed
-if [ ! -d "/tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64" ]; then
-    echo "==> Installing Java 24..."
-    mkdir -p /tmp/java24
-    cd /tmp/java24
-    wget -q https://cdn.azul.com/zulu/bin/zulu24.32.13-ca-jdk24.0.2-linux_x64.tar.gz
-    tar -xzf zulu24.32.13-ca-jdk24.0.2-linux_x64.tar.gz
-    rm zulu24.32.13-ca-jdk24.0.2-linux_x64.tar.gz
-    echo "==> Java 24 installed to /tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64"
+# Install Java 25 if not already installed
+if [ ! -d "/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64" ]; then
+    echo "==> Installing Java 25..."
+    mkdir -p /tmp/java25
+    cd /tmp/java25
+    wget -q https://cdn.azul.com/zulu/bin/zulu25.30.17-ca-jdk25.0.1-linux_x64.tar.gz
+    tar -xzf zulu25.30.17-ca-jdk25.0.1-linux_x64.tar.gz
+    rm zulu25.30.17-ca-jdk25.0.1-linux_x64.tar.gz
+    echo "==> Java 25 installed to /tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64"
 else
-    echo "==> Java 24 already installed"
+    echo "==> Java 25 already installed"
 fi
 
 # Set up Java environment
-export JAVA_HOME=/tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64
+export JAVA_HOME=/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64
 export PATH=$JAVA_HOME/bin:$PATH
 
 # Verify Java installation
