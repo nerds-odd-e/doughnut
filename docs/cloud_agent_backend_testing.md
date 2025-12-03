@@ -2,12 +2,12 @@
 
 ## Overview
 
-This document explains how to run backend unit tests in Cursor's cloud agent environment where Nix is not available. The local development environment uses Nix to manage dependencies (including Java 24 and MySQL), but the cloud agent requires a different approach.
+This document explains how to run backend unit tests in Cursor's cloud agent environment where Nix is not available. The local development environment uses Nix to manage dependencies (including Java 25 and MySQL), but the cloud agent requires a different approach.
 
 ## Problem
 
 The Doughnut project has these requirements:
-- **Java 24**: The backend requires Java 24 (specified in `build.gradle`)
+- **Java 25**: The backend requires Java 25 (specified in `build.gradle`)
 - **MySQL**: Backend tests use real database interactions with MySQL
 - **Local Environment**: Uses Nix (`flake.nix`) to manage these dependencies
 - **Cloud Environment**: Cursor's cloud agent VMs don't have Nix installed
@@ -15,7 +15,7 @@ The Doughnut project has these requirements:
 ## Solution
 
 A setup script (`scripts/cloud_agent_setup.sh`) that:
-1. Downloads and installs Azul Zulu Java 24
+1. Downloads and installs Azul Zulu Java 25
 2. Downloads and sets up MySQL 8.4 server
 3. Initializes test databases
 4. Exports necessary environment variables
@@ -42,9 +42,9 @@ source /workspace/scripts/cloud_agent_setup.sh
 
 The script performs these steps:
 
-1. **Installs Java 24** (if not already installed)
-   - Downloads Azul Zulu JDK 24.0.2 for Linux x64
-   - Extracts to `/tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64`
+1. **Installs Java 25** (if not already installed)
+   - Downloads Azul Zulu JDK 25.0.1 for Linux x64
+   - Extracts to `/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64`
    - Sets `JAVA_HOME` and updates `PATH`
 
 2. **Installs MySQL 8.4** (if not already installed)
@@ -65,7 +65,7 @@ The script performs these steps:
 
 5. **Exports Environment Variables**
    ```bash
-   JAVA_HOME=/tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64
+   JAVA_HOME=/tmp/java25/zulu25.30.17-ca-jdk25.0.1-linux_x64
    MYSQL_HOME=/tmp/mysql-8.4.3-linux-glibc2.28-x86_64
    SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/doughnut_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
    SPRING_DATASOURCE_USERNAME=doughnut
@@ -75,7 +75,7 @@ The script performs these steps:
 ### Idempotent Design
 
 The setup script is designed to be idempotent - you can run it multiple times safely:
-- Checks if Java 24 is already installed before downloading
+- Checks if Java 25 is already installed before downloading
 - Checks if MySQL is already downloaded before extracting
 - Checks if MySQL data directory exists before initializing
 - Checks if MySQL server is running before starting
@@ -100,7 +100,7 @@ The backend has two types of tests:
 | Aspect | Local Development | Cloud Agent |
 |--------|------------------|-------------|
 | Environment Manager | Nix (`nix develop`) | Manual setup script |
-| Java Installation | `zulu24` from nixpkgs | Downloaded from Azul CDN |
+| Java Installation | `zulu25` from nixpkgs | Downloaded from Azul CDN |
 | MySQL Installation | `mysql84` from nixpkgs | Downloaded from MySQL CDN |
 | MySQL Port | 3309 | 3306 |
 | Command Prefix | `CURSOR_DEV=true nix develop -c` | Direct execution |
@@ -110,12 +110,12 @@ The backend has two types of tests:
 
 ### Java Version Mismatch
 
-If you see "invalid source release: 24":
+If you see "invalid source release: 25":
 ```bash
 # Check Java version
 java -version
 
-# Should show "openjdk version "24.0.2""
+# Should show "openjdk version "25.0.1""
 # If not, re-source the setup script
 source /workspace/scripts/cloud_agent_setup.sh
 ```
@@ -162,7 +162,7 @@ whoami  # Should show "ubuntu" or similar non-root user
 
 ### Key Technologies
 
-- **Azul Zulu JDK 24**: Chosen for compatibility and reliability
+- **Azul Zulu JDK 25**: Chosen for compatibility and reliability
 - **MySQL 8.4 Community**: Latest stable version with good performance
 - **Gradle**: Uses project's wrapper (ensures consistent Gradle version)
 - **Spring Boot Test**: Integration test framework with real database

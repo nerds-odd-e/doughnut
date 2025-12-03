@@ -5,9 +5,9 @@ Launch your IntelliJ IDE from your host OS.
 ## Setup IntelliJ IDEA SDK with appropriate JDK version defined in `backend` project
 
 - Locate your `nix develop` installed JDK path location from the header printout on entering `nix develop` ($JAVA_HOME is printed to stdout on entering `nix develop`).
-  - e.g. On macOS this could look like `/nix/store/s2an4vnhl2f3i9rgf8yh0kj7l1n94pls-zulu-ca-jdk-24.0.0/Library/Java/JavaVirtualMachines/zulu-24.jdk/Contents/Home`.
+  - e.g. On macOS this could look like `/nix/store/l4b6n5yhxcs3ys5s7kia7ch23dp8zyzq-zulu-ca-jdk-25.0.0/Library/Java/JavaVirtualMachines/zulu-25.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/s2an4vnhl2f3i9rgf8yh0kj7l1n94pls-zulu-ca-jdk-24.0.0/Library/Java/JavaVirtualMachines/zulu-24.jdk/Contents/Home`).
+  - Enter the full path of above (e.g. `/nix/store/l4b6n5yhxcs3ys5s7kia7ch23dp8zyzq-zulu-ca-jdk-25.0.0/Library/Java/JavaVirtualMachines/zulu-25.jdk/Contents/Home`).
     ![Sample `nix develop` JAVA_HOME](./images/01_doughnut_nix_develop_JAVA_HOME.png "Sample nix develop JAVA_HOME")
   - Ensure JDK level is set to appropriate JDK version defined in your backend project's `build.gradle` file.
     ![Project Structure -> Project SDK -> Language Level](./images/jdk_language_level.png "Language Level Setting")

@@ -1,7 +1,7 @@
 # Technology Stack
 
 - [Determinate Nix](https://determinate.systems/nix/)
-- [Azul Zulu OpenJDK 24](https://docs.azul.com/core/release/24-ga/release-notes)
+- [Azul Zulu OpenJDK 25](https://docs.azul.com/core/release/25-ga/release-notes)
 - [Spring Boot](https://spring.io/guides)
 - [Flyway](https://flywaydb.org)
 - [Gradle](https://gradle.org/)
