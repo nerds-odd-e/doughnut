@@ -1,70 +1,74 @@
 <template>
-  <GlobalBar
-    v-if="isProgressBarVisible"
-    :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''"
-  >
-    <RecallProgressBar
-      v-bind="{
-        finished,
-        toRepeatCount,
-        previousAnsweredQuestionCursor,
-        canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
-        currentIndex,
-      }"
-      @view-last-answered-question="viewLastAnsweredQuestion($event)"
-      @show-more="showTooltip = true"
-      @move-to-end="moveMemoryTrackerToEnd($event)"
+  <div class="recall-page-container">
+    <GlobalBar
+      v-if="isProgressBarVisible"
+      :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''"
     >
-    </RecallProgressBar>
-  </GlobalBar>
+      <RecallProgressBar
+        v-bind="{
+          finished,
+          toRepeatCount,
+          previousAnsweredQuestionCursor,
+          canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
+          currentIndex,
+        }"
+        @view-last-answered-question="viewLastAnsweredQuestion($event)"
+        @show-more="showTooltip = true"
+        @move-to-end="moveMemoryTrackerToEnd($event)"
+      >
+      </RecallProgressBar>
+    </GlobalBar>
 
-  <div
-    v-if="showTooltip"
-    class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
-    @click="showTooltip = false"
-  >
-    <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
-      <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-      <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+    <div
+      v-if="showTooltip"
+      class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
+      @click="showTooltip = false"
+    >
+      <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
+        <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+        <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+      </div>
+    </div>
+
+    <div class="recall-content-container">
+    <template v-if="toRepeat != undefined">
+      <Quiz
+        v-if="toRepeatCount !== 0"
+        v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
+        :memory-trackers="toRepeat"
+        :current-index="currentIndex"
+        :eager-fetch-count="eagerFetchCount ?? 5"
+        @answered-question="onAnsweredQuestion"
+        @answered-spelling="onAnsweredSpelling"
+        @just-reviewed="onJustReviewed"
+      />
+      <AnsweredQuestionComponent
+        v-if="currentAnsweredQuestion"
+        v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true }"
+      />
+      <AnsweredSpellingQuestion
+        v-if="currentAnsweredSpelling"
+        v-bind="{ result: currentAnsweredSpelling }"
+      />
+      <template v-else-if="toRepeatCount === 0">
+        <div class="daisy-alert daisy-alert-success">
+          You have finished all repetitions for this half a day!
+        </div>
+        <div>
+          <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(3)">
+            Load more from next 3 days
+          </button>
+          <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(7)">
+            Load more from next 7 days
+          </button>
+          <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(14)">
+            Load more from next 14 days
+          </button>
+        </div>
+      </template>
+    </template>
     </div>
   </div>
-
-  <template v-if="toRepeat != undefined">
-    <Quiz
-      v-if="toRepeatCount !== 0"
-      v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
-      :memory-trackers="toRepeat"
-      :current-index="currentIndex"
-      :eager-fetch-count="eagerFetchCount ?? 5"
-      @answered-question="onAnsweredQuestion"
-      @answered-spelling="onAnsweredSpelling"
-      @just-reviewed="onJustReviewed"
-    />
-    <AnsweredQuestionComponent
-      v-if="currentAnsweredQuestion"
-      v-bind="{ answeredQuestion: currentAnsweredQuestion, conversationButton: true }"
-    />
-    <AnsweredSpellingQuestion
-      v-if="currentAnsweredSpelling"
-      v-bind="{ result: currentAnsweredSpelling }"
-    />
-    <template v-else-if="toRepeatCount === 0">
-      <div class="daisy-alert daisy-alert-success">
-        You have finished all repetitions for this half a day!
-      </div>
-      <div>
-        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(3)">
-          Load more from next 3 days
-        </button>
-        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(7)">
-          Load more from next 7 days
-        </button>
-        <button role="button" class="daisy-btn daisy-btn-secondary" @click="loadMore(14)">
-          Load more from next 14 days
-        </button>
-      </div>
-    </template>
-  </template>
 </template>
 
 <script setup lang="ts">
@@ -231,7 +235,22 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+.recall-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
 .repeat-paused {
   background-color: rgba(50, 150, 50, 0.8);
+}
+
+.recall-content-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
 }
 </style>

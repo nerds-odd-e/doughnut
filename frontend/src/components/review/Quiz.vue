@@ -205,3 +205,19 @@ onMounted(() => {
   fetchQuestion()
 })
 </script>
+
+<style lang="scss" scoped>
+.content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+</style>

@@ -1,24 +1,29 @@
 <template>
-  <div class="quiz-instruction daisy-relative" data-test="question-section">
+  <div class="spelling-question-container" data-test="question-section">
     <ContentLoader v-if="loading" />
     <template v-else>
-      <div v-if="spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
-        <NotebookLink :notebook="spellingQuestion.notebook" />
+      <div class="spelling-prompt-container">
+        <div v-if="spellingQuestion?.notebook" class="notebook-source daisy-mb-4">
+          <NotebookLink :notebook="spellingQuestion.notebook" />
+        </div>
+        <QuestionStem :stem="spellingQuestion?.stem" />
       </div>
-      <QuestionStem :stem="spellingQuestion?.stem" />
-      <form @submit.prevent="submitAnswer">
-        <TextInput
-          scope-name="memory_tracker"
-          field="answer"
-          v-model="spellingAnswer"
-          placeholder="put your answer here"
-          v-focus
-        />
-        <input
-          type="submit"
-          value="Answer"
-          class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-w-full"
-        />
+      <form class="spelling-form" @submit.prevent="submitAnswer">
+        <div class="daisy-join daisy-w-full">
+          <TextInput
+            scope-name="memory_tracker"
+            field="answer"
+            v-model="spellingAnswer"
+            placeholder="put your answer here"
+            v-focus
+            class="daisy-join-item daisy-flex-1"
+          />
+          <input
+            type="submit"
+            value="Answer"
+            class="daisy-btn daisy-btn-primary daisy-btn-lg daisy-join-item"
+          />
+        </div>
       </form>
     </template>
   </div>
@@ -70,3 +75,27 @@ onMounted(() => {
   start()
 })
 </script>
+
+<style lang="scss" scoped>
+.spelling-question-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.spelling-prompt-container {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0;
+  padding-bottom: 1rem;
+}
+
+.spelling-form {
+  flex-shrink: 0;
+  padding: 1rem;
+  background: hsl(var(--b1));
+  border-top: 1px solid hsl(var(--bc) / 0.2);
+}
+</style>
