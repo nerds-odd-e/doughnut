@@ -49,8 +49,8 @@ class RecallPromptController {
     authorizationService.assertLoggedIn();
     return recallQuestionService.regenerateAQuestion(
         contestResult,
-        recallPrompt.getAnswerableMCQ().getPredefinedQuestion().getNote(),
-        recallPrompt.getAnswerableMCQ().getPredefinedQuestion().getMcqWithAnswer(),
+        recallPrompt.getPredefinedQuestion().getNote(),
+        recallPrompt.getPredefinedQuestion().getMcqWithAnswer(),
         recallPrompt);
   }
 

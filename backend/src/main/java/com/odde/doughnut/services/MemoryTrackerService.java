@@ -95,8 +95,7 @@ public class MemoryTrackerService {
   public void updateMemoryTrackerAfterAnsweringQuestion(
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     List<MemoryTracker> memoryTrackers =
-        userService.getMemoryTrackersFor(
-            user, recallPrompt.getAnswerableMCQ().getPredefinedQuestion().getNote());
+        userService.getMemoryTrackersFor(user, recallPrompt.getPredefinedQuestion().getNote());
     memoryTrackers.stream()
         .filter(
             tracker -> {

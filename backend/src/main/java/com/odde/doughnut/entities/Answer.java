@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.dto.AnswerDTO;
+import com.odde.doughnut.exceptions.QuestionAnswerException;
 import com.odde.doughnut.services.ai.MultipleChoicesQuestion;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -35,5 +37,17 @@ public class Answer extends EntityIdentifiedByIdOnly {
       return bareQuestion.getF1__choices().get(getChoiceIndex());
     }
     return "";
+  }
+
+  public static Answer buildAnswer(
+      AnswerDTO answerDTO, PredefinedQuestion predefinedQuestion, Answer existingAnswer) {
+    if (existingAnswer != null) {
+      throw new QuestionAnswerException("The question is already answered");
+    }
+    Answer answer = new Answer();
+    answer.choiceIndex = answerDTO.getChoiceIndex();
+    answer.setCorrect(predefinedQuestion.checkAnswer(answerDTO));
+    answer.setThinkingTimeMs(answerDTO.getThinkingTimeMs());
+    return answer;
   }
 }

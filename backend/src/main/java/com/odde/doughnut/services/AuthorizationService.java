@@ -90,9 +90,8 @@ public class AuthorizationService {
 
   private void assertReadAuthorizationRecallPrompt(User user, RecallPrompt object)
       throws UnexpectedNoAccessRightException {
-    if (object.getAnswerableMCQ() != null) {
-      assertReadAuthorizationPredefinedQuestion(
-          user, object.getAnswerableMCQ().getPredefinedQuestion());
+    if (object.getPredefinedQuestion() != null) {
+      assertReadAuthorizationPredefinedQuestion(user, object.getPredefinedQuestion());
     }
   }
 

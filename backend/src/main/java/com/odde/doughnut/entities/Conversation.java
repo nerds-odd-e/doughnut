@@ -66,13 +66,13 @@ public class Conversation extends EntityIdentifiedByIdOnly {
     }
 
     RecallPrompt recallPrompt = subject.getRecallPrompt();
-    if (recallPrompt != null && recallPrompt.getAnswerableMCQ() != null) {
-      return recallPrompt.getAnswerableMCQ().getPredefinedQuestion().getNote();
+    if (recallPrompt != null && recallPrompt.getPredefinedQuestion() != null) {
+      return recallPrompt.getPredefinedQuestion().getNote();
     }
 
     AssessmentQuestionInstance assessmentQuestionInstance = subject.getAssessmentQuestionInstance();
     if (assessmentQuestionInstance != null) {
-      return assessmentQuestionInstance.getAnswerableMCQ().getPredefinedQuestion().getNote();
+      return assessmentQuestionInstance.getPredefinedQuestion().getNote();
     }
 
     return null;

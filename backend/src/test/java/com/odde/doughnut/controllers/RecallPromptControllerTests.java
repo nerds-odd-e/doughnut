@@ -404,7 +404,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       contestedQuestion.setContested(true);
       makeMe.entityPersister.save(contestedQuestion);
       RecallPrompt existingPrompt = makeMe.aRecallPrompt().please();
-      existingPrompt.getAnswerableMCQ().setPredefinedQuestion(contestedQuestion);
+      existingPrompt.setPredefinedQuestion(contestedQuestion);
       makeMe.entityPersister.save(existingPrompt);
 
       // Mock the AI to generate a new question
@@ -417,8 +417,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       // Verify that a new prompt was returned
       assertThat(returnedPrompt.getId(), not(equalTo(existingPrompt.getId())));
-      assertThat(
-          returnedPrompt.getAnswerableMCQ().getPredefinedQuestion().isContested(), equalTo(false));
+      assertThat(returnedPrompt.getPredefinedQuestion().isContested(), equalTo(false));
 
       // Verify that a new prompt was created
       long count =
@@ -454,8 +453,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       // Then
       assertThat(result.rejected, equalTo(false));
-      assertThat(
-          recallPrompt.getAnswerableMCQ().getPredefinedQuestion().isContested(), equalTo(true));
+      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(true));
     }
 
     @Test
@@ -468,8 +466,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
       // Then
       assertThat(result.rejected, equalTo(true));
-      assertThat(
-          recallPrompt.getAnswerableMCQ().getPredefinedQuestion().isContested(), equalTo(false));
+      assertThat(recallPrompt.getPredefinedQuestion().isContested(), equalTo(false));
     }
   }
 }
