@@ -18,5 +18,6 @@ public enum RelationshipToFocusNote {
   ChildOfSiblingOfParentOfObject,
   InboundReferenceContextualPath,
   SiblingOfSubjectOfInboundReference,
-  InboundReferenceToObjectOfReifiedChild
+  InboundReferenceToObjectOfReifiedChild,
+  RemotelyRelated
 }

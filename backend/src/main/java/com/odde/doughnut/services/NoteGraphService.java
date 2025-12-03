@@ -111,6 +111,113 @@ public class NoteGraphService {
     }
     childrenEmitted.put(focusNote, childrenAlreadyEmitted + selectedChildren.size());
 
+    // Step 4.1: Depth 2 traversal - collect all depth 1 notes as source notes
+    List<Note> depth1SourceNotes = new ArrayList<>();
+    Map<Note, RelationshipToFocusNote> depth1NoteToRelationship = new HashMap<>();
+    for (CandidateNote candidate : candidates) {
+      if (candidate.getDepthFetched() == 1) {
+        depth1SourceNotes.add(candidate.getNote());
+        depth1NoteToRelationship.put(candidate.getNote(), candidate.getRelationshipType());
+      }
+    }
+
+    // Step 4.1: Process depth 2 relationships from each depth 1 source note
+    for (Note depth1Note : depth1SourceNotes) {
+      RelationshipToFocusNote depth1Relationship = depth1NoteToRelationship.get(depth1Note);
+
+      // Step 4.1: Process parent of depth 1 note
+      if (depth1Note.getParent() != null && !depthFetched.containsKey(depth1Note.getParent())) {
+        Note parentNote = depth1Note.getParent();
+        depthFetched.put(parentNote, 2);
+        List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+        discoveryPath.add(depth1Relationship);
+        discoveryPath.add(RelationshipToFocusNote.Parent);
+        RelationshipToFocusNote relationship =
+            relationshipTypeDerivationService.deriveRelationshipType(
+                parentNote, focusNote, discoveryPath);
+        if (relationship != null) {
+          candidates.add(new CandidateNote(parentNote, relationship, 2, discoveryPath));
+        }
+      }
+
+      // Step 4.1: Process object of depth 1 note (if reification)
+      if (depth1Note.getTargetNote() != null
+          && !depthFetched.containsKey(depth1Note.getTargetNote())) {
+        Note objectNote = depth1Note.getTargetNote();
+        depthFetched.put(objectNote, 2);
+        List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+        discoveryPath.add(depth1Relationship);
+        discoveryPath.add(RelationshipToFocusNote.Object);
+        RelationshipToFocusNote relationship =
+            relationshipTypeDerivationService.deriveRelationshipType(
+                objectNote, focusNote, discoveryPath);
+        if (relationship != null) {
+          candidates.add(new CandidateNote(objectNote, relationship, 2, discoveryPath));
+        }
+      }
+
+      // Step 4.1: Process children of depth 1 note with per-depth caps and selection logic
+      List<Note> allDepth2Children = depthQueryService.queryDepth1Children(depth1Note);
+      int depth2ChildCap = calculateChildCap(depth1Note, 2, depthFetched);
+      int depth2ChildrenAlreadyEmitted = childrenEmitted.getOrDefault(depth1Note, 0);
+      int depth2ChildrenRemainingBudget =
+          Math.max(0, depth2ChildCap - depth2ChildrenAlreadyEmitted);
+      Set<Integer> depth2PickedIndices =
+          new HashSet<>(pickedChildIndices.getOrDefault(depth1Note, new HashSet<>()));
+      var selectedDepth2Children =
+          childrenSelectionService.selectChildren(
+              depth1Note, depth2ChildrenRemainingBudget, depth2PickedIndices, allDepth2Children);
+
+      // Update picked indices
+      for (int i = 0; i < allDepth2Children.size(); i++) {
+        if (selectedDepth2Children.contains(allDepth2Children.get(i))) {
+          depth2PickedIndices.add(i);
+        }
+      }
+      pickedChildIndices.put(depth1Note, depth2PickedIndices);
+
+      for (Note child : selectedDepth2Children) {
+        if (!depthFetched.containsKey(child)) {
+          depthFetched.put(child, 2);
+          List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+          discoveryPath.add(depth1Relationship);
+          discoveryPath.add(RelationshipToFocusNote.Child);
+          RelationshipToFocusNote relationship =
+              relationshipTypeDerivationService.deriveRelationshipType(
+                  child, focusNote, discoveryPath);
+          if (relationship != null) {
+            candidates.add(new CandidateNote(child, relationship, 2, discoveryPath));
+          }
+        }
+      }
+      childrenEmitted.put(depth1Note, depth2ChildrenAlreadyEmitted + selectedDepth2Children.size());
+
+      // Step 4.1: Process inbound references of depth 1 note with per-depth caps and selection
+      // logic
+      List<Note> allDepth2InboundRefs = depthQueryService.queryDepth1InboundReferences(depth1Note);
+      int depth2InboundAlreadyEmitted = inboundEmitted.getOrDefault(depth1Note, 0);
+      var selectedDepth2InboundRefs =
+          inboundReferenceSelectionService.selectInboundReferences(
+              depth1Note, 2, depthFetched, depth2InboundAlreadyEmitted, allDepth2InboundRefs);
+
+      for (Note inboundRef : selectedDepth2InboundRefs) {
+        if (!depthFetched.containsKey(inboundRef)) {
+          depthFetched.put(inboundRef, 2);
+          List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+          discoveryPath.add(depth1Relationship);
+          discoveryPath.add(RelationshipToFocusNote.InboundReference);
+          RelationshipToFocusNote relationship =
+              relationshipTypeDerivationService.deriveRelationshipType(
+                  inboundRef, focusNote, discoveryPath);
+          if (relationship != null) {
+            candidates.add(new CandidateNote(inboundRef, relationship, 2, discoveryPath));
+          }
+        }
+      }
+      inboundEmitted.put(
+          depth1Note, depth2InboundAlreadyEmitted + selectedDepth2InboundRefs.size());
+    }
+
     // Step 2.5: Score all candidates
     for (CandidateNote candidate : candidates) {
       double score = relevanceScoringService.calculateScore(candidate);
@@ -145,5 +252,11 @@ public class NoteGraphService {
   private int calculateChildCap(Note parent, int currentDepth, Map<Note, Integer> depthFetched) {
     int parentDepthFetched = depthFetched.getOrDefault(parent, currentDepth);
     return CHILD_CAP_MULTIPLIER * (currentDepth - parentDepthFetched);
+  }
+
+  // Step 4.1: Calculate inbound cap for a target note at a given depth
+  private int calculateInboundCap(Note target, int currentDepth, Map<Note, Integer> depthFetched) {
+    int targetDepthFetched = depthFetched.getOrDefault(target, currentDepth);
+    return 2 * (currentDepth - targetDepthFetched); // INBOUND_CAP_MULTIPLIER = 2
   }
 }

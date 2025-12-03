@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import static com.odde.doughnut.services.graphRAG.GraphRAGConstants.RELATED_NOTE_DETAILS_TRUNCATE_LENGTH;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -1019,10 +1020,11 @@ public class NoteGraphServiceTest {
       // Set budget to allow all notes
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
-      // Should have parent, object, 2 children, and 2 inbound refs (6 notes total)
-      // Budget 1000 - 1 for focus note = 999 remaining, which is more than enough for 6 notes
-      assertThat(result.getRelatedNotes(), hasSize(6));
-      // Verify all relationship types are present
+      // Should have at least parent, object, 2 children, and 2 inbound refs (6 depth 1 notes)
+      // With depth 2 traversal, may also include depth 2 notes (e.g., parents of inbound refs)
+      // Budget 1000 - 1 for focus note = 999 remaining, which is more than enough
+      assertThat(result.getRelatedNotes().size(), greaterThanOrEqualTo(6));
+      // Verify all depth 1 relationship types are present
       List<RelationshipToFocusNote> relationships =
           result.getRelatedNotes().stream()
               .map(BareNote::getRelationToFocusNote)
@@ -1031,10 +1033,10 @@ public class NoteGraphServiceTest {
       assertThat(relationships, hasItem(RelationshipToFocusNote.Object));
       assertThat(
           relationships.stream().filter(r -> r == RelationshipToFocusNote.Child).count(),
-          equalTo(2L));
+          greaterThanOrEqualTo(2L));
       assertThat(
           relationships.stream().filter(r -> r == RelationshipToFocusNote.InboundReference).count(),
-          equalTo(2L));
+          greaterThanOrEqualTo(2L));
     }
   }
 
@@ -1307,6 +1309,40 @@ public class NoteGraphServiceTest {
       assertThat(selectedSets.size(), greaterThanOrEqualTo(1));
       // Note: Due to randomness, we can't guarantee multiple different sets, but we verify the
       // selection works
+    }
+  }
+
+  @Nested
+  class Depth2Traversal {
+    @Test
+    void shouldDiscoverDepth2NotesFromDepth1SourceNotes() {
+      // Step 4.1: Test that depth 2 notes (e.g., parent's parent, child's child) are discovered
+      Note grandParent = makeMe.aNote().titleConstructor("Grand Parent").please();
+      Note parent = makeMe.aNote().under(grandParent).titleConstructor("Parent").please();
+      Note focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
+      Note child = makeMe.aNote().under(focusNote).titleConstructor("Child").please();
+      Note grandChild = makeMe.aNote().under(child).titleConstructor("Grand Child").please();
+
+      // Set budget to allow depth 2 notes
+      GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
+
+      // Verify depth 2 notes are discovered (parent's parent = grandParent, child's child =
+      // grandChild)
+      List<BareNote> relatedNotes = result.getRelatedNotes();
+      List<String> relatedUris =
+          relatedNotes.stream().map(BareNote::getUri).collect(Collectors.toList());
+
+      // Should include depth 1 notes (parent, child)
+      assertThat(relatedUris, hasItem(parent.getUri()));
+      assertThat(relatedUris, hasItem(child.getUri()));
+
+      // Should include depth 2 notes (grandParent, grandChild) when budget allows
+      // Note: They may have RemotelyRelated relationship type for step 4.1
+      boolean hasGrandParent = relatedUris.contains(grandParent.getUri());
+      boolean hasGrandChild = relatedUris.contains(grandChild.getUri());
+
+      // At least one depth 2 note should be discovered
+      assertThat(hasGrandParent || hasGrandChild, is(true));
     }
   }
 }
