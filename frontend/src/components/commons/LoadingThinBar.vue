@@ -10,7 +10,7 @@ import { ContentLoader } from "vue-content-loader"
 
 <style lang="scss" scoped>
 .toolbar-overlap {
-  position: fixed;
+  position: absolute;
   left: 0;
   top: 0;
   right: 0;
