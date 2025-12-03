@@ -136,6 +136,13 @@ public class MemoryTrackerService {
   }
 
   public RecallPrompt getSpellingQuestion(MemoryTracker memoryTracker) {
+    // First check if there's an existing unanswered recall prompt for this memory tracker
+    RecallPrompt existingPrompt =
+        recallPromptRepository.findUnansweredByMemoryTracker(memoryTracker.getId()).orElse(null);
+    if (existingPrompt != null && existingPrompt.getQuestionType() == QuestionType.SPELLING) {
+      return existingPrompt;
+    }
+
     RecallPrompt recallPrompt = new RecallPrompt();
     recallPrompt.setMemoryTracker(memoryTracker);
     recallPrompt.setQuestionType(QuestionType.SPELLING);

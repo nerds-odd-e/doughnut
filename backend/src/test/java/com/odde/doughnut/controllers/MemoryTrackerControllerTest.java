@@ -54,6 +54,28 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
     }
 
     @Test
+    void shouldRecycleUnansweredSpellingRecallPromptForSpellingMemoryTracker()
+        throws UnexpectedNoAccessRightException {
+      Note note =
+          makeMe
+              .aNote("moon")
+              .details("partner of earth")
+              .creatorAndOwner(currentUser.getUser())
+              .please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
+
+      // Create an unanswered spelling recall prompt
+      RecallPrompt existingPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+
+      // Ask question again - should return the existing unanswered prompt
+      RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
+      assertThat(recallPrompt.getId(), equalTo(existingPrompt.getId()));
+      assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.SPELLING));
+      assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
+    }
+
+    @Test
     void shouldReturnMCQRecallPromptForNonSpellingMemoryTracker()
         throws UnexpectedNoAccessRightException {
       Note note =
