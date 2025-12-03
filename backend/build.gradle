@@ -17,8 +17,8 @@ apply plugin: 'io.spring.dependency-management'
 group = 'com.odde'
 version = '0.0.1-SNAPSHOT'
 java {
-  sourceCompatibility = 24
-  targetCompatibility = 24
+  sourceCompatibility = 25
+  targetCompatibility = 25
 }
 
 configurations {

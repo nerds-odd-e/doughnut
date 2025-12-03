@@ -2,7 +2,7 @@
   description = "doughnut development environment";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -34,15 +34,15 @@
         pythonDev = pythonDevEnv == "true";
         poetryPath = "${pkgs.poetry}/bin";
         pythonPackages = if pythonDev then [
-          pkgs.python313
+          pkgs.python314
           pkgs.poetry
-          pkgs.python313Packages.pip
-          pkgs.python313Packages.setuptools
-          pkgs.python313Packages.wheel
+          pkgs.python314Packages.pip
+          pkgs.python314Packages.setuptools
+          pkgs.python314Packages.wheel
         ] else [];
 
         basePackages = with pkgs; [
-          zulu24
+          zulu25
           nodejs_22
           corepack_22
           fzf
@@ -50,9 +50,9 @@
           gitleaks
           jq
           libmysqlclient
-          mysql84
-          mysql-client
           mysql_jdbc
+          mysql84
+          mariadb.client
           redis
           yamllint
           nixfmt-classic

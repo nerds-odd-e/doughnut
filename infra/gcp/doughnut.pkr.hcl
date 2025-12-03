@@ -54,8 +54,8 @@ source "googlecompute" "doughnut" {
   source_image_family = var.source_image_family
   region              = var.region
   zone                = var.zone
-  image_description   = "doughnut Debian12 MySQL80 base image provisioned with saltstack"
-  image_name          = "doughnut-debian12-zulu24-mysql80-base-saltstack"
+  image_description   = "doughnut Debian12 MySQL84 base image provisioned with saltstack"
+  image_name          = "doughnut-debian12-zulu25-mysql84-base-saltstack"
   ssh_username        = var.ssh_username
   disk_size           = 25
   disk_type           = "pd-ssd"

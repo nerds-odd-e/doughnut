@@ -8,25 +8,24 @@
     - backup: '.bak'
     - show_changes: True
 
-mysql-repo-key:
-  file.managed:
-    - name: /usr/share/keyrings/mysql-archive-keyring.gpg
-    - source: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
-    - skip_verify: True
-    - mode: 644
-    - user: root
-    - group: root
+mysql-apt-config-install:
+  cmd.run:
+    - name: |
+        export DEBIAN_FRONTEND=noninteractive
+        apt-get update -qq
+        apt-get install -y -qq debconf-utils wget
+        wget -q -O /tmp/mysql-apt-config.deb https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb || \
+        wget -q -O /tmp/mysql-apt-config.deb https://repo.mysql.com/apt/debian/pool/mysql-apt-config/m/mysql-apt-config/mysql-apt-config_0.8.35-1_all.deb || \
+        (curl -fsSL -o /tmp/mysql-apt-config.deb https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb || curl -fsSL -o /tmp/mysql-apt-config.deb https://repo.mysql.com/apt/debian/pool/mysql-apt-config/m/mysql-apt-config/mysql-apt-config_0.8.35-1_all.deb)
+        echo "mysql-apt-config mysql-apt-config/select-server select mysql-8.4-lts" | debconf-set-selections
+        echo "mysql-apt-config mysql-apt-config/select-product select Ok" | debconf-set-selections
+        dpkg -i /tmp/mysql-apt-config.deb || apt-get install -f -y
 
-mysql-repo:
-  pkgrepo.managed:
-    - humanname: MySQL
-    - name: deb [signed-by=/usr/share/keyrings/mysql-archive-keyring.gpg] http://repo.mysql.com/apt/debian bookworm mysql-8.0
-    - file: /etc/apt/sources.list.d/mysql.list
-    - key_url: https://repo.mysql.com/RPM-GPG-KEY-mysql-2023
-    - aptkey: False
-    - gpgcheck: 1
+mysql-repo-refresh:
+  cmd.run:
+    - name: apt-get update
     - require:
-      - file: mysql-repo-key
+      - cmd: mysql-apt-config-install
 
 doughnut-app-deps:
   pkg.installed:
@@ -46,10 +45,9 @@ doughnut-app-deps:
         - gnupg-agent
         - readline-common
         - jq
-        - libmysqlclient21
         - mysql-community-client
     - require:
-      - pkgrepo: mysql-repo
+      - cmd: mysql-repo-refresh
 
 /etc/profile.d/doughnut_env.sh:
   file.managed:
