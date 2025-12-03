@@ -5,6 +5,8 @@ alwaysApply: true
 
 # Running Commands and Tests - Cloud Agent vs Local Development
 
+**CRITICAL: On Cloud VM, the `CURSOR_DEV=true nix develop -c` prefix MUST NOT be added to commands. Run commands directly without any nix prefix.**
+
 ## When to Use This Rule
 
 **Use this rule when:**
@@ -36,6 +38,8 @@ alwaysApply: true
 
 **Command execution:** MUST use nix wrapper: `CURSOR_DEV=true nix develop -c <command>`
 
+**Note:** This rule focuses on Cloud Agent environment. For local development, refer to other workspace rules.
+
 ## Running Tests
 
 ### Frontend Unit Tests
@@ -43,11 +47,6 @@ alwaysApply: true
 **Cloud Agent:**
 ```bash
 pnpm frontend:test
-```
-
-**Local Development:**
-```bash
-CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```
 
 ### Backend Unit Tests
@@ -61,46 +60,34 @@ source /workspace/scripts/cloud_agent_setup.sh
 pnpm backend:verify
 ```
 
-**Local Development:**
-```bash
-CURSOR_DEV=true nix develop -c pnpm backend:verify
-```
-
 ### E2E Tests
 
 **Cloud Agent:**
 ```bash
-# First, start services in the background
+# First, start services in the background (only needed for e2e tests)
 pnpm sut &
 
-# Wait for services to be ready, then run tests
+# Wait 10 seconds for services to be ready
+sleep 10
+
+# Run tests
 pnpm cypress run --spec e2e_test/features/<feature-file>.feature
-```
-
-**Local Development:**
-```bash
-# First, start services in the background
-CURSOR_DEV=true nix develop -c pnpm sut &
-
-# Wait for services to be ready, then run tests
-CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/<feature-file>.feature
 ```
 
 ## Key Rules
 
 1. **Cloud agents:** Do NOT use `CURSOR_DEV=true nix develop -c` prefix - run commands directly
-2. **Local development:** ALWAYS use `CURSOR_DEV=true nix develop -c` prefix for commands that need the nix environment
-3. **Backend tests on cloud:** May require one-time setup script for Java and MySQL
-4. **E2E tests:** **MUST start `pnpm sut` in the background first** before running e2e tests (both cloud agent and local development)
-5. **Test execution:** Frontend tests verified to work on cloud agents without nix
-6. **Linting errors:** TypeScript/vue-tsc errors may appear but don't prevent test execution
+2. **Backend tests on cloud:** May require one-time setup script for Java and MySQL
+3. **E2E tests:** **MUST start `pnpm sut` in the background first, wait 10 seconds, then run tests** (only needed for e2e tests, not for unit tests)
+4. **Test execution:** Frontend tests verified to work on cloud agents without nix
+5. **Linting errors:** TypeScript/vue-tsc errors may appear but don't prevent test execution
 
 ## Common Commands Reference
 
-| Command | Cloud Agent | Local Development |
-|---------|-------------|-------------------|
-| Frontend tests | `pnpm frontend:test` | `CURSOR_DEV=true nix develop -c pnpm frontend:test` |
-| Backend tests | `pnpm backend:verify` | `CURSOR_DEV=true nix develop -c pnpm backend:verify` |
-| E2E tests | `pnpm cypress run --spec <path>` | `CURSOR_DEV=true nix develop -c pnpm cypress run --spec <path>` |
-| Linting | `pnpm lint:all` | `CURSOR_DEV=true nix develop -c pnpm lint:all` |
-| Formatting | `pnpm format:all` | `CURSOR_DEV=true nix develop -c pnpm format:all` |
+| Command | Cloud Agent |
+|---------|-------------|
+| Frontend tests | `pnpm frontend:test` |
+| Backend tests | `pnpm backend:verify` |
+| E2E tests | `pnpm sut &` then `sleep 10` then `pnpm cypress run --spec <path>` |
+| Linting | `pnpm lint:all` |
+| Formatting | `pnpm format:all` |
