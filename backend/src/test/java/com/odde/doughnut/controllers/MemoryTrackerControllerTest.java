@@ -4,11 +4,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -268,8 +270,12 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       makeMe.theNote(answerNote).titleConstructor("this / that").please();
       answerDTO.setSpellingAnswer("this");
       assertTrue(controller.answerSpelling(memoryTracker, answerDTO).getIsCorrect());
-      answerDTO.setSpellingAnswer("that");
-      assertTrue(controller.answerSpelling(memoryTracker, answerDTO).getIsCorrect());
+      // Create a new recall prompt for the second answer
+      RecallPrompt secondRecallPrompt = controller.getSpellingQuestion(memoryTracker);
+      AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
+      secondAnswerDTO.setSpellingAnswer("that");
+      secondAnswerDTO.setRecallPromptId(secondRecallPrompt.getId());
+      assertTrue(controller.answerSpelling(memoryTracker, secondAnswerDTO).getIsCorrect());
     }
 
     @Test
@@ -285,8 +291,34 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       answerDTO.setThinkingTimeMs(5000);
       SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
       assertTrue(answerResult.getIsCorrect());
-      // Thinking time is accepted in the DTO but not stored for spelling answers
-      // (unlike multiple choice questions which create Answer entities)
+      RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
+      Answer answer = reloadedPrompt.getAnswer();
+      assertNotNull(answer);
+      assertThat(answer.getThinkingTimeMs(), equalTo(5000));
+      assertThat(answer.getSpellingAnswer(), equalTo(answerDTO.getSpellingAnswer()));
+      assertTrue(answer.getCorrect());
+    }
+
+    @Test
+    void shouldCreateAnswerEntityForSpellingQuestion() throws UnexpectedNoAccessRightException {
+      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+      answerDTO.setThinkingTimeMs(3000);
+      controller.answerSpelling(memoryTracker, answerDTO);
+
+      RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
+      Answer answer = reloadedPrompt.getAnswer();
+      assertNotNull(answer);
+      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTopicConstructor()));
+      assertThat(answer.getThinkingTimeMs(), equalTo(3000));
+      assertTrue(answer.getCorrect());
+    }
+
+    @Test
+    void shouldNotAllowAnsweringTwice() throws UnexpectedNoAccessRightException {
+      controller.answerSpelling(memoryTracker, answerDTO);
+      assertThrows(
+          IllegalArgumentException.class,
+          () -> controller.answerSpelling(memoryTracker, answerDTO));
     }
 
     @Test

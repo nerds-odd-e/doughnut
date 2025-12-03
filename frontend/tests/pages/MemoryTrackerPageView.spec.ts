@@ -518,7 +518,7 @@ describe("MemoryTrackerPageView", () => {
   })
 
   describe("spelling question type", () => {
-    it("displays spelling question message when question type is SPELLING", async () => {
+    it("displays spelling question message when question type is SPELLING and unanswered", async () => {
       const memoryTracker = makeMe.aMemoryTracker.please()
       const spellingPrompt = makeMe.aRecallPrompt
         .withQuestionType("SPELLING")
@@ -538,6 +538,71 @@ describe("MemoryTrackerPageView", () => {
       expect(wrapper.text()).toContain(
         "This is a spelling question. Details are not needed."
       )
+    })
+
+    it("displays spelling answer information when answered correctly", async () => {
+      const memoryTracker = makeMe.aMemoryTracker.please()
+      const spellingPrompt = makeMe.aRecallPrompt
+        .withQuestionType("SPELLING")
+        .withAnswer({
+          id: 1,
+          spellingAnswer: "Sedition",
+          correct: true,
+          thinkingTimeMs: 3000,
+        })
+        .withAnswerTime(new Date().toISOString())
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [spellingPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Your answer:")
+      expect(wrapper.text()).toContain("Sedition")
+      expect(wrapper.text()).toContain("Result:")
+      expect(wrapper.text()).toContain("Correct")
+      expect(wrapper.text()).toContain("Thinking time: 3.0s")
+      expect(wrapper.text()).not.toContain(
+        "This is a spelling question. Details are not needed."
+      )
+    })
+
+    it("displays spelling answer information when answered incorrectly", async () => {
+      const memoryTracker = makeMe.aMemoryTracker.please()
+      const spellingPrompt = makeMe.aRecallPrompt
+        .withQuestionType("SPELLING")
+        .withAnswer({
+          id: 1,
+          spellingAnswer: "asdf",
+          correct: false,
+          thinkingTimeMs: 1500,
+        })
+        .withAnswerTime(new Date().toISOString())
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [spellingPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).toContain("Your answer:")
+      expect(wrapper.text()).toContain("asdf")
+      expect(wrapper.text()).toContain("Result:")
+      expect(wrapper.text()).toContain("Incorrect")
+      expect(wrapper.text()).toContain("Thinking time: 1.5s")
     })
 
     it("does not display question details for spelling questions", async () => {

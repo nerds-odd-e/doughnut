@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.InitialInfo;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
@@ -149,10 +150,21 @@ public class MemoryTrackerService {
     if (recallPrompt.getQuestionType() != QuestionType.SPELLING) {
       throw new IllegalArgumentException("Recall prompt must be of type SPELLING");
     }
+    if (recallPrompt.getAnswer() != null) {
+      throw new IllegalArgumentException("Recall prompt is already answered");
+    }
     MemoryTracker memoryTracker = recallPrompt.getMemoryTracker();
     String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
     Note note = memoryTracker.getNote();
     Boolean correct = note.matchAnswer(spellingAnswer);
+
+    Answer answer = new Answer();
+    answer.setSpellingAnswer(spellingAnswer);
+    answer.setCorrect(correct);
+    answer.setThinkingTimeMs(answerSpellingDTO.getThinkingTimeMs());
+    recallPrompt.setAnswer(answer);
+    entityPersister.save(recallPrompt);
+
     markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
     return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
   }

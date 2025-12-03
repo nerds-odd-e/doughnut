@@ -3773,6 +3773,8 @@ components:
         thinkingTimeMs:
           type: integer
           format: int32
+        spellingAnswer:
+          type: string
       required:
       - correct
       - id
