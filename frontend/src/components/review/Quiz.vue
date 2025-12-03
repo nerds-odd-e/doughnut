@@ -186,6 +186,7 @@ const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
       body: {
         spellingAnswer: answerData.spellingAnswer!,
         thinkingTimeMs: answerData.thinkingTimeMs,
+        recallPromptId: answerData.recallPromptId,
       },
     })
   )

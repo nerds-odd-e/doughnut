@@ -3,6 +3,7 @@ import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
 import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
+import makeMe from "@tests/fixtures/makeMe"
 
 describe("SpellingQuestionDisplay", () => {
   let performanceNowSpy: ReturnType<typeof vi.spyOn>
@@ -10,7 +11,19 @@ describe("SpellingQuestionDisplay", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     performanceNowSpy = vi.spyOn(performance, "now").mockReturnValue(0)
-    mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
+    const recallPrompt = makeMe.aRecallPrompt
+      .withQuestionType("SPELLING")
+      .please()
+    mockSdkService("getSpellingQuestion", recallPrompt)
+    const memoryTracker = makeMe.aMemoryTracker.please()
+    // Add clozeDescription method to note for stem computation
+    if (memoryTracker.note) {
+      // @ts-expect-error - clozeDescription is a method on Note, not a property
+      memoryTracker.note.clozeDescription = {
+        clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
+      }
+    }
+    mockSdkService("showMemoryTracker", memoryTracker)
   })
 
   afterEach(() => {
@@ -61,7 +74,11 @@ describe("SpellingQuestionDisplay", () => {
     const emitted = wrapper.emitted()
     expect(emitted.answer).toBeTruthy()
     expect(emitted.answer![0]).toEqual([
-      { spellingAnswer: "cat", thinkingTimeMs: expect.any(Number) },
+      {
+        spellingAnswer: "cat",
+        thinkingTimeMs: expect.any(Number),
+        recallPromptId: expect.any(Number),
+      },
     ])
   })
 
@@ -97,8 +114,10 @@ describe("SpellingQuestionDisplay", () => {
     const answerData = emitted?.[0]?.[0] as {
       spellingAnswer?: string
       thinkingTimeMs?: number
+      recallPromptId?: number
     }
     expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(5000)
     expect(answerData?.spellingAnswer).toBe("cat")
+    expect(answerData?.recallPromptId).toBeDefined()
   })
 })
