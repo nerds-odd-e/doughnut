@@ -92,8 +92,18 @@ public class RelationshipTypeDerivationService {
       return RelationshipToFocusNote.ObjectOfReifiedChild;
     }
 
+    // Step 4.5: Detect subject of inbound reference via path [InboundReference, Parent]
+    // When we go from focus note to an inbound reference, then to the parent of that inbound
+    // reference (the subject),
+    // that subject note is SubjectOfInboundReference
+    if (discoveryPath.size() >= 2
+        && discoveryPath.get(discoveryPath.size() - 2) == RelationshipToFocusNote.InboundReference
+        && discoveryPath.get(discoveryPath.size() - 1) == RelationshipToFocusNote.Parent) {
+      return RelationshipToFocusNote.SubjectOfInboundReference;
+    }
+
     // For step 4.1, default to RemotelyRelated - other specific types will be added in later steps
-    // (steps 4.5-4.6 will add specific relationship type derivation based on discovery path)
+    // (steps 4.6-4.8 will add specific relationship type derivation based on discovery path)
     return RelationshipToFocusNote.RemotelyRelated;
   }
 

@@ -674,7 +674,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 2.2: Not yet implemented - subjects of inbound references")
     void shouldIncludeInboundReferenceSubjectsWhenBudgetIsEnough() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 

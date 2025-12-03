@@ -146,6 +146,21 @@ public class NoteGraphService {
       processInboundReferences(
           depth1Note, focusNote, depth1Relationship, 2, depthFetched, inboundEmitted, candidates);
     }
+
+    // Process subjects of inbound references discovered at depth 1
+    // These should be discovered at depth 2 via the path [InboundReference, Subject]
+    for (CandidateNote candidate : candidates) {
+      if (candidate.getDepthFetched() == 1
+          && candidate.getRelationshipType() == RelationshipToFocusNote.InboundReference) {
+        processSubjectOfInboundReference(
+            candidate.getNote(),
+            candidate.getRelationshipType(),
+            focusNote,
+            depthFetched,
+            candidates,
+            2);
+      }
+    }
   }
 
   private void processChildren(
@@ -263,6 +278,8 @@ public class NoteGraphService {
           }
         }
       }
+      // Note: Subjects of inbound references are processed at depth 2, not depth 1
+      // This ensures they are discovered via the path [InboundReference, Subject] at depth 2
     }
 
     inboundEmitted.put(targetNote, alreadyEmitted + selectedInboundRefs.size());
@@ -320,6 +337,32 @@ public class NoteGraphService {
             objectNote, focusNote, discoveryPath);
     if (relationship != null) {
       candidates.add(new CandidateNote(objectNote, relationship, depth, discoveryPath));
+    }
+  }
+
+  private void processSubjectOfInboundReference(
+      Note inboundRef,
+      RelationshipToFocusNote inboundRefRelationship,
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      List<CandidateNote> candidates,
+      int depth) {
+    if (inboundRef.getParent() == null || depthFetched.containsKey(inboundRef.getParent())) {
+      return;
+    }
+
+    Note subjectNote = inboundRef.getParent();
+    depthFetched.put(subjectNote, depth);
+    List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+    // The path is always [InboundReference, Parent] for subjects discovered from depth 1
+    // inbound references at depth 2
+    discoveryPath.add(RelationshipToFocusNote.InboundReference);
+    discoveryPath.add(RelationshipToFocusNote.Parent);
+    RelationshipToFocusNote relationship =
+        relationshipTypeDerivationService.deriveRelationshipType(
+            subjectNote, focusNote, discoveryPath);
+    if (relationship != null) {
+      candidates.add(new CandidateNote(subjectNote, relationship, depth, discoveryPath));
     }
   }
 
