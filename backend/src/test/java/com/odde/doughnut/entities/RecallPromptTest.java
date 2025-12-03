@@ -56,4 +56,35 @@ class RecallPromptTest {
       assertThat(spellingQuestion, nullValue());
     }
   }
+
+  @Nested
+  class GetQuestionGeneratedTime {
+    @Test
+    void shouldReturnRecallPromptCreatedAtForMCQ() {
+      java.sql.Timestamp createdAt = new java.sql.Timestamp(System.currentTimeMillis());
+      RecallPrompt recallPrompt = new RecallPrompt();
+      recallPrompt.setQuestionType(QuestionType.MCQ);
+      recallPrompt.setMemoryTracker(memoryTracker);
+      recallPrompt.setCreatedAt(createdAt);
+      recallPrompt.setPredefinedQuestion(
+          makeMe.aPredefinedQuestion().ofAIGeneratedQuestionForNote(note).please());
+
+      java.sql.Timestamp questionGeneratedTime = recallPrompt.getQuestionGeneratedTime();
+
+      assertThat(questionGeneratedTime, equalTo(createdAt));
+    }
+
+    @Test
+    void shouldReturnRecallPromptCreatedAtForSpelling() {
+      java.sql.Timestamp createdAt = new java.sql.Timestamp(System.currentTimeMillis());
+      RecallPrompt recallPrompt = new RecallPrompt();
+      recallPrompt.setQuestionType(QuestionType.SPELLING);
+      recallPrompt.setMemoryTracker(memoryTracker);
+      recallPrompt.setCreatedAt(createdAt);
+
+      java.sql.Timestamp questionGeneratedTime = recallPrompt.getQuestionGeneratedTime();
+
+      assertThat(questionGeneratedTime, equalTo(createdAt));
+    }
+  }
 }

@@ -59,6 +59,10 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @JsonProperty
   private QuestionType questionType;
 
+  @Column(name = "created_at")
+  @JsonIgnore
+  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+
   public Notebook getNotebook() {
     if (getPredefinedQuestion() == null) {
       return null;
@@ -129,10 +133,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
 
   @JsonProperty
   public Timestamp getQuestionGeneratedTime() {
-    if (getPredefinedQuestion() == null) {
-      return null;
-    }
-    return getPredefinedQuestion().getCreatedAt();
+    return getCreatedAt();
   }
 
   @JsonProperty
