@@ -19,7 +19,10 @@ describe("repeat page", () => {
     mockSdkService("showNote", makeMe.aNoteRealm.please())
     mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
     askAQuestionSpy = mockSdkService("askAQuestion", recallPrompt)
-    mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
+    const spellingRecallPrompt = makeMe.aRecallPrompt
+      .withQuestionType("SPELLING")
+      .please()
+    mockSdkService("getSpellingQuestion", spellingRecallPrompt)
   })
 
   afterEach(() => {
@@ -127,6 +130,20 @@ describe("repeat page", () => {
         wrapSdkResponse(recallPromptWithoutChoices)
       )
 
+      const spellingRecallPrompt = makeMe.aRecallPrompt
+        .withQuestionType("SPELLING")
+        .please()
+      mockSdkService("getSpellingQuestion", spellingRecallPrompt)
+      const memoryTracker = makeMe.aMemoryTracker.please()
+      // Add clozeDescription method to note for stem computation
+      if (memoryTracker.note) {
+        // @ts-expect-error - clozeDescription is a method on Note, not a property
+        memoryTracker.note.clozeDescription = {
+          clozeDetails: () => "<p>Spell the word 'cat'</p>\n",
+        }
+      }
+      mockSdkService("showMemoryTracker", memoryTracker)
+
       const answerResult: SpellingResultDto = {
         note: makeMe.aNote.please(),
         answer: "cat",
@@ -138,15 +155,20 @@ describe("repeat page", () => {
       )
 
       const wrapper = await mountPage([1], 1, true)
+      await flushPromises()
       await wrapper
         .findComponent({ name: "SpellingQuestionComponent" })
-        .vm.$emit("answer", { spellingAnswer: "cat" })
+        .vm.$emit("answer", {
+          spellingAnswer: "cat",
+          recallPromptId: spellingRecallPrompt.id,
+        })
       await flushPromises()
 
       expect(mockedAnswerSpelling).toHaveBeenCalledWith({
         path: { memoryTracker: 1 },
         body: {
           spellingAnswer: "cat",
+          recallPromptId: spellingRecallPrompt.id,
         },
       })
 
