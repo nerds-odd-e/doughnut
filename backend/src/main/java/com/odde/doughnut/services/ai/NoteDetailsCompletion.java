@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
     """
     Replace the entire `details` field of the current focus note with the new content.
     The details should be in markdown format.
-    
+
     IMPORTANT: Keep all parts of the existing details that the user did not ask to change.
     Copy those unchanged parts exactly as they appear in the original details, without any
     modifications. Only modify or add the parts that the user specifically requested to change.

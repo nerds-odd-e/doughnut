@@ -460,9 +460,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
       assertThat(export).contains("## Context");
       assertThat(export).contains("Focus Note and the notes related to it:");
       assertThat(export).contains("There are 42 prefectures in Japan");
-      assertThat(export)
-          .contains(
-              "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.");
+      assertThat(export).contains("Make tool calls when user asks to update the note.");
     }
 
     @Test

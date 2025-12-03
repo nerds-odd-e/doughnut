@@ -71,8 +71,7 @@ public class ConversationHistoryBuilder {
       messages.add(
           ChatCompletionMessageParam.ofSystem(
               ChatCompletionSystemMessageParam.builder()
-                  .content(
-                      "User is seeking for having a conversation, so don't call functions to update the note unless user asks explicitly.")
+                  .content("Make tool calls when user asks to update the note.")
                   .build()));
     }
   }
