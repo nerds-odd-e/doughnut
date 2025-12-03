@@ -38,14 +38,33 @@ public class RelationshipTypeDerivationService {
    */
   public RelationshipToFocusNote deriveRelationshipType(
       Note note, Note focusNote, List<RelationshipToFocusNote> discoveryPath) {
-    // For step 4.1, use basic derivation - default to RemotelyRelated for now
-    // Specific relationship types will be added in steps 4.2-4.6
     if (discoveryPath == null || discoveryPath.size() != 2) {
       return RelationshipToFocusNote.RemotelyRelated;
     }
 
-    // For step 4.1, default to RemotelyRelated - specific types will be added in later steps
-    // (steps 4.2-4.6 will add specific relationship type derivation based on discovery path)
+    // Step 4.2: Detect siblings via path [Parent, Child]
+    // When we go from focus note to parent, then to a child of the parent,
+    // that child is a sibling of the focus note if they share the same parent
+    if (discoveryPath.get(0) == RelationshipToFocusNote.Parent
+        && discoveryPath.get(1) == RelationshipToFocusNote.Child) {
+      // Check if the note is a sibling of the focus note (same parent)
+      if (note.getParent() != null
+          && focusNote.getParent() != null
+          && note.getParent().equals(focusNote.getParent())
+          && !note.equals(focusNote)) {
+        // Determine PriorSibling vs YoungerSibling based on siblingOrder
+        // Lower siblingOrder = prior/older sibling
+        // Higher siblingOrder = younger/newer sibling
+        if (note.getSiblingOrder() < focusNote.getSiblingOrder()) {
+          return RelationshipToFocusNote.PriorSibling;
+        } else if (note.getSiblingOrder() > focusNote.getSiblingOrder()) {
+          return RelationshipToFocusNote.YoungerSibling;
+        }
+      }
+    }
+
+    // For step 4.1, default to RemotelyRelated - other specific types will be added in later steps
+    // (steps 4.3-4.6 will add specific relationship type derivation based on discovery path)
     return RelationshipToFocusNote.RemotelyRelated;
   }
 }

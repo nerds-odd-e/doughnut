@@ -162,19 +162,38 @@ public class NoteGraphService {
       int depth2ChildrenAlreadyEmitted = childrenEmitted.getOrDefault(depth1Note, 0);
       int depth2ChildrenRemainingBudget =
           Math.max(0, depth2ChildCap - depth2ChildrenAlreadyEmitted);
+      // Step 4.2: If this is the focus note's parent, ensure we select enough children
+      // to get all siblings after filtering out the focus note
+      if (depth1Note.equals(focusNote.getParent()) && allDepth2Children.contains(focusNote)) {
+        // Count how many siblings we need (all children except focus note)
+        int numberOfSiblings = allDepth2Children.size() - 1;
+        // We need to select at least (numberOfSiblings + 1) children to get all siblings
+        // (numberOfSiblings siblings + focus note)
+        int neededBudget = numberOfSiblings + 1;
+        depth2ChildrenRemainingBudget =
+            Math.max(
+                depth2ChildrenRemainingBudget, Math.min(neededBudget, allDepth2Children.size()));
+      }
       Set<Integer> depth2PickedIndices =
           new HashSet<>(pickedChildIndices.getOrDefault(depth1Note, new HashSet<>()));
       var selectedDepth2Children =
           childrenSelectionService.selectChildren(
               depth1Note, depth2ChildrenRemainingBudget, depth2PickedIndices, allDepth2Children);
 
-      // Update picked indices
+      // Update picked indices (including focus note if it was selected, for tracking purposes)
       for (int i = 0; i < allDepth2Children.size(); i++) {
         if (selectedDepth2Children.contains(allDepth2Children.get(i))) {
           depth2PickedIndices.add(i);
         }
       }
       pickedChildIndices.put(depth1Note, depth2PickedIndices);
+
+      // Step 4.2: Filter out focus note from selected children (it's already at depth 0)
+      // This ensures siblings are properly processed without the focus note taking up a slot
+      selectedDepth2Children =
+          selectedDepth2Children.stream()
+              .filter(child -> !child.equals(focusNote))
+              .collect(java.util.stream.Collectors.toList());
 
       for (Note child : selectedDepth2Children) {
         if (!depthFetched.containsKey(child)) {
@@ -228,6 +247,10 @@ public class NoteGraphService {
     candidates.sort(Comparator.comparing(CandidateNote::getRelevanceScore).reversed());
 
     // Step 2.5: Select top candidates that fit in budget
+    // Step 4.2: Collect siblings separately to sort by siblingOrder before adding to focus note
+    List<CandidateNote> priorSiblings = new ArrayList<>();
+    List<CandidateNote> youngerSiblings = new ArrayList<>();
+
     for (CandidateNote candidate : candidates) {
       BareNote addedNote =
           builder.addNoteToRelatedNotes(candidate.getNote(), candidate.getRelationshipType());
@@ -238,11 +261,24 @@ public class NoteGraphService {
         } else if (candidate.getRelationshipType() == RelationshipToFocusNote.InboundReference) {
           builder.getFocusNote().getInboundReferences().add(candidate.getNote().getUri());
         } else if (candidate.getRelationshipType() == RelationshipToFocusNote.PriorSibling) {
-          builder.getFocusNote().getPriorSiblings().add(candidate.getNote().getUri());
+          // Step 4.2: Collect prior siblings to sort by siblingOrder
+          priorSiblings.add(candidate);
         } else if (candidate.getRelationshipType() == RelationshipToFocusNote.YoungerSibling) {
-          builder.getFocusNote().getYoungerSiblings().add(candidate.getNote().getUri());
+          // Step 4.2: Collect younger siblings to sort by siblingOrder
+          youngerSiblings.add(candidate);
         }
       }
+    }
+
+    // Step 4.2: Sort siblings by siblingOrder and add to focus note's lists
+    priorSiblings.sort(Comparator.comparing(c -> c.getNote().getSiblingOrder()));
+    for (CandidateNote candidate : priorSiblings) {
+      builder.getFocusNote().getPriorSiblings().add(candidate.getNote().getUri());
+    }
+
+    youngerSiblings.sort(Comparator.comparing(c -> c.getNote().getSiblingOrder()));
+    for (CandidateNote candidate : youngerSiblings) {
+      builder.getFocusNote().getYoungerSiblings().add(candidate.getNote().getUri());
     }
 
     return builder.build();

@@ -331,7 +331,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludeYoungerSiblingsInFocusNoteList() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
@@ -341,7 +340,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludeYoungerSiblingsInRelatedNotes() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
@@ -471,7 +469,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludePriorSiblingsInFocusNoteListInOrder() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
@@ -481,7 +478,6 @@ public class NoteGraphServiceTest {
     }
 
     @Test
-    @Disabled("Step 1-2: Not yet implemented - related notes retrieval")
     void shouldIncludePriorSiblingsInRelatedNotes() {
       GraphRAGResult result = noteGraphService.retrieve(focusNote, 1000);
 
