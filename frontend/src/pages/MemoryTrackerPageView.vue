@@ -107,8 +107,11 @@
               Thinking time: {{ formatThinkingTime(prompt.answer.thinkingTimeMs) }}
             </span>
           </div>
+          <div v-if="prompt.questionType === 'SPELLING'" class="daisy-alert daisy-alert-info">
+            This is a spelling question. Details are not needed.
+          </div>
           <QuestionDisplay
-            v-if="prompt.predefinedQuestion && prompt.answer"
+            v-else-if="prompt.predefinedQuestion && prompt.answer"
             v-bind="{
               multipleChoicesQuestion: prompt.predefinedQuestion.multipleChoicesQuestion,
               correctChoiceIndex: prompt.predefinedQuestion.correctAnswerIndex,

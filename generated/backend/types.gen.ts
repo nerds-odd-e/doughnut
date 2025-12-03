@@ -178,6 +178,7 @@ export type Answer = {
 
 export type RecallPrompt = {
     id: number;
+    questionType: 'MCQ' | 'SPELLING';
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: Note;
@@ -283,6 +284,7 @@ export type MemoryTracker = {
 export type AnswerSpellingDto = {
     spellingAnswer?: string;
     thinkingTimeMs?: number;
+    recallPromptId?: number;
 };
 
 export type SpellingResultDto = {
@@ -551,11 +553,6 @@ export type NotebookCertificateApprovalDto = {
     approval?: NotebookCertificateApproval;
 };
 
-export type SpellingQuestion = {
-    stem?: string;
-    notebook?: Notebook;
-};
-
 export type FailureReport = {
     id?: number;
     errorName: string;
@@ -629,6 +626,7 @@ export type SubscriptionWritable = {
 
 export type RecallPromptWritable = {
     id: number;
+    questionType: 'MCQ' | 'SPELLING';
     multipleChoicesQuestion?: MultipleChoicesQuestion;
     notebook?: Notebook;
     note?: NoteWritable;
@@ -3753,7 +3751,7 @@ export type GetSpellingQuestionResponses = {
     /**
      * OK
      */
-    200: SpellingQuestion;
+    200: RecallPrompt;
 };
 
 export type GetSpellingQuestionResponse = GetSpellingQuestionResponses[keyof GetSpellingQuestionResponses];

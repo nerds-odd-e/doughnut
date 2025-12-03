@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.SpellingQuestion;
 import com.odde.doughnut.controllers.dto.SpellingResultDTO;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.RecallPrompt;
@@ -38,14 +37,12 @@ class MemoryTrackerController {
   }
 
   @GetMapping("/{memoryTracker}/spelling-question")
-  public SpellingQuestion getSpellingQuestion(
+  public RecallPrompt getSpellingQuestion(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(memoryTracker);
-    return new SpellingQuestion(
-        memoryTracker.getNote().getClozeDescription().clozeDetails(),
-        memoryTracker.getNote().getNotebook());
+    return memoryTrackerService.getSpellingQuestion(memoryTracker);
   }
 
   @GetMapping("/{memoryTracker}")
@@ -107,10 +104,22 @@ class MemoryTrackerController {
   @Transactional
   public SpellingResultDTO answerSpelling(
       @PathVariable("memoryTracker") @Schema(type = "integer") MemoryTracker memoryTracker,
-      @Valid @RequestBody AnswerSpellingDTO answerDTO) {
+      @Valid @RequestBody AnswerSpellingDTO answerDTO)
+      throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
+    authorizationService.assertReadAuthorization(memoryTracker);
+    RecallPrompt recallPrompt =
+        answerDTO.getRecallPromptId() != null
+            ? entityPersister.find(RecallPrompt.class, answerDTO.getRecallPromptId())
+            : null;
+    if (recallPrompt == null) {
+      throw new IllegalArgumentException("Recall prompt ID is required");
+    }
+    if (!recallPrompt.getMemoryTracker().getId().equals(memoryTracker.getId())) {
+      throw new IllegalArgumentException("Recall prompt does not belong to the memory tracker");
+    }
     return memoryTrackerService.answerSpelling(
-        memoryTracker,
+        recallPrompt,
         answerDTO,
         authorizationService.getCurrentUser(),
         testabilitySettings.getCurrentUTCTimestamp());

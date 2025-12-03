@@ -4,7 +4,10 @@ import AssessmentPage from "@/pages/AssessmentPage.vue"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { flushPromises } from "@vue/test-utils"
-import type { AssessmentQuestionInstance } from "@generated/backend"
+import type {
+  AssessmentQuestionInstance,
+  RecallPrompt,
+} from "@generated/backend"
 
 vitest.mock("vue-router", () => ({
   useRouter: () => ({
@@ -19,9 +22,13 @@ describe("assessment page", () => {
     const notebook = makeMe.aNotebook.please()
     const assessmentQuestionInstance =
       makeMe.anAssessmentQuestionInstance.please()
+    const recallPrompt: RecallPrompt = {
+      ...assessmentQuestionInstance,
+      questionType: "MCQ",
+    }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
-      .withQuestions([assessmentQuestionInstance])
+      .withQuestions([recallPrompt])
       .please()
     let generateAssessmentQuestionsSpy: ReturnType<
       typeof mockSdkService<"generateAssessmentQuestions">
@@ -72,16 +79,26 @@ describe("assessment page", () => {
       .withChoices(["answer3", "answer4"])
       .please()
     const answerResult1: AssessmentQuestionInstance = {
-      ...quizQuestion_1,
+      id: quizQuestion_1.id,
+      multipleChoicesQuestion: quizQuestion_1.multipleChoicesQuestion,
       answer: { id: 1, correct: true, choiceIndex: 0 },
     }
     const answerResult2: AssessmentQuestionInstance = {
-      ...quizQuestion_2,
+      id: quizQuestion_2.id,
+      multipleChoicesQuestion: quizQuestion_2.multipleChoicesQuestion,
       answer: { id: 1, correct: true, choiceIndex: 0 },
+    }
+    const recallPrompt1: RecallPrompt = {
+      ...quizQuestion_1,
+      questionType: "MCQ",
+    }
+    const recallPrompt2: RecallPrompt = {
+      ...quizQuestion_2,
+      questionType: "MCQ",
     }
     const assessmentAttempt = makeMe.anAssessmentAttempt
       .forNotebook(notebook)
-      .withQuestions([quizQuestion_1, quizQuestion_2])
+      .withQuestions([recallPrompt1, recallPrompt2])
       .please()
     let answerQuestionSpy: ReturnType<typeof mockSdkService<"answerQuestion">>
     let submitAssessmentResultSpy: ReturnType<

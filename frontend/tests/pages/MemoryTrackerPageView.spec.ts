@@ -516,4 +516,51 @@ describe("MemoryTrackerPageView", () => {
       expect(reEnableButton.exists()).toBe(false)
     })
   })
+
+  describe("spelling question type", () => {
+    it("displays spelling question message when question type is SPELLING", async () => {
+      const memoryTracker = makeMe.aMemoryTracker.please()
+      const spellingPrompt = makeMe.aRecallPrompt
+        .withQuestionType("SPELLING")
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [spellingPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      expect(wrapper.text()).toContain(
+        "This is a spelling question. Details are not needed."
+      )
+    })
+
+    it("does not display question details for spelling questions", async () => {
+      const memoryTracker = makeMe.aMemoryTracker.please()
+      const spellingPrompt = makeMe.aRecallPrompt
+        .withQuestionType("SPELLING")
+        .please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [spellingPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      // Should not display multiple choice question
+      expect(wrapper.findComponent({ name: "QuestionDisplay" }).exists()).toBe(
+        false
+      )
+    })
+  })
 })

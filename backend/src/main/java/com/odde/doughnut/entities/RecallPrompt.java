@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @JsonPropertyOrder({
   "id",
+  "questionType",
   "multipleChoicesQuestion",
   "notebook",
   "note",
@@ -44,7 +45,7 @@ public class RecallPrompt extends EntityIdentifiedByIdOnly {
   @Enumerated(EnumType.STRING)
   @Column(name = "question_type")
   @NotNull
-  @JsonIgnore
+  @JsonProperty
   private QuestionType questionType;
 
   public Notebook getNotebook() {
