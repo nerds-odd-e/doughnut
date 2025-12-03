@@ -91,10 +91,7 @@ const useQuestionFetching = (props: QuizProps) => {
       const memoryTrackerId = memoryTracker?.memoryTrackerId
       if (memoryTrackerId === undefined) break
 
-      // Skip spelling memory trackers - they don't need AI-generated questions
-      if (memoryTracker?.spelling) {
-        continue
-      }
+      // All memory trackers (including spelling) can use askAQuestion
 
       const cachedValue = recallPromptCache.value[memoryTrackerId]
       if (cachedValue !== undefined) continue
@@ -102,7 +99,7 @@ const useQuestionFetching = (props: QuizProps) => {
       fetchingMemoryTrackerIds.value.add(memoryTrackerId)
       try {
         const { data: question, error } = await apiCallWithLoading(() =>
-          RecallPromptController.askAQuestion({
+          MemoryTrackerController.askAQuestion({
             path: { memoryTracker: memoryTrackerId },
           })
         )
@@ -155,11 +152,6 @@ const isCurrentMemoryTrackerFetching = computed(() => {
 })
 const currentQuestionFetched = computed(() => {
   const memoryTrackerId = currentMemoryTrackerId.value
-  const memoryTracker = currentMemoryTracker.value
-  // Spelling trackers don't need recall prompts, so they're always "fetched"
-  if (memoryTracker?.spelling) {
-    return true
-  }
   return (
     memoryTrackerId !== undefined && memoryTrackerId in recallPromptCache.value
   )
@@ -176,17 +168,18 @@ const memoryTrackerAt = (index: number): MemoryTrackerLite | undefined => {
   return props.memoryTrackers?.[index]
 }
 
-const onSpellingAnswer = async (answerData: AnswerSpellingDto) => {
-  if (answerData.spellingAnswer === undefined || !currentMemoryTrackerId.value)
+const onSpellingAnswer = async (
+  answerData: AnswerSpellingDto & { recallPromptId?: number }
+) => {
+  if (answerData.spellingAnswer === undefined || !answerData.recallPromptId)
     return
 
   const { data: answerResult, error } = await apiCallWithLoading(() =>
-    MemoryTrackerController.answerSpelling({
-      path: { memoryTracker: currentMemoryTrackerId.value! },
+    RecallPromptController.answerSpelling({
+      path: { recallPrompt: answerData.recallPromptId! },
       body: {
         spellingAnswer: answerData.spellingAnswer!,
         thinkingTimeMs: answerData.thinkingTimeMs,
-        recallPromptId: answerData.recallPromptId,
       },
     })
   )

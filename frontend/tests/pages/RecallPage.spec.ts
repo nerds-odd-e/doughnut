@@ -38,7 +38,10 @@ beforeEach(() => {
     "recalling",
     makeMe.aDueMemoryTrackersList.please()
   )
-  mockSdkService("getSpellingQuestion", { stem: "Spell the word 'cat'" })
+  mockSdkService(
+    "askAQuestion",
+    makeMe.aRecallPrompt.withQuestionType("SPELLING").please()
+  )
   renderer = helper
     .component(RecallPage)
     .withCleanStorage()

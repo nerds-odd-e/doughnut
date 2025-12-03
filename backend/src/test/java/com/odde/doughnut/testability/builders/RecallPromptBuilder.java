@@ -26,9 +26,11 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   protected void beforeCreate(boolean needPersist) {
     if (entity == null) {
       entity = new RecallPrompt();
-      PredefinedQuestion predefinedQuestion = predefinedQuestionBuilder.please(needPersist);
-      entity.setPredefinedQuestion(predefinedQuestion);
-      entity.setQuestionType(QuestionType.MCQ);
+      if (entity.getQuestionType() != QuestionType.SPELLING) {
+        PredefinedQuestion predefinedQuestion = predefinedQuestionBuilder.please(needPersist);
+        entity.setPredefinedQuestion(predefinedQuestion);
+        entity.setQuestionType(QuestionType.MCQ);
+      }
     }
     if (answerDTO != null) {
       entity.setAnswer(
@@ -85,5 +87,14 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     AnswerDTO dto = new AnswerDTO();
     dto.setChoiceIndex(index);
     return answer(dto);
+  }
+
+  public RecallPromptBuilder spelling() {
+    if (entity == null) {
+      entity = new RecallPrompt();
+    }
+    entity.setQuestionType(QuestionType.SPELLING);
+    entity.setPredefinedQuestion(null);
+    return this;
   }
 }

@@ -60,7 +60,7 @@ const stem = computed(() => {
 const fetchSpellingQuestion = async () => {
   loading.value = true
   const { data: prompt, error: promptError } =
-    await MemoryTrackerController.getSpellingQuestion({
+    await MemoryTrackerController.askAQuestion({
       path: { memoryTracker: props.memoryTrackerId },
     })
   if (!promptError && prompt) {

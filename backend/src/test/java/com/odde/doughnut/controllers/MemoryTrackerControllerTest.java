@@ -3,69 +3,91 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
-import com.odde.doughnut.controllers.dto.SpellingResultDTO;
-import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuestionType;
 import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.utils.TimestampOperations;
-import java.sql.Timestamp;
+import com.odde.doughnut.testability.OpenAIChatCompletionMock;
+import com.openai.client.OpenAIClient;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.server.ResponseStatusException;
 
 class MemoryTrackerControllerTest extends ControllerTestBase {
+  @MockitoBean(name = "officialOpenAiClient")
+  OpenAIClient officialClient;
+
   @Autowired MemoryTrackerController controller;
+  OpenAIChatCompletionMock openAIChatCompletionMock;
 
   @BeforeEach
   void setup() {
     currentUser.setUser(makeMe.aUser().please());
+    openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
   }
 
   @Nested
-  class GetSpellingQuestion {
+  class AskAQuestion {
     @Test
-    void shouldReturnSpellingRecallPrompt() throws UnexpectedNoAccessRightException {
+    void shouldReturnSpellingRecallPromptForSpellingMemoryTracker()
+        throws UnexpectedNoAccessRightException {
       Note note =
           makeMe
               .aNote("moon")
               .details("partner of earth")
               .creatorAndOwner(currentUser.getUser())
               .please();
-      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).spelling().please();
 
-      RecallPrompt recallPrompt = controller.getSpellingQuestion(memoryTracker);
+      RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
       assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.SPELLING));
       assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
       assertThat(recallPrompt.getPredefinedQuestion(), nullValue());
     }
 
     @Test
-    void shouldNotBeAbleToGetSpellingQuestionForOthersMemoryTracker() {
+    void shouldReturnMCQRecallPromptForNonSpellingMemoryTracker()
+        throws UnexpectedNoAccessRightException {
+      Note note =
+          makeMe
+              .aNote("moon")
+              .details("partner of earth")
+              .creatorAndOwner(currentUser.getUser())
+              .rememberSpelling()
+              .please();
+      makeMe.aNote().under(note).please();
+      MemoryTracker memoryTracker = makeMe.aMemoryTrackerFor(note).please();
+
+      // Mock OpenAI API call
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(
+          makeMe.aMCQWithAnswer().please());
+
+      RecallPrompt recallPrompt = controller.askAQuestion(memoryTracker);
+      assertThat(recallPrompt, notNullValue());
+      assertThat(recallPrompt.getQuestionType(), equalTo(QuestionType.MCQ));
+      assertThat(recallPrompt.getMemoryTracker(), equalTo(memoryTracker));
+    }
+
+    @Test
+    void shouldNotBeAbleToAskQuestionForOthersMemoryTracker() {
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
       assertThrows(
-          UnexpectedNoAccessRightException.class,
-          () -> controller.getSpellingQuestion(memoryTracker));
+          UnexpectedNoAccessRightException.class, () -> controller.askAQuestion(memoryTracker));
     }
 
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
       MemoryTracker memoryTracker = makeMe.aMemoryTrackerBy(makeMe.aUser().please()).please();
-      assertThrows(
-          ResponseStatusException.class, () -> controller.getSpellingQuestion(memoryTracker));
+      assertThrows(ResponseStatusException.class, () -> controller.askAQuestion(memoryTracker));
     }
   }
 
@@ -240,167 +262,6 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
       assertThat(memoryTrackers, hasSize(1));
       assertThat(memoryTrackers, contains(activeTracker));
       assertThat(memoryTrackers, not(hasItem(deletedTracker)));
-    }
-  }
-
-  @Nested
-  class answerSpellingQuestion {
-    Note answerNote;
-    MemoryTracker memoryTracker;
-    RecallPrompt recallPrompt;
-    AnswerSpellingDTO answerDTO = new AnswerSpellingDTO();
-
-    @BeforeEach
-    void setup() throws UnexpectedNoAccessRightException {
-      answerNote = makeMe.aNote().rememberSpelling().please();
-      memoryTracker =
-          makeMe
-              .aMemoryTrackerFor(answerNote)
-              .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200)
-              .spelling()
-              .please();
-      recallPrompt = controller.getSpellingQuestion(memoryTracker);
-      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
-      answerDTO.setRecallPromptId(recallPrompt.getId());
-    }
-
-    @Test
-    void answerOneOfTheTitles() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(answerNote).titleConstructor("this / that").please();
-      answerDTO.setSpellingAnswer("this");
-      assertTrue(controller.answerSpelling(memoryTracker, answerDTO).getIsCorrect());
-      // Create a new recall prompt for the second answer
-      RecallPrompt secondRecallPrompt = controller.getSpellingQuestion(memoryTracker);
-      AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
-      secondAnswerDTO.setSpellingAnswer("that");
-      secondAnswerDTO.setRecallPromptId(secondRecallPrompt.getId());
-      assertTrue(controller.answerSpelling(memoryTracker, secondAnswerDTO).getIsCorrect());
-    }
-
-    @Test
-    void shouldValidateTheAnswerAndUpdateMemoryTracker() throws UnexpectedNoAccessRightException {
-      Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-      SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
-      assertTrue(answerResult.getIsCorrect());
-      assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
-    }
-
-    @Test
-    void shouldAcceptThinkingTimeMs() throws UnexpectedNoAccessRightException {
-      answerDTO.setThinkingTimeMs(5000);
-      SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
-      assertTrue(answerResult.getIsCorrect());
-      RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
-      Answer answer = reloadedPrompt.getAnswer();
-      assertNotNull(answer);
-      assertThat(answer.getThinkingTimeMs(), equalTo(5000));
-      assertThat(answer.getSpellingAnswer(), equalTo(answerDTO.getSpellingAnswer()));
-      assertTrue(answer.getCorrect());
-    }
-
-    @Test
-    void shouldCreateAnswerEntityForSpellingQuestion() throws UnexpectedNoAccessRightException {
-      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
-      answerDTO.setThinkingTimeMs(3000);
-      controller.answerSpelling(memoryTracker, answerDTO);
-
-      RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
-      Answer answer = reloadedPrompt.getAnswer();
-      assertNotNull(answer);
-      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTopicConstructor()));
-      assertThat(answer.getThinkingTimeMs(), equalTo(3000));
-      assertTrue(answer.getCorrect());
-    }
-
-    @Test
-    void shouldNotAllowAnsweringTwice() throws UnexpectedNoAccessRightException {
-      controller.answerSpelling(memoryTracker, answerDTO);
-      assertThrows(
-          IllegalArgumentException.class,
-          () -> controller.answerSpelling(memoryTracker, answerDTO));
-    }
-
-    @Test
-    void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
-      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerSpelling(memoryTracker, answerDTO);
-      assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
-    }
-
-    @Test
-    void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
-      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-      controller.answerSpelling(memoryTracker, answerDTO);
-      assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
-      assertThat(
-          memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
-    }
-
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      answer.setRecallPromptId(recallPrompt.getId());
-      currentUser.setUser(null);
-      assertThrows(
-          ResponseStatusException.class, () -> controller.answerSpelling(memoryTracker, answer));
-    }
-
-    @Test
-    void shouldRequireRecallPromptId() {
-      AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      answer.setSpellingAnswer(answerNote.getTopicConstructor());
-      assertThrows(
-          IllegalArgumentException.class, () -> controller.answerSpelling(memoryTracker, answer));
-    }
-
-    @Test
-    void shouldValidateRecallPromptIsSpellingType() {
-      RecallPrompt mcqPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
-      AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      answer.setSpellingAnswer(answerNote.getTopicConstructor());
-      answer.setRecallPromptId(mcqPrompt.getId());
-      assertThrows(
-          IllegalArgumentException.class, () -> controller.answerSpelling(memoryTracker, answer));
-    }
-
-    @Nested
-    class WrongAnswer {
-      @BeforeEach
-      void setup() {
-        answerDTO.setSpellingAnswer("wrong");
-      }
-
-      @Test
-      void shouldValidateTheWrongAnswer() throws UnexpectedNoAccessRightException {
-        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-        Integer oldRepetitionCount = memoryTracker.getRepetitionCount();
-        SpellingResultDTO answerResult = controller.answerSpelling(memoryTracker, answerDTO);
-        assertFalse(answerResult.getIsCorrect());
-        assertThat(memoryTracker.getRepetitionCount(), greaterThan(oldRepetitionCount));
-      }
-
-      @Test
-      void shouldNotChangeTheLastRecalledAtTime() throws UnexpectedNoAccessRightException {
-        testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-        Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
-        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
-        controller.answerSpelling(memoryTracker, answerDTO);
-        assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
-        assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
-      }
-
-      @Test
-      void shouldRepeatTheNextDay() throws UnexpectedNoAccessRightException {
-        controller.answerSpelling(memoryTracker, answerDTO);
-        assertThat(
-            memoryTracker.getNextRecallAt(),
-            lessThan(
-                TimestampOperations.addHoursToTimestamp(
-                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
-      }
     }
   }
 

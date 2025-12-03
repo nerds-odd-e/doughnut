@@ -210,6 +210,18 @@ export type AnsweredQuestion = {
     memoryTrackerId?: number;
 };
 
+export type AnswerSpellingDto = {
+    spellingAnswer?: string;
+    thinkingTimeMs?: number;
+};
+
+export type SpellingResultDto = {
+    note: Note;
+    answer?: string;
+    isCorrect?: boolean;
+    memoryTrackerId?: number;
+};
+
 export type QuestionSuggestionCreationParams = {
     comment?: string;
     isPositiveFeedback?: boolean;
@@ -286,19 +298,6 @@ export type MemoryTracker = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
-};
-
-export type AnswerSpellingDto = {
-    spellingAnswer?: string;
-    thinkingTimeMs?: number;
-    recallPromptId?: number;
-};
-
-export type SpellingResultDto = {
-    note: Note;
-    answer?: string;
-    isCorrect?: boolean;
-    memoryTrackerId?: number;
 };
 
 export type McpNoteAddDto = {
@@ -654,6 +653,13 @@ export type AnsweredQuestionWritable = {
     memoryTrackerId?: number;
 };
 
+export type SpellingResultDtoWritable = {
+    note: NoteWritable;
+    answer?: string;
+    isCorrect?: boolean;
+    memoryTrackerId?: number;
+};
+
 export type NoteCreationResultWritable = {
     created: NoteRealmWritable;
     parent: NoteRealmWritable;
@@ -678,13 +684,6 @@ export type MemoryTrackerWritable = {
     forgettingCurveIndex?: number;
     removedFromTracking?: boolean;
     spelling?: boolean;
-};
-
-export type SpellingResultDtoWritable = {
-    note: NoteWritable;
-    answer?: string;
-    isCorrect?: boolean;
-    memoryTrackerId?: number;
 };
 
 export type ConversationWritable = {
@@ -1430,6 +1429,33 @@ export type AnswerQuizResponses = {
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
+
+export type AnswerSpellingData = {
+    body: AnswerSpellingDto;
+    path: {
+        recallPrompt: number;
+    };
+    query?: never;
+    url: '/api/recall-prompts/{recallPrompt}/answer-spelling';
+};
+
+export type AnswerSpellingErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type AnswerSpellingError = AnswerSpellingErrors[keyof AnswerSpellingErrors];
+
+export type AnswerSpellingResponses = {
+    /**
+     * OK
+     */
+    200: SpellingResultDto;
+};
+
+export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
 
 export type ToggleApprovalData = {
     body?: never;
@@ -2184,33 +2210,6 @@ export type ReEnableResponses = {
 };
 
 export type ReEnableResponse = ReEnableResponses[keyof ReEnableResponses];
-
-export type AnswerSpellingData = {
-    body: AnswerSpellingDto;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/answer-spelling';
-};
-
-export type AnswerSpellingErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AnswerSpellingError = AnswerSpellingErrors[keyof AnswerSpellingErrors];
-
-export type AnswerSpellingResponses = {
-    /**
-     * OK
-     */
-    200: SpellingResultDto;
-};
-
-export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];
 
 export type CreateNoteViaMcpData = {
     body: McpNoteAddDto;
@@ -3440,33 +3439,6 @@ export type RecallingResponses = {
 
 export type RecallingResponse = RecallingResponses[keyof RecallingResponses];
 
-export type AskAQuestionData = {
-    body?: never;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/recall-prompts/{memoryTracker}/question';
-};
-
-export type AskAQuestionErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AskAQuestionError = AskAQuestionErrors[keyof AskAQuestionErrors];
-
-export type AskAQuestionResponses = {
-    /**
-     * OK
-     */
-    200: RecallPrompt;
-};
-
-export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];
-
 export type ExportQuestionGenerationData = {
     body?: never;
     path: {
@@ -3737,33 +3709,6 @@ export type ShowMemoryTrackerResponses = {
 
 export type ShowMemoryTrackerResponse = ShowMemoryTrackerResponses[keyof ShowMemoryTrackerResponses];
 
-export type GetSpellingQuestionData = {
-    body?: never;
-    path: {
-        memoryTracker: number;
-    };
-    query?: never;
-    url: '/api/memory-trackers/{memoryTracker}/spelling-question';
-};
-
-export type GetSpellingQuestionErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type GetSpellingQuestionError = GetSpellingQuestionErrors[keyof GetSpellingQuestionErrors];
-
-export type GetSpellingQuestionResponses = {
-    /**
-     * OK
-     */
-    200: RecallPrompt;
-};
-
-export type GetSpellingQuestionResponse = GetSpellingQuestionResponses[keyof GetSpellingQuestionResponses];
-
 export type GetRecallPromptsData = {
     body?: never;
     path: {
@@ -3790,6 +3735,33 @@ export type GetRecallPromptsResponses = {
 };
 
 export type GetRecallPromptsResponse = GetRecallPromptsResponses[keyof GetRecallPromptsResponses];
+
+export type AskAQuestionData = {
+    body?: never;
+    path: {
+        memoryTracker: number;
+    };
+    query?: never;
+    url: '/api/memory-trackers/{memoryTracker}/question';
+};
+
+export type AskAQuestionErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type AskAQuestionError = AskAQuestionErrors[keyof AskAQuestionErrors];
+
+export type AskAQuestionResponses = {
+    /**
+     * OK
+     */
+    200: RecallPrompt;
+};
+
+export type AskAQuestionResponse = AskAQuestionResponses[keyof AskAQuestionResponses];
 
 export type GetRecentlyReviewedData = {
     body?: never;
