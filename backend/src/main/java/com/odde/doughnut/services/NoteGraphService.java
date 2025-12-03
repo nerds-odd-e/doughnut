@@ -128,6 +128,33 @@ public class NoteGraphService {
       processParentChainForContextualPath(
           depth1Note, pathPrefix, focusNote, depthFetched, candidates, 2);
 
+      // Step 4.6: Process children of ancestors discovered via contextual paths
+      // This discovers parent's siblings (children of grandparent)
+      if (depth1Relationship == RelationshipToFocusNote.Parent) {
+        processChildrenOfAncestors(
+            depth1Note,
+            depth1Relationship,
+            focusNote,
+            depthFetched,
+            childrenEmitted,
+            pickedChildIndices,
+            candidates,
+            2);
+      }
+
+      // Step 4.6: Process children of object's parent to discover siblings of parent of object
+      if (depth1Relationship == RelationshipToFocusNote.Object) {
+        processChildrenOfObjectParent(
+            depth1Note,
+            depth1Relationship,
+            focusNote,
+            depthFetched,
+            childrenEmitted,
+            pickedChildIndices,
+            candidates,
+            2);
+      }
+
       // Process object of depth 1 note (if reification)
       processObjectOfNote(depth1Note, depth1Relationship, focusNote, depthFetched, candidates, 2);
 
@@ -461,5 +488,144 @@ public class NoteGraphService {
             parentNote, discoveryPath, focusNote, depthFetched, candidates, depth);
       }
     }
+  }
+
+  private void processChildrenOfAncestors(
+      Note depth1Note,
+      RelationshipToFocusNote depth1Relationship,
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      Map<Note, Integer> childrenEmitted,
+      Map<Note, Set<Integer>> pickedChildIndices,
+      List<CandidateNote> candidates,
+      int depth) {
+    // Step 4.6: Process children of ancestors to discover parent's siblings
+    // Go up the parent chain from the depth 1 note
+    Note ancestor = depth1Note.getParent();
+    if (ancestor == null) {
+      return;
+    }
+
+    // Ensure the ancestor is discovered (it should be discovered via contextual path processing)
+    // If not, discover it now
+    if (!depthFetched.containsKey(ancestor)) {
+      depthFetched.put(ancestor, depth);
+      List<RelationshipToFocusNote> ancestorPath = new ArrayList<>();
+      ancestorPath.add(depth1Relationship); // Parent
+      ancestorPath.add(RelationshipToFocusNote.Parent); // Parent's parent
+      RelationshipToFocusNote ancestorRelationship =
+          relationshipTypeDerivationService.deriveRelationshipType(
+              ancestor, focusNote, ancestorPath);
+      if (ancestorRelationship != null) {
+        candidates.add(new CandidateNote(ancestor, ancestorRelationship, depth, ancestorPath));
+      }
+    }
+
+    // Process children of the ancestor (grandparent)
+    // The discovery path for these children will be [Parent, Parent, Child]
+    // Note: For ancestors discovered at depth 2, we use a minimum cap of 2 to allow
+    // processing of their children (parent's siblings)
+    List<Note> allChildren = depthQueryService.queryDepth1Children(ancestor);
+    int ancestorDepthFetched = depthFetched.getOrDefault(ancestor, depth);
+    int childCap = Math.max(2, CHILD_CAP_MULTIPLIER * (depth - ancestorDepthFetched));
+    int childrenAlreadyEmitted = childrenEmitted.getOrDefault(ancestor, 0);
+    int childrenRemainingBudget = Math.max(0, childCap - childrenAlreadyEmitted);
+
+    Set<Integer> pickedIndices =
+        new HashSet<>(pickedChildIndices.getOrDefault(ancestor, new HashSet<>()));
+    var selectedChildren =
+        childrenSelectionService.selectChildren(
+            ancestor, childrenRemainingBudget, pickedIndices, allChildren);
+
+    // Update picked indices
+    for (int i = 0; i < allChildren.size(); i++) {
+      if (selectedChildren.contains(allChildren.get(i))) {
+        pickedIndices.add(i);
+      }
+    }
+    pickedChildIndices.put(ancestor, pickedIndices);
+
+    // Add children as candidates with discovery path [Parent, Parent, Child]
+    for (Note child : selectedChildren) {
+      if (!depthFetched.containsKey(child)) {
+        depthFetched.put(child, depth);
+        List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+        discoveryPath.add(depth1Relationship); // Parent
+        discoveryPath.add(RelationshipToFocusNote.Parent); // Parent's parent
+        discoveryPath.add(RelationshipToFocusNote.Child); // Child of parent's parent
+        RelationshipToFocusNote relationship =
+            relationshipTypeDerivationService.deriveRelationshipType(
+                child, focusNote, discoveryPath);
+        if (relationship != null) {
+          candidates.add(new CandidateNote(child, relationship, depth, discoveryPath));
+        }
+      }
+    }
+
+    childrenEmitted.put(ancestor, childrenAlreadyEmitted + selectedChildren.size());
+  }
+
+  private void processChildrenOfObjectParent(
+      Note objectNote,
+      RelationshipToFocusNote objectRelationship,
+      Note focusNote,
+      Map<Note, Integer> depthFetched,
+      Map<Note, Integer> childrenEmitted,
+      Map<Note, Set<Integer>> pickedChildIndices,
+      List<CandidateNote> candidates,
+      int depth) {
+    // Step 4.6: Process children of object's parent to discover siblings of parent of object
+    // The discovery path for these children will be [Object, Parent, Child]
+    Note objectParent = objectNote.getParent();
+    if (objectParent == null) {
+      return;
+    }
+
+    List<Note> allChildren = depthQueryService.queryDepth1Children(objectParent);
+    // Note: For object's parent discovered at depth 2, we use a minimum cap of 2 to allow
+    // processing of their children (siblings of parent of object)
+    int objectParentDepthFetched = depthFetched.getOrDefault(objectParent, depth);
+    int childCap = Math.max(2, CHILD_CAP_MULTIPLIER * (depth - objectParentDepthFetched));
+    int childrenAlreadyEmitted = childrenEmitted.getOrDefault(objectParent, 0);
+    int childrenRemainingBudget = Math.max(0, childCap - childrenAlreadyEmitted);
+
+    Set<Integer> pickedIndices =
+        new HashSet<>(pickedChildIndices.getOrDefault(objectParent, new HashSet<>()));
+    var selectedChildren =
+        childrenSelectionService.selectChildren(
+            objectParent, childrenRemainingBudget, pickedIndices, allChildren);
+
+    // Update picked indices
+    for (int i = 0; i < allChildren.size(); i++) {
+      if (selectedChildren.contains(allChildren.get(i))) {
+        pickedIndices.add(i);
+      }
+    }
+    pickedChildIndices.put(objectParent, pickedIndices);
+
+    // Filter out the object note itself from selected children
+    selectedChildren =
+        selectedChildren.stream()
+            .filter(child -> !child.equals(objectNote))
+            .collect(Collectors.toList());
+
+    // Add children as candidates with discovery path [Object, Parent, Child]
+    for (Note child : selectedChildren) {
+      if (!depthFetched.containsKey(child)) {
+        depthFetched.put(child, depth);
+        List<RelationshipToFocusNote> discoveryPath = new ArrayList<>();
+        discoveryPath.add(objectRelationship); // Object
+        discoveryPath.add(RelationshipToFocusNote.Parent); // Object's parent
+        discoveryPath.add(RelationshipToFocusNote.Child); // Child of object's parent
+        RelationshipToFocusNote relationship =
+            relationshipTypeDerivationService.deriveRelationshipType(
+                child, focusNote, discoveryPath);
+        if (relationship != null) {
+          candidates.add(new CandidateNote(child, relationship, depth, discoveryPath));
+        }
+      }
+    }
+
+    childrenEmitted.put(objectParent, childrenAlreadyEmitted + selectedChildren.size());
   }
 }

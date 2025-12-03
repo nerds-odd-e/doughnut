@@ -82,6 +82,42 @@ public class RelationshipTypeDerivationService {
       }
     }
 
+    // Step 4.6: Detect parent's siblings via path [Parent, Parent, Child]
+    // When we go from focus note to parent, then to parent's parent (grandparent), then to a child
+    // of the grandparent, that child is a sibling of the parent
+    if (discoveryPath.size() == 3
+        && discoveryPath.get(0) == RelationshipToFocusNote.Parent
+        && discoveryPath.get(1) == RelationshipToFocusNote.Parent
+        && discoveryPath.get(2) == RelationshipToFocusNote.Child) {
+      // Check if the note is a sibling of the parent
+      // A sibling of the parent would have the same parent as the focus note's parent
+      // (i.e., note.getParent() == focusNote.getParent().getParent())
+      if (note.getParent() != null
+          && focusNote.getParent() != null
+          && focusNote.getParent().getParent() != null
+          && note.getParent().equals(focusNote.getParent().getParent())
+          && !note.equals(focusNote.getParent())) {
+        return RelationshipToFocusNote.SiblingOfParent;
+      }
+    }
+
+    // Step 4.6: Detect sibling of parent of object via path [Object, Parent, Child]
+    // When we go from focus note to object, then to object's parent, then to a child of that
+    // parent, that child is a sibling of the parent of the object
+    if (discoveryPath.size() == 3
+        && discoveryPath.get(0) == RelationshipToFocusNote.Object
+        && discoveryPath.get(1) == RelationshipToFocusNote.Parent
+        && discoveryPath.get(2) == RelationshipToFocusNote.Child) {
+      // Check if the note is a sibling of the object's parent
+      if (note.getParent() != null
+          && focusNote.getTargetNote() != null
+          && focusNote.getTargetNote().getParent() != null
+          && note.getParent().equals(focusNote.getTargetNote().getParent())
+          && !note.equals(focusNote.getTargetNote().getParent())) {
+        return RelationshipToFocusNote.SiblingOfParentOfObject;
+      }
+    }
+
     // Step 4.4: Detect object of reified child via path [Child, Object]
     // When we go from focus note to a child, then to the object of that child (if it's a
     // reification),
