@@ -40,22 +40,6 @@
 
       <PopButton
         btn-class="daisy-btn daisy-btn-ghost daisy-w-full daisy-justify-start"
-        title="Edit Note Image"
-      >
-        <template #button_face>
-          <SvgImage />
-          <span class="ms-2">Edit Note Image</span>
-        </template>
-        <template #default="{ closer }">
-          <NoteEditImageDialog
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
-
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-w-full daisy-justify-start"
         title="Edit Note URL"
       >
         <template #button_face>
@@ -77,10 +61,25 @@
         title="Generate Image with DALL-E"
       >
         <template #button_face>
-          <SvgImage />
+          <SvgRobot />
         </template>
         <template #default>
           <AIGenerateImageDialog v-bind="{ note }" />
+        </template>
+      </PopButton>
+
+      <PopButton
+        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        title="Edit Note Image"
+      >
+        <template #button_face>
+          <SvgImage />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditImageDialog
+            v-bind="{ noteId: note.id }"
+            @close-dialog="noteAccessoriesUpdated(closer, $event)"
+          />
         </template>
       </PopButton>
 
@@ -125,7 +124,6 @@ import type { NoteAccessory } from "@generated/backend"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import Questions from "../Questions.vue"
-import SvgImage from "../../svgs/SvgImage.vue"
 import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
 import NoteEditImageDialog from "./NoteEditImageDialog.vue"
 import NoteEditUrlDialog from "./NoteEditUrlDialog.vue"
@@ -133,6 +131,8 @@ import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "../core/NoteExportDialog.vue"
 import SvgAssessment from "../../svgs/SvgAssessment.vue"
 import SvgRemove from "../../svgs/SvgRemove.vue"
+import SvgRobot from "../../svgs/SvgRobot.vue"
+import SvgImage from "../../svgs/SvgImage.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
