@@ -1,5 +1,4 @@
 <template>
-  <h6>Recall Settings</h6>
   <RecallSettingForm
     v-bind="{ noteId: noteInfo.note.id, recallSetting }"
     @level-changed="$emit('levelChanged', $event)"

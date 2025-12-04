@@ -7,52 +7,8 @@
     </button>
     <div class="daisy-flex daisy-flex-col daisy-gap-2">
       <div v-if="noteInfo?.note" class="daisy-mb-4">
-        <h6>Recall Settings</h6>
-        <RecallSettingForm
-          v-bind="{ noteId: note.id, recallSetting }"
-          @level-changed="handleLevelChanged"
-        />
-        <h6 v-if="memoryTrackers.length" class="daisy-mt-4">Memory Trackers</h6>
-        <table v-if="memoryTrackers.length" class="daisy-table daisy-table-bordered daisy-mt-2">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Repetition Count</th>
-              <th>Forgetting Curve Index</th>
-              <th>Next Recall</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="memoryTracker in memoryTrackers"
-              :key="memoryTracker.id"
-              class="clickable-row"
-              @click="navigateToMemoryTracker(memoryTracker.id)"
-            >
-              <NoteInfoMemoryTracker
-                :model-value="memoryTracker"
-                @update:model-value="updateMemoryTracker($event)"
-              />
-            </tr>
-          </tbody>
-        </table>
+        <NoteInfoComponent :note-info="noteInfo" />
       </div>
-
-      <PopButton
-        btn-class="daisy-btn daisy-btn-ghost daisy-w-full daisy-justify-start"
-        title="Edit Note URL"
-      >
-        <template #button_face>
-          <SvgUrlIndicator />
-          <span class="ms-2">Edit Note URL</span>
-        </template>
-        <template #default="{ closer }">
-          <NoteEditUrlDialog
-            v-bind="{ noteId: note.id }"
-            @close-dialog="noteAccessoriesUpdated(closer, $event)"
-          />
-        </template>
-      </PopButton>
     </div>
     <div class="daisy-divider daisy-my-2"></div>
     <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end">
@@ -77,6 +33,21 @@
         </template>
         <template #default="{ closer }">
           <NoteEditImageDialog
+            v-bind="{ noteId: note.id }"
+            @close-dialog="noteAccessoriesUpdated(closer, $event)"
+          />
+        </template>
+      </PopButton>
+
+      <PopButton
+        btn-class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        title="Edit Note URL"
+      >
+        <template #button_face>
+          <SvgUrlIndicator />
+        </template>
+        <template #default="{ closer }">
+          <NoteEditUrlDialog
             v-bind="{ noteId: note.id }"
             @close-dialog="noteAccessoriesUpdated(closer, $event)"
           />
@@ -136,11 +107,10 @@ import SvgImage from "../../svgs/SvgImage.vue"
 import { useRouter } from "vue-router"
 import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
-import type { NoteInfo, MemoryTracker } from "@generated/backend"
+import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
-import { ref, computed, onMounted } from "vue"
-import RecallSettingForm from "../../review/RecallSettingForm.vue"
-import NoteInfoMemoryTracker from "../NoteInfoMemoryTracker.vue"
+import { ref, onMounted } from "vue"
+import NoteInfoComponent from "../NoteInfoComponent.vue"
 
 const { note } = defineProps<{
   note: Note
@@ -156,9 +126,6 @@ const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
-const memoryTrackers = ref<MemoryTracker[]>([])
-
-const recallSetting = computed(() => noteInfo.value?.recallSetting)
 
 const fetchNoteInfo = async () => {
   const { data: noteInfoData, error } = await NoteController.getNoteInfo({
@@ -166,31 +133,12 @@ const fetchNoteInfo = async () => {
   })
   if (!error && noteInfoData) {
     noteInfo.value = noteInfoData
-    memoryTrackers.value = noteInfoData.memoryTrackers ?? []
   }
 }
 
 onMounted(() => {
   fetchNoteInfo()
 })
-
-const handleLevelChanged = () => {
-  // Handle level change if needed
-}
-
-const updateMemoryTracker = (newTracker: MemoryTracker) => {
-  const index = memoryTrackers.value.findIndex((t) => t.id === newTracker.id)
-  if (index !== -1) {
-    memoryTrackers.value[index] = newTracker
-  }
-}
-
-const navigateToMemoryTracker = (memoryTrackerId: number) => {
-  router.push({
-    name: "memoryTrackerShow",
-    params: { memoryTrackerId },
-  })
-}
 
 const closeDialog = () => {
   emit("close-dialog")
@@ -225,14 +173,6 @@ const deleteNote = async () => {
 .animate-dropdown {
   animation: dropDown 0.3s ease-out;
   transform-origin: top;
-}
-
-.clickable-row {
-  cursor: pointer;
-}
-
-.clickable-row:hover {
-  background-color: rgba(0, 0, 0, 0.05);
 }
 </style>
 
