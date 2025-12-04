@@ -33,18 +33,27 @@ const undoTitle = computed(() => {
   return "undo"
 })
 
+const getNoteIdentifier = (noteId: Doughnut.ID): string => {
+  const noteRealm = storageAccessor.value.refOfNoteRealm(noteId).value
+  if (noteRealm?.note?.noteTopology?.titleOrPredicate) {
+    return `"${noteRealm.note.noteTopology.titleOrPredicate}"`
+  }
+  return `note id: ${noteId}`
+}
+
 const getUndoMessage = () => {
   if (!history.value) return "Undo action"
   const actionType = history.value.type
+  const noteIdentifier = getNoteIdentifier(history.value.noteId)
   switch (actionType) {
     case "edit title":
-      return "Are you sure you want to undo editing the title?"
+      return `Are you sure you want to undo editing the title of ${noteIdentifier}?`
     case "edit details":
-      return "Are you sure you want to undo editing the details?"
+      return `Are you sure you want to undo editing the details of ${noteIdentifier}?`
     case "delete note":
-      return "Are you sure you want to undo deleting the note?"
+      return `Are you sure you want to undo deleting ${noteIdentifier}?`
     default:
-      return `Are you sure you want to undo ${actionType}?`
+      return `Are you sure you want to undo ${actionType} for ${noteIdentifier}?`
   }
 }
 

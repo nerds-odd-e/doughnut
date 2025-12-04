@@ -45,75 +45,160 @@ describe("NoteUndoButton", () => {
   })
 
   describe("confirmation dialog", () => {
-    it("shows confirmation dialog when undo button is clicked for delete note", async () => {
-      const note = makeMe.aNote.please()
-      noteEditingHistory.deleteNote(note.id)
-      const wrapper = helper.component(NoteUndoButton).mount()
+    describe("when note is in cache", () => {
+      it("shows confirmation dialog with note title for delete note", async () => {
+        const noteRealm = makeMe.aNoteRealm.topicConstructor("My Note").please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm)
+        noteEditingHistory.deleteNote(noteRealm.id)
+        const wrapper = helper.component(NoteUndoButton).mount()
 
-      const undoButton = wrapper.find("button")
-      await undoButton.trigger("click")
-      await flushPromises()
+        const undoButton = wrapper.find("button")
+        await undoButton.trigger("click")
+        await flushPromises()
 
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
-      expect(popups?.[0]?.type).toBe("confirm")
-      expect(popups?.[0]?.message).toBe(
-        "Are you sure you want to undo deleting the note?"
-      )
+        const popups = usePopups().popups.peek()
+        expect(popups?.length).toBe(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(
+          'Are you sure you want to undo deleting "My Note"?'
+        )
 
-      // Clean up
-      usePopups().popups.done(false)
-      await flushPromises()
+        // Clean up
+        usePopups().popups.done(false)
+        await flushPromises()
+      })
+
+      it("shows confirmation dialog with note title for edit title", async () => {
+        const noteRealm = makeMe.aNoteRealm
+          .topicConstructor("Test Note")
+          .please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm)
+        noteEditingHistory.addEditingToUndoHistory(
+          noteRealm.id,
+          "edit title",
+          "Old Title"
+        )
+        const wrapper = helper.component(NoteUndoButton).mount()
+
+        const undoButton = wrapper.find("button")
+        await undoButton.trigger("click")
+        await flushPromises()
+
+        const popups = usePopups().popups.peek()
+        expect(popups?.length).toBe(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(
+          'Are you sure you want to undo editing the title of "Test Note"?'
+        )
+
+        // Clean up
+        usePopups().popups.done(false)
+        await flushPromises()
+      })
+
+      it("shows confirmation dialog with note title for edit details", async () => {
+        const noteRealm = makeMe.aNoteRealm
+          .topicConstructor("Details Note")
+          .please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm)
+        noteEditingHistory.addEditingToUndoHistory(
+          noteRealm.id,
+          "edit details",
+          "Old Details"
+        )
+        const wrapper = helper.component(NoteUndoButton).mount()
+
+        const undoButton = wrapper.find("button")
+        await undoButton.trigger("click")
+        await flushPromises()
+
+        const popups = usePopups().popups.peek()
+        expect(popups?.length).toBe(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(
+          'Are you sure you want to undo editing the details of "Details Note"?'
+        )
+
+        // Clean up
+        usePopups().popups.done(false)
+        await flushPromises()
+      })
     })
 
-    it("shows confirmation dialog with correct message for edit title", async () => {
-      const note = makeMe.aNote.please()
-      noteEditingHistory.addEditingToUndoHistory(
-        note.id,
-        "edit title",
-        "Old Title"
-      )
-      const wrapper = helper.component(NoteUndoButton).mount()
+    describe("when note is not in cache", () => {
+      it("shows confirmation dialog with note id for delete note", async () => {
+        const note = makeMe.aNote.please()
+        noteEditingHistory.deleteNote(note.id)
+        const wrapper = helper.component(NoteUndoButton).mount()
 
-      const undoButton = wrapper.find("button")
-      await undoButton.trigger("click")
-      await flushPromises()
+        const undoButton = wrapper.find("button")
+        await undoButton.trigger("click")
+        await flushPromises()
 
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
-      expect(popups?.[0]?.type).toBe("confirm")
-      expect(popups?.[0]?.message).toBe(
-        "Are you sure you want to undo editing the title?"
-      )
+        const popups = usePopups().popups.peek()
+        expect(popups?.length).toBe(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(
+          `Are you sure you want to undo deleting note id: ${note.id}?`
+        )
 
-      // Clean up
-      usePopups().popups.done(false)
-      await flushPromises()
-    })
+        // Clean up
+        usePopups().popups.done(false)
+        await flushPromises()
+      })
 
-    it("shows confirmation dialog with correct message for edit details", async () => {
-      const note = makeMe.aNote.please()
-      noteEditingHistory.addEditingToUndoHistory(
-        note.id,
-        "edit details",
-        "Old Details"
-      )
-      const wrapper = helper.component(NoteUndoButton).mount()
+      it("shows confirmation dialog with note id for edit title", async () => {
+        const note = makeMe.aNote.please()
+        noteEditingHistory.addEditingToUndoHistory(
+          note.id,
+          "edit title",
+          "Old Title"
+        )
+        const wrapper = helper.component(NoteUndoButton).mount()
 
-      const undoButton = wrapper.find("button")
-      await undoButton.trigger("click")
-      await flushPromises()
+        const undoButton = wrapper.find("button")
+        await undoButton.trigger("click")
+        await flushPromises()
 
-      const popups = usePopups().popups.peek()
-      expect(popups?.length).toBe(1)
-      expect(popups?.[0]?.type).toBe("confirm")
-      expect(popups?.[0]?.message).toBe(
-        "Are you sure you want to undo editing the details?"
-      )
+        const popups = usePopups().popups.peek()
+        expect(popups?.length).toBe(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(
+          `Are you sure you want to undo editing the title of note id: ${note.id}?`
+        )
 
-      // Clean up
-      usePopups().popups.done(false)
-      await flushPromises()
+        // Clean up
+        usePopups().popups.done(false)
+        await flushPromises()
+      })
+
+      it("shows confirmation dialog with note id for edit details", async () => {
+        const note = makeMe.aNote.please()
+        noteEditingHistory.addEditingToUndoHistory(
+          note.id,
+          "edit details",
+          "Old Details"
+        )
+        const wrapper = helper.component(NoteUndoButton).mount()
+
+        const undoButton = wrapper.find("button")
+        await undoButton.trigger("click")
+        await flushPromises()
+
+        const popups = usePopups().popups.peek()
+        expect(popups?.length).toBe(1)
+        expect(popups?.[0]?.type).toBe("confirm")
+        expect(popups?.[0]?.message).toBe(
+          `Are you sure you want to undo editing the details of note id: ${note.id}?`
+        )
+
+        // Clean up
+        usePopups().popups.done(false)
+        await flushPromises()
+      })
     })
 
     it("calls undo when confirmation is accepted for delete note", async () => {
