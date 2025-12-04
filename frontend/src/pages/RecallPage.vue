@@ -84,7 +84,14 @@ import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
-import { computed, onMounted, ref, onActivated, onDeactivated } from "vue"
+import {
+  computed,
+  onMounted,
+  ref,
+  onActivated,
+  onDeactivated,
+  watch,
+} from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 export type SpellingResult = SpellingResultDto & { type: "spelling" }
@@ -101,6 +108,9 @@ const {
   recallWindowEndAt,
   setRecallWindowEndAt,
   totalAssimilatedCount,
+  setIsRecallPaused,
+  shouldResumeRecall,
+  clearShouldResumeRecall,
 } = useRecallData()
 
 defineProps({
@@ -138,6 +148,24 @@ const toRepeatCount = computed(
 const viewLastAnsweredQuestion = (cursor: number | undefined) => {
   previousAnsweredQuestionCursor.value = cursor
 }
+
+watch(
+  () => previousAnsweredQuestionCursor.value,
+  (cursor) => {
+    setIsRecallPaused(cursor !== undefined)
+  },
+  { immediate: true }
+)
+
+watch(
+  () => shouldResumeRecall.value,
+  (shouldResume) => {
+    if (shouldResume) {
+      previousAnsweredQuestionCursor.value = undefined
+      clearShouldResumeRecall()
+    }
+  }
+)
 
 const loadMore = async (dueInDays?: number) => {
   const { data: response, error } = await RecallsController.recalling({
