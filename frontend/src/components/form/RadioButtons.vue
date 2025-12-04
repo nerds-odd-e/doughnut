@@ -13,7 +13,13 @@
         <label
           role="button"
           :title="option.title"
-          :class="['daisy-btn', 'daisy-btn-outline', 'daisy-join-item', 'daisy-text-nowrap', { 'daisy-bg-primary daisy-border-primary': modelValue === option.value }]"
+          :class="[
+            'daisy-btn',
+            'daisy-btn-outline',
+            'daisy-join-item',
+            'daisy-text-nowrap',
+            { 'daisy-bg-primary daisy-border-primary': modelValue === option.value }
+          ]"
           :for="`${scopeName}-${option.value}`"
         >
           <slot name="labelAddition" :value="option.value" />
@@ -52,5 +58,17 @@ const selectionChanged = (event: Event) => {
 
 label {
   font-size: small;
+}
+
+/* Ensure first visible label has rounded left corners */
+output label:first-of-type {
+  border-top-left-radius: 0.5rem !important;
+  border-bottom-left-radius: 0.5rem !important;
+}
+
+/* Ensure last visible label has rounded right corners */
+output label:last-of-type {
+  border-top-right-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
 }
 </style>
