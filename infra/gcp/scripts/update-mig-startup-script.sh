@@ -36,7 +36,10 @@ fi
 echo "Current template: $CURRENT_TEMPLATE"
 
 # Create new template with updated startup script
-NEW_TEMPLATE_NAME="${TEMPLATE_NAME}-$(date +%Y%m%d-%H%M%S)"
+# GCP template names must be lowercase, start with a letter, and contain only [a-z0-9-]
+# Max length is 63 characters, so use shorter timestamp format
+TIMESTAMP=$(date +%s)
+NEW_TEMPLATE_NAME="${TEMPLATE_NAME}-${TIMESTAMP}"
 echo "Creating new template: $NEW_TEMPLATE_NAME"
 
 gcloud compute instance-templates create $NEW_TEMPLATE_NAME \
