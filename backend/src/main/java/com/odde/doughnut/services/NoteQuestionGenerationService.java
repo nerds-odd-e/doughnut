@@ -48,7 +48,7 @@ public class NoteQuestionGenerationService {
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addSystemMessage(instructions);
+      chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
     // Add any additional message if provided (before the question generation instruction)
@@ -89,7 +89,7 @@ public class NoteQuestionGenerationService {
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addSystemMessage(instructions);
+      chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
     Optional<JsonNode> result =

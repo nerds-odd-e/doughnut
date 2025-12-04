@@ -27,7 +27,7 @@ public class ChatCompletionNoteAutomationService {
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addSystemMessage(instructions);
+      chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
     var tool = AiToolFactory.suggestNoteTitleAiTool();

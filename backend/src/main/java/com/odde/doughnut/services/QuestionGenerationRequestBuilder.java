@@ -26,7 +26,7 @@ public class QuestionGenerationRequestBuilder {
 
     String instructions = note.getNotebookAssistantInstructions();
     if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addSystemMessage(instructions);
+      chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
     // Add the question generation instruction (this also sets up JSON schema response format)

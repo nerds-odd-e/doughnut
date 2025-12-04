@@ -59,7 +59,7 @@ public final class OtherAiServices {
     OpenAIChatRequestBuilder chatAboutNoteRequestBuilder = getOpenAIChatRequestBuilder(modelName);
 
     if (additionalInstructions != null && !additionalInstructions.isEmpty()) {
-      chatAboutNoteRequestBuilder.addSystemMessage(
+      chatAboutNoteRequestBuilder.addToOverallSystemMessage(
           "Additional instruction:\n" + additionalInstructions);
     }
 

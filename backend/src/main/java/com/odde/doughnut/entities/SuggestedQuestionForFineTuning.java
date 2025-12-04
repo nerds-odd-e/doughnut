@@ -94,7 +94,7 @@ public class SuggestedQuestionForFineTuning extends EntityIdentifiedByIdOnly {
       InstructionAndSchema tool, Object argument) {
     OpenAIChatRequestBuilder builder =
         new OpenAIChatRequestBuilder()
-            .addSystemMessage(preservedNoteContent)
+            .addToOverallSystemMessage(preservedNoteContent)
             .responseJsonSchema(tool);
 
     List<ChatCompletionMessageParam> messages = builder.buildMessages();

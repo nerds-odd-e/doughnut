@@ -41,6 +41,6 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   private static String getNoteOfFocusDescription(Note note) {
     ChatCompletionCreateParams request =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder("gpt", note).build();
-    return request.messages().get(1).system().get().content().toString();
+    return request.messages().get(0).system().get().content().toString();
   }
 }
