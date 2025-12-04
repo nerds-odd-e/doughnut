@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,6 +31,10 @@ class PredefinedQuestionTest {
   @Autowired EntityPersister entityPersister;
   @Autowired PredefinedQuestionService predefinedQuestionService;
   @MockitoBean AiQuestionGenerator aiQuestionGenerator;
+
+  @Value("${question.regeneration.times:1}")
+  int regenerationTimes;
+
   User user;
 
   @BeforeEach
@@ -152,6 +157,6 @@ class PredefinedQuestionTest {
   }
 
   private PredefinedQuestionService createPredefinedQuestionService(EntityPersister persister) {
-    return new PredefinedQuestionService(persister, aiQuestionGenerator);
+    return new PredefinedQuestionService(persister, aiQuestionGenerator, regenerationTimes);
   }
 }

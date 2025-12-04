@@ -8,18 +8,23 @@ import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import java.sql.Timestamp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PredefinedQuestionService {
   private final EntityPersister entityPersister;
   private final AiQuestionGenerator aiQuestionGenerator;
+  private final int regenerationTimes;
 
   @Autowired
   public PredefinedQuestionService(
-      EntityPersister entityPersister, AiQuestionGenerator aiQuestionGenerator) {
+      EntityPersister entityPersister,
+      AiQuestionGenerator aiQuestionGenerator,
+      @Value("${question.regeneration.times:0}") int regenerationTimes) {
     this.entityPersister = entityPersister;
     this.aiQuestionGenerator = aiQuestionGenerator;
+    this.regenerationTimes = regenerationTimes;
   }
 
   public PredefinedQuestion addQuestion(Note note, PredefinedQuestion predefinedQuestion) {
@@ -72,22 +77,28 @@ public class PredefinedQuestionService {
     PredefinedQuestion result = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     entityPersister.save(result);
 
-    // Auto-evaluate the generated question
-    QuestionContestResult contestResult = contest(result);
+    // Auto-evaluate and regenerate up to regenerationTimes
+    for (int i = 0; i < regenerationTimes; i++) {
+      QuestionContestResult contestResult = contest(result);
 
-    if (contestResult == null || contestResult.rejected) {
-      return result;
+      if (contestResult == null || contestResult.rejected) {
+        return result;
+      }
+
+      // Try to regenerate with the contest feedback
+      MCQWithAnswer regeneratedQuestion =
+          aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
+      if (regeneratedQuestion != null) {
+        // Create and save the regenerated question
+        PredefinedQuestion regenerated =
+            PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
+        result = entityPersister.save(regenerated);
+        mcqWithAnswer = regeneratedQuestion;
+      } else {
+        return result;
+      }
     }
 
-    // Try to regenerate with the contest feedback
-    MCQWithAnswer regeneratedQuestion =
-        aiQuestionGenerator.regenerateQuestion(contestResult, note, mcqWithAnswer);
-    if (regeneratedQuestion != null) {
-      // Create and save the regenerated question
-      PredefinedQuestion regenerated =
-          PredefinedQuestion.fromMCQWithAnswer(regeneratedQuestion, note);
-      return entityPersister.save(regenerated);
-    }
-    return entityPersister.save(result);
+    return result;
   }
 }
