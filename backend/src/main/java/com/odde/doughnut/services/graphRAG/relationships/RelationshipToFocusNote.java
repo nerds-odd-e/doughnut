@@ -20,5 +20,6 @@ public enum RelationshipToFocusNote {
   SiblingOfSubjectOfInboundReference,
   InboundReferenceToObjectOfReifiedChild,
   ObjectSibling,
+  SubjectOfObjectSibling,
   RemotelyRelated
 }

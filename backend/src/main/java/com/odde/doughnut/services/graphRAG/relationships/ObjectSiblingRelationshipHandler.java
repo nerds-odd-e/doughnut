@@ -2,6 +2,7 @@ package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.graphRAG.PriorityLayer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,9 +10,12 @@ import java.util.List;
 public class ObjectSiblingRelationshipHandler extends RelationshipHandler {
   private final List<Note> objectSiblings;
   private int currentIndex = 0;
+  private final PriorityLayer priorityThreeLayer;
 
-  public ObjectSiblingRelationshipHandler(Note relatingNote, NoteRepository noteRepository) {
+  public ObjectSiblingRelationshipHandler(
+      Note relatingNote, NoteRepository noteRepository, PriorityLayer priorityThreeLayer) {
     super(RelationshipToFocusNote.ObjectSibling, relatingNote);
+    this.priorityThreeLayer = priorityThreeLayer;
     if (relatingNote.getTargetNote() != null) {
       List<Note> allNotesWithSameObject =
           noteRepository.findAllByTargetNote(relatingNote.getTargetNote().getId());
@@ -29,7 +33,14 @@ public class ObjectSiblingRelationshipHandler extends RelationshipHandler {
   @Override
   public Note handle() {
     if (currentIndex < objectSiblings.size()) {
-      return objectSiblings.get(currentIndex++);
+      Note objectSibling = objectSiblings.get(currentIndex++);
+
+      // Add subject of object sibling to priority 3
+      if (priorityThreeLayer != null) {
+        priorityThreeLayer.addHandler(new SubjectOfObjectSiblingRelationshipHandler(objectSibling));
+      }
+
+      return objectSibling;
     }
     return null;
   }

@@ -4479,6 +4479,7 @@ components:
           - SiblingOfSubjectOfInboundReference
           - InboundReferenceToObjectOfReifiedChild
           - ObjectSibling
+          - SubjectOfObjectSibling
           - RemotelyRelated
         details:
           type: string
@@ -4524,6 +4525,7 @@ components:
           - SiblingOfSubjectOfInboundReference
           - InboundReferenceToObjectOfReifiedChild
           - ObjectSibling
+          - SubjectOfObjectSibling
           - RemotelyRelated
         details:
           type: string

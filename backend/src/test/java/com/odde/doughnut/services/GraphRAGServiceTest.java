@@ -275,6 +275,32 @@ public class GraphRAGServiceTest {
       // Verify no object siblings are included
       assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ObjectSibling), empty());
     }
+
+    @Nested
+    class WhenObjectSiblingsHaveSubjects {
+      @Test
+      void shouldIncludeSubjectsOfObjectSiblingsInRelatedNotes() {
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+        // Get the parent notes of object siblings
+        Note siblingParent1 = objectSibling1.getParent();
+        Note siblingParent2 = objectSibling2.getParent();
+
+        assertRelatedNotesContain(
+            result, RelationshipToFocusNote.SubjectOfObjectSibling, siblingParent1, siblingParent2);
+      }
+
+      @Test
+      void shouldNotIncludeSubjectsOfObjectSiblingsWhenBudgetIsLimited() {
+        // Set budget to only allow parent, object, and object siblings
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
+
+        // Verify no subjects of object siblings are included
+        assertThat(
+            getNotesWithRelationship(result, RelationshipToFocusNote.SubjectOfObjectSibling),
+            empty());
+      }
+    }
   }
 
   @Nested
