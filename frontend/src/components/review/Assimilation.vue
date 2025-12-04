@@ -1,8 +1,10 @@
 <template>
   <main>
-    <Breadcrumb
-      v-bind="{ noteTopology: note.noteTopology, includingSelf: true }"
-    />
+    <div class="breadcrumb-wrapper daisy-mb-2">
+      <Breadcrumb
+        v-bind="{ noteTopology: note.noteTopology, includingSelf: false }"
+      />
+    </div>
     <NoteShow
       v-bind="{ noteId: note.id, expandChildren: false }"
     />

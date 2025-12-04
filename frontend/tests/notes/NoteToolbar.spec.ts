@@ -1,5 +1,5 @@
 import NoteToolbar from "@/components/notes/core/NoteToolbar.vue"
-import SvgCog from "@/components/svgs/SvgCog.vue"
+import NoteMoreOptionsDialog from "@/components/notes/accessory/NoteMoreOptionsDialog.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
@@ -14,15 +14,16 @@ it("displays menu items when dropdown is open", async () => {
     })
     .mount()
 
-  // Find the dropdown toggle button
-  const dropdownToggleButton = wrapper.findComponent(SvgCog)
+  // Find the more options button by title
+  const moreOptionsButton = wrapper.find('button[title="more options"]')
 
-  // Simulate a click event on the button to open the dropdown menu
-  await dropdownToggleButton.trigger("click")
+  // Simulate a click event on the button to open the dialog
+  await moreOptionsButton.trigger("click")
 
-  // Check if menu items exist
-  expect(wrapper.find(".daisy-dropdown-content").exists()).toBe(true)
-  expect(wrapper.find(".daisy-dropdown-content").text()).toContain(
-    "Questions for the note"
-  )
+  // Check if the dialog component exists
+  const dialog = wrapper.findComponent(NoteMoreOptionsDialog)
+  expect(dialog.exists()).toBe(true)
+
+  // Check if menu items exist in the dialog
+  expect(dialog.text()).toContain("Questions for the note")
 })

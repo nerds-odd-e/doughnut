@@ -66,103 +66,21 @@
         <SvgAudioInput />
       </button>
 
-      <div v-if="!readonly" class="daisy-dropdown daisy-dropdown-end">
-        <button
-          tabindex="0"
-          class="daisy-btn daisy-btn-ghost daisy-btn-sm"
-          title="more options"
-        >
-          <SvgCog />
-        </button>
-        <ul tabindex="0" class="daisy-dropdown-content daisy-menu daisy-p-2 daisy-bg-base-300 daisy-rounded-box daisy-w-52 daisy-shadow daisy-z-50">
-          <li>
-            <PopButton
-              btn-class="daisy-w-full"
-              title="Note Recall Settings"
-            >
-              <NoteInfoBar v-bind="{ noteId: note.id }" />
-            </PopButton>
-          </li>
-
-          <li>
-            <PopButton
-              btn-class="daisy-w-full"
-              title="Generate Image with DALL-E"
-            >
-              <AIGenerateImageDialog v-bind="{ note }" />
-            </PopButton>
-          </li>
-
-          <li>
-            <PopButton
-              btn-class="daisy-w-full"
-              title="Edit Note Image"
-            >
-              <template #button_face>
-                <SvgImage />
-                <span class="ms-2">Edit Note Image</span>
-              </template>
-              <template #default="{ closer }">
-                <NoteEditImageDialog
-                  v-bind="{ noteId: note.id }"
-                  @close-dialog="noteAccessoriesUpdated(closer, $event)"
-                />
-              </template>
-            </PopButton>
-          </li>
-
-          <li>
-            <PopButton
-              btn-class="daisy-w-full"
-              title="Edit Note URL"
-            >
-              <template #button_face>
-                <SvgUrlIndicator />
-                <span class="ms-2">Edit Note URL</span>
-              </template>
-              <template #default="{ closer }">
-                <NoteEditUrlDialog
-                  v-bind="{ noteId: note.id }"
-                  @close-dialog="noteAccessoriesUpdated(closer, $event)"
-                />
-              </template>
-            </PopButton>
-          </li>
-
-          <li>
-            <PopButton btn-class="daisy-w-full" title="Export...">
-              <template #button_face>
-                <SvgExport />
-                <span class="ms-2">Export...</span>
-              </template>
-              <template #default="{ closer }">
-                <NoteExportDialog :note="note" @close-dialog="closer" />
-              </template>
-            </PopButton>
-          </li>
-
-          <li>
-            <PopButton
-              btn-class="daisy-w-full"
-              title="Questions for the note"
-            >
-              <Questions v-bind="{ note }" />
-            </PopButton>
-          </li>
-          <li>
-            <NoteDeleteButton
-              class="daisy-w-full"
-              v-bind="{ noteId: note.id }"
-            />
-          </li>
-        </ul>
-      </div>
+      <button v-if="!readonly" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="more options" @click="moreOptions = !moreOptions">
+        <SvgCog />
+      </button>
     </div>
   </nav>
   <NoteAudioTools
     v-if="!readonly && audioTools"
     v-bind="{ note }"
     @close-dialog="audioTools = false"
+  />
+  <NoteMoreOptionsDialog
+    v-if="!readonly && moreOptions"
+    v-bind="{ note }"
+    @close-dialog="moreOptions = false"
+    @note-accessory-updated="noteAccessoriesUpdated($event)"
   />
 
 </template>
@@ -177,25 +95,15 @@ import SvgAddSibling from "../../svgs/SvgAddSibling.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
 import LinkNoteDialog from "../../links/LinkNoteDialog.vue"
 import SvgCog from "../../svgs/SvgCog.vue"
-import NoteDeleteButton from "./NoteDeleteButton.vue"
-import PopButton from "../../commons/Popups/PopButton.vue"
-import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
-import Questions from "../Questions.vue"
-import NoteInfoBar from "../NoteInfoBar.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 import SvgRichContent from "@/components/svgs/SvgRichContent.vue"
-import SvgImage from "../../svgs/SvgImage.vue"
 import SvgAudioInput from "../../svgs/SvgAudioInput.vue"
-import SvgUrlIndicator from "../../svgs/SvgUrlIndicator.vue"
-import NoteEditImageDialog from "../accessory/NoteEditImageDialog.vue"
-import NoteEditUrlDialog from "../accessory/NoteEditUrlDialog.vue"
 import NoteAudioTools from "../accessory/NoteAudioTools.vue"
 import { useRouter } from "vue-router"
 import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
-import SvgExport from "../../svgs/SvgExport.vue"
-import NoteExportDialog from "./NoteExportDialog.vue"
+import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
 
 const { note } = defineProps<{
   note: Note
@@ -205,16 +113,16 @@ const { note } = defineProps<{
 }>()
 
 const audioTools = ref(false)
+const moreOptions = ref(false)
 
 const router = useRouter()
 
 const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 
-const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
+const noteAccessoriesUpdated = (na: NoteAccessory) => {
   if (na) {
     emit("note-accessory-updated", na)
   }
-  closer()
 }
 </script>
 
