@@ -66,7 +66,12 @@
         <SvgAudioInput />
       </button>
 
-      <button v-if="!readonly" class="daisy-btn daisy-btn-ghost daisy-btn-sm" title="more options" @click="moreOptions = !moreOptions">
+      <button
+        v-if="!readonly"
+        :class="['daisy-btn daisy-btn-ghost daisy-btn-sm', { 'daisy-btn-active': moreOptions }]"
+        title="more options"
+        @click="moreOptions = !moreOptions"
+      >
         <SvgCog />
       </button>
     </div>

@@ -24,6 +24,8 @@ it("displays menu items when dropdown is open", async () => {
   const dialog = wrapper.findComponent(NoteMoreOptionsDialog)
   expect(dialog.exists()).toBe(true)
 
-  // Check if menu items exist in the dialog
-  expect(dialog.text()).toContain("Questions for the note")
+  // Check if menu items exist in the dialog (by title attribute for toolbar buttons)
+  expect(wrapper.find('button[title="Questions for the note"]').exists()).toBe(
+    true
+  )
 })

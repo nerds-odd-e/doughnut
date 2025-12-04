@@ -47,7 +47,11 @@ export const assumeNotePage = (noteTopology?: string) => {
   }
 
   const notePageMoreOptionsButton = (btnTextOrTitle: string) => {
-    privateToolbarButton('more options').click()
+    cy.findByRole('button', { name: 'more options' }).then(($button) => {
+      if (!$button.hasClass('daisy-btn-active')) {
+        cy.wrap($button).click()
+      }
+    })
     return privateToolbarButton(btnTextOrTitle)
   }
 
