@@ -6,18 +6,10 @@ import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { beforeEach, vi } from "vitest"
-import { useRecallData } from "@/composables/useRecallData"
-import { ref } from "vue"
-
-vi.mock("@/composables/useRecallData")
 
 const useRouteValue = { name: "" }
-const mockPush = vi.fn()
 vitest.mock("vue-router", () => ({
   useRoute: () => useRouteValue,
-  useRouter: () => ({
-    push: mockPush,
-  }),
 }))
 
 // Mock window.matchMedia
@@ -53,20 +45,6 @@ describe("main menu", () => {
         totalAssimilatedCount: 0,
       },
       unreadConversations: [],
-    })
-    vi.mocked(useRecallData).mockReturnValue({
-      toRepeatCount: ref(0),
-      recallWindowEndAt: ref(undefined),
-      totalAssimilatedCount: ref(0),
-      isRecallPaused: ref(false),
-      shouldResumeRecall: ref(false),
-      setToRepeatCount: vi.fn(),
-      setRecallWindowEndAt: vi.fn(),
-      setTotalAssimilatedCount: vi.fn(),
-      setIsRecallPaused: vi.fn(),
-      resumeRecall: vi.fn(),
-      clearShouldResumeRecall: vi.fn(),
-      decrementToRepeatCount: vi.fn(),
     })
     user = makeMe.aUser.please()
   })
@@ -266,21 +244,6 @@ describe("main menu", () => {
         unreadConversations: [],
       })
 
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(789),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(false),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: vi.fn(),
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
-
       const { getByText } = helper
         .component(MainMenu)
         .withProps({ user })
@@ -368,147 +331,6 @@ describe("main menu", () => {
       // The menu might still exist but in collapsed state
       // We can verify by checking that the expand button is still there
       expect(screen.getByLabelText("Toggle menu")).toBeInTheDocument()
-    })
-  })
-
-  describe("resume recall menu item", () => {
-    beforeEach(() => {
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(0),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(true),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: vi.fn(),
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
-    })
-
-    it("shows resume recall menu item when recall is paused", async () => {
-      helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
-
-      const resumeRecallLink = screen.getByLabelText("Resume Recall")
-      expect(resumeRecallLink).toBeInTheDocument()
-    })
-
-    it("highlights resume recall menu item when recall is paused", async () => {
-      helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
-
-      const resumeRecallLink = screen.getByLabelText("Resume Recall")
-      const navItem = resumeRecallLink.closest(".nav-item")
-      expect(navItem).toHaveClass("daisy-text-primary")
-    })
-
-    it("shows resume recall as first item when recall is paused", async () => {
-      helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
-
-      // Check that resume recall appears before note in the DOM
-      const resumeRecallElement = screen.getByLabelText("Resume Recall")
-      const noteElement = screen.getByLabelText("Note")
-      
-      // Get all navigation items by querying the DOM
-      const allNavItems = Array.from(document.querySelectorAll('.nav-item'))
-      const resumeNavItem = allNavItems.find(
-        (el) => el.querySelector('a[aria-label="Resume Recall"]') || el.querySelector('[aria-label="Resume Recall"]')
-      )
-      const noteNavItem = allNavItems.find(
-        (el) => el.querySelector('a[aria-label="Note"]') || el.querySelector('[aria-label="Note"]')
-      )
-
-      expect(resumeRecallElement).toBeInTheDocument()
-      expect(noteElement).toBeInTheDocument()
-      expect(resumeNavItem).toBeDefined()
-      expect(noteNavItem).toBeDefined()
-      
-      // Check that resume recall appears before note in the DOM order
-      const resumeIndex = allNavItems.indexOf(resumeNavItem!)
-      const noteIndex = allNavItems.indexOf(noteNavItem!)
-      expect(resumeIndex).toBeGreaterThan(-1)
-      expect(noteIndex).toBeGreaterThan(-1)
-      expect(resumeIndex).toBeLessThan(noteIndex)
-    })
-
-    it("does not show resume recall menu item when recall is not paused", async () => {
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(0),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(false),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: vi.fn(),
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
-
-      helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
-
-      const resumeRecallLink = screen.queryByLabelText("Resume Recall")
-      expect(resumeRecallLink).not.toBeInTheDocument()
-    })
-
-    it("resumes recall when clicking resume recall in horizontal menu without expanding", async () => {
-      window.matchMedia = createMatchMedia(false)
-      const resumeRecallSpy = vi.fn()
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(0),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(true),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: resumeRecallSpy,
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
-
-      helper.component(MainMenu).withProps({ user }).render()
-
-      // Menu should be collapsed initially
-      const expandButton = screen.getByLabelText("Toggle menu")
-      expect(expandButton).toBeInTheDocument()
-
-      // Click on the resume recall item (should be visible as active item in collapsed state)
-      const resumeRecallLink = screen.getByLabelText("Resume Recall")
-      await fireEvent.click(resumeRecallLink)
-
-      // Should call resumeRecall
-      expect(resumeRecallSpy).toHaveBeenCalled()
     })
   })
 })

@@ -7,7 +7,7 @@
     }"
   >
     <router-link
-      v-if="name && !hasDropdown && name !== 'resumeRecall'"
+      v-if="name && !hasDropdown"
       :to="{ name: name }"
       :aria-label="label"
       class="daisy-flex daisy-flex-col daisy-items-center"
@@ -20,20 +20,6 @@
       </div>
       <span class="label">{{ label }}</span>
     </router-link>
-    <a
-      v-else-if="name === 'resumeRecall' && !hasDropdown"
-      :aria-label="label"
-      class="daisy-flex daisy-flex-col daisy-items-center"
-      @click.prevent="$emit('resumeRecall')"
-    >
-      <div class="icon-container">
-        <component :is="icon" width="24" height="24" />
-        <div v-if="badge" :class="badgeClass">
-          {{ badge }}
-        </div>
-      </div>
-      <span class="label">{{ label }}</span>
-    </a>
 
     <details v-if="hasDropdown" ref="dropdownTrigger" class="daisy-dropdown daisy-dropdown-bottom daisy-dropdown-end lg:daisy-dropdown-top lg:daisy-dropdown-right">
       <summary
@@ -68,10 +54,6 @@ const props = defineProps<{
   badge?: number
   badgeClass?: string
   hasDropdown?: boolean
-}>()
-
-defineEmits<{
-  (e: "resumeRecall"): void
 }>()
 
 const dropdownTrigger = ref<HTMLDetailsElement | null>(null)
