@@ -33,8 +33,7 @@ Feature: Browse answers and notes while recalling
     And I type my answer "riot"
     And I should see that my spelling answer "riot" is incorrect
     When I visit all my notebooks
-    Then I should see the resume recall menu item
-    And I click resume recall from the menu
+    And I go to the recalls page
     Then I should see that my spelling answer "riot" is incorrect
 
   Scenario: I can remove a note from further recalls

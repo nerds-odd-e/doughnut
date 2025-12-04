@@ -1,6 +1,7 @@
 <template>
   <ProgressBar
     v-bind="{ title: `Recalling: `, finished, toRepeatCount }"
+    @resume="$emit('viewLastAnsweredQuestion', undefined)"
     @showMore="$emit('showMore')"
   >
     <template #buttons>
@@ -20,6 +21,14 @@
             "
           >
             <SvgBackward />
+          </button>
+
+          <button
+            class="btn large-btn"
+            title="view next answered question"
+            @click="$emit('viewLastAnsweredQuestion', undefined)"
+          >
+            <SvgResume />
           </button>
         </template>
         <button
@@ -49,6 +58,7 @@
 import ProgressBar from "../commons/ProgressBar.vue"
 import SvgPause from "../svgs/SvgPause.vue"
 import SvgBackward from "../svgs/SvgBackward.vue"
+import SvgResume from "../svgs/SvgResume.vue"
 import SvgSkip from "../svgs/SvgSkip.vue"
 
 defineProps({

@@ -4,7 +4,7 @@
       <ul v-if="user" class="top-menu daisy-menu daisy-w-full daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
-            <NavigationItem v-bind="{ ...item }" @resumeRecall="handleResumeRecall" />
+            <NavigationItem v-bind="{ ...item }" />
           </li>
         </template>
 
@@ -47,7 +47,6 @@ import type { PropType, Component } from "vue"
 import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
-import { useRecallData } from "@/composables/useRecallData"
 
 type NavigationItemType = {
   name?: string
@@ -76,11 +75,6 @@ defineProps({
   },
   logout: { type: Function as PropType<() => void>, required: true },
 })
-
-const { resumeRecall } = useRecallData()
-const handleResumeRecall = () => {
-  resumeRecall()
-}
 </script>
 
 <style lang="scss" scoped>
