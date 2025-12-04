@@ -21,7 +21,7 @@
           <template v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem">
             <li class="daisy-menu-item active-item-only">
               <div @click.capture.stop.prevent="handleActiveItemClick" class="active-item-wrapper">
-                <NavigationItem v-bind="{ ...activeItem }" />
+                <NavigationItem v-bind="{ ...activeItem }" @resumeRecall="resumeRecall" />
               </div>
             </li>
           </template>
@@ -30,7 +30,7 @@
           <ul v-if="shouldShowExpanded" class="top-menu daisy-menu daisy-flex-1">
         <template v-if="!isHomePage">
           <li v-for="item in upperNavItems" :title="item.label" :key="item.name" class="daisy-menu-item">
-            <NavigationItem v-bind="{ ...item }" />
+            <NavigationItem v-bind="{ ...item }" @resumeRecall="resumeRecall" />
           </li>
         </template>
 
@@ -72,6 +72,7 @@ import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import SvgChevronRight from "@/components/svgs/SvgChevronRight.vue"
+import { useRecallData } from "@/composables/useRecallData"
 
 type NavigationItemType = {
   name?: string
@@ -137,9 +138,18 @@ const handleMenuContentClick = () => {
   }
 }
 
+const { resumeRecall } = useRecallData()
+
 const handleActiveItemClick = (event: MouseEvent) => {
   // When collapsed, clicking the active item should expand the menu, not navigate
+  // Exception: "resumeRecall" should resume without expanding
   if (!shouldShowExpanded.value && props.user) {
+    if (activeItem.value?.name === "resumeRecall") {
+      event.preventDefault()
+      event.stopPropagation()
+      resumeRecall()
+      return
+    }
     event.preventDefault()
     event.stopPropagation()
     expandMenu()

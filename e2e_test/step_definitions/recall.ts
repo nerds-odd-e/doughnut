@@ -201,6 +201,14 @@ Then('choose to remove the last memory tracker from recalls', () => {
     .removeMemoryTrackerFromReview('normal')
 })
 
+Then('I should see the resume recall menu item', () => {
+  cy.findByLabelText('Resume Recall').should('exist')
+})
+
+When('I click resume recall from the menu', () => {
+  cy.findByLabelText('Resume Recall').click()
+})
+
 When(
   'I have the true false question {string} rated as a good example',
   (questionStem: string) => {
