@@ -41,3 +41,11 @@ echo ""
 echo "6. Checking if application is responding:"
 gcloud compute ssh $INSTANCE_ID --zone=$ZONE --command="curl -s http://localhost:8081/api/healthcheck 2>&1 | head -5 || echo 'Health check failed'"
 
+echo ""
+echo "7. Checking startup script output (should contain Spring Boot logs):"
+gcloud compute ssh $INSTANCE_ID --zone=$ZONE --command="journalctl -u google-startup-scripts.service --no-pager 2>&1 | grep -i 'spring\|doughnut\|started\|pid' | tail -20 || echo 'No Spring Boot logs in startup script output'"
+
+echo ""
+echo "8. Checking for any Java errors:"
+gcloud compute ssh $INSTANCE_ID --zone=$ZONE --command="journalctl -u google-startup-scripts.service --no-pager 2>&1 | grep -i 'error\|exception\|failed' | tail -10 || echo 'No errors found'"
+

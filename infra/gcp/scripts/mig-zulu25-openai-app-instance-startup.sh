@@ -95,7 +95,7 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
 # Start Spring Boot app
 # Write directly to stdout/stderr - Cloud Logging agent automatically captures these
 # Background the process but keep stdout/stderr connected
-java ${JAVA_OPTS} -jar \
+bash -c "java ${JAVA_OPTS} -jar \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \
         -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' \
@@ -104,7 +104,4 @@ java ${JAVA_OPTS} -jar \
         -Dspring.openai.token=${OPENAI_API_TOKEN} \
         -Dlogging.level.com.zaxxer.hikari=WARN \
         -Dlogging.level.com.zaxxer.hikari.HikariConfig=WARN \
-        /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar &
-
-# Disown the process so it continues after script exits, but keeps stdout/stderr
-disown
+        /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
