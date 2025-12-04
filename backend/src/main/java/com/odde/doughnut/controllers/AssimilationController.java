@@ -8,6 +8,7 @@ import com.odde.doughnut.services.MemoryTrackerService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.utils.TimezoneUtils;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -47,12 +48,7 @@ class AssimilationController {
   public List<Note> assimilating(@RequestParam(value = "timezone") String timezone) {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
-    ZoneId timeZone;
-    try {
-      timeZone = ZoneId.of(timezone);
-    } catch (Exception e) {
-      timeZone = ZoneId.of("UTC");
-    }
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     return new AssimilationService(

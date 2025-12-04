@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.utils.TimezoneUtils;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,12 +40,7 @@ class RecallsController {
       @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     authorizationService.assertLoggedIn();
-    ZoneId timeZone;
-    try {
-      timeZone = ZoneId.of(timezone);
-    } catch (Exception e) {
-      timeZone = ZoneId.of("UTC");
-    }
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallService.getDueMemoryTrackers(
         authorizationService.getCurrentUser(),

@@ -14,6 +14,7 @@ import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.services.SubscriptionService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.testability.TestabilitySettings;
+import com.odde.doughnut.utils.TimezoneUtils;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.security.Principal;
@@ -125,12 +126,7 @@ class UserController {
   public MenuDataDTO getMenuData(@RequestParam(value = "timezone") String timezone) {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
-    ZoneId timeZone;
-    try {
-      timeZone = ZoneId.of(timezone);
-    } catch (Exception e) {
-      timeZone = ZoneId.of("UTC");
-    }
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     var assimilationService =
