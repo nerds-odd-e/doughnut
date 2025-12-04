@@ -28,16 +28,8 @@ All services automatically restart when code changes are made. The developer doe
 
 ## Run E2E Test in Terminal
 
-**For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
-
 We usually don't run all the e2e tests locally, since it will take too much time. To run one feature file:
 
-**Cloud Agent:**
-```bash
-pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
-```
-
-**Local Development:**
 ```bash
 CURSOR_DEV=true nix develop -c pnpm cypress run --spec e2e_test/features/ai_generated_recall_questions/question_contest.feature
 ```

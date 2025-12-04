@@ -5,11 +5,11 @@ alwaysApply: true
 
 # The use of nix
 
-**CRITICAL: This project uses nix to manage the development environment locally.**
+**CRITICAL: This project uses nix to manage the development environment.**
 
-**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true nix develop -c` (unless you are on a Cursor Cloud VM):**
+**YOU MUST ALWAYS prefix commands with `CURSOR_DEV=true nix develop -c`:**
 
-**For how to run commands on Cloud VM see the `cloud-agent-setup` rule.**
+**For Cloud VM setup, see the `cloud-agent-setup` rule.**
 
 ```bash
 CURSOR_DEV=true nix develop -c <command>
@@ -41,11 +41,9 @@ This command starts:
 
 ## Running Commands in Terminal
 
-**For detailed instructions on running tests and commands (cloud agent vs local development), see the `cloud-agent-setup` rule.**
+**For Cloud VM setup, see the `cloud-agent-setup` rule.**
 
-**Quick reference:**
-- **Cloud agents:** Run commands directly without nix prefix (e.g., `pnpm frontend:test`)
-- **Local development:** Always use `CURSOR_DEV=true nix develop -c` prefix (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`)
+Always use `CURSOR_DEV=true nix develop -c` prefix for commands (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`).
 
 # Development preferences
 

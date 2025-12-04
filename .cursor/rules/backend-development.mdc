@@ -17,11 +17,7 @@ alwaysApply: false
 
 ## Run Test in Terminal
 
-**For general command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
-
-### Local Development (with Nix)
-
-To run the tests in local development environment with Nix, at the root folder level run command:
+To run the tests, at the root folder level run command:
 
 ```bash
 CURSOR_DEV=true nix develop -c pnpm backend:verify
@@ -32,36 +28,6 @@ or, when there's no db migration needed, run the follow will be faster:
 ```bash
 CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
-
-### Cursor Cloud Agent (without Nix)
-
-**IMPORTANT**: When running as a Cursor Cloud Agent (remote environment without Nix), use the setup script first:
-
-```bash
-# One-time setup (installs Java 24 and MySQL)
-source /workspace/scripts/cloud_agent_setup.sh
-
-# Run database migration (required before first test run or after schema changes)
-./backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
-
-# Run tests
-./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel
-```
-
-The cloud_agent_setup.sh script:
-- Downloads and installs Azul Zulu Java 24 (required by the project)
-- Downloads and sets up MySQL 8.4 server
-- Initializes doughnut test databases
-- Exports necessary environment variables (JAVA_HOME, MYSQL_HOME, SPRING_DATASOURCE_*)
-
-**Environment Details**:
-- Java 24 installed to: `/tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64`
-- MySQL installed to: `/tmp/mysql-8.4.3-linux-glibc2.28-x86_64`
-- MySQL data directory: `/tmp/mysql_data`
-- MySQL socket: `/tmp/mysql.sock`
-- MySQL port: 3306
-
-**Note**: The setup script is idempotent and can be run multiple times safely. It will skip steps that are already completed.
 
 Always run all unit tests instead of just sepected file or test case, unlike for e2e test.
 

@@ -17,16 +17,8 @@ alwaysApply: false
 
 ## Run Test in Terminal
 
-**For command execution details (cloud agent vs local), see the `cloud-agent-setup` rule.**
-
 ### Running All Tests
 
-**Cloud Agent:**
-```bash
-pnpm frontend:test
-```
-
-**Local Development:**
 ```bash
 CURSOR_DEV=true nix develop -c pnpm frontend:test
 ```

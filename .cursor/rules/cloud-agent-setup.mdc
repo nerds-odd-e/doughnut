@@ -1,68 +1,76 @@
 ---
-description: Running tests and commands in terminal - cloud agent vs local development, nix commands, test execution, pnpm commands
+description: How to setup dev env on Cursor Cloud Agent with Cloud VM
 alwaysApply: true
 ---
 
-# Running Commands and Tests - Cloud Agent vs Local Development
+# Cloud VM Development Environment Setup
 
 **CRITICAL: On Cloud VM, the `CURSOR_DEV=true nix develop -c` prefix MUST NOT be added to commands. Run commands directly without any nix prefix.**
 
 ## When to Use This Rule
 
 **Use this rule when:**
-- Running tests (frontend, backend, e2e)
-- Executing terminal commands in the project
-- Determining whether to use nix wrapper or run commands directly
-- Working as a Cursor cloud agent (background agent)
-- Working in local development environment
-- Encountering command execution errors
-- Setting up test execution
+- Setting up development environment on Cursor Cloud VM
+- Running tests (frontend, backend, e2e) on Cloud VM
+- Executing terminal commands on Cloud VM
+- Encountering command execution errors on Cloud VM
 
-## Environment Detection
-
-### Cloud Agent Environment (Cursor Background Agent)
-
-**How to identify:** You are running on Cursor's cloud virtual machine (not local machine)
+## Environment Setup
 
 **Pre-configured environment:**
 - **Node.js**: v22.21.1 ✅ (meets project requirement: >=22)
 - **pnpm**: 10.22.0 ✅ (meets project requirement: >=10.22.0)
 - **No nix**: Not available (nor needed)
-- **Java and MySQL**: May need one-time setup via `source /workspace/scripts/cloud_agent_setup.sh` (for backend tests)
 
 **Command execution:** Run commands **DIRECTLY** without nix prefix
 
-### Local Development Environment
+## One-Time Setup for Backend Tests
 
-**How to identify:** Running on developer's local machine with nix installed
+For backend tests, you may need to set up Java and MySQL:
 
-**Command execution:** MUST use nix wrapper: `CURSOR_DEV=true nix develop -c <command>`
+```bash
+# One-time setup (installs Java 24 and MySQL)
+source /workspace/scripts/cloud_agent_setup.sh
+```
 
-**Note:** This rule focuses on Cloud Agent environment. For local development, refer to other workspace rules.
+This script:
+- Downloads and installs Azul Zulu Java 24 (required by the project)
+- Downloads and sets up MySQL 8.4 server
+- Initializes doughnut test databases
+- Exports necessary environment variables (JAVA_HOME, MYSQL_HOME, SPRING_DATASOURCE_*)
+
+**Environment Details**:
+- Java 24 installed to: `/tmp/java24/zulu24.32.13-ca-jdk24.0.2-linux_x64`
+- MySQL installed to: `/tmp/mysql-8.4.3-linux-glibc2.28-x86_64`
+- MySQL data directory: `/tmp/mysql_data`
+- MySQL socket: `/tmp/mysql.sock`
+- MySQL port: 3306
+
+**Note**: The setup script is idempotent and can be run multiple times safely. It will skip steps that are already completed.
 
 ## Running Tests
 
 ### Frontend Unit Tests
 
-**Cloud Agent:**
 ```bash
 pnpm frontend:test
 ```
 
 ### Backend Unit Tests
 
-**Cloud Agent:**
 ```bash
 # One-time setup (if not already done)
 source /workspace/scripts/cloud_agent_setup.sh
 
+# Run database migration (required before first test run or after schema changes)
+./backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
+
 # Run tests
-pnpm backend:verify
+./backend/gradlew -p backend test -Dspring.profiles.active=test --build-cache --parallel
 ```
 
 ### E2E Tests
 
-**Cloud Agent:**
 ```bash
 # First, start services in the background (only needed for e2e tests)
 pnpm sut &
@@ -76,16 +84,16 @@ pnpm cypress run --spec e2e_test/features/<feature-file>.feature
 
 ## Key Rules
 
-1. **Cloud agents:** Do NOT use `CURSOR_DEV=true nix develop -c` prefix - run commands directly
-2. **Backend tests on cloud:** May require one-time setup script for Java and MySQL
+1. **Do NOT use `CURSOR_DEV=true nix develop -c` prefix** - run commands directly
+2. **Backend tests:** May require one-time setup script for Java and MySQL
 3. **E2E tests:** **MUST start `pnpm sut` in the background first, wait 10 seconds, then run tests** (only needed for e2e tests, not for unit tests)
-4. **Test execution:** Frontend tests verified to work on cloud agents without nix
+4. **Test execution:** Frontend tests work without nix
 5. **Linting errors:** TypeScript/vue-tsc errors may appear but don't prevent test execution
 
 ## Common Commands Reference
 
-| Command | Cloud Agent |
-|---------|-------------|
+| Command | Cloud VM |
+|---------|----------|
 | Frontend tests | `pnpm frontend:test` |
 | Backend tests | `pnpm backend:verify` |
 | E2E tests | `pnpm sut &` then `sleep 10` then `pnpm cypress run --spec <path>` |

@@ -14,14 +14,8 @@ You are a full stack developer who prefer to change backend code and frontend co
 
 When a backend controller signature is changed, or a backend data type that is used by any controller signature is changed, we need to re-generate the backend API call code for frontend.
 
-**For local development:**
 ```bash
 CURSOR_DEV=true nix develop -c pnpm generateTypeScript
-```
-
-**For cloud agents:**
-```bash
-pnpm generateTypeScript
 ```
 
 ## detecting related changed
@@ -42,14 +36,8 @@ When `pnpm openapi:lint` or `pnpm format:all` fails with OpenAPI validation erro
 
 3. **How to Regenerate**:
    
-   **For local development:**
    ```bash
    CURSOR_DEV=true nix develop -c pnpm generateTypeScript
-   ```
-   
-   **For cloud agents:**
-   ```bash
-   pnpm generateTypeScript
    ```
    
    This command:
