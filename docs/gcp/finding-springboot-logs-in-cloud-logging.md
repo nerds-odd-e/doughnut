@@ -42,11 +42,11 @@ textPayload=~"com.odde.doughnut"
 ### Using gcloud CLI
 
 ```bash
-# View logs for a specific instance (from log file)
-gcloud logging read "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~doughnut-app" --limit=50 --format=json
+# View logs for a specific instance (from stdout)
+gcloud logging read "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~stdout" --limit=50 --format=json
 
 # Tail logs for a specific instance
-gcloud logging tail "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~doughnut-app"
+gcloud logging tail "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~stdout"
 
 # Or search for application logs by content
 gcloud logging read "resource.type=gce_instance AND textPayload=~'com.odde.doughnut'" --limit=50
@@ -115,10 +115,10 @@ The production profile now includes proper logging configuration:
 Logs appear in GCP with:
 
 - **Resource Type**: `gce_instance`
-- **Log Name**: `projects/<project-id>/logs/doughnut-app.log` (from /var/log/doughnut-app.log)
-- **Payload**: Text format (from Logback CONSOLE appender, redirected to log file)
+- **Log Name**: `projects/<project-id>/logs/stdout` or `.../logs/stderr`
+- **Payload**: Text format (from Logback CONSOLE appender writing to stdout/stderr)
 
-**Note**: The startup script redirects stdout/stderr to `/var/log/doughnut-app.log` to ensure logs are captured by the Cloud Logging agent even when the process is backgrounded.
+**Note**: The startup script writes directly to stdout/stderr, which the Cloud Logging agent automatically captures. The process is backgrounded using `disown` to ensure it continues after the startup script exits while maintaining stdout/stderr connection.
 
 ## Notes
 
