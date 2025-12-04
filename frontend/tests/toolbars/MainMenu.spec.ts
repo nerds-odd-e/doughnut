@@ -34,6 +34,44 @@ const createMatchMedia = (matches: boolean) => {
   }))
 }
 
+const createDefaultMenuData = (overrides = {}) => ({
+  assimilationCount: {
+    dueCount: 0,
+    assimilatedCountOfTheDay: 0,
+    totalUnassimilatedCount: 0,
+  },
+  recallStatus: {
+    toRepeatCount: 0,
+    recallWindowEndAt: "",
+    totalAssimilatedCount: 0,
+  },
+  unreadConversations: [],
+  ...overrides,
+})
+
+const createDefaultRecallData = (overrides = {}) => ({
+  toRepeatCount: ref(0),
+  recallWindowEndAt: ref(undefined),
+  totalAssimilatedCount: ref(0),
+  isRecallPaused: ref(false),
+  shouldResumeRecall: ref(false),
+  setToRepeatCount: vi.fn(),
+  setRecallWindowEndAt: vi.fn(),
+  setTotalAssimilatedCount: vi.fn(),
+  setIsRecallPaused: vi.fn(),
+  resumeRecall: vi.fn(),
+  clearShouldResumeRecall: vi.fn(),
+  decrementToRepeatCount: vi.fn(),
+  ...overrides,
+})
+
+const expandMenuIfNeeded = async () => {
+  const expandButton = screen.queryByLabelText("Toggle menu")
+  if (expandButton) {
+    await fireEvent.click(expandButton)
+  }
+}
+
 describe("main menu", () => {
   let user: User
 
@@ -41,44 +79,14 @@ describe("main menu", () => {
     vi.clearAllMocks()
     // Default to lg or larger (vertical menu) for tests
     window.matchMedia = createMatchMedia(true)
-    mockSdkService("getMenuData", {
-      assimilationCount: {
-        dueCount: 0,
-        assimilatedCountOfTheDay: 0,
-        totalUnassimilatedCount: 0,
-      },
-      recallStatus: {
-        toRepeatCount: 0,
-        recallWindowEndAt: "",
-        totalAssimilatedCount: 0,
-      },
-      unreadConversations: [],
-    })
-    vi.mocked(useRecallData).mockReturnValue({
-      toRepeatCount: ref(0),
-      recallWindowEndAt: ref(undefined),
-      totalAssimilatedCount: ref(0),
-      isRecallPaused: ref(false),
-      shouldResumeRecall: ref(false),
-      setToRepeatCount: vi.fn(),
-      setRecallWindowEndAt: vi.fn(),
-      setTotalAssimilatedCount: vi.fn(),
-      setIsRecallPaused: vi.fn(),
-      resumeRecall: vi.fn(),
-      clearShouldResumeRecall: vi.fn(),
-      decrementToRepeatCount: vi.fn(),
-    })
+    mockSdkService("getMenuData", createDefaultMenuData())
+    vi.mocked(useRecallData).mockReturnValue(createDefaultRecallData())
     user = makeMe.aUser.please()
   })
 
   it("shows assimilate link in main menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
-
-    // If HorizontalMenu is used, expand it first
-    const expandButton = screen.queryByLabelText("Toggle menu")
-    if (expandButton) {
-      await fireEvent.click(expandButton)
-    }
+    await expandMenuIfNeeded()
 
     const assimilateLink = screen.getByLabelText("Assimilate")
     expect(assimilateLink).toBeInTheDocument()
@@ -89,12 +97,7 @@ describe("main menu", () => {
     useRouteValue.name = "notebooks"
 
     helper.component(MainMenu).withProps({ user }).render()
-
-    // If HorizontalMenu is used, expand it first
-    const expandButton = screen.queryByLabelText("Toggle menu")
-    if (expandButton) {
-      await fireEvent.click(expandButton)
-    }
+    await expandMenuIfNeeded()
 
     const noteLink = screen.getByLabelText("Note")
     const navItem = noteLink.closest(".nav-item")
@@ -105,12 +108,7 @@ describe("main menu", () => {
     useRouteValue.name = "notebookEdit"
 
     helper.component(MainMenu).withProps({ user }).render()
-
-    // If HorizontalMenu is used, expand it first
-    const expandButton = screen.queryByLabelText("Toggle menu")
-    if (expandButton) {
-      await fireEvent.click(expandButton)
-    }
+    await expandMenuIfNeeded()
 
     const noteLink = screen.getByLabelText("Note")
     const navItem = noteLink.closest(".nav-item")
@@ -119,12 +117,7 @@ describe("main menu", () => {
 
   it("shows note link in main menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
-
-    // If HorizontalMenu is used, expand it first
-    const expandButton = screen.queryByLabelText("Toggle menu")
-    if (expandButton) {
-      await fireEvent.click(expandButton)
-    }
+    await expandMenuIfNeeded()
 
     const noteLink = screen.getByLabelText("Note")
     expect(noteLink).toBeInTheDocument()
@@ -134,12 +127,7 @@ describe("main menu", () => {
     useRouteValue.name = "circleShow"
 
     helper.component(MainMenu).withProps({ user }).render()
-
-    // If HorizontalMenu is used, expand it first
-    const expandButton = screen.queryByLabelText("Toggle menu")
-    if (expandButton) {
-      await fireEvent.click(expandButton)
-    }
+    await expandMenuIfNeeded()
 
     const circlesLink = screen.getByLabelText("Circles")
     const navItem = circlesLink.closest(".nav-item")
@@ -148,12 +136,7 @@ describe("main menu", () => {
 
   it("shows assimilate link in both main menu and dropdown menu", async () => {
     helper.component(MainMenu).withProps({ user }).render()
-
-    // If HorizontalMenu is used, expand it first
-    const expandButton = screen.queryByLabelText("Toggle menu")
-    if (expandButton) {
-      await fireEvent.click(expandButton)
-    }
+    await expandMenuIfNeeded()
 
     const mainMenuAssimilateLink = screen.getByLabelText("Assimilate")
 
@@ -162,19 +145,16 @@ describe("main menu", () => {
 
   describe("assimilate due count", () => {
     it("shows due count when there are due items", async () => {
-      mockSdkService("getMenuData", {
-        assimilationCount: {
-          dueCount: 5,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        recallStatus: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        unreadConversations: [],
-      })
+      mockSdkService(
+        "getMenuData",
+        createDefaultMenuData({
+          assimilationCount: {
+            dueCount: 5,
+            assimilatedCountOfTheDay: 0,
+            totalUnassimilatedCount: 0,
+          },
+        })
+      )
 
       const { getByText } = helper
         .component(MainMenu)
@@ -199,19 +179,16 @@ describe("main menu", () => {
     })
 
     it("fetches menu data when user changes", async () => {
-      const getMenuDataSpy = mockSdkService("getMenuData", {
-        assimilationCount: {
-          dueCount: 3,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        recallStatus: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        unreadConversations: [],
-      })
+      const getMenuDataSpy = mockSdkService(
+        "getMenuData",
+        createDefaultMenuData({
+          assimilationCount: {
+            dueCount: 3,
+            assimilatedCountOfTheDay: 0,
+            totalUnassimilatedCount: 0,
+          },
+        })
+      )
 
       const { rerender } = helper
         .component(MainMenu)
@@ -227,19 +204,16 @@ describe("main menu", () => {
     })
 
     it("calls getMenuData with the correct timezone", async () => {
-      const getMenuDataSpy = mockSdkService("getMenuData", {
-        assimilationCount: {
-          dueCount: 3,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        recallStatus: {
-          toRepeatCount: 0,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        unreadConversations: [],
-      })
+      const getMenuDataSpy = mockSdkService(
+        "getMenuData",
+        createDefaultMenuData({
+          assimilationCount: {
+            dueCount: 3,
+            assimilatedCountOfTheDay: 0,
+            totalUnassimilatedCount: 0,
+          },
+        })
+      )
 
       helper.component(MainMenu).withProps({ user }).render()
       await flushPromises()
@@ -252,34 +226,22 @@ describe("main menu", () => {
 
   describe("recall count", () => {
     it("shows recall count when there are items to repeat", async () => {
-      mockSdkService("getMenuData", {
-        assimilationCount: {
-          dueCount: 0,
-          assimilatedCountOfTheDay: 0,
-          totalUnassimilatedCount: 0,
-        },
-        recallStatus: {
-          toRepeatCount: 789,
-          recallWindowEndAt: "",
-          totalAssimilatedCount: 0,
-        },
-        unreadConversations: [],
-      })
+      mockSdkService(
+        "getMenuData",
+        createDefaultMenuData({
+          recallStatus: {
+            toRepeatCount: 789,
+            recallWindowEndAt: "",
+            totalAssimilatedCount: 0,
+          },
+        })
+      )
 
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(789),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(false),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: vi.fn(),
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
+      vi.mocked(useRecallData).mockReturnValue(
+        createDefaultRecallData({
+          toRepeatCount: ref(789),
+        })
+      )
 
       const { getByText } = helper
         .component(MainMenu)
@@ -373,30 +335,16 @@ describe("main menu", () => {
 
   describe("resume recall menu item", () => {
     beforeEach(() => {
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(0),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(true),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: vi.fn(),
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
+      vi.mocked(useRecallData).mockReturnValue(
+        createDefaultRecallData({
+          isRecallPaused: ref(true),
+        })
+      )
     })
 
     it("shows resume recall menu item when recall is paused", async () => {
       helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
+      await expandMenuIfNeeded()
 
       const resumeRecallLink = screen.getByLabelText("Resume Recall")
       expect(resumeRecallLink).toBeInTheDocument()
@@ -404,12 +352,7 @@ describe("main menu", () => {
 
     it("highlights resume recall menu item when recall is paused", async () => {
       helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
+      await expandMenuIfNeeded()
 
       const resumeRecallLink = screen.getByLabelText("Resume Recall")
       const navItem = resumeRecallLink.closest(".nav-item")
@@ -418,31 +361,30 @@ describe("main menu", () => {
 
     it("shows resume recall as first item when recall is paused", async () => {
       helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
+      await expandMenuIfNeeded()
 
       // Check that resume recall appears before note in the DOM
       const resumeRecallElement = screen.getByLabelText("Resume Recall")
       const noteElement = screen.getByLabelText("Note")
-      
+
       // Get all navigation items by querying the DOM
-      const allNavItems = Array.from(document.querySelectorAll('.nav-item'))
+      const allNavItems = Array.from(document.querySelectorAll(".nav-item"))
       const resumeNavItem = allNavItems.find(
-        (el) => el.querySelector('a[aria-label="Resume Recall"]') || el.querySelector('[aria-label="Resume Recall"]')
+        (el) =>
+          el.querySelector('a[aria-label="Resume Recall"]') ||
+          el.querySelector('[aria-label="Resume Recall"]')
       )
       const noteNavItem = allNavItems.find(
-        (el) => el.querySelector('a[aria-label="Note"]') || el.querySelector('[aria-label="Note"]')
+        (el) =>
+          el.querySelector('a[aria-label="Note"]') ||
+          el.querySelector('[aria-label="Note"]')
       )
 
       expect(resumeRecallElement).toBeInTheDocument()
       expect(noteElement).toBeInTheDocument()
       expect(resumeNavItem).toBeDefined()
       expect(noteNavItem).toBeDefined()
-      
+
       // Check that resume recall appears before note in the DOM order
       const resumeIndex = allNavItems.indexOf(resumeNavItem!)
       const noteIndex = allNavItems.indexOf(noteNavItem!)
@@ -452,28 +394,14 @@ describe("main menu", () => {
     })
 
     it("does not show resume recall menu item when recall is not paused", async () => {
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(0),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(false),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: vi.fn(),
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
+      vi.mocked(useRecallData).mockReturnValue(
+        createDefaultRecallData({
+          isRecallPaused: ref(false),
+        })
+      )
 
       helper.component(MainMenu).withProps({ user }).render()
-
-      // If HorizontalMenu is used, expand it first
-      const expandButton = screen.queryByLabelText("Toggle menu")
-      if (expandButton) {
-        await fireEvent.click(expandButton)
-      }
+      await expandMenuIfNeeded()
 
       const resumeRecallLink = screen.queryByLabelText("Resume Recall")
       expect(resumeRecallLink).not.toBeInTheDocument()
@@ -482,20 +410,12 @@ describe("main menu", () => {
     it("resumes recall when clicking resume recall in horizontal menu without expanding", async () => {
       window.matchMedia = createMatchMedia(false)
       const resumeRecallSpy = vi.fn()
-      vi.mocked(useRecallData).mockReturnValue({
-        toRepeatCount: ref(0),
-        recallWindowEndAt: ref(undefined),
-        totalAssimilatedCount: ref(0),
-        isRecallPaused: ref(true),
-        shouldResumeRecall: ref(false),
-        setToRepeatCount: vi.fn(),
-        setRecallWindowEndAt: vi.fn(),
-        setTotalAssimilatedCount: vi.fn(),
-        setIsRecallPaused: vi.fn(),
-        resumeRecall: resumeRecallSpy,
-        clearShouldResumeRecall: vi.fn(),
-        decrementToRepeatCount: vi.fn(),
-      })
+      vi.mocked(useRecallData).mockReturnValue(
+        createDefaultRecallData({
+          isRecallPaused: ref(true),
+          resumeRecall: resumeRecallSpy,
+        })
+      )
 
       helper.component(MainMenu).withProps({ user }).render()
 
