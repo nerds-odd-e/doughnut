@@ -1,6 +1,15 @@
 <template>
   <nav class="daisy-navbar daisy-bg-base-200">
     <div class="daisy-btn-group daisy-btn-group-sm">
+      <button
+        v-if="!readonly && isHeadNote"
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        title="Edit notebook settings"
+        @click="editNotebookSettings"
+      >
+        <SvgNotebook />
+      </button>
+
       <NoteNewButton
         v-if="!readonly"
         button-title="Add Child Note"
@@ -91,8 +100,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue"
-import type { Note } from "@generated/backend"
+import { ref, computed } from "vue"
+import type { Note, Notebook } from "@generated/backend"
 import type { NoteAccessory } from "@generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
@@ -109,9 +118,11 @@ import SvgChat from "@/components/svgs/SvgChat.vue"
 import SvgWikidata from "../../svgs/SvgWikidata.vue"
 import WikidataAssociationForNoteDialog from "../WikidataAssociationForNoteDialog.vue"
 import NoteMoreOptionsDialog from "../accessory/NoteMoreOptionsDialog.vue"
+import SvgNotebook from "../../svgs/SvgNotebook.vue"
 
-const { note } = defineProps<{
+const { note, notebook } = defineProps<{
   note: Note
+  notebook?: Notebook
   asMarkdown?: boolean
   conversationButton?: boolean
   readonly?: boolean
@@ -123,6 +134,19 @@ const moreOptions = ref(false)
 const router = useRouter()
 
 const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
+
+const isHeadNote = computed(() => {
+  return notebook !== undefined && notebook.headNoteId === note.id
+})
+
+const editNotebookSettings = () => {
+  if (notebook) {
+    router.push({
+      name: "notebookEdit",
+      params: { notebookId: notebook.id },
+    })
+  }
+}
 
 const noteAccessoriesUpdated = (na: NoteAccessory) => {
   if (na) {

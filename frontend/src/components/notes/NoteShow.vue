@@ -9,6 +9,7 @@
               v-if="currentUser"
               v-bind="{
                 note: noteRealm.note,
+                notebook: noteRealm.notebook,
                 asMarkdown,
                 conversationButton: noConversationButton,
                 readonly: readonly(noteRealm),
