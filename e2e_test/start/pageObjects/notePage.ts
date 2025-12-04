@@ -322,7 +322,7 @@ export const assumeNotePage = (noteTopology?: string) => {
         })
     },
     memoryTracker() {
-      clickNotePageMoreOptionsButton('Note Recall Settings')
+      privateToolbarButton('more options').click()
       return {
         expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
           for (const k in expected) {
