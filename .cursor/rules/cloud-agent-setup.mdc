@@ -80,20 +80,20 @@ source /workspace/scripts/cloud_agent_setup.sh
 # The setup script exports INPUT_DB_URL which the backend uses when running with e2e profile
 pnpm sut &
 
-# Wait 10 seconds for services to be ready
-sleep 10
+# Wait for services to be ready (waits for both backend on 9081 and frontend on 5173)
+pnpm wait-on tcp:9081 tcp:5173
 
 # Run tests
 pnpm cypress run --spec e2e_test/features/<feature-file>.feature
 ```
 
-**Note**: The backend runs on port **9081** and frontend on port **5173**. The setup script exports `INPUT_DB_URL` which tells the backend (when using e2e profile) to use the `doughnut_e2e_test` database on port 3306.
+**Note**: The backend runs on port **9081** and frontend on port **5173**. Cypress connects to the frontend at `http://localhost:5173` (as configured in `cypress.config.ts`). The setup script exports `INPUT_DB_URL` which tells the backend (when using e2e profile) to use the `doughnut_e2e_test` database on port 3306.
 
 ## Key Rules
 
 1. **Do NOT use `CURSOR_DEV=true nix develop -c` prefix** - run commands directly
 2. **Backend tests:** Require one-time setup script for Java and MySQL
-3. **E2E tests:** **MUST source the setup script first** (to set INPUT_DB_URL), **then start `pnpm sut` in the background, wait 10 seconds, then run tests** (only needed for e2e tests, not for unit tests)
+3. **E2E tests:** **MUST source the setup script first** (to set INPUT_DB_URL), **then start `pnpm sut` in the background, wait for services with `pnpm wait-on tcp:9081 tcp:5173`, then run tests** (only needed for e2e tests, not for unit tests)
 4. **Service ports:** Backend runs on **9081**, frontend on **5173**
 5. **Test execution:** Frontend tests work without nix
 6. **Linting errors:** TypeScript/vue-tsc errors may appear but don't prevent test execution
@@ -104,6 +104,6 @@ pnpm cypress run --spec e2e_test/features/<feature-file>.feature
 |---------|----------|
 | Frontend tests | `pnpm frontend:test` |
 | Backend tests | `pnpm backend:verify` |
-| E2E tests | `pnpm sut &` then `sleep 10` then `pnpm cypress run --spec <path>` |
+| E2E tests | `pnpm sut &` then `pnpm wait-on tcp:9081 tcp:5173` then `pnpm cypress run --spec <path>` |
 | Linting | `pnpm lint:all` |
 | Formatting | `pnpm format:all` |
