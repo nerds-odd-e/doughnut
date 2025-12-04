@@ -7,17 +7,16 @@ import com.odde.doughnut.services.graphRAG.relationships.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 @Service
 public class GraphRAGService {
   private final TokenCountingStrategy tokenCountingStrategy;
-  @Nullable private final NoteRepository noteRepository;
+  private final NoteRepository noteRepository;
 
   @Autowired
   public GraphRAGService(
-      TokenCountingStrategy tokenCountingStrategy, @Nullable NoteRepository noteRepository) {
+      TokenCountingStrategy tokenCountingStrategy, NoteRepository noteRepository) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     this.noteRepository = noteRepository;
   }
@@ -47,9 +46,7 @@ public class GraphRAGService {
     priorityTwoHandlers.add(new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer));
     priorityTwoHandlers.add(
         new SiblingOfParentOfObjectRelationshipHandler(focusNote, priorityFourLayer));
-    if (noteRepository != null) {
-      priorityTwoHandlers.add(new ObjectSiblingRelationshipHandler(focusNote, noteRepository));
-    }
+    priorityTwoHandlers.add(new ObjectSiblingRelationshipHandler(focusNote, noteRepository));
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(3, priorityTwoHandlers.toArray(new RelationshipHandler[0]));
 

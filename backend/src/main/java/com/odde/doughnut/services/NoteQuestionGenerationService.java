@@ -23,12 +23,14 @@ public class NoteQuestionGenerationService {
       GlobalSettingsService globalSettingsService,
       Note note,
       OpenAiApiHandler openAiApiHandler,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;
     this.note = note;
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
-    this.requestBuilder = new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
+    this.requestBuilder =
+        new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper, graphRAGService);
   }
 
   public MCQWithAnswer generateQuestion(String additionalMessage) throws JsonProcessingException {

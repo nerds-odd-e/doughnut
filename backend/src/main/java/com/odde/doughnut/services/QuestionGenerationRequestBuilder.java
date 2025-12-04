@@ -10,11 +10,15 @@ import com.openai.models.chat.completions.ChatCompletionCreateParams;
 public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
   private final ObjectMapper objectMapper;
+  private final GraphRAGService graphRAGService;
 
   public QuestionGenerationRequestBuilder(
-      GlobalSettingsService globalSettingsService, ObjectMapper objectMapper) {
+      GlobalSettingsService globalSettingsService,
+      ObjectMapper objectMapper,
+      GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;
     this.objectMapper = objectMapper;
+    this.graphRAGService = graphRAGService;
   }
 
   public ChatCompletionCreateParams buildQuestionGenerationRequest(
@@ -39,7 +43,7 @@ public class QuestionGenerationRequestBuilder {
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    String noteDescription = note.getGraphRAGDescription(objectMapper);
+    String noteDescription = note.getGraphRAGDescription(objectMapper, graphRAGService);
     String noteInstructions =
         "The JSON below is available only to you (the question generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like “this note”, “above”, “the focus note”, or anything revealing that the question originates from hidden context.\n";
     return new OpenAIChatRequestBuilder()

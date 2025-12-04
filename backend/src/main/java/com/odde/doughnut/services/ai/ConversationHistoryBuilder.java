@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.GraphRAGService;
 import com.openai.models.chat.completions.ChatCompletionAssistantMessageParam;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
@@ -13,9 +14,11 @@ import java.util.List;
 
 public class ConversationHistoryBuilder {
   private final ObjectMapper objectMapper;
+  private final GraphRAGService graphRAGService;
 
-  public ConversationHistoryBuilder(ObjectMapper objectMapper) {
+  public ConversationHistoryBuilder(ObjectMapper objectMapper, GraphRAGService graphRAGService) {
     this.objectMapper = objectMapper;
+    this.graphRAGService = graphRAGService;
   }
 
   public List<ChatCompletionMessageParam> buildHistory(Conversation conversation) {
@@ -46,7 +49,7 @@ public class ConversationHistoryBuilder {
       List<ChatCompletionMessageParam> messages, Conversation conversation) {
     Note note = conversation.getSubjectNote();
     if (note != null) {
-      String noteDescription = note.getGraphRAGDescription(objectMapper);
+      String noteDescription = note.getGraphRAGDescription(objectMapper, graphRAGService);
       String notebookInstructions = note.getNotebookAssistantInstructions();
 
       // Combine note description with notebook instructions

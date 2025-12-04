@@ -11,14 +11,17 @@ public final class NotebookAssistantForNoteServiceFactory {
   private final GlobalSettingsService globalSettingsService;
   private final OpenAiApiHandler openAiApiHandler;
   private final ObjectMapper objectMapper;
+  private final GraphRAGService graphRAGService;
 
   public NotebookAssistantForNoteServiceFactory(
       GlobalSettingsService globalSettingsService,
       OpenAiApiHandler openAiApiHandler,
-      ObjectMapper objectMapper) {
+      ObjectMapper objectMapper,
+      GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
+    this.graphRAGService = graphRAGService;
   }
 
   public NoteAutomationService createNoteAutomationService(Note note) {
@@ -29,6 +32,6 @@ public final class NotebookAssistantForNoteServiceFactory {
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
     return new NoteQuestionGenerationService(
-        globalSettingsService, note, openAiApiHandler, objectMapper);
+        globalSettingsService, note, openAiApiHandler, objectMapper, graphRAGService);
   }
 }

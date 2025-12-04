@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 class ConversationHistoryBuilderTest {
 
   @Autowired MakeMe makeMe;
+  @Autowired com.odde.doughnut.services.GraphRAGService graphRAGService;
   private ObjectMapper objectMapper;
 
   @BeforeEach
@@ -43,7 +44,8 @@ class ConversationHistoryBuilderTest {
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       // When building history
-      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
+      ConversationHistoryBuilder builder =
+          new ConversationHistoryBuilder(objectMapper, graphRAGService);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then first message should be system message with note context
@@ -73,7 +75,8 @@ class ConversationHistoryBuilderTest {
               .please();
 
       // When building history
-      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
+      ConversationHistoryBuilder builder =
+          new ConversationHistoryBuilder(objectMapper, graphRAGService);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions) + 3
@@ -93,7 +96,8 @@ class ConversationHistoryBuilderTest {
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       // When building history
-      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(objectMapper);
+      ConversationHistoryBuilder builder =
+          new ConversationHistoryBuilder(objectMapper, graphRAGService);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions)

@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.GlobalSettingsService;
+import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.PredefinedQuestionService;
 import com.odde.doughnut.services.QuestionGenerationRequestBuilder;
 import com.odde.doughnut.services.SuggestedQuestionForFineTuningService;
@@ -35,6 +36,7 @@ class PredefinedQuestionController {
   private final ObjectMapper objectMapper;
   private final AuthorizationService authorizationService;
   private final GlobalSettingsService globalSettingsService;
+  private final GraphRAGService graphRAGService;
 
   @Autowired
   public PredefinedQuestionController(
@@ -44,10 +46,12 @@ class PredefinedQuestionController {
       ObjectMapper objectMapper,
       AuthorizationService authorizationService,
       GlobalSettingsService globalSettingsService,
-      AiQuestionGenerator aiQuestionGenerator) {
+      AiQuestionGenerator aiQuestionGenerator,
+      GraphRAGService graphRAGService) {
     this.predefinedQuestionService = predefinedQuestionService;
     this.suggestedQuestionForFineTuningService = suggestedQuestionForFineTuningService;
     this.testabilitySettings = testabilitySettings;
+    this.graphRAGService = graphRAGService;
     this.objectMapper = objectMapper;
     this.authorizationService = authorizationService;
     this.globalSettingsService = globalSettingsService;
@@ -124,7 +128,7 @@ class PredefinedQuestionController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     QuestionGenerationRequestBuilder requestBuilder =
-        new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper);
+        new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper, graphRAGService);
     ChatCompletionCreateParams params = requestBuilder.buildQuestionGenerationRequest(note, null);
     return serializeChatCompletionCreateParams(params);
   }

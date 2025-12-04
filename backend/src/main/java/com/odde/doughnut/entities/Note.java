@@ -14,7 +14,6 @@ import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -368,9 +367,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public String getGraphRAGDescription(ObjectMapper objectMapper) {
-    GraphRAGService graphRAGService =
-        new GraphRAGService(new CharacterBasedTokenCountingStrategy(), null);
+  public String getGraphRAGDescription(ObjectMapper objectMapper, GraphRAGService graphRAGService) {
     GraphRAGResult retrieve = graphRAGService.retrieve(this, 2500);
     String prettyString;
     try {
