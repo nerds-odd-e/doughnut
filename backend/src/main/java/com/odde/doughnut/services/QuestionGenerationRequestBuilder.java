@@ -5,11 +5,15 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
   private final GraphRAGService graphRAGService;
 
+  @Autowired
   public QuestionGenerationRequestBuilder(
       GlobalSettingsService globalSettingsService, GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;

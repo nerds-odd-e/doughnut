@@ -1,12 +1,10 @@
 package com.odde.doughnut.services.ai;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.NoteQuestionGenerationService;
-import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
@@ -19,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class AiQuestionGenerator {
-  private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+  private final NoteQuestionGenerationService noteQuestionGenerationService;
   private final GlobalSettingsService globalSettingsService;
   private final Randomizer randomizer;
   private final OpenAiApiHandler openAiApiHandler;
@@ -27,12 +25,11 @@ public class AiQuestionGenerator {
 
   @Autowired
   public AiQuestionGenerator(
-      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
+      NoteQuestionGenerationService noteQuestionGenerationService,
       GlobalSettingsService globalSettingsService,
       TestabilitySettings testabilitySettings,
-      ObjectMapper objectMapper,
       OpenAiApiHandler openAiApiHandler) {
-    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
+    this.noteQuestionGenerationService = noteQuestionGenerationService;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = testabilitySettings.getRandomizer();
     this.openAiApiHandler = openAiApiHandler;
@@ -41,13 +38,12 @@ public class AiQuestionGenerator {
 
   // Test-only constructor for injecting Randomizer directly
   public AiQuestionGenerator(
-      NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory,
+      NoteQuestionGenerationService noteQuestionGenerationService,
       GlobalSettingsService globalSettingsService,
       Randomizer randomizer,
-      ObjectMapper objectMapper,
       OpenAiApiHandler openAiApiHandler,
       TestabilitySettings testabilitySettings) {
-    this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
+    this.noteQuestionGenerationService = noteQuestionGenerationService;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = randomizer;
     this.openAiApiHandler = openAiApiHandler;
@@ -58,10 +54,9 @@ public class AiQuestionGenerator {
     if (testabilitySettings.isOpenAiDisabled()) {
       return null;
     }
-    NoteQuestionGenerationService service =
-        notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      MCQWithAnswer original = service.generateQuestion(note, additionalMessage);
+      MCQWithAnswer original =
+          noteQuestionGenerationService.generateQuestion(note, additionalMessage);
       if (original != null && !original.isF2__strictChoiceOrder()) {
         return shuffleChoices(original);
       }
@@ -98,10 +93,8 @@ public class AiQuestionGenerator {
     if (testabilitySettings.isOpenAiDisabled()) {
       return null;
     }
-    NoteQuestionGenerationService service =
-        notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      return service.evaluateQuestion(note, mcqWithAnswer).orElse(null);
+      return noteQuestionGenerationService.evaluateQuestion(note, mcqWithAnswer).orElse(null);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

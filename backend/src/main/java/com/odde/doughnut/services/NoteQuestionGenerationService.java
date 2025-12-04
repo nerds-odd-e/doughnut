@@ -11,23 +11,26 @@ import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class NoteQuestionGenerationService {
   protected final GlobalSettingsService globalSettingsService;
   private final OpenAiApiHandler openAiApiHandler;
   private final ObjectMapper objectMapper;
   private final QuestionGenerationRequestBuilder requestBuilder;
 
+  @Autowired
   public NoteQuestionGenerationService(
       GlobalSettingsService globalSettingsService,
       OpenAiApiHandler openAiApiHandler,
       ObjectMapper objectMapper,
-      GraphRAGService graphRAGService) {
+      QuestionGenerationRequestBuilder requestBuilder) {
     this.globalSettingsService = globalSettingsService;
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
-    this.requestBuilder =
-        new QuestionGenerationRequestBuilder(globalSettingsService, graphRAGService);
+    this.requestBuilder = requestBuilder;
   }
 
   public MCQWithAnswer generateQuestion(Note note, String additionalMessage)

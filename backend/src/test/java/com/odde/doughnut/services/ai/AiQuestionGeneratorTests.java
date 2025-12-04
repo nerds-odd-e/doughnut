@@ -4,10 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
-import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
+import com.odde.doughnut.services.NoteQuestionGenerationService;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
@@ -37,7 +36,7 @@ class AiQuestionGeneratorTests {
   @Autowired MakeMe makeMe;
   @Autowired GlobalSettingsService globalSettingsService;
   @Autowired OpenAiApiHandler openAiApiHandler;
-  @Autowired NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+  @Autowired NoteQuestionGenerationService noteQuestionGenerationService;
   @Autowired AiQuestionGenerator aiQuestionGenerator;
   @Autowired TestabilitySettings testabilitySettings;
   OpenAIChatCompletionMock openAIChatCompletionMock;
@@ -123,13 +122,11 @@ class AiQuestionGeneratorTests {
   void shouldShuffleChoicesInSpecificOrder() {
     // Setup a mocked randomizer
     Randomizer mockedRandomizer = mock(Randomizer.class);
-    var objectMapper = new ObjectMapperConfig().objectMapper();
     AiQuestionGenerator aiQuestionGeneratorWithMockedRandomizer =
         new AiQuestionGenerator(
-            notebookAssistantForNoteServiceFactory,
+            noteQuestionGenerationService,
             globalSettingsService,
             mockedRandomizer,
-            objectMapper,
             openAiApiHandler,
             testabilitySettings);
 

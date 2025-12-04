@@ -31,12 +31,10 @@ class NoteQuestionGenerationServiceTests {
   @MockitoBean(name = "officialOpenAiClient")
   OpenAIClient officialClient;
 
-  @Autowired GlobalSettingsService globalSettingsService;
   @Autowired MakeMe makeMe;
-  @Autowired NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
+  @Autowired NoteQuestionGenerationService service;
   OpenAIChatCompletionMock openAIChatCompletionMock;
   private Note testNote;
-  private NoteQuestionGenerationService service;
 
   @BeforeEach
   void setup() {
@@ -46,9 +44,6 @@ class NoteQuestionGenerationServiceTests {
     // Create common test data
     testNote = makeMe.aNote().details("description long enough.").please();
     makeMe.aNote().under(testNote).please();
-
-    // Initialize common services
-    service = notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
   }
 
   @Nested
@@ -200,8 +195,6 @@ class NoteQuestionGenerationServiceTests {
       notebookAiAssistant.setUpdatedAt(currentTime);
       makeMe.entityPersister.save(notebookAiAssistant);
       makeMe.refresh(testNote.getNotebook());
-      service =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(testNote, null);
@@ -255,11 +248,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.RELATED_TO).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -282,11 +273,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.SPECIALIZE).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -310,11 +299,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.APPLICATION).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -338,11 +325,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.INSTANCE).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -366,11 +351,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.PART).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -393,11 +376,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.TAGGED_BY).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -420,11 +401,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.ATTRIBUTE).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -448,11 +427,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.OPPOSITE_OF).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -476,11 +453,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.AUTHOR_OF).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -503,11 +478,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.USES).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -530,11 +503,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.EXAMPLE_OF).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -557,11 +528,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.PRECEDES).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -584,11 +553,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.SIMILAR_TO).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -611,11 +578,9 @@ class NoteQuestionGenerationServiceTests {
       Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.CONFUSE_WITH).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
-      NoteQuestionGenerationService linkService =
-          notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
