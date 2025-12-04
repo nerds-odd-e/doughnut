@@ -38,9 +38,14 @@ beforeEach(() => {
     totalAssimilatedCount: mockedTotalAssimilatedCount,
     toRepeatCount: ref(0),
     recallWindowEndAt: ref(undefined),
+    isRecallPaused: ref(false),
+    shouldResumeRecall: ref(false),
     setToRepeatCount: vi.fn(),
     setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
+    setIsRecallPaused: vi.fn(),
+    resumeRecall: vi.fn(),
+    clearShouldResumeRecall: vi.fn(),
     decrementToRepeatCount: vi.fn(),
   })
 
