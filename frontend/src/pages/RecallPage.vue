@@ -161,7 +161,8 @@ watch(
   () => shouldResumeRecall.value,
   (shouldResume) => {
     if (shouldResume) {
-      previousAnsweredQuestionCursor.value = undefined
+      // Don't clear the cursor when resuming - KeepAlive preserves the component state
+      // so previousAnsweredQuestionCursor should still be set if it was before navigating away
       clearShouldResumeRecall()
     }
   }
