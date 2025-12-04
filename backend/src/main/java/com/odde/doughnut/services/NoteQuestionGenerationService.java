@@ -14,34 +14,33 @@ import java.util.Optional;
 
 public class NoteQuestionGenerationService {
   protected final GlobalSettingsService globalSettingsService;
-  private final Note note;
   private final OpenAiApiHandler openAiApiHandler;
   private final ObjectMapper objectMapper;
   private final QuestionGenerationRequestBuilder requestBuilder;
 
   public NoteQuestionGenerationService(
       GlobalSettingsService globalSettingsService,
-      Note note,
       OpenAiApiHandler openAiApiHandler,
       ObjectMapper objectMapper,
       GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;
-    this.note = note;
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
     this.requestBuilder =
         new QuestionGenerationRequestBuilder(globalSettingsService, graphRAGService);
   }
 
-  public MCQWithAnswer generateQuestion(String additionalMessage) throws JsonProcessingException {
-    return generateQuestionWithChatCompletion(additionalMessage);
+  public MCQWithAnswer generateQuestion(Note note, String additionalMessage)
+      throws JsonProcessingException {
+    return generateQuestionWithChatCompletion(note, additionalMessage);
   }
 
-  public ChatCompletionCreateParams buildQuestionGenerationRequest(String additionalMessage) {
+  public ChatCompletionCreateParams buildQuestionGenerationRequest(
+      Note note, String additionalMessage) {
     return requestBuilder.buildQuestionGenerationRequest(note, additionalMessage);
   }
 
-  private MCQWithAnswer generateQuestionWithChatCompletion(String additionalMessage) {
+  private MCQWithAnswer generateQuestionWithChatCompletion(Note note, String additionalMessage) {
     OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();
@@ -76,12 +75,13 @@ public class NoteQuestionGenerationService {
         .orElse(null);
   }
 
-  public Optional<QuestionEvaluation> evaluateQuestion(MCQWithAnswer question)
+  public Optional<QuestionEvaluation> evaluateQuestion(Note note, MCQWithAnswer question)
       throws JsonProcessingException {
-    return evaluateQuestionWithChatCompletion(question);
+    return evaluateQuestionWithChatCompletion(note, question);
   }
 
-  private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(MCQWithAnswer question) {
+  private Optional<QuestionEvaluation> evaluateQuestionWithChatCompletion(
+      Note note, MCQWithAnswer question) {
     OpenAIChatRequestBuilder chatRequestBuilder = requestBuilder.getChatRequestBuilder(note);
 
     String instructions = note.getNotebookAssistantInstructions();

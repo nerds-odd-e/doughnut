@@ -62,7 +62,7 @@ class NoteQuestionGenerationServiceTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
       // Execute
-      MCQWithAnswer generatedQuestion = service.generateQuestion(null);
+      MCQWithAnswer generatedQuestion = service.generateQuestion(testNote, null);
 
       // Verify
       assertThat(
@@ -84,7 +84,7 @@ class NoteQuestionGenerationServiceTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
       // Execute
-      service.generateQuestion(null);
+      service.generateQuestion(testNote, null);
 
       // Verify
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
@@ -116,7 +116,7 @@ class NoteQuestionGenerationServiceTests {
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
       // Act
-      service.generateQuestion(null);
+      service.generateQuestion(testNote, null);
 
       // Verify
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
@@ -133,7 +133,7 @@ class NoteQuestionGenerationServiceTests {
       openAIChatCompletionMock.mockNullChatCompletion();
 
       // Execute and verify
-      MCQWithAnswer result = service.generateQuestion(null);
+      MCQWithAnswer result = service.generateQuestion(testNote, null);
 
       // Verify that a null completion returns null
       assertThat(result, is(nullValue()));
@@ -146,7 +146,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldBuildRequestWithNoteDescription() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(null);
+          service.buildQuestionGenerationRequest(testNote, null);
       assertThat(request, is(notNullValue()));
       assertThat(request.model().toString(), is("gpt-4o-mini"));
       boolean hasNoteDescription =
@@ -161,7 +161,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldBuildRequestWithNoteInstructions() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(null);
+          service.buildQuestionGenerationRequest(testNote, null);
       assertThat(request, is(notNullValue()));
       assertThat(request.model().toString(), is("gpt-4o-mini"));
       boolean hasNoteDescription =
@@ -176,7 +176,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldBuildRequestWithQuestionGenerationInstruction() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(null);
+          service.buildQuestionGenerationRequest(testNote, null);
 
       boolean hasQuestionDesignerInstruction =
           request.messages().stream()
@@ -204,7 +204,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(testNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(null);
+          service.buildQuestionGenerationRequest(testNote, null);
 
       boolean hasNotebookInstructions =
           request.messages().stream()
@@ -222,7 +222,7 @@ class NoteQuestionGenerationServiceTests {
       String additionalMessage = "Generate a question about the capital city";
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(additionalMessage);
+          service.buildQuestionGenerationRequest(testNote, additionalMessage);
 
       boolean hasAdditionalMessage =
           request.messages().stream()
@@ -238,7 +238,7 @@ class NoteQuestionGenerationServiceTests {
     void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
       // No NotebookAiAssistant created, so instructions should be null/empty
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(null);
+          service.buildQuestionGenerationRequest(testNote, null);
 
       long systemMessageCount =
           request.messages().stream().filter(message -> message.system().isPresent()).count();
@@ -259,7 +259,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -286,7 +286,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -314,7 +314,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -342,7 +342,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -370,7 +370,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -397,7 +397,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -424,7 +424,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -452,7 +452,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -480,7 +480,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -507,7 +507,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -534,7 +534,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -561,7 +561,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -588,7 +588,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -615,7 +615,7 @@ class NoteQuestionGenerationServiceTests {
           notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(linkingNote);
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          linkService.buildQuestionGenerationRequest(null);
+          linkService.buildQuestionGenerationRequest(linkingNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
@@ -635,7 +635,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldNotIncludeLinkTypeInstructionForNonLinkingNote() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(null);
+          service.buildQuestionGenerationRequest(testNote, null);
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()

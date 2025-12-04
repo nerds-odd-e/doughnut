@@ -22,7 +22,6 @@ public class AiQuestionGenerator {
   private final NotebookAssistantForNoteServiceFactory notebookAssistantForNoteServiceFactory;
   private final GlobalSettingsService globalSettingsService;
   private final Randomizer randomizer;
-  private final ObjectMapper objectMapper;
   private final OpenAiApiHandler openAiApiHandler;
   private final TestabilitySettings testabilitySettings;
 
@@ -36,7 +35,6 @@ public class AiQuestionGenerator {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = testabilitySettings.getRandomizer();
-    this.objectMapper = objectMapper;
     this.openAiApiHandler = openAiApiHandler;
     this.testabilitySettings = testabilitySettings;
   }
@@ -52,7 +50,6 @@ public class AiQuestionGenerator {
     this.notebookAssistantForNoteServiceFactory = notebookAssistantForNoteServiceFactory;
     this.globalSettingsService = globalSettingsService;
     this.randomizer = randomizer;
-    this.objectMapper = objectMapper;
     this.openAiApiHandler = openAiApiHandler;
     this.testabilitySettings = testabilitySettings;
   }
@@ -64,7 +61,7 @@ public class AiQuestionGenerator {
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      MCQWithAnswer original = service.generateQuestion(additionalMessage);
+      MCQWithAnswer original = service.generateQuestion(note, additionalMessage);
       if (original != null && !original.isF2__strictChoiceOrder()) {
         return shuffleChoices(original);
       }
@@ -104,7 +101,7 @@ public class AiQuestionGenerator {
     NoteQuestionGenerationService service =
         notebookAssistantForNoteServiceFactory.createNoteQuestionGenerationService(note);
     try {
-      return service.evaluateQuestion(mcqWithAnswer).orElse(null);
+      return service.evaluateQuestion(note, mcqWithAnswer).orElse(null);
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }

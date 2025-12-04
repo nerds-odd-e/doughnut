@@ -32,6 +32,6 @@ public final class NotebookAssistantForNoteServiceFactory {
 
   public NoteQuestionGenerationService createNoteQuestionGenerationService(Note note) {
     return new NoteQuestionGenerationService(
-        globalSettingsService, note, openAiApiHandler, objectMapper, graphRAGService);
+        globalSettingsService, openAiApiHandler, objectMapper, graphRAGService);
   }
 }
