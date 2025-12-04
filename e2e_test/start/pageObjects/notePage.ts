@@ -150,6 +150,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     undo(undoType: string) {
       this.toolbarButton(`undo ${undoType}`).click()
+      cy.findByRole('button', { name: 'OK' }).click()
     },
     editTextContent: (noteAttributes: Record<string, string>) => {
       for (const propName in noteAttributes) {
