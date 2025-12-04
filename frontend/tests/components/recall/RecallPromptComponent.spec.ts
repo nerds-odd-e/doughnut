@@ -1,4 +1,4 @@
-import RecallPromptComponent from "@/components/review/RecallPromptComponent.vue"
+import RecallPromptComponent from "@/components/recall/RecallPromptComponent.vue"
 import { flushPromises } from "@vue/test-utils"
 import helper, {
   mockSdkService,

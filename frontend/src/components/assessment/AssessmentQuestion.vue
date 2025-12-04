@@ -40,7 +40,7 @@ import type { AnswerDto, AssessmentQuestionInstance } from "@generated/backend"
 import { AssessmentController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
-import QuestionDisplay from "../review/QuestionDisplay.vue"
+import QuestionDisplay from "../recall/QuestionDisplay.vue"
 
 const { popups } = usePopups()
 

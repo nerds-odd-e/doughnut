@@ -33,7 +33,7 @@
 import type { MemoryTracker, NoteInfo } from "@generated/backend"
 import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
-import RecallSettingForm from "../review/RecallSettingForm.vue"
+import RecallSettingForm from "../recall/RecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 
 // Props

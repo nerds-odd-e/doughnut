@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import { mount } from "@vue/test-utils"
-import QuestionChoices from "@/components/review/QuestionChoices.vue"
+import QuestionChoices from "@/components/recall/QuestionChoices.vue"
 
 describe("QuestionChoices", () => {
   it("prevents link navigation while allowing answer submission", async () => {

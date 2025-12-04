@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import ContestableQuestion from "@/components/review/ContestableQuestion.vue"
+import ContestableQuestion from "@/components/recall/ContestableQuestion.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
