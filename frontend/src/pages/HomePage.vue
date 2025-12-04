@@ -1,4 +1,5 @@
 <template>
+  <GlobalBar />
   <div class="home-container">
     <div class="upper-half" ref="upperHalf">
       <h1 class="welcome-text">Welcome {{ user?.name || 'To Doughnut' }}!</h1>
@@ -66,6 +67,7 @@ import { ref, onMounted, onUnmounted, type Ref, inject } from "vue"
 import type { User } from "@generated/backend"
 import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
+import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const { upperNavItems, lowerNavItems } = useNavigationItems()
