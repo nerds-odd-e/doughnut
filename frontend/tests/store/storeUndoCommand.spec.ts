@@ -46,7 +46,39 @@ describe("storeUndoCommand", () => {
       expect(histories.noteUndoHistories.length).toEqual(2)
     })
 
-    it("should create new entry for details edit even to same note", () => {
+    it("should accumulate continuous details edits to the same note", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      histories.addEditingToUndoHistory(
+        note1.id,
+        "edit details",
+        "Original Details"
+      )
+      expect(histories.noteUndoHistories.length).toEqual(1)
+
+      // Second edit to same note's details should not create a new entry
+      histories.addEditingToUndoHistory(
+        note1.id,
+        "edit details",
+        "Original Details"
+      )
+      expect(histories.noteUndoHistories.length).toEqual(1)
+      expect(histories.noteUndoHistories[0]!.textContent).toBe(
+        "Original Details"
+      )
+    })
+
+    it("should create new entry for details edit to different note", () => {
+      const histories = new NoteEditingHistory()
+      const note1 = makeMe.aNote.please()
+      const note2 = makeMe.aNote.please()
+      histories.addEditingToUndoHistory(note1.id, "edit details", "Details 1")
+      histories.addEditingToUndoHistory(note2.id, "edit details", "Details 2")
+
+      expect(histories.noteUndoHistories.length).toEqual(2)
+    })
+
+    it("should create new entry when switching between title and details for same note", () => {
       const histories = new NoteEditingHistory()
       const note1 = makeMe.aNote.please()
       histories.addEditingToUndoHistory(note1.id, "edit title", "Title")

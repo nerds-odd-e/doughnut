@@ -22,13 +22,8 @@ export default class NoteEditingHistory {
     textContent?: string
   ) {
     const lastEntry = this.peekUndo()
-    // Accumulate continuous edits to the same note's title into one undo entry
-    if (
-      lastEntry &&
-      lastEntry.type === field &&
-      lastEntry.noteId === noteId &&
-      field === "edit title"
-    ) {
+    // Accumulate continuous edits to the same note's title or details into one undo entry
+    if (lastEntry && lastEntry.type === field && lastEntry.noteId === noteId) {
       // Don't add a new entry - keep the original old value
       return
     }
