@@ -39,7 +39,12 @@ class RecallsController {
       @RequestParam(value = "timezone") String timezone,
       @RequestParam(value = "dueindays", required = false) Integer dueInDays) {
     authorizationService.assertLoggedIn();
-    ZoneId timeZone = ZoneId.of(timezone);
+    ZoneId timeZone;
+    try {
+      timeZone = ZoneId.of(timezone);
+    } catch (Exception e) {
+      timeZone = ZoneId.of("UTC");
+    }
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     return recallService.getDueMemoryTrackers(
         authorizationService.getCurrentUser(),
