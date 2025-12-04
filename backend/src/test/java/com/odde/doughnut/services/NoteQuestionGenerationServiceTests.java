@@ -237,7 +237,10 @@ class NoteQuestionGenerationServiceTests {
       long systemMessageCount =
           request.messages().stream().filter(message -> message.system().isPresent()).count();
 
-      assertThat("Request should have one system message with tool instruction", systemMessageCount, is(1L));
+      assertThat(
+          "Request should have one system message with tool instruction",
+          systemMessageCount,
+          is(1L));
     }
   }
 

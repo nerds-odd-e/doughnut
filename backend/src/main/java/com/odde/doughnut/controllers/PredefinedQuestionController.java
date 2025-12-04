@@ -142,9 +142,32 @@ class PredefinedQuestionController {
       // Serialize the Body using ObjectMapper, which handles JsonField properly
       String jsonString = objectMapper.writeValueAsString(body);
       // Convert back to Map to ensure all non-empty fields are included
-      return objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+      Map<String, Object> result =
+          objectMapper.readValue(jsonString, new TypeReference<Map<String, Object>>() {});
+      // Remove internal "valid" fields from the SDK
+      removeValidFields(result);
+      return result;
     } catch (Exception e) {
       throw new RuntimeException("Failed to serialize ChatCompletionCreateParams", e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void removeValidFields(Object obj) {
+    if (obj == null) {
+      return;
+    }
+    if (obj instanceof Map) {
+      Map<String, Object> map = (Map<String, Object>) obj;
+      map.remove("valid");
+      for (Object value : map.values()) {
+        removeValidFields(value);
+      }
+    } else if (obj instanceof List) {
+      List<?> list = (List<?>) obj;
+      for (Object item : list) {
+        removeValidFields(item);
+      }
     }
   }
 }

@@ -299,5 +299,48 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
       assertThat(jsonString, not(equalTo("{}")));
       assertThat(jsonString.length(), greaterThan(10));
     }
+
+    @Test
+    void shouldNotContainValidFieldsInExportedQuestionGeneration()
+        throws UnexpectedNoAccessRightException {
+      java.util.Map<String, Object> request = controller.exportQuestionGeneration(note);
+      java.util.List<String> validFields = findValidFields(request);
+      assertThat(
+          "Exported question generation should not contain 'valid' fields, but found: "
+              + validFields,
+          validFields,
+          empty());
+    }
+
+    private java.util.List<String> findValidFields(Object obj) {
+      java.util.List<String> validFields = new java.util.ArrayList<>();
+      findValidFieldsRecursive(obj, "", validFields);
+      return validFields;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void findValidFieldsRecursive(
+        Object obj, String path, java.util.List<String> validFields) {
+      if (obj == null) {
+        return;
+      }
+      if (obj instanceof java.util.Map) {
+        java.util.Map<String, Object> map = (java.util.Map<String, Object>) obj;
+        for (java.util.Map.Entry<String, Object> entry : map.entrySet()) {
+          String key = entry.getKey();
+          Object value = entry.getValue();
+          String currentPath = path.isEmpty() ? key : path + "." + key;
+          if ("valid".equals(key)) {
+            validFields.add(currentPath);
+          }
+          findValidFieldsRecursive(value, currentPath, validFields);
+        }
+      } else if (obj instanceof java.util.List) {
+        java.util.List<?> list = (java.util.List<?>) obj;
+        for (int i = 0; i < list.size(); i++) {
+          findValidFieldsRecursive(list.get(i), path + "[" + i + "]", validFields);
+        }
+      }
+    }
   }
 }
