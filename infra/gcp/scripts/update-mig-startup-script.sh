@@ -55,6 +55,13 @@ gcloud compute instance-templates create $NEW_TEMPLATE_NAME \
 
 echo "New template created: $NEW_TEMPLATE_NAME"
 
+# Update MIG update policy to allow REPLACE actions (required when changing template)
+echo "Updating MIG update policy to allow REPLACE actions..."
+gcloud compute instance-groups managed update $MIG_NAME \
+  --update-policy-type=PROACTIVE \
+  --update-policy-most-disruptive-action=replace \
+  --zone=$ZONE
+
 # Update MIG to use new template
 echo "Updating MIG to use new template..."
 gcloud compute instance-groups managed set-instance-template $MIG_NAME \
