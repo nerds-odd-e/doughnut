@@ -1,5 +1,8 @@
 <template>
   <main>
+    <Breadcrumb
+      v-bind="{ noteTopology: note.noteTopology, includingSelf: true }"
+    />
     <NoteShow
       v-bind="{ noteId: note.id, expandChildren: false }"
     />
@@ -23,6 +26,7 @@ import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
+import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import { computed } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
