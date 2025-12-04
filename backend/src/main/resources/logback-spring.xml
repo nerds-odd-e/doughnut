@@ -8,6 +8,7 @@
     <encoder>
       <pattern>${PATTERN}</pattern>
     </encoder>
+    <immediateFlush>true</immediateFlush>
   </appender>
 
   <appender name="E2E_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">

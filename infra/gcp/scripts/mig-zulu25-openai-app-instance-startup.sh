@@ -92,7 +92,10 @@ export JAVA_OPTS="-XX:InitialRAMPercentage=75.0 \
         -Dspring.jmx.enabled=false \
         -Dspring.liveBeansView.mbeanDomain=false"
 
-bash -c "java ${JAVA_OPTS} -jar \
+# Start Spring Boot app
+# Redirect stdout/stderr to log files that Cloud Logging agent monitors
+# Cloud Logging agent automatically captures logs from /var/log/*.log files
+nohup java ${JAVA_OPTS} -jar \
         -Dspring-boot.run.profiles=prod \
         -Dspring.profiles.active=prod \
         -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' \
@@ -101,4 +104,5 @@ bash -c "java ${JAVA_OPTS} -jar \
         -Dspring.openai.token=${OPENAI_API_TOKEN} \
         -Dlogging.level.com.zaxxer.hikari=WARN \
         -Dlogging.level.com.zaxxer.hikari.HikariConfig=WARN \
-        /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+        /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar \
+        > /var/log/doughnut-app.log 2>&1 &

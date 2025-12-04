@@ -12,18 +12,28 @@ Spring Boot application logs written to stdout/stderr are automatically captured
 2. Use these filters to find your application logs:
 
 **Option 1: Filter by Resource Type**
+
 ```
 resource.type="gce_instance"
 resource.labels.instance_id="<instance-id>"
 ```
 
 **Option 2: Filter by Log Name**
+
+```
+resource.type="gce_instance"
+logName=~"doughnut-app"
+```
+
+Or if looking for stdout logs:
+
 ```
 resource.type="gce_instance"
 logName="projects/carbon-syntax-298809/logs/stdout"
 ```
 
 **Option 3: Filter by Text Content**
+
 ```
 resource.type="gce_instance"
 textPayload=~"com.odde.doughnut"
@@ -32,11 +42,14 @@ textPayload=~"com.odde.doughnut"
 ### Using gcloud CLI
 
 ```bash
-# View logs for a specific instance
-gcloud logging read "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~stdout" --limit=50 --format=json
+# View logs for a specific instance (from log file)
+gcloud logging read "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~doughnut-app" --limit=50 --format=json
 
 # Tail logs for a specific instance
-gcloud logging tail "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~stdout"
+gcloud logging tail "resource.type=gce_instance AND resource.labels.instance_id=<instance-id> AND logName=~doughnut-app"
+
+# Or search for application logs by content
+gcloud logging read "resource.type=gce_instance AND textPayload=~'com.odde.doughnut'" --limit=50
 ```
 
 ### Finding Instance IDs
@@ -54,7 +67,7 @@ gcloud compute instances list --filter="tags:mig-app-srv"
 The production profile now includes proper logging configuration:
 
 - **Logback**: Logs to CONSOLE appender (stdout/stderr)
-- **Log Levels**: 
+- **Log Levels**:
   - Root: INFO
   - Application (`com.odde.doughnut`): INFO
   - Spring Framework: INFO
@@ -66,23 +79,30 @@ The production profile now includes proper logging configuration:
 ### Logs Not Appearing?
 
 1. **Check Service Account Permissions**
+
    ```bash
    ./infra/gcp/scripts/grant-logging-permission-to-service-account.sh
    ```
 
 2. **Verify Application is Running**
+
    ```bash
    # SSH into instance and check
    ps aux | grep java
    ```
 
 3. **Check if Logs are Being Written**
+
    ```bash
-   # SSH into instance and check stdout/stderr
-   journalctl -u google-startup-scripts.service
+   # SSH into instance and check the log file
+   tail -f /var/log/doughnut-app.log
+   
+   # Or check if the file exists and has content
+   ls -lh /var/log/doughnut-app.log
    ```
 
 4. **Verify Cloud Logging Agent**
+
    ```bash
    # Check if agent is running
    systemctl status google-fluentd
@@ -93,9 +113,12 @@ The production profile now includes proper logging configuration:
 ### Log Format
 
 Logs appear in GCP with:
+
 - **Resource Type**: `gce_instance`
-- **Log Name**: `projects/<project-id>/logs/stdout` or `.../logs/stderr`
-- **Payload**: Text format (from Logback CONSOLE appender)
+- **Log Name**: `projects/<project-id>/logs/doughnut-app.log` (from /var/log/doughnut-app.log)
+- **Payload**: Text format (from Logback CONSOLE appender, redirected to log file)
+
+**Note**: The startup script redirects stdout/stderr to `/var/log/doughnut-app.log` to ensure logs are captured by the Cloud Logging agent even when the process is backgrounded.
 
 ## Notes
 
@@ -103,4 +126,3 @@ Logs appear in GCP with:
 - No additional configuration needed beyond proper logback setup
 - Logs may take a few seconds to appear in Cloud Logging
 - The Cloud Logging agent runs automatically on GCE instances
-
