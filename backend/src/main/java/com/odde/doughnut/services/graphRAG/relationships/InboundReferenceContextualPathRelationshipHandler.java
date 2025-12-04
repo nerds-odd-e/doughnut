@@ -2,23 +2,23 @@ package com.odde.doughnut.services.graphRAG.relationships;
 
 import com.odde.doughnut.entities.Note;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class InboundReferenceContextualPathRelationshipHandler extends RelationshipHandler {
   private final List<Note> contextualPath;
-  private int currentIndex = 0;
+  private int currentIndex;
 
   public InboundReferenceContextualPathRelationshipHandler(Note inboundReferenceNote) {
     super(RelationshipToFocusNote.InboundReferenceContextualPath, inboundReferenceNote);
     this.contextualPath = new ArrayList<>(inboundReferenceNote.getAncestors());
-    Collections.shuffle(this.contextualPath);
+    // Start from the end (closest ancestor/parent) and work backwards to root
+    this.currentIndex = contextualPath.size() - 1;
   }
 
   @Override
   public Note handle() {
-    if (currentIndex < contextualPath.size()) {
-      return contextualPath.get(currentIndex++);
+    if (currentIndex >= 0) {
+      return contextualPath.get(currentIndex--);
     }
     return null;
   }

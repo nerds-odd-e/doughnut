@@ -6,17 +6,19 @@ import java.util.List;
 
 public class AncestorInContextualPathRelationshipHandler extends RelationshipHandler {
   private final List<Note> ancestors;
-  private int currentIndex = 0;
+  private int currentIndex;
 
   public AncestorInContextualPathRelationshipHandler(Note relatingNote) {
     super(RelationshipToFocusNote.AncestorInContextualPath, relatingNote);
     ancestors = new ArrayList<>(relatingNote.getAncestors());
+    // Start from the end (closest ancestor/parent) and work backwards to root
+    this.currentIndex = ancestors.size() - 1;
   }
 
   @Override
   public Note handle() {
-    if (currentIndex < ancestors.size()) {
-      return ancestors.get(currentIndex++);
+    if (currentIndex >= 0) {
+      return ancestors.get(currentIndex--);
     }
     return null;
   }
