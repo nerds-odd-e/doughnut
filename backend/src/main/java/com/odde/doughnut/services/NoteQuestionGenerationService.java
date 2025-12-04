@@ -30,7 +30,7 @@ public class NoteQuestionGenerationService {
     this.openAiApiHandler = openAiApiHandler;
     this.objectMapper = objectMapper;
     this.requestBuilder =
-        new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper, graphRAGService);
+        new QuestionGenerationRequestBuilder(globalSettingsService, graphRAGService);
   }
 
   public MCQWithAnswer generateQuestion(String additionalMessage) throws JsonProcessingException {

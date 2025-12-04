@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.algorithms.ClozedString;
 import com.odde.doughnut.algorithms.HtmlOrMarkdown;
 import com.odde.doughnut.algorithms.NoteTitle;
@@ -12,9 +11,7 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
-import com.odde.doughnut.services.GraphRAGService;
 import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -364,22 +361,6 @@ public class Note extends EntityIdentifiedByIdOnly {
       return null;
     }
     return notebookAiAssistant.getAdditionalInstructionsToAi();
-  }
-
-  @JsonIgnore
-  public String getGraphRAGDescription(ObjectMapper objectMapper, GraphRAGService graphRAGService) {
-    GraphRAGResult retrieve = graphRAGService.retrieve(this, 2500);
-    String prettyString;
-    try {
-      prettyString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(retrieve);
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
-    return """
-          Focus Note and the notes related to it:
-          %s
-          """
-        .formatted(prettyString);
   }
 
   public NoteRealm toNoteRealm(User viewer) {

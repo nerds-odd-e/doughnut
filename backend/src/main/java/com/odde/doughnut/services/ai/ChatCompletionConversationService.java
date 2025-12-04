@@ -1,6 +1,5 @@
 package com.odde.doughnut.services.ai;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.exceptions.OpenAiUnauthorizedException;
 import com.odde.doughnut.services.ConversationService;
@@ -27,13 +26,11 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 public class ChatCompletionConversationService {
   private final OpenAiApiHandler openAiApiHandler;
   private final GlobalSettingsService globalSettingsService;
-  private final ObjectMapper objectMapper;
   private final GraphRAGService graphRAGService;
 
   public ChatCompletionCreateParams buildChatCompletionRequest(Conversation conversation) {
     // Build conversation history from database
-    ConversationHistoryBuilder historyBuilder =
-        new ConversationHistoryBuilder(objectMapper, graphRAGService);
+    ConversationHistoryBuilder historyBuilder = new ConversationHistoryBuilder(graphRAGService);
     List<ChatCompletionMessageParam> history = historyBuilder.buildHistory(conversation);
 
     // Get available tools for conversation

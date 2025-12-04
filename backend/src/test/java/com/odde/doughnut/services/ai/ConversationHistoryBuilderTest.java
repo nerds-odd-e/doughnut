@@ -2,8 +2,6 @@ package com.odde.doughnut.services.ai;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Conversation;
 import com.odde.doughnut.entities.ConversationMessage;
 import com.odde.doughnut.entities.Note;
@@ -12,7 +10,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.openai.models.chat.completions.ChatCompletionMessageParam;
 import com.openai.models.chat.completions.ChatCompletionSystemMessageParam;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +24,6 @@ class ConversationHistoryBuilderTest {
 
   @Autowired MakeMe makeMe;
   @Autowired com.odde.doughnut.services.GraphRAGService graphRAGService;
-  private ObjectMapper objectMapper;
-
-  @BeforeEach
-  void setup() {
-    objectMapper = new ObjectMapperConfig().objectMapper();
-  }
 
   @Nested
   class BuildHistory {
@@ -44,8 +35,7 @@ class ConversationHistoryBuilderTest {
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       // When building history
-      ConversationHistoryBuilder builder =
-          new ConversationHistoryBuilder(objectMapper, graphRAGService);
+      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(graphRAGService);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then first message should be system message with note context
@@ -75,8 +65,7 @@ class ConversationHistoryBuilderTest {
               .please();
 
       // When building history
-      ConversationHistoryBuilder builder =
-          new ConversationHistoryBuilder(objectMapper, graphRAGService);
+      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(graphRAGService);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions) + 3
@@ -96,8 +85,7 @@ class ConversationHistoryBuilderTest {
       Conversation conversation = makeMe.aConversation().forANote(note).please();
 
       // When building history
-      ConversationHistoryBuilder builder =
-          new ConversationHistoryBuilder(objectMapper, graphRAGService);
+      ConversationHistoryBuilder builder = new ConversationHistoryBuilder(graphRAGService);
       List<ChatCompletionMessageParam> history = builder.buildHistory(conversation);
 
       // Then should have system messages (note context + conversation instructions)

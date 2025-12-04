@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
@@ -13,12 +14,16 @@ import org.springframework.stereotype.Service;
 public class GraphRAGService {
   private final TokenCountingStrategy tokenCountingStrategy;
   private final NoteRepository noteRepository;
+  private final ObjectMapper objectMapper;
 
   @Autowired
   public GraphRAGService(
-      TokenCountingStrategy tokenCountingStrategy, NoteRepository noteRepository) {
+      TokenCountingStrategy tokenCountingStrategy,
+      NoteRepository noteRepository,
+      ObjectMapper objectMapper) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     this.noteRepository = noteRepository;
+    this.objectMapper = objectMapper;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
@@ -58,5 +63,20 @@ public class GraphRAGService {
         new GraphRAGResultBuilder(focusNote, tokenBudgetForRelatedNotes, tokenCountingStrategy);
     priorityOneLayer.handle(builder);
     return builder.build();
+  }
+
+  public String getGraphRAGDescription(Note note) {
+    GraphRAGResult retrieve = retrieve(note, 2500);
+    String prettyString;
+    try {
+      prettyString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(retrieve);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    return """
+          Focus Note and the notes related to it:
+          %s
+          """
+        .formatted(prettyString);
   }
 }

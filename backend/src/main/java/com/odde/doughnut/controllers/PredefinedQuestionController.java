@@ -128,7 +128,7 @@ class PredefinedQuestionController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     QuestionGenerationRequestBuilder requestBuilder =
-        new QuestionGenerationRequestBuilder(globalSettingsService, objectMapper, graphRAGService);
+        new QuestionGenerationRequestBuilder(globalSettingsService, graphRAGService);
     ChatCompletionCreateParams params = requestBuilder.buildQuestionGenerationRequest(note, null);
     return serializeChatCompletionCreateParams(params);
   }

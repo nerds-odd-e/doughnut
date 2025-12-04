@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -9,15 +8,11 @@ import com.openai.models.chat.completions.ChatCompletionCreateParams;
 
 public class QuestionGenerationRequestBuilder {
   private final GlobalSettingsService globalSettingsService;
-  private final ObjectMapper objectMapper;
   private final GraphRAGService graphRAGService;
 
   public QuestionGenerationRequestBuilder(
-      GlobalSettingsService globalSettingsService,
-      ObjectMapper objectMapper,
-      GraphRAGService graphRAGService) {
+      GlobalSettingsService globalSettingsService, GraphRAGService graphRAGService) {
     this.globalSettingsService = globalSettingsService;
-    this.objectMapper = objectMapper;
     this.graphRAGService = graphRAGService;
   }
 
@@ -43,9 +38,9 @@ public class QuestionGenerationRequestBuilder {
 
   public OpenAIChatRequestBuilder getChatRequestBuilder(Note note) {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    String noteDescription = note.getGraphRAGDescription(objectMapper, graphRAGService);
+    String noteDescription = graphRAGService.getGraphRAGDescription(note);
     String noteInstructions =
-        "The JSON below is available only to you (the question generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like “this note”, “above”, “the focus note”, or anything revealing that the question originates from hidden context.\n";
+        "The JSON below is available only to you (the question generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like \"this note\", \"above\", \"the focus note\", or anything revealing that the question originates from hidden context.\n";
     return new OpenAIChatRequestBuilder()
         .model(modelName)
         .addUserMessage(noteInstructions + noteDescription);
