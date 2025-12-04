@@ -1,5 +1,12 @@
 package com.odde.doughnut.services.graphRAG;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+
+@Component
+@Primary
+@Profile("test")
 public class OneTokenPerNoteStrategy implements TokenCountingStrategy {
   @Override
   public int estimateTokens(BareNote bareNote) {

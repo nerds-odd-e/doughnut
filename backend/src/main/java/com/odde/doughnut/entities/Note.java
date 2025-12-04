@@ -370,7 +370,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   public String getGraphRAGDescription(ObjectMapper objectMapper) {
     GraphRAGService graphRAGService =
-        new GraphRAGService(new CharacterBasedTokenCountingStrategy());
+        new GraphRAGService(new CharacterBasedTokenCountingStrategy(), null);
     GraphRAGResult retrieve = graphRAGService.retrieve(this, 2500);
     String prettyString;
     try {

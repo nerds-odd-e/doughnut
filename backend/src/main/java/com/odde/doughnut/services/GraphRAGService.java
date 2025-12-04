@@ -6,18 +6,18 @@ import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
 
+@Service
 public class GraphRAGService {
   private final TokenCountingStrategy tokenCountingStrategy;
-  private final NoteRepository noteRepository;
+  @Nullable private final NoteRepository noteRepository;
 
-  public GraphRAGService(TokenCountingStrategy tokenCountingStrategy) {
-    this.tokenCountingStrategy = tokenCountingStrategy;
-    this.noteRepository = null;
-  }
-
+  @Autowired
   public GraphRAGService(
-      TokenCountingStrategy tokenCountingStrategy, NoteRepository noteRepository) {
+      TokenCountingStrategy tokenCountingStrategy, @Nullable NoteRepository noteRepository) {
     this.tokenCountingStrategy = tokenCountingStrategy;
     this.noteRepository = noteRepository;
   }

@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -28,14 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GraphRAGServiceTest {
   @Autowired private MakeMe makeMe;
-  @Autowired private NoteRepository noteRepository;
-
-  private GraphRAGService graphRAGService;
-
-  @BeforeEach
-  void setup() {
-    graphRAGService = new GraphRAGService(new OneTokenPerNoteStrategy(), noteRepository);
-  }
+  @Autowired private GraphRAGService graphRAGService;
 
   // Helper methods for common test operations
   private List<BareNote> getNotesWithRelationship(

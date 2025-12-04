@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
@@ -15,7 +14,6 @@ import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.UserService;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
-import com.odde.doughnut.services.graphRAG.CharacterBasedTokenCountingStrategy;
 import com.odde.doughnut.services.graphRAG.FocusNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
@@ -45,7 +43,7 @@ class NoteController {
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
   private final UserService userService;
-  private final NoteRepository noteRepository;
+  private final GraphRAGService graphRAGService;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -55,14 +53,14 @@ class NoteController {
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService,
-      NoteRepository noteRepository) {
+      GraphRAGService graphRAGService) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
     this.userService = userService;
-    this.noteRepository = noteRepository;
+    this.graphRAGService = graphRAGService;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -214,8 +212,6 @@ class NoteController {
       throws UnexpectedNoAccessRightException {
     authorizationService.assertReadAuthorization(note);
 
-    GraphRAGService graphRAGService =
-        new GraphRAGService(new CharacterBasedTokenCountingStrategy(), noteRepository);
     return graphRAGService.retrieve(note, tokenLimit);
   }
 
