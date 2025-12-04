@@ -153,21 +153,18 @@
       </div>
     </section>
 
-    <!-- Admin Section -->
-    <template v-if="user?.admin">
-      <section class="settings-section daisy-mb-6">
-        <div class="section-header">
-          <h4 class="section-title">Assistant Management</h4>
-          <p class="section-description">
-            Configure AI assistant settings and instructions for this notebook.
-          </p>
-        </div>
-        <NotebookAssistantManagementDialog 
-          :notebook="notebook" 
-          :additional-instructions="additionalInstructions"
-        />
-      </section>
-    </template>
+    <section class="settings-section daisy-mb-6">
+      <div class="section-header">
+        <h4 class="section-title">Assistant Management</h4>
+        <p class="section-description">
+          Configure AI assistant settings and instructions for this notebook.
+        </p>
+      </div>
+      <NotebookAssistantManagementDialog 
+        :notebook="notebook" 
+        :additional-instructions="additionalInstructions"
+      />
+    </section>
 
     <!-- Notebook Indexing Section -->
     <section class="settings-section daisy-mb-6">

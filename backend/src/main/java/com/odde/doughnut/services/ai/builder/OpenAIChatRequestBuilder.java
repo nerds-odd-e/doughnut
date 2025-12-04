@@ -31,7 +31,7 @@ public class OpenAIChatRequestBuilder {
   }
 
   public OpenAIChatRequestBuilder responseJsonSchema(InstructionAndSchema tool) {
-    addUserMessage(tool.getMessageBody());
+    addToOverallSystemMessage(tool.getMessageBody());
     // Use official SDK's responseFormat with schema class
     if (tool.getParameterClass() != null) {
       @SuppressWarnings("unchecked")

@@ -175,7 +175,7 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasQuestionDesignerInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> message.toString().contains("Please act as a Question Designer"));
 
@@ -230,13 +230,14 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
       // No NotebookAiAssistant created, so instructions should be null/empty
+      // But there will be a system message with the tool instruction
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(testNote, null);
 
       long systemMessageCount =
           request.messages().stream().filter(message -> message.system().isPresent()).count();
 
-      assertThat("Request should have no system message", systemMessageCount, is(0L));
+      assertThat("Request should have one system message with tool instruction", systemMessageCount, is(1L));
     }
   }
 
@@ -254,10 +255,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (related to)");
                   });
 
@@ -279,10 +280,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains(
                         "Special Instruction for Linking Note (a specialization of)");
                   });
@@ -305,10 +306,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains(
                         "Special Instruction for Linking Note (an application of)");
                   });
@@ -331,10 +332,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains(
                         "Special Instruction for Linking Note (an instance of)");
                   });
@@ -357,10 +358,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (a part of)");
                   });
 
@@ -382,10 +383,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (tagged by)");
                   });
 
@@ -407,10 +408,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains(
                         "Special Instruction for Linking Note (an attribute of)");
                   });
@@ -433,10 +434,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains(
                         "Special Instruction for Linking Note (the opposite of)");
                   });
@@ -459,10 +460,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (author of)");
                   });
 
@@ -484,10 +485,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (using)");
                   });
 
@@ -509,10 +510,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (an example of)");
                   });
 
@@ -534,10 +535,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (before)");
                   });
 
@@ -559,10 +560,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (similar to)");
                   });
 
@@ -584,10 +585,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note (confused with)");
                   });
 
@@ -604,10 +605,10 @@ class NoteQuestionGenerationServiceTests {
 
       boolean hasLinkTypeInstruction =
           request.messages().stream()
-              .filter(message -> message.user().isPresent())
+              .filter(message -> message.system().isPresent())
               .anyMatch(
                   message -> {
-                    String content = message.user().get().content().toString();
+                    String content = message.system().get().content().toString();
                     return content.contains("Special Instruction for Linking Note");
                   });
 

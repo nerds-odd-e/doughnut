@@ -61,7 +61,7 @@ class FineTuningServiceTest {
           goodOpenAIChatGPTFineTuningExampleList.get(0).getMessages();
       assertThat(goodTrainingData.get(0).getContent(), containsString("Test Title"));
       assertThat(
-          goodTrainingData.get(1).getContent(),
+          goodTrainingData.get(0).getContent(),
           containsString("Please act as a Question Designer"));
     }
 
@@ -75,7 +75,7 @@ class FineTuningServiceTest {
           .please();
       OpenAIChatGPTFineTuningExample example =
           fineTuningService.getQuestionGenerationTrainingExamples().get(0);
-      ChatMessageForFineTuning assistantMessage = example.getMessages().get(2);
+      ChatMessageForFineTuning assistantMessage = example.getMessages().get(1);
       assertThat(assistantMessage.getRole(), equalTo("assistant"));
       assertThat(assistantMessage.getContent(), containsString("This is the raw Json question"));
     }

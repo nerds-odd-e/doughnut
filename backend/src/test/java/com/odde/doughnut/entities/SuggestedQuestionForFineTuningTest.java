@@ -31,20 +31,17 @@ class SuggestedQuestionForFineTuningTest {
   void testFirstPart() {
     ChatMessageForFineTuning firstMessage = getFirstMessage();
     assertThat(firstMessage.getRole(), equalTo("system"));
-    assertThat(firstMessage.getContent(), equalTo("note content"));
+    assertThat(firstMessage.getContent(), containsString("note content"));
+    assertThat(
+        firstMessage.getContent(),
+        containsString("You are an AI assistant evaluating a memory recall question"));
+    assertThat(firstMessage.getContent(), containsString("a default question stem"));
 
     ChatMessageForFineTuning secondMessage = getSecondMessage();
-    assertThat(secondMessage.getRole(), equalTo("user"));
-    assertThat(
-        secondMessage.getContent(),
-        containsString("You are an AI assistant evaluating a memory recall question"));
-    assertThat(secondMessage.getContent(), containsString("a default question stem"));
-
-    ChatMessageForFineTuning thirdMessage = getThirdMessage();
-    assertThat(thirdMessage.getRole(), equalTo("assistant"));
-    assertThat(thirdMessage.getContent(), containsString("correctChoices"));
-    assertThat(thirdMessage.getContent(), containsString("feasibleQuestion"));
-    assertThat(thirdMessage.getContent(), containsString("a comment"));
+    assertThat(secondMessage.getRole(), equalTo("assistant"));
+    assertThat(secondMessage.getContent(), containsString("correctChoices"));
+    assertThat(secondMessage.getContent(), containsString("feasibleQuestion"));
+    assertThat(secondMessage.getContent(), containsString("a comment"));
   }
 
   @Test
@@ -63,7 +60,7 @@ class SuggestedQuestionForFineTuningTest {
   }
 
   private QuestionEvaluation getQuestionEvaluation() {
-    ChatMessageForFineTuning message = getThirdMessage();
+    ChatMessageForFineTuning message = getSecondMessage();
     try {
       // First parse the JSON string to JsonNode, then convert to QuestionEvaluation
       return new ObjectMapperConfig()
@@ -86,11 +83,5 @@ class SuggestedQuestionForFineTuningTest {
     List<ChatMessageForFineTuning> messages =
         suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData().getMessages();
     return messages.get(1);
-  }
-
-  private ChatMessageForFineTuning getThirdMessage() {
-    List<ChatMessageForFineTuning> messages =
-        suggestedQuestionForFineTuning.toQuestionEvaluationFineTuningData().getMessages();
-    return messages.get(2);
   }
 }
