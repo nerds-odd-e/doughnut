@@ -112,22 +112,22 @@ export SPRING_DATASOURCE_PASSWORD="doughnut"
 # Export environment variable for e2e tests (backend uses INPUT_DB_URL when running with e2e profile)
 export INPUT_DB_URL="jdbc:mysql://localhost:3306/doughnut_e2e_test?allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true"
 
-# Run database migration for test database
-echo "==> Running database migration for test database..."
-cd /workspace
-if ./backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test > /tmp/migrate.log 2>&1; then
-    echo "==> Test database migration completed successfully"
-else
-    echo "ERROR: Test database migration failed. Check /tmp/migrate.log"
-    exit 1
-fi
-
 # Verify e2e database connection (migration will happen automatically when backend starts with e2e profile)
 echo "==> Verifying e2e database connection..."
 if mysql -u doughnut -pdoughnut -S /tmp/mysql.sock -e "USE doughnut_e2e_test; SELECT 1" > /dev/null 2>&1; then
     echo "==> E2E database connection verified"
 else
     echo "ERROR: E2E database connection failed"
+    exit 1
+fi
+
+# Run database migration for test database (at the end)
+echo "==> Running database migration for test database..."
+cd /workspace
+if ./backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test > /tmp/migrate.log 2>&1; then
+    echo "==> Test database migration completed successfully"
+else
+    echo "ERROR: Test database migration failed. Check /tmp/migrate.log"
     exit 1
 fi
 
