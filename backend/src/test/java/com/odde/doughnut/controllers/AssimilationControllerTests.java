@@ -40,6 +40,14 @@ class AssimilationControllerTests extends ControllerTestBase {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.assimilating("Asia/Shanghai"));
     }
+
+    @Test
+    void shouldHandleInvalidTimezoneByUsingUTC() {
+      Note n = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      assertThat(n.getId(), notNullValue());
+      List<Note> memoryTrackerWithRecallSettings = controller.assimilating("Etc/Unknown");
+      assertThat(memoryTrackerWithRecallSettings, hasSize(1));
+    }
   }
 
   @Nested

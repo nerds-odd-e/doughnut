@@ -47,7 +47,12 @@ class AssimilationController {
   public List<Note> assimilating(@RequestParam(value = "timezone") String timezone) {
     authorizationService.assertLoggedIn();
     User user = authorizationService.getCurrentUser();
-    ZoneId timeZone = ZoneId.of(timezone);
+    ZoneId timeZone;
+    try {
+      timeZone = ZoneId.of(timezone);
+    } catch (Exception e) {
+      timeZone = ZoneId.of("UTC");
+    }
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     return new AssimilationService(
