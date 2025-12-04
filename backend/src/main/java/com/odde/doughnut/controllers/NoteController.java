@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.*;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
 import com.odde.doughnut.exceptions.MovementNotPossibleException;
@@ -44,6 +45,7 @@ class NoteController {
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
   private final UserService userService;
+  private final NoteRepository noteRepository;
 
   public NoteController(
       EntityPersister entityPersister,
@@ -52,13 +54,15 @@ class NoteController {
       NoteMotionService noteMotionService,
       NoteService noteService,
       AuthorizationService authorizationService,
-      UserService userService) {
+      UserService userService,
+      NoteRepository noteRepository) {
     this.entityPersister = entityPersister;
     this.testabilitySettings = testabilitySettings;
     this.noteMotionService = noteMotionService;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
     this.userService = userService;
+    this.noteRepository = noteRepository;
     this.wikidataService =
         new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
@@ -211,7 +215,7 @@ class NoteController {
     authorizationService.assertReadAuthorization(note);
 
     GraphRAGService graphRAGService =
-        new GraphRAGService(new CharacterBasedTokenCountingStrategy());
+        new GraphRAGService(new CharacterBasedTokenCountingStrategy(), noteRepository);
     return graphRAGService.retrieve(note, tokenLimit);
   }
 

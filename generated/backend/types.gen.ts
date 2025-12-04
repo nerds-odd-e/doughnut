@@ -516,7 +516,7 @@ export type BareNote = {
     title?: string;
     objectUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild' | 'ObjectSibling' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -529,7 +529,7 @@ export type FocusNote = {
     title?: string;
     objectUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild' | 'ObjectSibling' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;

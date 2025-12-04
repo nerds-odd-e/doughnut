@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.RelationshipToFocusNote;
 import com.odde.doughnut.testability.MakeMe;
@@ -27,9 +28,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GraphRAGServiceTest {
   @Autowired private MakeMe makeMe;
+  @Autowired private NoteRepository noteRepository;
 
-  private final GraphRAGService graphRAGService =
-      new GraphRAGService(new OneTokenPerNoteStrategy());
+  private GraphRAGService graphRAGService;
+
+  @BeforeEach
+  void setup() {
+    graphRAGService = new GraphRAGService(new OneTokenPerNoteStrategy(), noteRepository);
+  }
 
   // Helper methods for common test operations
   private List<BareNote> getNotesWithRelationship(
@@ -225,6 +231,57 @@ public class GraphRAGServiceTest {
                 result, RelationshipToFocusNote.AncestorInObjectContextualPath),
             empty());
       }
+    }
+  }
+
+  @Nested
+  class WhenNoteHasObjectSiblings {
+    private Note object;
+    private Note focusNote;
+    private Note objectSibling1;
+    private Note objectSibling2;
+
+    @BeforeEach
+    void setup() {
+      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      object = makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
+      focusNote = makeMe.aReification().between(parent, object).please();
+
+      // Create other notes that share the same object
+      Note siblingParent1 = makeMe.aNote().titleConstructor("Sibling Parent 1").please();
+      objectSibling1 = makeMe.aReification().between(siblingParent1, object).please();
+
+      Note siblingParent2 = makeMe.aNote().titleConstructor("Sibling Parent 2").please();
+      objectSibling2 = makeMe.aReification().between(siblingParent2, object).please();
+    }
+
+    @Test
+    void shouldIncludeObjectSiblingsInRelatedNotes() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      assertRelatedNotesContain(
+          result, RelationshipToFocusNote.ObjectSibling, objectSibling1, objectSibling2);
+    }
+
+    @Test
+    void shouldNotIncludeFocusNoteAsObjectSibling() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      List<BareNote> objectSiblings =
+          getNotesWithRelationship(result, RelationshipToFocusNote.ObjectSibling);
+      assertThat(objectSiblings, hasSize(2));
+      assertThat(
+          objectSiblings.stream().map(BareNote::getUri).collect(Collectors.toList()),
+          not(hasItem(focusNote.getUri())));
+    }
+
+    @Test
+    void shouldNotIncludeObjectSiblingsWhenBudgetIsLimited() {
+      // Set budget to only allow parent and object
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
+
+      // Verify no object siblings are included
+      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ObjectSibling), empty());
     }
   }
 

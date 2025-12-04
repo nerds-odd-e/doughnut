@@ -4478,6 +4478,7 @@ components:
           - InboundReferenceContextualPath
           - SiblingOfSubjectOfInboundReference
           - InboundReferenceToObjectOfReifiedChild
+          - ObjectSibling
           - RemotelyRelated
         details:
           type: string
@@ -4522,6 +4523,7 @@ components:
           - InboundReferenceContextualPath
           - SiblingOfSubjectOfInboundReference
           - InboundReferenceToObjectOfReifiedChild
+          - ObjectSibling
           - RemotelyRelated
         details:
           type: string

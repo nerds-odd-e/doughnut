@@ -1,14 +1,25 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.graphRAG.*;
 import com.odde.doughnut.services.graphRAG.relationships.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GraphRAGService {
   private final TokenCountingStrategy tokenCountingStrategy;
+  private final NoteRepository noteRepository;
 
   public GraphRAGService(TokenCountingStrategy tokenCountingStrategy) {
     this.tokenCountingStrategy = tokenCountingStrategy;
+    this.noteRepository = null;
+  }
+
+  public GraphRAGService(
+      TokenCountingStrategy tokenCountingStrategy, NoteRepository noteRepository) {
+    this.tokenCountingStrategy = tokenCountingStrategy;
+    this.noteRepository = noteRepository;
   }
 
   public GraphRAGResult retrieve(Note focusNote, int tokenBudgetForRelatedNotes) {
@@ -25,19 +36,22 @@ public class GraphRAGService {
               new ObjectRelationshipHandler(focusNote),
               new AncestorInContextualPathRelationshipHandler(focusNote)
             });
+    List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
+    priorityTwoHandlers.add(
+        new ChildRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer));
+    priorityTwoHandlers.add(new PriorSiblingRelationshipHandler(focusNote));
+    priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote));
+    priorityTwoHandlers.add(
+        new InboundReferenceRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer));
+    priorityTwoHandlers.add(new AncestorInObjectContextualPathRelationshipHandler(focusNote));
+    priorityTwoHandlers.add(new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer));
+    priorityTwoHandlers.add(
+        new SiblingOfParentOfObjectRelationshipHandler(focusNote, priorityFourLayer));
+    if (noteRepository != null) {
+      priorityTwoHandlers.add(new ObjectSiblingRelationshipHandler(focusNote, noteRepository));
+    }
     PriorityLayer priorityTwoLayer =
-        new PriorityLayer(
-            3,
-            new RelationshipHandler[] {
-              new ChildRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer),
-              new PriorSiblingRelationshipHandler(focusNote),
-              new YoungerSiblingRelationshipHandler(focusNote),
-              new InboundReferenceRelationshipHandler(
-                  focusNote, priorityThreeLayer, priorityFourLayer),
-              new AncestorInObjectContextualPathRelationshipHandler(focusNote),
-              new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer),
-              new SiblingOfParentOfObjectRelationshipHandler(focusNote, priorityFourLayer)
-            });
+        new PriorityLayer(3, priorityTwoHandlers.toArray(new RelationshipHandler[0]));
 
     priorityOneLayer.setNextLayer(priorityTwoLayer);
     priorityTwoLayer.setNextLayer(priorityThreeLayer);
