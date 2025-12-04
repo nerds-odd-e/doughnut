@@ -16,7 +16,7 @@
           />
         </template>
       </PopButton>
-      <NoteUndoButton v-bind="{ storageAccessor }" />
+      <NoteUndoButton />
     </div>
   </nav>
 </template>
