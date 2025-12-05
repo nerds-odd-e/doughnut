@@ -147,7 +147,11 @@ describe("repeat page", () => {
       // Initial order should be [123, 456, 3]
       expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([123, 456, 3])
 
-      // Click the "Move to end" button
+      // Click the "Recall settings" button to open the dropdown
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+
+      // Click the "Move to end" button in the dropdown
       await wrapper.find('button[title="Move to end of list"]').trigger("click")
 
       // New order should be [456, 3, 123]
@@ -161,6 +165,10 @@ describe("repeat page", () => {
 
       // Move to last item
       vm.currentIndex = 2
+      await wrapper.vm.$nextTick()
+
+      // Click the "Recall settings" button to open the dropdown
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
       // Button should not be visible when on last item

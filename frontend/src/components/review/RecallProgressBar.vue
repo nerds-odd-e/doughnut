@@ -4,64 +4,93 @@
     @showMore="$emit('showMore')"
   >
     <template #buttons>
-      <div class="btn-group">
-        <template v-if="previousAnsweredQuestionCursor !== undefined">
+      <div class="btn-group-wrapper daisy-relative">
+        <div class="btn-group">
+          <template v-if="previousAnsweredQuestionCursor !== undefined">
+            <button
+              class="btn large-btn"
+              title="view previous answered question"
+              :disabled="finished === 0 || previousAnsweredQuestionCursor === 0"
+              @click="
+                $emit(
+                  'viewLastAnsweredQuestion',
+                  !previousAnsweredQuestionCursor
+                    ? finished - 1
+                    : previousAnsweredQuestionCursor - 1
+                )
+              "
+            >
+              <SvgBackward />
+            </button>
+          </template>
+          <button
+            v-else
+            class="btn large-btn"
+            title="view last answered question"
+            :disabled="finished === 0"
+            @click="$emit('viewLastAnsweredQuestion', finished - 1)"
+          >
+            <SvgPause />
+          </button>
           <button
             class="btn large-btn"
-            title="view previous answered question"
-            :disabled="finished === 0 || previousAnsweredQuestionCursor === 0"
-            @click="
-              $emit(
-                'viewLastAnsweredQuestion',
-                !previousAnsweredQuestionCursor
-                  ? finished - 1
-                  : previousAnsweredQuestionCursor - 1
-              )
-            "
+            :class="{ 'daisy-btn-active': showSettings }"
+            title="Recall settings"
+            @click="showSettings = !showSettings"
           >
-            <SvgBackward />
+            <SvgCog />
           </button>
-        </template>
-        <button
-          v-else
-          class="btn large-btn"
-          title="view last answered question"
-          :disabled="finished === 0"
-          @click="$emit('viewLastAnsweredQuestion', finished - 1)"
-        >
-          <SvgPause />
-        </button>
-        <button
-          v-if="canMoveToEnd && previousAnsweredQuestionCursor === undefined"
-          class="btn large-btn"
-          title="Move to end of list"
-          aria-label="Move to end of list"
-          @click="$emit('moveToEnd', currentIndex)"
-        >
-          <SvgSkip />
-        </button>
+        </div>
+        <RecallSettingsDialog
+          v-if="showSettings"
+          v-bind="{
+            canMoveToEnd,
+            previousAnsweredQuestionCursor,
+            currentIndex,
+          }"
+          @close-dialog="showSettings = false"
+          @move-to-end="handleMoveToEnd"
+        />
       </div>
     </template>
   </ProgressBar>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
 import SvgPause from "../svgs/SvgPause.vue"
 import SvgBackward from "../svgs/SvgBackward.vue"
-import SvgSkip from "../svgs/SvgSkip.vue"
+import SvgCog from "../svgs/SvgCog.vue"
+import RecallSettingsDialog from "./RecallSettingsDialog.vue"
 
-defineProps({
+const props = defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
   previousAnsweredQuestionCursor: Number,
   canMoveToEnd: { type: Boolean, required: true },
   currentIndex: { type: Number, required: true },
 })
-defineEmits(["viewLastAnsweredQuestion", "showMore", "moveToEnd"])
+
+const emit = defineEmits<{
+  (e: "viewLastAnsweredQuestion", cursor: number): void
+  (e: "showMore"): void
+  (e: "moveToEnd", index: number): void
+}>()
+
+const showSettings = ref(false)
+
+const handleMoveToEnd = (index: number) => {
+  emit("moveToEnd", index)
+}
 </script>
 
 <style lang="scss" scoped>
+.btn-group-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
 .large-btn {
   padding: 0.75rem 1rem;
   min-height: 2.5rem;

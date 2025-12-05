@@ -1,5 +1,5 @@
 <template>
-  <nav class="daisy-navbar daisy-max-w-full daisy-flex daisy-justify-between">
+  <nav class="daisy-navbar daisy-max-w-full daisy-flex daisy-justify-between daisy-relative">
     <div class="daisy-flex daisy-flex-1 daisy-overflow-x-auto">
       <slot />
     </div>
