@@ -56,6 +56,7 @@ const assumeQuestionPage = (stem?: string) => {
     skipQuestion() {
       cy.pageIsNotLoading()
       getQuestionSection().should('exist')
+      cy.findByRole('button', { name: 'Recall settings' }).click()
       cy.findByRole('button', { name: 'Move to end of list' }).click()
     },
     answerFirstOption() {
