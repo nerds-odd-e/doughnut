@@ -1,7 +1,7 @@
 import { flushPromises } from "@vue/test-utils"
 import { vi, beforeEach, afterEach } from "vitest"
 import helper from "@tests/helpers"
-import QuestionDisplay from "@/components/review/QuestionDisplay.vue"
+import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import makeMe from "@tests/fixtures/makeMe"
 import markdownizer from "@/components/form/markdownizer"
 

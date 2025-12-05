@@ -64,7 +64,7 @@
 import { computed, ref } from "vue"
 import type { Note } from "@generated/backend"
 import type { PropType } from "vue"
-import Assimilation from "@/components/review/Assimilation.vue"
+import Assimilation from "@/components/recall/Assimilation.vue"
 import ContentLoader from "@/components/commons/ContentLoader.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 

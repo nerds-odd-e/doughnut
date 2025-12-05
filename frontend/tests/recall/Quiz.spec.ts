@@ -1,4 +1,4 @@
-import Quiz from "@/components/review/Quiz.vue"
+import Quiz from "@/components/recall/Quiz.vue"
 import { flushPromises } from "@vue/test-utils"
 import { beforeEach, describe, it, vi, afterEach } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"

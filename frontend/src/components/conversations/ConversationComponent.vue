@@ -47,7 +47,7 @@
 import type { User, Conversation } from "@generated/backend"
 import NoteShow from "@/components/notes/NoteShow.vue"
 import AssessmentQuestion from "@/components/assessment/AssessmentQuestion.vue"
-import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
+import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import { useRouter } from "vue-router"
 import { ref, onMounted } from "vue"
 import { ConversationMessageController } from "@generated/backend/sdk.gen"

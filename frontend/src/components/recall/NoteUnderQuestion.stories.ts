@@ -3,7 +3,7 @@ import NoteUnderQuestion from "./NoteUnderQuestion.vue"
 import makeMe from "@tests/fixtures/makeMe"
 
 const meta = {
-  title: "Review/NoteUnderQuestion",
+  title: "Recall/NoteUnderQuestion",
   component: NoteUnderQuestion,
   tags: ["autodocs"],
   argTypes: {

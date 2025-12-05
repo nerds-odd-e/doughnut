@@ -1,4 +1,4 @@
-import Assimilation from "@/components/review/Assimilation.vue"
+import Assimilation from "@/components/recall/Assimilation.vue"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
