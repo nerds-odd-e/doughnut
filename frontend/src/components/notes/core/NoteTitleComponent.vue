@@ -18,7 +18,7 @@
     <span>
       <NoteTitleComponent
         v-if="iconizedTarget"
-        v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
+        v-bind="{ noteTopology: noteTopology.objectNoteTopology, clickable: false }"
       />
       <NoteTitleWithLink
         class="hover-underline"
@@ -30,7 +30,14 @@
     </span>
   </template>
   <template v-else>
-    <span class="title-text">{{ title }} </span>
+    <RouterLink
+      v-if="clickable"
+      :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
+      class="daisy-text-decoration-none hover-underline"
+    >
+      <span class="title-text">{{ title }}</span>
+    </RouterLink>
+    <span v-else class="title-text">{{ title }}</span>
   </template>
 </template>
 
@@ -40,10 +47,12 @@ import { computed, ref } from "vue"
 import type { NoteTopology } from "@generated/backend"
 import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
 import NoteTitleWithLink from "../NoteTitleWithLink.vue"
+import { RouterLink } from "vue-router"
 
 const props = defineProps({
   noteTopology: { type: Object as PropType<NoteTopology>, required: true },
   full: { type: Boolean, default: false },
+  clickable: { type: Boolean, default: true },
 })
 
 const reactiveProps = ref(props)
