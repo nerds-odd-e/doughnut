@@ -36,9 +36,15 @@ app.use(Toast, {
 
 app.directive("focus", {
   mounted(el) {
-    const input = el.querySelector("input, textarea")
-    if (input) {
-      input.focus()
+    // If the element itself is a button, focus it
+    if (el instanceof HTMLButtonElement) {
+      el.focus()
+      return
+    }
+    // Otherwise, look for input, textarea, or button inside
+    const focusable = el.querySelector("input, textarea, button")
+    if (focusable) {
+      focusable.focus()
     }
   },
 })

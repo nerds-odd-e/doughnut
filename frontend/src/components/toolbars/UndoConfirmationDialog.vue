@@ -20,7 +20,7 @@
       <button class="daisy-btn daisy-btn-secondary" @click="handleCancel">
         Cancel
       </button>
-      <button class="daisy-btn daisy-btn-success" @click="handleConfirm">
+      <button class="daisy-btn daisy-btn-success" @click="handleConfirm" v-focus>
         OK
       </button>
     </div>

@@ -1,5 +1,6 @@
 <template>
   <button
+    ref="buttonRef"
     :class="btnClass || 'daisy-btn daisy-btn-ghost daisy-btn-sm'"
     :aria-label="ariaLabel"
     role="button"
@@ -34,9 +35,14 @@ defineProps({
 })
 
 const show = ref(false)
+const buttonRef = ref<HTMLButtonElement | null>(null)
 
 const closeDialog = () => {
   show.value = false
+  // Blur the button to remove focus style after closing dialog
+  if (buttonRef.value) {
+    buttonRef.value.blur()
+  }
 }
 
 defineExpose({
