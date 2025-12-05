@@ -209,6 +209,13 @@ When('I click resume recall from the menu', () => {
   cy.findByLabelText('Resume Recall').click()
 })
 
+Then('I should be back to the current question', () => {
+  // Verify we're back to the quiz view (current question) by checking that
+  // the question section exists, which means we're viewing a question, not an answered question
+  cy.pageIsNotLoading()
+  cy.get('[data-test="question-section"]').should('exist')
+})
+
 When(
   'I have the true false question {string} rated as a good example',
   (questionStem: string) => {
