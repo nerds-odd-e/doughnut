@@ -30,6 +30,16 @@ export default function markdownToQuillHtml(
     if (htmlContent.includes("<ul>") || htmlContent.includes("<li>")) {
       return convertHtmlList(htmlContent)
     }
+    const trimmed = htmlContent.trim()
+    // Allow <br> or <br/> (self-closing tags)
+    if (/^<br\s*\/?>$/i.test(trimmed)) {
+      return htmlContent
+    }
+    // Allow complete HTML tags matching <tag xxx>...</tag> pattern
+    // This matches opening tag with optional attributes, content, and closing tag
+    if (/^<[^>]+>[\s\S]*<\/[^>]+>$/.test(trimmed)) {
+      return htmlContent
+    }
     // Escape all other HTML tags
     return escapeHtml(htmlContent)
   }

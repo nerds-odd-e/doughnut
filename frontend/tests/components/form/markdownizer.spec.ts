@@ -100,6 +100,18 @@ describe("Markdown and HTML Conversion Tests", () => {
       const result = markdownizer.markdownToHtml(markdown)
       expect(result).toBe("<p>raw &lt;span&gt; is ok.</p>")
     })
+
+    it("allows HTML tags at the beginning of line without escaping", () => {
+      const markdown = "<p><br></p>"
+      const result = markdownizer.markdownToHtml(markdown)
+      expect(result).toBe("<p><br></p>")
+    })
+
+    it("allows single HTML tags like <br> without escaping", () => {
+      const markdown = "<br>"
+      const result = markdownizer.markdownToHtml(markdown)
+      expect(result).toBe("<br>")
+    })
   })
 
   describe("Html to markdown", () => {
