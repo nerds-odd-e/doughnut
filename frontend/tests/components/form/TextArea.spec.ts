@@ -139,7 +139,9 @@ describe("TextArea.vue", () => {
 
     // Check what was emitted - inserting "Bold text" at position 9 (start of "text")
     // gives us "existing " + "Bold text" + "text" = "existing Bold texttext"
-    const emittedValue = wrapper.emitted("update:modelValue")?.[0]?.[0]
+    const emittedValue = wrapper.emitted(
+      "update:modelValue"
+    )?.[0]?.[0] as string
     expect(emittedValue).toBe("existing Bold texttext")
 
     // Update the prop to reflect the emitted value

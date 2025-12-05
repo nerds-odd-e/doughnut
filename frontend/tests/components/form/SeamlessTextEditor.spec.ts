@@ -37,7 +37,6 @@ describe("SeamlessTextEditor.vue", () => {
     await nextTick()
 
     const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    const editorRef = (wrapper.vm as any).editor as HTMLElement
 
     // Create paste event with HTML content
     const pasteEvent = createClipboardEvent(
@@ -53,7 +52,7 @@ describe("SeamlessTextEditor.vue", () => {
 
     // Verify editor ref is set
     expect(component.editor).toBeTruthy()
-    expect(component.editor).toBe(editorRef)
+    expect(component.editor).toBe(editor)
 
     component.onPaste(pasteEvent)
     await nextTick()
@@ -108,7 +107,6 @@ describe("SeamlessTextEditor.vue", () => {
     await nextTick()
 
     const editor = wrapper.find(".seamless-editor").element as HTMLElement
-    const editorRef = (wrapper.vm as any).editor as HTMLElement
 
     const pasteEvent = createClipboardEvent("", "replaced")
 
