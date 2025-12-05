@@ -7,6 +7,7 @@
     @input="onInput"
     @blur="onBlur"
     @keydown.enter.prevent="onEnter"
+    @paste="onPaste"
   ></div>
 </template>
 
@@ -37,6 +38,40 @@ const onEnter = (event: KeyboardEvent) => {
   event.target?.dispatchEvent(new Event("blur"))
 }
 
+const onPaste = (event: ClipboardEvent) => {
+  if (props.readonly) return
+
+  event.preventDefault()
+  const plainText = event.clipboardData?.getData("text/plain") || ""
+
+  if (!editor.value) return
+
+  const selection = window.getSelection()
+  if (!selection || selection.rangeCount === 0) {
+    // If no selection, just append at the end
+    const textNode = document.createTextNode(plainText)
+    editor.value.appendChild(textNode)
+    selection?.removeAllRanges()
+    const range = document.createRange()
+    range.selectNodeContents(editor.value)
+    range.collapse(false)
+    selection?.addRange(range)
+  } else {
+    const range = selection.getRangeAt(0)
+    range.deleteContents()
+    const textNode = document.createTextNode(plainText)
+    range.insertNode(textNode)
+    // Move cursor to end of inserted text
+    range.setStartAfter(textNode)
+    range.collapse(true)
+    selection.removeAllRanges()
+    selection.addRange(range)
+  }
+
+  // Trigger input event to update modelValue
+  editor.value.dispatchEvent(new Event("input", { bubbles: true }))
+}
+
 const updateContent = (newValue: string) => {
   if (editor.value && editor.value.innerText !== newValue) {
     editor.value.innerText = newValue
@@ -58,6 +93,11 @@ onMounted(() => {
   if (editor.value) {
     updateContent(props.modelValue)
   }
+})
+
+defineExpose({
+  onPaste,
+  editor,
 })
 </script>
 

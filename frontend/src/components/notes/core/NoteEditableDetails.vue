@@ -67,7 +67,7 @@ const handlePaste = async (
 ) => {
   if (!props.asMarkdown || !textareaRef.value) return
 
-  await handleHtmlPaste(event, (markdown) => {
+  const handled = await handleHtmlPaste(event, (markdown) => {
     const textarea = textareaRef.value?.$el?.querySelector(
       "textarea"
     ) as HTMLTextAreaElement | null
@@ -88,5 +88,11 @@ const handlePaste = async (
       })
     }
   })
+
+  // If HTML was handled, prevent default to stop TextArea's plain text handler
+  // If no HTML, let TextArea's handler process plain text
+  if (handled) {
+    event.preventDefault()
+  }
 }
 </script>

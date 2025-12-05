@@ -16,6 +16,7 @@
       @blur="emit('blur', $event)"
       ref="input"
       @keydown="handleKeydown"
+      @paste="handlePaste"
     />
   </InputWithType>
 </template>
@@ -44,10 +45,6 @@ const focus = () => {
   input.value.focus()
 }
 
-defineExpose({
-  focus,
-})
-
 const handleKeydown = (event: KeyboardEvent) => {
   if (
     props.enterSubmit &&
@@ -59,6 +56,35 @@ const handleKeydown = (event: KeyboardEvent) => {
     emit("enterPressed")
   }
 }
+
+const handlePaste = (event: ClipboardEvent) => {
+  event.preventDefault()
+  const plainText = event.clipboardData?.getData("text/plain") || ""
+
+  if (!input.value) return
+
+  const textarea = input.value
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const currentValue = textarea.value || ""
+
+  const newValue =
+    currentValue.slice(0, start) + plainText + currentValue.slice(end)
+
+  emit("update:modelValue", newValue)
+
+  // Set cursor position after pasted content
+  nextTick(() => {
+    if (textarea) {
+      textarea.selectionStart = textarea.selectionEnd = start + plainText.length
+    }
+  })
+}
+
+defineExpose({
+  focus,
+  handlePaste,
+})
 
 const resize = () => {
   if (input.value && props.autoExtendUntil) {
