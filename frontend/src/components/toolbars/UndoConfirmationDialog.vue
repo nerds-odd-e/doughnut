@@ -20,6 +20,9 @@
       <button class="daisy-btn daisy-btn-secondary" @click="handleCancel">
         Cancel
       </button>
+      <button class="daisy-btn daisy-btn-warning" @click="handleDiscard">
+        Discard
+      </button>
       <button class="daisy-btn daisy-btn-success" @click="handleConfirm" v-focus>
         OK
       </button>
@@ -45,6 +48,7 @@ const props = defineProps({
 const emit = defineEmits<{
   confirm: []
   cancel: []
+  discard: []
 }>()
 
 const handleConfirm = () => {
@@ -55,6 +59,10 @@ const handleConfirm = () => {
 const handleCancel = () => {
   emit("cancel")
   props.closer()
+}
+
+const handleDiscard = () => {
+  emit("discard")
 }
 </script>
 
