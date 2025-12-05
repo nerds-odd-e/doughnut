@@ -14,7 +14,7 @@ import { messageCenterConversations } from "@/store/messageStore"
 export function useNavigationItems() {
   const route = useRoute()
   const { dueCount } = useAssimilationCount()
-  const { toRepeatCount, isRecallPaused } = useRecallData()
+  const { toRepeatCount, isRecallPaused, currentRecallIndex } = useRecallData()
 
   const upperNavItems = computed(() => {
     const baseItems = [
@@ -44,7 +44,10 @@ export function useNavigationItems() {
       },
     ]
 
-    if (isRecallPaused.value) {
+    const recallInProgressAwayFromPage =
+      (route.name as string) !== "recall" && (currentRecallIndex.value ?? 0) > 0
+
+    if (isRecallPaused.value || recallInProgressAwayFromPage) {
       return [
         {
           name: "resumeRecall",

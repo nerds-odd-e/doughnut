@@ -59,6 +59,7 @@ const createUseRecallDataMock = (overrides?: {
   toRepeatCount?: number
   isRecallPaused?: boolean
   resumeRecall?: () => void
+  currentRecallIndex?: number
 }) => {
   return {
     toRepeatCount: ref(overrides?.toRepeatCount ?? 0),
@@ -67,6 +68,7 @@ const createUseRecallDataMock = (overrides?: {
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
+    currentRecallIndex: ref(overrides?.currentRecallIndex ?? 0),
     setToRepeatCount: vi.fn(),
     setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
@@ -75,6 +77,7 @@ const createUseRecallDataMock = (overrides?: {
     clearShouldResumeRecall: vi.fn(),
     decrementToRepeatCount: vi.fn(),
     setTreadmillMode: vi.fn(),
+    setCurrentRecallIndex: vi.fn(),
   }
 }
 
@@ -440,6 +443,22 @@ describe("main menu", () => {
 
       // Should call resumeRecall
       expect(resumeRecallSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe("resume recall when progress exists away from recall page", () => {
+    it("shows resume when not on recall page and current index > 0 even if not paused", async () => {
+      useRouteValue.name = "notebooks"
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: false,
+          currentRecallIndex: 2,
+        })
+      )
+
+      await renderComponent()
+      const resumeRecallLink = screen.getByLabelText("Resume")
+      expect(resumeRecallLink).toBeInTheDocument()
     })
   })
 })

@@ -116,6 +116,7 @@ const {
   shouldResumeRecall,
   clearShouldResumeRecall,
   treadmillMode,
+  setCurrentRecallIndex,
 } = useRecallData()
 
 defineProps({
@@ -211,6 +212,15 @@ watch(
   { immediate: true }
 )
 
+// Keep global recall index in sync for menu logic
+watch(
+  () => currentIndex.value,
+  (idx) => {
+    setCurrentRecallIndex(idx)
+  },
+  { immediate: true }
+)
+
 watch(
   () => treadmillMode.value,
   () => {
@@ -253,6 +263,7 @@ const loadMore = async (dueInDays?: number) => {
   if (!error && response) {
     toRepeat.value = response.toRepeat
     currentIndex.value = 0
+    setCurrentRecallIndex(0)
     if (toRepeat.value?.length === 0) {
       return response
     }
