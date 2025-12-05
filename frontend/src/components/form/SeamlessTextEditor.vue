@@ -39,50 +39,59 @@ const onEnter = (event: KeyboardEvent) => {
 }
 
 const onPaste = (event: ClipboardEvent) => {
-  event.preventDefault()
   const plainText = event.clipboardData?.getData("text/plain") || ""
   if (!editor.value) {
     return
   }
 
-  const currentText = editor.value.innerText || ""
+  // Get selection BEFORE preventing default, as preventDefault might affect it
   const selection = window.getSelection()
+  const currentText = editor.value.innerText || ""
   let start = currentText.length
   let end = currentText.length
 
   // Calculate selection range within the editor's text
+  // The component maintains a single text node, so we can use range offsets directly
   if (selection && selection.rangeCount > 0) {
     try {
       const range = selection.getRangeAt(0)
       const startContainer = range.startContainer
+      const endContainer = range.endContainer
 
-      // If we have a valid range, try to use its offsets
-      // Check if range is within the editor by checking commonAncestorContainer
-      const commonAncestor = range.commonAncestorContainer
-      if (
-        commonAncestor === editor.value ||
-        editor.value.contains(commonAncestor) ||
-        (commonAncestor.nodeType === 3 &&
-          commonAncestor.parentNode === editor.value)
-      ) {
-        // Range is within editor - use offsets directly
-        // For contenteditable with single text node, offsets are character positions
-        if (startContainer.nodeType === 3) {
+      // Since the component only has one text node, if startContainer is a text node,
+      // it's almost certainly our text node. Use a simple check.
+      const textNode = editor.value.firstChild
+      if (startContainer.nodeType === 3) {
+        // It's a text node - if editor has a text node child, assume it's ours
+        // This works because we maintain a single text node structure
+        if (textNode && textNode.nodeType === 3) {
           start = range.startOffset
-          if (range.endContainer.nodeType === 3) {
+          if (endContainer.nodeType === 3) {
             end = range.endOffset
           } else {
             end = range.startOffset
           }
-        } else if (startContainer === editor.value) {
-          start = 0
-          end = currentText.length
+        } else if (startContainer.parentNode === editor.value) {
+          // Fallback: check if parent is editor
+          start = range.startOffset
+          if (endContainer.nodeType === 3 && endContainer.parentNode === editor.value) {
+            end = range.endOffset
+          } else {
+            end = range.startOffset
+          }
         }
+      } else if (startContainer === editor.value) {
+        // Range spans entire editor
+        start = 0
+        end = currentText.length
       }
     } catch (e) {
       // Range might be invalid, fall back to appending at end
     }
   }
+
+  // Now prevent default after we've captured the selection
+  event.preventDefault()
 
   // Build new text: before selection + pasted text + after selection
   const newText =
