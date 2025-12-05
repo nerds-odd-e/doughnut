@@ -7,6 +7,14 @@ const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
 const shouldResumeRecall = ref(false)
 
+const TREADMILL_MODE_KEY = "treadmillMode"
+const getTreadmillModeFromStorage = (): boolean => {
+  if (typeof window === "undefined") return false
+  const stored = localStorage.getItem(TREADMILL_MODE_KEY)
+  return stored === "true"
+}
+const treadmillMode = ref<boolean>(getTreadmillModeFromStorage())
+
 export function useRecallData() {
   const router = useRouter()
 
@@ -41,12 +49,20 @@ export function useRecallData() {
     }
   }
 
+  const setTreadmillMode = (enabled: boolean) => {
+    treadmillMode.value = enabled
+    if (typeof window !== "undefined") {
+      localStorage.setItem(TREADMILL_MODE_KEY, enabled.toString())
+    }
+  }
+
   return {
     toRepeatCount,
     recallWindowEndAt,
     totalAssimilatedCount,
     isRecallPaused,
     shouldResumeRecall,
+    treadmillMode,
     setToRepeatCount,
     setRecallWindowEndAt,
     setTotalAssimilatedCount,
@@ -54,5 +70,6 @@ export function useRecallData() {
     resumeRecall,
     clearShouldResumeRecall,
     decrementToRepeatCount,
+    setTreadmillMode,
   }
 }

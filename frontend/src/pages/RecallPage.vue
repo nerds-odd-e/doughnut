@@ -2,7 +2,10 @@
   <div class="recall-page daisy-h-full daisy-flex daisy-flex-col">
     <GlobalBar
       v-if="isProgressBarVisible"
-      :class="previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : ''"
+      :class="[
+        previousAnsweredQuestionCursor !== undefined ? 'repeat-paused' : '',
+        treadmillMode ? 'treadmill-mode' : '',
+      ]"
     >
       <RecallProgressBar
         v-bind="{
@@ -15,6 +18,7 @@
         @view-last-answered-question="viewLastAnsweredQuestion($event)"
         @show-more="showTooltip = true"
         @move-to-end="moveMemoryTrackerToEnd($event)"
+        @treadmill-mode-changed="handleTreadmillModeChanged"
       >
       </RecallProgressBar>
     </GlobalBar>
@@ -22,10 +26,10 @@
     <div class="daisy-flex-1 daisy-min-h-0 daisy-overflow-y-auto">
     <template v-if="toRepeat != undefined">
       <Quiz
-        v-if="toRepeatCount !== 0"
+        v-if="toRepeatCount !== 0 && getCurrentMemoryTracker() && (!treadmillMode || !getCurrentMemoryTracker()?.spelling)"
         v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
-        :memory-trackers="toRepeat"
-        :current-index="currentIndex"
+        :memory-trackers="toRepeat ?? []"
+        :current-index="getCurrentMemoryTrackerIndex()"
         :eager-fetch-count="eagerFetchCount ?? 5"
         @answered-question="onAnsweredQuestion"
         @answered-spelling="onAnsweredSpelling"
@@ -111,6 +115,7 @@ const {
   setIsRecallPaused,
   shouldResumeRecall,
   clearShouldResumeRecall,
+  treadmillMode,
 } = useRecallData()
 
 defineProps({
@@ -123,6 +128,32 @@ const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const showTooltip = ref(false)
+
+const getCurrentMemoryTracker = (): MemoryTrackerLite | undefined => {
+  if (!toRepeat.value) return undefined
+  if (!treadmillMode.value) {
+    return toRepeat.value[currentIndex.value]
+  }
+  // In treadmill mode, skip spelling trackers
+  for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
+    if (!toRepeat.value[i]?.spelling) {
+      return toRepeat.value[i]
+    }
+  }
+  return undefined
+}
+
+const getCurrentMemoryTrackerIndex = (): number => {
+  if (!toRepeat.value) return 0
+  if (!treadmillMode.value) return currentIndex.value
+  // In treadmill mode, ensure we're pointing to a non-spelling tracker
+  // If current index points to spelling, find next non-spelling
+  let index = currentIndex.value
+  while (index < toRepeat.value.length && toRepeat.value[index]?.spelling) {
+    index++
+  }
+  return index < toRepeat.value.length ? index : currentIndex.value
+}
 
 const currentAnsweredQuestion = computed(() => {
   if (previousAnsweredQuestionCursor.value === undefined) return undefined
@@ -141,9 +172,29 @@ const currentAnsweredSpelling = computed(() => {
 })
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
-const toRepeatCount = computed(
-  () => (toRepeat.value?.length ?? 0) - currentIndex.value
-)
+
+const getNonSpellingCount = (list: MemoryTrackerLite[] | undefined): number => {
+  if (!list) return 0
+  if (!treadmillMode.value) return list.length
+  return list.filter((t) => !t.spelling).length
+}
+
+const getRemainingNonSpellingCount = (): number => {
+  if (!toRepeat.value) return 0
+  if (!treadmillMode.value) {
+    return toRepeat.value.length - currentIndex.value
+  }
+  // Count non-spelling trackers from current index onwards
+  let count = 0
+  for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
+    if (!toRepeat.value[i]?.spelling) {
+      count++
+    }
+  }
+  return count
+}
+
+const toRepeatCount = computed(() => getRemainingNonSpellingCount())
 
 const viewLastAnsweredQuestion = (cursor: number | undefined) => {
   previousAnsweredQuestionCursor.value = cursor
@@ -155,6 +206,27 @@ watch(
     setIsRecallPaused(cursor !== undefined)
   },
   { immediate: true }
+)
+
+watch(
+  () => treadmillMode.value,
+  () => {
+    if (toRepeat.value) {
+      updateToRepeatCount()
+      // Move to first non-spelling tracker if current is spelling and treadmill mode is on
+      if (treadmillMode.value) {
+        const currentTracker = toRepeat.value[currentIndex.value]
+        if (currentTracker?.spelling) {
+          const firstNonSpelling = toRepeat.value.findIndex(
+            (t, idx) => !t.spelling && idx >= currentIndex.value
+          )
+          if (firstNonSpelling !== -1) {
+            currentIndex.value = firstNonSpelling
+          }
+        }
+      }
+    }
+  }
 )
 
 watch(
@@ -184,13 +256,31 @@ const loadMore = async (dueInDays?: number) => {
     if (getEnvironment() !== "testing" && toRepeat.value) {
       toRepeat.value = shuffle(toRepeat.value)
     }
+    updateToRepeatCount(response.toRepeatCount)
     return response
   }
   return undefined
 }
 
+const moveToNextMemoryTracker = () => {
+  if (!toRepeat.value) return
+  if (!treadmillMode.value) {
+    currentIndex.value += 1
+    return
+  }
+  // Skip spelling memory trackers in treadmill mode
+  let nextIndex = currentIndex.value + 1
+  while (
+    nextIndex < toRepeat.value.length &&
+    toRepeat.value[nextIndex]?.spelling
+  ) {
+    nextIndex += 1
+  }
+  currentIndex.value = nextIndex
+}
+
 const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
-  currentIndex.value += 1
+  moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push({
     type: "question",
     answeredQuestion: answerResult,
@@ -202,7 +292,7 @@ const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
 }
 
 const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
-  currentIndex.value += 1
+  moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push({
     type: "spelling",
     ...answerResult,
@@ -214,7 +304,7 @@ const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
 }
 
 const onJustReviewed = () => {
-  currentIndex.value += 1
+  moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(undefined)
   decrementToRepeatCount()
 }
@@ -232,11 +322,36 @@ const moveMemoryTrackerToEnd = (index: number) => {
   ]
 }
 
+const handleTreadmillModeChanged = () => {
+  // Reset to start when treadmill mode changes
+  currentIndex.value = 0
+  // Recalculate counts
+  if (toRepeat.value) {
+    updateToRepeatCount()
+  }
+}
+
+const updateToRepeatCount = (backendCount?: number) => {
+  if (!toRepeat.value) {
+    setToRepeatCount(0)
+    return
+  }
+  if (treadmillMode.value) {
+    const count = getNonSpellingCount(toRepeat.value)
+    setToRepeatCount(count)
+  } else if (backendCount !== undefined) {
+    // Preserve backend count when treadmill mode is off
+    setToRepeatCount(backendCount)
+  } else {
+    // Fallback to counting all trackers
+    setToRepeatCount(toRepeat.value.length)
+  }
+}
+
 const loadCurrentDueRecalls = async () => {
   toRepeat.value = undefined
   const response = await loadMore(0)
   if (response) {
-    setToRepeatCount(response.toRepeatCount)
     setRecallWindowEndAt(response.recallWindowEndAt)
   }
 }
@@ -266,5 +381,30 @@ defineExpose({
 <style lang="scss" scoped>
 .repeat-paused {
   background-color: rgba(50, 150, 50, 0.8);
+}
+
+:deep(.treadmill-mode) {
+  background: linear-gradient(
+    135deg,
+    #667eea 0%,
+    #764ba2 25%,
+    #f093fb 50%,
+    #4facfe 75%,
+    #00f2fe 100%
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 </style>

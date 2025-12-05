@@ -50,6 +50,7 @@
           }"
           @close-dialog="showSettings = false"
           @move-to-end="handleMoveToEnd"
+          @treadmill-mode-changed="$emit('treadmill-mode-changed')"
         />
       </div>
     </template>
@@ -76,6 +77,7 @@ const emit = defineEmits<{
   (e: "viewLastAnsweredQuestion", cursor: number): void
   (e: "showMore"): void
   (e: "moveToEnd", index: number): void
+  (e: "treadmill-mode-changed"): void
 }>()
 
 const showSettings = ref(false)

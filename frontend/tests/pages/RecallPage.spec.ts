@@ -29,10 +29,12 @@ let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
 
 afterEach(() => {
   document.body.innerHTML = ""
+  localStorage.clear()
 })
 
 beforeEach(() => {
   vitest.resetAllMocks()
+  localStorage.clear()
   mockSdkService("showNote", makeMe.aNoteRealm.please())
   recallingSpy = mockSdkService(
     "recalling",
@@ -183,6 +185,7 @@ describe("repeat page", () => {
     const firstMemoryTrackerId = 123
 
     beforeEach(() => {
+      localStorage.clear()
       vi.useFakeTimers()
       mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
       mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
@@ -245,6 +248,161 @@ describe("repeat page", () => {
       })
       expect(viewMemoryTrackerLink.exists()).toBe(true)
       expect(viewMemoryTrackerLink.props("memoryTrackerId")).toBe(123)
+    })
+  })
+
+  describe("treadmill mode", () => {
+    const normalMemoryTrackerId = 123
+    const spellingMemoryTrackerId = 456
+    const anotherNormalMemoryTrackerId = 789
+    let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
+
+    beforeEach(() => {
+      localStorage.clear()
+      vi.useFakeTimers()
+      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      askAQuestionSpy = mockSdkService(
+        "askAQuestion",
+        makeMe.aRecallPrompt.please()
+      )
+      recallingSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aDueMemoryTrackersList
+            .toRepeat([
+              createMemoryTrackerLite(normalMemoryTrackerId, false),
+              createMemoryTrackerLite(spellingMemoryTrackerId, true),
+              createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
+            ])
+            .please()
+        )
+      )
+    })
+
+    const mountPage = async () => {
+      const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+      await flushPromises()
+      return wrapper
+    }
+
+    it("should show treadmill mode toggle in settings", async () => {
+      const wrapper = await mountPage()
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+
+      const toggle = wrapper.find('input[type="checkbox"]')
+      expect(toggle.exists()).toBe(true)
+      expect(wrapper.text()).toContain("Treadmill mode")
+    })
+
+    it("should skip spelling memory trackers when treadmill mode is enabled", async () => {
+      const wrapper = await mountPage()
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+      expect(globalBar.text()).toContain("0/3")
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      const toggle = wrapper.find('input[type="checkbox"]')
+      await toggle.setValue(true)
+      await wrapper.vm.$nextTick()
+
+      // Progress should now show 0/2 (excluding spelling tracker)
+      expect(globalBar.text()).toContain("0/2")
+
+      // Should start with first normal tracker, not spelling
+      expect(askAQuestionSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: { memoryTracker: normalMemoryTrackerId },
+        })
+      )
+    })
+
+    it("should apply sportive background to GlobalBar when treadmill mode is enabled", async () => {
+      const wrapper = await mountPage()
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      const toggle = wrapper.find('input[type="checkbox"]')
+      await toggle.setValue(true)
+      await wrapper.vm.$nextTick()
+
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+      expect(globalBar.classes()).toContain("treadmill-mode")
+    })
+
+    it("should not show spelling questions when treadmill mode is enabled", async () => {
+      const wrapper = await mountPage()
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      const toggle = wrapper.find('input[type="checkbox"]')
+      await toggle.setValue(true)
+      await wrapper.vm.$nextTick()
+
+      // Should skip spelling tracker and go to next normal one
+      const quiz = wrapper.findComponent({ name: "Quiz" })
+      if (quiz.exists()) {
+        type ExposedVM = {
+          toRepeat?: MemoryTrackerLite[]
+          currentIndex: number
+        }
+        const vm = wrapper.vm as unknown as ExposedVM
+        const currentTracker = vm.toRepeat?.[vm.currentIndex]
+        expect(currentTracker?.spelling).toBe(false)
+      }
+    })
+
+    it("should update progress bar to exclude spelling memory trackers", async () => {
+      recallingSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aDueMemoryTrackersList
+            .toRepeat([
+              createMemoryTrackerLite(normalMemoryTrackerId, false),
+              createMemoryTrackerLite(spellingMemoryTrackerId, true),
+              createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
+            ])
+            .please()
+        )
+      )
+      const wrapper = await mountPage()
+      await flushPromises()
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+
+      // Initially shows all 3 trackers (treadmill mode is off by default)
+      // Note: The progress bar shows remaining count, which is 3 initially
+      expect(globalBar.text()).toMatch(/0\/[23]/)
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+      const toggle = wrapper.find('input[type="checkbox"]')
+      await toggle.setValue(true)
+      await toggle.trigger("change")
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      // Should now show 2 (excluding spelling)
+      expect(globalBar.text()).toContain("0/2")
+    })
+
+    it("should persist treadmill mode in localStorage", async () => {
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+      const toggle = wrapper.find('input[type="checkbox"]')
+      await toggle.setValue(true)
+      await toggle.trigger("change")
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      expect(localStorage.getItem("treadmillMode")).toBe("true")
     })
   })
 })

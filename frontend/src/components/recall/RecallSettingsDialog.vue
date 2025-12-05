@@ -20,12 +20,22 @@
         <SvgSkip />
         <span class="daisy-ml-2">Move to end of list</span>
       </button>
+      <label class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2">
+        <input
+          type="checkbox"
+          class="daisy-toggle daisy-toggle-primary"
+          :checked="treadmillMode"
+          @change="handleTreadmillModeToggle"
+        />
+        <span class="daisy-label-text">Treadmill mode</span>
+      </label>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import SvgSkip from "../svgs/SvgSkip.vue"
+import { useRecallData } from "@/composables/useRecallData"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
@@ -36,7 +46,10 @@ const props = defineProps({
 const emit = defineEmits<{
   (e: "close-dialog"): void
   (e: "move-to-end", index: number): void
+  (e: "treadmill-mode-changed"): void
 }>()
+
+const { treadmillMode, setTreadmillMode } = useRecallData()
 
 const closeDialog = () => {
   emit("close-dialog")
@@ -45,6 +58,12 @@ const closeDialog = () => {
 const handleMoveToEnd = () => {
   emit("move-to-end", props.currentIndex)
   closeDialog()
+}
+
+const handleTreadmillModeToggle = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  setTreadmillMode(target.checked)
+  emit("treadmill-mode-changed")
 }
 </script>
 
