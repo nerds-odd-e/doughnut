@@ -43,7 +43,7 @@
         v-if="currentAnsweredSpelling"
         v-bind="{ result: currentAnsweredSpelling }"
       />
-      <template v-else-if="toRepeatCount === 0">
+      <template v-else-if="toRepeatCount === 0 && previousAnsweredQuestionCursor === undefined">
         <div class="daisy-alert daisy-alert-success">
           You have finished all repetitions for this half a day!
         </div>
