@@ -40,6 +40,13 @@ const recallPage = () => {
         }
       })
     },
+    expectCurrentQuestion() {
+      // Verify we're back to the quiz view (current question) by checking that
+      // the question section exists, which means we're viewing a question, not an answered question
+      cy.pageIsNotLoading()
+      cy.get('[data-test="question-section"]').should('exist')
+      return this
+    },
   }
 }
 export const recall = () => {
