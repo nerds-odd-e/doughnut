@@ -116,7 +116,7 @@ const config = defineConfig({
     },
   },
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'quill', 'gsap', 'marked', 'turndown', 'es-toolkit'],
+    include: ['vue', 'vue-router', 'quill', 'gsap', 'remark', 'rehype-parse', 'rehype-remark', 'remark-parse', 'remark-rehype', 'remark-stringify', 'rehype-stringify', 'unified', 'es-toolkit'],
     exclude: ['fsevents'],
     force: true
   },
@@ -140,7 +140,7 @@ const config = defineConfig({
       output: {
         manualChunks: {
           'vue-vendor': ['vue', 'vue-router'],
-          'ui-vendor': ['quill', 'gsap', 'marked', 'turndown']
+          'ui-vendor': ['quill', 'gsap', 'remark', 'rehype-parse', 'rehype-remark', 'remark-parse', 'remark-rehype', 'remark-stringify', 'rehype-stringify', 'unified']
         },
         assetFileNames: ({ name }) => {
           if (name === 'main.css') return 'assets/main.css';
