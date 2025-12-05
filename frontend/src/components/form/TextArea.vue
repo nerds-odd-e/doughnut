@@ -16,6 +16,7 @@
       @blur="emit('blur', $event)"
       ref="input"
       @keydown="handleKeydown"
+      @paste="handlePaste"
     />
   </InputWithType>
 </template>
@@ -23,6 +24,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref, watch } from "vue"
 import InputWithType from "./InputWithType.vue"
+import { handleHtmlPaste } from "./pasteHandler"
 
 const props = defineProps({
   modelValue: String,
@@ -58,6 +60,27 @@ const handleKeydown = (event: KeyboardEvent) => {
     event.preventDefault() // Prevent newline insertion
     emit("enterPressed")
   }
+}
+
+const handlePaste = async (event: ClipboardEvent) => {
+  await handleHtmlPaste(event, (markdown) => {
+    if (input.value) {
+      const textarea = input.value
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
+      const currentValue = props.modelValue || ""
+      const newValue =
+        currentValue.slice(0, start) + markdown + currentValue.slice(end)
+      emit("update:modelValue", newValue)
+      // Set cursor position after pasted content
+      nextTick(() => {
+        if (textarea) {
+          textarea.selectionStart = textarea.selectionEnd =
+            start + markdown.length
+        }
+      })
+    }
+  })
 }
 
 const resize = () => {

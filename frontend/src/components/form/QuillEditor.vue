@@ -6,6 +6,7 @@
 import { ref, onMounted, watch } from "vue"
 import Quill, { type QuillOptions } from "quill"
 import "quill/dist/quill.bubble.css"
+import markdownizer from "./markdownizer"
 
 const { modelValue, readonly } = defineProps({
   modelValue: String,
@@ -48,6 +49,29 @@ onMounted(() => {
 
     // Set initial content
     updateQuillContent(localValue.value)
+
+    // Handle paste events - convert HTML to markdown then back to HTML
+    quill.value.root.addEventListener(
+      "paste",
+      async (event: ClipboardEvent) => {
+        if (readonly) return
+        const htmlData = event.clipboardData?.getData("text/html")
+        if (htmlData) {
+          event.preventDefault()
+          const markdown = markdownizer.htmlToMarkdown(htmlData)
+          const convertedHtml = markdownizer.markdownToHtml(markdown)
+          const range = quill.value!.getSelection(true) || {
+            index: 0,
+            length: 0,
+          }
+          quill.value!.clipboard.dangerouslyPasteHTML(
+            range.index,
+            convertedHtml
+          )
+          quill.value!.setSelection(range.index + convertedHtml.length)
+        }
+      }
+    )
 
     // Listen for text changes
     quill.value.on("text-change", () => {
