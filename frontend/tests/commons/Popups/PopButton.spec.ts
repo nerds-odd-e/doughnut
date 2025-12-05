@@ -78,7 +78,9 @@ describe("PopButton", () => {
   it("blurs button when closeDialog is called directly", async () => {
     const wrapper = mountWithoutTeleport()
     const button = wrapper.find("button").element as HTMLButtonElement
-    const popButton = wrapper.vm as InstanceType<typeof PopButton>
+    const popButton = wrapper.vm as InstanceType<typeof PopButton> & {
+      closeDialog: () => void
+    }
 
     // Click button to open dialog
     await wrapper.find("button").trigger("click")
