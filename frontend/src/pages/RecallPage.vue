@@ -393,10 +393,6 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-.repeat-paused {
-  background-color: rgba(50, 150, 50, 0.8);
-}
-
 :deep(.treadmill-mode) {
   background: linear-gradient(
     135deg,
