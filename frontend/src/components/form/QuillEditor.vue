@@ -7,6 +7,7 @@ import { nextTick, ref, onMounted, watch } from "vue"
 import Quill, { type QuillOptions } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
+import { useInterruptingHtmlToMarkdown } from "@/composables/useInterruptingHtmlToMarkdown"
 
 const { modelValue, readonly } = defineProps({
   modelValue: String,
@@ -18,6 +19,7 @@ const emits = defineEmits(["update:modelValue", "blur"])
 const localValue = ref(modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
+const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
 
 const onBlurTextField = () => {
   emits("blur")
@@ -67,7 +69,7 @@ onMounted(async () => {
             if (format === "text/html") {
               const htmlData = originalGetData(format)
               if (htmlData) {
-                const markdown = markdownizer.htmlToMarkdown(htmlData)
+                const markdown = htmlToMarkdown(htmlData)
                 return markdownizer.markdownToHtml(markdown)
               }
             }

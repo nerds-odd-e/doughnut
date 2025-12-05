@@ -34,7 +34,7 @@ import { nextTick, ref } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
-import { handleHtmlPaste } from "@/components/form/pasteHandler"
+import { useInterruptingHtmlToMarkdown } from "@/composables/useInterruptingHtmlToMarkdown"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
@@ -44,6 +44,21 @@ const props = defineProps({
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
+const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+
+async function handleHtmlPaste(
+  event: ClipboardEvent,
+  callback: (markdown: string) => void
+): Promise<boolean> {
+  const htmlData = event.clipboardData?.getData("text/html")
+  if (htmlData) {
+    event.preventDefault()
+    const markdown = htmlToMarkdown(htmlData)
+    callback(markdown)
+    return true
+  }
+  return false
+}
 
 const handlePaste = async (
   event: ClipboardEvent,
