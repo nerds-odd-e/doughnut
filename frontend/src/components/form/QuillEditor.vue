@@ -36,7 +36,7 @@ const options: QuillOptions = {
     toolbar: [
       ["bold", "italic", "underline"],
       [{ header: 1 }, { header: 2 }],
-      ["blockquote"],
+      ["blockquote", "code-block"],
       [{ list: "ordered" }, { list: "bullet" }],
       ["link"],
     ],
@@ -126,6 +126,10 @@ const onUpdateContent = () => {
     right: 0 !important
   p
     margin: inherit !important
+  pre
+    margin: inherit !important
+    white-space: pre-wrap
+    word-wrap: break-word
 .ql-container.ql-bubble
   border: none
   font-size: inherit !important
