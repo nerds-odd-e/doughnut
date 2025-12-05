@@ -7,6 +7,7 @@
     @input="onInput"
     @blur="onBlur"
     @keydown.enter.prevent="onEnter"
+    @paste="onPaste"
   ></div>
 </template>
 
@@ -35,6 +36,75 @@ const onBlur = () => {
 
 const onEnter = (event: KeyboardEvent) => {
   event.target?.dispatchEvent(new Event("blur"))
+}
+
+const onPaste = (event: ClipboardEvent) => {
+  event.preventDefault()
+  const plainText = event.clipboardData?.getData("text/plain") || ""
+  if (!editor.value) {
+    return
+  }
+
+  const currentText = editor.value.innerText || ""
+  const selection = window.getSelection()
+  let start = currentText.length
+  let end = currentText.length
+
+  // Calculate selection range within the editor's text
+  if (selection && selection.rangeCount > 0) {
+    try {
+      const range = selection.getRangeAt(0)
+      const startContainer = range.startContainer
+
+      // If we have a valid range, try to use its offsets
+      // Check if range is within the editor by checking commonAncestorContainer
+      const commonAncestor = range.commonAncestorContainer
+      if (
+        commonAncestor === editor.value ||
+        editor.value.contains(commonAncestor) ||
+        (commonAncestor.nodeType === 3 &&
+          commonAncestor.parentNode === editor.value)
+      ) {
+        // Range is within editor - use offsets directly
+        // For contenteditable with single text node, offsets are character positions
+        if (startContainer.nodeType === 3) {
+          start = range.startOffset
+          if (range.endContainer.nodeType === 3) {
+            end = range.endOffset
+          } else {
+            end = range.startOffset
+          }
+        } else if (startContainer === editor.value) {
+          start = 0
+          end = currentText.length
+        }
+      }
+    } catch (e) {
+      // Range might be invalid, fall back to appending at end
+    }
+  }
+
+  // Build new text: before selection + pasted text + after selection
+  const newText =
+    currentText.slice(0, start) + plainText + currentText.slice(end)
+
+  // Update content and model value
+  updateContent(newText)
+  emits("update:modelValue", newText)
+
+  // Set cursor position after pasted text
+  const textNode = editor.value.firstChild as Text | null
+  if (textNode) {
+    const newCursorPos = start + plainText.length
+    const range = document.createRange()
+    range.setStart(textNode, Math.min(newCursorPos, textNode.length))
+    range.collapse(true)
+    const sel = window.getSelection()
+    if (sel) {
+      sel.removeAllRanges()
+      sel.addRange(range)
+    }
+  }
 }
 
 const updateContent = (newValue: string) => {
