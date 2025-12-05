@@ -36,6 +36,7 @@ const options: QuillOptions = {
     toolbar: [
       ["bold", "italic", "underline"],
       [{ header: 1 }, { header: 2 }],
+      ["blockquote"],
       [{ list: "ordered" }, { list: "bullet" }],
       ["link"],
     ],
