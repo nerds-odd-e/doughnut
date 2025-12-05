@@ -414,13 +414,9 @@ describe("repeat page", () => {
     })
 
     it("should not add answered questions back to the list when toggling treadmill mode", async () => {
-      const mockedMarkAsRepeatedCall = mockSdkService(
-        "markAsRepeated",
-        makeMe.aMemoryTracker.please()
-      )
+      mockSdkService("markAsRepeated", makeMe.aMemoryTracker.please())
       const wrapper = await mountPage()
       await flushPromises()
-      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
       type ExposedVM = {
         toRepeat?: MemoryTrackerLite[]
         currentIndex: number
