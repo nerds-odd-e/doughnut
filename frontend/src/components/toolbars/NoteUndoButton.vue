@@ -1,31 +1,34 @@
 <template>
-  <button
-    class="daisy-btn daisy-btn-sm daisy-btn-ghost"
-    role="button"
-    :title="undoTitle"
-    @click="undoDelete()"
+  <PopButton
     v-if="history"
+    :title="undoTitle"
+    btn-class="daisy-btn daisy-btn-sm daisy-btn-ghost"
   >
-    <SvgUndo />
-  </button>
-  <UndoConfirmationDialog
-    v-if="showDialog && history"
-    :message="getUndoMessage()"
-    :noteTopology="getNoteTopology()"
-    :currentContent="getCurrentContent()"
-    :oldContent="getOldContent()"
-    :showDiff="shouldShowDiff"
-    @confirm="handleConfirm"
-    @cancel="handleCancel"
-  />
+    <template #button_face>
+      <SvgUndo />
+    </template>
+    <template #default="{ closer }">
+      <UndoConfirmationDialog
+        :message="getUndoMessage()"
+        :noteTopology="getNoteTopology()"
+        :currentContent="getCurrentContent()"
+        :oldContent="getOldContent()"
+        :showDiff="shouldShowDiff"
+        :closer="closer"
+        @confirm="handleConfirm"
+        @cancel="handleCancel"
+      />
+    </template>
+  </PopButton>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 import SvgUndo from "../svgs/SvgUndo.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import UndoConfirmationDialog from "./UndoConfirmationDialog.vue"
+import PopButton from "../commons/Popups/PopButton.vue"
 
 const router = useRouter()
 const storageAccessor = useStorageAccessor()
@@ -33,8 +36,6 @@ const storageAccessor = useStorageAccessor()
 defineProps({
   noteId: Number,
 })
-
-const showDialog = ref(false)
 
 const history = computed(() => storageAccessor.value.peekUndo())
 const undoTitle = computed(() => {
@@ -116,16 +117,11 @@ const shouldShowDiff = computed((): boolean => {
   )
 })
 
-const undoDelete = () => {
-  showDialog.value = true
-}
-
 const handleConfirm = async () => {
-  showDialog.value = false
   await storageAccessor.value.storedApi().undo(router)
 }
 
 const handleCancel = () => {
-  showDialog.value = false
+  // PopButton will handle closing the dialog
 }
 </script>

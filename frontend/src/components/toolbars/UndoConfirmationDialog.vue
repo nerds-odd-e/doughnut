@@ -1,42 +1,35 @@
 <template>
-  <Modal :isPopup="true" @close_request="handleCancel">
-    <template #header>
-      <h2>Confirm Undo</h2>
-    </template>
-    <template #body>
-      <div class="undo-confirmation">
-        <div class="daisy-mb-4">
-          <p>
-            {{ message }}
-            <NoteTitleWithLink
-              v-if="noteTopology"
-              :noteTopology="noteTopology"
-            />?
-          </p>
-        </div>
-        <DiffView
-          v-if="showDiff"
-          :current="currentContent"
-          :old="oldContent"
-          maxHeight="300px"
-        />
-        <div class="daisy-flex daisy-gap-2 daisy-mt-4 daisy-justify-end">
-          <button class="daisy-btn daisy-btn-secondary" @click="handleCancel">
-            Cancel
-          </button>
-          <button class="daisy-btn daisy-btn-success" @click="handleConfirm">
-            OK
-          </button>
-        </div>
-      </div>
-    </template>
-  </Modal>
+  <div class="undo-confirmation">
+    <div class="daisy-mb-4">
+      <h2 class="daisy-text-xl daisy-font-bold daisy-mb-4">Confirm Undo</h2>
+      <p>
+        {{ message }}
+        <NoteTitleWithLink
+          v-if="noteTopology"
+          :noteTopology="noteTopology"
+        />?
+      </p>
+    </div>
+    <DiffView
+      v-if="showDiff"
+      :current="currentContent"
+      :old="oldContent"
+      maxHeight="300px"
+    />
+    <div class="daisy-flex daisy-gap-2 daisy-mt-4 daisy-justify-end">
+      <button class="daisy-btn daisy-btn-secondary" @click="handleCancel">
+        Cancel
+      </button>
+      <button class="daisy-btn daisy-btn-success" @click="handleConfirm">
+        OK
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { NoteTopology } from "@generated/backend"
-import Modal from "../commons/Modal.vue"
 import DiffView from "../commons/DiffView.vue"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
@@ -46,6 +39,7 @@ const props = defineProps({
   currentContent: { type: String, default: "" },
   oldContent: { type: String, default: "" },
   showDiff: { type: Boolean, default: false },
+  closer: { type: Function, required: true },
 })
 
 const emit = defineEmits<{
@@ -55,10 +49,12 @@ const emit = defineEmits<{
 
 const handleConfirm = () => {
   emit("confirm")
+  props.closer()
 }
 
 const handleCancel = () => {
   emit("cancel")
+  props.closer()
 }
 </script>
 
