@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue"
+import { nextTick, ref, onMounted, watch } from "vue"
 import Quill, { type QuillOptions } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
@@ -43,35 +43,40 @@ const options: QuillOptions = {
   theme: "bubble",
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (editor.value) {
     quill.value = new Quill(editor.value, options)
 
     // Set initial content
     updateQuillContent(localValue.value)
 
-    // Handle paste events - convert HTML to markdown then back to HTML
-    quill.value.root.addEventListener(
-      "paste",
-      async (event: ClipboardEvent) => {
-        if (readonly) return
-        const htmlData = event.clipboardData?.getData("text/html")
-        if (htmlData) {
-          event.preventDefault()
-          const markdown = markdownizer.htmlToMarkdown(htmlData)
-          const convertedHtml = markdownizer.markdownToHtml(markdown)
-          const range = quill.value!.getSelection(true) || {
-            index: 0,
-            length: 0,
-          }
-          quill.value!.clipboard.dangerouslyPasteHTML(
-            range.index,
-            convertedHtml
+    // Wait for next tick to ensure Quill is fully initialized
+    await nextTick()
+
+    if (!readonly && quill.value) {
+      quill.value.root.addEventListener(
+        "paste",
+        (event: ClipboardEvent) => {
+          if (!event.clipboardData) return
+
+          const originalGetData = event.clipboardData.getData.bind(
+            event.clipboardData
           )
-          quill.value!.setSelection(range.index + convertedHtml.length)
-        }
-      }
-    )
+
+          event.clipboardData.getData = (format: string) => {
+            if (format === "text/html") {
+              const htmlData = originalGetData(format)
+              if (htmlData) {
+                const markdown = markdownizer.htmlToMarkdown(htmlData)
+                return markdownizer.markdownToHtml(markdown)
+              }
+            }
+            return originalGetData(format)
+          }
+        },
+        true
+      )
+    }
 
     // Listen for text changes
     quill.value.on("text-change", () => {
