@@ -2,7 +2,8 @@
   <div
     class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
     :class="{
-      'daisy-text-primary daisy-bg-primary/10': isActive,
+      'daisy-text-primary daisy-bg-primary/10': isActive && name !== 'resumeRecall',
+      'resume-recall-active': name === 'resumeRecall' && isActive,
       'hover:daisy-bg-base-content/5': !isActive
     }"
   >
@@ -148,6 +149,11 @@ onUnmounted(() => {
 
 .unread-count {
   background: #d07027;
+}
+
+.resume-recall-active {
+  background-color: #4CAF50;
+  color: white;
 }
 
 .label {

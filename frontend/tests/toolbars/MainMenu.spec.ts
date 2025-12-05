@@ -369,7 +369,15 @@ describe("main menu", () => {
 
       const resumeRecallLink = screen.getByLabelText("Resume")
       const navItem = resumeRecallLink.closest(".nav-item")
-      expect(navItem).toHaveClass("daisy-text-primary")
+      expect(navItem).toHaveClass("resume-recall-active")
+    })
+
+    it("applies green background to resume recall menu item when recall is paused", async () => {
+      await renderComponent()
+
+      const resumeRecallLink = screen.getByLabelText("Resume")
+      const navItem = resumeRecallLink.closest(".nav-item")
+      expect(navItem).toHaveClass("resume-recall-active")
     })
 
     it("shows resume recall as first item when recall is paused", async () => {
