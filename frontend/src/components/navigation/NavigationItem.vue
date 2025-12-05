@@ -2,7 +2,10 @@
   <div
     class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2"
     :class="{
-      'daisy-text-primary daisy-bg-primary/10': isActive,
+      // Default active style for normal items
+      'daisy-text-primary daisy-bg-primary/10': isActive && name !== 'resumeRecall',
+      // Unique green background for Resume when recall is paused
+      'daisy-bg-success daisy-text-success-content': name === 'resumeRecall',
       'hover:daisy-bg-base-content/5': !isActive
     }"
   >
