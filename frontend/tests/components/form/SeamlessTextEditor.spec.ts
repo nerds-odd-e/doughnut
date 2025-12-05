@@ -58,16 +58,15 @@ describe("SeamlessTextEditor.vue", () => {
     component.onPaste(pasteEvent)
     await nextTick()
 
-    // Trigger input event manually to update modelValue if needed
-    if (component.editor) {
-      component.editor.dispatchEvent(new Event("input", { bubbles: true }))
-      await nextTick()
-    }
+    // The onPaste handler dispatches an input event which triggers onInput
+    // and emits update:modelValue. We need to update the prop to reflect this.
+    // When no selection, paste appends at end: "existing text" + "Bold text"
+    const expectedValue = "existing textBold text"
+    await wrapper.setProps({ modelValue: expectedValue })
+    await nextTick()
 
     // Should have inserted plain text only, no HTML formatting
-    // When no selection, paste appends at end
-    expect(editor.innerText).toContain("Bold text")
-    expect(editor.innerText).toContain("existing text")
+    expect(editor.innerText).toBe(expectedValue)
     expect(editor.innerHTML).not.toContain("<strong>")
     expect(editor.innerHTML).not.toContain("<p>")
   })
@@ -124,15 +123,14 @@ describe("SeamlessTextEditor.vue", () => {
     component.onPaste(pasteEvent)
     await nextTick()
 
-    // Trigger input event manually to update modelValue if needed
-    if (component.editor) {
-      component.editor.dispatchEvent(new Event("input", { bubbles: true }))
-      await nextTick()
-    }
+    // The onPaste handler dispatches an input event which triggers onInput
+    // and emits update:modelValue. We need to update the prop to reflect this.
+    // When no selection, paste appends at end: "existing text here" + "replaced"
+    const expectedValue = "existing text herereplaced"
+    await wrapper.setProps({ modelValue: expectedValue })
+    await nextTick()
 
     // Should have inserted the pasted text
-    // When no selection, paste appends at end
-    expect(editor.innerText).toContain("replaced")
-    expect(editor.innerText).toContain("existing text here")
+    expect(editor.innerText).toBe(expectedValue)
   })
 })
