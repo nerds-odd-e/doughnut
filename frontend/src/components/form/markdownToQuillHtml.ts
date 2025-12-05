@@ -70,6 +70,14 @@ export default function markdownToQuillHtml(
     }
   }
 
+  // Override the blockquote method to remove <p> tags
+  renderer.blockquote = function (token: Tokens.Blockquote): string {
+    const body = this.parser!.parse(token.tokens)
+    // Remove <p> and </p> tags from within blockquote
+    const cleanedBody = body.replace(/<p>/g, "").replace(/<\/p>/g, "")
+    return `<blockquote>${cleanedBody}</blockquote>`
+  }
+
   // Set up the parser with the custom renderer
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser

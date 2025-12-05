@@ -65,6 +65,35 @@ describe("Markdown and HTML Conversion Tests", () => {
         `"<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>95</td></tr><tr><td>Bob</td><td>88</td></tr></tbody></table>"`
       )
     })
+
+    it("removes <p> tags from blockquotes", () => {
+      const markdown = "> This is a quote"
+      const html = markdownizer.markdownToHtml(markdown)
+      expect(html).toBe("<blockquote>This is a quote</blockquote>")
+      expect(html).not.toContain("<p>")
+      expect(html).not.toContain("</p>")
+    })
+
+    it("removes <p> tags from multi-line blockquotes", () => {
+      const markdown = "> This is a quote\n> with multiple lines"
+      const html = markdownizer.markdownToHtml(markdown)
+      const elm = markdownToHTMLElement(markdown)
+      const blockquote = elm.querySelector("blockquote")
+      expect(blockquote).not.toBeNull()
+      expect(blockquote?.querySelector("p")).toBeNull()
+      expect(html).not.toContain("<p>")
+      expect(html).not.toContain("</p>")
+    })
+
+    it("removes <p> tags from blockquotes with formatting", () => {
+      const markdown = "> This is a *quote* with **formatting**"
+      const html = markdownizer.markdownToHtml(markdown)
+      expect(html).toBe(
+        "<blockquote>This is a <em>quote</em> with <strong>formatting</strong></blockquote>"
+      )
+      expect(html).not.toContain("<p>")
+      expect(html).not.toContain("</p>")
+    })
   })
 
   describe("Html to markdown", () => {
