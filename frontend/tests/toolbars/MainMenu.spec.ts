@@ -66,6 +66,7 @@ const createUseRecallDataMock = (overrides?: {
     totalAssimilatedCount: ref(0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(false),
+    treadmillMode: ref(false),
     setToRepeatCount: vi.fn(),
     setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
@@ -73,6 +74,7 @@ const createUseRecallDataMock = (overrides?: {
     resumeRecall: (overrides?.resumeRecall ?? vi.fn()) as () => void,
     clearShouldResumeRecall: vi.fn(),
     decrementToRepeatCount: vi.fn(),
+    setTreadmillMode: vi.fn(),
   }
 }
 
