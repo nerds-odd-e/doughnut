@@ -412,5 +412,104 @@ describe("repeat page", () => {
       // Should now show 2 (excluding spelling)
       expect(globalBar.text()).toContain("0/2")
     })
+
+    it("should not add answered questions back to the list when toggling treadmill mode", async () => {
+      const mockedMarkAsRepeatedCall = mockSdkService(
+        "markAsRepeated",
+        makeMe.aMemoryTracker.please()
+      )
+      const wrapper = await mountPage()
+      await flushPromises()
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+      type ExposedVM = {
+        toRepeat?: MemoryTrackerLite[]
+        currentIndex: number
+      }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      // Answer the first question
+      const recallPrompt = makeMe.aRecallPrompt.please()
+      askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
+      vi.runOnlyPendingTimers()
+      await flushPromises()
+      const answerButton = wrapper.find("button.daisy-btn-primary")
+      expect(answerButton.exists()).toBe(true)
+      await answerButton.trigger("click")
+      await flushPromises()
+
+      // After answering, progress should show 1/2 (1 answered, 2 remaining)
+      expect(globalBar.text()).toContain("1/2")
+      expect(vm.currentIndex).toBe(1)
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      // Progress should still show 1/1 (1 answered, 1 remaining)
+      // The answered question should NOT be added back
+      expect(globalBar.text()).toContain("1/1")
+      // currentIndex should not be reset to 0
+      expect(vm.currentIndex).toBeGreaterThan(0)
+    })
+
+    it("should not reset currentIndex to 0 when toggling treadmill mode off", async () => {
+      const mockedMarkAsRepeatedCall = mockSdkService(
+        "markAsRepeated",
+        makeMe.aMemoryTracker.please()
+      )
+      const wrapper = await mountPage()
+      await flushPromises()
+      type ExposedVM = {
+        toRepeat?: MemoryTrackerLite[]
+        currentIndex: number
+      }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      // Answer the first question
+      const recallPrompt = makeMe.aRecallPrompt.please()
+      askAQuestionSpy.mockResolvedValueOnce(wrapSdkResponse(recallPrompt))
+      vi.runOnlyPendingTimers()
+      await flushPromises()
+      const answerButton = wrapper.find("button.daisy-btn-primary")
+      expect(answerButton.exists()).toBe(true)
+      await answerButton.trigger("click")
+      await flushPromises()
+
+      const indexAfterAnswer = vm.currentIndex
+      expect(indexAfterAnswer).toBe(1)
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      let toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      // Disable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      toggle.checked = false
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      // currentIndex should not be reset to 0
+      expect(vm.currentIndex).toBeGreaterThan(0)
+    })
   })
 })
