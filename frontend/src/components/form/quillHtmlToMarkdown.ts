@@ -22,6 +22,32 @@ turndownService.addRule("quillListItem", {
   },
 })
 
+const isEmptyElement = (el: Element): boolean => {
+  // Check if element has no meaningful text content
+  return el.textContent?.trim() === ""
+}
+
+const mergeConsecutiveHeaders = (tempDiv: HTMLElement): void => {
+  // Merge consecutive headers of the same level, but only if there's evidence
+  // they came from the same block (e.g., empty element remnants from browser normalization)
+  const headers = tempDiv.querySelectorAll("h1, h2, h3, h4, h5, h6")
+  for (let i = 0; i < headers.length; i++) {
+    const current = headers[i] as HTMLElement
+    if (!current.parentNode) continue // Already removed
+    const next = current.nextElementSibling as HTMLElement | null
+    if (next && next.tagName === current.tagName) {
+      // Only merge if there's an empty element before the first header
+      // (evidence of browser normalization pulling headers out of a wrapper)
+      const prev = current.previousElementSibling
+      if (prev && isEmptyElement(prev)) {
+        current.innerHTML += next.innerHTML
+        next.remove()
+        i-- // Check again for more consecutive headers
+      }
+    }
+  }
+}
+
 turndownService.addRule("p", {
   filter: "p",
   replacement(_, node: Node) {
@@ -34,5 +60,9 @@ turndownService.addRule("p", {
 })
 
 export default function htmlToMarkdown(html: string) {
-  return turndownService.turndown(html)
+  // Pre-process HTML to merge consecutive headers of the same level
+  const tempDiv = document.createElement("div")
+  tempDiv.innerHTML = html
+  mergeConsecutiveHeaders(tempDiv)
+  return turndownService.turndown(tempDiv.innerHTML)
 }

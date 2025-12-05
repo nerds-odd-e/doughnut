@@ -122,5 +122,22 @@ describe("Markdown and HTML Conversion Tests", () => {
       const expectedMarkdown = "* item1\n  * item1.1"
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
     })
+
+    it("converts nested h1 tags to single header", () => {
+      const html =
+        '<p class="p1"><span class="s1"><h1><b>✅<span class="Apple-converted-space"> </span></b></h1><h1><b>Conclusion</b></h1></span></p>'
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Should result in one header, not two headers
+      const headerMatches = markdown.match(/={3,}$/gm)
+      expect(headerMatches?.length).toBe(1)
+    })
+
+    it("keeps separate h1 tags as separate headers", () => {
+      const html = "<h1>Chapter 1</h1><h1>Chapter 2</h1>"
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Should result in two separate headers
+      const headerMatches = markdown.match(/={3,}$/gm)
+      expect(headerMatches?.length).toBe(2)
+    })
   })
 })
