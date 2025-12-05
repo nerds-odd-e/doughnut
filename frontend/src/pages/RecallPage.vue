@@ -28,7 +28,7 @@
       <Quiz
         v-if="toRepeatCount !== 0 && getCurrentMemoryTracker() && (!treadmillMode || !getCurrentMemoryTracker()?.spelling)"
         v-show="!currentAnsweredQuestion && !currentAnsweredSpelling"
-        :memory-trackers="toRepeat ?? []"
+        :memory-trackers="memoryTrackers"
         :current-index="getCurrentMemoryTrackerIndex()"
         :eager-fetch-count="eagerFetchCount ?? 5"
         @answered-question="onAnsweredQuestion"
@@ -128,6 +128,9 @@ const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const showTooltip = ref(false)
+
+// Computed list of memory trackers that should not be modified
+const memoryTrackers = computed(() => toRepeat.value ?? [])
 
 const getCurrentMemoryTracker = (): MemoryTrackerLite | undefined => {
   if (!toRepeat.value) return undefined
@@ -323,10 +326,21 @@ const moveMemoryTrackerToEnd = (index: number) => {
 }
 
 const handleTreadmillModeChanged = () => {
-  // Reset to start when treadmill mode changes
-  currentIndex.value = 0
-  // Recalculate counts
+  // Adjust current index based on treadmill mode, but don't reset to 0
+  // This prevents answered questions from being added back to the list
   if (toRepeat.value) {
+    if (treadmillMode.value) {
+      // In treadmill mode, move to first non-spelling tracker from current position
+      const currentTracker = toRepeat.value[currentIndex.value]
+      if (currentTracker?.spelling) {
+        const firstNonSpelling = toRepeat.value.findIndex(
+          (t, idx) => !t.spelling && idx >= currentIndex.value
+        )
+        if (firstNonSpelling !== -1) {
+          currentIndex.value = firstNonSpelling
+        }
+      }
+    }
     updateToRepeatCount()
   }
 }
