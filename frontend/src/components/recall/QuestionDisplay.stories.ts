@@ -3,7 +3,7 @@ import QuestionDisplay from "./QuestionDisplay.vue"
 import makeMe from "@tests/fixtures/makeMe"
 
 const meta = {
-  title: "Review/QuestionDisplay",
+  title: "Recall/QuestionDisplay",
   component: QuestionDisplay,
   tags: ["autodocs"],
   parameters: {

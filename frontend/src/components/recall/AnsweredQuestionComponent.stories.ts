@@ -4,7 +4,7 @@ import makeMe from "@tests/fixtures/makeMe"
 import type { AnsweredQuestion } from "@generated/backend"
 
 const meta = {
-  title: "Review/AnsweredQuestionComponent",
+  title: "Recall/AnsweredQuestionComponent",
   component: AnsweredQuestionComponent,
   tags: ["autodocs"],
   argTypes: {

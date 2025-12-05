@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach } from "vitest"
 import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 import helper, { mockSdkService } from "@tests/helpers"
-import SpellingQuestionComponent from "@/components/review/SpellingQuestionComponent.vue"
+import SpellingQuestionComponent from "@/components/recall/SpellingQuestionComponent.vue"
 import makeMe from "@tests/fixtures/makeMe"
 
 describe("SpellingQuestionDisplay", () => {

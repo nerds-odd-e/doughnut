@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest"
 import helper from "@tests/helpers"
-import ViewMemoryTrackerLink from "@/components/review/ViewMemoryTrackerLink.vue"
+import ViewMemoryTrackerLink from "@/components/recall/ViewMemoryTrackerLink.vue"
 
 const mockedPush = vi.fn()
 vitest.mock("vue-router", () => ({

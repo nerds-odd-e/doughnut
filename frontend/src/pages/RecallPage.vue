@@ -72,10 +72,10 @@
 </template>
 
 <script setup lang="ts">
-import Quiz from "@/components/review/Quiz.vue"
-import RecallProgressBar from "@/components/review/RecallProgressBar.vue"
-import AnsweredQuestionComponent from "@/components/review/AnsweredQuestionComponent.vue"
-import AnsweredSpellingQuestion from "@/components/review/AnsweredSpellingQuestion.vue"
+import Quiz from "@/components/recall/Quiz.vue"
+import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
+import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
+import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
 import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
 import type { MemoryTrackerLite } from "@generated/backend"
