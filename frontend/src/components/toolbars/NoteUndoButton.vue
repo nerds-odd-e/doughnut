@@ -17,6 +17,7 @@
         :closer="closer"
         @confirm="handleConfirm"
         @cancel="handleCancel"
+        @discard="handleDiscard(closer)"
       />
     </template>
   </PopButton>
@@ -123,5 +124,12 @@ const handleConfirm = async () => {
 
 const handleCancel = () => {
   // PopButton will handle closing the dialog
+}
+
+const handleDiscard = (closer: () => void) => {
+  storageAccessor.value.discardUndo()
+  if (!storageAccessor.value.peekUndo()) {
+    closer()
+  }
 }
 </script>

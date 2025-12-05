@@ -8,6 +8,7 @@ import StoredApiCollection from "./StoredApiCollection"
 interface StorageAccessor extends NoteStorage {
   storedApi(): StoredApi
   peekUndo(): null | HistoryRecord
+  discardUndo(): void
 }
 
 class AccessorImplementation
@@ -31,6 +32,10 @@ class AccessorImplementation
 
   storedApi(): StoredApi {
     return new StoredApiCollection(this.noteEditingHistory, this)
+  }
+
+  discardUndo(): void {
+    this.noteEditingHistory.popUndoHistory()
   }
 }
 

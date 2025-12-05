@@ -290,5 +290,146 @@ describe("NoteUndoButton", () => {
 
       expect(mockedPush).not.toHaveBeenCalled()
     })
+
+    describe("discard functionality", () => {
+      it("discards current undo item and shows next item when multiple items exist", async () => {
+        const noteRealm1 = makeMe.aNoteRealm
+          .topicConstructor("First Note")
+          .please()
+        const noteRealm2 = makeMe.aNoteRealm
+          .topicConstructor("Second Note")
+          .please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm1)
+        storageAccessor.value.refreshNoteRealm(noteRealm2)
+
+        noteEditingHistory.deleteNote(noteRealm2.id)
+        noteEditingHistory.deleteNote(noteRealm1.id)
+        helper.component(NoteUndoButton).render()
+
+        const undoButton = screen.getByTitle("undo delete note")
+        await undoButton.click()
+        await flushPromises()
+
+        // Verify first item is shown (most recent is first)
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(screen.getByText("First Note")).toBeInTheDocument()
+
+        // Discard first item
+        const discardButton = screen.getByRole("button", { name: "Discard" })
+        await discardButton.click()
+        await flushPromises()
+
+        // Verify next item is shown
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(screen.getByText("Second Note")).toBeInTheDocument()
+        expect(screen.queryByText("First Note")).not.toBeInTheDocument()
+      })
+
+      it("closes dialog when discarding the last undo item", async () => {
+        const note = makeMe.aNote.please()
+        noteEditingHistory.deleteNote(note.id)
+        helper.component(NoteUndoButton).render()
+
+        const undoButton = screen.getByTitle("undo delete note")
+        await undoButton.click()
+        await flushPromises()
+
+        // Verify dialog is shown
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+
+        // Discard last item
+        const discardButton = screen.getByRole("button", { name: "Discard" })
+        await discardButton.click()
+        await flushPromises()
+
+        // Verify dialog is closed
+        expect(screen.queryByText("Confirm Undo")).not.toBeInTheDocument()
+      })
+
+      it("discards edit title item and shows next item", async () => {
+        const noteRealm1 = makeMe.aNoteRealm
+          .topicConstructor("First Note")
+          .please()
+        const noteRealm2 = makeMe.aNoteRealm
+          .topicConstructor("Second Note")
+          .please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm1)
+        storageAccessor.value.refreshNoteRealm(noteRealm2)
+
+        noteEditingHistory.addEditingToUndoHistory(
+          noteRealm2.id,
+          "edit title",
+          "Old Title 2"
+        )
+        noteEditingHistory.addEditingToUndoHistory(
+          noteRealm1.id,
+          "edit title",
+          "Old Title 1"
+        )
+        helper.component(NoteUndoButton).render()
+
+        const undoButton = screen.getByTitle("undo edit title")
+        await undoButton.click()
+        await flushPromises()
+
+        // Verify first item is shown (most recent is first)
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(screen.getByText("First Note")).toBeInTheDocument()
+
+        // Discard first item
+        const discardButton = screen.getByRole("button", { name: "Discard" })
+        await discardButton.click()
+        await flushPromises()
+
+        // Verify next item is shown
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(screen.getByText("Second Note")).toBeInTheDocument()
+        expect(screen.queryByText("First Note")).not.toBeInTheDocument()
+      })
+
+      it("discards edit details item and shows next item", async () => {
+        const noteRealm1 = makeMe.aNoteRealm
+          .topicConstructor("First Note")
+          .please()
+        const noteRealm2 = makeMe.aNoteRealm
+          .topicConstructor("Second Note")
+          .please()
+        const storageAccessor = useStorageAccessor()
+        storageAccessor.value.refreshNoteRealm(noteRealm1)
+        storageAccessor.value.refreshNoteRealm(noteRealm2)
+
+        noteEditingHistory.addEditingToUndoHistory(
+          noteRealm2.id,
+          "edit details",
+          "Old Details 2"
+        )
+        noteEditingHistory.addEditingToUndoHistory(
+          noteRealm1.id,
+          "edit details",
+          "Old Details 1"
+        )
+        helper.component(NoteUndoButton).render()
+
+        const undoButton = screen.getByTitle("undo edit details")
+        await undoButton.click()
+        await flushPromises()
+
+        // Verify first item is shown (most recent is first)
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(screen.getByText("First Note")).toBeInTheDocument()
+
+        // Discard first item
+        const discardButton = screen.getByRole("button", { name: "Discard" })
+        await discardButton.click()
+        await flushPromises()
+
+        // Verify next item is shown
+        expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
+        expect(screen.getByText("Second Note")).toBeInTheDocument()
+        expect(screen.queryByText("First Note")).not.toBeInTheDocument()
+      })
+    })
   })
 })
