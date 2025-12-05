@@ -34,7 +34,6 @@
           </button>
           <button
             class="btn large-btn"
-            :class="{ 'daisy-btn-active': showSettings }"
             title="Recall settings"
             @click="showSettings = !showSettings"
           >

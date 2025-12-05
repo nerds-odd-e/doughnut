@@ -441,5 +441,53 @@ describe("main menu", () => {
       // Should call resumeRecall
       expect(resumeRecallSpy).toHaveBeenCalled()
     })
+
+    it("shows recall count badge on resume item when there are items to repeat", async () => {
+      mockSdkService(
+        "getMenuData",
+        createMenuData({
+          recallStatus: {
+            toRepeatCount: 789,
+            recallWindowEndAt: "",
+            totalAssimilatedCount: 0,
+          },
+        })
+      )
+
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: true,
+          toRepeatCount: 789,
+        })
+      )
+
+      helper.component(MainMenu).withProps({ user }).render()
+      await flushPromises()
+
+      const resumeLink = screen.getByLabelText("Resume")
+      const resumeNavItem = resumeLink.closest(".nav-item")
+      const resumeCount = resumeNavItem?.querySelector(".recall-count")
+      expect(resumeCount).toBeInTheDocument()
+      expect(resumeCount).toHaveTextContent("789")
+      expect(resumeCount).toHaveClass("recall-count")
+    })
+
+    it("does not show recall count badge on resume item when there are no items to repeat", async () => {
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: true,
+          toRepeatCount: 0,
+        })
+      )
+
+      const { queryByText } = helper
+        .component(MainMenu)
+        .withProps({ user })
+        .render()
+      await flushPromises()
+
+      const resumeCount = queryByText("0")
+      expect(resumeCount).not.toBeInTheDocument()
+    })
   })
 })

@@ -50,6 +50,8 @@ export function useNavigationItems() {
           name: "resumeRecall",
           label: "Resume",
           icon: SvgResume,
+          badge: toRepeatCount.value,
+          badgeClass: "recall-count",
           isActive: true,
         },
         ...baseItems,
