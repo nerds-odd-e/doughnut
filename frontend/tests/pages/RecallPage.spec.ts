@@ -13,6 +13,10 @@ import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
 
 vitest.mock("vue-router", () => ({
+  useRoute: () => ({
+    path: "/",
+    fullPath: "/",
+  }),
   useRouter: () => ({
     currentRoute: {
       value: {
@@ -153,7 +157,7 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
-      // Click the "Move to end" button in the dropdown (teleported to body)
+      // Click the "Move to end" button in the modal dialog
       const moveToEndButton = document.body.querySelector(
         'button[title="Move to end of list"]'
       )
@@ -178,7 +182,7 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
-      // Button should not be visible when on last item (teleported to body)
+      // Button should not be visible when on last item
       const moveToEndButton = document.body.querySelector(
         'button[title="Move to end of list"]'
       )
@@ -294,7 +298,7 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
-      // Dialog is teleported to body
+      // Dialog is shown as a modal
       const toggle = document.body.querySelector('input[type="checkbox"]')
       expect(toggle).toBeTruthy()
       expect(document.body.textContent).toContain("Treadmill mode")

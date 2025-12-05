@@ -33,7 +33,6 @@
             <SvgPause />
           </button>
           <button
-            ref="settingsButtonRef"
             class="btn large-btn"
             :class="{ 'daisy-btn-active': showSettings }"
             title="Recall settings"
@@ -42,19 +41,17 @@
             <SvgCog />
           </button>
         </div>
-        <Teleport to="body" v-if="showSettings">
-          <RecallSettingsDialog
-            :button-element="settingsButtonRef"
-            v-bind="{
-              canMoveToEnd,
-              previousAnsweredQuestionCursor,
-              currentIndex,
-            }"
-            @close-dialog="showSettings = false"
-            @move-to-end="handleMoveToEnd"
-            @treadmill-mode-changed="$emit('treadmill-mode-changed')"
-          />
-        </Teleport>
+        <RecallSettingsDialog
+          v-if="showSettings"
+          v-bind="{
+            canMoveToEnd,
+            previousAnsweredQuestionCursor,
+            currentIndex,
+          }"
+          @close-dialog="showSettings = false"
+          @move-to-end="handleMoveToEnd"
+          @treadmill-mode-changed="$emit('treadmill-mode-changed')"
+        />
       </div>
     </template>
   </ProgressBar>
@@ -62,7 +59,6 @@
 
 <script setup lang="ts">
 import { ref } from "vue"
-import { Teleport } from "vue"
 import ProgressBar from "../commons/ProgressBar.vue"
 import SvgPause from "../svgs/SvgPause.vue"
 import SvgBackward from "../svgs/SvgBackward.vue"
@@ -85,7 +81,6 @@ const emit = defineEmits<{
 }>()
 
 const showSettings = ref(false)
-const settingsButtonRef = ref<HTMLButtonElement | null>(null)
 
 const handleMoveToEnd = (index: number) => {
   emit("moveToEnd", index)
