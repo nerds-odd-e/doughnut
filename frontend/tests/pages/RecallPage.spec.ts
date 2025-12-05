@@ -153,8 +153,13 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
-      // Click the "Move to end" button in the dropdown
-      await wrapper.find('button[title="Move to end of list"]').trigger("click")
+      // Click the "Move to end" button in the dropdown (teleported to body)
+      const moveToEndButton = document.body.querySelector(
+        'button[title="Move to end of list"]'
+      )
+      expect(moveToEndButton).toBeTruthy()
+      await moveToEndButton?.dispatchEvent(new Event("click"))
+      await wrapper.vm.$nextTick()
 
       // New order should be [456, 3, 123]
       expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([456, 3, 123])
@@ -173,11 +178,11 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
-      // Button should not be visible when on last item
-      const moveToEndButton = wrapper.find(
+      // Button should not be visible when on last item (teleported to body)
+      const moveToEndButton = document.body.querySelector(
         'button[title="Move to end of list"]'
       )
-      expect(moveToEndButton.exists()).toBe(false)
+      expect(moveToEndButton).toBeFalsy()
     })
   })
 
@@ -289,9 +294,10 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
 
-      const toggle = wrapper.find('input[type="checkbox"]')
-      expect(toggle.exists()).toBe(true)
-      expect(wrapper.text()).toContain("Treadmill mode")
+      // Dialog is teleported to body
+      const toggle = document.body.querySelector('input[type="checkbox"]')
+      expect(toggle).toBeTruthy()
+      expect(document.body.textContent).toContain("Treadmill mode")
     })
 
     it("should skip spelling memory trackers when treadmill mode is enabled", async () => {
@@ -302,8 +308,12 @@ describe("repeat page", () => {
       // Enable treadmill mode
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
-      const toggle = wrapper.find('input[type="checkbox"]')
-      await toggle.setValue(true)
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
       await wrapper.vm.$nextTick()
 
       // Progress should now show 0/2 (excluding spelling tracker)
@@ -323,8 +333,12 @@ describe("repeat page", () => {
       // Enable treadmill mode
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
-      const toggle = wrapper.find('input[type="checkbox"]')
-      await toggle.setValue(true)
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
       await wrapper.vm.$nextTick()
 
       const globalBar = wrapper.findComponent({ name: "GlobalBar" })
@@ -337,8 +351,12 @@ describe("repeat page", () => {
       // Enable treadmill mode
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
-      const toggle = wrapper.find('input[type="checkbox"]')
-      await toggle.setValue(true)
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
       await wrapper.vm.$nextTick()
 
       // Should skip spelling tracker and go to next normal one
@@ -378,9 +396,12 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
       await flushPromises()
-      const toggle = wrapper.find('input[type="checkbox"]')
-      await toggle.setValue(true)
-      await toggle.trigger("change")
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
       await wrapper.vm.$nextTick()
       await flushPromises()
 
@@ -396,9 +417,12 @@ describe("repeat page", () => {
       await wrapper.find('button[title="Recall settings"]').trigger("click")
       await wrapper.vm.$nextTick()
       await flushPromises()
-      const toggle = wrapper.find('input[type="checkbox"]')
-      await toggle.setValue(true)
-      await toggle.trigger("change")
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
       await wrapper.vm.$nextTick()
       await flushPromises()
 
