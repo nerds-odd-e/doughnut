@@ -139,38 +139,5 @@ describe("Markdown and HTML Conversion Tests", () => {
       const headerMatches = markdown.match(/={3,}$/gm)
       expect(headerMatches?.length).toBe(2)
     })
-
-    it("converts <pre><code> blocks to markdown code blocks", () => {
-      const html =
-        "<pre><code>&lt;p class=&quot;p1&quot;&gt;\n  &lt;span class=&quot;s1&quot;&gt;\n    &lt;h1&gt;&lt;b&gt;✅&lt;span class=&quot;Apple-converted-space&quot;&gt; &lt;/span&gt;&lt;/b&gt;&lt;/h1&gt;\n    &lt;h1&gt;&lt;b&gt;Conclusion&lt;/b&gt;&lt;/h1&gt;\n  &lt;/span&gt;\n&lt;/p&gt;</code></pre>"
-      const markdown = markdownizer.htmlToMarkdown(html)
-      // Should contain markdown code block with ```
-      expect(markdown).toContain("```")
-      expect(markdown).toContain('<p class="p1">')
-      expect(markdown).toContain("<h1><b>✅")
-      expect(markdown).toContain("<h1><b>Conclusion</b></h1>")
-    })
-
-    it("converts markdown code blocks back to <pre><code>", () => {
-      const markdown =
-        '```\n<p class="p1">\n  <span class="s1">\n    <h1><b>✅<span class="Apple-converted-space"> </span></b></h1>\n    <h1><b>Conclusion</b></h1>\n  </span>\n</p>\n```'
-      const html = markdownizer.markdownToHtml(markdown)
-      // Should contain <pre><code>
-      expect(html).toContain("<pre><code>")
-      expect(html).toContain("</code></pre>")
-      // HTML entities should be escaped
-      expect(html).toContain("&lt;p")
-      expect(html).toContain("&quot;")
-    })
-
-    it("round-trip conversion: <pre><code> to markdown and back", () => {
-      const originalHtml =
-        "<pre><code>&lt;p class=&quot;p1&quot;&gt;\n  &lt;span class=&quot;s1&quot;&gt;\n    &lt;h1&gt;&lt;b&gt;✅&lt;span class=&quot;Apple-converted-space&quot;&gt; &lt;/span&gt;&lt;/b&gt;&lt;/h1&gt;\n    &lt;h1&gt;&lt;b&gt;Conclusion&lt;/b&gt;&lt;/h1&gt;\n  &lt;/span&gt;\n&lt;/p&gt;</code></pre>"
-      const markdown = markdownizer.htmlToMarkdown(originalHtml)
-      const convertedHtml = markdownizer.markdownToHtml(markdown)
-      // Should contain <pre><code> in the result
-      expect(convertedHtml).toContain("<pre><code>")
-      expect(convertedHtml).toContain("</code></pre>")
-    })
   })
 })

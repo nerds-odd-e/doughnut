@@ -48,21 +48,6 @@ const mergeConsecutiveHeaders = (tempDiv: HTMLElement): void => {
   }
 }
 
-turndownService.addRule("pre", {
-  filter: "pre",
-  replacement(_, node: Node) {
-    const codeElement = (node as HTMLElement).querySelector("code")
-    if (codeElement) {
-      // Extract text content from code element, preserving HTML entities
-      const textContent = codeElement.textContent || ""
-      return `\n\n\`\`\`\n${textContent}\n\`\`\`\n\n`
-    }
-    // If no code element, just get the text content
-    const textContent = (node as HTMLElement).textContent || ""
-    return `\n\n\`\`\`\n${textContent}\n\`\`\`\n\n`
-  },
-})
-
 turndownService.addRule("p", {
   filter: "p",
   replacement(_, node: Node) {

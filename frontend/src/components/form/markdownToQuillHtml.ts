@@ -78,19 +78,6 @@ export default function markdownToQuillHtml(
     return `<blockquote>${cleanedBody}</blockquote>`
   }
 
-  // Override the code method to output <pre><code>
-  renderer.code = function (token: Tokens.Code): string {
-    const code = token.text || ""
-    // Escape HTML entities in the code content
-    const escapedCode = code
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;")
-    return `<pre><code>${escapedCode}</code></pre>`
-  }
-
   // Set up the parser with the custom renderer
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser
