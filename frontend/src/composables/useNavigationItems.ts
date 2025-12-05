@@ -14,7 +14,7 @@ import { messageCenterConversations } from "@/store/messageStore"
 export function useNavigationItems() {
   const route = useRoute()
   const { dueCount } = useAssimilationCount()
-  const { toRepeatCount, isRecallPaused } = useRecallData()
+  const { toRepeatCount, isRecallPaused, currentIndex } = useRecallData()
 
   const upperNavItems = computed(() => {
     const baseItems = [
@@ -44,7 +44,14 @@ export function useNavigationItems() {
       },
     ]
 
-    if (isRecallPaused.value) {
+    // Recall is paused if:
+    // 1. previousAnsweredQuestionCursor is set (viewing answered question), OR
+    // 2. currentIndex > 0 (not at first memory tracker) AND not on recall page
+    const isPausedByCursor = isRecallPaused.value
+    const isPausedByIndex = currentIndex.value > 0 && route.name !== "recall"
+    const shouldShowResume = isPausedByCursor || isPausedByIndex
+
+    if (shouldShowResume) {
       return [
         {
           name: "resumeRecall",

@@ -58,6 +58,7 @@ const createMenuData = (overrides?: Partial<typeof defaultMenuData>) => {
 const createUseRecallDataMock = (overrides?: {
   toRepeatCount?: number
   isRecallPaused?: boolean
+  currentIndex?: number
   resumeRecall?: () => void
 }) => {
   return {
@@ -67,6 +68,7 @@ const createUseRecallDataMock = (overrides?: {
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
+    currentIndex: ref(overrides?.currentIndex ?? 0),
     setToRepeatCount: vi.fn(),
     setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
@@ -75,6 +77,7 @@ const createUseRecallDataMock = (overrides?: {
     clearShouldResumeRecall: vi.fn(),
     decrementToRepeatCount: vi.fn(),
     setTreadmillMode: vi.fn(),
+    setCurrentIndex: vi.fn(),
   }
 }
 
@@ -496,6 +499,66 @@ describe("main menu", () => {
 
       const resumeCount = queryByText("0")
       expect(resumeCount).not.toBeInTheDocument()
+    })
+
+    it("shows resume recall menu item when currentIndex > 0 and not on recall page", async () => {
+      useRouteValue.name = "notebooks"
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: false,
+          currentIndex: 1,
+        })
+      )
+
+      await renderComponent()
+
+      const resumeRecallLink = screen.getByLabelText("Resume")
+      expect(resumeRecallLink).toBeInTheDocument()
+    })
+
+    it("does not show resume recall menu item when currentIndex > 0 but on recall page", async () => {
+      useRouteValue.name = "recall"
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: false,
+          currentIndex: 1,
+        })
+      )
+
+      await renderComponent()
+
+      const resumeRecallLink = screen.queryByLabelText("Resume")
+      expect(resumeRecallLink).not.toBeInTheDocument()
+    })
+
+    it("does not show resume recall menu item when currentIndex is 0 and not on recall page", async () => {
+      useRouteValue.name = "notebooks"
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: false,
+          currentIndex: 0,
+        })
+      )
+
+      await renderComponent()
+
+      const resumeRecallLink = screen.queryByLabelText("Resume")
+      expect(resumeRecallLink).not.toBeInTheDocument()
+    })
+
+    it("shows resume recall menu item when both isRecallPaused and currentIndex > 0 conditions are true", async () => {
+      useRouteValue.name = "notebooks"
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: true,
+          currentIndex: 2,
+        })
+      )
+
+      await renderComponent()
+
+      const resumeRecallLink = screen.getByLabelText("Resume")
+      expect(resumeRecallLink).toBeInTheDocument()
     })
   })
 })

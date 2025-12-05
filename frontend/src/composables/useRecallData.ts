@@ -7,6 +7,7 @@ const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
 const shouldResumeRecall = ref(false)
 const treadmillMode = ref<boolean>(false)
+const currentIndex = ref(0)
 
 export function useRecallData() {
   const router = useRouter()
@@ -46,6 +47,10 @@ export function useRecallData() {
     treadmillMode.value = enabled
   }
 
+  const setCurrentIndex = (index: number) => {
+    currentIndex.value = index
+  }
+
   return {
     toRepeatCount,
     recallWindowEndAt,
@@ -53,6 +58,7 @@ export function useRecallData() {
     isRecallPaused,
     shouldResumeRecall,
     treadmillMode,
+    currentIndex,
     setToRepeatCount,
     setRecallWindowEndAt,
     setTotalAssimilatedCount,
@@ -61,5 +67,6 @@ export function useRecallData() {
     clearShouldResumeRecall,
     decrementToRepeatCount,
     setTreadmillMode,
+    setCurrentIndex,
   }
 }
