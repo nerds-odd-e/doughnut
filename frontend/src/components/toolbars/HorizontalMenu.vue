@@ -294,7 +294,7 @@ onUnmounted(() => {
 }
 
 .is-collapsed .menu-content {
-  flex: 0 0 auto; // Don't grow when collapsed, just fit content
+  flex: 1; // Take full remaining width when collapsed
   width: auto;
   justify-content: flex-start;
 }
@@ -311,10 +311,16 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
 
-  :deep(.navigation-item) {
+  :deep(.nav-item) {
     width: 100%;
     display: flex;
     justify-content: center;
+  }
+
+  :deep(.nav-item > a),
+  :deep(.nav-item > details > summary) {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 
   .label {
@@ -324,8 +330,8 @@ onUnmounted(() => {
 }
 
 .active-item-only {
-  flex-shrink: 0;
-  min-width: fit-content;
+  flex: 1; // Take full width
+  min-width: 0; // Allow shrinking
   display: flex;
   align-items: center;
 }
@@ -336,6 +342,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   cursor: pointer;
+  padding: 0;
 }
 
 .top-menu,
@@ -351,7 +358,8 @@ onUnmounted(() => {
   opacity: 1;
   transform: translateX(0);
   position: relative;
-  width: auto;
+  width: 100%;
+  padding-right: 0;
 }
 
 .is-collapsed .top-menu {
