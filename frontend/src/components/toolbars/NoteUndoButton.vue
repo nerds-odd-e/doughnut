@@ -51,12 +51,6 @@ const getNoteIdentifier = (noteId: Doughnut.ID): string => {
   return `note id: ${noteId}`
 }
 
-const stripHtml = (html: string): string => {
-  const div = document.createElement("div")
-  div.innerHTML = html
-  return div.textContent || div.innerText || ""
-}
-
 const getCurrentContent = (): string => {
   if (!history.value) return ""
   const noteRealm = storageAccessor.value.refOfNoteRealm(
@@ -68,16 +62,13 @@ const getCurrentContent = (): string => {
     return noteRealm.note.noteTopology.titleOrPredicate || ""
   }
   if (history.value.type === "edit details") {
-    return stripHtml(noteRealm.note.details || "")
+    return noteRealm.note.details || ""
   }
   return ""
 }
 
 const getOldContent = (): string => {
   if (!history.value?.textContent) return ""
-  if (history.value.type === "edit details") {
-    return stripHtml(history.value.textContent)
-  }
   return history.value.textContent
 }
 

@@ -134,7 +134,7 @@ describe("NoteUndoButton", () => {
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
       })
 
-      it("strips HTML tags from details content in diff view", async () => {
+      it("shows HTML tags as part of markdown content in diff view", async () => {
         const noteRealm = makeMe.aNoteRealm
           .topicConstructor("Details Note")
           .please()
@@ -152,9 +152,11 @@ describe("NoteUndoButton", () => {
         await flushPromises()
 
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
-        // HTML should be stripped in the diff view
+        // HTML tags should be shown as part of the content
         const diffContent = screen.getByText("Will restore to").parentElement
-        expect(diffContent?.textContent).toContain("Old Details with HTML")
+        expect(diffContent?.textContent).toContain(
+          "<p>Old <strong>Details</strong> with <em>HTML</em></p>"
+        )
       })
     })
 
