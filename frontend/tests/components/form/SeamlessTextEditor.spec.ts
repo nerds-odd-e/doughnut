@@ -98,6 +98,7 @@ describe("SeamlessTextEditor.vue", () => {
     const editorElement = editor.element as HTMLElement
 
     // Set up selection - select all content using the component's text node
+    editorElement.focus()
     const textNode = editorElement.firstChild as Text
     if (!textNode) {
       throw new Error("Text node not found")
@@ -105,8 +106,10 @@ describe("SeamlessTextEditor.vue", () => {
     const range = document.createRange()
     range.selectNodeContents(textNode)
     const selection = window.getSelection()
-    selection?.removeAllRanges()
-    selection?.addRange(range)
+    if (selection) {
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
 
     // Create paste event with HTML data
     const pasteEvent = createClipboardEvent("bold text", "<b>bold</b> text")
