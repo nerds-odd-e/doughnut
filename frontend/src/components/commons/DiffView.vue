@@ -1,5 +1,5 @@
 <template>
-  <div class="diff-view daisy-flex daisy-gap-2">
+  <div class="diff-view daisy-flex daisy-flex-col md:daisy-flex-row daisy-gap-2">
     <div class="daisy-flex-1">
       <div class="daisy-text-sm daisy-font-semibold daisy-mb-2 daisy-text-error">
         Current

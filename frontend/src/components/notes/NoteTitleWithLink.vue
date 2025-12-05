@@ -3,7 +3,7 @@
     :to="{ name: 'noteShow', params: { noteId: noteTopology.id } }"
     class="daisy-text-decoration-none"
   >
-    <NoteTitleComponent v-if="!iconized" v-bind="{ noteTopology }" />
+    <NoteTitleComponent v-if="!iconized" v-bind="{ noteTopology, clickable: false }" />
     <span v-else>🔗</span>
   </router-link>
 </template>

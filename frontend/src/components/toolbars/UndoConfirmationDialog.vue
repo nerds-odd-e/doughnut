@@ -54,7 +54,16 @@ const handleCancel = () => {
 
 <style scoped>
 .undo-confirmation {
-  min-width: 600px;
+  /* Mobile-first: take full width of the viewport with some padding */
+  width: 100%;
+  max-width: 95vw;
+}
+
+/* On medium and larger screens, enforce a comfortable min width */
+@media (min-width: 768px) {
+  .undo-confirmation {
+    min-width: 600px;
+  }
 }
 </style>
 
