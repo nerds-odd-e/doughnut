@@ -4,10 +4,40 @@
 
 <script setup lang="ts">
 import { nextTick, ref, onMounted, watch } from "vue"
-import Quill, { type QuillOptions } from "quill"
+import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
 import { useInterruptingHtmlToMarkdown } from "@/composables/useInterruptingHtmlToMarkdown"
+
+// Define soft line break blot
+// Quill.import returns dynamic types that aren't fully typed in the Quill library
+interface EmbedBlotInstance {
+  // Blot instance interface
+}
+type EmbedBlotConstructor = new (
+  node: Node,
+  value?: unknown
+) => EmbedBlotInstance
+
+interface DeltaInstance {
+  insert(content: unknown): DeltaInstance
+}
+type DeltaConstructor = new (ops?: unknown) => DeltaInstance
+
+const Embed = Quill.import("blots/embed") as unknown as EmbedBlotConstructor
+const Delta = Quill.import("delta") as unknown as DeltaConstructor
+
+class SoftLineBreakBlot extends Embed {
+  static blotName = "softbreak"
+  static tagName = "br"
+  static className = "softbreak"
+}
+
+// Quill.register accepts dynamic blot classes - the type system can't fully validate this
+Quill.register(
+  SoftLineBreakBlot as unknown as Parameters<typeof Quill.register>[0],
+  true
+)
 
 const { modelValue, readonly } = defineProps({
   modelValue: String,
@@ -31,6 +61,22 @@ const updateQuillContent = (content: string | undefined) => {
   }
 }
 
+// Shift+Enter handler for soft line breaks
+const shiftEnterHandler = function (
+  this: { quill: Quill },
+  range: Range | null
+) {
+  if (!range) return
+  this.quill.insertEmbed(range.index, "softbreak", true, Quill.sources.USER)
+  this.quill.insertText(range.index + 1, "\u200B", Quill.sources.USER)
+  this.quill.setSelection(range.index + 1, Quill.sources.SILENT)
+}
+
+// BR matcher for clipboard operations
+const brMatcher = () => {
+  return new Delta().insert({ softbreak: true })
+}
+
 const options: QuillOptions = {
   modules: {
     toolbar: [
@@ -40,7 +86,31 @@ const options: QuillOptions = {
       [{ list: "ordered" }, { list: "bullet" }],
       ["link"],
     ],
+    keyboard: {
+      bindings: {
+        shiftEnter: {
+          key: "Enter",
+          shiftKey: true,
+          handler: shiftEnterHandler,
+        },
+      },
+    },
+    clipboard: {
+      matchers: [["BR", brMatcher]],
+      matchVisual: false,
+    },
   },
+  formats: [
+    "bold",
+    "italic",
+    "underline",
+    "header",
+    "blockquote",
+    "code-block",
+    "list",
+    "link",
+    "softbreak",
+  ],
   placeholder: readonly ? "" : "Enter note details here...",
   readOnly: readonly,
   theme: "bubble",
