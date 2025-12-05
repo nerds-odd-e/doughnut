@@ -360,14 +360,14 @@ describe("main menu", () => {
     it("shows resume recall menu item when recall is paused", async () => {
       await renderComponent()
 
-      const resumeRecallLink = screen.getByLabelText("Resume Recall")
+      const resumeRecallLink = screen.getByLabelText("Resume")
       expect(resumeRecallLink).toBeInTheDocument()
     })
 
     it("highlights resume recall menu item when recall is paused", async () => {
       await renderComponent()
 
-      const resumeRecallLink = screen.getByLabelText("Resume Recall")
+      const resumeRecallLink = screen.getByLabelText("Resume")
       const navItem = resumeRecallLink.closest(".nav-item")
       expect(navItem).toHaveClass("daisy-text-primary")
     })
@@ -376,15 +376,15 @@ describe("main menu", () => {
       await renderComponent()
 
       // Check that resume recall appears before note in the DOM
-      const resumeRecallElement = screen.getByLabelText("Resume Recall")
+      const resumeRecallElement = screen.getByLabelText("Resume")
       const noteElement = screen.getByLabelText("Note")
 
       // Get all navigation items by querying the DOM
       const allNavItems = Array.from(document.querySelectorAll(".nav-item"))
       const resumeNavItem = allNavItems.find(
         (el) =>
-          el.querySelector('a[aria-label="Resume Recall"]') ||
-          el.querySelector('[aria-label="Resume Recall"]')
+          el.querySelector('a[aria-label="Resume"]') ||
+          el.querySelector('[aria-label="Resume"]')
       )
       const noteNavItem = allNavItems.find(
         (el) =>
@@ -414,7 +414,7 @@ describe("main menu", () => {
 
       await renderComponent()
 
-      const resumeRecallLink = screen.queryByLabelText("Resume Recall")
+      const resumeRecallLink = screen.queryByLabelText("Resume")
       expect(resumeRecallLink).not.toBeInTheDocument()
     })
 
@@ -435,7 +435,7 @@ describe("main menu", () => {
       expect(expandButton).toBeInTheDocument()
 
       // Click on the resume recall item (should be visible as active item in collapsed state)
-      const resumeRecallLink = screen.getByLabelText("Resume Recall")
+      const resumeRecallLink = screen.getByLabelText("Resume")
       await fireEvent.click(resumeRecallLink)
 
       // Should call resumeRecall

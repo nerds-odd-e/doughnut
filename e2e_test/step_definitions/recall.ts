@@ -202,11 +202,11 @@ Then('choose to remove the last memory tracker from recalls', () => {
 })
 
 Then('I should see the resume recall menu item', () => {
-  cy.findByLabelText('Resume Recall').should('exist')
+  cy.findByLabelText('Resume').should('exist')
 })
 
 When('I click resume recall from the menu', () => {
-  cy.findByLabelText('Resume Recall').click()
+  cy.findByLabelText('Resume').click()
 })
 
 Then('I should be back to the current question', () => {

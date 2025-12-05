@@ -18,13 +18,13 @@
         <!-- User menu content -->
         <template v-if="user">
           <!-- Collapsed state: show only active item (not on home page) -->
-          <template v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem">
+          <ul v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem" class="collapsed-menu daisy-menu">
             <li class="daisy-menu-item active-item-only">
               <div @click.capture.stop.prevent="handleActiveItemClick" class="active-item-wrapper">
                 <NavigationItem v-bind="{ ...activeItem }" @resumeRecall="resumeRecall" />
               </div>
             </li>
-          </template>
+          </ul>
 
           <!-- Expanded state: show all items -->
           <ul v-if="shouldShowExpanded" class="top-menu daisy-menu daisy-flex-1">
@@ -338,12 +338,20 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
-.top-menu {
+.top-menu,
+.collapsed-menu {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: center;
   gap: 1rem;
   transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.collapsed-menu {
+  opacity: 1;
+  transform: translateX(0);
+  position: relative;
+  width: auto;
 }
 
 .is-collapsed .top-menu {

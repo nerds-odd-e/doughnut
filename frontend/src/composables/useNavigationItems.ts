@@ -48,7 +48,7 @@ export function useNavigationItems() {
       return [
         {
           name: "resumeRecall",
-          label: "Resume Recall",
+          label: "Resume",
           icon: SvgResume,
           isActive: true,
         },
