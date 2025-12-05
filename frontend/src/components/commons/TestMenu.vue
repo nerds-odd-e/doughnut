@@ -83,15 +83,17 @@ export default defineComponent({
 <style lang="scss" scoped>
 .testability-wrapper {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
   z-index: 99999;
 }
 
 .feature-toggle-alert {
   position: fixed;
-  bottom: 80px;
-  left: 20px;
+  top: calc(50% - 60px);
+  right: 20px;
+  transform: translateY(-50%);
   z-index: 99999;
 }
 
