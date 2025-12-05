@@ -6,7 +6,13 @@
     <template #body>
       <div class="undo-confirmation">
         <div class="daisy-mb-4">
-          <p>{{ message }}</p>
+          <p>
+            {{ message }}
+            <NoteTitleWithLink
+              v-if="noteTopology"
+              :noteTopology="noteTopology"
+            />?
+          </p>
         </div>
         <DiffView
           v-if="showDiff"
@@ -28,11 +34,15 @@
 </template>
 
 <script setup lang="ts">
+import type { PropType } from "vue"
+import type { NoteTopology } from "@generated/backend"
 import Modal from "../commons/Modal.vue"
 import DiffView from "../commons/DiffView.vue"
+import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
 
 const props = defineProps({
   message: { type: String, required: true },
+  noteTopology: { type: Object as PropType<NoteTopology>, required: false },
   currentContent: { type: String, default: "" },
   oldContent: { type: String, default: "" },
   showDiff: { type: Boolean, default: false },

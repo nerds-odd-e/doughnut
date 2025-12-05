@@ -54,8 +54,11 @@ describe("NoteUndoButton", () => {
 
         expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
         expect(
-          screen.getByText(/Are you sure you want to undo deleting "My Note"\?/)
+          screen.getByText(/Are you sure you want to undo deleting /)
         ).toBeInTheDocument()
+        expect(screen.getByText("My Note")).toBeInTheDocument()
+        const link = screen.getByText("My Note").closest("a.router-link")
+        expect(link).toBeInTheDocument()
       })
 
       it("shows confirmation dialog with note title and diff for edit title", async () => {
@@ -78,9 +81,12 @@ describe("NoteUndoButton", () => {
         expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
         expect(
           screen.getByText(
-            /Are you sure you want to undo editing the title of "Test Note"\?/
+            /Are you sure you want to undo editing the title of /
           )
         ).toBeInTheDocument()
+        expect(screen.getByText("Test Note")).toBeInTheDocument()
+        const link = screen.getByText("Test Note").closest("a.router-link")
+        expect(link).toBeInTheDocument()
         expect(screen.getByText("Current")).toBeInTheDocument()
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
       })
@@ -105,9 +111,12 @@ describe("NoteUndoButton", () => {
         expect(screen.getByText("Confirm Undo")).toBeInTheDocument()
         expect(
           screen.getByText(
-            /Are you sure you want to undo editing the details of "Details Note"\?/
+            /Are you sure you want to undo editing the details of /
           )
         ).toBeInTheDocument()
+        expect(screen.getByText("Details Note")).toBeInTheDocument()
+        const link = screen.getByText("Details Note").closest("a.router-link")
+        expect(link).toBeInTheDocument()
         expect(screen.getByText("Current")).toBeInTheDocument()
         expect(screen.getByText("Will restore to")).toBeInTheDocument()
       })

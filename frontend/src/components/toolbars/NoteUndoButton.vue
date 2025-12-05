@@ -11,6 +11,7 @@
   <UndoConfirmationDialog
     v-if="showDialog && history"
     :message="getUndoMessage()"
+    :noteTopology="getNoteTopology()"
     :currentContent="getCurrentContent()"
     :oldContent="getOldContent()"
     :showDiff="shouldShowDiff"
@@ -42,6 +43,14 @@ const undoTitle = computed(() => {
   }
   return "undo"
 })
+
+const getNoteTopology = () => {
+  if (!history.value) return undefined
+  const noteRealm = storageAccessor.value.refOfNoteRealm(
+    history.value.noteId
+  ).value
+  return noteRealm?.note?.noteTopology
+}
 
 const getNoteIdentifier = (noteId: Doughnut.ID): string => {
   const noteRealm = storageAccessor.value.refOfNoteRealm(noteId).value
@@ -75,16 +84,27 @@ const getOldContent = (): string => {
 const getUndoMessage = (): string => {
   if (!history.value) return "Undo action"
   const actionType = history.value.type
-  const noteIdentifier = getNoteIdentifier(history.value.noteId)
+  const noteTopology = getNoteTopology()
+  const noteIdentifier = noteTopology
+    ? ""
+    : getNoteIdentifier(history.value.noteId)
   switch (actionType) {
     case "edit title":
-      return `Are you sure you want to undo editing the title of ${noteIdentifier}?`
+      return noteTopology
+        ? "Are you sure you want to undo editing the title of "
+        : `Are you sure you want to undo editing the title of ${noteIdentifier}?`
     case "edit details":
-      return `Are you sure you want to undo editing the details of ${noteIdentifier}?`
+      return noteTopology
+        ? "Are you sure you want to undo editing the details of "
+        : `Are you sure you want to undo editing the details of ${noteIdentifier}?`
     case "delete note":
-      return `Are you sure you want to undo deleting ${noteIdentifier}?`
+      return noteTopology
+        ? "Are you sure you want to undo deleting "
+        : `Are you sure you want to undo deleting ${noteIdentifier}?`
     default:
-      return `Are you sure you want to undo ${actionType} for ${noteIdentifier}?`
+      return noteTopology
+        ? `Are you sure you want to undo ${actionType} for `
+        : `Are you sure you want to undo ${actionType} for ${noteIdentifier}?`
   }
 }
 
