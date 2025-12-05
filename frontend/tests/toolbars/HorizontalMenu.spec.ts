@@ -175,7 +175,7 @@ describe("HorizontalMenu", () => {
       expect(activeItem).toBeInTheDocument()
     })
 
-    it("hides active item area when collapsed and no active item exists", () => {
+    it("shows menu icon when collapsed and no active item exists", () => {
       const navItems = createMockNavItems()
       helper
         .component(HorizontalMenu)
@@ -188,8 +188,94 @@ describe("HorizontalMenu", () => {
         })
         .render()
 
-      const activeItemOnly = document.querySelector(".active-item-only")
-      expect(activeItemOnly).not.toBeInTheDocument()
+      const menuIcon = screen.getByLabelText("Menu")
+      expect(menuIcon).toBeInTheDocument()
+    })
+
+    it("hides menu icon when expanded", async () => {
+      const navItems = createMockNavItems()
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Menu icon should be visible when collapsed
+      expect(screen.getByLabelText("Menu")).toBeInTheDocument()
+
+      // Expand the menu
+      const expandButton = screen.getByLabelText("Toggle menu")
+      await fireEvent.click(expandButton)
+
+      // Menu icon should not be visible when expanded
+      expect(screen.queryByLabelText("Menu")).not.toBeInTheDocument()
+    })
+
+    it("hides menu icon when there is an active item", () => {
+      const navItems = createMockNavItems("assimilate")
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Active item should be visible
+      expect(screen.getByLabelText("Assimilate")).toBeInTheDocument()
+      // Menu icon should not be visible
+      expect(screen.queryByLabelText("Menu")).not.toBeInTheDocument()
+    })
+
+    it("hides menu icon on home page", () => {
+      const navItems = createMockNavItems()
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: true,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Menu icon should not be visible on home page
+      expect(screen.queryByLabelText("Menu")).not.toBeInTheDocument()
+    })
+
+    it("expands menu when clicking menu icon", async () => {
+      const navItems = createMockNavItems()
+      helper
+        .component(HorizontalMenu)
+        .withProps({
+          user,
+          ...navItems,
+          isHomePage: false,
+          showUserSettingsDialog: noop,
+          logout: noop,
+        })
+        .render()
+
+      // Menu should start collapsed
+      let menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-collapsed")
+
+      // Click on the menu icon
+      const menuIcon = screen.getByLabelText("Menu")
+      await fireEvent.click(menuIcon)
+
+      // Menu should now be expanded
+      menuWrapper = document.querySelector(".menu-wrapper")
+      expect(menuWrapper).toHaveClass("is-expanded")
     })
 
     it("shows active item icon and label correctly when collapsed", () => {
