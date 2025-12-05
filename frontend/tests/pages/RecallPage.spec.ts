@@ -412,5 +412,70 @@ describe("repeat page", () => {
       // Should now show 2 (excluding spelling)
       expect(globalBar.text()).toContain("0/2")
     })
+
+    it("should not add answered questions back to the list when toggling treadmill mode", async () => {
+      const wrapper = await mountPage()
+      await flushPromises()
+      type ExposedVM = {
+        toRepeat?: MemoryTrackerLite[]
+        currentIndex: number
+      }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      // Manually advance currentIndex to simulate answering a question
+      vm.currentIndex = 1
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      // currentIndex should not be reset to 0
+      // It should remain at 1 or be adjusted to point to a non-spelling tracker
+      expect(vm.currentIndex).toBeGreaterThan(0)
+    })
+
+    it("should not reset currentIndex to 0 when toggling treadmill mode", async () => {
+      const wrapper = await mountPage()
+      await flushPromises()
+      type ExposedVM = {
+        toRepeat?: MemoryTrackerLite[]
+        currentIndex: number
+      }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      // Manually set currentIndex to simulate having answered questions
+      const initialIndex = 2
+      vm.currentIndex = initialIndex
+
+      // Enable treadmill mode
+      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.vm.$nextTick()
+      const toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+      expect(toggle).toBeTruthy()
+      toggle.checked = true
+      toggle.dispatchEvent(new Event("change", { bubbles: true }))
+      await wrapper.vm.$nextTick()
+      await flushPromises()
+
+      // currentIndex should not be reset to 0
+      // It may be adjusted to point to a non-spelling tracker, but should not go back to 0
+      expect(vm.currentIndex).toBeGreaterThan(0)
+      // If the current tracker at initialIndex is not spelling, index should remain the same
+      // If it is spelling, it should move to the next non-spelling tracker
+      const currentTracker = vm.toRepeat?.[vm.currentIndex]
+      if (currentTracker) {
+        expect(currentTracker.spelling).toBe(false)
+      }
+    })
   })
 })
