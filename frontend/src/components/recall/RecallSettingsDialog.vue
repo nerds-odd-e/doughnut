@@ -1,5 +1,8 @@
 <template>
-  <div class="recall-settings-dialog daisy-bg-base-200 daisy-rounded-b-lg daisy-p-5 daisy-shadow-lg animate-dropdown daisy-relative">
+  <div 
+    class="recall-settings-dialog daisy-bg-base-200 daisy-rounded-b-lg daisy-p-5 daisy-shadow-lg animate-dropdown"
+    :style="dialogStyle"
+  >
     <button 
       class="daisy-btn daisy-btn-ghost daisy-btn-sm daisy-btn-circle daisy-absolute daisy-top-2 daisy-right-2" 
       @click="closeDialog" 
@@ -34,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, watch } from "vue"
 import SvgSkip from "../svgs/SvgSkip.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
@@ -41,6 +45,7 @@ const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
   previousAnsweredQuestionCursor: Number,
   currentIndex: { type: Number, required: true },
+  buttonElement: { type: Object as () => HTMLElement | null, default: null },
 })
 
 const emit = defineEmits<{
@@ -50,6 +55,59 @@ const emit = defineEmits<{
 }>()
 
 const { treadmillMode, setTreadmillMode } = useRecallData()
+
+const dialogStyle = computed(() => {
+  if (!props.buttonElement) {
+    return {}
+  }
+
+  const rect = props.buttonElement.getBoundingClientRect()
+  const spaceAbove = rect.top
+  const spaceBelow = window.innerHeight - rect.bottom
+
+  // Open upward if there's more space above, otherwise open downward
+  const openUpward = spaceAbove > spaceBelow
+
+  if (openUpward) {
+    return {
+      position: "fixed" as const,
+      bottom: `${window.innerHeight - rect.top + 8}px`,
+      right: `${window.innerWidth - rect.right}px`,
+      zIndex: 1000,
+      minWidth: "200px",
+    }
+  } else {
+    return {
+      position: "fixed" as const,
+      top: `${rect.bottom + 8}px`,
+      right: `${window.innerWidth - rect.right}px`,
+      zIndex: 1000,
+      minWidth: "200px",
+    }
+  }
+})
+
+const updatePosition = () => {
+  // Force reactivity update when window is resized or scrolled
+}
+
+onMounted(() => {
+  window.addEventListener("resize", updatePosition)
+  window.addEventListener("scroll", updatePosition, true)
+})
+
+onUnmounted(() => {
+  window.removeEventListener("resize", updatePosition)
+  window.removeEventListener("scroll", updatePosition, true)
+})
+
+watch(
+  () => props.buttonElement,
+  () => {
+    // Update position when button element changes
+  },
+  { immediate: true }
+)
 
 const closeDialog = () => {
   emit("close-dialog")
@@ -71,7 +129,7 @@ const handleTreadmillModeToggle = (event: Event) => {
 @keyframes dropDown {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-10px);
   }
   to {
     opacity: 1;
@@ -81,16 +139,10 @@ const handleTreadmillModeToggle = (event: Event) => {
 
 .animate-dropdown {
   animation: dropDown 0.3s ease-out;
-  transform-origin: top;
 }
 
 .recall-settings-dialog {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 1000;
-  min-width: 200px;
-  margin-top: 0.5rem;
+  // Position is set via inline styles
 }
 
 .large-btn {
