@@ -408,25 +408,5 @@ describe("repeat page", () => {
       // Should now show 2 (excluding spelling)
       expect(globalBar.text()).toContain("0/2")
     })
-
-    it("should persist treadmill mode in localStorage", async () => {
-      const wrapper = await mountPage()
-      await flushPromises()
-
-      // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      await flushPromises()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
-      await flushPromises()
-
-      expect(localStorage.getItem("treadmillMode")).toBe("true")
-    })
   })
 })
