@@ -14,13 +14,24 @@ export default function markdownToQuillHtml(
       .replace(/<li>/g, '<li data-list="bullet">')
   }
 
+  // Helper function to escape HTML tags
+  const escapeHtml = (html: string): string => {
+    return html
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;")
+  }
+
   // Override the html method to handle raw HTML
   renderer.html = function (html: string | Tokens.Generic): string {
     const htmlContent = typeof html === "string" ? html : html.text
     if (htmlContent.includes("<ul>") || htmlContent.includes("<li>")) {
       return convertHtmlList(htmlContent)
     }
-    return htmlContent
+    // Escape all other HTML tags
+    return escapeHtml(htmlContent)
   }
 
   // Override the list method

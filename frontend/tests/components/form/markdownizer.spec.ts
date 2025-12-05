@@ -94,6 +94,12 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(html).not.toContain("<p>")
       expect(html).not.toContain("</p>")
     })
+
+    it("converts markdown with raw HTML tags", () => {
+      const markdown = "raw <span> is ok."
+      const result = markdownizer.markdownToHtml(markdown)
+      expect(result).toBe("<p>raw &lt;span&gt; is ok.</p>")
+    })
   })
 
   describe("Html to markdown", () => {
