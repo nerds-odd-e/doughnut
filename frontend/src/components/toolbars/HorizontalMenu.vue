@@ -26,6 +26,20 @@
             </li>
           </ul>
 
+          <!-- Collapsed state: show menu icon when no active item (not on home page) -->
+          <ul v-if="!shouldShowExpanded && !hasActiveItem && !isHomePage" class="collapsed-menu daisy-menu">
+            <li class="daisy-menu-item active-item-only">
+              <div @click.capture.stop.prevent="handleMenuIconClick" class="active-item-wrapper">
+                <div class="nav-item daisy-text-neutral-content daisy-rounded-lg daisy-px-2 daisy-flex daisy-flex-col daisy-items-center" aria-label="Menu">
+                  <div class="icon-container">
+                    <SvgMenu width="24" height="24" />
+                  </div>
+                  <span class="label">Menu</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+
           <!-- Expanded state: show all items -->
           <ul v-if="shouldShowExpanded" class="top-menu daisy-menu daisy-flex-1">
         <template v-if="!isHomePage">
@@ -72,6 +86,7 @@ import LoginButton from "@/components/toolbars/LoginButton.vue"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import AccountMenuItem from "@/components/toolbars/AccountMenuItem.vue"
 import SvgChevronRight from "@/components/svgs/SvgChevronRight.vue"
+import SvgMenu from "@/components/svgs/SvgMenu.vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 type NavigationItemType = {
@@ -150,6 +165,15 @@ const handleActiveItemClick = (event: MouseEvent) => {
       resumeRecall()
       return
     }
+    event.preventDefault()
+    event.stopPropagation()
+    expandMenu()
+  }
+}
+
+const handleMenuIconClick = (event: MouseEvent) => {
+  // When collapsed, clicking the menu icon should expand the menu
+  if (!shouldShowExpanded.value && props.user) {
     event.preventDefault()
     event.stopPropagation()
     expandMenu()
@@ -343,6 +367,12 @@ onUnmounted(() => {
   align-items: center;
   cursor: pointer;
   padding: 0;
+
+  .icon-container {
+    position: relative;
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .top-menu,
