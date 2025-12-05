@@ -112,8 +112,7 @@ const shouldShowDiff = computed((): boolean => {
   return !!(
     history.value &&
     (history.value.type === "edit title" ||
-      history.value.type === "edit details") &&
-    history.value.textContent !== undefined
+      history.value.type === "edit details")
   )
 })
 
