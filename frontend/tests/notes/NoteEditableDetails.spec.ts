@@ -291,4 +291,53 @@ describe("NoteEditableDetails", () => {
     expect(detailsEl.value).not.toContain("This is the first note's details")
     expect(detailsEl.value).toBe("")
   })
+
+  it("converts HTML to markdown when pasting HTML content", async () => {
+    const wrapper: VueWrapper<ComponentPublicInstance> = helper
+      .component(NoteEditableDetails)
+      .withCleanStorage()
+      .withProps({
+        noteId: 1,
+        noteDetails: "existing text",
+        readonly: false,
+        asMarkdown: true,
+      })
+      .mount()
+
+    await flushPromises()
+
+    const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
+    textarea.setSelectionRange(8, 8) // Position cursor after "existing"
+
+    function createClipboardEvent(html: string): ClipboardEvent {
+      const event = new Event("paste", {
+        bubbles: true,
+        cancelable: true,
+      }) as ClipboardEvent
+      const dataTransfer = {
+        getData: (format: string) => {
+          if (format === "text/html") return html
+          return ""
+        },
+        setData: () => {
+          // Mock implementation - not used in tests
+        },
+      }
+      Object.defineProperty(event, "clipboardData", {
+        value: dataTransfer,
+        writable: false,
+      })
+      return event
+    }
+
+    const pasteEvent = createClipboardEvent("<p><strong>Bold text</strong></p>")
+
+    await textarea.dispatchEvent(pasteEvent)
+    await flushPromises()
+
+    // The HTML should be converted to markdown and the value should be updated
+    // The update should have been called through TextContentWrapper
+    expect(textarea.value).toContain("Bold text")
+    expect(textarea.value).toContain("existing")
+  })
 })

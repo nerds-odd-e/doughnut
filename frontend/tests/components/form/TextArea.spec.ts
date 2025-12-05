@@ -8,27 +8,6 @@ window.getComputedStyle = vi.fn().mockImplementation((elem) => ({
   lineHeight: "20px", // Example lineHeight
 }))
 
-function createClipboardEvent(html: string): ClipboardEvent {
-  const event = new Event("paste", {
-    bubbles: true,
-    cancelable: true,
-  }) as ClipboardEvent
-  const dataTransfer = {
-    getData: (format: string) => {
-      if (format === "text/html") return html
-      return ""
-    },
-    setData: () => {
-      // Mock implementation - not used in tests
-    },
-  }
-  Object.defineProperty(event, "clipboardData", {
-    value: dataTransfer,
-    writable: false,
-  })
-  return event
-}
-
 describe("TextArea.vue", () => {
   // Reset mock after all tests are done
   afterAll(() => {
@@ -104,28 +83,5 @@ describe("TextArea.vue", () => {
     await textarea.trigger("keydown", { key: "Enter", isComposing: true })
 
     expect(wrapper.emitted()).not.toHaveProperty("enterPressed")
-  })
-
-  it("converts HTML to markdown when pasting HTML content", async () => {
-    const wrapper = mount(TextArea, {
-      props: {
-        modelValue: "existing text",
-      },
-    })
-
-    const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
-    textarea.setSelectionRange(8, 8) // Position cursor after "existing"
-
-    const pasteEvent = createClipboardEvent("<p><strong>Bold text</strong></p>")
-
-    await textarea.dispatchEvent(pasteEvent)
-    await wrapper.vm.$nextTick()
-
-    const emitted = wrapper.emitted()["update:modelValue"]
-    expect(emitted).toBeDefined()
-    const lastEmitted = emitted![emitted!.length - 1]![0] as string
-    // Should contain the markdown version of the HTML
-    expect(lastEmitted).toContain("Bold text")
-    expect(lastEmitted).toContain("existing")
   })
 })
