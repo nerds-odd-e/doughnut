@@ -35,7 +35,7 @@ Feature: Browse answers and notes while recalling
     When I visit all my notebooks
     Then I should see the resume recall menu item
     And I click resume recall from the menu
-    Then I should see that my spelling answer "riot" is incorrect
+    Then I should be back to the current question
 
   Scenario: I can remove a note from further recalls
     Given I am recalling my note on day 2
