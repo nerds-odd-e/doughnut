@@ -116,6 +116,7 @@ const {
   shouldResumeRecall,
   clearShouldResumeRecall,
   treadmillMode,
+  setCurrentIndex,
 } = useRecallData()
 
 defineProps({
@@ -128,6 +129,15 @@ const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
 const showTooltip = ref(false)
+
+// Sync currentIndex with useRecallData
+watch(
+  () => currentIndex.value,
+  (index) => {
+    setCurrentIndex(index)
+  },
+  { immediate: true }
+)
 
 // Computed list of memory trackers that should not be modified
 const memoryTrackers = computed(() => toRepeat.value ?? [])
