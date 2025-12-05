@@ -57,7 +57,9 @@ describe("useInterruptingHtmlToMarkdown", () => {
     const html =
       '<p><a href="https://example.com">link1</a> <a href="https://example2.com">link2</a> <a href="https://example3.com">link3</a></p>'
     const result = htmlToMarkdown(html)
-    expect(confirmSpy).toHaveBeenCalled()
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 3 links from the pasting content?"
+    )
     expect(result).toContain("link1")
     expect(result).toContain("link2")
     expect(result).toContain("link3")
@@ -72,7 +74,9 @@ describe("useInterruptingHtmlToMarkdown", () => {
     const html =
       '<p><a href="https://example.com">link1</a> <a href="https://example2.com">link2</a> <a href="https://example3.com">link3</a></p>'
     const result = htmlToMarkdown(html)
-    expect(confirmSpy).toHaveBeenCalled()
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 3 links from the pasting content?"
+    )
     expect(result).toMatch(/\[link1\]\(https:\/\/example\.com\)/)
     expect(result).toMatch(/\[link2\]\(https:\/\/example2\.com\)/)
     expect(result).toMatch(/\[link3\]\(https:\/\/example3\.com\)/)
@@ -108,5 +112,73 @@ describe("useInterruptingHtmlToMarkdown", () => {
     expect(result).toContain("link4")
     expect(result).toContain("link5")
     expect(result).not.toMatch(/\[link1\]\(https:\/\/example\.com\)/)
+  })
+
+  it("prompts user when markdown contains more than 2 images", () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
+    const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+    const html =
+      '<p><img src="https://example.com/img1.jpg" alt="img1"> <img src="https://example.com/img2.jpg" alt="img2"> <img src="https://example.com/img3.jpg" alt="img3"></p>'
+    htmlToMarkdown(html)
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 3 images from the pasting content?"
+    )
+  })
+
+  it("removes images when user confirms", () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(true)
+    const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+    const html =
+      '<p><img src="https://example.com/img1.jpg" alt="img1"> <img src="https://example.com/img2.jpg" alt="img2"> <img src="https://example.com/img3.jpg" alt="img3"></p>'
+    const result = htmlToMarkdown(html)
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 3 images from the pasting content?"
+    )
+    expect(result).toContain("img1")
+    expect(result).toContain("img2")
+    expect(result).toContain("img3")
+    expect(result).not.toMatch(/!\[img1\]\(https:\/\/example\.com\/img1\.jpg\)/)
+    expect(result).not.toMatch(/!\[img2\]\(https:\/\/example\.com\/img2\.jpg\)/)
+    expect(result).not.toMatch(/!\[img3\]\(https:\/\/example\.com\/img3\.jpg\)/)
+  })
+
+  it("prompts separately for links and images when both exceed threshold", () => {
+    const confirmSpy = vi
+      .spyOn(window, "confirm")
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(false)
+    const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+    const html =
+      '<p><a href="https://example.com">link1</a> <a href="https://example2.com">link2</a> <a href="https://example3.com">link3</a> <img src="https://example.com/img1.jpg" alt="img1"> <img src="https://example.com/img2.jpg" alt="img2"> <img src="https://example.com/img3.jpg" alt="img3"></p>'
+    const result = htmlToMarkdown(html)
+    expect(confirmSpy).toHaveBeenCalledTimes(2)
+    expect(confirmSpy).toHaveBeenNthCalledWith(
+      1,
+      "Shall I remove the 3 links from the pasting content?"
+    )
+    expect(confirmSpy).toHaveBeenNthCalledWith(
+      2,
+      "Shall I remove the 3 images from the pasting content?"
+    )
+    // Links should be removed (confirmed), images should remain (cancelled)
+    expect(result).toContain("link1")
+    expect(result).not.toMatch(/\[link1\]\(https:\/\/example\.com\)/)
+    expect(result).toMatch(/!\[img1\]\(https:\/\/example\.com\/img1\.jpg\)/)
+  })
+
+  it("removes both links and images when both are confirmed", () => {
+    const confirmSpy = vi
+      .spyOn(window, "confirm")
+      .mockReturnValueOnce(true)
+      .mockReturnValueOnce(true)
+    const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+    const html =
+      '<p><a href="https://example.com">link1</a> <a href="https://example2.com">link2</a> <a href="https://example3.com">link3</a> <img src="https://example.com/img1.jpg" alt="img1"> <img src="https://example.com/img2.jpg" alt="img2"> <img src="https://example.com/img3.jpg" alt="img3"></p>'
+    const result = htmlToMarkdown(html)
+    expect(confirmSpy).toHaveBeenCalledTimes(2)
+    expect(result).toContain("link1")
+    expect(result).toContain("img1")
+    expect(result).not.toMatch(/\[link1\]\(https:\/\/example\.com\)/)
+    expect(result).not.toMatch(/!\[img1\]\(https:\/\/example\.com\/img1\.jpg\)/)
   })
 })
