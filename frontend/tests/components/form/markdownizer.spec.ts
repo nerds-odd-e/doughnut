@@ -130,6 +130,18 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(html).not.toMatch(/<\/p><p><br/)
     })
 
+    it("converts markdown with <br> and newline to HTML with one paragraph only", () => {
+      const markdown = "hello<br>\nworld"
+      const html = markdownizer.markdownToHtml(markdown)
+      const elm = markdownToHTMLElement(markdown)
+      // Should have only one paragraph
+      const paragraphs = elm.querySelectorAll("p")
+      expect(paragraphs.length).toBe(1)
+      expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
+      // Should not have a newline following the <br> tag
+      expect(html).not.toMatch(/<br[^>]*>\n/)
+    })
+
     it("joins single newlines in alphabetical text with space", () => {
       const markdown = "hello\nwork"
       const html = markdownizer.markdownToHtml(markdown)

@@ -91,10 +91,15 @@ export default function markdownToQuillHtml(
   // For alphabetical text, join with space
   // For mixed text, join with space (alphabetical text needs spaces)
   const joinSingleNewlinesInHtml = (html: string): string => {
+    // First, remove newlines that immediately follow HTML tag closing characters (>)
+    // This handles cases like <br>\nworld where the newline should be removed
+    const result = html.replace(/>\n([^\n<])/g, (_match, after) => {
+      return `>${after}`
+    })
     // Replace newline characters in HTML text content
     // This regex matches a newline that is between non-newline characters
     // and handles both plain text and text within HTML tags
-    return html.replace(/([^\n>])\n([^\n<])/g, (_match, before, after) => {
+    return result.replace(/([^\n>])\n([^\n<])/g, (_match, before, after) => {
       // Check if both sides contain CJK characters
       // CJK Unicode ranges:
       // - CJK Unified Ideographs: \u4E00-\u9FFF
