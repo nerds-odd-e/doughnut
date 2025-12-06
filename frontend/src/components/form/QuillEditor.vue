@@ -25,6 +25,9 @@ interface DeltaInstance {
 type DeltaConstructor = new (ops?: unknown) => DeltaInstance
 
 const Embed = Quill.import("blots/embed") as unknown as EmbedBlotConstructor
+const BlockEmbed = Quill.import(
+  "blots/block/embed"
+) as unknown as EmbedBlotConstructor
 const Delta = Quill.import("delta") as unknown as DeltaConstructor
 
 class SoftLineBreakBlot extends Embed {
@@ -38,13 +41,13 @@ class HorizontalRuleBlot extends Embed {
   static tagName = "hr"
 }
 
-class TableBlot extends Embed {
+class TableBlot extends BlockEmbed {
   static blotName = "table"
   static tagName = "table"
 
   static create(value: string | { html: string }) {
     // Quill.import returns dynamic types - use type assertion for static methods
-    // @ts-expect-error - Quill's Embed class has static create method but types don't reflect it
+    // @ts-expect-error - Quill's BlockEmbed class has static create method but types don't reflect it
     const node = super.create() as HTMLElement
     const html = typeof value === "string" ? value : value.html
     node.innerHTML = html
