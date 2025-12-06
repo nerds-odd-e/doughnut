@@ -145,6 +145,20 @@ export const assumeNotePage = (noteTopology?: string) => {
             : cy.get('[role=details]').should('contain', line)
         )
     },
+    expectNoteDetailsContainLineBreak: () => {
+      cy.get('[role=details]').within(() => {
+        // Verify that "Hello" is immediately followed by a <br> tag
+        cy.get('.ql-editor, [contenteditable]').should(($el) => {
+          const html = $el.html()
+          // Check that "Hello" is immediately followed by a <br> tag (with optional whitespace/newlines)
+          // This ensures the <br> is right after "Hello", not somewhere else
+          const match = html.match(/Hello\s*<br[^>]*>/i)
+          expect(match).to.not.be.null
+          // Also verify "World" comes after the <br>
+          expect(html).to.match(/Hello\s*<br[^>]*>\s*World/i)
+        })
+      })
+    },
     toolbarButton: (btnTextOrTitle: string) => {
       return privateToolbarButton(btnTextOrTitle)
     },
@@ -153,13 +167,19 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.findByRole('button', { name: 'OK' }).click()
     },
     editTextContent: (noteAttributes: Record<string, string>) => {
+      const parseSpecialKeys = (text: string): string => {
+        // Replace <Shift-Enter> with Cypress key sequence {shift}{enter}
+        return text.replace(/<Shift-Enter>/g, '{shift}{enter}')
+      }
+
       for (const propName in noteAttributes) {
         const value = noteAttributes[propName]
         if (value) {
           cy.findByRole(propName.toLowerCase()).click()
           // Only call cy.tick if the clock is mocked
           cy.state && cy.state('clock') && cy.tick(5000)
-          cy.clearFocusedText().type(value).blur()
+          const parsedValue = parseSpecialKeys(value)
+          cy.clearFocusedText().type(parsedValue).blur()
           cy.get('.dirty').should('not.exist')
         }
       }

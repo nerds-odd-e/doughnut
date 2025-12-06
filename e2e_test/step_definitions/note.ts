@@ -568,3 +568,7 @@ Then(
       .findNoteDetails(expectedDetails)
   }
 )
+
+Then('the note details should contain a line break', () => {
+  start.assumeNotePage().expectNoteDetailsContainLineBreak()
+})

@@ -81,3 +81,11 @@ Feature: Note Edit
     Then I should see the note tree in the sidebar
       | note-title        |
       | Critical thinking |
+
+  Scenario: Edit a note details with Shift-Enter adds line break
+    When I update note "LeSS in Action" to become:
+      | Title     | Details              |
+      | Odd-e CSD | Hello<Shift-Enter>World |
+    Then I should see "Hello" in the page
+    And I should see "World" in the page
+    And the note details should contain a line break
