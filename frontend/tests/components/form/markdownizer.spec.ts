@@ -211,6 +211,18 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(html).toBe(expectedHtml)
     })
 
+    it("escapes HTML tags in markdown code block content", () => {
+      const markdown = "```\n<p>X</p>\n```"
+      const html = markdownizer.markdownToHtml(markdown)
+      const elm = markdownToHTMLElement(markdown)
+      const codeBlock = elm.querySelector(".ql-code-block")
+      expect(codeBlock).not.toBeNull()
+      // The HTML tags should be escaped in the ql-code-block
+      expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
+      // The textContent should still show the original content
+      expect(codeBlock?.textContent).toBe("<p>X</p>")
+    })
+
     it("uses plain <pre> HTML when preserve_pre option is true", () => {
       const markdown = "```\ncode content\n```"
       const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
@@ -220,6 +232,19 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(html).toContain("code content")
       expect(html).not.toContain("ql-code-block-container")
       expect(html).not.toContain("ql-code-block")
+    })
+
+    it("escapes HTML tags in <pre> when preserve_pre option is true", () => {
+      const markdown = "```\n<p>X</p>\n```"
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+      const div = document.createElement("div")
+      div.innerHTML = html
+      const pre = div.querySelector("pre")
+      expect(pre).not.toBeNull()
+      // The HTML tags should be escaped in the <pre> tag
+      expect(html).toContain("&lt;p&gt;X&lt;/p&gt;")
+      // The textContent should still show the original content
+      expect(pre?.textContent).toBe("<p>X</p>")
     })
 
     it("uses ql-code-block style by default when preserve_pre is false", () => {

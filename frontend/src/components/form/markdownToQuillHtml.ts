@@ -152,7 +152,8 @@ export default function markdownToQuillHtml(
 
     // If preserve_pre is true, use plain <pre> tags
     if (preservePre) {
-      return `<pre><code>${content}</code></pre>`
+      // Escape HTML tags in <pre> content
+      return `<pre><code>${escapeHtml(content)}</code></pre>`
     }
 
     // Otherwise, use Quill code block format
@@ -163,7 +164,8 @@ export default function markdownToQuillHtml(
       if (line.length === 0) {
         return `<div class="ql-code-block" data-language="${language}"><br></div>`
       }
-      return `<div class="ql-code-block" data-language="${language}">${line}</div>`
+      // Escape HTML tags in code block content
+      return `<div class="ql-code-block" data-language="${language}">${escapeHtml(line)}</div>`
     })
     return `<div class="ql-code-block-container" spellcheck="false">${codeBlocks.join("")}</div>`
   }
