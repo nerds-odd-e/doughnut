@@ -101,6 +101,20 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(result).toBe("<p>raw &lt;span&gt; is ok.</p>")
     })
 
+    it("wraps <br> in a <p> tag when surrounded by double newlines", () => {
+      const markdown = "hello\n\n<br>\n\nworld"
+      const elm = markdownToHTMLElement(markdown)
+      // The <br> should be wrapped in a <p> tag
+      const brParagraph = elm.querySelector("p br")
+      expect(brParagraph).not.toBeNull()
+      // Should have three paragraphs: hello, <br>, world
+      const paragraphs = elm.querySelectorAll("p")
+      expect(paragraphs.length).toBe(3)
+      expect(paragraphs[0]?.textContent).toBe("hello")
+      expect(paragraphs[1]?.querySelector("br")).not.toBeNull()
+      expect(paragraphs[2]?.textContent).toBe("world")
+    })
+
     it("joins single newlines in alphabetical text with space", () => {
       const markdown = "hello\nwork"
       const html = markdownizer.markdownToHtml(markdown)

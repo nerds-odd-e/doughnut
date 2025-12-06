@@ -163,6 +163,16 @@ export default function markdownToQuillHtml(
     return `<div class="ql-code-block-container" spellcheck="false">${codeBlocks.join("")}</div>`
   }
 
+  // Helper function to wrap standalone <br> tags in <p> tags
+  const wrapStandaloneBrInParagraph = (html: string): string => {
+    // Match <br class="softbreak"> that appears between </p> and <p> tags
+    // This pattern matches: </p><br class="softbreak"><p>
+    return html.replace(
+      /<\/p><br class="softbreak"><p>/g,
+      '</p><p><br class="softbreak"></p><p>'
+    )
+  }
+
   // Set up the parser with the custom renderer
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser
@@ -174,5 +184,8 @@ export default function markdownToQuillHtml(
   const result = parser.parse(tokens)
 
   // Modify the final return to handle any remaining HTML list conversions
-  return convertHtmlList(result.trim().replace(/>\s+</g, "><"))
+  // and wrap standalone <br> tags in paragraphs
+  return wrapStandaloneBrInParagraph(
+    convertHtmlList(result.trim().replace(/>\s+</g, "><"))
+  )
 }
