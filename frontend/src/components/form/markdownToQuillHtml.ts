@@ -80,9 +80,42 @@ export default function markdownToQuillHtml(
     return `<li${indentClass} data-list="${itemType}">${text}</li>`
   }
 
+  // Helper function to join lines with single newlines in HTML text content
+  // For CJK (Chinese, Japanese, Korean) characters, join without space
+  // For alphabetical text, join with space
+  // For mixed text, join with space (alphabetical text needs spaces)
+  const joinSingleNewlinesInHtml = (html: string): string => {
+    // Replace newline characters in HTML text content
+    // This regex matches a newline that is between non-newline characters
+    // and handles both plain text and text within HTML tags
+    return html.replace(/([^\n>])\n([^\n<])/g, (_match, before, after) => {
+      // Check if both sides contain CJK characters
+      // CJK Unicode ranges:
+      // - CJK Unified Ideographs: \u4E00-\u9FFF
+      // - Hiragana: \u3040-\u309F
+      // - Katakana: \u30A0-\u30FF
+      // - Hangul: \uAC00-\uD7AF
+      const cjkRegex = /[\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF]/
+      const beforeIsCJK = cjkRegex.test(before)
+      const afterIsCJK = cjkRegex.test(after)
+
+      // Only join without space if both sides are CJK
+      // Otherwise join with space (for alphabetical or mixed text)
+      return beforeIsCJK && afterIsCJK
+        ? `${before}${after}`
+        : `${before} ${after}`
+    })
+  }
+
   // Override the paragraph method
   renderer.paragraph = function (token: Tokens.Paragraph): string {
-    const text = this.parser!.parseInline(token.tokens)
+    // Parse inline tokens to get HTML
+    let text = this.parser!.parseInline(token.tokens)
+
+    // Join single newlines in the HTML text content
+    // This handles newlines that might be preserved in the HTML output
+    text = joinSingleNewlinesInHtml(text)
+
     if (indentLevel >= 0) {
       // Inside a list, don't wrap text in <p> tags
       return text

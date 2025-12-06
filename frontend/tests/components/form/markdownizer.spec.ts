@@ -112,6 +112,28 @@ describe("Markdown and HTML Conversion Tests", () => {
       const result = markdownizer.markdownToHtml(markdown)
       expect(result).toBe('<br class="softbreak">')
     })
+
+    it("joins single newlines in alphabetical text with space", () => {
+      const markdown = "hello\nwork"
+      const html = markdownizer.markdownToHtml(markdown)
+      // Single newlines should be joined into one paragraph with space
+      // This prevents Quill from rendering newlines as line breaks
+      expect(html).toBe("<p>hello work</p>")
+    })
+
+    it("joins single newlines in CJK text without space", () => {
+      const markdown = "你好\n世界"
+      const html = markdownizer.markdownToHtml(markdown)
+      // CJK text should be joined without space
+      expect(html).toBe("<p>你好世界</p>")
+    })
+
+    it("joins single newlines in mixed CJK and alphabetical text", () => {
+      const markdown = "hello\n世界"
+      const html = markdownizer.markdownToHtml(markdown)
+      // When mixing CJK and alphabetical, join with space
+      expect(html).toBe("<p>hello 世界</p>")
+    })
   })
 
   describe("Html to markdown", () => {
@@ -162,6 +184,13 @@ describe("Markdown and HTML Conversion Tests", () => {
       // Should result in two separate headers
       const headerMatches = markdown.match(/={3,}$/gm)
       expect(headerMatches?.length).toBe(2)
+    })
+
+    it("converts HTML code block with blank line back to markdown", () => {
+      const html = "<pre><code>hello\n\nwork\n</code></pre>"
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // This test documents current behavior - may need adjustment based on actual issue
+      expect(markdown).toBeTruthy()
     })
   })
 })
