@@ -25,6 +25,7 @@
     "mini-debounce": "^1.0.8",
     "quill": "2.0.3",
     "turndown": "^7.2.2",
+    "turndown-plugin-gfm": "^1.0.2",
     "vue-content-loader": "2.0.1",
     "vue-router": "4.6.3",
     "vue-toastification": "2.0.0-rc.5"

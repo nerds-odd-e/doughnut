@@ -1,8 +1,11 @@
 import TurndownService from "turndown"
+import { gfm } from "turndown-plugin-gfm"
 
 export const turndownService = new TurndownService({
   br: "<br>",
 })
+
+turndownService.use(gfm)
 
 turndownService.addRule("quillListItem", {
   filter(node) {
