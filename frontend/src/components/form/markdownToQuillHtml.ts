@@ -164,6 +164,7 @@ export default function markdownToQuillHtml(
   }
 
   // Helper function to wrap standalone <br> tags in <p> tags
+  // Only wraps <br> tags that appear between paragraphs, not ones inside paragraphs
   const wrapStandaloneBrInParagraph = (html: string): string => {
     // Match <br class="softbreak"> that appears between </p> and <p> tags
     // This pattern matches: </p><br class="softbreak"><p>
@@ -184,7 +185,7 @@ export default function markdownToQuillHtml(
   const result = parser.parse(tokens)
 
   // Modify the final return to handle any remaining HTML list conversions
-  // and wrap standalone <br> tags in paragraphs
+  // and wrap standalone <br> tags in paragraphs (only those between paragraphs)
   return wrapStandaloneBrInParagraph(
     convertHtmlList(result.trim().replace(/>\s+</g, "><"))
   )

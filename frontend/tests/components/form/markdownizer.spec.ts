@@ -115,6 +115,21 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(paragraphs[2]?.textContent).toBe("world")
     })
 
+    it("does not wrap <br> in a <p> tag when it's inside a paragraph", () => {
+      const markdown = "abc<br>\ndef"
+      const html = markdownizer.markdownToHtml(markdown)
+      const elm = markdownToHTMLElement(markdown)
+      // The <br> should be inside a single paragraph, not wrapped in its own paragraph
+      const paragraphs = elm.querySelectorAll("p")
+      expect(paragraphs.length).toBe(1)
+      expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
+      // Should be a single paragraph with <br> inside
+      expect(html).toContain("<p>abc<br")
+      expect(html).toContain("def</p>")
+      // Should not have multiple paragraphs
+      expect(html).not.toMatch(/<\/p><p><br/)
+    })
+
     it("joins single newlines in alphabetical text with space", () => {
       const markdown = "hello\nwork"
       const html = markdownizer.markdownToHtml(markdown)
