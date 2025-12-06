@@ -51,7 +51,6 @@ Feature: Note Edit
       | li             | Specification by Example |
       | li.ql-indent-1 | Living documentation     |
 
-  @ignore
   Scenario: Edit a note's details with a markdown table
     When I update note "LeSS in Action" details using markdown to become:
       """
@@ -63,9 +62,11 @@ Feature: Note Edit
     Then I should see the rich content of the note with details:
       | Tag    | Content |
       | table  |         |
+      | thead  |         |
       | tr     |         |
-      | td     | Name    |
-      | td     | Score   |
+      | th     | Name    |
+      | th     | Score   |
+      | tbody  |         |
       | tr     |         |
       | td     | Alice   |
       | td     | 95      |
