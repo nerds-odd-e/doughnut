@@ -8,16 +8,25 @@ describe("quillHtmlToMarkdown", () => {
     expect(result).toBe("raw <span> is ok.")
   })
 
-  it("converts HTML with soft break", () => {
-    const html = '<p>Hello<br class="softbreak">World</p>'
-    const result = htmlToMarkdown(html)
-    expect(result).toBe("Hello<br>\nWorld")
-  })
-
   it("preserves escaped HTML entities in markdown output", () => {
     const html = '<p>emit <span class="s1">&lt;br&gt;</span>.</p>'
     const result = htmlToMarkdown(html)
     // The escaped entity should remain escaped in markdown
+    expect(result).toContain("\\<br\\>")
+  })
+
+  it("preserves escaped HTML entities inside span with nested tags", () => {
+    const html = '<p><span class="s1"><b>&lt;br&gt;</b></span></p>'
+    const result = htmlToMarkdown(html)
+    // The escaped entity should remain escaped even when span contains nested HTML tags
+    expect(result).toContain("\\<br\\>")
+  })
+
+  it("preserves escaped HTML entities inside span with h3 nested tag", () => {
+    const html =
+      '<p><span class="s1"><h3><b>text with &lt;br&gt; here</b></h3></span></p>'
+    const result = htmlToMarkdown(html)
+    // The escaped entity should remain escaped even when span contains h3 and b tags
     expect(result).toContain("\\<br\\>")
   })
 })

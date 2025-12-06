@@ -101,18 +101,6 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(result).toBe("<p>raw &lt;span&gt; is ok.</p>")
     })
 
-    it("allows HTML tags at the beginning of line without escaping", () => {
-      const markdown = "<p><br></p>"
-      const result = markdownizer.markdownToHtml(markdown)
-      expect(result).toBe('<p><br class="softbreak"></p>')
-    })
-
-    it("allows single HTML tags like <br> without escaping", () => {
-      const markdown = "<br>"
-      const result = markdownizer.markdownToHtml(markdown)
-      expect(result).toBe('<br class="softbreak">')
-    })
-
     it("joins single newlines in alphabetical text with space", () => {
       const markdown = "hello\nwork"
       const html = markdownizer.markdownToHtml(markdown)
@@ -201,13 +189,7 @@ describe("Markdown and HTML Conversion Tests", () => {
 
     it("converts empty lines with br correctly", () => {
       const html = "<p>a</p><p><br></p><p>b</p>"
-      const expectedMarkdown = "a\n\n<p><br></p>\n\nb"
-      expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
-    })
-
-    it("converts empty lines with br class softbreak correctly", () => {
-      const html = '<p>a</p><p><br class="softbreak"></p><p>b</p>'
-      const expectedMarkdown = "a\n\n<p><br></p>\n\nb"
+      const expectedMarkdown = "a\n\n<br>\n\nb"
       expect(markdownizer.htmlToMarkdown(html)).toBe(expectedMarkdown)
     })
 

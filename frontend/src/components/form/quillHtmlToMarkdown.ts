@@ -95,41 +95,88 @@ turndownService.addRule("p", {
   filter: "p",
   replacement(_, node: Node) {
     const replacement = (node as HTMLElement).innerHTML
-    if (replacement === "<br>" || replacement === '<br class="softbreak">') {
-      // Normalize <br class="softbreak"> to <br> in output
-      return "<p><br></p>"
-    }
     return replacement ? `\n\n${turndownService.turndown(replacement)}\n\n` : ""
   },
 })
 
-// Custom rule for spans that contain escaped HTML entities
+// Helper to check if an element has text nodes containing HTML tag patterns
+const hasTextNodesWithHtmlTags = (element: HTMLElement): boolean => {
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+  let node: Node | null
+  while ((node = walker.nextNode())) {
+    if (/<[a-zA-Z][a-zA-Z0-9]*\s*\/?>/.test(node.textContent || "")) {
+      return true
+    }
+  }
+  return false
+}
+
+// Helper to escape HTML tags in text nodes (they were originally escaped entities)
+const escapeHtmlTagsInTextNodes = (element: HTMLElement): string => {
+  let result = ""
+  for (const child of Array.from(element.childNodes)) {
+    if (child.nodeType === Node.TEXT_NODE) {
+      const text = child.textContent || ""
+      result += text.replace(
+        /<([a-zA-Z][a-zA-Z0-9]*)(\s*\/?)>/g,
+        (_match, tagName, selfClose) => `\\<${tagName}${selfClose}\\>`
+      )
+    } else if (child.nodeType === Node.ELEMENT_NODE) {
+      const childElement = child as HTMLElement
+      if (hasTextNodesWithHtmlTags(childElement)) {
+        // Recursively process child elements that have HTML tags in text nodes
+        result += escapeHtmlTagsInTextNodes(childElement)
+      } else {
+        result += turndownService.turndown(childElement.outerHTML)
+      }
+    }
+  }
+  return result
+}
+
+// Custom rule for spans that contain text nodes with HTML tag patterns (originally escaped entities)
 turndownService.addRule("spanWithEscapedEntities", {
   filter(node) {
     if (node.nodeName !== "SPAN") return false
-    const span = node as HTMLElement
-    return span.getAttribute("data-escaped-entities") === "true"
+    return hasTextNodesWithHtmlTags(node as HTMLElement)
   },
   replacement(_content, node) {
-    const span = node as HTMLElement
-    // Check child nodes - if we have text nodes containing HTML tags, escape them
-    let result = ""
-    for (const child of Array.from(span.childNodes)) {
-      if (child.nodeType === Node.TEXT_NODE) {
-        // Text node - escape any HTML tags in it (they were originally escaped entities)
-        const text = child.textContent || ""
-        result += text.replace(
-          /<([a-zA-Z][a-zA-Z0-9]*)(\s*\/?)>/g,
-          (_match, tagName, selfClose) => {
-            return `\\<${tagName}${selfClose}\\>`
-          }
-        )
-      } else if (child.nodeType === Node.ELEMENT_NODE) {
-        // Element node - convert it through turndown
-        result += turndownService.turndown((child as HTMLElement).outerHTML)
-      }
-    }
-    return result || turndownService.turndown(span.innerHTML)
+    return escapeHtmlTagsInTextNodes(node as HTMLElement)
+  },
+})
+
+// Custom rule for headers that contain text nodes with HTML tag patterns
+turndownService.addRule("headerWithEscapedEntities", {
+  filter(node) {
+    if (!/^H[1-6]$/.test(node.nodeName)) return false
+    return hasTextNodesWithHtmlTags(node as HTMLElement)
+  },
+  replacement(_content, node) {
+    const level = parseInt(node.nodeName[1]!, 10)
+    const prefix = `${"#".repeat(level)} `
+    return `\n\n${prefix}${escapeHtmlTagsInTextNodes(node as HTMLElement)}\n\n`
+  },
+})
+
+// Custom rule for bold/strong that contain text nodes with HTML tag patterns
+turndownService.addRule("boldWithEscapedEntities", {
+  filter(node) {
+    if (node.nodeName !== "B" && node.nodeName !== "STRONG") return false
+    return hasTextNodesWithHtmlTags(node as HTMLElement)
+  },
+  replacement(_content, node) {
+    return `**${escapeHtmlTagsInTextNodes(node as HTMLElement)}**`
+  },
+})
+
+// Custom rule for italic/em that contain text nodes with HTML tag patterns
+turndownService.addRule("italicWithEscapedEntities", {
+  filter(node) {
+    if (node.nodeName !== "I" && node.nodeName !== "EM") return false
+    return hasTextNodesWithHtmlTags(node as HTMLElement)
+  },
+  replacement(_content, node) {
+    return `*${escapeHtmlTagsInTextNodes(node as HTMLElement)}*`
   },
 })
 
@@ -164,33 +211,10 @@ const preserveCodeBlockContent = (html: string): string => {
   )
 }
 
-// Pre-process HTML to mark spans that contain escaped HTML entities
-// This allows us to escape them in the markdown output
-const markSpansWithEscapedEntities = (html: string): string => {
-  // Find spans that contain escaped HTML entities like &lt;br&gt;
-  // Match pattern: <span[^>]*>...&lt;...&gt;...</span>
-  return html.replace(
-    /<span([^>]*)>([^<]*(?:&lt;[^&]*&gt;[^<]*)*)<\/span>/g,
-    (match, attributes, content) => {
-      // Check if content contains escaped HTML entities
-      if (/&lt;[a-zA-Z][a-zA-Z0-9]*\s*\/?&gt;/.test(content)) {
-        // Add data attribute to mark this span
-        if (attributes.includes("data-escaped-entities")) {
-          return match // Already marked
-        }
-        return `<span${attributes} data-escaped-entities="true">${content}</span>`
-      }
-      return match
-    }
-  )
-}
-
 export default function htmlToMarkdown(html: string) {
-  // Pre-process HTML to mark spans containing escaped entities
-  const htmlWithMarkedSpans = markSpansWithEscapedEntities(html)
   // Pre-process HTML to preserve code block content before DOM parsing
-  const processedHtml = preserveCodeBlockContent(htmlWithMarkedSpans)
-  // Pre-process HTML to merge consecutive headers of the same level
+  const processedHtml = preserveCodeBlockContent(html)
+  // Parse HTML and merge consecutive headers of the same level
   const tempDiv = document.createElement("div")
   tempDiv.innerHTML = processedHtml
   mergeConsecutiveHeaders(tempDiv)
