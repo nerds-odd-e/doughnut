@@ -142,6 +142,17 @@ describe("Markdown and HTML Conversion Tests", () => {
         '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
       expect(html).toBe(expectedHtml)
     })
+
+    it("converts multi-line markdown code block with blank lines to multiple ql-code-block elements", () => {
+      const markdown = "```\nline1\nline2\n```"
+      const elm = markdownToHTMLElement(markdown)
+      const container = elm.querySelector(".ql-code-block-container")
+      expect(container).not.toBeNull()
+      const codeBlocks = elm.querySelectorAll(".ql-code-block")
+      expect(codeBlocks.length).toBe(2)
+      expect(codeBlocks[0]?.textContent).toBe("line1")
+      expect(codeBlocks[1]?.textContent).toBe("line2")
+    })
   })
 
   describe("Html to markdown", () => {

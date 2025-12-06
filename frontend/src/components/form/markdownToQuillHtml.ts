@@ -137,7 +137,17 @@ export default function markdownToQuillHtml(
   renderer.code = function (token: Tokens.Code): string {
     const language = token.lang || "plain"
     const content = token.text.trim()
-    return `<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="${language}">${content}</div></div>`
+    // Split content by newlines to create multiple code blocks
+    const lines = content.split(/\n/)
+    const codeBlocks = lines
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0)
+      .map(
+        (line) =>
+          `<div class="ql-code-block" data-language="${language}">${line}</div>`
+      )
+      .join("")
+    return `<div class="ql-code-block-container" spellcheck="false">${codeBlocks}</div>`
   }
 
   // Set up the parser with the custom renderer
