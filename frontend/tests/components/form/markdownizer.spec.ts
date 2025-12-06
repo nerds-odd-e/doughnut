@@ -237,5 +237,14 @@ describe("Markdown and HTML Conversion Tests", () => {
       // Should be formatted as a fenced code block with triple backticks
       expect(markdown).toMatch(/```[\s\S]*?Content[\s\S]*?```/)
     })
+
+    it("preserves leading spaces when converting Quill code block HTML to markdown", () => {
+      const html =
+        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">  indented line</div></div>'
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Leading spaces should be preserved in the markdown code block
+      expect(markdown).toContain("  indented line")
+      expect(markdown).toMatch(/```[\s\S]*? {2}indented line[\s\S]*?```/)
+    })
   })
 })
