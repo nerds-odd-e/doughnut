@@ -171,12 +171,20 @@ export default function markdownToQuillHtml(
   // Helper function to wrap standalone <br> tags in <p> tags
   // Only wraps <br> tags that appear between paragraphs, not ones inside paragraphs
   const wrapStandaloneBrInParagraph = (html: string): string => {
+    let result = html
     // Match <br class="softbreak"> that appears between </p> and <p> tags
     // This pattern matches: </p><br class="softbreak"><p>
-    return html.replace(
+    result = result.replace(
       /<\/p><br class="softbreak"><p>/g,
       '</p><p><br class="softbreak"></p><p>'
     )
+    // Also match <br class="softbreak"> that appears after closing header tags
+    // This pattern matches: </h[1-6]><br class="softbreak"> followed by <p> or end of string
+    result = result.replace(
+      /<\/h([1-6])><br class="softbreak">(<p>)/g,
+      '</h$1><p><br class="softbreak"></p>$2'
+    )
+    return result
   }
 
   // Set up the parser with the custom renderer

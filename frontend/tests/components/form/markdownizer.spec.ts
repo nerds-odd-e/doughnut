@@ -115,6 +115,19 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(paragraphs[2]?.textContent).toBe("world")
     })
 
+    it("wraps <br> in a <p> tag when surrounded by double newlines after header", () => {
+      const markdown = "hello\n=====\n\n<br>\n\nworld"
+      const elm = markdownToHTMLElement(markdown)
+      // The <br> should be wrapped in a <p> tag
+      const brParagraph = elm.querySelector("p br")
+      expect(brParagraph).not.toBeNull()
+      // Should have a header, then two paragraphs: <br>, world
+      const paragraphs = elm.querySelectorAll("p")
+      expect(paragraphs.length).toBe(2)
+      expect(paragraphs[0]?.querySelector("br")).not.toBeNull()
+      expect(paragraphs[1]?.textContent).toBe("world")
+    })
+
     it("does not wrap <br> in a <p> tag when it's inside a paragraph", () => {
       const markdown = "abc<br>\ndef"
       const html = markdownizer.markdownToHtml(markdown)
