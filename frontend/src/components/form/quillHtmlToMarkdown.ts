@@ -48,6 +48,26 @@ const mergeConsecutiveHeaders = (tempDiv: HTMLElement): void => {
   }
 }
 
+turndownService.addRule("quillCodeBlockContainer", {
+  filter(node) {
+    return (
+      node.nodeName === "DIV" &&
+      (node as HTMLElement).classList.contains("ql-code-block-container")
+    )
+  },
+  replacement(_, node) {
+    // Convert Quill code block container to markdown fenced code blocks
+    // Extract content from ql-code-block divs and join with newlines
+    const container = node as HTMLElement
+    const codeBlocks = container.querySelectorAll(".ql-code-block")
+    const lines = Array.from(codeBlocks).map(
+      (block) => block.textContent?.trim() || ""
+    )
+    const codeContent = lines.filter((line) => line.length > 0).join("\n")
+    return `\n\n\`\`\`\n${codeContent}\n\`\`\`\n\n`
+  },
+})
+
 turndownService.addRule("pre", {
   filter: "pre",
   replacement(content) {

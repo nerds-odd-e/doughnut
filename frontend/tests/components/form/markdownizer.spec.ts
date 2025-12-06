@@ -220,5 +220,15 @@ describe("Markdown and HTML Conversion Tests", () => {
       // Should be formatted as a fenced code block with triple backticks
       expect(markdown).toMatch(/```[\s\S]*?content[\s\S]*?```/)
     })
+
+    it("converts Quill code block HTML to markdown code block", () => {
+      const html =
+        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Quill code block should convert to markdown fenced code blocks
+      expect(markdown).toContain("Content")
+      // Should be formatted as a fenced code block with triple backticks
+      expect(markdown).toMatch(/```[\s\S]*?Content[\s\S]*?```/)
+    })
   })
 })
