@@ -31,14 +31,15 @@ export default function markdownToQuillHtml(
       return convertHtmlList(htmlContent)
     }
     const trimmed = htmlContent.trim()
-    // Allow <br> or <br/> (self-closing tags)
+    // Allow <br> or <br/> (self-closing tags) and convert to <br class="softbreak">
     if (/^<br\s*\/?>$/i.test(trimmed)) {
-      return htmlContent
+      return '<br class="softbreak">'
     }
     // Allow complete HTML tags matching <tag xxx>...</tag> pattern
     // This matches opening tag with optional attributes, content, and closing tag
     if (/^<[^>]+>[\s\S]*<\/[^>]+>$/.test(trimmed)) {
-      return htmlContent
+      // Replace <br> tags inside other HTML tags with <br class="softbreak">
+      return htmlContent.replace(/<br\s*\/?>/gi, '<br class="softbreak">')
     }
     // Escape all other HTML tags
     return escapeHtml(htmlContent)

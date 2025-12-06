@@ -52,8 +52,9 @@ turndownService.addRule("p", {
   filter: "p",
   replacement(_, node: Node) {
     const replacement = (node as HTMLElement).innerHTML
-    if (replacement === "<br>") {
-      return (node as HTMLElement).outerHTML
+    if (replacement === "<br>" || replacement === '<br class="softbreak">') {
+      // Normalize <br class="softbreak"> to <br> in output
+      return "<p><br></p>"
     }
     return replacement ? `\n\n${turndownService.turndown(replacement)}\n\n` : ""
   },
