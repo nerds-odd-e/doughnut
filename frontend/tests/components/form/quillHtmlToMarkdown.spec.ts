@@ -29,4 +29,16 @@ describe("quillHtmlToMarkdown", () => {
     // The escaped entity should remain escaped even when span contains h3 and b tags
     expect(result).toContain("\\<br\\>")
   })
+
+  it.skip("converts HTML with code blocks separated by hr to separate markdown code blocks", () => {
+    const html =
+      '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">A</div></div><p><hr></p><div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">B</div></div>'
+    const result = htmlToMarkdown(html)
+    // Should contain a code block with A only
+    expect(result).toContain("```\nA\n```")
+    // Should contain a code block with B only
+    expect(result).toContain("```\nB\n```")
+    // Should not merge A and B into a single code block
+    expect(result).not.toContain("```\nA\nB\n```")
+  })
 })
