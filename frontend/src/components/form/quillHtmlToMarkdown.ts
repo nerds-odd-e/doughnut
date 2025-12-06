@@ -214,12 +214,54 @@ const preserveCodeBlockContent = (html: string): string => {
   )
 }
 
+// Remove <p> tags inside table cells to prevent breaking table structure
+const normalizeTableCells = (tempDiv: HTMLElement): void => {
+  // Find all table cells (th and td)
+  const cells = tempDiv.querySelectorAll("th, td")
+  cells.forEach((cell) => {
+    // Find all <p> tags inside the cell
+    const paragraphs = Array.from(cell.querySelectorAll("p"))
+    paragraphs.forEach((p) => {
+      // Replace <p> with its content (unwrap)
+      const parent = p.parentNode
+      if (parent) {
+        while (p.firstChild) {
+          parent.insertBefore(p.firstChild, p)
+        }
+        parent.removeChild(p)
+      }
+    })
+    // Clean up any remaining whitespace-only text nodes at the start/end
+    const childNodes = Array.from(cell.childNodes)
+    // Remove leading whitespace-only text nodes
+    while (
+      childNodes.length > 0 &&
+      childNodes[0]?.nodeType === Node.TEXT_NODE &&
+      childNodes[0].textContent?.trim() === ""
+    ) {
+      cell.removeChild(childNodes[0]!)
+      childNodes.shift()
+    }
+    // Remove trailing whitespace-only text nodes
+    while (
+      childNodes.length > 0 &&
+      childNodes[childNodes.length - 1]?.nodeType === Node.TEXT_NODE &&
+      childNodes[childNodes.length - 1]?.textContent?.trim() === ""
+    ) {
+      cell.removeChild(childNodes[childNodes.length - 1]!)
+      childNodes.pop()
+    }
+  })
+}
+
 export default function htmlToMarkdown(html: string) {
   // Pre-process HTML to preserve code block content before DOM parsing
   const processedHtml = preserveCodeBlockContent(html)
   // Parse HTML and merge consecutive headers of the same level
   const tempDiv = document.createElement("div")
   tempDiv.innerHTML = processedHtml
+  // Normalize table cells by removing <p> tags inside them
+  normalizeTableCells(tempDiv)
   mergeConsecutiveHeaders(tempDiv)
   return turndownService.turndown(tempDiv.innerHTML)
 }

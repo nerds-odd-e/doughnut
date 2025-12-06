@@ -374,5 +374,78 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(markdown).toMatch(/\|.*Alice.*\|.*95.*\|/)
       expect(markdown).toMatch(/\|.*Bob.*\|.*88.*\|/)
     })
+
+    it("converts HTML table with nested p and b tags to markdown table", () => {
+      const html = `<table><thead><tr><th>
+
+<p class="p1"><b>Item</b></p>
+
+</th><th>
+
+<p class="p1"><b>Value</b></p>
+
+</th></tr></thead><tbody><tr><td>
+
+<p class="p1">A</p>
+
+</td><td>
+
+<p class="p1">17</p>
+
+</td></tr><tr><td>
+
+<p class="p1">B</p>
+
+</td><td>
+
+<p class="p1">42</p>
+
+</td></tr><tr><td>
+
+<p class="p1">C</p>
+
+</td><td>
+
+<p class="p1">9</p>
+
+</td></tr><tr><td>
+
+<p class="p1">D</p>
+
+</td><td>
+
+<p class="p1">28</p>
+
+</td></tr></tbody></table>`
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Should convert to markdown table format with pipes
+      expect(markdown).toContain("Item")
+      expect(markdown).toContain("Value")
+      expect(markdown).toContain("A")
+      expect(markdown).toContain("17")
+      expect(markdown).toContain("B")
+      expect(markdown).toContain("42")
+      expect(markdown).toContain("C")
+      expect(markdown).toContain("9")
+      expect(markdown).toContain("D")
+      expect(markdown).toContain("28")
+      // Item and Value should be on the same line (header row)
+      const lines = markdown.split("\n")
+      const headerLine = lines.find(
+        (line) => line.includes("Item") && line.includes("Value")
+      )
+      expect(headerLine).toBeDefined()
+      expect(headerLine).toMatch(/\|.*Item.*\|.*Value.*\|/)
+      // Should have table structure with pipes and separators (allowing for whitespace/newlines)
+      expect(markdown).toMatch(/\|[\s\S]*Item[\s\S]*\|[\s\S]*Value[\s\S]*\|/)
+      expect(markdown).toMatch(/\|[\s\S]*-+[\s\S]*\|[\s\S]*-+[\s\S]*\|/) // separator row
+      expect(markdown).toMatch(/\|[\s\S]*A[\s\S]*\|[\s\S]*17[\s\S]*\|/)
+      expect(markdown).toMatch(/\|[\s\S]*B[\s\S]*\|[\s\S]*42[\s\S]*\|/)
+      expect(markdown).toMatch(/\|[\s\S]*C[\s\S]*\|[\s\S]*9[\s\S]*\|/)
+      expect(markdown).toMatch(/\|[\s\S]*D[\s\S]*\|[\s\S]*28[\s\S]*\|/)
+      // Bold text in headers should be converted to markdown bold
+      expect(markdown).toMatch(/\*\*Item\*\*/)
+      expect(markdown).toMatch(/\*\*Value\*\*/)
+    })
   })
 })
