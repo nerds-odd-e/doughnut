@@ -13,4 +13,11 @@ describe("quillHtmlToMarkdown", () => {
     const result = htmlToMarkdown(html)
     expect(result).toBe("Hello<br>\nWorld")
   })
+
+  it("preserves escaped HTML entities in markdown output", () => {
+    const html = '<p>emit <span class="s1">&lt;br&gt;</span>.</p>'
+    const result = htmlToMarkdown(html)
+    // The escaped entity should remain escaped in markdown
+    expect(result).toContain("\\<br\\>")
+  })
 })

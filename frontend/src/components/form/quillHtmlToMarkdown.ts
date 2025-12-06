@@ -103,6 +103,36 @@ turndownService.addRule("p", {
   },
 })
 
+// Custom rule for spans that contain escaped HTML entities
+turndownService.addRule("spanWithEscapedEntities", {
+  filter(node) {
+    if (node.nodeName !== "SPAN") return false
+    const span = node as HTMLElement
+    return span.getAttribute("data-escaped-entities") === "true"
+  },
+  replacement(_content, node) {
+    const span = node as HTMLElement
+    // Check child nodes - if we have text nodes containing HTML tags, escape them
+    let result = ""
+    for (const child of Array.from(span.childNodes)) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        // Text node - escape any HTML tags in it (they were originally escaped entities)
+        const text = child.textContent || ""
+        result += text.replace(
+          /<([a-zA-Z][a-zA-Z0-9]*)(\s*\/?)>/g,
+          (_match, tagName, selfClose) => {
+            return `\\<${tagName}${selfClose}\\>`
+          }
+        )
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        // Element node - convert it through turndown
+        result += turndownService.turndown((child as HTMLElement).outerHTML)
+      }
+    }
+    return result || turndownService.turndown(span.innerHTML)
+  },
+})
+
 // Pre-process HTML to preserve code block content before DOM parsing
 const preserveCodeBlockContent = (html: string): string => {
   // Extract content from ql-code-block divs directly from the HTML string
@@ -134,9 +164,32 @@ const preserveCodeBlockContent = (html: string): string => {
   )
 }
 
+// Pre-process HTML to mark spans that contain escaped HTML entities
+// This allows us to escape them in the markdown output
+const markSpansWithEscapedEntities = (html: string): string => {
+  // Find spans that contain escaped HTML entities like &lt;br&gt;
+  // Match pattern: <span[^>]*>...&lt;...&gt;...</span>
+  return html.replace(
+    /<span([^>]*)>([^<]*(?:&lt;[^&]*&gt;[^<]*)*)<\/span>/g,
+    (match, attributes, content) => {
+      // Check if content contains escaped HTML entities
+      if (/&lt;[a-zA-Z][a-zA-Z0-9]*\s*\/?&gt;/.test(content)) {
+        // Add data attribute to mark this span
+        if (attributes.includes("data-escaped-entities")) {
+          return match // Already marked
+        }
+        return `<span${attributes} data-escaped-entities="true">${content}</span>`
+      }
+      return match
+    }
+  )
+}
+
 export default function htmlToMarkdown(html: string) {
+  // Pre-process HTML to mark spans containing escaped entities
+  const htmlWithMarkedSpans = markSpansWithEscapedEntities(html)
   // Pre-process HTML to preserve code block content before DOM parsing
-  const processedHtml = preserveCodeBlockContent(html)
+  const processedHtml = preserveCodeBlockContent(htmlWithMarkedSpans)
   // Pre-process HTML to merge consecutive headers of the same level
   const tempDiv = document.createElement("div")
   tempDiv.innerHTML = processedHtml

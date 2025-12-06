@@ -33,9 +33,18 @@ class SoftLineBreakBlot extends Embed {
   static className = "softbreak"
 }
 
+class HorizontalRuleBlot extends Embed {
+  static blotName = "horizontalrule"
+  static tagName = "hr"
+}
+
 // Quill.register accepts dynamic blot classes - the type system can't fully validate this
 Quill.register(
   SoftLineBreakBlot as unknown as Parameters<typeof Quill.register>[0],
+  true
+)
+Quill.register(
+  HorizontalRuleBlot as unknown as Parameters<typeof Quill.register>[0],
   true
 )
 
@@ -110,6 +119,7 @@ const options: QuillOptions = {
     "list",
     "link",
     "softbreak",
+    "horizontalrule",
   ],
   placeholder: readonly ? "" : "Enter note details here...",
   readOnly: readonly,
