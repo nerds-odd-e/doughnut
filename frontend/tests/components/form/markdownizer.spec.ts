@@ -277,5 +277,23 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(markdown).not.toContain("<br>")
       expect(markdown).toMatch(/```\n\n```/)
     })
+
+    it("converts HTML table to markdown table", () => {
+      const html =
+        "<table><thead><tr><th>Name</th><th>Score</th></tr></thead><tbody><tr><td>Alice</td><td>95</td></tr><tr><td>Bob</td><td>88</td></tr></tbody></table>"
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Should convert to markdown table format with pipes
+      expect(markdown).toContain("Name")
+      expect(markdown).toContain("Score")
+      expect(markdown).toContain("Alice")
+      expect(markdown).toContain("95")
+      expect(markdown).toContain("Bob")
+      expect(markdown).toContain("88")
+      // Should have table structure with pipes and separators
+      expect(markdown).toMatch(/\|.*Name.*\|.*Score.*\|/)
+      expect(markdown).toMatch(/\|.*-+.*\|.*-+.*\|/) // separator row
+      expect(markdown).toMatch(/\|.*Alice.*\|.*95.*\|/)
+      expect(markdown).toMatch(/\|.*Bob.*\|.*88.*\|/)
+    })
   })
 })
