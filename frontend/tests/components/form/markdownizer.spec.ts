@@ -168,6 +168,28 @@ describe("Markdown and HTML Conversion Tests", () => {
         '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
       expect(html).toBe(expectedHtml)
     })
+
+    it("uses plain <pre> HTML when preserve_pre option is true", () => {
+      const markdown = "```\ncode content\n```"
+      const html = markdownizer.markdownToHtml(markdown, { preserve_pre: true })
+      // Should use plain <pre> tags instead of ql-code-block style
+      expect(html).toContain("<pre>")
+      expect(html).toContain("</pre>")
+      expect(html).toContain("code content")
+      expect(html).not.toContain("ql-code-block-container")
+      expect(html).not.toContain("ql-code-block")
+    })
+
+    it("uses ql-code-block style by default when preserve_pre is false", () => {
+      const markdown = "```\ncode content\n```"
+      const html = markdownizer.markdownToHtml(markdown, {
+        preserve_pre: false,
+      })
+      // Should use ql-code-block style (default behavior)
+      expect(html).toContain("ql-code-block-container")
+      expect(html).toContain("ql-code-block")
+      expect(html).not.toContain("<pre>")
+    })
   })
 
   describe("Html to markdown", () => {

@@ -1,8 +1,14 @@
 import { marked, type Tokens } from "marked"
 
+export interface MarkdownToHtmlOptions {
+  preserve_pre?: boolean
+}
+
 export default function markdownToQuillHtml(
-  markdown: string | undefined
+  markdown: string | undefined,
+  options?: MarkdownToHtmlOptions
 ): string {
+  const preservePre = options?.preserve_pre ?? false
   const renderer = new marked.Renderer()
   let indentLevel = -1 // Variable to track indentation level
 
@@ -133,11 +139,18 @@ export default function markdownToQuillHtml(
     return `<blockquote>${cleanedBody}</blockquote>`
   }
 
-  // Override the code method to convert to Quill code block format
+  // Override the code method to convert to Quill code block format or plain <pre>
   renderer.code = function (token: Tokens.Code): string {
     const language = token.lang || "plain"
     // Use trimEnd() to preserve leading spaces on each line
     const content = token.text.trimEnd()
+
+    // If preserve_pre is true, use plain <pre> tags
+    if (preservePre) {
+      return `<pre><code>${content}</code></pre>`
+    }
+
+    // Otherwise, use Quill code block format
     // Split content by newlines to create multiple code blocks
     const lines = content.split(/\n/)
     const codeBlocks = lines.map((line) => {

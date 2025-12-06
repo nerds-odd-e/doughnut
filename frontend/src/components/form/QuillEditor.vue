@@ -141,7 +141,9 @@ onMounted(async () => {
               const htmlData = originalGetData(format)
               if (htmlData) {
                 const markdown = htmlToMarkdown(htmlData)
-                return markdownizer.markdownToHtml(markdown)
+                return markdownizer.markdownToHtml(markdown, {
+                  preserve_pre: true,
+                })
               }
             }
             return originalGetData(format)

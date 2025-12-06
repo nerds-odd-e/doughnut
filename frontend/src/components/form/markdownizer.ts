@@ -18,6 +18,9 @@ turndownService.addRule("p", {
 })
 
 export default {
-  markdownToHtml: markdownToQuillHtml,
+  markdownToHtml: (
+    markdown: string | undefined,
+    options?: { preserve_pre?: boolean }
+  ) => markdownToQuillHtml(markdown, options),
   htmlToMarkdown: quillHtmlToMarkdown,
 }
