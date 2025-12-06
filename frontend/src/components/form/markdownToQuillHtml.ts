@@ -133,6 +133,13 @@ export default function markdownToQuillHtml(
     return `<blockquote>${cleanedBody}</blockquote>`
   }
 
+  // Override the code method to convert to Quill code block format
+  renderer.code = function (token: Tokens.Code): string {
+    const language = token.lang || "plain"
+    const content = token.text.trim()
+    return `<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="${language}">${content}</div></div>`
+  }
+
   // Set up the parser with the custom renderer
   const parser = new marked.Parser({ renderer })
   renderer.parser = parser

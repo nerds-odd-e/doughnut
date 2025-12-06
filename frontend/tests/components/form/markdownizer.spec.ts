@@ -134,6 +134,14 @@ describe("Markdown and HTML Conversion Tests", () => {
       // When mixing CJK and alphabetical, join with space
       expect(html).toBe("<p>hello 世界</p>")
     })
+
+    it("converts markdown code block to Quill code block HTML", () => {
+      const markdown = "```\nContent\n```"
+      const html = markdownizer.markdownToHtml(markdown)
+      const expectedHtml =
+        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
+      expect(html).toBe(expectedHtml)
+    })
   })
 
   describe("Html to markdown", () => {
