@@ -136,11 +136,11 @@ export default function markdownToQuillHtml(
   // Override the code method to convert to Quill code block format
   renderer.code = function (token: Tokens.Code): string {
     const language = token.lang || "plain"
-    const content = token.text.trim()
+    // Use trimEnd() to preserve leading spaces on each line
+    const content = token.text.trimEnd()
     // Split content by newlines to create multiple code blocks
     const lines = content.split(/\n/)
     const codeBlocks = lines
-      .map((line) => line.trim())
       .filter((line) => line.length > 0)
       .map(
         (line) =>

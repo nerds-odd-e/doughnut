@@ -153,6 +153,13 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(codeBlocks[0]?.textContent).toBe("line1")
       expect(codeBlocks[1]?.textContent).toBe("line2")
     })
+
+    it("preserves leading spaces when converting markdown code block to HTML", () => {
+      const markdown = "```\n  indented line\n```"
+      const elm = markdownToHTMLElement(markdown)
+      const codeBlock = elm.querySelector(".ql-code-block")
+      expect(codeBlock?.textContent).toBe("  indented line")
+    })
   })
 
   describe("Html to markdown", () => {
