@@ -293,6 +293,42 @@ describe("repeat page", () => {
       return wrapper
     }
 
+    const toggleTreadmillMode = async (
+      wrapper: Awaited<ReturnType<typeof mountPage>>,
+      enabled: boolean
+    ) => {
+      const settingsButton = wrapper.find('button[title="Recall settings"]')
+
+      // Check if dialog is already open by looking for the checkbox
+      let toggle = document.body.querySelector(
+        'input[type="checkbox"]'
+      ) as HTMLInputElement
+
+      // If checkbox not found, click to open dialog
+      if (!toggle) {
+        await settingsButton.trigger("click")
+        await wrapper.vm.$nextTick()
+        await flushPromises()
+
+        // Wait for dialog to render
+        for (let i = 0; i < 10; i++) {
+          toggle = document.body.querySelector(
+            'input[type="checkbox"]'
+          ) as HTMLInputElement
+          if (toggle) break
+          await new Promise((resolve) => setTimeout(resolve, 10))
+        }
+      }
+
+      expect(toggle).toBeTruthy()
+      if (toggle) {
+        toggle.checked = enabled
+        toggle.dispatchEvent(new Event("change", { bubbles: true }))
+        await wrapper.vm.$nextTick()
+        await flushPromises()
+      }
+    }
+
     it("should show treadmill mode toggle in settings", async () => {
       const wrapper = await mountPage()
       await wrapper.find('button[title="Recall settings"]').trigger("click")
@@ -310,15 +346,7 @@ describe("repeat page", () => {
       expect(globalBar.text()).toContain("0/3")
 
       // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
+      await toggleTreadmillMode(wrapper, true)
 
       // Progress should now show 0/2 (excluding spelling tracker)
       expect(globalBar.text()).toContain("0/2")
@@ -335,15 +363,7 @@ describe("repeat page", () => {
       const wrapper = await mountPage()
 
       // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
+      await toggleTreadmillMode(wrapper, true)
 
       const globalBar = wrapper.findComponent({ name: "GlobalBar" })
       expect(globalBar.classes()).toContain("treadmill-mode")
@@ -353,15 +373,7 @@ describe("repeat page", () => {
       const wrapper = await mountPage()
 
       // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
+      await toggleTreadmillMode(wrapper, true)
 
       // Should skip spelling tracker and go to next normal one
       const quiz = wrapper.findComponent({ name: "Quiz" })
@@ -397,17 +409,7 @@ describe("repeat page", () => {
       expect(globalBar.text()).toMatch(/0\/[23]/)
 
       // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      await flushPromises()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
-      await flushPromises()
+      await toggleTreadmillMode(wrapper, true)
 
       // Should now show 2 (excluding spelling)
       expect(globalBar.text()).toContain("0/2")
@@ -426,16 +428,7 @@ describe("repeat page", () => {
       vm.currentIndex = 1
 
       // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
-      await flushPromises()
+      await toggleTreadmillMode(wrapper, true)
 
       // currentIndex should not be reset to 0
       // It should remain at 1 or be adjusted to point to a non-spelling tracker
@@ -456,16 +449,7 @@ describe("repeat page", () => {
       vm.currentIndex = initialIndex
 
       // Enable treadmill mode
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
-      await wrapper.vm.$nextTick()
-      const toggle = document.body.querySelector(
-        'input[type="checkbox"]'
-      ) as HTMLInputElement
-      expect(toggle).toBeTruthy()
-      toggle.checked = true
-      toggle.dispatchEvent(new Event("change", { bubbles: true }))
-      await wrapper.vm.$nextTick()
-      await flushPromises()
+      await toggleTreadmillMode(wrapper, true)
 
       // currentIndex should not be reset to 0
       // It may be adjusted to point to a non-spelling tracker, but should not go back to 0
@@ -476,6 +460,58 @@ describe("repeat page", () => {
       if (currentTracker) {
         expect(currentTracker.spelling).toBe(false)
       }
+    })
+
+    it("should move unanswered spelling memory trackers to the end when treadmill mode is turned off", async () => {
+      // Setup: normal, normal, spelling, normal
+      const fourthNormalTrackerId = 111
+      recallingSpy.mockResolvedValue(
+        wrapSdkResponse(
+          makeMe.aDueMemoryTrackersList
+            .toRepeat([
+              createMemoryTrackerLite(normalMemoryTrackerId, false),
+              createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
+              createMemoryTrackerLite(spellingMemoryTrackerId, true),
+              createMemoryTrackerLite(fourthNormalTrackerId, false),
+            ])
+            .please()
+        )
+      )
+
+      const wrapper = await mountPage()
+      await flushPromises()
+      type ExposedVM = {
+        toRepeat?: MemoryTrackerLite[]
+        currentIndex: number
+      }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      // Initial order: [normal(123), normal(789), spelling(456), normal(111)]
+      expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
+        normalMemoryTrackerId,
+        anotherNormalMemoryTrackerId,
+        spellingMemoryTrackerId,
+        fourthNormalTrackerId,
+      ])
+
+      // Enable treadmill mode
+      await toggleTreadmillMode(wrapper, true)
+
+      // Set currentIndex to 1 to simulate answering the first normal tracker
+      vm.currentIndex = 1
+      await wrapper.vm.$nextTick()
+
+      // Turn off treadmill mode
+      // Spelling tracker(456) at index 2 should be moved to the end
+      await toggleTreadmillMode(wrapper, false)
+
+      // Order should be: [normal(123), normal(789), normal(111), spelling(456)]
+      expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([
+        normalMemoryTrackerId,
+        anotherNormalMemoryTrackerId,
+        fourthNormalTrackerId,
+        spellingMemoryTrackerId,
+      ])
     })
   })
 })

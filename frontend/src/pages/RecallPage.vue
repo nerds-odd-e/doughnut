@@ -350,6 +350,30 @@ const handleTreadmillModeChanged = () => {
           currentIndex.value = firstNonSpelling
         }
       }
+    } else {
+      // When treadmill mode is turned off, move unanswered spelling trackers to the end
+      const unansweredSpellingTrackers: MemoryTrackerLite[] = []
+      const nonSpellingTrackers: MemoryTrackerLite[] = []
+
+      // Separate spelling and non-spelling trackers from currentIndex onwards
+      for (let i = currentIndex.value; i < toRepeat.value.length; i++) {
+        const tracker = toRepeat.value[i]
+        if (!tracker) continue
+        if (tracker.spelling) {
+          unansweredSpellingTrackers.push(tracker)
+        } else {
+          nonSpellingTrackers.push(tracker)
+        }
+      }
+
+      // Rebuild the list: answered trackers (before currentIndex) + non-spelling trackers + spelling trackers
+      if (unansweredSpellingTrackers.length > 0) {
+        toRepeat.value = [
+          ...toRepeat.value.slice(0, currentIndex.value),
+          ...nonSpellingTrackers,
+          ...unansweredSpellingTrackers,
+        ]
+      }
     }
     updateToRepeatCount()
   }
