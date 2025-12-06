@@ -192,5 +192,14 @@ describe("Markdown and HTML Conversion Tests", () => {
       // This test documents current behavior - may need adjustment based on actual issue
       expect(markdown).toBeTruthy()
     })
+
+    it("converts <pre>content</pre> to markdown code block", () => {
+      const html = "<pre>content</pre>"
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // <pre> tags should convert to markdown fenced code blocks
+      expect(markdown).toContain("content")
+      // Should be formatted as a fenced code block with triple backticks
+      expect(markdown).toMatch(/```[\s\S]*?content[\s\S]*?```/)
+    })
   })
 })

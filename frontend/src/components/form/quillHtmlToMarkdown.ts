@@ -48,6 +48,14 @@ const mergeConsecutiveHeaders = (tempDiv: HTMLElement): void => {
   }
 }
 
+turndownService.addRule("pre", {
+  filter: "pre",
+  replacement(content) {
+    // Convert <pre> tags to markdown fenced code blocks
+    return `\n\n\`\`\`\n${content.trim()}\n\`\`\`\n\n`
+  },
+})
+
 turndownService.addRule("p", {
   filter: "p",
   replacement(_, node: Node) {
