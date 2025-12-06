@@ -82,8 +82,11 @@ turndownService.addRule("quillCodeBlockContainer", {
 
 turndownService.addRule("pre", {
   filter: "pre",
-  replacement(content) {
+  replacement(_, node) {
     // Convert <pre> tags to markdown fenced code blocks
+    // Use textContent directly to avoid escaping special characters like underscores
+    const preElement = node as HTMLElement
+    const content = preElement.textContent || ""
     return `\n\n\`\`\`\n${content.trim()}\n\`\`\`\n\n`
   },
 })

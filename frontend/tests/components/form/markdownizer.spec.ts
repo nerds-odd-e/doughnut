@@ -258,6 +258,16 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(markdown).toMatch(/```[\s\S]*?content[\s\S]*?```/)
     })
 
+    it("does not escape underscore in <pre> tag when converting to markdown", () => {
+      const html = '<pre data-language="plain">\n\n_\n</pre>'
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Underscore should not be escaped in code blocks
+      expect(markdown).toContain("_")
+      expect(markdown).not.toContain("\\_")
+      // Should be formatted as a fenced code block with triple backticks
+      expect(markdown).toMatch(/```[\s\S]*?_\s*```/)
+    })
+
     it("converts Quill code block HTML to markdown code block", () => {
       const html =
         '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">Content</div></div>'
