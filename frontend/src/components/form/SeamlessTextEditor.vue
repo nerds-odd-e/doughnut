@@ -74,7 +74,10 @@ const onPaste = (event: ClipboardEvent) => {
         } else if (startContainer.parentNode === editor.value) {
           // Fallback: check if parent is editor
           start = range.startOffset
-          if (endContainer.nodeType === 3 && endContainer.parentNode === editor.value) {
+          if (
+            endContainer.nodeType === 3 &&
+            endContainer.parentNode === editor.value
+          ) {
             end = range.endOffset
           } else {
             end = range.startOffset

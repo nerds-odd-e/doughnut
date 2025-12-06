@@ -7,4 +7,10 @@ describe("quillHtmlToMarkdown", () => {
     const result = htmlToMarkdown(html)
     expect(result).toBe("raw <span> is ok.")
   })
+
+  it("converts HTML with soft break", () => {
+    const html = '<p>Hello<br class="softbreak">World</p>'
+    const result = htmlToMarkdown(html)
+    expect(result).toBe("Hello<br>\nWorld")
+  })
 })
