@@ -66,6 +66,29 @@ describe("Markdown and HTML Conversion Tests", () => {
       )
     })
 
+    it("converts simple markdown table to HTML", () => {
+      const markdown = `| Item | Value |\n| --- | --- |\n| A | 1 |`
+      const elm = markdownToHTMLElement(markdown)
+      const table = elm.querySelector("table")
+      expect(table).not.toBeNull()
+      const thead = table?.querySelector("thead")
+      expect(thead).not.toBeNull()
+      const headerRow = thead?.querySelector("tr")
+      expect(headerRow).not.toBeNull()
+      const headers = headerRow?.querySelectorAll("th")
+      expect(headers?.length).toBe(2)
+      expect(headers?.[0]?.textContent).toBe("Item")
+      expect(headers?.[1]?.textContent).toBe("Value")
+      const tbody = table?.querySelector("tbody")
+      expect(tbody).not.toBeNull()
+      const dataRow = tbody?.querySelector("tr")
+      expect(dataRow).not.toBeNull()
+      const cells = dataRow?.querySelectorAll("td")
+      expect(cells?.length).toBe(2)
+      expect(cells?.[0]?.textContent).toBe("A")
+      expect(cells?.[1]?.textContent).toBe("1")
+    })
+
     it("removes <p> tags from blockquotes", () => {
       const markdown = "> This is a quote"
       const html = markdownizer.markdownToHtml(markdown)

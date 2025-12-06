@@ -38,6 +38,25 @@ class HorizontalRuleBlot extends Embed {
   static tagName = "hr"
 }
 
+class TableBlot extends Embed {
+  static blotName = "table"
+  static tagName = "table"
+
+  static create(value: string | { html: string }) {
+    // Quill.import returns dynamic types - use type assertion for static methods
+    // @ts-expect-error - Quill's Embed class has static create method but types don't reflect it
+    const node = super.create() as HTMLElement
+    const html = typeof value === "string" ? value : value.html
+    node.innerHTML = html
+    node.setAttribute("contenteditable", "false")
+    return node
+  }
+
+  static value(node: HTMLElement) {
+    return { html: node.innerHTML }
+  }
+}
+
 // Quill.register accepts dynamic blot classes - the type system can't fully validate this
 Quill.register(
   SoftLineBreakBlot as unknown as Parameters<typeof Quill.register>[0],
@@ -45,6 +64,10 @@ Quill.register(
 )
 Quill.register(
   HorizontalRuleBlot as unknown as Parameters<typeof Quill.register>[0],
+  true
+)
+Quill.register(
+  TableBlot as unknown as Parameters<typeof Quill.register>[0],
   true
 )
 
@@ -120,6 +143,7 @@ const options: QuillOptions = {
     "link",
     "softbreak",
     "horizontalrule",
+    "table",
   ],
   placeholder: readonly ? "" : "Enter note details here...",
   readOnly: readonly,
