@@ -140,14 +140,14 @@ export default function markdownToQuillHtml(
     const content = token.text.trimEnd()
     // Split content by newlines to create multiple code blocks
     const lines = content.split(/\n/)
-    const codeBlocks = lines
-      .filter((line) => line.length > 0)
-      .map(
-        (line) =>
-          `<div class="ql-code-block" data-language="${language}">${line}</div>`
-      )
-      .join("")
-    return `<div class="ql-code-block-container" spellcheck="false">${codeBlocks}</div>`
+    const codeBlocks = lines.map((line) => {
+      // Empty lines should be converted to <br>
+      if (line.length === 0) {
+        return `<div class="ql-code-block" data-language="${language}"><br></div>`
+      }
+      return `<div class="ql-code-block" data-language="${language}">${line}</div>`
+    })
+    return `<div class="ql-code-block-container" spellcheck="false">${codeBlocks.join("")}</div>`
   }
 
   // Set up the parser with the custom renderer

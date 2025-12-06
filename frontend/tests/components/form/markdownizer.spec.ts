@@ -160,6 +160,14 @@ describe("Markdown and HTML Conversion Tests", () => {
       const codeBlock = elm.querySelector(".ql-code-block")
       expect(codeBlock?.textContent).toBe("  indented line")
     })
+
+    it("converts empty line in markdown code block to HTML with <br>", () => {
+      const markdown = "```\n\n```"
+      const html = markdownizer.markdownToHtml(markdown)
+      const expectedHtml =
+        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
+      expect(html).toBe(expectedHtml)
+    })
   })
 
   describe("Html to markdown", () => {
@@ -245,6 +253,15 @@ describe("Markdown and HTML Conversion Tests", () => {
       // Leading spaces should be preserved in the markdown code block
       expect(markdown).toContain("  indented line")
       expect(markdown).toMatch(/```[\s\S]*? {2}indented line[\s\S]*?```/)
+    })
+
+    it("converts empty line in Quill code block HTML to markdown as empty line, not <br>", () => {
+      const html =
+        '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain"><br></div></div>'
+      const markdown = markdownizer.htmlToMarkdown(html)
+      // Empty line should be converted to empty line in markdown, not <br>
+      expect(markdown).not.toContain("<br>")
+      expect(markdown).toMatch(/```\n\n```/)
     })
   })
 })

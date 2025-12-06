@@ -141,11 +141,6 @@ onMounted(async () => {
               const htmlData = originalGetData(format)
               if (htmlData) {
                 const markdown = htmlToMarkdown(htmlData)
-                console.log("markdown from markdownizer", markdown)
-                console.log(
-                  "html from markdownizer",
-                  markdownizer.markdownToHtml(markdown)
-                )
                 return markdownizer.markdownToHtml(markdown)
               }
             }

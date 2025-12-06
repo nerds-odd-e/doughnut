@@ -65,8 +65,17 @@ turndownService.addRule("quillCodeBlockContainer", {
     }
     // Fallback to extracting from DOM (may lose leading spaces)
     const codeBlocks = container.querySelectorAll(".ql-code-block")
-    const lines = Array.from(codeBlocks).map((block) => block.textContent || "")
-    const codeContent = lines.filter((line) => line.length > 0).join("\n")
+    const lines = Array.from(codeBlocks).map((block) => {
+      // Check if block contains only <br> tag
+      if (
+        block.innerHTML.trim() === "<br>" ||
+        block.innerHTML.trim() === "<br/>"
+      ) {
+        return ""
+      }
+      return block.textContent || ""
+    })
+    const codeContent = lines.join("\n")
     return `\n\n\`\`\`\n${codeContent}\n\`\`\`\n\n`
   },
 })
@@ -99,14 +108,16 @@ const preserveCodeBlockContent = (html: string): string => {
   const lines: string[] = []
   let blockMatch
   while ((blockMatch = blockRegex.exec(html)) !== null) {
-    const content = blockMatch[1]
+    let content = blockMatch[1]
       .replace(/&nbsp;/g, " ")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&amp;/g, "&")
-    if (content.length > 0) {
-      lines.push(content)
+    // Convert <br> or <br/> to empty line
+    if (/^<br\s*\/?>$/i.test(content.trim())) {
+      content = ""
     }
+    lines.push(content)
   }
   if (lines.length === 0) {
     return html
