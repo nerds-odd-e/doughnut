@@ -340,4 +340,190 @@ describe("NoteEditableDetails", () => {
     expect(textarea.value).toContain("Bold text")
     expect(textarea.value).toContain("existing")
   })
+
+  describe("HTML content normalization", () => {
+    it("should not save when value contains only <p><br></p> and last saved was also empty", async () => {
+      vi.useFakeTimers()
+
+      const noteId = 1
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId,
+          noteDetails: "",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+      detailsEl.value = "<p><br></p>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+
+      vi.useRealTimers()
+    })
+
+    it("should save when clearing content (from non-empty to <p><br></p>)", async () => {
+      vi.useFakeTimers()
+
+      const noteId = 1
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId,
+          noteDetails: "Original details",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+      detailsEl.value = "<p><br></p>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { details: "" },
+      })
+
+      vi.useRealTimers()
+    })
+
+    it("should not save when only addition is empty lines and <p><br></p> at the end", async () => {
+      vi.useFakeTimers()
+
+      const noteId = 1
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId,
+          noteDetails: "Original details",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+      detailsEl.value = "Original details\n\n<p><br></p>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+
+      vi.useRealTimers()
+    })
+
+    it("should save with trailing empty lines and <p><br></p> removed when change is not only at the end", async () => {
+      vi.useFakeTimers()
+
+      const noteId = 1
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId,
+          noteDetails: "Original details",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+      detailsEl.value = "Modified details\n\n<p><br></p>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { details: "Modified details" },
+      })
+
+      vi.useRealTimers()
+    })
+
+    it("should remove trailing consecutive empty lines, <br>, and <p><br></p>, and only save when there's content change", async () => {
+      vi.useFakeTimers()
+
+      const noteId = 1
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId,
+          noteDetails: "Original details",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const detailsEl = wrapper.find("textarea").element as HTMLTextAreaElement
+
+      // Test with trailing <br> tags
+      detailsEl.value = "Original details\n<br>\n<br>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      // Should not save because normalized value is the same
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+
+      // Test with trailing empty lines and <p><br></p>
+      detailsEl.value = "Original details\n\n\n<p><br></p>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      // Should not save because normalized value is the same
+      expect(updateNoteDetailsSpy).not.toHaveBeenCalled()
+
+      // Test with actual content change
+      detailsEl.value = "Modified content\n\n<br>\n<p><br></p>"
+      detailsEl.dispatchEvent(new Event("input"))
+      await flushPromises()
+
+      vi.advanceTimersByTime(1000)
+      await flushPromises()
+
+      // Should save with normalized value (trailing content removed)
+      expect(updateNoteDetailsSpy).toHaveBeenCalledWith({
+        path: { note: noteId },
+        body: { details: "Modified content" },
+      })
+
+      vi.useRealTimers()
+    })
+  })
 })

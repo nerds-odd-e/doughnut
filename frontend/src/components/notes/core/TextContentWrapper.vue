@@ -14,6 +14,7 @@ import { debounce } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed, onUnmounted, ref, watch } from "vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { normalizeNoteDetails } from "@/utils/normalizeNoteDetails"
 
 const storageAccessor = useStorageAccessor()
 
@@ -66,6 +67,22 @@ const onUpdate = (noteId: number, newValue: string) => {
   if (field === "edit title" && !newValue.trim()) {
     return
   }
+
+  if (field === "edit details") {
+    const normalizedNewValue = normalizeNoteDetails(newValue)
+    const normalizedLastSaved = normalizeNoteDetails(lastSavedValue.value ?? "")
+
+    if (normalizedNewValue === normalizedLastSaved) {
+      return
+    }
+
+    version.value += 1
+    errors.value = {}
+    localValue.value = newValue
+    changer(noteId, normalizedNewValue, version.value, setError)
+    return
+  }
+
   version.value += 1
   errors.value = {}
   localValue.value = newValue
