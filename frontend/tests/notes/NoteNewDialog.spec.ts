@@ -47,7 +47,7 @@ describe("adding new note", () => {
     vi.useRealTimers()
   })
 
-  const note = makeMe.aNote.topicConstructor("mythical").please()
+  const note = makeMe.aNote.titleConstructor("mythical").please()
 
   it("does not search for initial default 'Untitled' title", async () => {
     searchForLinkTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))

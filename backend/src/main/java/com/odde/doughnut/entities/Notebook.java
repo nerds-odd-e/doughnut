@@ -137,7 +137,7 @@ public class Notebook extends EntityIdentifiedByIdOnly {
 
   @NonNull
   public String getTitle() {
-    return headNote.getTopicConstructor();
+    return headNote.getTitleConstructor();
   }
 
   @NonNull

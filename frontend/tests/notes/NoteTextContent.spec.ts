@@ -9,7 +9,7 @@ import helper, { mockSdkServiceWithImplementation } from "@tests/helpers"
 const mockedUpdateTitleCall = vi.fn()
 
 describe("in place edit on title", () => {
-  const note = makeMe.aNote.topicConstructor("Dummy Title").please()
+  const note = makeMe.aNote.titleConstructor("Dummy Title").please()
   const mountComponent = (
     n: Note,
     readonly = false

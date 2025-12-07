@@ -95,7 +95,7 @@ public class ConversationService {
   public String getConversationSubject(Conversation conversation) {
     Note note = conversation.getSubject().getNote();
     if (note != null) {
-      return note.getTopicConstructor();
+      return note.getTitleConstructor();
     }
 
     AssessmentQuestionInstance assessmentQuestionInstance =
@@ -106,7 +106,7 @@ public class ConversationService {
 
     RecallPrompt recallPrompt = conversation.getSubject().getRecallPrompt();
     if (recallPrompt != null && recallPrompt.getPredefinedQuestion() != null) {
-      return recallPrompt.getPredefinedQuestion().getNote().getTopicConstructor();
+      return recallPrompt.getPredefinedQuestion().getNote().getTitleConstructor();
     }
 
     return "Unknown Subject";

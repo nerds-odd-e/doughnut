@@ -33,7 +33,7 @@ public class Subscription extends EntityIdentifiedByIdOnly {
   private Notebook notebook;
 
   public String getTitle() {
-    return notebook.getHeadNote().getTopicConstructor();
+    return notebook.getHeadNote().getTitleConstructor();
   }
 
   public Note getHeadNote() {

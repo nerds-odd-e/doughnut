@@ -2,7 +2,7 @@ import NoteEditingHistory from "@/store/NoteEditingHistory"
 import makeMe from "@tests/fixtures/makeMe"
 
 describe("storeUndoCommand", () => {
-  const note = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()
+  const note = makeMe.aNoteRealm.titleConstructor("Dummy Title").please()
 
   describe("addEditingToUndoHistory", () => {
     it("should push textContent into store state noteUndoHistories ", () => {

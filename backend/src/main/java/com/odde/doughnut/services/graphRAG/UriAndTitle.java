@@ -21,7 +21,7 @@ public class UriAndTitle {
 
   @JsonProperty("title")
   public String getTitle() {
-    return note.getTopicConstructor();
+    return note.getTitleConstructor();
   }
 
   public static UriAndTitle fromNote(Note note) {

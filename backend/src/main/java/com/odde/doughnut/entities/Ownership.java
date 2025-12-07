@@ -63,9 +63,9 @@ public class Ownership {
       Timestamp currentUTCTimestamp,
       NoteRepository noteRepository,
       EntityPersister entityPersister,
-      String topicConstructor) {
+      String titleConstructor) {
     final Note note = new Note();
-    note.initialize(user, null, currentUTCTimestamp, topicConstructor);
+    note.initialize(user, null, currentUTCTimestamp, titleConstructor);
     note.buildNotebookForHeadNote(this, user);
     entityPersister.save(note.getNotebook());
     entityPersister.save(note);

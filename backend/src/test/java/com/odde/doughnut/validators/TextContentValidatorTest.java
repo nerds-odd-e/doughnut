@@ -43,13 +43,13 @@ public class TextContentValidatorTest {
 
   @Test
   public void titleIsNotOptional() {
-    newNote.setTopicConstructor("");
+    newNote.setTitleConstructor("");
     assertThat(getViolations(), is(not(empty())));
   }
 
   @Test
   public void titleCannotBeTooLong() {
-    newNote.setTopicConstructor(makeMe.aStringOfLength(151));
+    newNote.setTitleConstructor(makeMe.aStringOfLength(151));
     assertThat(getViolations(), is(not(empty())));
   }
 

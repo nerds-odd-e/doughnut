@@ -43,8 +43,8 @@ public class NotebookService {
   }
 
   public Note createNotebookForOwnership(
-      Ownership ownership, User user, Timestamp currentUTCTimestamp, String topicConstructor) {
+      Ownership ownership, User user, Timestamp currentUTCTimestamp, String titleConstructor) {
     return ownership.createAndPersistNotebook(
-        user, currentUTCTimestamp, noteRepository, entityPersister, topicConstructor);
+        user, currentUTCTimestamp, noteRepository, entityPersister, titleConstructor);
   }
 }

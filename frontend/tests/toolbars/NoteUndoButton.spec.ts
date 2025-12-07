@@ -42,7 +42,7 @@ describe("NoteUndoButton", () => {
   describe("confirmation dialog", () => {
     describe("when note is in cache", () => {
       it("shows confirmation dialog with note title for delete note", async () => {
-        const noteRealm = makeMe.aNoteRealm.topicConstructor("My Note").please()
+        const noteRealm = makeMe.aNoteRealm.titleConstructor("My Note").please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
         noteEditingHistory.deleteNote(noteRealm.id)
@@ -63,7 +63,7 @@ describe("NoteUndoButton", () => {
 
       it("shows confirmation dialog with note title and diff for edit title", async () => {
         const noteRealm = makeMe.aNoteRealm
-          .topicConstructor("Test Note")
+          .titleConstructor("Test Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
@@ -93,7 +93,7 @@ describe("NoteUndoButton", () => {
 
       it("shows confirmation dialog with note title and diff for edit details", async () => {
         const noteRealm = makeMe.aNoteRealm
-          .topicConstructor("Details Note")
+          .titleConstructor("Details Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
@@ -123,7 +123,7 @@ describe("NoteUndoButton", () => {
 
       it("shows diff view for edit details with long content", async () => {
         const noteRealm = makeMe.aNoteRealm
-          .topicConstructor("Details Note")
+          .titleConstructor("Details Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
@@ -145,7 +145,7 @@ describe("NoteUndoButton", () => {
 
       it("shows HTML tags as part of markdown content in diff view", async () => {
         const noteRealm = makeMe.aNoteRealm
-          .topicConstructor("Details Note")
+          .titleConstructor("Details Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm)
@@ -294,10 +294,10 @@ describe("NoteUndoButton", () => {
     describe("discard functionality", () => {
       it("discards current undo item and shows next item when multiple items exist", async () => {
         const noteRealm1 = makeMe.aNoteRealm
-          .topicConstructor("First Note")
+          .titleConstructor("First Note")
           .please()
         const noteRealm2 = makeMe.aNoteRealm
-          .topicConstructor("Second Note")
+          .titleConstructor("Second Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm1)
@@ -349,10 +349,10 @@ describe("NoteUndoButton", () => {
 
       it("discards edit title item and shows next item", async () => {
         const noteRealm1 = makeMe.aNoteRealm
-          .topicConstructor("First Note")
+          .titleConstructor("First Note")
           .please()
         const noteRealm2 = makeMe.aNoteRealm
-          .topicConstructor("Second Note")
+          .titleConstructor("Second Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm1)
@@ -391,10 +391,10 @@ describe("NoteUndoButton", () => {
 
       it("discards edit details item and shows next item", async () => {
         const noteRealm1 = makeMe.aNoteRealm
-          .topicConstructor("First Note")
+          .titleConstructor("First Note")
           .please()
         const noteRealm2 = makeMe.aNoteRealm
-          .topicConstructor("Second Note")
+          .titleConstructor("Second Note")
           .please()
         const storageAccessor = useStorageAccessor()
         storageAccessor.value.refreshNoteRealm(noteRealm1)

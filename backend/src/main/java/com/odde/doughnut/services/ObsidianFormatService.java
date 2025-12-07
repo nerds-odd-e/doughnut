@@ -64,13 +64,13 @@ public class ObsidianFormatService {
 
     for (Note child : note.getChildren()) {
       String newPath =
-          path.isEmpty() ? note.getTopicConstructor() : path + "/" + note.getTopicConstructor();
+          path.isEmpty() ? note.getTitleConstructor() : path + "/" + note.getTitleConstructor();
       writeNoteToZip(child, zos, newPath);
     }
   }
 
   private String generateFilePath(String path, Note note) {
-    String sanitizedTopic = sanitizeFileName(note.getTopicConstructor());
+    String sanitizedTopic = sanitizeFileName(note.getTitleConstructor());
     String fileName =
         note.getChildren().isEmpty() ? sanitizedTopic + ".md" : sanitizedTopic + "/__index.md";
     return path.isEmpty() ? fileName : path + "/" + fileName;
@@ -95,7 +95,7 @@ public class ObsidianFormatService {
     return """
            # %s
            %s"""
-        .formatted(note.getTopicConstructor(), note.getDetails());
+        .formatted(note.getTitleConstructor(), note.getDetails());
   }
 
   private String sanitizeFileName(String fileName) {
@@ -185,7 +185,7 @@ public class ObsidianFormatService {
 
   private Note findExistingNote(Note parent, String noteName) {
     return parent.getChildren().stream()
-        .filter(note -> note.getTopicConstructor().equals(noteName))
+        .filter(note -> note.getTitleConstructor().equals(noteName))
         .findFirst()
         .orElse(null);
   }
@@ -206,7 +206,7 @@ public class ObsidianFormatService {
 
         if (existingNote != null) {
           // Update existing note instead of creating new one
-          updateExistingNote(existingNote, parts[2].trim(), note.getTopicConstructor());
+          updateExistingNote(existingNote, parts[2].trim(), note.getTitleConstructor());
           // Copy the children to the existing note
           note.getChildren().forEach(child -> child.setParentNote(existingNote));
           // Remove the temporary note
@@ -243,7 +243,7 @@ public class ObsidianFormatService {
   }
 
   private void updateExistingNote(Note existingNote, String content, String newTitle) {
-    existingNote.setTopicConstructor(newTitle);
+    existingNote.setTitleConstructor(newTitle);
     if (content.startsWith("# ")) {
       int nextLineIndex = content.indexOf('\n');
       if (nextLineIndex != -1) {

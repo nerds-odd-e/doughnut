@@ -43,7 +43,7 @@ class ConversationHistoryBuilderTest {
       ChatCompletionMessageParam firstMessage = history.get(0);
       assertTrue(firstMessage.system().isPresent());
       ChatCompletionSystemMessageParam systemMessage = firstMessage.system().get();
-      assertTrue(systemMessage.content().toString().contains(note.getTopicConstructor()));
+      assertTrue(systemMessage.content().toString().contains(note.getTitleConstructor()));
     }
 
     @Test

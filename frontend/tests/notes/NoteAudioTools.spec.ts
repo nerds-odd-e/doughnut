@@ -549,7 +549,7 @@ describe("NoteAudioTools", () => {
     })
 
     it("suggests title for power-of-2 audio processes", async () => {
-      const note = makeMe.aNote.topicConstructor("Untitled").please()
+      const note = makeMe.aNote.titleConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
         .withCleanStorage()
@@ -572,7 +572,7 @@ describe("NoteAudioTools", () => {
     })
 
     it("does not update title when suggestion is empty", async () => {
-      const note = makeMe.aNote.topicConstructor("Untitled").please()
+      const note = makeMe.aNote.titleConstructor("Untitled").please()
       wrapper = helper
         .component(NoteAudioTools)
         .withCleanStorage()

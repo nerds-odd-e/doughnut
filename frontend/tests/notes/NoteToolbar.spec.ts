@@ -6,7 +6,7 @@ import { mockSdkService } from "@tests/helpers"
 import type { NoteInfo } from "@generated/backend"
 
 it("displays menu items when dropdown is open", async () => {
-  const noteRealm = makeMe.aNoteRealm.topicConstructor("Dummy Title").please()
+  const noteRealm = makeMe.aNoteRealm.titleConstructor("Dummy Title").please()
   const mockNoteInfo: NoteInfo = {
     note: noteRealm,
     recallSetting: {

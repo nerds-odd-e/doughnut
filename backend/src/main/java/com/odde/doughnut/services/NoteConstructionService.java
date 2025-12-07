@@ -42,11 +42,11 @@ public class NoteConstructionService {
     this.noteService = noteService;
   }
 
-  public Note createNote(Note parentNote, String topicConstructor) {
+  public Note createNote(Note parentNote, String titleConstructor) {
     final Note note = new Note();
     User user = authorizationService.getCurrentUser();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    note.initialize(user, parentNote, currentUTCTimestamp, topicConstructor);
+    note.initialize(user, parentNote, currentUTCTimestamp, titleConstructor);
     if (entityPersister != null) {
       entityPersister.save(note);
     }
@@ -54,9 +54,9 @@ public class NoteConstructionService {
   }
 
   private Note createNoteWithWikidataInfo(
-      Note parentNote, WikidataIdWithApi wikidataIdWithApi, String topicConstructor)
+      Note parentNote, WikidataIdWithApi wikidataIdWithApi, String titleConstructor)
       throws DuplicateWikidataIdException, IOException, InterruptedException {
-    Note note = createNote(parentNote, topicConstructor);
+    Note note = createNote(parentNote, titleConstructor);
     if (wikidataIdWithApi != null) {
       wikidataIdWithApi.associateNoteToWikidata(note, noteService);
       wikidataIdWithApi.getCountryOfOrigin().ifPresent(wwa -> createSubNote(note, wwa));

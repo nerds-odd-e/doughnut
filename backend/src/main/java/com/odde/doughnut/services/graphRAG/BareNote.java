@@ -50,12 +50,12 @@ public class BareNote {
 
   @JsonProperty("title")
   public String getTitle() {
-    return getObjectUriAndTitle() != null ? null : note.getTopicConstructor();
+    return getObjectUriAndTitle() != null ? null : note.getTitleConstructor();
   }
 
   @JsonProperty("predicate")
   public String getPredicate() {
-    return getObjectUriAndTitle() != null ? note.getTopicConstructor() : null;
+    return getObjectUriAndTitle() != null ? note.getTitleConstructor() : null;
   }
 
   @JsonProperty("objectUriAndTitle")

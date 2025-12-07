@@ -23,7 +23,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   public NoteBuilder(MakeMe makeMe) {
     super(makeMe, new Note());
     entity.initialize(null, null, new Timestamp(System.currentTimeMillis()), "");
-    if (Strings.isEmpty(entity.getTopicConstructor())) titleConstructor(titleCounter.generate());
+    if (Strings.isEmpty(entity.getTitleConstructor())) titleConstructor(titleCounter.generate());
     details("descrption");
     updatedAt(entity.getCreatedAt());
   }
@@ -116,7 +116,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder titleConstructor(String text) {
-    entity.setTopicConstructor(text);
+    entity.setTitleConstructor(text);
     return this;
   }
 

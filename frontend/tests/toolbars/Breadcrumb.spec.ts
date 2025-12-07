@@ -4,9 +4,9 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
 describe("breadcrumb with circles", () => {
-  const parentNote = makeMe.aNote.topicConstructor("parent").please()
+  const parentNote = makeMe.aNote.titleConstructor("parent").please()
   const child = makeMe.aNote
-    .topicConstructor("child")
+    .titleConstructor("child")
     .underNote(parentNote)
     .please()
   const grandChild = makeMe.aNote.underNote(child).please()

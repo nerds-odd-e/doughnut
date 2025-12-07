@@ -53,7 +53,7 @@ public class AssessmentAttempt extends EntityIdentifiedByIdOnly {
   }
 
   public String getNotebookTitle() {
-    return getNotebook().getHeadNote().getTopicConstructor();
+    return getNotebook().getHeadNote().getTitleConstructor();
   }
 
   public Boolean getIsPass() {

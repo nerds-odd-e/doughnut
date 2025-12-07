@@ -316,7 +316,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .spelling()
               .please();
       recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+      answerDTO.setSpellingAnswer(answerNote.getTitleConstructor());
     }
 
     @Test
@@ -355,14 +355,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void shouldCreateAnswerEntityForSpellingQuestion() throws UnexpectedNoAccessRightException {
-      answerDTO.setSpellingAnswer(answerNote.getTopicConstructor());
+      answerDTO.setSpellingAnswer(answerNote.getTitleConstructor());
       answerDTO.setThinkingTimeMs(3000);
       controller.answerSpelling(recallPrompt, answerDTO);
 
       RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
       Answer answer = reloadedPrompt.getAnswer();
       assertNotNull(answer);
-      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTopicConstructor()));
+      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTitleConstructor()));
       assertThat(answer.getThinkingTimeMs(), equalTo(3000));
       assertTrue(answer.getCorrect());
     }
@@ -404,7 +404,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     void shouldValidateRecallPromptIsSpellingType() {
       RecallPrompt mcqPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      answer.setSpellingAnswer(answerNote.getTopicConstructor());
+      answer.setSpellingAnswer(answerNote.getTitleConstructor());
       assertThrows(
           IllegalArgumentException.class, () -> controller.answerSpelling(mcqPrompt, answer));
     }

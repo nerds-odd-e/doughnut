@@ -53,7 +53,7 @@ class ObsidianFormatServiceTest {
   @Test
   void shouldGenerateValidZipFileWithCorrectStructureAndContent() throws IOException {
     // Arrange
-    headNote.setTopicConstructor("Root Note");
+    headNote.setTitleConstructor("Root Note");
     headNote.setDetails("Root Content");
     Note note1 = makeMe.aNote("Parent Note").under(headNote).details("Parent Content").please();
     Note note2 = makeMe.aNote("Child Note").under(note1).details("Child Content").please();
@@ -154,7 +154,7 @@ class ObsidianFormatServiceTest {
     assertThat(zipContents.size(), org.hamcrest.Matchers.greaterThan(0));
 
     // Verify the file names in the zip content - using the actual title of the head note
-    String headNoteTitle = headNote.getTopicConstructor();
+    String headNoteTitle = headNote.getTitleConstructor();
     assertThat(
         zipContents.keySet(),
         hasItems(

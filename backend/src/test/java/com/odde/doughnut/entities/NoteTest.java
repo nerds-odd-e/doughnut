@@ -64,7 +64,7 @@ public class NoteTest {
     void replaceParentPlaceholder() {
       assertThat(
           linkingNote.getNoteTopology().getObjectNoteTopology().getTitleOrPredicate(),
-          equalTo(target.getTopicConstructor()));
+          equalTo(target.getTitleConstructor()));
     }
 
     @Test

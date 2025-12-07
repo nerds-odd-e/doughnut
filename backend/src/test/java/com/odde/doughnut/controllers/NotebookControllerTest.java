@@ -298,11 +298,11 @@ class NotebookControllerTest extends ControllerTestBase {
       // Assert
       Note existingNote =
           notebook.getHeadNote().getChildren().stream()
-              .filter(n -> n.getTopicConstructor().equals("note 1"))
+              .filter(n -> n.getTitleConstructor().equals("note 1"))
               .findFirst()
               .orElseThrow();
 
-      assertThat(existingNote.getTopicConstructor(), equalTo("note 1"));
+      assertThat(existingNote.getTitleConstructor(), equalTo("note 1"));
       assertThat(existingNote.getDetails(), equalTo("Content of Note 1"));
     }
 
@@ -316,7 +316,7 @@ class NotebookControllerTest extends ControllerTestBase {
       // Assert
       Note importedNote = note1.getChildren().stream().findFirst().orElseThrow();
 
-      assertThat(importedNote.getTopicConstructor(), equalTo("note 2"));
+      assertThat(importedNote.getTitleConstructor(), equalTo("note 2"));
       assertThat(importedNote.getDetails(), equalTo("note 2"));
     }
 

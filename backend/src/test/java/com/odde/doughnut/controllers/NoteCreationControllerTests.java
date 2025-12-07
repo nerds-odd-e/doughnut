@@ -227,9 +227,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
         noteCreation.setNewTitle("Johnny boy");
         NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
 
-        assertEquals("Johnny boy", note.getNote().getTopicConstructor());
+        assertEquals("Johnny boy", note.getNote().getTitleConstructor());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("Canada", note.getNote().getChildren().get(0).getTopicConstructor());
+        assertEquals("Canada", note.getNote().getChildren().get(0).getTitleConstructor());
       }
     }
 
@@ -253,9 +253,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
             "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
         NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
 
-        assertEquals("Harry Potter", note.getNote().getTopicConstructor());
+        assertEquals("Harry Potter", note.getNote().getTitleConstructor());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTopicConstructor());
+        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTitleConstructor());
       }
 
       @Test
@@ -274,7 +274,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
         assertEquals(
             "The girl sat next to the window",
-            note.getNote().getChildren().get(1).getTopicConstructor());
+            note.getNote().getChildren().get(1).getTitleConstructor());
       }
     }
   }
@@ -297,7 +297,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
       assertThat(response.getId(), not(nullValue()));
-      assertThat(response.getNote().getTopicConstructor(), equalTo("new note"));
+      assertThat(response.getNote().getTitleConstructor(), equalTo("new note"));
     }
 
     @Test
@@ -328,9 +328,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
 
       // Verify order: referenceNote -> createdNote -> "next sibling"
       assertThat(
-          siblings.get(0).getTopicConstructor(), equalTo(referenceNote.getTopicConstructor()));
-      assertThat(siblings.get(1).getTopicConstructor(), equalTo("new note"));
-      assertThat(siblings.get(2).getTopicConstructor(), equalTo("next sibling"));
+          siblings.get(0).getTitleConstructor(), equalTo(referenceNote.getTitleConstructor()));
+      assertThat(siblings.get(1).getTitleConstructor(), equalTo("new note"));
+      assertThat(siblings.get(2).getTitleConstructor(), equalTo("next sibling"));
     }
   }
 }

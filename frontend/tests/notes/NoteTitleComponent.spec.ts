@@ -20,7 +20,7 @@ describe("note title", () => {
   })
 
   describe("linking note", () => {
-    const note = makeMe.aNote.topicConstructor("Dummy Title").please()
+    const note = makeMe.aNote.titleConstructor("Dummy Title").please()
     const target = makeMe.aNote.underNote(note).please()
     const linkingNote = makeMe.aLink.to(target).please()
 

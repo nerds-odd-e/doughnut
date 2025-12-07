@@ -100,7 +100,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     `(
       "saves $noteTitle with $wikidataTitle via manual input",
       async ({ noteTitle, wikidataTitle, needsTitleAction }) => {
-        const note = makeMe.aNote.topicConstructor(noteTitle).please()
+        const note = makeMe.aNote.titleConstructor(noteTitle).please()
         const wikidata = makeMe.aWikidataEntity
           .wikidataTitle(wikidataTitle)
           .please()
@@ -151,7 +151,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     )
 
     it("saves when selecting from search results with matching titles", async () => {
-      const note = makeMe.aNote.topicConstructor("dog").please()
+      const note = makeMe.aNote.titleConstructor("dog").please()
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")
@@ -188,7 +188,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("shows error when fetchWikidataEntityDataById fails", async () => {
-      const note = makeMe.aNote.topicConstructor("dog").please()
+      const note = makeMe.aNote.titleConstructor("dog").please()
       const error = {
         message: "The wikidata service is not available",
       }
@@ -206,7 +206,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("shows error when updateWikidataId fails", async () => {
-      const note = makeMe.aNote.topicConstructor("dog").please()
+      const note = makeMe.aNote.titleConstructor("dog").please()
       const wikidata = makeMe.aWikidataEntity.wikidataTitle("dog").please()
       fetchWikidataEntitySpy.mockResolvedValue(wrapSdkResponse(wikidata))
       const error = { wikidataId: "Duplicate Wikidata ID Detected." }
@@ -224,7 +224,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("searches using note title as searchKey", async () => {
-      const note = makeMe.aNote.topicConstructor("dog").please()
+      const note = makeMe.aNote.titleConstructor("dog").please()
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")
@@ -240,7 +240,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("replaces title immediately when Replace title is selected", async () => {
-      const note = makeMe.aNote.topicConstructor("Canine").please()
+      const note = makeMe.aNote.titleConstructor("Canine").please()
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")
@@ -292,7 +292,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("appends title immediately when Append title is selected", async () => {
-      const note = makeMe.aNote.topicConstructor("Canine").please()
+      const note = makeMe.aNote.titleConstructor("Canine").please()
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")
@@ -344,7 +344,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("appends title correctly when current title is empty", async () => {
-      const note = makeMe.aNote.topicConstructor("").please()
+      const note = makeMe.aNote.titleConstructor("").please()
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")
@@ -396,7 +396,7 @@ describe("WikidataAssociationForNoteDialog", () => {
     })
 
     it("only saves wikidata ID when Save is clicked without title action", async () => {
-      const note = makeMe.aNote.topicConstructor("dog").please()
+      const note = makeMe.aNote.titleConstructor("dog").please()
       const searchResult = makeMe.aWikidataSearchEntity
         .label("Dog")
         .id("Q11399")

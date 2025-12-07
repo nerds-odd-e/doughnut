@@ -60,7 +60,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Column(name = "topic_constructor")
   @NotNull
   @JsonIgnore
-  private String topicConstructor = "";
+  private String titleConstructor = "";
 
   @Column(name = "created_at")
   @Setter
@@ -143,7 +143,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTopicConstructor());
+    return new NoteTitle(getTitleConstructor());
   }
 
   @JsonIgnore
@@ -168,13 +168,13 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public LinkType getLinkType() {
-    if (!getTopicConstructor().startsWith(":")) return null;
-    return LinkType.fromLabel(getTopicConstructor().substring(1));
+    if (!getTitleConstructor().startsWith(":")) return null;
+    return LinkType.fromLabel(getTitleConstructor().substring(1));
   }
 
   @JsonIgnore
   public void setLinkType(LinkType linkType) {
-    setTopicConstructor(":" + linkType.label);
+    setTitleConstructor(":" + linkType.label);
   }
 
   @JsonIgnore
@@ -190,7 +190,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @Override
   public String toString() {
-    return "Note{" + "id=" + id + ", title='" + getTopicConstructor() + '\'' + '}';
+    return "Note{" + "id=" + id + ", title='" + getTitleConstructor() + '\'' + '}';
   }
 
   @JsonIgnore
@@ -281,7 +281,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   public NoteTopology getNoteTopology() {
     NoteTopology noteTopology = new NoteTopology();
     noteTopology.setId(getId());
-    noteTopology.setTitleOrPredicate(getTopicConstructor());
+    noteTopology.setTitleOrPredicate(getTitleConstructor());
     noteTopology.setShortDetails(getShortDetails());
     noteTopology.setLinkType(getLinkType());
     if (getParent() != null) {
@@ -337,10 +337,10 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   public void initialize(
-      User user, Note parentNote, Timestamp currentUTCTimestamp, String topicConstructor) {
+      User user, Note parentNote, Timestamp currentUTCTimestamp, String titleConstructor) {
     setParentNote(parentNote);
     setUpdatedAt(currentUTCTimestamp);
-    setTopicConstructor(topicConstructor);
+    setTitleConstructor(titleConstructor);
     setCreatedAt(currentUTCTimestamp);
     setUpdatedAt(currentUTCTimestamp);
     setCreator(user);

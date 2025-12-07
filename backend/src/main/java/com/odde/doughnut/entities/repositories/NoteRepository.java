@@ -9,19 +9,19 @@ import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
   String selectFromNote = "SELECT n FROM Note n";
-  String searchForTitleLike = " WHERE n.topicConstructor LIKE :pattern AND n.deletedAt IS NULL ";
+  String searchForTitleLike = " WHERE n.titleConstructor LIKE :pattern AND n.deletedAt IS NULL ";
   String searchForTitleExact =
-      " WHERE LOWER(n.topicConstructor) = LOWER(:key) AND n.deletedAt IS NULL ";
+      " WHERE LOWER(n.titleConstructor) = LOWER(:key) AND n.deletedAt IS NULL ";
 
-  @Query(value = selectFromNote + " where n.topicConstructor = :key")
+  @Query(value = selectFromNote + " where n.titleConstructor = :key")
   Note findFirstByTitle(@Param("key") String key);
 
   @Query(
       value =
           selectFromNote
               + " WHERE n.notebook.id = ("
-              + "SELECT nhn.notebook_id FROM NotebookHeadNote nhn WHERE nhn.head_note_id = (SELECT rn.id FROM Note rn WHERE rn.topicConstructor = :title)"
-              + ") AND n.topicConstructor = :key")
+              + "SELECT nhn.notebook_id FROM NotebookHeadNote nhn WHERE nhn.head_note_id = (SELECT rn.id FROM Note rn WHERE rn.titleConstructor = :title)"
+              + ") AND n.titleConstructor = :key")
   Note findFirstInNotebookByTitle(@Param("title") String notebookTitle, @Param("key") String key);
 
   @Query(

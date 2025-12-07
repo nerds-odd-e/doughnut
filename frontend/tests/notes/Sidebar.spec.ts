@@ -17,17 +17,17 @@ function isBefore(node1: Node, node2: Node) {
 
 describe("Sidebar", () => {
   const storageAccessor = useStorageAccessor()
-  const topNoteRealm = makeMe.aNoteRealm.topicConstructor("top").please()
+  const topNoteRealm = makeMe.aNoteRealm.titleConstructor("top").please()
   const firstGeneration = makeMe.aNoteRealm
-    .topicConstructor("first gen")
+    .titleConstructor("first gen")
     .under(topNoteRealm)
     .please()
   const firstGenerationSibling = makeMe.aNoteRealm
-    .topicConstructor("first gen sibling")
+    .titleConstructor("first gen sibling")
     .under(topNoteRealm)
     .please()
   const secondGeneration = makeMe.aNoteRealm
-    .topicConstructor("2nd gen")
+    .titleConstructor("2nd gen")
     .under(firstGeneration)
     .please()
 

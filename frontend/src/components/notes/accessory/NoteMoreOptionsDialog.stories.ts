@@ -21,7 +21,7 @@ const meta = {
       // Mock NoteController.getNoteInfo to avoid API calls
       const originalGetNoteInfo = NoteController.getNoteInfo
       const mockNoteInfo: NoteInfo = {
-        note: makeMe.aNoteRealm.topicConstructor("Sample Note").please(),
+        note: makeMe.aNoteRealm.titleConstructor("Sample Note").please(),
         recallSetting: {
           level: 0,
           rememberSpelling: false,
@@ -67,14 +67,14 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {
-    note: makeMe.aNoteRealm.topicConstructor("Sample Note").please().note,
+    note: makeMe.aNoteRealm.titleConstructor("Sample Note").please().note,
   },
 }
 
 export const WithLongTitle: Story = {
   args: {
     note: makeMe.aNoteRealm
-      .topicConstructor(
+      .titleConstructor(
         "This is a very long note title that might wrap to multiple lines"
       )
       .please().note,
@@ -84,7 +84,7 @@ export const WithLongTitle: Story = {
 export const WithDetails: Story = {
   args: {
     note: makeMe.aNoteRealm
-      .topicConstructor("Note with Details")
+      .titleConstructor("Note with Details")
       .details("This note has some details content")
       .please().note,
   },
@@ -93,8 +93,8 @@ export const WithDetails: Story = {
 export const WithParent: Story = {
   args: {
     note: makeMe.aNoteRealm
-      .topicConstructor("Child Note")
-      .under(makeMe.aNoteRealm.topicConstructor("Parent Note").please())
+      .titleConstructor("Child Note")
+      .under(makeMe.aNoteRealm.titleConstructor("Parent Note").please())
       .please().note,
   },
 }

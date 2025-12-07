@@ -52,7 +52,7 @@ public class UserModelSearchTest {
 
   @Test
   void theNoteItselfIsNotIncludedInTheResult() {
-    searchTerm.setSearchKey(note.getTopicConstructor());
+    searchTerm.setSearchKey(note.getTitleConstructor());
     assertTrue(search().isEmpty());
   }
 

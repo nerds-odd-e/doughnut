@@ -32,11 +32,11 @@ export const WithNotes: Story = {
   args: {
     notes: [
       makeMe.aNote
-        .topicConstructor("TypeScript")
+        .titleConstructor("TypeScript")
         .details("TypeScript is a typed superset of JavaScript.")
         .please(),
       makeMe.aNote
-        .topicConstructor("Vue.js")
+        .titleConstructor("Vue.js")
         .details("Vue.js is a progressive JavaScript framework.")
         .please(),
     ],
@@ -50,7 +50,7 @@ export const WithSingleNote: Story = {
   args: {
     notes: [
       makeMe.aNote
-        .topicConstructor("React")
+        .titleConstructor("React")
         .details("React is a JavaScript library for building user interfaces.")
         .please(),
     ],
@@ -82,7 +82,7 @@ export const HighProgress: Story = {
   args: {
     notes: [
       makeMe.aNote
-        .topicConstructor("Python")
+        .titleConstructor("Python")
         .details("Python is a high-level programming language.")
         .please(),
     ],
@@ -96,7 +96,7 @@ export const DailyProgressOnly: Story = {
   args: {
     notes: [
       makeMe.aNote
-        .topicConstructor("JavaScript")
+        .titleConstructor("JavaScript")
         .details("JavaScript is a programming language.")
         .please(),
     ],
