@@ -68,9 +68,9 @@ public class GraphRAGService {
 
   public String getGraphRAGDescription(Note note) {
     GraphRAGResult retrieve = retrieve(note, 2500);
-    String prettyString;
+    String jsonString;
     try {
-      prettyString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(retrieve);
+      jsonString = objectMapper.writeValueAsString(retrieve);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -78,6 +78,6 @@ public class GraphRAGService {
           Focus Note and the notes related to it:
           %s
           """
-        .formatted(prettyString);
+        .formatted(jsonString);
   }
 }

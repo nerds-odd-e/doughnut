@@ -997,4 +997,30 @@ public class GraphRAGServiceTest {
           lessThanOrEqualTo((long) RELATED_NOTE_DETAILS_TRUNCATE_LENGTH));
     }
   }
+
+  @Nested
+  class GetGraphRAGDescriptionTests {
+    @Test
+    void shouldNotContainNewlinesInJson() {
+      Note note = makeMe.aNote().titleConstructor("Test Note").details("Test Details").please();
+      Note child = makeMe.aNote().under(note).titleConstructor("Child Note").please();
+
+      String description = graphRAGService.getGraphRAGDescription(child);
+
+      // Extract the JSON part (from first { to last })
+      int jsonStart = description.indexOf("{");
+      int jsonEnd = description.lastIndexOf("}") + 1;
+      String jsonPart = description.substring(jsonStart, jsonEnd);
+      // Verify no newlines in the JSON content itself
+      assertThat(jsonPart, not(containsString("\n")));
+      assertThat(jsonPart, not(containsString("\r")));
+      // Verify it's valid JSON by parsing it
+      try {
+        JsonNode jsonNode = new ObjectMapperConfig().objectMapper().readTree(jsonPart);
+        assertThat(jsonNode.has("focusNote"), is(true));
+      } catch (Exception e) {
+        throw new RuntimeException("Generated JSON is invalid", e);
+      }
+    }
+  }
 }
