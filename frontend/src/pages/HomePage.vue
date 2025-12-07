@@ -63,11 +63,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, type Ref, inject } from "vue"
-import type { User } from "@generated/backend"
-import { useNavigationItems } from "@/composables/useNavigationItems"
 import NavigationItem from "@/components/navigation/NavigationItem.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
+import { useNavigationItems } from "@/composables/useNavigationItems"
+import type { User } from "@generated/backend"
+import { inject, onMounted, onUnmounted, ref, type Ref } from "vue"
 
 const user = inject<Ref<User | undefined>>("currentUser")
 const { upperNavItems, lowerNavItems } = useNavigationItems()

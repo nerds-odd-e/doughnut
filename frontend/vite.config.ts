@@ -5,15 +5,15 @@ import { defineConfig } from 'vitest/config'
 
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import autoprefixer from 'autoprefixer'
+import tailwindcss from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
+import Inspector from 'unplugin-vue-inspector/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
-import tailwindcss from 'tailwindcss'
-import autoprefixer from 'autoprefixer'
-import Inspector from 'unplugin-vue-inspector/vite'
 import checker from 'vite-plugin-checker'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 // Check if we're running tests - Vitest sets process.env.VITEST
 // This is the official and most reliable way to detect test mode
