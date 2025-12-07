@@ -6,7 +6,7 @@
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
   "engines": {
-    "node": ">=22",
+    "node": ">=24",
     "pnpm": ">=10.24.0"
   },
   "scripts": {
@@ -69,7 +69,7 @@
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.33",
-    "@types/node": "^22.15.30",
+    "@types/node": "^24.10.1",
     "adm-zip": "^0.5.16",
     "cypress": "15.7.1",
     "cypress-file-upload": "^5.0.8",

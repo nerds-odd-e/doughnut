@@ -43,8 +43,8 @@
 
         basePackages = with pkgs; [
           zulu25
-          nodejs_22
-          corepack_22
+          nodejs_24
+          corepack_24
           fzf
           git-secret
           gitleaks
