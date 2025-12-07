@@ -81,12 +81,13 @@ const onUpdate = (noteId: number, newValue: string) => {
     const normalizedNewValue = normalizeNoteDetails(newValue)
     const normalizedLastSaved = normalizeNoteDetails(lastSavedValue.value ?? "")
 
+    errors.value = {}
+    localValue.value = newValue
+
     if (normalizedNewValue === normalizedLastSaved) {
       return
     }
 
-    errors.value = {}
-    localValue.value = newValue
     changer(noteId, normalizedNewValue, version.value + 1, setError)
     version.value += 1
     return

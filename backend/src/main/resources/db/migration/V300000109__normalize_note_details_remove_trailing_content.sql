@@ -5,12 +5,12 @@
 -- Uses \n for newline matching (MySQL interprets \n in string literals as newline)
 
 UPDATE `note`
-SET `details` = TRIM(
+SET `description` = TRIM(
   REGEXP_REPLACE(
     REGEXP_REPLACE(
       REGEXP_REPLACE(
         REGEXP_REPLACE(
-          TRIM(COALESCE(`details`, '')),
+          TRIM(COALESCE(`description`, '')),
           '([[:space:]]*<p><br></p>[[:space:]]*)+$', '', 1, 0, 'i'
         ),
         '([[:space:]]*<br>[[:space:]]*)+$', '', 1, 0, 'i'
@@ -20,6 +20,6 @@ SET `details` = TRIM(
     '\n+$', '', 1, 0
   )
 )
-WHERE `details` IS NOT NULL
-  AND `details` != '';
+WHERE `description` IS NOT NULL
+  AND `description` != '';
 
