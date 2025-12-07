@@ -6,6 +6,7 @@
       class="menu-wrapper daisy-flex daisy-flex-col daisy-h-full daisy-bg-neutral"
       :class="{ 'is-expanded': shouldShowExpanded, 'is-collapsed': !shouldShowExpanded }"
       @blur="handleFocusLoss"
+      @click="handleMenuWrapperClick"
     >
       <div
         class="menu-content daisy-flex daisy-flex-row daisy-items-center"
@@ -18,11 +19,19 @@
         <!-- User menu content -->
         <template v-if="user">
           <!-- Collapsed state: show only active item (not on home page) -->
-          <ul v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem" class="collapsed-menu daisy-menu">
+          <ul
+            v-if="!shouldShowExpanded && hasActiveItem && !isHomePage && activeItem"
+            class="collapsed-menu daisy-menu"
+            :class="{ 'pass-through-clicks': activeItem.name !== 'resumeRecall' }"
+          >
             <li class="daisy-menu-item active-item-only">
-              <div @click.capture.stop.prevent="handleActiveItemClick" class="active-item-wrapper">
-                <NavigationItem v-bind="{ ...activeItem }" @resumeRecall="resumeRecall" />
-              </div>
+              <NavigationItem
+                v-bind="{
+                  ...activeItem,
+                  nonClickable: activeItem.name !== 'resumeRecall'
+                }"
+                @resumeRecall="resumeRecall"
+              />
             </li>
           </ul>
 
@@ -153,23 +162,24 @@ const handleMenuContentClick = () => {
   }
 }
 
-const { resumeRecall } = useRecallData()
-
-const handleActiveItemClick = (event: MouseEvent) => {
-  // When collapsed, clicking the active item should expand the menu, not navigate
-  // Exception: "resumeRecall" should resume without expanding
+const handleMenuWrapperClick = (event: MouseEvent) => {
+  // When collapsed, clicking anywhere in the menu wrapper should expand
+  // Exception: don't expand if clicking the expand button or resumeRecall link
   if (!shouldShowExpanded.value && props.user) {
-    if (activeItem.value?.name === "resumeRecall") {
-      event.preventDefault()
-      event.stopPropagation()
-      resumeRecall()
+    const target = event.target as HTMLElement
+    // Don't expand if clicking the expand button
+    if (target.closest(".expand-button")) {
       return
     }
-    event.preventDefault()
-    event.stopPropagation()
+    // Don't expand if clicking resumeRecall link (it should work as a button)
+    if (activeItem.value?.name === "resumeRecall" && target.closest("a")) {
+      return
+    }
     expandMenu()
   }
 }
+
+const { resumeRecall } = useRecallData()
 
 const handleMenuIconClick = (event: MouseEvent) => {
   // When collapsed, clicking the menu icon should expand the menu
@@ -341,12 +351,6 @@ onUnmounted(() => {
     justify-content: center;
   }
 
-  :deep(.nav-item > a),
-  :deep(.nav-item > details > summary) {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-  }
-
   .label {
     font-size: 0.8rem;
     line-height: 1;
@@ -360,20 +364,6 @@ onUnmounted(() => {
   align-items: center;
 }
 
-.active-item-wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 0;
-
-  .icon-container {
-    position: relative;
-    width: 24px;
-    height: 24px;
-  }
-}
 
 .top-menu,
 .collapsed-menu {
@@ -390,6 +380,14 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   padding-right: 0;
+}
+
+.collapsed-menu.pass-through-clicks {
+  pointer-events: none;
+}
+
+.collapsed-menu.pass-through-clicks .daisy-menu-item {
+  pointer-events: none;
 }
 
 .is-collapsed .top-menu {
