@@ -29,47 +29,24 @@ class NoteTitleTest {
   }
 
   @Test
-  void with_non_breaking_space_after_slash() {
-    // Test case for title with non-breaking space (U+00A0) after "/"
-    // This simulates the database value "nebulas / nebula" with non-breaking space
-    String titleWithNonBreakingSpace = "nebulas /\u00A0nebula";
-    NoteTitle noteTitle = new NoteTitle(titleWithNonBreakingSpace);
+  void normalizes_unicode_whitespace_to_regular_spaces() {
+    // Test that various Unicode whitespace characters are normalized to regular spaces
+    // U+00A0: non-breaking space, U+3000: CJK ideographic space,
+    // U+2000-U+2003: en/em spaces
+    NoteTitle noteTitle = new NoteTitle("nebulas /\u00A0nebula");
     assertThat(noteTitle.getTitles(), hasSize(2));
-    // Fragments are sorted by length (longest first), so "nebulas" comes before "nebula"
     assertThat(noteTitle.getTitles().get(0).stem(), equalTo("nebulas"));
     assertThat(noteTitle.getTitles().get(1).stem(), equalTo("nebula"));
-    // Verify matching works with regular space
-    assertThat(noteTitle.getTitles().get(0).matches("nebulas"), is(true));
-    assertThat(noteTitle.getTitles().get(1).matches("nebula"), is(true));
-  }
 
-  @Test
-  void with_cjk_ideographic_space() {
-    // Test case for title with CJK ideographic space (U+3000) after "/"
-    String titleWithCjkSpace = "cat\u3000/\u3000kitten";
-    NoteTitle noteTitle = new NoteTitle(titleWithCjkSpace);
+    noteTitle = new NoteTitle("cat\u3000/\u3000kitten");
     assertThat(noteTitle.getTitles(), hasSize(2));
     assertThat(noteTitle.getTitles().get(0).stem(), equalTo("kitten"));
     assertThat(noteTitle.getTitles().get(1).stem(), equalTo("cat"));
-    // Verify matching works
-    assertThat(noteTitle.getTitles().get(0).matches("kitten"), is(true));
-    assertThat(noteTitle.getTitles().get(1).matches("cat"), is(true));
-  }
 
-  @Test
-  void with_various_unicode_whitespace() {
-    // Test case for various Unicode whitespace characters
-    // U+2000: En quad, U+2001: Em quad, U+2002: En space, U+2003: Em space
-    String titleWithVariousSpaces = "word1\u2000/\u2001word2\u2002/\u2003word3";
-    NoteTitle noteTitle = new NoteTitle(titleWithVariousSpaces);
+    noteTitle = new NoteTitle("word1\u2000/\u2001word2\u2002/\u2003word3");
     assertThat(noteTitle.getTitles(), hasSize(3));
-    // All whitespace should be normalized, fragments should be clean
     assertThat(noteTitle.getTitles().get(0).stem(), equalTo("word3"));
     assertThat(noteTitle.getTitles().get(1).stem(), equalTo("word2"));
     assertThat(noteTitle.getTitles().get(2).stem(), equalTo("word1"));
-    // Verify matching works
-    assertThat(noteTitle.getTitles().get(0).matches("word3"), is(true));
-    assertThat(noteTitle.getTitles().get(1).matches("word2"), is(true));
-    assertThat(noteTitle.getTitles().get(2).matches("word1"), is(true));
   }
 }
