@@ -97,4 +97,9 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
     entity.setPredefinedQuestion(null);
     return this;
   }
+
+  public RecallPromptBuilder contested() {
+    this.predefinedQuestionBuilder.contested();
+    return this;
+  }
 }

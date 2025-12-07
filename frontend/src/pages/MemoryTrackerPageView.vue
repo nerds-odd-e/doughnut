@@ -208,11 +208,15 @@ const formatThinkingTime = (ms: number): string => {
 }
 
 const hasUnansweredPrompts = computed(() => {
-  return props.recallPrompts.some((prompt) => !prompt.answer)
+  return props.recallPrompts.some(
+    (prompt) => !prompt.answer && !prompt.isContested
+  )
 })
 
 const deleteUnansweredPrompts = async () => {
-  const unansweredCount = props.recallPrompts.filter((p) => !p.answer).length
+  const unansweredCount = props.recallPrompts.filter(
+    (p) => !p.answer && !p.isContested
+  ).length
   if (
     !(await popups.confirm(
       `Are you sure you want to delete ${unansweredCount} unanswered recall prompt${unansweredCount !== 1 ? "s" : ""}?`

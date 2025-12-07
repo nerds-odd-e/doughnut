@@ -442,5 +442,28 @@ class MemoryTrackerControllerTest extends ControllerTestBase {
           ResponseStatusException.class,
           () -> controller.deleteUnansweredRecallPrompts(memoryTracker));
     }
+
+    @Test
+    void shouldNotDeleteContestedUnansweredRecallPrompts() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      RecallPrompt unansweredPrompt =
+          makeMe.aRecallPrompt().approvedQuestionOf(note).forMemoryTracker(memoryTracker).please();
+      RecallPrompt contestedPrompt =
+          makeMe
+              .aRecallPrompt()
+              .approvedQuestionOf(note)
+              .forMemoryTracker(memoryTracker)
+              .contested()
+              .please();
+
+      controller.deleteUnansweredRecallPrompts(memoryTracker);
+
+      List<RecallPrompt> remainingPrompts = controller.getRecallPrompts(memoryTracker);
+      assertThat(remainingPrompts, hasSize(1));
+      assertThat(remainingPrompts.get(0).getId(), equalTo(contestedPrompt.getId()));
+    }
   }
 }

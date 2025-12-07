@@ -346,6 +346,69 @@ describe("MemoryTrackerPageView", () => {
       usePopups().popups.done(false)
       await flushPromises()
     })
+
+    it("does not show delete button when only contested unanswered prompts exist", async () => {
+      const contestedPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Contested question")
+        .withIsContested(true)
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [contestedPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(false)
+    })
+
+    it("excludes contested prompts from unanswered count in confirmation message", async () => {
+      const unansweredPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Unanswered question")
+        .please()
+      const contestedPrompt = makeMe.aRecallPrompt
+        .withQuestionStem("Contested question")
+        .withIsContested(true)
+        .please()
+      const memoryTracker = makeMe.aMemoryTracker.please()
+
+      mockSdkService("deleteUnansweredRecallPrompts", undefined)
+
+      const wrapper = helper
+        .component(MemoryTrackerPageView)
+        .withProps({
+          recallPrompts: [unansweredPrompt, contestedPrompt],
+          memoryTracker,
+          memoryTrackerId: 1,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const deleteButton = wrapper.find(
+        'button[title="delete all unanswered recall prompts"]'
+      )
+      expect(deleteButton.exists()).toBe(true)
+      await deleteButton.trigger("click")
+      await flushPromises()
+
+      const popups = usePopups().popups.peek()
+      expect(popups?.length).toBe(1)
+      expect(popups?.[0]?.message).toBe(
+        "Are you sure you want to delete 1 unanswered recall prompt?"
+      )
+      usePopups().popups.done(false)
+      await flushPromises()
+    })
   })
 
   describe("skipped memory tracker", () => {

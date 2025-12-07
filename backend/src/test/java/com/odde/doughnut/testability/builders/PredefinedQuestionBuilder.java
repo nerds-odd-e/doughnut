@@ -37,4 +37,9 @@ public class PredefinedQuestionBuilder extends EntityBuilder<PredefinedQuestion>
     this.entity = PredefinedQuestion.fromMCQWithAnswer(mcqWithAnswer, note);
     return this;
   }
+
+  public PredefinedQuestionBuilder contested() {
+    this.entity.setContested(true);
+    return this;
+  }
 }
