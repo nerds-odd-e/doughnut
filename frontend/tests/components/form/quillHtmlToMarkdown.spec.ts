@@ -30,7 +30,7 @@ describe("quillHtmlToMarkdown", () => {
     expect(result).toContain("\\<br\\>")
   })
 
-  it.skip("converts HTML with code blocks separated by hr to separate markdown code blocks", () => {
+  it("converts HTML with code blocks separated by hr to separate markdown code blocks", () => {
     const html =
       '<div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">A</div></div><p><hr></p><div class="ql-code-block-container" spellcheck="false"><div class="ql-code-block" data-language="plain">B</div></div>'
     const result = htmlToMarkdown(html)

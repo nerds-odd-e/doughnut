@@ -183,35 +183,73 @@ turndownService.addRule("italicWithEscapedEntities", {
   },
 })
 
-// Pre-process HTML to preserve code block content before DOM parsing
-const preserveCodeBlockContent = (html: string): string => {
-  // Extract content from ql-code-block divs directly from the HTML string
-  // to preserve leading spaces that would be lost during DOM parsing
+// Extract code block lines from a container's HTML content
+const extractCodeBlockLines = (containerContent: string): string[] => {
   const blockRegex = /<div[^>]*class="ql-code-block"[^>]*>([\s\S]*?)<\/div>/g
   const lines: string[] = []
   let blockMatch
-  while ((blockMatch = blockRegex.exec(html)) !== null) {
-    let content = blockMatch[1]
+  while ((blockMatch = blockRegex.exec(containerContent)) !== null) {
+    let content = blockMatch[1]!
       .replace(/&nbsp;/g, " ")
       .replace(/&lt;/g, "<")
       .replace(/&gt;/g, ">")
       .replace(/&amp;/g, "&")
-    // Convert <br> or <br/> to empty line
     if (/^<br\s*\/?>$/i.test(content.trim())) {
       content = ""
     }
     lines.push(content)
   }
-  if (lines.length === 0) {
-    return html
+  return lines
+}
+
+// Pre-process HTML to preserve code block content before DOM parsing
+// Processes each container separately to handle multiple code blocks
+const preserveCodeBlockContent = (html: string): string => {
+  let result = ""
+  let lastIndex = 0
+  const containerOpenRegex = /<div[^>]*class="ql-code-block-container"[^>]*>/g
+  let match
+
+  while ((match = containerOpenRegex.exec(html)) !== null) {
+    result += html.substring(lastIndex, match.index)
+    const openTag = match[0]
+    const contentStart = match.index + openTag.length
+
+    // Find the matching closing </div> by counting div nesting depth
+    let depth = 1
+    let pos = contentStart
+    let containerEnd = html.length
+    while (depth > 0 && pos < html.length) {
+      const openPos = html.indexOf("<div", pos)
+      const closePos = html.indexOf("</div>", pos)
+      if (closePos === -1) break
+      if (openPos !== -1 && openPos < closePos) {
+        depth++
+        pos = openPos + 4
+      } else {
+        depth--
+        if (depth === 0) containerEnd = closePos
+        pos = closePos + 6
+      }
+    }
+
+    const containerContent = html.substring(contentStart, containerEnd)
+    const lines = extractCodeBlockLines(containerContent)
+
+    let newOpenTag = openTag
+    if (lines.length > 0) {
+      const escapedContent = lines.join("\n").replace(/"/g, "&quot;")
+      newOpenTag = openTag.replace(
+        /class="ql-code-block-container"/,
+        `class="ql-code-block-container" data-preserved-content="${escapedContent}"`
+      )
+    }
+
+    result += `${newOpenTag}${containerContent}</div>`
+    lastIndex = containerEnd + 6
   }
-  const preservedContent = lines.join("\n")
-  const escapedContent = preservedContent.replace(/"/g, "&quot;")
-  // Add data attribute to the container with preserved content
-  return html.replace(
-    /class="ql-code-block-container"/,
-    `class="ql-code-block-container" data-preserved-content="${escapedContent}"`
-  )
+
+  return result + html.substring(lastIndex)
 }
 
 // Remove <p> tags inside table cells to prevent breaking table structure
