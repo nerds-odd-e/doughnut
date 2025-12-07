@@ -56,8 +56,17 @@ const localValue = ref(value)
 const version = ref(0)
 const errors = ref({} as Record<string, string>)
 
+const hasUnsavedChanges = (): boolean => {
+  if (field === "edit details") {
+    const normalizedCurrent = normalizeNoteDetails(localValue.value ?? "")
+    const normalizedSaved = normalizeNoteDetails(lastSavedValue.value ?? "")
+    return normalizedCurrent !== normalizedSaved
+  }
+  return localValue.value !== lastSavedValue.value
+}
+
 const wrapperClass = computed(() => {
-  if (version.value !== savedVersion.value) {
+  if (hasUnsavedChanges()) {
     return "dirty"
   }
   return ""
@@ -76,17 +85,17 @@ const onUpdate = (noteId: number, newValue: string) => {
       return
     }
 
-    version.value += 1
     errors.value = {}
     localValue.value = newValue
-    changer(noteId, normalizedNewValue, version.value, setError)
+    changer(noteId, normalizedNewValue, version.value + 1, setError)
+    version.value += 1
     return
   }
 
-  version.value += 1
   errors.value = {}
   localValue.value = newValue
-  changer(noteId, newValue, version.value, setError)
+  changer(noteId, newValue, version.value + 1, setError)
+  version.value += 1
 }
 
 const onBlur = () => {
