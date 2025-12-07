@@ -23,14 +23,14 @@ export function useInterruptingHtmlToMarkdown() {
     let shouldRemoveImages = false
 
     // Ask for confirmation separately for links
-    if (linkCount > 2) {
+    if (linkCount > 0) {
       shouldRemoveLinks = window.confirm(
         `Shall I remove the ${linkCount} links from the pasting content?`
       )
     }
 
     // Ask for confirmation separately for images
-    if (imageCount > 2) {
+    if (imageCount > 0) {
       shouldRemoveImages = window.confirm(
         `Shall I remove the ${imageCount} images from the pasting content?`
       )

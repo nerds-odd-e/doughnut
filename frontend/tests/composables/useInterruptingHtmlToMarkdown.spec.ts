@@ -20,27 +20,31 @@ describe("useInterruptingHtmlToMarkdown", () => {
     expect(result).toContain("Hello World")
   })
 
-  it("converts HTML to markdown with 1 link without prompting", () => {
+  it("prompts user when markdown contains 1 link", () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
     const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
     const html = '<p>Check out <a href="https://example.com">this link</a></p>'
     const result = htmlToMarkdown(html)
-    expect(confirmSpy).not.toHaveBeenCalled()
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 1 links from the pasting content?"
+    )
     expect(result).toMatch(/\[this link\]\(https:\/\/example\.com\)/)
   })
 
-  it("converts HTML to markdown with 2 links without prompting", () => {
+  it("prompts user when markdown contains 2 links", () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
     const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
     const html =
       '<p>Check <a href="https://example.com">link1</a> and <a href="https://example2.com">link2</a></p>'
     const result = htmlToMarkdown(html)
-    expect(confirmSpy).not.toHaveBeenCalled()
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 2 links from the pasting content?"
+    )
     expect(result).toMatch(/\[link1\]\(https:\/\/example\.com\)/)
     expect(result).toMatch(/\[link2\]\(https:\/\/example2\.com\)/)
   })
 
-  it("prompts user when markdown contains more than 2 links", () => {
+  it("prompts user when markdown contains 3 links", () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
     const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
     const html =
@@ -114,7 +118,28 @@ describe("useInterruptingHtmlToMarkdown", () => {
     expect(result).not.toMatch(/\[link1\]\(https:\/\/example\.com\)/)
   })
 
-  it("prompts user when markdown contains more than 2 images", () => {
+  it("prompts user when markdown contains 1 image", () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
+    const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+    const html = '<p><img src="https://example.com/img1.jpg" alt="img1"></p>'
+    htmlToMarkdown(html)
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 1 images from the pasting content?"
+    )
+  })
+
+  it("prompts user when markdown contains 2 images", () => {
+    const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
+    const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
+    const html =
+      '<p><img src="https://example.com/img1.jpg" alt="img1"> <img src="https://example.com/img2.jpg" alt="img2"></p>'
+    htmlToMarkdown(html)
+    expect(confirmSpy).toHaveBeenCalledWith(
+      "Shall I remove the 2 images from the pasting content?"
+    )
+  })
+
+  it("prompts user when markdown contains 3 images", () => {
     const confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
     const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
     const html =
