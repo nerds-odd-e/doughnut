@@ -49,7 +49,6 @@
           git-secret
           gitleaks
           jq
-          libmysqlclient
           mysql_jdbc
           mysql84
           mariadb.client
