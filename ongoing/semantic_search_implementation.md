@@ -6,7 +6,7 @@ Replace the current literal note title search with intelligent semantic search t
 
 ## Current State
 
-- **Current Search**: Literal LIKE pattern matching on `topic_constructor` only
+- **Current Search**: Literal LIKE pattern matching on `topic_constructor` database column only (mapped to `titleConstructor` field in code)
 - **Limitations**: 
   - No semantic understanding
   - No fuzzy/typo tolerance

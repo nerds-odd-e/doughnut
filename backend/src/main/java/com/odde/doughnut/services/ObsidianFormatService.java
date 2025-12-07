@@ -70,9 +70,9 @@ public class ObsidianFormatService {
   }
 
   private String generateFilePath(String path, Note note) {
-    String sanitizedTopic = sanitizeFileName(note.getTitleConstructor());
+    String sanitizedTitle = sanitizeFileName(note.getTitleConstructor());
     String fileName =
-        note.getChildren().isEmpty() ? sanitizedTopic + ".md" : sanitizedTopic + "/__index.md";
+        note.getChildren().isEmpty() ? sanitizedTitle + ".md" : sanitizedTitle + "/__index.md";
     return path.isEmpty() ? fileName : path + "/" + fileName;
   }
 

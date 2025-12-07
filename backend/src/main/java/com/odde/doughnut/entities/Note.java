@@ -48,7 +48,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private NoteAccessory noteAccessory;
 
-  @Column(name = "description")
+  @Column(name = "details")
   @Getter
   @Setter
   @JsonPropertyDescription("The details of the note is in markdown format.")
@@ -57,7 +57,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
-  @Column(name = "topic_constructor")
+  @Column(name = "title_constructor")
   @NotNull
   @JsonIgnore
   private String titleConstructor = "";

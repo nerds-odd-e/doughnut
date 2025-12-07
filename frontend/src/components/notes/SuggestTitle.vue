@@ -3,7 +3,7 @@
     <label>Suggested Title: {{ suggestedTitle }}</label>
     <RadioButtons
       v-model="replaceOrAppendTitle"
-      scope-name="topicRadio"
+      scope-name="titleRadio"
       :options="[
         { value: 'Replace', label: 'Replace title' },
         { value: 'Append', label: 'Append title' },
