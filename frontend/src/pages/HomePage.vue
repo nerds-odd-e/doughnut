@@ -42,7 +42,7 @@
       </div>
     </div>
 
-    <div class="lower-half" ref="lowerHalf">
+    <div class="lower-half">
       <div class="sharing-section">
         <nav class="nav-items">
           <NavigationItem
@@ -73,7 +73,6 @@ const user = inject<Ref<User | undefined>>("currentUser")
 const { upperNavItems, lowerNavItems } = useNavigationItems()
 
 const upperHalf = ref<HTMLElement>()
-const lowerHalf = ref<HTMLElement>()
 const isScrolling = ref(false)
 
 const cardTitles = [
