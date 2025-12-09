@@ -19,7 +19,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
     "@modelcontextprotocol/sdk": "^1.24.3",
-    "@types/node": "^24.10.1",
+    "@types/node": "^24.10.2",
     "esbuild": "0.27.1",
     "typescript": "5.9.3",
     "vitest": "4.0.15",
