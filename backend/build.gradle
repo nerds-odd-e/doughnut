@@ -9,7 +9,7 @@ plugins {
   id 'org.springframework.boot' version '3.5.8'
   // Spotless for the code style
   id "com.diffplug.spotless" version "8.1.0"
-  id "com.github.ben-manes.versions" version "0.52.0"
+  id "com.github.ben-manes.versions" version "0.53.0"
 }
 
 apply plugin: 'io.spring.dependency-management'
@@ -44,14 +44,14 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-security'
   implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.8.3'
-  implementation 'com.openai:openai-java:4.8.0'
+  implementation 'com.openai:openai-java:4.9.0'
   // RxJava2 for Flowable streaming support
   implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
   implementation 'com.vladsch.flexmark:flexmark-all:0.64.8'
   compileOnly 'org.projectlombok:lombok:1.18.42'
   annotationProcessor 'org.projectlombok:lombok:1.18.42'
   developmentOnly 'org.springframework.boot:spring-boot-devtools'
-  runtimeOnly 'com.mysql:mysql-connector-j:9.4.0'
+  runtimeOnly 'com.mysql:mysql-connector-j:9.5.0'
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
