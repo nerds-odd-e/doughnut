@@ -572,3 +572,11 @@ Then(
 Then('the note details should contain a line break', () => {
   start.assumeNotePage().expectNoteDetailsContainLineBreak()
 })
+
+When('I add note type {string} to my note', (noteType: string) => {
+  start.assumeNotePage().updateNoteType(noteType)
+})
+
+Then('I will see new type {string} on my note', (noteType: string) => {
+  cy.get('#note-noteType').should('have.value', noteType)
+})

@@ -9,6 +9,16 @@
       <div v-if="noteInfo?.note" class="daisy-mb-4">
         <NoteInfoComponent :note-info="noteInfo" />
       </div>
+      <div class="daisy-mb-4">
+        <Select
+          id="note-type-edit"
+          v-model="localNoteType"
+          :options="noteTypeOptions"
+          scope-name="note"
+          field="noteType"
+          @update:model-value="updateNoteType"
+        ></Select>
+      </div>
     </div>
     <div class="daisy-divider daisy-my-2"></div>
     <div class="daisy-btn-group daisy-btn-group-horizontal daisy-justify-end">
@@ -111,6 +121,7 @@ import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { ref, onMounted } from "vue"
 import NoteInfoComponent from "../NoteInfoComponent.vue"
+import Select from "../../form/Select.vue"
 
 const { note } = defineProps<{
   note: Note
@@ -126,6 +137,19 @@ const { popups } = usePopups()
 const storageAccessor = useStorageAccessor()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
+
+const noteTypeOptions = [
+  "concept",
+  "category",
+  "vocab",
+  "journal"
+]
+
+const localNoteType = ref<string>("concept")
+
+const updateNoteType = async (newType: string) => {
+  localNoteType.value = newType
+}
 
 const fetchNoteInfo = async () => {
   const { data: noteInfoData, error } = await NoteController.getNoteInfo({

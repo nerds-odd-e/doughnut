@@ -230,6 +230,24 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
 
+    updateNoteType(noteType: string) {
+      cy.findByRole('button', { name: 'more options' }).then(($button) => {
+        if (!$button.hasClass('daisy-btn-active')) {
+          cy.wrap($button).click()
+        }
+      })
+      cy.get('#note-noteType').select(noteType)
+      cy.pageIsNotLoading()
+      return this
+    },
+
+    selectNoteType(noteType: string) {
+      cy.get('#note-noteType')
+        .should('be.visible')
+        .select(noteType)
+      return this
+    },
+
     startSearchingAndLinkNote() {
       this.toolbarButton('search and link note').click()
       return assumeNoteTargetSearchDialog()
