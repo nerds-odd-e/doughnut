@@ -138,12 +138,7 @@ const storageAccessor = useStorageAccessor()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
-const noteTypeOptions = [
-  "concept",
-  "category",
-  "vocab",
-  "journal"
-]
+const noteTypeOptions = ["concept", "category", "vocab", "journal"]
 
 const localNoteType = ref<string>("concept")
 

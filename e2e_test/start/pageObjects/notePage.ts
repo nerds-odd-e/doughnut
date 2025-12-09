@@ -242,9 +242,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
 
     selectNoteType(noteType: string) {
-      cy.get('#note-noteType')
-        .should('be.visible')
-        .select(noteType)
+      cy.get('#note-noteType').should('be.visible').select(noteType)
       return this
     },
 
