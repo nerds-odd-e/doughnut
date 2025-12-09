@@ -120,6 +120,7 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
+    noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
 export type NoteTopology = {
@@ -618,6 +619,7 @@ export type NoteWritable = {
     id: number;
     createdAt: string;
     wikidataId?: string;
+    noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
 export type SubscriptionWritable = {
@@ -3085,6 +3087,33 @@ export type UndoDeleteNoteResponses = {
 };
 
 export type UndoDeleteNoteResponse = UndoDeleteNoteResponses[keyof UndoDeleteNoteResponses];
+
+export type UpdateNoteTypeData = {
+    body: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/notes/{note}/note-type';
+};
+
+export type UpdateNoteTypeErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type UpdateNoteTypeError = UpdateNoteTypeErrors[keyof UpdateNoteTypeErrors];
+
+export type UpdateNoteTypeResponses = {
+    /**
+     * OK
+     */
+    200: NoteRealm;
+};
+
+export type UpdateNoteTypeResponse = UpdateNoteTypeResponses[keyof UpdateNoteTypeResponses];
 
 export type MoveToCircleData = {
     body?: never;

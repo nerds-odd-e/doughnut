@@ -175,6 +175,18 @@ class NoteController {
     return new RedirectToNoteResponse(note.getId());
   }
 
+  @PatchMapping(value = "/{note}/note-type")
+  @Transactional
+  public NoteRealm updateNoteType(
+      @PathVariable("note") @Schema(type = "integer") Note note,
+      @Valid @RequestBody NoteType noteType)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    noteService.setNoteType(note, noteType);
+    return note.toNoteRealm(authorizationService.getCurrentUser());
+  }
+
   @PostMapping(value = "/move_after/{note}/{targetNote}/{asFirstChild}")
   @Transactional
   public List<NoteRealm> moveAfter(

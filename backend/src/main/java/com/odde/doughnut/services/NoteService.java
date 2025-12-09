@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -159,5 +160,10 @@ public class NoteService {
                 targetNote.getRecallSetting().getLevel()));
 
     return note;
+  }
+
+  public void setNoteType(Note note, NoteType noteType) {
+    note.setNoteType(noteType);
+    entityPersister.merge(note);
   }
 }

@@ -115,6 +115,12 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private Note parent;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "note_type")
+  @Getter
+  @Setter
+  private NoteType noteType = NoteType.UNASSIGNED;
+
   @OneToMany(mappedBy = "note")
   @Getter
   @JsonIgnore
