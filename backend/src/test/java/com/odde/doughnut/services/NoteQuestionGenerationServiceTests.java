@@ -119,7 +119,7 @@ class NoteQuestionGenerationServiceTests {
               com.openai.models.chat.completions.ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
 
-      assertThat(paramsCaptor.getValue().model().asString(), is("gpt-4o-mini"));
+      assertThat(paramsCaptor.getValue().model().asString(), is("gpt-4.1-mini"));
     }
 
     @Test
@@ -143,7 +143,7 @@ class NoteQuestionGenerationServiceTests {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(testNote, null);
       assertThat(request, is(notNullValue()));
-      assertThat(request.model().toString(), is("gpt-4o-mini"));
+      assertThat(request.model().toString(), is("gpt-4.1-mini"));
       boolean hasNoteDescription =
           request.messages().stream()
               .filter(message -> message.user().isPresent())
@@ -158,7 +158,7 @@ class NoteQuestionGenerationServiceTests {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(testNote, null);
       assertThat(request, is(notNullValue()));
-      assertThat(request.model().toString(), is("gpt-4o-mini"));
+      assertThat(request.model().toString(), is("gpt-4.1-mini"));
       boolean hasNoteDescription =
           request.messages().stream()
               .filter(message -> message.user().isPresent())

@@ -46,7 +46,7 @@ public class OpenAIChatCompletionMock {
         ChatCompletion.builder()
             .id("chatcmpl-null")
             .created(System.currentTimeMillis() / 1000L)
-            .model("gpt-4o-mini")
+            .model("gpt-4.1-mini")
             .choices(Collections.emptyList())
             .build();
     Mockito.doReturn(completion)
@@ -82,7 +82,7 @@ public class OpenAIChatCompletionMock {
     return ChatCompletion.builder()
         .id("chatcmpl-mock")
         .created(System.currentTimeMillis() / 1000L)
-        .model("gpt-4o-mini")
+        .model("gpt-4.1-mini")
         .choices(List.of(choice))
         .build();
   }

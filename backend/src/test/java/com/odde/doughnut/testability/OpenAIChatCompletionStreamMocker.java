@@ -57,7 +57,7 @@ public class OpenAIChatCompletionStreamMocker {
           ChatCompletionChunk.builder()
               .id("chatcmpl-mock")
               .created(System.currentTimeMillis() / 1000L)
-              .model("gpt-4o-mini")
+              .model("gpt-4.1-mini")
               .choices(List.of(choice))
               .build();
       chunks.add(chunk);
@@ -76,7 +76,7 @@ public class OpenAIChatCompletionStreamMocker {
         ChatCompletionChunk.builder()
             .id("chatcmpl-mock")
             .created(System.currentTimeMillis() / 1000L)
-            .model("gpt-4o-mini")
+            .model("gpt-4.1-mini")
             .choices(List.of(finalChoice))
             .build();
     chunks.add(finalChunk);

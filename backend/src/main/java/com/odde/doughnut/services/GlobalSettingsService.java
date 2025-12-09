@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class GlobalSettingsService {
 
-  public static final String DEFAULT_CHAT_MODEL = "gpt-4o-mini";
+  public static final String DEFAULT_CHAT_MODEL = "gpt-4.1-mini";
   private final GlobalSettingRepository globalSettingRepository;
   private final EntityPersister entityPersister;
 
