@@ -281,11 +281,12 @@ Given(
 When('I start assimilating {string}', (noteTitle: string) => {
   start.assimilation().goToAssimilationPage()
   cy.findByText(noteTitle, { selector: 'main *' }).should('be.visible')
+  cy.pageIsNotLoading()
   cy.findByRole('button', { name: 'Keep for repetition' }).click()
 })
 
 Then('I should be prompted to select a note_type', () => {
-  // Verify that a dialog/modal appears prompting for note_type selection
+  cy.pageIsNotLoading()
   cy.get('[data-test="note-type-selection-dialog"]', { timeout: 5000 }).should(
     'be.visible'
   )
@@ -299,17 +300,15 @@ Then('I should see the note_type options: {string}', (options: string) => {
 })
 
 When('I select note_type {string}', (noteType: string) => {
-  cy.findByRole('combobox', { name: 'Select Note Type:' }).select(noteType)
+  cy.get('[data-test="note-type-selection-dialog"]').within(() => {
+    cy.get('select').select(noteType)
+  })
 })
 
 Then(
   'the note {string} should be assimilated with note_type {string}',
   (noteTitle: string, noteType: string) => {
-    // Verify the note was assimilated and has the correct note_type
-    // This will need to check the note's note_type property once implemented
-    cy.url().should('not.contain', '/assimilate')
-    // The note should no longer be in the assimilation list
-    cy.get('main').should('not.contain', noteTitle)
+    start.jumpToNotePage(noteTitle).expectNoteType(noteType)
   }
 )
 

@@ -28,10 +28,10 @@
         style="text-align: left; width: 100%;"
       >
         <option value="">Please select...</option>
-        <option value="CONCEPT">Concept</option>
-        <option value="VOCABULARY">Vocabulary</option>
-        <option value="CATEGORY">Category</option>
-        <option value="JOURNAL">Journal</option>
+        <option value="concept">concept</option>
+        <option value="category">category</option>
+        <option value="vocab">vocab</option>
+        <option value="journal">journal</option>
       </select>
     </label>
   </div>

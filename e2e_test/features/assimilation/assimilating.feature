@@ -46,8 +46,6 @@ Feature: Assimilating
       And there is a note "Untyped Note" without a valid note_type
       When I start assimilating "Untyped Note"
       Then I should be prompted to select a note_type
-      #And I should see the note_type options: Concept, Vocabulary, Category, Journal
-      When I select note_type "Concept"
-    # Then the note "Untyped Note" should be assimilated with note_type "Concept"
-    #   And I can continue with the assimilation
+      When I select note_type "concept"
+      Then the note "Untyped Note" should be assimilated with note_type "concept"
 
