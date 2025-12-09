@@ -14,6 +14,25 @@
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
   />
+  <div
+    v-if="showNoteTypeSelection"
+    data-test="note-type-selection-dialog"
+    class="daisy-mb-4"
+  >
+    <label class="daisy-label">
+      <span class="daisy-label-text">Select Note Type:</span>
+      <select
+        v-model="selectedNoteType"
+        class="daisy-select daisy-select-bordered"
+      >
+        <option value="">Please select...</option>
+        <option value="CONCEPT">Concept</option>
+        <option value="VOCABULARY">Vocabulary</option>
+        <option value="CATEGORY">Category</option>
+        <option value="JOURNAL">Journal</option>
+      </select>
+    </label>
+  </div>
   <AssimilationButtons
     :key="buttonKey"
     @assimilate="processForm"
@@ -29,7 +48,7 @@ import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
@@ -50,7 +69,10 @@ const { totalAssimilatedCount } = useRecallData()
 
 const { incrementAssimilatedCount } = useAssimilationCount()
 
-// Computed
+// State
+const showNoteTypeSelection = ref(true)
+const selectedNoteType = ref("")
+
 const buttonKey = computed(() => note.id)
 
 // Methods
