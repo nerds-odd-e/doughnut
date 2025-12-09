@@ -299,7 +299,7 @@ Then('I should see the note_type options: {string}', (options: string) => {
 })
 
 When('I select note_type {string}', (noteType: string) => {
-  cy.findByRole('button', { name: noteType }).click()
+  cy.findByRole('combobox', { name: 'Select Note Type:' }).select(noteType)
 })
 
 Then(
