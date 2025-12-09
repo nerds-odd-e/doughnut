@@ -18,12 +18,14 @@
     v-if="showNoteTypeSelection"
     data-test="note-type-selection-dialog"
     class="daisy-mb-4"
+    style="text-align: left;"
   >
-    <label class="daisy-label">
+    <label class="daisy-label" style="justify-content: flex-start;">
       <span class="daisy-label-text">Select Note Type:</span>
       <select
         v-model="selectedNoteType"
         class="daisy-select daisy-select-bordered"
+        style="text-align: left; width: 100%;"
       >
         <option value="">Please select...</option>
         <option value="CONCEPT">Concept</option>
@@ -118,5 +120,28 @@ const processForm = async (skipMemoryTracking: boolean) => {
   background-color: rgba(50, 50, 150, 0.8);
   padding: 5px;
   border-radius: 10px;
+}
+
+[data-test="note-type-selection-dialog"] {
+  text-align: left;
+}
+
+[data-test="note-type-selection-dialog"] .daisy-label {
+  justify-content: flex-start !important;
+  align-items: flex-start !important;
+}
+
+[data-test="note-type-selection-dialog"] .daisy-label-text {
+  text-align: left;
+}
+
+[data-test="note-type-selection-dialog"] select {
+  text-align: left !important;
+  direction: ltr;
+}
+
+[data-test="note-type-selection-dialog"] select option {
+  text-align: left;
+  direction: ltr;
 }
 </style>
