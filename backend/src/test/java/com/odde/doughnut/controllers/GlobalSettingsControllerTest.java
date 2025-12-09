@@ -33,9 +33,12 @@ class GlobalSettingsControllerTest extends ControllerTestBase {
     @Test
     void ShouldUseGpt35ByDefault() {
       GlobalAiModelSettings currentModelVersions = controller.getCurrentModelVersions();
-      assertEquals("gpt-4.1-mini", currentModelVersions.getQuestionGenerationModel());
-      assertEquals("gpt-4.1-mini", currentModelVersions.getEvaluationModel());
-      assertEquals("gpt-4.1-mini", currentModelVersions.getOthersModel());
+      assertEquals(
+          GlobalSettingsService.DEFAULT_CHAT_MODEL,
+          currentModelVersions.getQuestionGenerationModel());
+      assertEquals(
+          GlobalSettingsService.DEFAULT_CHAT_MODEL, currentModelVersions.getEvaluationModel());
+      assertEquals(GlobalSettingsService.DEFAULT_CHAT_MODEL, currentModelVersions.getOthersModel());
     }
 
     @Test

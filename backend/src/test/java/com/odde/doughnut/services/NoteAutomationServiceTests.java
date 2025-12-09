@@ -82,7 +82,7 @@ class NoteAutomationServiceTests {
     // Note: We don't use responseFormat here to avoid type issues - we just need tools present
     ChatCompletionCreateParams requestWithTools =
         ChatCompletionCreateParams.builder()
-            .model(com.openai.models.ChatModel.of("gpt-4.1-mini"))
+            .model(com.openai.models.ChatModel.of(GlobalSettingsService.DEFAULT_CHAT_MODEL))
             .messages(
                 List.of(
                     com.openai.models.chat.completions.ChatCompletionMessageParam.ofUser(

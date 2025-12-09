@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.configs.ObjectMapperConfig;
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.openai.client.OpenAIClient;
 import com.openai.core.JsonValue;
 import com.openai.models.chat.completions.ChatCompletion;
@@ -46,7 +47,7 @@ public class OpenAIChatCompletionMock {
         ChatCompletion.builder()
             .id("chatcmpl-null")
             .created(System.currentTimeMillis() / 1000L)
-            .model("gpt-4.1-mini")
+            .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
             .choices(Collections.emptyList())
             .build();
     Mockito.doReturn(completion)
@@ -82,7 +83,7 @@ public class OpenAIChatCompletionMock {
     return ChatCompletion.builder()
         .id("chatcmpl-mock")
         .created(System.currentTimeMillis() / 1000L)
-        .model("gpt-4.1-mini")
+        .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
         .choices(List.of(choice))
         .build();
   }

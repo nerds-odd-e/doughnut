@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.odde.doughnut.services.GlobalSettingsService;
 import com.openai.client.OpenAIClient;
 import com.openai.client.OpenAIClientAsync;
 import com.openai.core.http.AsyncStreamResponse;
@@ -57,7 +58,7 @@ public class OpenAIChatCompletionStreamMocker {
           ChatCompletionChunk.builder()
               .id("chatcmpl-mock")
               .created(System.currentTimeMillis() / 1000L)
-              .model("gpt-4.1-mini")
+              .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
               .choices(List.of(choice))
               .build();
       chunks.add(chunk);
@@ -76,7 +77,7 @@ public class OpenAIChatCompletionStreamMocker {
         ChatCompletionChunk.builder()
             .id("chatcmpl-mock")
             .created(System.currentTimeMillis() / 1000L)
-            .model("gpt-4.1-mini")
+            .model(GlobalSettingsService.DEFAULT_CHAT_MODEL)
             .choices(List.of(finalChoice))
             .build();
     chunks.add(finalChunk);
