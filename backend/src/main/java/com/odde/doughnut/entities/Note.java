@@ -11,6 +11,7 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
+import com.odde.doughnut.entities.converters.NoteTypeConverter;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -115,7 +116,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   private Note parent;
 
-  @Enumerated(EnumType.STRING)
+  @Convert(converter = NoteTypeConverter.class)
   @Column(name = "note_type")
   @Getter
   @Setter
