@@ -291,15 +291,12 @@ Then('I should be prompted to select a note_type', () => {
   )
 })
 
-Then(
-  'I should see the note_type options: {string}',
-  (options: string) => {
-    const expectedOptions = options.split(', ').map((opt) => opt.trim())
-    expectedOptions.forEach((option) => {
-      cy.findByRole('button', { name: option }).should('be.visible')
-    })
-  }
-)
+Then('I should see the note_type options: {string}', (options: string) => {
+  const expectedOptions = options.split(', ').map((opt) => opt.trim())
+  expectedOptions.forEach((option) => {
+    cy.findByRole('button', { name: option }).should('be.visible')
+  })
+})
 
 When('I select note_type {string}', (noteType: string) => {
   cy.findByRole('button', { name: noteType }).click()

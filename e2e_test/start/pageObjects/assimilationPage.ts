@@ -51,9 +51,9 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   expectNoteTypePrompt() {
-    cy.get('[data-test="note-type-selection-dialog"]', { timeout: 5000 }).should(
-      'be.visible'
-    )
+    cy.get('[data-test="note-type-selection-dialog"]', {
+      timeout: 5000,
+    }).should('be.visible')
     return this
   },
   expectNoteTypeOptions(options: string[]) {
