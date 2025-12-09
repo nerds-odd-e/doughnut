@@ -1,10 +1,17 @@
 packages:
   - frontend
   - mcp-server
+
+strictDepBuilds: true
+
 onlyBuiltDependencies:
+  - package-with-necessary-build-scripts
   - '@badeball/cypress-cucumber-preprocessor'
   - '@biomejs/biome'
   - '@parcel/watcher'
   - core-js-pure
   - cypress
   - esbuild
+
+ignoredBuiltDependencies:
+  - package-with-unnecessary-build-scripts
