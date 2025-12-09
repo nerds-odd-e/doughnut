@@ -44,6 +44,26 @@ export const assumeAssimilationPage = () => ({
       })
     )
   },
+  selectNoteType(noteType: string) {
+    cy.get('[data-test="note-type-selection-dialog"]').within(() => {
+      cy.findByRole('button', { name: noteType }).click()
+    })
+    return this
+  },
+  expectNoteTypePrompt() {
+    cy.get('[data-test="note-type-selection-dialog"]', { timeout: 5000 }).should(
+      'be.visible'
+    )
+    return this
+  },
+  expectNoteTypeOptions(options: string[]) {
+    options.forEach((option) => {
+      cy.get('[data-test="note-type-selection-dialog"]').within(() => {
+        cy.findByRole('button', { name: option }).should('be.visible')
+      })
+    })
+    return this
+  },
 })
 
 export const assimilation = () => {
