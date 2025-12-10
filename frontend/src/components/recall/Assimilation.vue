@@ -20,21 +20,13 @@
     class="daisy-mb-4"
     style="text-align: left;"
   >
-    <label class="daisy-label" style="justify-content: flex-start;">
-      <span class="daisy-label-text">Select Note Type:</span>
-      <select
-        v-model="selectedNoteType"
-        class="daisy-select daisy-select-bordered"
-        style="text-align: left; width: 100%;"
-      >
-        <option value="">Please select...</option>
-        <option value="concept">concept</option>
-        <option value="category">category</option>
-        <option value="vocab">vocab</option>
-        <option value="journal">journal</option>
-        <option value="unassigned">unassigned</option>
-      </select>
-    </label>
+    <Select
+      v-model="selectedNoteType"
+      :options="noteTypeOptions"
+      scope-name="note"
+      field="noteType"
+      @update:model-value="updateNoteType"
+    />
   </div>
   <AssimilationButtons
     :key="buttonKey"
@@ -57,6 +49,9 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import Select from "../form/Select.vue"
+import { noteTypeOptions } from "@/models/noteTypeOptions"
+import type { NoteType } from "@/models/noteTypeOptions"
 
 // Props
 const { note } = defineProps<{
@@ -76,7 +71,7 @@ const { totalAssimilatedCount } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
-const selectedNoteType = ref(note.noteType || "")
+const selectedNoteType = ref<NoteType>(note.noteType || "unassigned")
 
 // Always show dialog so user can update note type if they wish
 const showNoteTypeSelection = ref(true)
@@ -87,41 +82,31 @@ const buttonKey = computed(() => note.id)
 watch(
   () => note.noteType,
   (newNoteType) => {
-    selectedNoteType.value = newNoteType || ""
+    selectedNoteType.value = newNoteType || "unassigned"
   }
 )
 
-// Watch for user changes and save to database
-watch(selectedNoteType, async (newType, oldType) => {
-  // Don't save on initial mount or if value hasn't actually changed
-  if (!newType || newType === "" || newType === oldType) {
-    return
-  }
+const updateNoteType = async (newType: NoteType) => {
+  const previousValue = note.noteType || "unassigned"
+  selectedNoteType.value = newType
 
   // Don't save if it matches the current note.noteType (avoid unnecessary API calls)
   if (newType === note.noteType) {
     return
   }
 
-  const previousValue = note.noteType || ""
-
   const { error } = await apiCallWithLoading(() =>
     NoteController.updateNoteType({
       path: { note: note.id },
-      body: newType as
-        | "concept"
-        | "category"
-        | "vocab"
-        | "journal"
-        | "unassigned",
+      body: newType,
     })
   )
 
   if (error) {
     // Revert to previous value on error
-    selectedNoteType.value = previousValue
+    selectedNoteType.value = previousValue as NoteType
   }
-})
+}
 
 // Methods
 const processForm = async (skipMemoryTracking: boolean) => {

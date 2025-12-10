@@ -4,7 +4,8 @@
       :class="`daisy-select daisy-select-bordered ${!!errorMessage ? 'daisy-select-error' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="scopeName"
-      v-model="localValue"
+      :value="modelValue"
+      @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
     >
       <option
         class="options"
@@ -20,7 +21,6 @@
 
 <script lang="ts" setup>
 import type { PropType } from "vue"
-import { ref, watch } from "vue"
 import InputWithType from "./InputWithType.vue"
 
 const props = defineProps({
@@ -32,9 +32,4 @@ const props = defineProps({
 })
 
 const emit = defineEmits(["update:modelValue"])
-const localValue = ref(props.modelValue)
-
-watch(localValue, (newValue) => {
-  emit("update:modelValue", newValue)
-})
 </script>

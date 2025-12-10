@@ -131,7 +131,7 @@ describe("Assimilation component", () => {
       expect(dialog.exists()).toBe(true)
       const select = dialog.find("select")
       expect(select.exists()).toBe(true)
-      expect(select.element.value).toBe("")
+      expect(select.element.value).toBe("unassigned")
     })
 
     it("always shows note type selection dialog when noteType is unassigned", async () => {
@@ -254,12 +254,14 @@ describe("Assimilation component", () => {
         path: { note: note.id },
         body: "vocab",
       })
-      // After error, the value should revert to empty (original value)
+      // After error, the value should revert to unassigned (original value)
       // Re-find the select after the error to get the updated value
       const selectAfterError = wrapper.find(
         '[data-test="note-type-selection-dialog"] select'
       )
-      expect((selectAfterError.element as HTMLSelectElement).value).toBe("")
+      expect((selectAfterError.element as HTMLSelectElement).value).toBe(
+        "unassigned"
+      )
     })
 
     it("does not save when selectedNoteType matches current note.noteType", async () => {
@@ -327,7 +329,7 @@ describe("Assimilation component", () => {
       let dialog = wrapper.find('[data-test="note-type-selection-dialog"]')
       expect(dialog.exists()).toBe(true)
       let select = dialog.find("select")
-      expect(select.element.value).toBe("")
+      expect(select.element.value).toBe("unassigned")
 
       // Update prop to have a type
       await wrapper.setProps({
