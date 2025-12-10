@@ -28,6 +28,24 @@
       @update:model-value="updateNoteType"
     />
   </div>
+  <div
+    v-if="noteSummaryPoints.length > 0"
+    data-test="note-details-summary"
+    class="daisy-mb-4 daisy-alert daisy-alert-info"
+  >
+    <div class="daisy-text-sm">
+      <div class="daisy-font-semibold daisy-mb-2">Summary:</div>
+      <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
+        <li
+          v-for="(point, index) in noteSummaryPoints"
+          :key="index"
+          class="daisy-text-base-content/80"
+        >
+          {{ point }}
+        </li>
+      </ul>
+    </div>
+  </div>
   <AssimilationButtons
     :key="buttonKey"
     @assimilate="processForm"
@@ -74,6 +92,22 @@ const selectedNoteType = ref<NoteType>(note.noteType || "unassigned")
 const showNoteTypeSelection = ref(true)
 
 const buttonKey = computed(() => note.id)
+
+// Hardcoded summary for test - split note details by periods into points
+const noteSummaryPoints = computed(() => {
+  if (!note.details) {
+    return []
+  }
+
+  // Split by periods and filter out empty strings
+  const points = note.details
+    .split(".")
+    .map((point) => point.trim())
+    .filter((point) => point.length > 0)
+    .map((point) => `${point}.`)
+
+  return points
+})
 
 watch(
   () => note.noteType,

@@ -302,6 +302,15 @@ Then(
   }
 )
 
+Then(
+  'I should see a summary of the note broken down into two points: {string} and {string}',
+  (point1: string, point2: string) => {
+    cy.get('[data-test="note-details-summary"]').should('be.visible')
+    cy.get('[data-test="note-details-summary"]').should('contain', point1)
+    cy.get('[data-test="note-details-summary"]').should('contain', point2)
+  }
+)
+
 Then('I can continue with the assimilation', () => {
   // Verify we're still on the assimilation page or moved to the next note
   cy.url().should('satisfy', (url: string) => {
