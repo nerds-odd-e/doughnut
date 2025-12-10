@@ -32,6 +32,7 @@
         <option value="category">category</option>
         <option value="vocab">vocab</option>
         <option value="journal">journal</option>
+        <option value="unassigned">unassigned</option>
       </select>
     </label>
   </div>
@@ -43,14 +44,17 @@
 
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
-import { AssimilationController } from "@generated/backend/sdk.gen"
+import {
+  AssimilationController,
+  NoteController,
+} from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
 import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
-import { computed, ref } from "vue"
+import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 
@@ -72,10 +76,52 @@ const { totalAssimilatedCount } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
+const selectedNoteType = ref(note.noteType || "")
+
+// Always show dialog so user can update note type if they wish
 const showNoteTypeSelection = ref(true)
-const selectedNoteType = ref("")
 
 const buttonKey = computed(() => note.id)
+
+// Update selectedNoteType when note prop changes (new note loaded)
+watch(
+  () => note.noteType,
+  (newNoteType) => {
+    selectedNoteType.value = newNoteType || ""
+  }
+)
+
+// Watch for user changes and save to database
+watch(selectedNoteType, async (newType, oldType) => {
+  // Don't save on initial mount or if value hasn't actually changed
+  if (!newType || newType === "" || newType === oldType) {
+    return
+  }
+
+  // Don't save if it matches the current note.noteType (avoid unnecessary API calls)
+  if (newType === note.noteType) {
+    return
+  }
+
+  const previousValue = note.noteType || ""
+
+  const { error } = await apiCallWithLoading(() =>
+    NoteController.updateNoteType({
+      path: { note: note.id },
+      body: newType as
+        | "concept"
+        | "category"
+        | "vocab"
+        | "journal"
+        | "unassigned",
+    })
+  )
+
+  if (error) {
+    // Revert to previous value on error
+    selectedNoteType.value = previousValue
+  }
+})
 
 // Methods
 const processForm = async (skipMemoryTracking: boolean) => {
