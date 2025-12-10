@@ -53,12 +53,10 @@ import Select from "../form/Select.vue"
 import { noteTypeOptions } from "@/models/noteTypeOptions"
 import type { NoteType } from "@/models/noteTypeOptions"
 
-// Props
 const { note } = defineProps<{
   note: Note
 }>()
 
-// Emits
 const emit = defineEmits<{
   (e: "reloadNeeded"): void
   (e: "initialReviewDone"): void
@@ -73,12 +71,10 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 // State
 const selectedNoteType = ref<NoteType>(note.noteType || "unassigned")
 
-// Always show dialog so user can update note type if they wish
 const showNoteTypeSelection = ref(true)
 
 const buttonKey = computed(() => note.id)
 
-// Update selectedNoteType when note prop changes (new note loaded)
 watch(
   () => note.noteType,
   (newNoteType) => {
@@ -90,7 +86,6 @@ const updateNoteType = async (newType: NoteType) => {
   const previousValue = note.noteType || "unassigned"
   selectedNoteType.value = newType
 
-  // Don't save if it matches the current note.noteType (avoid unnecessary API calls)
   if (newType === note.noteType) {
     return
   }
@@ -103,8 +98,7 @@ const updateNoteType = async (newType: NoteType) => {
   )
 
   if (error) {
-    // Revert to previous value on error
-    selectedNoteType.value = previousValue as NoteType
+    selectedNoteType.value = previousValue
   }
 }
 
