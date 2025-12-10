@@ -164,7 +164,6 @@ describe("NoteMoreOptionsDialog", () => {
       const select = wrapper.find('select[id="note-noteType"]')
       expect((select.element as HTMLSelectElement).value).toBe("concept")
 
-
       await select.setValue("journal")
       await flushPromises()
       await flushPromises()
@@ -263,7 +262,6 @@ describe("NoteMoreOptionsDialog", () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
-
 
       const accessory = {
         id: 1,
