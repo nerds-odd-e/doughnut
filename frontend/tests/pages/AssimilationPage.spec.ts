@@ -34,6 +34,9 @@ beforeEach(() => {
     createdAt: "",
   })
   showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
+  mockSdkService("generateSummary", {
+    points: [],
+  })
   mockShowNoteAccessory()
   renderer = helper.component(AssimilationPage).withCleanStorage().withProps({})
 })

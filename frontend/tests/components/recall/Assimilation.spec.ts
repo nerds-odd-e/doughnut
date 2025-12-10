@@ -36,6 +36,9 @@ beforeEach(() => {
     note: makeMe.aNoteRealm.please(),
     createdAt: "",
   })
+  mockSdkService("generateSummary", {
+    points: [],
+  })
 
   vi.mocked(useRecallData).mockReturnValue({
     totalAssimilatedCount: mockedTotalAssimilatedCount,
