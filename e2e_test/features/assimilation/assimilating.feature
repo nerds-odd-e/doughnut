@@ -40,12 +40,3 @@ Feature: Assimilating
           | single note   | Note 3     | no    |
           | initial done  |            |       |
 
-  
-  Scenario: Prompt for note_type when missing during assimilation
-      Given It's day 1, 8 hour
-      And there is a note "Untyped Note" without a valid note_type
-      When I start assimilating "Untyped Note"
-      Then I should be prompted to select a note_type
-      When I select note_type "concept"
-      Then the note "Untyped Note" should be assimilated with note_type "concept"
-

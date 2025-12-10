@@ -267,39 +267,28 @@ Then(
   }
 )
 
-Given(
-  'there is a note {string} without a valid note_type',
-  (noteTitle: string) => {
-    cy.get<string>('@currentLoginUser').then((username) => {
-      // Create a note without a valid note_type
-      // Note: This will need to be updated once the backend supports note_type field
-      start.testability().injectNotes([{ Title: noteTitle }], username)
-    })
-  }
-)
+Given('there is a note {string}', (noteTitle: string) => {
+  cy.get<string>('@currentLoginUser').then((username) => {
+    // Create a note without a valid note_type
+    // Note: This will need to be updated once the backend supports note_type field
+    start.testability().injectNotes([{ Title: noteTitle }], username)
+  })
+})
 
 When('I start assimilating {string}', (noteTitle: string) => {
   start.assimilation().goToAssimilationPage()
   cy.findByText(noteTitle, { selector: 'main *' }).should('be.visible')
   cy.pageIsNotLoading()
-  // cy.findByRole('button', { name: 'Keep for repetition' }).click()
 })
 
-Then('I should be prompted to select a note_type', () => {
+Then('I should be able to select a note type', () => {
   cy.pageIsNotLoading()
   cy.get('[data-test="note-type-selection-dialog"]', { timeout: 5000 }).should(
     'be.visible'
   )
 })
 
-Then('I should see the note_type options: {string}', (options: string) => {
-  const expectedOptions = options.split(', ').map((opt) => opt.trim())
-  expectedOptions.forEach((option) => {
-    cy.findByRole('button', { name: option }).should('be.visible')
-  })
-})
-
-When('I select note_type {string}', (noteType: string) => {
+When('I select note type {string}', (noteType: string) => {
   cy.get('[data-test="note-type-selection-dialog"]').within(() => {
     cy.get('select').select(noteType)
     cy.pageIsNotLoading()
@@ -307,7 +296,7 @@ When('I select note_type {string}', (noteType: string) => {
 })
 
 Then(
-  'the note {string} should be assimilated with note_type {string}',
+  'the note {string} should be saved with note type {string}',
   (noteTitle: string, noteType: string) => {
     start.jumpToNotePage(noteTitle, true).expectNoteType(noteType)
   }
