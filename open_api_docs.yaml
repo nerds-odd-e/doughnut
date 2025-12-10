@@ -2131,6 +2131,30 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SuggestedTitleDTO"
+  /api/ai/generate-summary/{note}:
+    post:
+      tags:
+      - ai-controller
+      operationId: generateSummary
+      parameters:
+      - name: note
+        in: path
+        required: true
+        schema:
+          type: integer
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/NoteSummaryDTO"
   /api/ai/generate-image:
     post:
       tags:
@@ -4276,6 +4300,13 @@ components:
       properties:
         title:
           type: string
+    NoteSummaryDTO:
+      type: object
+      properties:
+        points:
+          type: array
+          items:
+            type: string
     AiGeneratedImage:
       type: object
       properties:

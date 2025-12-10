@@ -305,7 +305,11 @@ Then(
 Then(
   'I should see a summary of the note broken down into two points: {string} and {string}',
   (point1: string, point2: string) => {
-    cy.get('[data-test="note-details-summary"]').should('be.visible')
+    cy.pageIsNotLoading()
+    // Wait for the summary to be generated and displayed
+    cy.get('[data-test="note-details-summary"]', { timeout: 10000 }).should(
+      'be.visible'
+    )
     cy.get('[data-test="note-details-summary"]').should('contain', point1)
     cy.get('[data-test="note-details-summary"]').should('contain', point2)
   }

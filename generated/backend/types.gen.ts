@@ -404,6 +404,10 @@ export type SuggestedTitleDto = {
     title?: string;
 };
 
+export type NoteSummaryDto = {
+    points?: Array<string>;
+};
+
 export type AiGeneratedImage = {
     b64encoded?: string;
 };
@@ -2900,6 +2904,33 @@ export type SuggestTitleResponses = {
 };
 
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
+
+export type GenerateSummaryData = {
+    body?: never;
+    path: {
+        note: number;
+    };
+    query?: never;
+    url: '/api/ai/generate-summary/{note}';
+};
+
+export type GenerateSummaryErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type GenerateSummaryError = GenerateSummaryErrors[keyof GenerateSummaryErrors];
+
+export type GenerateSummaryResponses = {
+    /**
+     * OK
+     */
+    200: NoteSummaryDto;
+};
+
+export type GenerateSummaryResponse = GenerateSummaryResponses[keyof GenerateSummaryResponses];
 
 export type GenerateImageData = {
     body: string;

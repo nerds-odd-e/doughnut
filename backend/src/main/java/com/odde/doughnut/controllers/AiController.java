@@ -8,6 +8,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NotebookAssistantForNoteServiceFactory;
 import com.odde.doughnut.services.ai.OtherAiServices;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,5 +62,25 @@ public class AiController {
     String title =
         notebookAssistantForNoteServiceFactory.createNoteAutomationService(note).suggestTitle();
     return new SuggestedTitleDTO(title);
+  }
+
+  @PostMapping("/generate-summary/{note}")
+  @Transactional
+  public NoteSummaryDTO generateSummary(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note)
+      throws UnexpectedNoAccessRightException {
+    authorizationService.assertAuthorization(note);
+    // Mock response: split note details by periods into summary points
+    String details = note.getDetails();
+    if (details == null || details.trim().isEmpty()) {
+      return new NoteSummaryDTO(List.of());
+    }
+    List<String> points =
+        Arrays.stream(details.split("\\."))
+            .map(String::trim)
+            .filter(s -> !s.isEmpty())
+            .map(s -> s + ".")
+            .toList();
+    return new NoteSummaryDTO(points);
   }
 }

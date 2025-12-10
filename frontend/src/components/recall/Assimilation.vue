@@ -55,6 +55,7 @@
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
 import {
+  AiController,
   AssimilationController,
   NoteController,
 } from "@generated/backend/sdk.gen"
@@ -93,21 +94,45 @@ const showNoteTypeSelection = ref(true)
 
 const buttonKey = computed(() => note.id)
 
-// Hardcoded summary for test - split note details by periods into points
-const noteSummaryPoints = computed(() => {
-  if (!note.details) {
-    return []
+// Summary from backend
+const noteSummaryPoints = ref<string[]>([])
+const isLoadingSummary = ref(false)
+
+const generateSummary = async () => {
+  if (!note.details || note.details.trim().length === 0) {
+    noteSummaryPoints.value = []
+    return
   }
 
-  // Split by periods and filter out empty strings
-  const points = note.details
-    .split(".")
-    .map((point) => point.trim())
-    .filter((point) => point.length > 0)
-    .map((point) => `${point}.`)
+  isLoadingSummary.value = true
+  try {
+    const result = await apiCallWithLoading(() =>
+      AiController.generateSummary({
+        path: { note: note.id },
+      })
+    )
 
-  return points
-})
+    if (!result.error && result.data) {
+      noteSummaryPoints.value = result.data.points || []
+    } else {
+      noteSummaryPoints.value = []
+    }
+  } catch (err) {
+    console.error("Failed to generate summary:", err)
+    noteSummaryPoints.value = []
+  } finally {
+    isLoadingSummary.value = false
+  }
+}
+
+// Generate summary when note changes
+watch(
+  () => note.id,
+  () => {
+    generateSummary()
+  },
+  { immediate: true }
+)
 
 watch(
   () => note.noteType,
