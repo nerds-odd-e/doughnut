@@ -41,7 +41,6 @@ Feature: Assimilating
           | initial done  |            |       |
 
   
-  @ignore
   Scenario: Prompt for note_type when missing during assimilation
       Given It's day 1, 8 hour
       And there is a note "Untyped Note" without a valid note_type
