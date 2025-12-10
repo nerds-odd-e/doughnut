@@ -16,4 +16,21 @@ Feature: Note type
     And I add note type "concept" to my note
     And I add note type "journal" to my note
     Then I will see new type "journal" on my note
+
+  @ignore
+  Scenario Outline: AI will interpret note type when generating questions
+    Given I have a notebook with the head note "Reservoirs" and details "The most popular reservoir to hike in is Macritchie"
+    And AI will generate question for note with type:
+     | note type | question                                       |
+     | journal   | What is the most popular reservoir to hike in? |
+     | vocab     | What does the word "reservoir" mean?           |
+
+    When I assign note type "<Note Type>" for note "Reservoirs"
+    Then AI will genreate question for note "Reservoirs" with question "<Question>"
+
+    Examples:
+    | Note Type | Question                                       |
+    | journal   | What is the most popular reservoir to hike in? |
+    | vocab     | What does the word "reservoir" mean?           |
+
     
