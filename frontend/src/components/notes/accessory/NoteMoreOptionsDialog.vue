@@ -102,6 +102,7 @@
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
 import type { NoteAccessory } from "@generated/backend"
+import type { UpdateNoteTypeData } from "@generated/backend"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import Questions from "../Questions.vue"
@@ -139,24 +140,27 @@ const storageAccessor = useStorageAccessor()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
-const noteTypeOptions: Array<
-  "unassigned" | "concept" | "category" | "vocab" | "journal"
-> = ["unassigned", "concept", "category", "vocab", "journal"]
+type NoteType = UpdateNoteTypeData["body"]
 
-const localNoteType = ref<string>(note.noteType || "unassigned")
+const noteTypeOptions: NoteType[] = [
+  "unassigned",
+  "concept",
+  "category",
+  "vocab",
+  "journal",
+]
 
-const updateNoteType = async (newType: string) => {
+const localNoteType = ref<UpdateNoteTypeData["body"]>(
+  note.noteType || "unassigned"
+)
+
+const updateNoteType = async (newType: UpdateNoteTypeData["body"]) => {
   const previousValue = localNoteType.value
   localNoteType.value = newType
   const { data: updatedNote, error } = await apiCallWithLoading(() =>
     NoteController.updateNoteType({
       path: { note: note.id },
-      body: newType as
-        | "concept"
-        | "category"
-        | "vocab"
-        | "journal"
-        | "unassigned",
+      body: newType,
     })
   )
   if (error) {
@@ -173,11 +177,7 @@ const fetchNoteInfo = async () => {
   if (!error && noteInfoData) {
     noteInfo.value = noteInfoData
     const fetchedNoteType = noteInfoData.note?.note?.noteType
-    if (fetchedNoteType) {
-      localNoteType.value = fetchedNoteType
-    } else {
-      localNoteType.value = "unassigned"
-    }
+    localNoteType.value = fetchedNoteType ?? "unassigned"
   }
 }
 

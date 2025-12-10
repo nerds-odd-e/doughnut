@@ -21,6 +21,7 @@ import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
@@ -179,7 +180,7 @@ class NoteController {
   @Transactional
   public NoteRealm updateNoteType(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody NoteType noteType)
+      @NotNull @Valid @RequestBody NoteType noteType)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
