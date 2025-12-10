@@ -102,7 +102,6 @@
 <script setup lang="ts">
 import type { Note } from "@generated/backend"
 import type { NoteAccessory } from "@generated/backend"
-import type { UpdateNoteTypeData } from "@generated/backend"
 import PopButton from "../../commons/Popups/PopButton.vue"
 import AIGenerateImageDialog from "../AIGenerateImageDialog.vue"
 import Questions from "../Questions.vue"
@@ -124,6 +123,8 @@ import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref, onMounted } from "vue"
 import NoteInfoComponent from "../NoteInfoComponent.vue"
 import Select from "../../form/Select.vue"
+import type { NoteType } from "@/models/noteTypeOptions"
+import { noteTypeOptions } from "@/models/noteTypeOptions"
 
 const { note } = defineProps<{
   note: Note
@@ -140,21 +141,9 @@ const storageAccessor = useStorageAccessor()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
-type NoteType = UpdateNoteTypeData["body"]
+const localNoteType = ref<NoteType>(note.noteType || "unassigned")
 
-const noteTypeOptions: NoteType[] = [
-  "unassigned",
-  "concept",
-  "category",
-  "vocab",
-  "journal",
-]
-
-const localNoteType = ref<UpdateNoteTypeData["body"]>(
-  note.noteType || "unassigned"
-)
-
-const updateNoteType = async (newType: UpdateNoteTypeData["body"]) => {
+const updateNoteType = async (newType: NoteType) => {
   const previousValue = localNoteType.value
   localNoteType.value = newType
   const { data: updatedNote, error } = await apiCallWithLoading(() =>
