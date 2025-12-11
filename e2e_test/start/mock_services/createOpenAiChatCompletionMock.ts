@@ -81,6 +81,9 @@ const openAiChatCompletionStubber = (
         ],
       })
     },
+    stubQuestionGenerationWithBodyMatch(argumentsString: string) {
+      return stubJsonSchemaResponse(argumentsString)
+    },
     requestDoesNotMessageMatch(message: MessageToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch, {
         messages: [message],
