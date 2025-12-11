@@ -78,19 +78,43 @@ public class AiToolFactory {
     return switch (noteType) {
       case VOCAB ->
           """
-          **Special Instruction for Vocab Note**: The focus note is a vocabulary/word note. When generating the question, focus on definitions, translations, word usage, etymology, or linguistic aspects. Consider asking about meanings, synonyms, antonyms, or how the word is used in context.
+          **Special Instruction for Vocab Note**: The focus note is a vocabulary/word note. Generate questions that test word-level knowledge:
+          - Ask for the definition, meaning, or translation of the word
+          - Test understanding of how the word is used in context or sentences
+          - Ask about word forms (noun, verb, adjective), etymology, or linguistic properties
+          - Test recognition of the word's spelling, pronunciation, or related words (synonyms, antonyms)
+          - Avoid questions that require deep conceptual understanding beyond the word itself
+          The question should focus on the word as a linguistic unit, not as a concept.
           """;
       case CATEGORY ->
           """
-          **Special Instruction for Category Note**: The focus note represents a category or classification. When generating the question, emphasize classification, membership, hierarchical relationships, or what belongs to this category. Consider asking about what fits in this category, how items are classified, or the characteristics that define membership.
+          **Special Instruction for Category Note**: The focus note represents a category or classification. Generate questions that test classification and membership knowledge:
+          - Ask what belongs to this category or what examples fit within it
+          - Test understanding of category boundaries: what is included vs excluded
+          - Ask about the defining characteristics or criteria for category membership
+          - Test ability to distinguish category members from non-members
+          - Ask about hierarchical relationships: what subcategories exist, or what broader category this belongs to
+          The question should focus on classification logic and membership rules, not on understanding individual items.
           """;
       case CONCEPT ->
           """
-          **Special Instruction for Concept Note**: The focus note represents a concept or idea. When generating the question, test understanding of the concept, its properties, relationships, or applications. Consider asking about the concept's definition, characteristics, how it relates to other concepts, or its significance.
+          **Special Instruction for Concept Note**: The focus note represents a concept or idea. Generate questions that test conceptual understanding:
+          - Ask how the concept works, why it matters, or what principles it embodies
+          - Test understanding of relationships: how this concept connects to or differs from related concepts
+          - Ask about applications: how the concept is used in practice or real-world scenarios
+          - Test deeper understanding: mechanisms, causes, effects, or underlying principles
+          - Ask about the concept's significance, implications, or role in a broader context
+          The question should require reasoning and understanding, not just recall of facts or definitions.
           """;
       case JOURNAL ->
           """
-          **Special Instruction for Journal Note**: The focus note is a journal entry or personal note. When generating the question, consider personal experiences, events, reflections, or chronological aspects. Consider asking about what happened, when it occurred, personal insights, or the significance of the recorded experience.
+          **Special Instruction for Journal Note**: The focus note is a journal entry or personal note. Generate questions that test recall of personal experiences and events:
+          - Ask about what happened: specific events, actions, or occurrences described in the note
+          - Test temporal recall: when events occurred, sequence of events, or chronological details
+          - Ask about who was involved, where events took place, or other factual details from the experience
+          - Test recall of personal insights, reflections, emotions, or significance described in the note
+          - Ask about connections: how this experience relates to other events or what it led to
+          The question should focus on recalling the specific personal experience documented, not on general knowledge.
           """;
       default -> null;
     };
