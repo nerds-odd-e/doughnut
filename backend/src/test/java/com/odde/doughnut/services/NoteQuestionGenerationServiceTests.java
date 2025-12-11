@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.MakeMe;
@@ -620,6 +621,164 @@ class NoteQuestionGenerationServiceTests {
           "Request should not contain link type instruction for non-linking note",
           hasLinkTypeInstruction,
           is(false));
+    }
+  }
+
+  @Nested
+  class NoteTypeInstructions {
+    @Test
+    void shouldIncludeNoteTypeInstructionForVocab() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.VOCAB);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Vocab Note");
+                  });
+
+      assertThat(
+          "Request should contain note type instruction for VOCAB",
+          hasNoteTypeInstruction,
+          is(true));
+    }
+
+    @Test
+    void shouldIncludeNoteTypeInstructionForCategory() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.CATEGORY);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Category Note");
+                  });
+
+      assertThat(
+          "Request should contain note type instruction for CATEGORY",
+          hasNoteTypeInstruction,
+          is(true));
+    }
+
+    @Test
+    void shouldIncludeNoteTypeInstructionForConcept() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.CONCEPT);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Concept Note");
+                  });
+
+      assertThat(
+          "Request should contain note type instruction for CONCEPT",
+          hasNoteTypeInstruction,
+          is(true));
+    }
+
+    @Test
+    void shouldIncludeNoteTypeInstructionForJournal() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.JOURNAL);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Journal Note");
+                  });
+
+      assertThat(
+          "Request should contain note type instruction for JOURNAL",
+          hasNoteTypeInstruction,
+          is(true));
+    }
+
+    @Test
+    void shouldNotIncludeNoteTypeInstructionForUnassigned() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.UNASSIGNED);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for");
+                  });
+
+      assertThat(
+          "Request should not contain note type instruction for UNASSIGNED",
+          hasNoteTypeInstruction,
+          is(false));
+    }
+
+    @Test
+    void shouldIncludeBothLinkTypeAndNoteTypeInstructions() {
+      Note targetNote = makeMe.aNote().please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.RELATED_TO).please();
+      Note linkingNote = sourceNote.getLinks().get(0);
+      linkingNote.setNoteType(NoteType.VOCAB);
+      makeMe.aNote().under(linkingNote).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(linkingNote, null);
+
+      boolean hasLinkTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Linking Note");
+                  });
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Vocab Note");
+                  });
+
+      assertThat(
+          "Request should contain both link type and note type instructions",
+          hasLinkTypeInstruction && hasNoteTypeInstruction,
+          is(true));
     }
   }
 }

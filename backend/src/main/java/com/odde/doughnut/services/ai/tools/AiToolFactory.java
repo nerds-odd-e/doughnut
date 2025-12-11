@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
 import com.odde.doughnut.entities.LinkType;
+import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
 
@@ -14,11 +15,16 @@ public class AiToolFactory {
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool() {
-    return mcqWithAnswerAiTool(null);
+    return mcqWithAnswerAiTool(null, null);
   }
 
   public static InstructionAndSchema mcqWithAnswerAiTool(LinkType linkType) {
+    return mcqWithAnswerAiTool(linkType, null);
+  }
+
+  public static InstructionAndSchema mcqWithAnswerAiTool(LinkType linkType, NoteType noteType) {
     String linkTypeInstruction = getLinkTypeInstruction(linkType);
+    String noteTypeInstruction = getNoteTypeInstruction(noteType);
 
     // 5. **Empty Stems When Necessary**: Leave the question stem empty if there's insufficient
     // information to create a meaningful question.
@@ -48,10 +54,13 @@ public class AiToolFactory {
            - In typical MCQs without meta-choices (‘All of the above’, ‘None of the above’, ‘Only A and B’), strictChoiceOrder must ALWAYS be false.
 
       """;
-    String fullInstruction =
-        linkTypeInstruction != null
-            ? baseInstruction + "\n" + linkTypeInstruction
-            : baseInstruction;
+    String fullInstruction = baseInstruction;
+    if (linkTypeInstruction != null) {
+      fullInstruction = fullInstruction + "\n" + linkTypeInstruction;
+    }
+    if (noteTypeInstruction != null) {
+      fullInstruction = fullInstruction + "\n" + noteTypeInstruction;
+    }
     return new InstructionAndSchema(fullInstruction, askSingleAnswerMultipleChoiceQuestion());
   }
 
@@ -60,6 +69,31 @@ public class AiToolFactory {
       return null;
     }
     return linkType.getQuestionGenerationInstruction();
+  }
+
+  private static String getNoteTypeInstruction(NoteType noteType) {
+    if (noteType == null || noteType == NoteType.UNASSIGNED) {
+      return null;
+    }
+    return switch (noteType) {
+      case VOCAB ->
+          """
+          **Special Instruction for Vocab Note**: The focus note is a vocabulary/word note. When generating the question, focus on definitions, translations, word usage, etymology, or linguistic aspects. Consider asking about meanings, synonyms, antonyms, or how the word is used in context.
+          """;
+      case CATEGORY ->
+          """
+          **Special Instruction for Category Note**: The focus note represents a category or classification. When generating the question, emphasize classification, membership, hierarchical relationships, or what belongs to this category. Consider asking about what fits in this category, how items are classified, or the characteristics that define membership.
+          """;
+      case CONCEPT ->
+          """
+          **Special Instruction for Concept Note**: The focus note represents a concept or idea. When generating the question, test understanding of the concept, its properties, relationships, or applications. Consider asking about the concept's definition, characteristics, how it relates to other concepts, or its significance.
+          """;
+      case JOURNAL ->
+          """
+          **Special Instruction for Journal Note**: The focus note is a journal entry or personal note. When generating the question, consider personal experiences, events, reflections, or chronological aspects. Consider asking about what happened, when it occurred, personal insights, or the significance of the recorded experience.
+          """;
+      default -> null;
+    };
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {

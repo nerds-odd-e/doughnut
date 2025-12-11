@@ -3,11 +3,14 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.util.Optional;
@@ -57,10 +60,13 @@ public class NoteQuestionGenerationService {
       chatRequestBuilder.addUserMessage(additionalMessage);
     }
 
-    chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool());
+    LinkType linkType = note.isLink() ? note.getLinkType() : null;
+    NoteType noteType = note.getNoteType();
+    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(linkType, noteType);
+    chatRequestBuilder.responseJsonSchema(tool);
 
     return openAiApiHandler
-        .requestAndGetJsonSchemaResult(AiToolFactory.mcqWithAnswerAiTool(), chatRequestBuilder)
+        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
         .map(
             jsonNode -> {
               try {
