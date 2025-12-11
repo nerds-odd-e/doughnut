@@ -44,9 +44,15 @@ export const assumeAssimilationPage = () => ({
       })
     )
   },
+  waitForNote(noteTitle: string) {
+    cy.findByText(noteTitle, { selector: 'main *' }).should('be.visible')
+    cy.pageIsNotLoading()
+    return this
+  },
   selectNoteType(noteType: string) {
     cy.get('[data-test="note-type-selection-dialog"]').within(() => {
-      cy.findByRole('button', { name: noteType }).click()
+      cy.get('select').select(noteType)
+      cy.pageIsNotLoading()
     })
     return this
   },
@@ -61,6 +67,17 @@ export const assumeAssimilationPage = () => ({
       cy.get('[data-test="note-type-selection-dialog"]').within(() => {
         cy.findByRole('button', { name: option }).should('be.visible')
       })
+    })
+    return this
+  },
+  expectSummaryPoints(points: string[]) {
+    cy.pageIsNotLoading()
+    // Wait for the summary to be generated and displayed
+    cy.get('[data-test="note-details-summary"]', { timeout: 10000 }).should(
+      'be.visible'
+    )
+    points.forEach((point) => {
+      cy.get('[data-test="note-details-summary"]').should('contain', point)
     })
     return this
   },

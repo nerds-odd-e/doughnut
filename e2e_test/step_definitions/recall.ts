@@ -276,23 +276,15 @@ Given('there is a note {string}', (noteTitle: string) => {
 })
 
 When('I start assimilating {string}', (noteTitle: string) => {
-  start.assimilation().goToAssimilationPage()
-  cy.findByText(noteTitle, { selector: 'main *' }).should('be.visible')
-  cy.pageIsNotLoading()
+  start.assimilation().goToAssimilationPage().waitForNote(noteTitle)
 })
 
 Then('I should be able to select a note type', () => {
-  cy.pageIsNotLoading()
-  cy.get('[data-test="note-type-selection-dialog"]', { timeout: 5000 }).should(
-    'be.visible'
-  )
+  start.assumeAssimilationPage().expectNoteTypePrompt()
 })
 
 When('I select note type {string}', (noteType: string) => {
-  cy.get('[data-test="note-type-selection-dialog"]').within(() => {
-    cy.get('select').select(noteType)
-    cy.pageIsNotLoading()
-  })
+  start.assumeAssimilationPage().selectNoteType(noteType)
 })
 
 Then(
@@ -305,13 +297,7 @@ Then(
 Then(
   'I should see a summary of the note broken down into two points: {string} and {string}',
   (point1: string, point2: string) => {
-    cy.pageIsNotLoading()
-    // Wait for the summary to be generated and displayed
-    cy.get('[data-test="note-details-summary"]', { timeout: 10000 }).should(
-      'be.visible'
-    )
-    cy.get('[data-test="note-details-summary"]').should('contain', point1)
-    cy.get('[data-test="note-details-summary"]').should('contain', point2)
+    start.assumeAssimilationPage().expectSummaryPoints([point1, point2])
   }
 )
 
