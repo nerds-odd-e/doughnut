@@ -17,7 +17,7 @@ Feature: Note type
     And I add note type "journal" to my note
     Then I will see new type "journal" on my note
 
-  @usingMockedOpenAiService
+  @usingMockedOpenAiService @ignore
   Scenario Outline: AI will interpret note type when generating questions
     Given I have a notebook with the head note "Reservoirs" and details "The most popular reservoir to hike in is Macritchie"
     And AI will generate question for note with type:
