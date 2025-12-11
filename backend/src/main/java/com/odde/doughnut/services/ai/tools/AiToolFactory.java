@@ -195,6 +195,12 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
         suggestNoteTitle());
   }
 
+  public static InstructionAndSchema generateSummaryAiTool() {
+    return new InstructionAndSchema(
+        "Please generate a summary of the note details broken down into key points. Each point should be a complete sentence that captures an important aspect of the note content. The summary should help the user quickly understand the main ideas in the note. There should only be a maximum of 5 points.",
+        generateSummary());
+  }
+
   public static List<Class<?>> getAllAssistantTools() {
     return List.of(
         completeNoteDetails(),
@@ -205,6 +211,10 @@ Please assume the role of a Memory Assistant, which involves helping me review, 
 
   public static Class<?> suggestNoteTitle() {
     return TitleReplacement.class;
+  }
+
+  public static Class<?> generateSummary() {
+    return NoteSummary.class;
   }
 
   public static Class<?> completeNoteDetails() {

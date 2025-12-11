@@ -49,4 +49,34 @@ public class ChatCompletionNoteAutomationService {
             })
         .orElse(null);
   }
+
+  public java.util.List<String> generateSummary() throws JsonProcessingException {
+    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
+    OpenAIChatRequestBuilder chatRequestBuilder =
+        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
+
+    String instructions = note.getNotebookAssistantInstructions();
+    if (instructions != null && !instructions.trim().isEmpty()) {
+      chatRequestBuilder.addToOverallSystemMessage(instructions);
+    }
+
+    var tool = AiToolFactory.generateSummaryAiTool();
+    chatRequestBuilder.responseJsonSchema(tool);
+
+    return openAiApiHandler
+        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
+        .map(
+            jsonNode -> {
+              try {
+                NoteSummary noteSummary =
+                    new ObjectMapperConfig()
+                        .objectMapper()
+                        .treeToValue(jsonNode, NoteSummary.class);
+                return noteSummary.getPoints();
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .orElse(java.util.List.of());
+  }
 }

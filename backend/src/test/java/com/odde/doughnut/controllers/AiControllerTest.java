@@ -7,9 +7,11 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.NoteSummaryDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.services.ai.NoteSummary;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
@@ -175,6 +177,108 @@ class AiControllerTest extends ControllerTestBase {
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.suggestTitle(testNote));
+    }
+  }
+
+  @Nested
+  class GenerateSummary {
+    Note testNote;
+    OpenAIChatCompletionMock openAIChatCompletionMock;
+
+    @BeforeEach
+    void setup() {
+      testNote = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
+    }
+
+    @Test
+    void shouldReturnSummaryPoints()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      NoteSummary noteSummary = new NoteSummary();
+      noteSummary.setPoints(
+          List.of(
+              "English is a language that is spoken in many countries.",
+              "It is also the most widely spoken language in the world."));
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      testNote.setDetails("English is a language that is spoken in many countries.");
+
+      NoteSummaryDTO result = controller.generateSummary(testNote);
+
+      assertThat(result.getPoints())
+          .containsExactly(
+              "English is a language that is spoken in many countries.",
+              "It is also the most widely spoken language in the world.");
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoteDetailsIsNull()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      testNote.setDetails(null);
+
+      NoteSummaryDTO result = controller.generateSummary(testNote);
+
+      assertThat(result.getPoints()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoteDetailsIsEmpty()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      testNote.setDetails("");
+
+      NoteSummaryDTO result = controller.generateSummary(testNote);
+
+      assertThat(result.getPoints()).isEmpty();
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoteDetailsIsWhitespace()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      testNote.setDetails("   ");
+
+      NoteSummaryDTO result = controller.generateSummary(testNote);
+
+      assertThat(result.getPoints()).isEmpty();
+    }
+
+    @Test
+    void shouldCallChatCompletionWithRightMessage()
+        throws UnexpectedNoAccessRightException, JsonProcessingException {
+      NoteSummary noteSummary = new NoteSummary();
+      noteSummary.setPoints(List.of("Point 1", "Point 2"));
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      testNote.setDetails("Some note details");
+
+      controller.generateSummary(testNote);
+
+      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(
+              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
+      com.openai.models.chat.completions.ChatCompletionCreateParams params =
+          paramsCaptor.getValue();
+      boolean hasInstruction =
+          params.messages().stream()
+              .map(Object::toString)
+              .anyMatch(
+                  msg ->
+                      msg.contains(
+                          "Please generate a summary of the note details broken down into key points"));
+      MatcherAssert.assertThat(
+          "A message should contain the instruction", hasInstruction, is(true));
+      MatcherAssert.assertThat(
+          "Should use responseFormat instead of tools",
+          params.responseFormat().isPresent(),
+          is(true));
+      MatcherAssert.assertThat(
+          "Should not have tools",
+          params.tools().map(list -> list.isEmpty()).orElse(true),
+          is(true));
+    }
+
+    @Test
+    void shouldRequireUserToBeLoggedIn() {
+      currentUser.setUser(null);
+      assertThrows(ResponseStatusException.class, () -> controller.generateSummary(testNote));
     }
   }
 }

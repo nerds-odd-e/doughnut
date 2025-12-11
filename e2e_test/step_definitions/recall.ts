@@ -301,6 +301,13 @@ Then(
   }
 )
 
+Then(
+  'I should see a summary of the note broken down into a maximum of {int} points',
+  (maxPoints: number) => {
+    start.assumeAssimilationPage().expectSummaryPointsAtMost(maxPoints)
+  }
+)
+
 Then('I can continue with the assimilation', () => {
   // Verify we're still on the assimilation page or moved to the next note
   cy.url().should('satisfy', (url: string) => {

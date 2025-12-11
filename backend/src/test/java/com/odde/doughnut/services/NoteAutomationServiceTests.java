@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.ai.ChatCompletionNoteAutomationService;
+import com.odde.doughnut.services.ai.NoteSummary;
 import com.odde.doughnut.services.ai.TitleReplacement;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
@@ -112,5 +113,46 @@ class NoteAutomationServiceTests {
     assertThat(
         exception.getMessage(),
         containsString("requestAndGetJsonSchemaResult must not be used with tools"));
+  }
+
+  @Test
+  void shouldReturnSummaryPoints() throws JsonProcessingException {
+    // Mock chat completion with JSON schema response
+    NoteSummary noteSummary = new NoteSummary();
+    noteSummary.setPoints(
+        List.of(
+            "English is a language that is spoken in many countries.",
+            "It is also the most widely spoken language in the world."));
+    openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+
+    List<String> result = service.generateSummary();
+
+    assertThat(result, hasSize(2));
+    assertThat(
+        result,
+        contains(
+            "English is a language that is spoken in many countries.",
+            "It is also the most widely spoken language in the world."));
+  }
+
+  @Test
+  void shouldHandleNoToolCallWhenGeneratingSummary() throws JsonProcessingException {
+    // Mock chat completion with no tool calls (empty response with tools)
+    // Use OpenAIChatCompletionMock to return an empty response
+    openAIChatCompletionMock.mockNullChatCompletion();
+
+    List<String> result = service.generateSummary();
+
+    assertThat(result, is(empty()));
+  }
+
+  @Test
+  void shouldReturnEmptyListWhenSummaryIsNull() throws JsonProcessingException {
+    // Mock chat completion that returns null
+    openAIChatCompletionMock.mockNullChatCompletion();
+
+    List<String> result = service.generateSummary();
+
+    assertThat(result, is(empty()));
   }
 }

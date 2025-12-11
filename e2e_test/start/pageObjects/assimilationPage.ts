@@ -57,6 +57,7 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   expectNoteTypePrompt() {
+    cy.pageIsNotLoading()
     cy.get('[data-test="note-type-selection-dialog"]', {
       timeout: 5000,
     }).should('be.visible')
@@ -79,6 +80,18 @@ export const assumeAssimilationPage = () => ({
     points.forEach((point) => {
       cy.get('[data-test="note-details-summary"]').should('contain', point)
     })
+    return this
+  },
+  expectSummaryPointsAtMost(maxPoints: number) {
+    cy.pageIsNotLoading()
+    // Wait for the summary to be generated and displayed
+    cy.get('[data-test="note-details-summary"]', { timeout: 10000 }).should(
+      'be.visible'
+    )
+    // Count the number of list items (summary points) in the summary
+    cy.get('[data-test="note-details-summary"]')
+      .find('ul li')
+      .should('have.length.at.most', maxPoints)
     return this
   },
 })
