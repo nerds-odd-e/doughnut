@@ -49,6 +49,24 @@ export const questionGenerationService = () => ({
         journal: 'Special Instruction for Journal Note',
       }
 
+      const evaluationResponse = {
+        feasibleQuestion: true,
+        correctChoices: [0],
+        improvementAdvices: '',
+      }
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMatches({
+          messages: [
+            {
+              role: 'system',
+              content: '.*evaluating a memory recall question.*',
+            },
+          ],
+        })
+        .stubQuestionGenerationWithBodyMatch(JSON.stringify(evaluationResponse))
+
       for (const [noteType, question] of Object.entries(noteTypeToQuestion)) {
         const instructionText = noteTypeInstructionMap[noteType.toLowerCase()]
         if (!instructionText) {
