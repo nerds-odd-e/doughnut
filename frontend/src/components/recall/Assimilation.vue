@@ -104,6 +104,13 @@ const generateSummary = async () => {
     return
   }
 
+  // Skip summary generation for category note type
+  // Use selectedNoteType as it reflects the current state (including pending updates)
+  if (selectedNoteType.value === "category") {
+    noteSummaryPoints.value = []
+    return
+  }
+
   isLoadingSummary.value = true
   try {
     const result = await apiCallWithLoading(() =>
@@ -138,6 +145,8 @@ watch(
   () => note.noteType,
   (newNoteType) => {
     selectedNoteType.value = newNoteType || "unassigned"
+    // Regenerate summary when note type changes (to handle category exclusion)
+    generateSummary()
   }
 )
 
@@ -158,6 +167,9 @@ const updateNoteType = async (newType: NoteType) => {
 
   if (error) {
     selectedNoteType.value = previousValue
+  } else {
+    // Regenerate summary after note type is updated (to handle category exclusion)
+    generateSummary()
   }
 }
 

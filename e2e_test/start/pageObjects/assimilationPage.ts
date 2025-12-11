@@ -94,6 +94,11 @@ export const assumeAssimilationPage = () => ({
       .should('have.length.at.most', maxPoints)
     return this
   },
+  expectSummaryNotShown() {
+    cy.pageIsNotLoading()
+    cy.get('[data-test="note-details-summary"]').should('not.exist')
+    return this
+  },
 })
 
 export const assimilation = () => {
