@@ -581,16 +581,13 @@ Then('I will see new type {string} on my note', (noteType: string) => {
   cy.get('#note-noteType').should('have.value', noteType)
 })
 
-Given(
-  'AI will generate question for note with type:',
-  (data: DataTable) => {
-    const noteTypeToQuestion: Record<string, string> = {}
-    data.hashes().forEach((row) => {
-      noteTypeToQuestion[row['note type']!] = row['question']!
-    })
-    start.questionGenerationService().stubQuestionByNoteType(noteTypeToQuestion)
-  }
-)
+Given('AI will generate question for note with type:', (data: DataTable) => {
+  const noteTypeToQuestion: Record<string, string> = {}
+  data.hashes().forEach((row) => {
+    noteTypeToQuestion[row['note type']!] = row.question!
+  })
+  start.questionGenerationService().stubQuestionByNoteType(noteTypeToQuestion)
+})
 
 When(
   'I assign note type {string} for note {string}',

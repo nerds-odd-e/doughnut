@@ -38,9 +38,7 @@ export const questionGenerationService = () => ({
     })
   },
 
-  stubQuestionByNoteType: (
-    noteTypeToQuestion: Record<string, string>
-  ) => {
+  stubQuestionByNoteType: (noteTypeToQuestion: Record<string, string>) => {
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
 
