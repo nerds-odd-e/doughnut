@@ -587,6 +587,11 @@ Given('AI will generate question for note with type:', (data: DataTable) => {
     noteTypeToQuestion[row['note type']!] = row.question!
   })
   start.questionGenerationService().stubQuestionByNoteType(noteTypeToQuestion)
+  start.questionGenerationService().stubEvaluationQuestion({
+    feasibleQuestion: true,
+    correctChoices: [0],
+    improvementAdvices: '',
+  })
 })
 
 When(

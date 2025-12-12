@@ -10,7 +10,6 @@ const createMcqWithAnswer = (stem: string): McqWithAnswer => ({
   },
 })
 
-
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
     const mcqWithAnswer = createMcqWithAnswer(record['Question Stem']!)
@@ -47,24 +46,6 @@ export const questionGenerationService = () => ({
         concept: 'Special Instruction for Concept Note',
         journal: 'Special Instruction for Journal Note',
       }
-
-      const evaluationResponse = {
-        feasibleQuestion: true,
-        correctChoices: [0],
-        improvementAdvices: '',
-      }
-      await mock_services
-        .openAi()
-        .chatCompletion()
-        .requestMatches({
-          messages: [
-            {
-              role: 'system',
-              content: '.*evaluating a memory recall question.*',
-            },
-          ],
-        })
-        .stubQuestionGenerationWithBodyMatch(JSON.stringify(evaluationResponse))
 
       for (const [noteType, question] of Object.entries(noteTypeToQuestion)) {
         const instructionText = noteTypeInstructionMap[noteType.toLowerCase()]
