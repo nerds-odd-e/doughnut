@@ -34,16 +34,18 @@
     class="daisy-mb-4 daisy-alert daisy-alert-info"
   >
     <div class="daisy-text-sm">
-      <div v-if="shouldShowCategoryMessage" class="daisy-text-base-content/80">
+      <div v-if="shouldShowCategoryMessage" class="daisy-text-base-content">
         No summary requested for category notes.
       </div>
       <template v-else>
-        <div class="daisy-font-semibold daisy-mb-2">Summary:</div>
+        <div class="daisy-font-semibold daisy-mb-2 daisy-text-base-content">
+          Summary:
+        </div>
         <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
           <li
             v-for="(point, index) in noteSummaryPoints"
             :key="index"
-            class="daisy-text-base-content/80"
+            class="daisy-text-base-content"
           >
             {{ point }}
           </li>
