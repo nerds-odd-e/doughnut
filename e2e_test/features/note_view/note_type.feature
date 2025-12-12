@@ -23,11 +23,11 @@ Feature: Note type
     And AI will generate question for note with type:
      | note type | question                                       |
      | journal   | What is the most popular reservoir to hike in? |
-     | vocab     | What does the word reservoir mean?            |
+     | vocab     | What does the word reservoir mean?             |
     And I learned one note "Reservoirs" on day 1
     When I assign note type "<Note Type>" for note "Reservoirs"
     And I am recalling my note on day 2
-    And I should be asked "<Question>"
+    Then I should be asked "<Question>"
 
     Examples:
     | Note Type | Question                                       |
