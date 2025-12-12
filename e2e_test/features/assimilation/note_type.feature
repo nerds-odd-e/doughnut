@@ -3,10 +3,9 @@ Feature: Note Type
 
   Background:
     Given I am logged in as an existing user
+    And there is a note "Unassigned Note"  
 
   Scenario: Allow user to assign note type during assimilation
-      Given there is a note "Unassigned Note"
-      When I start assimilating "Unassigned Note"
-      Then I should be able to select a note type
-      When I select note type "concept"
-      Then the note "Unassigned Note" should be saved with note type "concept"
+    When I start assimilating "Unassigned Note"
+    And I select note type "concept"
+    Then the note "Unassigned Note" should be saved with note type "concept"
