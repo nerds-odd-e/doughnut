@@ -29,21 +29,26 @@
     />
   </div>
   <div
-    v-if="noteSummaryPoints.length > 0"
+    v-if="noteSummaryPoints.length > 0 || shouldShowCategoryMessage"
     data-test="note-details-summary"
     class="daisy-mb-4 daisy-alert daisy-alert-info"
   >
     <div class="daisy-text-sm">
-      <div class="daisy-font-semibold daisy-mb-2">Summary:</div>
-      <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
-        <li
-          v-for="(point, index) in noteSummaryPoints"
-          :key="index"
-          class="daisy-text-base-content/80"
-        >
-          {{ point }}
-        </li>
-      </ul>
+      <div v-if="shouldShowCategoryMessage" class="daisy-text-base-content/80">
+        No summary requested for category notes.
+      </div>
+      <template v-else>
+        <div class="daisy-font-semibold daisy-mb-2">Summary:</div>
+        <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
+          <li
+            v-for="(point, index) in noteSummaryPoints"
+            :key="index"
+            class="daisy-text-base-content/80"
+          >
+            {{ point }}
+          </li>
+        </ul>
+      </template>
     </div>
   </div>
   <AssimilationButtons
@@ -97,6 +102,14 @@ const buttonKey = computed(() => note.id)
 // Summary from backend
 const noteSummaryPoints = ref<string[]>([])
 const isLoadingSummary = ref(false)
+
+const shouldShowCategoryMessage = computed(() => {
+  return (
+    selectedNoteType.value === "category" &&
+    note.details &&
+    note.details.trim().length > 0
+  )
+})
 
 const generateSummary = async () => {
   if (!note.details || note.details.trim().length === 0) {

@@ -11,4 +11,4 @@ Feature: Summary Generation
 
   Scenario: Exclude summary generation for note type "Category"
     And the note type is "category"
-    Then I should not see the summary of the note generated
+    Then I should see a text "No summary requested for category notes." in the summary section

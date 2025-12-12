@@ -99,6 +99,14 @@ export const assumeAssimilationPage = () => ({
     cy.get('[data-test="note-details-summary"]').should('not.exist')
     return this
   },
+  expectSummaryText(expectedText: string) {
+    cy.pageIsNotLoading()
+    cy.get('[data-test="note-details-summary"]', { timeout: 10000 }).should(
+      'be.visible'
+    )
+    cy.get('[data-test="note-details-summary"]').should('contain', expectedText)
+    return this
+  },
 })
 
 export const assimilation = () => {
