@@ -1,20 +1,19 @@
 import type { McqWithAnswer } from '@generated/backend/types.gen'
 import mock_services from './mock_services'
 
+const createMcqWithAnswer = (stem: string): McqWithAnswer => ({
+  f1__correctChoiceIndex: 0,
+  f2__strictChoiceOrder: true,
+  f0__multipleChoicesQuestion: {
+    f0__stem: stem,
+    f1__choices: ['Correct Answer', 'Incorrect Choice 1', 'Incorrect Choice 2'],
+  },
+})
+
+
 export const questionGenerationService = () => ({
   resetAndStubAskingMCQByChatCompletion: (record: Record<string, string>) => {
-    const mcqWithAnswer: McqWithAnswer = {
-      f1__correctChoiceIndex: 0,
-      f2__strictChoiceOrder: true,
-      f0__multipleChoicesQuestion: {
-        f0__stem: record['Question Stem']!,
-        f1__choices: [
-          record['Correct Choice']!,
-          record['Incorrect Choice 1']!,
-          record['Incorrect Choice 2']!,
-        ],
-      },
-    }
+    const mcqWithAnswer = createMcqWithAnswer(record['Question Stem']!)
     const reply = JSON.stringify(mcqWithAnswer)
     cy.then(async () => {
       await mock_services.openAi().restartImposter()
@@ -73,18 +72,7 @@ export const questionGenerationService = () => ({
           throw new Error(`Unknown note type: ${noteType}`)
         }
 
-        const mcqWithAnswer: McqWithAnswer = {
-          f1__correctChoiceIndex: 0,
-          f2__strictChoiceOrder: true,
-          f0__multipleChoicesQuestion: {
-            f0__stem: question,
-            f1__choices: [
-              'Correct Answer',
-              'Incorrect Choice 1',
-              'Incorrect Choice 2',
-            ],
-          },
-        }
+        const mcqWithAnswer = createMcqWithAnswer(question)
         const reply = JSON.stringify(mcqWithAnswer)
 
         await mock_services
