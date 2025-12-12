@@ -595,10 +595,3 @@ When(
     start.jumpToNotePage(noteName).updateNoteType(noteType)
   }
 )
-
-Then(
-  'AI will generate question for note {string} with question {string}',
-  (noteName: string, expectedQuestion: string) => {
-    start.assumeQuestionPage(expectedQuestion)
-  }
-)

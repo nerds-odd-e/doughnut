@@ -27,7 +27,7 @@ Feature: Note type
     And I learned one note "Reservoirs" on day 1
     When I assign note type "<Note Type>" for note "Reservoirs"
     And I am recalling my note on day 2
-    Then AI will generate question for note "Reservoirs" with question "<Question>"
+    And I should be asked "<Question>"
 
     Examples:
     | Note Type | Question                                       |
