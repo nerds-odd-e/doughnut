@@ -14,6 +14,7 @@
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
     @note-type-updated="onNoteTypeUpdated"
+    @note-info-loaded="onNoteInfoLoaded"
   />
   <div
     v-if="noteSummaryPoints.length > 0 || shouldShowCategoryMessage"
@@ -51,7 +52,6 @@ import type { Note } from "@generated/backend"
 import {
   AiController,
   AssimilationController,
-  NoteController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -59,7 +59,7 @@ import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
-import { computed, ref, watch, onMounted } from "vue"
+import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import type { NoteType } from "@/models/noteTypeOptions"
@@ -96,19 +96,6 @@ const shouldShowCategoryMessage = computed(() => {
   )
 })
 
-const fetchNoteType = async () => {
-  const { data: noteInfo, error } = await NoteController.getNoteInfo({
-    path: { note: note.id },
-  })
-  if (!error && noteInfo?.noteType) {
-    currentNoteType.value = noteInfo.noteType
-  }
-}
-
-onMounted(() => {
-  fetchNoteType()
-})
-
 const generateSummary = async () => {
   if (!note.details || note.details.trim().length === 0) {
     noteSummaryPoints.value = []
@@ -142,16 +129,10 @@ const generateSummary = async () => {
   }
 }
 
-// Generate summary when note changes
-watch(
-  () => note.id,
-  () => {
-    fetchNoteType().then(() => {
-      generateSummary()
-    })
-  },
-  { immediate: true }
-)
+const onNoteInfoLoaded = (noteType: NoteType) => {
+  currentNoteType.value = noteType
+  generateSummary()
+}
 
 const onNoteTypeUpdated = (newType: NoteType) => {
   currentNoteType.value = newType

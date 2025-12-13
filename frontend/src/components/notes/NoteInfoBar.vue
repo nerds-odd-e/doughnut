@@ -11,16 +11,17 @@
 import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
-import { ref, onMounted } from "vue"
+import { ref, watch } from "vue"
 import type { NoteType } from "@/models/noteTypeOptions"
 
 const props = defineProps<{
   noteId: number
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "noteTypeUpdated", noteType: NoteType): void
+  (e: "noteInfoLoaded", noteType: NoteType): void
 }>()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
@@ -31,10 +32,17 @@ const fetchData = async () => {
   })
   if (!error) {
     noteInfo.value = noteInfoData!
+    if (noteInfoData?.noteType) {
+      emit("noteInfoLoaded", noteInfoData.noteType)
+    }
   }
 }
 
-onMounted(() => {
-  fetchData()
-})
+watch(
+  () => props.noteId,
+  () => {
+    fetchData()
+  },
+  { immediate: true }
+)
 </script>
