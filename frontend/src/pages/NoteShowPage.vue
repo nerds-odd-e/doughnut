@@ -72,7 +72,7 @@
 
     <!-- Main Content -->
     <main
-      class="daisy-flex-1 daisy-p-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
+      class="daisy-flex-1 daisy-px-4 daisy-container daisy-mx-auto daisy-overflow-y-auto"
     >
       <NoteShow
         v-bind="{
