@@ -4,26 +4,33 @@
       <h2>Recall Settings</h2>
     </template>
     <template #body>
-      <div class="daisy-flex daisy-flex-col daisy-gap-2">
-        <button
-          v-if="canMoveToEnd && previousAnsweredQuestionCursor === undefined"
-          class="btn large-btn"
-          title="Move to end of list"
-          aria-label="Move to end of list"
-          @click="handleMoveToEnd"
-        >
-          <SvgSkip />
-          <span class="daisy-ml-2">Move to end of list</span>
-        </button>
-        <label class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2">
-          <input
-            type="checkbox"
-            class="daisy-toggle daisy-toggle-primary"
-            :checked="treadmillMode"
-            @change="handleTreadmillModeToggle"
-          />
-          <span class="daisy-label-text">Treadmill mode</span>
-        </label>
+      <div class="daisy-flex daisy-flex-col daisy-gap-4">
+        <div class="daisy-flex daisy-flex-col daisy-gap-2">
+          <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
+          <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+        </div>
+        <div class="daisy-divider"></div>
+        <div class="daisy-flex daisy-flex-col daisy-gap-2">
+          <button
+            v-if="canMoveToEnd && previousAnsweredQuestionCursor === undefined"
+            class="btn large-btn"
+            title="Move to end of list"
+            aria-label="Move to end of list"
+            @click="handleMoveToEnd"
+          >
+            <SvgSkip />
+            <span class="daisy-ml-2">Move to end of list</span>
+          </button>
+          <label class="daisy-label daisy-cursor-pointer daisy-flex daisy-items-center daisy-gap-2">
+            <input
+              type="checkbox"
+              class="daisy-toggle daisy-toggle-primary"
+              :checked="treadmillMode"
+              @change="handleTreadmillModeToggle"
+            />
+            <span class="daisy-label-text">Treadmill mode</span>
+          </label>
+        </div>
       </div>
     </template>
   </Modal>
@@ -38,6 +45,9 @@ const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
   previousAnsweredQuestionCursor: Number,
   currentIndex: { type: Number, required: true },
+  finished: { type: Number, required: true },
+  toRepeatCount: { type: Number, required: true },
+  totalAssimilatedCount: { type: Number, default: 0 },
 })
 
 const emit = defineEmits<{

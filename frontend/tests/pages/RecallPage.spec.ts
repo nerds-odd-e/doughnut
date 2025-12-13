@@ -153,9 +153,10 @@ describe("repeat page", () => {
       // Initial order should be [123, 456, 3]
       expect(vm.toRepeat?.map((t) => t.memoryTrackerId)).toEqual([123, 456, 3])
 
-      // Click the "Recall settings" button to open the dropdown
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      // Click the progress bar to open the settings dialog
+      await wrapper.find(".daisy-progress-bar").trigger("click")
       await wrapper.vm.$nextTick()
+      await flushPromises()
 
       // Click the "Move to end" button in the modal dialog
       const moveToEndButton = document.body.querySelector(
@@ -178,9 +179,10 @@ describe("repeat page", () => {
       vm.currentIndex = 2
       await wrapper.vm.$nextTick()
 
-      // Click the "Recall settings" button to open the dropdown
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      // Click the progress bar to open the settings dialog
+      await wrapper.find(".daisy-progress-bar").trigger("click")
       await wrapper.vm.$nextTick()
+      await flushPromises()
 
       // Button should not be visible when on last item
       const moveToEndButton = document.body.querySelector(
@@ -297,16 +299,14 @@ describe("repeat page", () => {
       wrapper: Awaited<ReturnType<typeof mountPage>>,
       enabled: boolean
     ) => {
-      const settingsButton = wrapper.find('button[title="Recall settings"]')
-
       // Check if dialog is already open by looking for the checkbox
       let toggle = document.body.querySelector(
         'input[type="checkbox"]'
       ) as HTMLInputElement
 
-      // If checkbox not found, click to open dialog
+      // If checkbox not found, click progress bar to open dialog
       if (!toggle) {
-        await settingsButton.trigger("click")
+        await wrapper.find(".daisy-progress-bar").trigger("click")
         await wrapper.vm.$nextTick()
         await flushPromises()
 
@@ -331,8 +331,9 @@ describe("repeat page", () => {
 
     it("should show treadmill mode toggle in settings", async () => {
       const wrapper = await mountPage()
-      await wrapper.find('button[title="Recall settings"]').trigger("click")
+      await wrapper.find(".daisy-progress-bar").trigger("click")
       await wrapper.vm.$nextTick()
+      await flushPromises()
 
       // Dialog is shown as a modal
       const toggle = document.body.querySelector('input[type="checkbox"]')

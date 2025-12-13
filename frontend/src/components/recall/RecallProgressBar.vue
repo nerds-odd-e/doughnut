@@ -1,7 +1,7 @@
 <template>
   <ProgressBar
     v-bind="{ title: `Recalling: `, finished, toRepeatCount }"
-    @showMore="$emit('showMore')"
+    @showSettings="showSettings = !showSettings"
   >
     <template #buttons>
       <div class="btn-group-wrapper daisy-relative" style="overflow: visible;">
@@ -32,13 +32,6 @@
           >
             <SvgPause />
           </button>
-          <button
-            class="btn large-btn"
-            title="Recall settings"
-            @click="showSettings = !showSettings"
-          >
-            <SvgCog />
-          </button>
         </div>
         <RecallSettingsDialog
           v-if="showSettings"
@@ -46,12 +39,18 @@
             canMoveToEnd,
             previousAnsweredQuestionCursor,
             currentIndex,
+            finished,
+            toRepeatCount,
+            totalAssimilatedCount,
           }"
           @close-dialog="showSettings = false"
           @move-to-end="handleMoveToEnd"
           @treadmill-mode-changed="$emit('treadmill-mode-changed')"
         />
       </div>
+    </template>
+    <template #cogIcon>
+      <SvgCog />
     </template>
   </ProgressBar>
 </template>
@@ -70,11 +69,11 @@ const props = defineProps({
   previousAnsweredQuestionCursor: Number,
   canMoveToEnd: { type: Boolean, required: true },
   currentIndex: { type: Number, required: true },
+  totalAssimilatedCount: { type: Number, default: 0 },
 })
 
 const emit = defineEmits<{
   (e: "viewLastAnsweredQuestion", cursor: number): void
-  (e: "showMore"): void
   (e: "moveToEnd", index: number): void
   (e: "treadmill-mode-changed"): void
 }>()

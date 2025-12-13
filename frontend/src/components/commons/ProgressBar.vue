@@ -2,7 +2,7 @@
   <div class="daisy-flex-shrink-0">
     <slot name="buttons" />
   </div>
-  <div class="daisy-flex-grow" @click.prevent="$emit('showMore')">
+  <div class="daisy-flex-grow" @click.prevent="$emit('showSettings')">
     <div
       :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
       v-if="toRepeatCount !== null"
@@ -15,6 +15,9 @@
       <span class="progress-text">
         {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
       </span>
+      <span v-if="$slots.cogIcon" class="cog-icon">
+        <slot name="cogIcon" />
+      </span>
     </div>
   </div>
 </template>
@@ -26,11 +29,12 @@ defineProps({
   title: String,
 })
 
-defineEmits(["resume", "showMore"])
+defineEmits(["resume", "showSettings"])
 
 defineSlots<{
   default?: () => Element | Element[]
   buttons?: () => Element | Element[]
+  cogIcon?: () => Element | Element[]
 }>()
 </script>
 
@@ -66,5 +70,16 @@ defineSlots<{
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
+}
+
+.cog-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  transform: translateY(-50%);
+  color: white;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 </style>

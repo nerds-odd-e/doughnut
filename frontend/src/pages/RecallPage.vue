@@ -14,9 +14,9 @@
           previousAnsweredQuestionCursor,
           canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
           currentIndex,
+          totalAssimilatedCount: totalAssimilatedCount ?? 0,
         }"
         @view-last-answered-question="viewLastAnsweredQuestion($event)"
-        @show-more="showTooltip = true"
         @move-to-end="moveMemoryTrackerToEnd($event)"
         @treadmill-mode-changed="handleTreadmillModeChanged"
       >
@@ -62,16 +62,6 @@
       </template>
     </div>
 
-    <div
-      v-if="showTooltip"
-      class="tooltip-popup daisy-fixed daisy-inset-0 daisy-bg-black/50 daisy-flex daisy-justify-center daisy-items-center daisy-z-[1000]"
-      @click="showTooltip = false"
-    >
-      <div class="tooltip-content daisy-bg-white daisy-p-4 daisy-rounded-lg daisy-shadow-lg">
-        <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
-        <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -128,7 +118,6 @@ const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
 const isProgressBarVisible = ref(true)
-const showTooltip = ref(false)
 
 // Sync currentIndex with useRecallData
 watch(
