@@ -5,7 +5,7 @@
     :readonly="readonly"
     @update:model-value="htmlValueUpdated"
     @blur="$emit('blur')"
-    @paste-complete="$emit('pasteComplete')"
+    @paste-complete="onPasteComplete"
   />
 </template>
 
@@ -24,7 +24,11 @@ const { modelValue } = defineProps({
   readonly: Boolean,
 })
 
-const emits = defineEmits(["update:modelValue", "blur", "pasteComplete"])
+const emits = defineEmits<{
+  (e: "update:modelValue", value: string): void
+  (e: "blur"): void
+  (e: "pasteComplete", value: string): void
+}>()
 
 let currentIntervalMarkdown: string | undefined = undefined
 let currentIntervalHtml: string | undefined = undefined
@@ -42,5 +46,11 @@ const htmlValueUpdated = (newHtmlValue: string) => {
   currentIntervalHtml = newHtmlValue
   if (markdownValue === modelValue) return
   emits("update:modelValue", markdownValue)
+}
+
+const onPasteComplete = (html: string) => {
+  // Convert current HTML content to markdown and emit
+  const markdown = markdownizer.htmlToMarkdown(html)
+  emits("pasteComplete", markdown)
 }
 </script>

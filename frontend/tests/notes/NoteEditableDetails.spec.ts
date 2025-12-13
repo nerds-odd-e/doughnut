@@ -444,13 +444,14 @@ describe("NoteEditableDetails", () => {
   })
 
   describe("paste with links and images in quill editor", () => {
-    it("shows options popup when quill editor emits pasteComplete and content contains links", async () => {
+    it("shows options popup based on content AFTER paste, not before", async () => {
+      // Start with plain text (no links)
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
         .withCleanStorage()
         .withProps({
           noteId: 1,
-          noteDetails: "[a link](https://example.com)",
+          noteDetails: "plain text",
           readonly: false,
           asMarkdown: false,
         })
@@ -459,9 +460,15 @@ describe("NoteEditableDetails", () => {
       await flushPromises()
 
       const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      await richEditor.vm.$emit("pasteComplete")
+      const newContent = "plain text [new link](https://example.com)"
+
+      // Simulate quill editor pasting content with a link:
+      // RichMarkdownEditor emits update:modelValue then pasteComplete with the new content
+      richEditor.vm.$emit("update:modelValue", newContent)
+      richEditor.vm.$emit("pasteComplete", newContent)
       await flushPromises()
 
+      // Should detect the link in the NEW content (after paste)
       expect(mockPopupsOptions).toHaveBeenCalledWith(
         "The content contains 1 links.",
         expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
@@ -474,7 +481,7 @@ describe("NoteEditableDetails", () => {
         .withCleanStorage()
         .withProps({
           noteId: 1,
-          noteDetails: "plain text without links",
+          noteDetails: "plain text",
           readonly: false,
           asMarkdown: false,
         })
@@ -483,7 +490,9 @@ describe("NoteEditableDetails", () => {
       await flushPromises()
 
       const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
-      await richEditor.vm.$emit("pasteComplete")
+      const newContent = "plain text with more plain text"
+      richEditor.vm.$emit("update:modelValue", newContent)
+      richEditor.vm.$emit("pasteComplete", newContent)
       await flushPromises()
 
       expect(mockPopupsOptions).not.toHaveBeenCalled()

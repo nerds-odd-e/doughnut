@@ -24,7 +24,7 @@
         :readonly="readonly"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
-        @paste-complete="handlePasteComplete(value, update)"
+        @paste-complete="(content) => handlePasteComplete(content, update)"
       />
     </template>
   </TextContentWrapper>

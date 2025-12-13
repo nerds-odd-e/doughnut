@@ -83,6 +83,7 @@ const emits = defineEmits(["update:modelValue", "blur", "pasteComplete"])
 const localValue = ref(modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
+const isPasting = ref(false)
 
 const onBlurTextField = () => {
   emits("blur")
@@ -184,10 +185,8 @@ onMounted(async () => {
             return originalGetData(format)
           }
 
-          // Emit pasteComplete after the paste is processed
-          nextTick(() => {
-            emits("pasteComplete")
-          })
+          // Mark paste in progress; emit after Quill updates content
+          isPasting.value = true
         },
         true
       )
@@ -198,6 +197,10 @@ onMounted(async () => {
       const content = quill.value!.root.innerHTML
       localValue.value = content
       onUpdateContent()
+      if (isPasting.value) {
+        isPasting.value = false
+        emits("pasteComplete", content)
+      }
     })
 
     quill.value.on("selection-change", (range) => {
