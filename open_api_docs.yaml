@@ -3675,14 +3675,6 @@ components:
           readOnly: true
         wikidataId:
           type: string
-        noteType:
-          type: string
-          enum:
-          - concept
-          - category
-          - vocab
-          - journal
-          - unassigned
       required:
       - createdAt
       - id

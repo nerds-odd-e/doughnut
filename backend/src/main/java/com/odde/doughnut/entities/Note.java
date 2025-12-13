@@ -118,6 +118,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @Convert(converter = NoteTypeConverter.class)
   @Column(name = "note_type")
+  @JsonIgnore
   @Getter
   @Setter
   private NoteType noteType = NoteType.UNASSIGNED;

@@ -120,7 +120,6 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
-    noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
 export type NoteTopology = {
@@ -624,7 +623,6 @@ export type NoteWritable = {
     id: number;
     createdAt: string;
     wikidataId?: string;
-    noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
 export type SubscriptionWritable = {

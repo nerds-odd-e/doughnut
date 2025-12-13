@@ -51,6 +51,7 @@ import type { Note } from "@generated/backend"
 import {
   AiController,
   AssimilationController,
+  NoteController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -58,7 +59,7 @@ import NoteInfoBar from "../notes/NoteInfoBar.vue"
 import AssimilationButtons from "./AssimilationButtons.vue"
 import NoteShow from "../notes/NoteShow.vue"
 import Breadcrumb from "../toolbars/Breadcrumb.vue"
-import { computed, ref, watch } from "vue"
+import { computed, ref, watch, onMounted } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
 import type { NoteType } from "@/models/noteTypeOptions"
@@ -79,7 +80,7 @@ const { totalAssimilatedCount } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
-const currentNoteType = ref<NoteType>(note.noteType || "unassigned")
+const currentNoteType = ref<NoteType>("unassigned")
 
 const buttonKey = computed(() => note.id)
 
@@ -93,6 +94,19 @@ const shouldShowCategoryMessage = computed(() => {
     note.details &&
     note.details.trim().length > 0
   )
+})
+
+const fetchNoteType = async () => {
+  const { data: noteInfo, error } = await NoteController.getNoteInfo({
+    path: { note: note.id },
+  })
+  if (!error && noteInfo?.noteType) {
+    currentNoteType.value = noteInfo.noteType
+  }
+}
+
+onMounted(() => {
+  fetchNoteType()
 })
 
 const generateSummary = async () => {
@@ -132,19 +146,11 @@ const generateSummary = async () => {
 watch(
   () => note.id,
   () => {
-    currentNoteType.value = note.noteType || "unassigned"
-    generateSummary()
+    fetchNoteType().then(() => {
+      generateSummary()
+    })
   },
   { immediate: true }
-)
-
-watch(
-  () => note.noteType,
-  (newNoteType) => {
-    currentNoteType.value = newNoteType || "unassigned"
-    // Regenerate summary when note type changes (to handle category exclusion)
-    generateSummary()
-  }
 )
 
 const onNoteTypeUpdated = (newType: NoteType) => {
