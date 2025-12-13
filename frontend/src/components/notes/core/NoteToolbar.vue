@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import type { Note, Notebook } from "@generated/backend"
 import type { NoteAccessory } from "@generated/backend"
 import NoteNewButton from "./NoteNewButton.vue"
@@ -138,6 +138,13 @@ const emit = defineEmits(["note-accessory-updated", "edit-as-markdown"])
 const isHeadNote = computed(() => {
   return notebook !== undefined && notebook.headNoteId === note.id
 })
+
+watch(
+  () => note.id,
+  () => {
+    moreOptions.value = false
+  }
+)
 
 const editNotebookSettings = () => {
   if (notebook) {

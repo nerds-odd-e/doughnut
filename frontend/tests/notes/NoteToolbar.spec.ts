@@ -43,3 +43,47 @@ it("displays menu items when dropdown is open", async () => {
     true
   )
 })
+
+it("closes more options dialog when note id changes", async () => {
+  const noteRealm = makeMe.aNoteRealm.titleConstructor("Dummy Title").please()
+  const mockNoteInfo: NoteInfo = {
+    note: noteRealm,
+    recallSetting: {
+      level: 0,
+      rememberSpelling: false,
+      skipMemoryTracking: false,
+    },
+    memoryTrackers: [],
+    createdAt: "",
+  }
+  mockSdkService("getNoteInfo", mockNoteInfo)
+
+  const wrapper = helper
+    .component(NoteToolbar)
+    .withRouter()
+    .withCleanStorage()
+    .withProps({
+      note: noteRealm.note,
+    })
+    .mount()
+
+  // Find the more options button by title
+  const moreOptionsButton = wrapper.find('button[title="more options"]')
+
+  // Open the dialog
+  await moreOptionsButton.trigger("click")
+
+  // Verify dialog is open
+  let dialog = wrapper.findComponent(NoteMoreOptionsDialog)
+  expect(dialog.exists()).toBe(true)
+
+  // Change the note id
+  const newNote = makeMe.aNoteRealm.titleConstructor("New Note").please()
+  await wrapper.setProps({
+    note: newNote.note,
+  })
+
+  // Verify dialog is closed
+  dialog = wrapper.findComponent(NoteMoreOptionsDialog)
+  expect(dialog.exists()).toBe(false)
+})
