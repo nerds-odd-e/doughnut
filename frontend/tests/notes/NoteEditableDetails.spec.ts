@@ -5,11 +5,16 @@ import { vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import type { UpdateNoteDetailsData } from "@generated/backend"
+import usePopups from "@/components/commons/Popups/usePopups"
+
+vi.mock("@/components/commons/Popups/usePopups")
 
 describe("NoteEditableDetails", () => {
   let updateNoteDetailsSpy: ReturnType<
     typeof mockSdkService<"updateNoteDetails">
   >
+  // biome-ignore lint/suspicious/noExplicitAny: Mock type for testing
+  let mockPopupsOptions: any
 
   beforeEach(() => {
     vi.resetAllMocks()
@@ -17,6 +22,17 @@ describe("NoteEditableDetails", () => {
       "updateNoteDetails",
       makeMe.aNoteRealm.please()
     )
+    mockPopupsOptions = vi.fn().mockResolvedValue(null)
+    vi.mocked(usePopups).mockReturnValue({
+      popups: {
+        options: mockPopupsOptions,
+        alert: vi.fn(),
+        confirm: vi.fn(),
+        done: vi.fn(),
+        register: vi.fn(),
+        peek: vi.fn(),
+      },
+    })
   })
 
   it("should not save previous note's details to the new note when navigating", async () => {
@@ -292,6 +308,27 @@ describe("NoteEditableDetails", () => {
     expect(detailsEl.value).toBe("")
   })
 
+  function createClipboardEvent(html: string): ClipboardEvent {
+    const event = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+    }) as ClipboardEvent
+    const dataTransfer = {
+      getData: (format: string) => {
+        if (format === "text/html") return html
+        return ""
+      },
+      setData: () => {
+        // Mock implementation - not used in tests
+      },
+    }
+    Object.defineProperty(event, "clipboardData", {
+      value: dataTransfer,
+      writable: false,
+    })
+    return event
+  }
+
   it("converts HTML to markdown when pasting HTML content", async () => {
     const wrapper: VueWrapper<ComponentPublicInstance> = helper
       .component(NoteEditableDetails)
@@ -309,27 +346,6 @@ describe("NoteEditableDetails", () => {
     const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
     textarea.setSelectionRange(8, 8) // Position cursor after "existing"
 
-    function createClipboardEvent(html: string): ClipboardEvent {
-      const event = new Event("paste", {
-        bubbles: true,
-        cancelable: true,
-      }) as ClipboardEvent
-      const dataTransfer = {
-        getData: (format: string) => {
-          if (format === "text/html") return html
-          return ""
-        },
-        setData: () => {
-          // Mock implementation - not used in tests
-        },
-      }
-      Object.defineProperty(event, "clipboardData", {
-        value: dataTransfer,
-        writable: false,
-      })
-      return event
-    }
-
     const pasteEvent = createClipboardEvent("<p><strong>Bold text</strong></p>")
 
     await textarea.dispatchEvent(pasteEvent)
@@ -339,6 +355,120 @@ describe("NoteEditableDetails", () => {
     // The update should have been called through TextContentWrapper
     expect(textarea.value).toContain("Bold text")
     expect(textarea.value).toContain("existing")
+  })
+
+  describe("paste with links and images", () => {
+    it("shows options popup when content contains links after paste", async () => {
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId: 1,
+          noteDetails: "",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
+      const pasteEvent = createClipboardEvent(
+        '<p>Check <a href="https://example.com">this link</a></p>'
+      )
+
+      await textarea.dispatchEvent(pasteEvent)
+      await flushPromises()
+
+      expect(mockPopupsOptions).toHaveBeenCalledWith(
+        "The content contains 1 links.",
+        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
+      )
+    })
+
+    it("counts links from entire content including existing text", async () => {
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId: 1,
+          noteDetails: "[existing link](https://existing.com)",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
+      const pasteEvent = createClipboardEvent(
+        '<p>Check <a href="https://example.com">new link</a></p>'
+      )
+
+      await textarea.dispatchEvent(pasteEvent)
+      await flushPromises()
+
+      expect(mockPopupsOptions).toHaveBeenCalledWith(
+        "The content contains 2 links.",
+        expect.arrayContaining([{ label: "Remove 2 links", value: "links" }])
+      )
+    })
+
+    it("removes all links from entire content when user selects remove links", async () => {
+      mockPopupsOptions.mockResolvedValue("links")
+
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId: 1,
+          noteDetails: "[existing link](https://existing.com) ",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
+      const pasteEvent = createClipboardEvent(
+        '<p><a href="https://example.com">new link</a></p>'
+      )
+
+      await textarea.dispatchEvent(pasteEvent)
+      await flushPromises()
+
+      // Both existing and new links should be removed
+      expect(textarea.value).toContain("existing link")
+      expect(textarea.value).toContain("new link")
+      expect(textarea.value).not.toContain("https://existing.com")
+      expect(textarea.value).not.toContain("https://example.com")
+    })
+
+    it("does not show popup when entire content has no links or images", async () => {
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId: 1,
+          noteDetails: "plain text",
+          readonly: false,
+          asMarkdown: true,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
+      const pasteEvent = createClipboardEvent(
+        "<p><strong>Bold text</strong></p>"
+      )
+
+      await textarea.dispatchEvent(pasteEvent)
+      await flushPromises()
+
+      expect(mockPopupsOptions).not.toHaveBeenCalled()
+    })
   })
 
   describe("HTML content normalization", () => {

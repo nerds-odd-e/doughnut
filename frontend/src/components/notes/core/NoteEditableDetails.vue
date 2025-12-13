@@ -34,7 +34,7 @@ import { nextTick, ref } from "vue"
 import RichMarkdownEditor from "../../form/RichMarkdownEditor.vue"
 import TextContentWrapper from "./TextContentWrapper.vue"
 import TextArea from "@/components/form/TextArea.vue"
-import { useInterruptingHtmlToMarkdown } from "@/composables/useInterruptingHtmlToMarkdown"
+import { usePasteWithLinkImageOptions } from "@/composables/usePasteWithLinkImageOptions"
 
 const props = defineProps({
   noteId: { type: Number, required: true },
@@ -44,21 +44,8 @@ const props = defineProps({
 })
 
 const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
-const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
-
-async function handleHtmlPaste(
-  event: ClipboardEvent,
-  callback: (markdown: string) => void
-): Promise<boolean> {
-  const htmlData = event.clipboardData?.getData("text/html")
-  if (htmlData) {
-    event.preventDefault()
-    const markdown = htmlToMarkdown(htmlData)
-    callback(markdown)
-    return true
-  }
-  return false
-}
+const { htmlToMarkdown, processContentAfterPaste } =
+  usePasteWithLinkImageOptions()
 
 const handlePaste = async (
   event: ClipboardEvent,
@@ -67,26 +54,36 @@ const handlePaste = async (
 ) => {
   if (!props.asMarkdown || !textareaRef.value) return
 
-  await handleHtmlPaste(event, (markdown) => {
-    const textarea = textareaRef.value?.$el?.querySelector(
-      "textarea"
-    ) as HTMLTextAreaElement | null
+  const htmlData = event.clipboardData?.getData("text/html")
+  if (!htmlData) return
+
+  event.preventDefault()
+
+  const textarea = textareaRef.value?.$el?.querySelector(
+    "textarea"
+  ) as HTMLTextAreaElement | null
+  if (!textarea) return
+
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const markdown = htmlToMarkdown(htmlData)
+  const newValue =
+    (currentValue || "").slice(0, start) +
+    markdown +
+    (currentValue || "").slice(end)
+
+  // Paste immediately without interruption
+  update(props.noteId, newValue)
+  nextTick(() => {
     if (textarea) {
-      const start = textarea.selectionStart
-      const end = textarea.selectionEnd
-      const newValue =
-        (currentValue || "").slice(0, start) +
-        markdown +
-        (currentValue || "").slice(end)
-      update(props.noteId, newValue)
-      // Set cursor position after pasted content
-      nextTick(() => {
-        if (textarea) {
-          textarea.selectionStart = textarea.selectionEnd =
-            start + markdown.length
-        }
-      })
+      textarea.selectionStart = textarea.selectionEnd = start + markdown.length
     }
   })
+
+  // Check entire content for links/images and offer to remove them
+  const processedContent = await processContentAfterPaste(newValue)
+  if (processedContent !== null) {
+    update(props.noteId, processedContent)
+  }
 }
 </script>
