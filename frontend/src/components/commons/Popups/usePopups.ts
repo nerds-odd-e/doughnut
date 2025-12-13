@@ -1,8 +1,25 @@
-interface PopupInfo {
-  type: "alert" | "confirm" | "dialog"
-  message?: string
-  doneResolve: ((value: unknown) => void) | ((value: boolean) => void)
+interface BasePopupInfo {
+  // biome-ignore lint/suspicious/noExplicitAny: Popup resolve needs to accept various return types
+  doneResolve: (value: any) => void
 }
+
+interface AlertPopupInfo extends BasePopupInfo {
+  type: "alert"
+  message: string
+}
+
+interface ConfirmPopupInfo extends BasePopupInfo {
+  type: "confirm"
+  message: string
+}
+
+interface OptionsPopupInfo extends BasePopupInfo {
+  type: "options"
+  message: string
+  options: { label: string; value: string }[]
+}
+
+type PopupInfo = AlertPopupInfo | ConfirmPopupInfo | OptionsPopupInfo
 
 class Popup {
   static popupDataWrap = {
@@ -25,7 +42,14 @@ class Popup {
       if (!topPopup) return
 
       const popups = usePopups()
-      popups.popups.done(topPopup.type !== "confirm")
+      // For confirm: false (cancel), for alert: true (ok), for options: null (cancel)
+      const result =
+        topPopup.type === "confirm"
+          ? false
+          : topPopup.type === "alert"
+            ? true
+            : null
+      popups.popups.done(result)
     }
   }
 
@@ -74,6 +98,17 @@ function usePopups() {
         })
       },
 
+      options(msg: string, opts: { label: string; value: string }[]) {
+        return new Promise<string | null>((resolve) => {
+          push({
+            type: "options",
+            message: msg,
+            options: opts,
+            doneResolve: resolve,
+          })
+        })
+      },
+
       done(result: unknown) {
         const popupInfo = Popup.popupDataWrap.popupData.popupInfo?.pop()
         if (!popupInfo) return
@@ -83,7 +118,7 @@ function usePopups() {
         }
 
         if (popupInfo.doneResolve) {
-          popupInfo.doneResolve(result as boolean)
+          popupInfo.doneResolve(result)
         }
       },
 
@@ -95,4 +130,4 @@ function usePopups() {
 }
 
 export default usePopups
-export type { PopupInfo }
+export type { PopupInfo, OptionsPopupInfo }

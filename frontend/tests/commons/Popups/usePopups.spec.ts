@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest"
 import usePopups from "@/components/commons/Popups/usePopups"
+import type { OptionsPopupInfo } from "@/components/commons/Popups/usePopups"
 import { flushPromises } from "@vue/test-utils"
 
 describe("usePopups", () => {
@@ -18,6 +19,46 @@ describe("usePopups", () => {
     while (popups.peek()?.length) {
       popups.done(true)
     }
+  })
+
+  describe("options popup", () => {
+    const testOptions = [
+      { label: "Option A", value: "a" },
+      { label: "Option B", value: "b" },
+      { label: "Option C", value: "c" },
+    ]
+
+    it("creates an options popup with correct type and options", () => {
+      popups.options("Choose an option", testOptions)
+
+      const peeked = popups.peek()
+      expect(peeked?.length).toBe(1)
+      expect(peeked?.[0]?.type).toBe("options")
+      expect(peeked?.[0]?.message).toBe("Choose an option")
+      expect((peeked?.[0] as OptionsPopupInfo)?.options).toEqual(testOptions)
+    })
+
+    it("resolves with selected value when done is called", async () => {
+      const optionsPromise = popups.options("Choose an option", testOptions)
+
+      popups.done("b")
+
+      const result = await optionsPromise
+      expect(result).toBe("b")
+      expect(popups.peek()?.length).toBe(0)
+    })
+
+    it("resolves with null when ESC is pressed", async () => {
+      const optionsPromise = popups.options("Choose an option", testOptions)
+      expect(popups.peek()?.length).toBe(1)
+
+      document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
+      await flushPromises()
+
+      const result = await optionsPromise
+      expect(result).toBeNull()
+      expect(popups.peek()?.length).toBe(0)
+    })
   })
 
   describe("ESC key handling", () => {

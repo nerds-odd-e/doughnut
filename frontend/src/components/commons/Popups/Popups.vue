@@ -36,13 +36,42 @@
         </button>
       </template>
     </Modal>
+
+    <Modal
+      v-if="popupInfo.type === 'options'"
+      class="popups daisy-z-[9998]"
+      :isPopup="true"
+      @close_request="resolve(null)"
+    >
+      <template #header>
+        <h2>Select an option</h2>
+      </template>
+      <template #body>
+        <div class="daisy-mb-4">
+          <span>{{ popupInfo.message }}</span>
+        </div>
+        <div class="daisy-flex daisy-flex-wrap daisy-gap-2">
+          <button
+            v-for="opt in (popupInfo as OptionsPopupInfo).options"
+            :key="opt.value"
+            class="daisy-btn daisy-btn-primary"
+            @click="resolve(opt.value)"
+          >
+            {{ opt.label }}
+          </button>
+          <button class="daisy-btn daisy-btn-secondary" @click="resolve(null)">
+            Cancel
+          </button>
+        </div>
+      </template>
+    </Modal>
   </template>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue"
 import Modal from "../Modal.vue"
-import type { PopupInfo } from "./usePopups"
+import type { PopupInfo, OptionsPopupInfo } from "./usePopups"
 import usePopups from "./usePopups"
 
 export default defineComponent({
