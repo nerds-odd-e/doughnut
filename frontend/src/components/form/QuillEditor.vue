@@ -7,7 +7,6 @@ import { nextTick, ref, onMounted, watch } from "vue"
 import Quill, { type QuillOptions, type Range } from "quill"
 import "quill/dist/quill.bubble.css"
 import markdownizer from "./markdownizer"
-import { useInterruptingHtmlToMarkdown } from "@/composables/useInterruptingHtmlToMarkdown"
 
 // Define soft line break blot
 // Quill.import returns dynamic types that aren't fully typed in the Quill library
@@ -79,12 +78,11 @@ const { modelValue, readonly } = defineProps({
   readonly: Boolean,
 })
 
-const emits = defineEmits(["update:modelValue", "blur"])
+const emits = defineEmits(["update:modelValue", "blur", "pasteComplete"])
 
 const localValue = ref(modelValue)
 const editor = ref<HTMLElement | null>(null)
 const quill = ref<Quill | null>(null)
-const { htmlToMarkdown } = useInterruptingHtmlToMarkdown()
 
 const onBlurTextField = () => {
   emits("blur")
@@ -177,7 +175,7 @@ onMounted(async () => {
             if (format === "text/html") {
               const htmlData = originalGetData(format)
               if (htmlData) {
-                const markdown = htmlToMarkdown(htmlData)
+                const markdown = markdownizer.htmlToMarkdown(htmlData)
                 return markdownizer.markdownToHtml(markdown, {
                   preserve_pre: true,
                 })
@@ -185,6 +183,11 @@ onMounted(async () => {
             }
             return originalGetData(format)
           }
+
+          // Emit pasteComplete after the paste is processed
+          nextTick(() => {
+            emits("pasteComplete")
+          })
         },
         true
       )

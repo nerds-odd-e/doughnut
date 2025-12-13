@@ -14,7 +14,7 @@
         :auto-extend-until="1000"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
-        @paste="(event) => handlePaste(event, value, update)"
+        @paste="(event) => handleTextareaPaste(event, value, update)"
       />
       <RichMarkdownEditor
         v-else
@@ -24,6 +24,7 @@
         :readonly="readonly"
         @update:model-value="update(noteId, $event)"
         @blur="blur"
+        @paste-complete="handlePasteComplete(value, update)"
       />
     </template>
   </TextContentWrapper>
@@ -47,7 +48,17 @@ const textareaRef = ref<InstanceType<typeof TextArea> | null>(null)
 const { htmlToMarkdown, processContentAfterPaste } =
   usePasteWithLinkImageOptions()
 
-const handlePaste = async (
+const offerToRemoveLinksAndImages = async (
+  content: string,
+  update: (noteId: number, newValue: string) => void
+) => {
+  const processedContent = await processContentAfterPaste(content)
+  if (processedContent !== null) {
+    update(props.noteId, processedContent)
+  }
+}
+
+const handleTextareaPaste = async (
   event: ClipboardEvent,
   currentValue: string | undefined,
   update: (noteId: number, newValue: string) => void
@@ -72,7 +83,6 @@ const handlePaste = async (
     markdown +
     (currentValue || "").slice(end)
 
-  // Paste immediately without interruption
   update(props.noteId, newValue)
   nextTick(() => {
     if (textarea) {
@@ -80,10 +90,14 @@ const handlePaste = async (
     }
   })
 
-  // Check entire content for links/images and offer to remove them
-  const processedContent = await processContentAfterPaste(newValue)
-  if (processedContent !== null) {
-    update(props.noteId, processedContent)
-  }
+  await offerToRemoveLinksAndImages(newValue, update)
+}
+
+const handlePasteComplete = async (
+  currentValue: string | undefined,
+  update: (noteId: number, newValue: string) => void
+) => {
+  if (!currentValue) return
+  await offerToRemoveLinksAndImages(currentValue, update)
 }
 </script>

@@ -357,7 +357,7 @@ describe("NoteEditableDetails", () => {
     expect(textarea.value).toContain("existing")
   })
 
-  describe("paste with links and images", () => {
+  describe("paste with links and images in textarea", () => {
     it("shows options popup when content contains links after paste", async () => {
       const wrapper: VueWrapper<ComponentPublicInstance> = helper
         .component(NoteEditableDetails)
@@ -383,34 +383,6 @@ describe("NoteEditableDetails", () => {
       expect(mockPopupsOptions).toHaveBeenCalledWith(
         "The content contains 1 links.",
         expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
-      )
-    })
-
-    it("counts links from entire content including existing text", async () => {
-      const wrapper: VueWrapper<ComponentPublicInstance> = helper
-        .component(NoteEditableDetails)
-        .withCleanStorage()
-        .withProps({
-          noteId: 1,
-          noteDetails: "[existing link](https://existing.com)",
-          readonly: false,
-          asMarkdown: true,
-        })
-        .mount()
-
-      await flushPromises()
-
-      const textarea = wrapper.find("textarea").element as HTMLTextAreaElement
-      const pasteEvent = createClipboardEvent(
-        '<p>Check <a href="https://example.com">new link</a></p>'
-      )
-
-      await textarea.dispatchEvent(pasteEvent)
-      await flushPromises()
-
-      expect(mockPopupsOptions).toHaveBeenCalledWith(
-        "The content contains 2 links.",
-        expect.arrayContaining([{ label: "Remove 2 links", value: "links" }])
       )
     })
 
@@ -465,6 +437,53 @@ describe("NoteEditableDetails", () => {
       )
 
       await textarea.dispatchEvent(pasteEvent)
+      await flushPromises()
+
+      expect(mockPopupsOptions).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("paste with links and images in quill editor", () => {
+    it("shows options popup when quill editor emits pasteComplete and content contains links", async () => {
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId: 1,
+          noteDetails: "[a link](https://example.com)",
+          readonly: false,
+          asMarkdown: false,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
+      await richEditor.vm.$emit("pasteComplete")
+      await flushPromises()
+
+      expect(mockPopupsOptions).toHaveBeenCalledWith(
+        "The content contains 1 links.",
+        expect.arrayContaining([{ label: "Remove 1 links", value: "links" }])
+      )
+    })
+
+    it("does not show popup when quill content has no links or images", async () => {
+      const wrapper: VueWrapper<ComponentPublicInstance> = helper
+        .component(NoteEditableDetails)
+        .withCleanStorage()
+        .withProps({
+          noteId: 1,
+          noteDetails: "plain text without links",
+          readonly: false,
+          asMarkdown: false,
+        })
+        .mount()
+
+      await flushPromises()
+
+      const richEditor = wrapper.findComponent({ name: "RichMarkdownEditor" })
+      await richEditor.vm.$emit("pasteComplete")
       await flushPromises()
 
       expect(mockPopupsOptions).not.toHaveBeenCalled()

@@ -5,6 +5,7 @@
     :readonly="readonly"
     @update:model-value="htmlValueUpdated"
     @blur="$emit('blur')"
+    @paste-complete="$emit('pasteComplete')"
   />
 </template>
 
@@ -23,7 +24,7 @@ const { modelValue } = defineProps({
   readonly: Boolean,
 })
 
-const emits = defineEmits(["update:modelValue", "blur"])
+const emits = defineEmits(["update:modelValue", "blur", "pasteComplete"])
 
 let currentIntervalMarkdown: string | undefined = undefined
 let currentIntervalHtml: string | undefined = undefined
