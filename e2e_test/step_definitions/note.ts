@@ -577,10 +577,6 @@ When('I add note type {string} to my note', (noteType: string) => {
   start.assumeNotePage().updateNoteType(noteType)
 })
 
-Then('I will see new type {string} on my note', (noteType: string) => {
-  cy.get('#note-noteType').should('have.value', noteType)
-})
-
 Given('AI will generate question for note with type:', (data: DataTable) => {
   const noteTypeToQuestion: Record<string, string> = {}
   data.hashes().forEach((row) => {

@@ -269,8 +269,6 @@ Then(
 
 Given('there is a note {string}', (noteTitle: string) => {
   cy.get<string>('@currentLoginUser').then((username) => {
-    // Create a note without a valid note_type
-    // Note: This will need to be updated once the backend supports note_type field
     start.testability().injectNotes([{ Title: noteTitle }], username)
   })
 })
@@ -283,14 +281,10 @@ Then('I should be able to select a note type', () => {
   start.assumeAssimilationPage().expectNoteTypePrompt()
 })
 
-When('I select note type {string}', (noteType: string) => {
-  start.assumeAssimilationPage().selectNoteType(noteType)
-})
-
 Then(
   'the note {string} should be saved with note type {string}',
   (noteTitle: string, noteType: string) => {
-    start.jumpToNotePage(noteTitle, true).expectNoteType(noteType)
+    start.jumpToNotePage(noteTitle).expectNoteType(noteType)
   }
 )
 

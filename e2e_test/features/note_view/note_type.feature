@@ -8,14 +8,15 @@ Feature: Note type
     Given I have a notebook with the head note "Reservoirs" and details "The most popular reservoir to hike in is Macritchie"
     When I navigate to "Reservoirs" note
     And I add note type "concept" to my note
-    Then I will see new type "concept" on my note
+    Then the note "Reservoirs" should be saved with note type "concept"
+
     
   Scenario: Changing note type of existing note
     Given I have a notebook with the head note "Reservoirs" and details "The most popular reservoir to hike in is Macritchie"
     When I navigate to "Reservoirs" note
     And I add note type "concept" to my note
     And I add note type "journal" to my note
-    Then I will see new type "journal" on my note
+    Then the note "Reservoirs" should be saved with note type "journal"
 
   @usingMockedOpenAiService
   Scenario Outline: AI will interpret note type when generating questions
