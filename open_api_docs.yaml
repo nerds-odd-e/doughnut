@@ -4514,6 +4514,14 @@ components:
           format: date-time
         recallSetting:
           $ref: "#/components/schemas/RecallSetting"
+        noteType:
+          type: string
+          enum:
+          - concept
+          - category
+          - vocab
+          - journal
+          - unassigned
       required:
       - createdAt
       - note

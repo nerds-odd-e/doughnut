@@ -26,6 +26,7 @@ const mockNoteInfo: NoteInfo = {
   },
   memoryTrackers: [],
   createdAt: "",
+  noteType: "unassigned",
 }
 
 afterEach(() => {
@@ -57,7 +58,7 @@ describe("NoteMoreOptionsDialog", () => {
       })
     })
 
-    it("displays note type selector", async () => {
+    it("displays note type selector via NoteInfoComponent", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
@@ -66,23 +67,13 @@ describe("NoteMoreOptionsDialog", () => {
       expect(select.exists()).toBe(true)
     })
 
-    it("initializes note type from note prop", async () => {
-      const noteWithType = {
-        ...note,
-        noteType: "concept" as const,
-      }
+    it("initializes note type from fetched noteInfo", async () => {
       const noteInfoWithType: NoteInfo = {
         ...mockNoteInfo,
-        note: {
-          ...mockNoteInfo.note,
-          note: {
-            ...mockNoteInfo.note.note,
-            noteType: "concept",
-          },
-        },
+        noteType: "concept",
       }
       getNoteInfoSpy.mockResolvedValue(wrapSdkResponse(noteInfoWithType))
-      const wrapper = renderer.withProps({ note: noteWithType }).mount()
+      const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
@@ -90,12 +81,8 @@ describe("NoteMoreOptionsDialog", () => {
       expect((select.element as HTMLSelectElement).value).toBe("concept")
     })
 
-    it("defaults to unassigned when note has no type", async () => {
-      const noteWithoutType = {
-        ...note,
-        noteType: undefined,
-      }
-      const wrapper = renderer.withProps({ note: noteWithoutType }).mount()
+    it("defaults to unassigned when noteType is not set", async () => {
+      const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
@@ -104,7 +91,7 @@ describe("NoteMoreOptionsDialog", () => {
     })
   })
 
-  describe("note type update", () => {
+  describe("note type update via NoteInfoComponent", () => {
     it("updates note type when user selects a new type", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
@@ -115,15 +102,12 @@ describe("NoteMoreOptionsDialog", () => {
       await flushPromises()
 
       expect(updateNoteTypeSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
+        path: { note: mockNoteInfo.note.id },
         body: "vocab",
       })
     })
 
-    it("refetches note info after successful update", async () => {
-      updateNoteTypeSpy.mockResolvedValue(
-        wrapSdkResponse(makeMe.aNote.please())
-      )
+    it("refetches note info after successful note type update", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
@@ -136,63 +120,6 @@ describe("NoteMoreOptionsDialog", () => {
       expect(getNoteInfoSpy).toHaveBeenCalledWith({
         path: { note: note.id },
       })
-    })
-
-    it("reverts to previous value on error", async () => {
-      const noteWithType = {
-        ...note,
-        noteType: "concept" as const,
-      }
-      const noteInfoWithType: NoteInfo = {
-        ...mockNoteInfo,
-        note: {
-          ...mockNoteInfo.note,
-          note: {
-            ...mockNoteInfo.note.note,
-            noteType: "concept",
-          },
-        },
-      }
-      getNoteInfoSpy.mockResolvedValue(wrapSdkResponse(noteInfoWithType))
-      updateNoteTypeSpy.mockResolvedValue(wrapSdkError("Failed to update"))
-
-      const wrapper = renderer.withProps({ note: noteWithType }).mount()
-
-      await flushPromises()
-      await flushPromises()
-
-      const select = wrapper.find('select[id="note-noteType"]')
-      expect((select.element as HTMLSelectElement).value).toBe("concept")
-
-      await select.setValue("journal")
-      await flushPromises()
-      await flushPromises()
-      await wrapper.vm.$nextTick()
-
-      expect(updateNoteTypeSpy).toHaveBeenCalledWith({
-        path: { note: note.id },
-        body: "journal",
-      })
-    })
-
-    it("updates localNoteType from fetched note info", async () => {
-      const fetchedNoteInfo: NoteInfo = {
-        ...mockNoteInfo,
-        note: {
-          ...mockNoteInfo.note,
-          note: {
-            ...mockNoteInfo.note.note,
-            noteType: "vocab",
-          },
-        },
-      }
-      getNoteInfoSpy.mockResolvedValue(wrapSdkResponse(fetchedNoteInfo))
-      const wrapper = renderer.withProps({ note }).mount()
-
-      await flushPromises()
-
-      const select = wrapper.find('select[id="note-noteType"]')
-      expect((select.element as HTMLSelectElement).value).toBe("vocab")
     })
   })
 

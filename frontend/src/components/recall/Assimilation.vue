@@ -13,21 +13,8 @@
     :note-id="note.id"
     :key="note.id"
     @level-changed="$emit('reloadNeeded')"
+    @note-type-updated="onNoteTypeUpdated"
   />
-  <div
-    v-if="showNoteTypeSelection"
-    data-test="note-type-selection-dialog"
-    class="daisy-mb-4"
-    style="text-align: left;"
-  >
-    <Select
-      v-model="selectedNoteType"
-      :options="noteTypeOptions"
-      scope-name="note"
-      field="noteType"
-      @update:model-value="updateNoteType"
-    />
-  </div>
   <div
     v-if="noteSummaryPoints.length > 0 || shouldShowCategoryMessage"
     data-test="note-details-summary"
@@ -64,7 +51,6 @@ import type { Note } from "@generated/backend"
 import {
   AiController,
   AssimilationController,
-  NoteController,
 } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -75,8 +61,6 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import { computed, ref, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import Select from "../form/Select.vue"
-import { noteTypeOptions } from "@/models/noteTypeOptions"
 import type { NoteType } from "@/models/noteTypeOptions"
 
 const { note } = defineProps<{
@@ -95,9 +79,7 @@ const { totalAssimilatedCount } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
-const selectedNoteType = ref<NoteType>(note.noteType || "unassigned")
-
-const showNoteTypeSelection = ref(true)
+const currentNoteType = ref<NoteType>(note.noteType || "unassigned")
 
 const buttonKey = computed(() => note.id)
 
@@ -107,7 +89,7 @@ const isLoadingSummary = ref(false)
 
 const shouldShowCategoryMessage = computed(() => {
   return (
-    selectedNoteType.value === "category" &&
+    currentNoteType.value === "category" &&
     note.details &&
     note.details.trim().length > 0
   )
@@ -120,8 +102,7 @@ const generateSummary = async () => {
   }
 
   // Skip summary generation for category note type
-  // Use selectedNoteType as it reflects the current state (including pending updates)
-  if (selectedNoteType.value === "category") {
+  if (currentNoteType.value === "category") {
     noteSummaryPoints.value = []
     return
   }
@@ -151,6 +132,7 @@ const generateSummary = async () => {
 watch(
   () => note.id,
   () => {
+    currentNoteType.value = note.noteType || "unassigned"
     generateSummary()
   },
   { immediate: true }
@@ -159,33 +141,16 @@ watch(
 watch(
   () => note.noteType,
   (newNoteType) => {
-    selectedNoteType.value = newNoteType || "unassigned"
+    currentNoteType.value = newNoteType || "unassigned"
     // Regenerate summary when note type changes (to handle category exclusion)
     generateSummary()
   }
 )
 
-const updateNoteType = async (newType: NoteType) => {
-  const previousValue = note.noteType || "unassigned"
-  selectedNoteType.value = newType
-
-  if (newType === note.noteType) {
-    return
-  }
-
-  const { error } = await apiCallWithLoading(() =>
-    NoteController.updateNoteType({
-      path: { note: note.id },
-      body: newType,
-    })
-  )
-
-  if (error) {
-    selectedNoteType.value = previousValue
-  } else {
-    // Regenerate summary after note type is updated (to handle category exclusion)
-    generateSummary()
-  }
+const onNoteTypeUpdated = (newType: NoteType) => {
+  currentNoteType.value = newType
+  // Regenerate summary after note type is updated (to handle category exclusion)
+  generateSummary()
 }
 
 // Methods
@@ -231,28 +196,5 @@ const processForm = async (skipMemoryTracking: boolean) => {
   background-color: rgba(50, 50, 150, 0.8);
   padding: 5px;
   border-radius: 10px;
-}
-
-[data-test="note-type-selection-dialog"] {
-  text-align: left;
-}
-
-[data-test="note-type-selection-dialog"] .daisy-label {
-  justify-content: flex-start !important;
-  align-items: flex-start !important;
-}
-
-[data-test="note-type-selection-dialog"] .daisy-label-text {
-  text-align: left;
-}
-
-[data-test="note-type-selection-dialog"] select {
-  text-align: left !important;
-  direction: ltr;
-}
-
-[data-test="note-type-selection-dialog"] select option {
-  text-align: left;
-  direction: ltr;
 }
 </style>

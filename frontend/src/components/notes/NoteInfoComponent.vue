@@ -1,4 +1,16 @@
 <template>
+  <div
+    data-test="note-type-selection-dialog"
+    class="daisy-mb-4"
+  >
+    <Select
+      v-model="localNoteType"
+      :options="noteTypeOptions"
+      scope-name="note"
+      field="noteType"
+      @update:model-value="updateNoteType"
+    />
+  </div>
   <RecallSettingForm
     v-bind="{ noteId: noteInfo.note.id, recallSetting }"
     @level-changed="$emit('levelChanged', $event)"
@@ -31,10 +43,15 @@
 
 <script setup lang="ts">
 import type { MemoryTracker, NoteInfo } from "@generated/backend"
-import { ref, computed } from "vue"
+import { NoteController } from "@generated/backend/sdk.gen"
+import { apiCallWithLoading } from "@/managedApi/clientSetup"
+import { ref, computed, watch } from "vue"
 import { useRouter } from "vue-router"
 import RecallSettingForm from "../recall/RecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
+import Select from "../form/Select.vue"
+import { noteTypeOptions } from "@/models/noteTypeOptions"
+import type { NoteType } from "@/models/noteTypeOptions"
 
 // Props
 const props = defineProps<{
@@ -42,8 +59,9 @@ const props = defineProps<{
 }>()
 
 // Emits
-defineEmits<{
+const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
+  (e: "noteTypeUpdated", noteType: NoteType): void
 }>()
 
 // Router
@@ -51,9 +69,18 @@ const router = useRouter()
 
 // Reactive state
 const memoryTrackers = ref(props.noteInfo.memoryTrackers ?? [])
+const localNoteType = ref<NoteType>(props.noteInfo.noteType ?? "unassigned")
 
 // Computed
 const recallSetting = computed(() => props.noteInfo.recallSetting)
+
+// Watch for external changes to noteInfo.noteType
+watch(
+  () => props.noteInfo.noteType,
+  (newNoteType) => {
+    localNoteType.value = newNoteType ?? "unassigned"
+  }
+)
 
 // Methods
 const updateMemoryTracker = (newTracker: MemoryTracker) => {
@@ -68,6 +95,28 @@ const navigateToMemoryTracker = (memoryTrackerId: number) => {
     name: "memoryTrackerShow",
     params: { memoryTrackerId },
   })
+}
+
+const updateNoteType = async (newType: NoteType) => {
+  const previousValue = localNoteType.value
+  localNoteType.value = newType
+
+  if (newType === props.noteInfo.noteType) {
+    return
+  }
+
+  const { error } = await apiCallWithLoading(() =>
+    NoteController.updateNoteType({
+      path: { note: props.noteInfo.note.id },
+      body: newType,
+    })
+  )
+
+  if (error) {
+    localNoteType.value = previousValue
+  } else {
+    emit("noteTypeUpdated", newType)
+  }
 }
 </script>
 

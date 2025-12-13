@@ -512,6 +512,7 @@ export type NoteInfo = {
     note: NoteRealm;
     createdAt: string;
     recallSetting?: RecallSetting;
+    noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
 export type BareNote = {
@@ -712,6 +713,7 @@ export type NoteInfoWritable = {
     note: NoteRealmWritable;
     createdAt: string;
     recallSetting?: RecallSetting;
+    noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
 export type NotebooksViewedByUserWritable = {

@@ -116,6 +116,14 @@ class NoteControllerTests extends ControllerTestBase {
               .anyMatch(mt -> Boolean.TRUE.equals(mt.getRemovedFromTracking())),
           is(true));
     }
+
+    @Test
+    void shouldIncludeNoteTypeInNoteInfo() throws UnexpectedNoAccessRightException {
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+
+      NoteInfo noteInfo = controller.getNoteInfo(note);
+      assertThat(noteInfo.getNoteType(), equalTo(NoteType.UNASSIGNED));
+    }
   }
 
   @Nested

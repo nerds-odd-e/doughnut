@@ -7,17 +7,10 @@
     </button>
     <div class="daisy-flex daisy-flex-col daisy-gap-2">
       <div v-if="noteInfo?.note" class="daisy-mb-4">
-        <NoteInfoComponent :note-info="noteInfo" />
-      </div>
-      <div class="daisy-mb-4">
-        <Select
-          id="note-type-edit"
-          v-model="localNoteType"
-          :options="noteTypeOptions"
-          scope-name="note"
-          field="noteType"
-          @update:model-value="updateNoteType"
-        ></Select>
+        <NoteInfoComponent
+          :note-info="noteInfo"
+          @note-type-updated="onNoteTypeUpdated"
+        />
       </div>
     </div>
     <div class="daisy-divider daisy-my-2"></div>
@@ -119,12 +112,9 @@ import usePopups from "../../commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
-import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref, onMounted } from "vue"
 import NoteInfoComponent from "../NoteInfoComponent.vue"
-import Select from "../../form/Select.vue"
 import type { NoteType } from "@/models/noteTypeOptions"
-import { noteTypeOptions } from "@/models/noteTypeOptions"
 
 const { note } = defineProps<{
   note: Note
@@ -141,38 +131,22 @@ const storageAccessor = useStorageAccessor()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
 
-const localNoteType = ref<NoteType>(note.noteType || "unassigned")
-
-const updateNoteType = async (newType: NoteType) => {
-  const previousValue = localNoteType.value
-  localNoteType.value = newType
-  const { data: updatedNote, error } = await apiCallWithLoading(() =>
-    NoteController.updateNoteType({
-      path: { note: note.id },
-      body: newType,
-    })
-  )
-  if (error) {
-    localNoteType.value = previousValue
-  } else if (updatedNote) {
-    await fetchNoteInfo()
-  }
-}
-
 const fetchNoteInfo = async () => {
   const { data: noteInfoData, error } = await NoteController.getNoteInfo({
     path: { note: note.id },
   })
   if (!error && noteInfoData) {
     noteInfo.value = noteInfoData
-    const fetchedNoteType = noteInfoData.note?.note?.noteType
-    localNoteType.value = fetchedNoteType ?? "unassigned"
   }
 }
 
 onMounted(() => {
   fetchNoteInfo()
 })
+
+const onNoteTypeUpdated = async (_newType: NoteType) => {
+  await fetchNoteInfo()
+}
 
 const closeDialog = () => {
   emit("close-dialog")
@@ -209,4 +183,3 @@ const deleteNote = async () => {
   transform-origin: top;
 }
 </style>
-

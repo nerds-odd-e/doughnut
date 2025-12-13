@@ -1,8 +1,13 @@
 import NoteInfoComponent from "@/components/notes/NoteInfoComponent.vue"
 import { flushPromises } from "@vue/test-utils"
-import helper from "@tests/helpers"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import helper, { mockSdkService, wrapSdkError } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import type { NoteInfo } from "@generated/backend"
+
+afterEach(() => {
+  vi.clearAllMocks()
+})
 
 describe("NoteInfoComponent", () => {
   it("should display all memory trackers including skipped ones", () => {
@@ -19,6 +24,7 @@ describe("NoteInfoComponent", () => {
       ],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
+      noteType: "unassigned",
     }
 
     const wrapper = helper
@@ -43,6 +49,7 @@ describe("NoteInfoComponent", () => {
       memoryTrackers: [skippedMemoryTracker],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
+      noteType: "unassigned",
     }
 
     const wrapper = helper
@@ -72,6 +79,7 @@ describe("NoteInfoComponent", () => {
       memoryTrackers: [makeMe.aMemoryTracker.please()],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
+      noteType: "unassigned",
     }
 
     const wrapper = helper
@@ -94,6 +102,7 @@ describe("NoteInfoComponent", () => {
       memoryTrackers: [],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
+      noteType: "unassigned",
     }
 
     const wrapper = helper
@@ -105,5 +114,153 @@ describe("NoteInfoComponent", () => {
       .mount()
 
     expect(wrapper.find("table").exists()).toBe(false)
+  })
+
+  describe("note type selection", () => {
+    let updateNoteTypeSpy: ReturnType<typeof mockSdkService<"updateNoteType">>
+
+    beforeEach(() => {
+      updateNoteTypeSpy = mockSdkService("updateNoteType", undefined)
+    })
+
+    it("should display note type selection", () => {
+      const noteInfo: NoteInfo = {
+        memoryTrackers: [],
+        note: makeMe.aNoteRealm.please(),
+        createdAt: "",
+        noteType: "concept",
+      }
+
+      const wrapper = helper
+        .component(NoteInfoComponent)
+        .withProps({
+          noteInfo,
+        })
+        .withRouter()
+        .mount()
+
+      const selection = wrapper.find('[data-test="note-type-selection-dialog"]')
+      expect(selection.exists()).toBe(true)
+      const select = selection.find("select")
+      expect(select.exists()).toBe(true)
+      expect(select.element.value).toBe("concept")
+    })
+
+    it("should save noteType when user selects a new type", async () => {
+      const noteInfo: NoteInfo = {
+        memoryTrackers: [],
+        note: makeMe.aNoteRealm.please(),
+        createdAt: "",
+        noteType: "unassigned",
+      }
+
+      const wrapper = helper
+        .component(NoteInfoComponent)
+        .withProps({
+          noteInfo,
+        })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const select = wrapper.find(
+        '[data-test="note-type-selection-dialog"] select'
+      )
+      await select.setValue("vocab")
+      await flushPromises()
+
+      expect(updateNoteTypeSpy).toHaveBeenCalledWith({
+        path: { note: noteInfo.note.id },
+        body: "vocab",
+      })
+    })
+
+    it("should emit noteTypeUpdated event on successful update", async () => {
+      const noteInfo: NoteInfo = {
+        memoryTrackers: [],
+        note: makeMe.aNoteRealm.please(),
+        createdAt: "",
+        noteType: "unassigned",
+      }
+
+      const wrapper = helper
+        .component(NoteInfoComponent)
+        .withProps({
+          noteInfo,
+        })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const select = wrapper.find(
+        '[data-test="note-type-selection-dialog"] select'
+      )
+      await select.setValue("journal")
+      await flushPromises()
+
+      expect(wrapper.emitted()).toHaveProperty("noteTypeUpdated")
+      expect(wrapper.emitted("noteTypeUpdated")?.[0]).toEqual(["journal"])
+    })
+
+    it("should revert selection on error", async () => {
+      const noteInfo: NoteInfo = {
+        memoryTrackers: [],
+        note: makeMe.aNoteRealm.please(),
+        createdAt: "",
+        noteType: "concept",
+      }
+
+      updateNoteTypeSpy.mockResolvedValue(wrapSdkError("Failed to update"))
+
+      const wrapper = helper
+        .component(NoteInfoComponent)
+        .withProps({
+          noteInfo,
+        })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      const select = wrapper.find(
+        '[data-test="note-type-selection-dialog"] select'
+      )
+      await select.setValue("category")
+      await flushPromises()
+
+      expect(updateNoteTypeSpy).toHaveBeenCalled()
+      // Should not emit noteTypeUpdated on error
+      expect(wrapper.emitted("noteTypeUpdated")).toBeUndefined()
+    })
+
+    it("should not save when selected type matches current noteType", async () => {
+      const noteInfo: NoteInfo = {
+        memoryTrackers: [],
+        note: makeMe.aNoteRealm.please(),
+        createdAt: "",
+        noteType: "category",
+      }
+
+      const wrapper = helper
+        .component(NoteInfoComponent)
+        .withProps({
+          noteInfo,
+        })
+        .withRouter()
+        .mount()
+
+      await flushPromises()
+
+      // Select the same value that's already set
+      const select = wrapper.find(
+        '[data-test="note-type-selection-dialog"] select'
+      )
+      await select.setValue("category")
+      await flushPromises()
+
+      expect(updateNoteTypeSpy).not.toHaveBeenCalled()
+    })
   })
 })

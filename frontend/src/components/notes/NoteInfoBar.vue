@@ -3,15 +3,16 @@
     v-if="noteInfo?.note"
     :note-info="noteInfo"
     @level-changed="$emit('levelChanged', $event)"
+    @note-type-updated="$emit('noteTypeUpdated', $event)"
   />
 </template>
 
 <script setup lang="ts">
 import type { NoteInfo } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
-import {} from "@/managedApi/clientSetup"
 import NoteInfoComponent from "./NoteInfoComponent.vue"
 import { ref, onMounted } from "vue"
+import type { NoteType } from "@/models/noteTypeOptions"
 
 const props = defineProps<{
   noteId: number
@@ -19,6 +20,7 @@ const props = defineProps<{
 
 defineEmits<{
   (e: "levelChanged", value: unknown): void
+  (e: "noteTypeUpdated", noteType: NoteType): void
 }>()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
