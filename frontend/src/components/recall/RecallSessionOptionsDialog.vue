@@ -8,6 +8,12 @@
         <div class="daisy-flex daisy-flex-col daisy-gap-2">
           <p class="daisy-my-2 daisy-text-neutral">Daily Progress: {{ finished }} / {{ finished + toRepeatCount }}</p>
           <p class="daisy-my-2 daisy-text-neutral">Total assimilated: {{ finished }} / {{ totalAssimilatedCount }}</p>
+          <p
+            v-if="averageThinkingTime !== null"
+            class="daisy-my-2 daisy-text-neutral"
+          >
+            Average thinking time: {{ formatThinkingTime(averageThinkingTime) }}
+          </p>
         </div>
         <div class="daisy-divider"></div>
         <div class="daisy-flex daisy-flex-col daisy-gap-2">
@@ -37,9 +43,11 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue"
 import SvgSkip from "../svgs/SvgSkip.vue"
 import Modal from "../commons/Modal.vue"
 import { useRecallData } from "@/composables/useRecallData"
+import type { QuestionResult, RecallResult } from "@generated/backend"
 
 const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
@@ -48,6 +56,10 @@ const props = defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
   totalAssimilatedCount: { type: Number, default: 0 },
+  previousAnsweredQuestions: {
+    type: Array as () => (RecallResult | undefined)[],
+    required: true,
+  },
 })
 
 const emit = defineEmits<{
@@ -71,6 +83,47 @@ const handleTreadmillModeToggle = (event: Event) => {
   const target = event.target as HTMLInputElement
   setTreadmillMode(target.checked)
   emit("treadmill-mode-changed")
+}
+
+const isQuestionResultWithThinkingTime = (
+  result: RecallResult | undefined
+): result is QuestionResult => {
+  if (result === undefined || result.type !== "QuestionResult") {
+    return false
+  }
+  const questionResult = result as QuestionResult
+  return questionResult.answeredQuestion?.answer?.thinkingTimeMs !== undefined
+}
+
+const averageThinkingTime = computed(() => {
+  const mcqQuestions = props.previousAnsweredQuestions.filter(
+    isQuestionResultWithThinkingTime
+  )
+
+  if (mcqQuestions.length === 0) {
+    return null
+  }
+
+  const totalThinkingTime = mcqQuestions.reduce(
+    (sum, result) =>
+      sum + (result.answeredQuestion?.answer?.thinkingTimeMs ?? 0),
+    0
+  )
+
+  return Math.round(totalThinkingTime / mcqQuestions.length)
+})
+
+const formatThinkingTime = (ms: number): string => {
+  if (ms < 1000) {
+    return `${ms}ms`
+  }
+  const seconds = Math.round(ms / 1000)
+  if (seconds < 60) {
+    return `${seconds}s`
+  }
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes}m ${remainingSeconds}s`
 }
 </script>
 

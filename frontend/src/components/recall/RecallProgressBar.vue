@@ -42,6 +42,7 @@
             finished,
             toRepeatCount,
             totalAssimilatedCount,
+            previousAnsweredQuestions,
           }"
           @close-dialog="showSettings = false"
           @move-to-end="handleMoveToEnd"
@@ -63,6 +64,8 @@ import SvgBackward from "../svgs/SvgBackward.vue"
 import SvgCog from "../svgs/SvgCog.vue"
 import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
+import type { RecallResult } from "@generated/backend"
+
 const props = defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
@@ -71,6 +74,10 @@ const props = defineProps({
   currentIndex: { type: Number, required: true },
   totalAssimilatedCount: { type: Number, default: 0 },
   diligentMode: { type: Boolean, default: false },
+  previousAnsweredQuestions: {
+    type: Array as () => (RecallResult | undefined)[],
+    required: true,
+  },
 })
 
 const emit = defineEmits<{

@@ -16,6 +16,7 @@
           currentIndex,
           totalAssimilatedCount: totalAssimilatedCount ?? 0,
           diligentMode: diligentMode,
+          previousAnsweredQuestions,
         }"
         @view-last-answered-question="viewLastAnsweredQuestion($event)"
         @move-to-end="moveMemoryTrackerToEnd($event)"
