@@ -65,15 +65,20 @@ const createUseRecallDataMock = (overrides?: {
   const toRepeat = ref<
     Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
   >(overrides?.toRepeat ?? [])
+  const currentIndex = ref(overrides?.currentIndex ?? 0)
   return {
-    toRepeatCount: computed(() => toRepeat.value?.length ?? 0),
+    toRepeatCount: computed(() => {
+      const length = toRepeat.value?.length ?? 0
+      const index = currentIndex.value
+      return Math.max(0, length - index)
+    }),
     toRepeat,
     currentRecallWindowEndAt: ref(undefined),
     totalAssimilatedCount: ref(0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
-    currentIndex: ref(overrides?.currentIndex ?? 0),
+    currentIndex,
     diligentMode: ref(overrides?.diligentMode ?? false),
     setToRepeat: vi.fn(),
     setCurrentRecallWindowEndAt: vi.fn(),
@@ -293,6 +298,41 @@ describe("main menu", () => {
 
       const recallCount = queryByText("0")
       expect(recallCount).not.toBeInTheDocument()
+    })
+
+    it("decreases recall count when questions are answered (currentIndex increases)", async () => {
+      const toRepeat = Array(10).fill({}) as Array<{
+        memoryTrackerId?: number
+        spelling?: boolean
+      }>
+
+      const mockData = createUseRecallDataMock({
+        toRepeat,
+        currentIndex: 0,
+      })
+
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+
+      const { getAllByText, rerender } = helper
+        .component(MainMenu)
+        .withProps({ user })
+        .render()
+      await flushPromises()
+
+      // Initially shows 10 items (may appear on both Recall and Resume if currentIndex > 0)
+      const initialCounts = getAllByText("10")
+      expect(initialCounts.length).toBeGreaterThan(0)
+
+      // Simulate answering 3 questions by updating currentIndex
+      mockData.currentIndex.value = 3
+      await rerender({ user })
+      await flushPromises()
+
+      // Count should decrease to 7 (10 - 3)
+      // When currentIndex > 0, both Resume and Recall show the count
+      const updatedCounts = getAllByText("7")
+      expect(updatedCounts.length).toBeGreaterThan(0)
+      expect(screen.queryByText("10")).not.toBeInTheDocument()
     })
   })
 
