@@ -477,7 +477,6 @@ export type AssimilationCountDto = {
 };
 
 export type DueMemoryTrackers = {
-    toRepeatCount: number;
     totalAssimilatedCount: number;
     recallWindowEndAt?: string;
     toRepeat?: Array<MemoryTrackerLite>;

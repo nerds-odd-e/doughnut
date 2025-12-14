@@ -65,7 +65,7 @@ const showUserSettings = ref(false)
 
 const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
   useAssimilationCount()
-const { setToRepeatCount, setRecallWindowEndAt, setTotalAssimilatedCount } =
+const { setToRepeat, setRecallWindowEndAt, setTotalAssimilatedCount } =
   useRecallData()
 
 const fetchMenuData = async () => {
@@ -83,7 +83,7 @@ const fetchMenuData = async () => {
       )
     }
     if (menuData.recallStatus) {
-      setToRepeatCount(menuData.recallStatus.toRepeatCount)
+      setToRepeat(menuData.recallStatus.toRepeat)
       setRecallWindowEndAt(menuData.recallStatus.recallWindowEndAt)
       setTotalAssimilatedCount(menuData.recallStatus.totalAssimilatedCount)
     }

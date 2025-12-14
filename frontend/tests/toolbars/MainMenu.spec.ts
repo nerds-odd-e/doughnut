@@ -7,7 +7,7 @@ import { flushPromises } from "@vue/test-utils"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { beforeEach, vi } from "vitest"
 import { useRecallData } from "@/composables/useRecallData"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 
 vi.mock("@/composables/useRecallData")
 
@@ -42,7 +42,7 @@ const defaultMenuData = {
     totalUnassimilatedCount: 0,
   },
   recallStatus: {
-    toRepeatCount: 0,
+    toRepeat: [] as Array<{ memoryTrackerId?: number; spelling?: boolean }>,
     recallWindowEndAt: "",
     totalAssimilatedCount: 0,
   },
@@ -56,26 +56,29 @@ const createMenuData = (overrides?: Partial<typeof defaultMenuData>) => {
 
 // Helper to create useRecallData mock return value
 const createUseRecallDataMock = (overrides?: {
-  toRepeatCount?: number
+  toRepeat?: Array<{ memoryTrackerId?: number; spelling?: boolean }>
   isRecallPaused?: boolean
   currentIndex?: number
   resumeRecall?: () => void
 }) => {
+  const toRepeat = ref<
+    Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
+  >(overrides?.toRepeat ?? [])
   return {
-    toRepeatCount: ref(overrides?.toRepeatCount ?? 0),
+    toRepeatCount: computed(() => toRepeat.value?.length ?? 0),
+    toRepeat,
     recallWindowEndAt: ref(undefined),
     totalAssimilatedCount: ref(0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
     currentIndex: ref(overrides?.currentIndex ?? 0),
-    setToRepeatCount: vi.fn(),
+    setToRepeat: vi.fn(),
     setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
     resumeRecall: (overrides?.resumeRecall ?? vi.fn()) as () => void,
     clearShouldResumeRecall: vi.fn(),
-    decrementToRepeatCount: vi.fn(),
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),
   }
@@ -248,7 +251,10 @@ describe("main menu", () => {
         "getMenuData",
         createMenuData({
           recallStatus: {
-            toRepeatCount: 789,
+            toRepeat: Array(789).fill({}) as Array<{
+              memoryTrackerId?: number
+              spelling?: boolean
+            }>,
             recallWindowEndAt: "",
             totalAssimilatedCount: 0,
           },
@@ -257,7 +263,10 @@ describe("main menu", () => {
 
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
-          toRepeatCount: 789,
+          toRepeat: Array(789).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
         })
       )
 
@@ -458,7 +467,10 @@ describe("main menu", () => {
         "getMenuData",
         createMenuData({
           recallStatus: {
-            toRepeatCount: 789,
+            toRepeat: Array(789).fill({}) as Array<{
+              memoryTrackerId?: number
+              spelling?: boolean
+            }>,
             recallWindowEndAt: "",
             totalAssimilatedCount: 0,
           },
@@ -468,7 +480,10 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
-          toRepeatCount: 789,
+          toRepeat: Array(789).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
         })
       )
 
@@ -487,7 +502,7 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
-          toRepeatCount: 0,
+          toRepeat: [],
         })
       )
 

@@ -97,8 +97,6 @@ export type QuestionResult = {
 
 type RecallResult = QuestionResult | SpellingResult
 const {
-  setToRepeatCount,
-  decrementToRepeatCount,
   recallWindowEndAt,
   setRecallWindowEndAt,
   totalAssimilatedCount,
@@ -175,12 +173,6 @@ const currentAnsweredSpelling = computed(() => {
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
 
-const getNonSpellingCount = (list: MemoryTrackerLite[] | undefined): number => {
-  if (!list) return 0
-  if (!treadmillMode.value) return list.length
-  return list.filter((t) => !t.spelling).length
-}
-
 const getRemainingNonSpellingCount = (): number => {
   if (!toRepeat.value) return 0
   if (!treadmillMode.value) {
@@ -214,7 +206,6 @@ watch(
   () => treadmillMode.value,
   () => {
     if (toRepeat.value) {
-      updateToRepeatCount()
       // Move to first non-spelling tracker if current is spelling and treadmill mode is on
       if (treadmillMode.value) {
         const currentTracker = toRepeat.value[currentIndex.value]
@@ -258,7 +249,6 @@ const loadMore = async (dueInDays?: number) => {
     if (getEnvironment() !== "testing" && toRepeat.value) {
       toRepeat.value = shuffle(toRepeat.value)
     }
-    updateToRepeatCount(response.toRepeatCount)
     return response
   }
   return undefined
@@ -290,7 +280,6 @@ const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
   if (!answerResult.answer.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  decrementToRepeatCount()
 }
 
 const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
@@ -302,13 +291,11 @@ const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
   if (!answerResult.isCorrect) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
-  decrementToRepeatCount()
 }
 
 const onJustReviewed = () => {
   moveToNextMemoryTracker()
   previousAnsweredQuestions.value.push(undefined)
-  decrementToRepeatCount()
 }
 
 const moveMemoryTrackerToEnd = (index: number) => {
@@ -364,24 +351,6 @@ const handleTreadmillModeChanged = () => {
         ]
       }
     }
-    updateToRepeatCount()
-  }
-}
-
-const updateToRepeatCount = (backendCount?: number) => {
-  if (!toRepeat.value) {
-    setToRepeatCount(0)
-    return
-  }
-  if (treadmillMode.value) {
-    const count = getNonSpellingCount(toRepeat.value)
-    setToRepeatCount(count)
-  } else if (backendCount !== undefined) {
-    // Preserve backend count when treadmill mode is off
-    setToRepeatCount(backendCount)
-  } else {
-    // Fallback to counting all trackers
-    setToRepeatCount(toRepeat.value.length)
   }
 }
 

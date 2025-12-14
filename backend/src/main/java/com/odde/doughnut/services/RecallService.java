@@ -54,7 +54,6 @@ public class RecallService {
     dueMemoryTrackers.setToRepeat(toRepeat);
 
     // Set recall status (always based on dueInDays=0)
-    dueMemoryTrackers.toRepeatCount = getToRecallCount(user, currentUTCTimestamp, timeZone);
     dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);
     dueMemoryTrackers.setRecallWindowEndAt(
         TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));

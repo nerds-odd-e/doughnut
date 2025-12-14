@@ -72,7 +72,7 @@ class RecallsControllerTests extends ControllerTestBase {
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 
-      assertEquals(1, dueMemoryTrackers.toRepeatCount);
+      assertEquals(1, dueMemoryTrackers.getToRepeat().size());
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertEquals(
           TimestampOperations.addHoursToTimestamp(currentTime, 24),
@@ -101,7 +101,7 @@ class RecallsControllerTests extends ControllerTestBase {
 
       DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
 
-      assertEquals(1, dueMemoryTrackers.toRepeatCount);
+      assertEquals(1, dueMemoryTrackers.getToRepeat().size());
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
     }

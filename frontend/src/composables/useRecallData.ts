@@ -1,7 +1,8 @@
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
+import type { MemoryTrackerLite } from "@/generated/backend/types.gen"
 
-const toRepeatCount = ref<number | undefined>(undefined)
+const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const recallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
@@ -9,11 +10,13 @@ const shouldResumeRecall = ref(false)
 const treadmillMode = ref<boolean>(false)
 const currentIndex = ref(0)
 
+const toRepeatCount = computed(() => toRepeat.value?.length ?? 0)
+
 export function useRecallData() {
   const router = useRouter()
 
-  const setToRepeatCount = (count: number | undefined) => {
-    toRepeatCount.value = count
+  const setToRepeat = (trackers: MemoryTrackerLite[] | undefined) => {
+    toRepeat.value = trackers
   }
 
   const setRecallWindowEndAt = (endAt: string | undefined) => {
@@ -37,12 +40,6 @@ export function useRecallData() {
     shouldResumeRecall.value = false
   }
 
-  const decrementToRepeatCount = () => {
-    if (toRepeatCount.value !== undefined && toRepeatCount.value > 0) {
-      toRepeatCount.value -= 1
-    }
-  }
-
   const setTreadmillMode = (enabled: boolean) => {
     treadmillMode.value = enabled
   }
@@ -53,19 +50,19 @@ export function useRecallData() {
 
   return {
     toRepeatCount,
+    toRepeat,
     recallWindowEndAt,
     totalAssimilatedCount,
     isRecallPaused,
     shouldResumeRecall,
     treadmillMode,
     currentIndex,
-    setToRepeatCount,
+    setToRepeat,
     setRecallWindowEndAt,
     setTotalAssimilatedCount,
     setIsRecallPaused,
     resumeRecall,
     clearShouldResumeRecall,
-    decrementToRepeatCount,
     setTreadmillMode,
     setCurrentIndex,
   }

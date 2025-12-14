@@ -4432,9 +4432,6 @@ components:
     DueMemoryTrackers:
       type: object
       properties:
-        toRepeatCount:
-          type: integer
-          format: int32
         totalAssimilatedCount:
           type: integer
           format: int32
@@ -4449,7 +4446,6 @@ components:
           type: integer
           format: int32
       required:
-      - toRepeatCount
       - totalAssimilatedCount
     MemoryTrackerLite:
       type: object

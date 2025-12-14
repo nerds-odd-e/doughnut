@@ -10,7 +10,7 @@ import helper, {
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 
 vi.mock("@/composables/useRecallData")
 vi.mock("@/composables/useAssimilationCount")
@@ -20,6 +20,9 @@ let assimilateSpy: ReturnType<typeof mockSdkService<"assimilate">>
 let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
 const mockedIncrementAssimilatedCount = vi.fn()
 const mockedTotalAssimilatedCount = ref(0)
+const toRepeat = ref<
+  Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
+>(undefined)
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -41,19 +44,19 @@ beforeEach(() => {
 
   vi.mocked(useRecallData).mockReturnValue({
     totalAssimilatedCount: mockedTotalAssimilatedCount,
-    toRepeatCount: ref(0),
+    toRepeatCount: computed(() => toRepeat.value?.length ?? 0),
+    toRepeat: ref(undefined),
     recallWindowEndAt: ref(undefined),
     isRecallPaused: ref(false),
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
     currentIndex: ref(0),
-    setToRepeatCount: vi.fn(),
+    setToRepeat: vi.fn(),
     setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
     resumeRecall: vi.fn(),
     clearShouldResumeRecall: vi.fn(),
-    decrementToRepeatCount: vi.fn(),
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),
   })
