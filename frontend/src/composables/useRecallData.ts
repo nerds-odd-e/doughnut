@@ -3,6 +3,7 @@ import { useRouter } from "vue-router"
 import type { MemoryTrackerLite } from "@/generated/backend/types.gen"
 
 const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
+const recallWindowEndAt = ref<string | undefined>(undefined)
 const totalAssimilatedCount = ref<number | undefined>(undefined)
 const isRecallPaused = ref(false)
 const shouldResumeRecall = ref(false)
@@ -17,6 +18,10 @@ export function useRecallData() {
 
   const setToRepeat = (trackers: MemoryTrackerLite[] | undefined) => {
     toRepeat.value = trackers
+  }
+
+  const setRecallWindowEndAt = (endAt: string | undefined) => {
+    recallWindowEndAt.value = endAt
   }
 
   const setTotalAssimilatedCount = (count: number | undefined) => {
@@ -51,6 +56,7 @@ export function useRecallData() {
   return {
     toRepeatCount,
     toRepeat,
+    recallWindowEndAt,
     totalAssimilatedCount,
     isRecallPaused,
     shouldResumeRecall,
@@ -58,6 +64,7 @@ export function useRecallData() {
     currentIndex,
     diligentMode,
     setToRepeat,
+    setRecallWindowEndAt,
     setTotalAssimilatedCount,
     setIsRecallPaused,
     resumeRecall,

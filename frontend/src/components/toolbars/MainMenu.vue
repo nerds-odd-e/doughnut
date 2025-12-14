@@ -65,7 +65,8 @@ const showUserSettings = ref(false)
 
 const { setDueCount, setAssimilatedCountOfTheDay, setTotalUnassimilatedCount } =
   useAssimilationCount()
-const { setToRepeat, setTotalAssimilatedCount } = useRecallData()
+const { setToRepeat, setRecallWindowEndAt, setTotalAssimilatedCount } =
+  useRecallData()
 
 const fetchMenuData = async () => {
   const { data: menuData, error } = await UserController.getMenuData({
@@ -83,6 +84,7 @@ const fetchMenuData = async () => {
     }
     if (menuData.recallStatus) {
       setToRepeat(menuData.recallStatus.toRepeat)
+      setRecallWindowEndAt(menuData.recallStatus.recallWindowEndAt)
       setTotalAssimilatedCount(menuData.recallStatus.totalAssimilatedCount)
     }
     if (menuData.unreadConversations !== undefined) {

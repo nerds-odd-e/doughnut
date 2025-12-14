@@ -33,6 +33,7 @@ const meta = {
         },
         recallStatus: {
           toRepeat: [],
+          recallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
         unreadConversations: [],
@@ -94,6 +95,7 @@ export const WithDueCount: Story = {
         },
         recallStatus: {
           toRepeat: [],
+          recallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
         unreadConversations: [],
@@ -139,6 +141,7 @@ export const WithRecallCount: Story = {
         },
         recallStatus: {
           toRepeat: Array(789).fill({}),
+          recallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
         unreadConversations: [],
@@ -189,6 +192,7 @@ export const WithUnreadMessages: Story = {
         },
         recallStatus: {
           toRepeat: [],
+          recallWindowEndAt: "",
           totalAssimilatedCount: 0,
         },
         unreadConversations: mockConversations,

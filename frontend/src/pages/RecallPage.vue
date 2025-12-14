@@ -79,7 +79,7 @@ import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
-import { computed, ref, onDeactivated, watch } from "vue"
+import { computed, ref, onActivated, onDeactivated, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 export type SpellingResult = SpellingResultDto & { type: "spelling" }
@@ -91,6 +91,8 @@ export type QuestionResult = {
 
 type RecallResult = QuestionResult | SpellingResult
 const {
+  recallWindowEndAt,
+  setRecallWindowEndAt,
   totalAssimilatedCount,
   setIsRecallPaused,
   shouldResumeRecall,
@@ -351,6 +353,22 @@ const handleTreadmillModeChanged = () => {
     }
   }
 }
+
+const loadCurrentDueRecalls = async () => {
+  setToRepeat(undefined)
+  const response = await loadMore(0)
+  if (response) {
+    setRecallWindowEndAt(response.recallWindowEndAt)
+  }
+}
+
+onActivated(() => {
+  isProgressBarVisible.value = true
+  const currentTime = new Date().toISOString()
+  if (recallWindowEndAt.value && currentTime > recallWindowEndAt.value) {
+    loadCurrentDueRecalls()
+  }
+})
 
 onDeactivated(() => {
   isProgressBarVisible.value = false

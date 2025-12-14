@@ -13,6 +13,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.UserToken;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
+import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -131,6 +132,18 @@ class UserControllerTest extends ControllerTestBase {
     void shouldThrowExceptionWhenUserNotLoggedIn() {
       currentUser.setUser(null);
       assertThrows(ResponseStatusException.class, () -> controller.getMenuData("Asia/Shanghai"));
+    }
+
+    @Test
+    void shouldReturnCorrectRecallWindowEndTime() {
+      Timestamp currentTime = makeMe.aTimestamp().of(0, 0).please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
+
+      assertEquals(
+          TimestampOperations.addHoursToTimestamp(currentTime, 24),
+          menuData.getRecallStatus().getRecallWindowEndAt());
     }
 
     @Test

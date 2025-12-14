@@ -39,6 +39,7 @@ let toRepeatRef: ReturnType<typeof ref<MemoryTrackerLite[] | undefined>>
 // Helper to create useRecallData mock return value
 const createUseRecallDataMock = (overrides?: {
   toRepeat?: MemoryTrackerLite[]
+  recallWindowEndAt?: string
   totalAssimilatedCount?: number
   isRecallPaused?: boolean
   shouldResumeRecall?: boolean
@@ -53,6 +54,7 @@ const createUseRecallDataMock = (overrides?: {
   return {
     toRepeatCount: computed(() => toRepeatRef.value?.length ?? 0),
     toRepeat: toRepeatRef,
+    recallWindowEndAt: ref(overrides?.recallWindowEndAt),
     totalAssimilatedCount: ref(overrides?.totalAssimilatedCount ?? 0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(overrides?.shouldResumeRecall ?? false),
@@ -62,6 +64,7 @@ const createUseRecallDataMock = (overrides?: {
     setToRepeat: vi.fn((trackers: MemoryTrackerLite[] | undefined) => {
       toRepeatRef.value = trackers
     }),
+    setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
     resumeRecall: vi.fn(),
