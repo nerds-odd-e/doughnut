@@ -490,7 +490,7 @@ export type AssimilationCountDto = {
 
 export type DueMemoryTrackers = {
     totalAssimilatedCount: number;
-    recallWindowEndAt?: string;
+    currentRecallWindowEndAt?: string;
     toRepeat?: Array<MemoryTrackerLite>;
     dueInDays?: number;
 };

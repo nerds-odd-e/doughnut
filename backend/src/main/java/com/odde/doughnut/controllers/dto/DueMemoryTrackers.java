@@ -8,7 +8,7 @@ import lombok.Setter;
 
 public class DueMemoryTrackers {
   @NotNull public int totalAssimilatedCount;
-  @Getter @Setter private Timestamp recallWindowEndAt;
+  @Getter @Setter private Timestamp currentRecallWindowEndAt;
   @Getter @Setter private List<MemoryTrackerLite> toRepeat;
   @Getter @Setter private Integer dueInDays;
 }

@@ -141,9 +141,10 @@ class UserControllerTest extends ControllerTestBase {
 
       MenuDataDTO menuData = controller.getMenuData("Asia/Shanghai");
 
-      assertEquals(
-          TimestampOperations.addHoursToTimestamp(currentTime, 24),
-          menuData.getRecallStatus().getRecallWindowEndAt());
+      // currentTime is 1989-01-01 00:00:00 UTC, which is 1989-01-01 08:00:00 in Asia/Shanghai
+      // Since hour < 12, alignByHalfADay returns same day at 12:00:00 Asia/Shanghai = 04:00:00 UTC
+      Timestamp expectedEndAt = TimestampOperations.addHoursToTimestamp(currentTime, 4);
+      assertEquals(expectedEndAt, menuData.getRecallStatus().getCurrentRecallWindowEndAt());
     }
 
     @Test

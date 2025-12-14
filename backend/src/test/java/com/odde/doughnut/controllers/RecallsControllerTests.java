@@ -74,9 +74,30 @@ class RecallsControllerTests extends ControllerTestBase {
 
       assertEquals(1, dueMemoryTrackers.getToRepeat().size());
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
-      assertEquals(
-          TimestampOperations.addHoursToTimestamp(currentTime, 24),
-          dueMemoryTrackers.getRecallWindowEndAt());
+      // currentTime is 1989-01-01 00:00:00 UTC, which is 1989-01-01 08:00:00 in Asia/Shanghai
+      // Since hour < 12, alignByHalfADay returns same day at 12:00:00 Asia/Shanghai = 04:00:00 UTC
+      Timestamp expectedEndAt = TimestampOperations.addHoursToTimestamp(currentTime, 4);
+      assertEquals(expectedEndAt, dueMemoryTrackers.getCurrentRecallWindowEndAt());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+      "0,  12", "6,  6", "11, 1", "12, 12", "18, 6",
+    })
+    void shouldSetCurrentRecallWindowEndAtAlignedByHalfADay(
+        int currentHour, int expectedHoursToAdd) {
+      Timestamp currentTime = makeMe.aTimestamp().of(1, currentHour).fromShanghai().please();
+      testabilitySettings.timeTravelTo(currentTime);
+      makeMe.aMemoryTrackerBy(currentUser.getUser()).nextRecallAt(currentTime).please();
+
+      DueMemoryTrackers dueMemoryTrackers = controller.recalling("Asia/Shanghai", 0);
+
+      Timestamp expectedEndAt =
+          TimestampOperations.addHoursToTimestamp(currentTime, expectedHoursToAdd);
+      assertEquals(expectedEndAt, dueMemoryTrackers.getCurrentRecallWindowEndAt());
+      // Verify it's not affected by dueInDays
+      DueMemoryTrackers dueMemoryTrackersWithDays = controller.recalling("Asia/Shanghai", 3);
+      assertEquals(expectedEndAt, dueMemoryTrackersWithDays.getCurrentRecallWindowEndAt());
     }
 
     @Test

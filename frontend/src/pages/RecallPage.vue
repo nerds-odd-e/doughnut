@@ -87,8 +87,8 @@ import { useRecallData } from "@/composables/useRecallData"
 
 type RecallResult = QuestionResult | SpellingResult
 const {
-  recallWindowEndAt,
-  setRecallWindowEndAt,
+  currentRecallWindowEndAt,
+  setCurrentRecallWindowEndAt,
   totalAssimilatedCount,
   setIsRecallPaused,
   shouldResumeRecall,
@@ -348,14 +348,17 @@ const loadCurrentDueRecalls = async () => {
   setToRepeat(undefined)
   const response = await loadMore(0)
   if (response) {
-    setRecallWindowEndAt(response.recallWindowEndAt)
+    setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
   }
 }
 
 onActivated(() => {
   isProgressBarVisible.value = true
   const currentTime = new Date().toISOString()
-  if (recallWindowEndAt.value && currentTime > recallWindowEndAt.value) {
+  if (
+    currentRecallWindowEndAt.value &&
+    currentTime > currentRecallWindowEndAt.value
+  ) {
     loadCurrentDueRecalls()
   }
 })

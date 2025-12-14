@@ -4455,7 +4455,7 @@ components:
         totalAssimilatedCount:
           type: integer
           format: int32
-        recallWindowEndAt:
+        currentRecallWindowEndAt:
           type: string
           format: date-time
         toRepeat:
