@@ -210,16 +210,28 @@ export type AnsweredQuestion = {
     memoryTrackerId?: number;
 };
 
-export type AnswerSpellingDto = {
-    spellingAnswer?: string;
-    thinkingTimeMs?: number;
+export type QuestionResult = RecallResult & {
+    type: 'QuestionResult';
+} & {
+    answeredQuestion?: AnsweredQuestion;
 };
 
-export type SpellingResultDto = {
-    note: Note;
+export type RecallResult = {
+    type: string;
+};
+
+export type SpellingResult = RecallResult & {
+    type: 'SpellingResult';
+} & {
+    note?: Note;
     answer?: string;
     isCorrect?: boolean;
     memoryTrackerId?: number;
+};
+
+export type AnswerSpellingDto = {
+    spellingAnswer?: string;
+    thinkingTimeMs?: number;
 };
 
 export type QuestionSuggestionCreationParams = {
@@ -651,8 +663,16 @@ export type AnsweredQuestionWritable = {
     memoryTrackerId?: number;
 };
 
-export type SpellingResultDtoWritable = {
-    note: NoteWritable;
+export type QuestionResultWritable = RecallResult & {
+    type: 'QuestionResultWritable';
+} & {
+    answeredQuestion?: AnsweredQuestionWritable;
+};
+
+export type SpellingResultWritable = RecallResult & {
+    type: 'SpellingResultWritable';
+} & {
+    note?: NoteWritable;
     answer?: string;
     isCorrect?: boolean;
     memoryTrackerId?: number;
@@ -1424,7 +1444,7 @@ export type AnswerQuizResponses = {
     /**
      * OK
      */
-    200: AnsweredQuestion;
+    200: QuestionResult | SpellingResult;
 };
 
 export type AnswerQuizResponse = AnswerQuizResponses[keyof AnswerQuizResponses];
@@ -1451,7 +1471,7 @@ export type AnswerSpellingResponses = {
     /**
      * OK
      */
-    200: SpellingResultDto;
+    200: QuestionResult | SpellingResult;
 };
 
 export type AnswerSpellingResponse = AnswerSpellingResponses[keyof AnswerSpellingResponses];

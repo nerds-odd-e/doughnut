@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.controllers.dto.AnswerDTO;
 import com.odde.doughnut.controllers.dto.AnswerSpellingDTO;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.controllers.dto.SpellingResultDTO;
+import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
 import com.odde.doughnut.services.AuthorizationService;
@@ -63,29 +63,31 @@ class RecallPromptController {
 
   @PostMapping("/{recallPrompt}/answer")
   @Transactional
-  public AnsweredQuestion answerQuiz(
+  public RecallResult answerQuiz(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerDTO answerDTO) {
     authorizationService.assertLoggedIn();
-    return recallQuestionService.answerQuestion(
-        recallPrompt,
-        answerDTO,
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp());
+    return new RecallResult.QuestionResult(
+        recallQuestionService.answerQuestion(
+            recallPrompt,
+            answerDTO,
+            authorizationService.getCurrentUser(),
+            testabilitySettings.getCurrentUTCTimestamp()));
   }
 
   @PostMapping("/{recallPrompt}/answer-spelling")
   @Transactional
-  public SpellingResultDTO answerSpelling(
+  public RecallResult answerSpelling(
       @PathVariable("recallPrompt") @Schema(type = "integer") RecallPrompt recallPrompt,
       @Valid @RequestBody AnswerSpellingDTO answerDTO)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertLoggedIn();
     authorizationService.assertReadAuthorization(recallPrompt.getMemoryTracker());
-    return memoryTrackerService.answerSpelling(
-        recallPrompt,
-        answerDTO,
-        authorizationService.getCurrentUser(),
-        testabilitySettings.getCurrentUTCTimestamp());
+    return RecallResult.SpellingResult.from(
+        memoryTrackerService.answerSpelling(
+            recallPrompt,
+            answerDTO,
+            authorizationService.getCurrentUser(),
+            testabilitySettings.getCurrentUTCTimestamp()));
   }
 }

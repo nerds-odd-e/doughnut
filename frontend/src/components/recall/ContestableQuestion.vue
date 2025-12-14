@@ -35,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AnsweredQuestion, RecallPrompt } from "@generated/backend"
+import type { QuestionResult, RecallPrompt } from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import type { PropType } from "vue"
@@ -48,7 +48,10 @@ const props = defineProps({
     required: true,
   },
 })
-const emit = defineEmits(["need-scroll", "answered"])
+const emit = defineEmits<{
+  (e: "need-scroll"): void
+  (e: "answered", result: QuestionResult): void
+}>()
 const regenerating = ref(false)
 const contesting = ref(false)
 const currentQuestionLegitMessage = ref<string | undefined>(undefined)
@@ -104,7 +107,7 @@ const contestQuestion = async () => {
   }
 }
 
-const onAnswered = (answer: AnsweredQuestion) => {
+const onAnswered = (answer: QuestionResult) => {
   emit("answered", answer)
 }
 </script>

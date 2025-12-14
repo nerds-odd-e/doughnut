@@ -25,7 +25,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import type { PropType } from "vue"
-import type { AnswerDto, RecallPrompt } from "@generated/backend"
+import type {
+  AnswerDto,
+  RecallPrompt,
+  QuestionResult,
+} from "@generated/backend"
 import { RecallPromptController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import usePopups from "../commons/Popups/usePopups"
@@ -44,7 +48,9 @@ const props = defineProps({
   },
 })
 
-const emits = defineEmits(["answered"])
+const emits = defineEmits<{
+  (e: "answered", result: QuestionResult): void
+}>()
 
 const handleError = async () => {
   error.value = "Failed to submit answer. Please try again."
@@ -67,7 +73,7 @@ const submitQuizAnswer = async (answerData: AnswerDto) => {
     })
   )
   if (!apiError) {
-    emits("answered", answerResult!)
+    emits("answered", answerResult! as QuestionResult)
   } else {
     await handleError()
     isAnswered.value = false

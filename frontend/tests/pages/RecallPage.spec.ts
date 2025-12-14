@@ -10,7 +10,7 @@ import helper, {
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
+import type { SpellingResult, MemoryTrackerLite } from "@generated/backend"
 import { useRecallData } from "@/composables/useRecallData"
 import { computed, ref } from "vue"
 
@@ -256,7 +256,8 @@ describe("repeat page", () => {
     it("should handle spelling questions correctly", async () => {
       const note = makeMe.aNote.please()
       note.id = 42
-      const answerResult: SpellingResultDto = {
+      const answerResult: SpellingResult = {
+        type: "SpellingResult",
         note,
         answer: "test answer",
         isCorrect: false,

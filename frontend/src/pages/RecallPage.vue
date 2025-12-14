@@ -72,8 +72,11 @@ import RecallProgressBar from "@/components/recall/RecallProgressBar.vue"
 import AnsweredQuestionComponent from "@/components/recall/AnsweredQuestionComponent.vue"
 import AnsweredSpellingQuestion from "@/components/recall/AnsweredSpellingQuestion.vue"
 import GlobalBar from "@/components/toolbars/GlobalBar.vue"
-import type { AnsweredQuestion, SpellingResultDto } from "@generated/backend"
-import type { MemoryTrackerLite } from "@generated/backend"
+import type {
+  QuestionResult,
+  SpellingResult,
+  MemoryTrackerLite,
+} from "@generated/backend"
 import { RecallsController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
@@ -81,13 +84,6 @@ import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
 import { computed, ref, onActivated, onDeactivated, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
-
-export type SpellingResult = SpellingResultDto & { type: "spelling" }
-
-export type QuestionResult = {
-  type: "question"
-  answeredQuestion: AnsweredQuestion
-}
 
 type RecallResult = QuestionResult | SpellingResult
 const {
@@ -157,7 +153,7 @@ const currentAnsweredQuestion = computed(() => {
   const result =
     previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
-  return result.type === "question" ? result.answeredQuestion : undefined
+  return result.type === "QuestionResult" ? result.answeredQuestion : undefined
 })
 
 const currentAnsweredSpelling = computed(() => {
@@ -165,7 +161,7 @@ const currentAnsweredSpelling = computed(() => {
   const result =
     previousAnsweredQuestions.value[previousAnsweredQuestionCursor.value]
   if (!result) return undefined
-  return result.type === "spelling" ? result : undefined
+  return result.type === "SpellingResult" ? result : undefined
 })
 
 const finished = computed(() => previousAnsweredQuestions.value.length)
@@ -271,23 +267,17 @@ const moveToNextMemoryTracker = () => {
   currentIndex.value = nextIndex
 }
 
-const onAnsweredQuestion = (answerResult: AnsweredQuestion) => {
+const onAnsweredQuestion = (answerResult: QuestionResult) => {
   moveToNextMemoryTracker()
-  previousAnsweredQuestions.value.push({
-    type: "question",
-    answeredQuestion: answerResult,
-  })
-  if (!answerResult.answer.correct) {
+  previousAnsweredQuestions.value.push(answerResult)
+  if (!answerResult.answeredQuestion?.answer.correct) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }
 }
 
-const onAnsweredSpelling = (answerResult: SpellingResultDto) => {
+const onAnsweredSpelling = (answerResult: SpellingResult) => {
   moveToNextMemoryTracker()
-  previousAnsweredQuestions.value.push({
-    type: "spelling",
-    ...answerResult,
-  })
+  previousAnsweredQuestions.value.push(answerResult)
   if (!answerResult.isCorrect) {
     viewLastAnsweredQuestion(previousAnsweredQuestions.value.length - 1)
   }

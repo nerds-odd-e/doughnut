@@ -667,7 +667,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/AnsweredQuestion"
+                oneOf:
+                - $ref: "#/components/schemas/QuestionResult"
+                - $ref: "#/components/schemas/SpellingResult"
   /api/recall-prompts/{recallPrompt}/answer-spelling:
     post:
       tags:
@@ -697,7 +699,9 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/SpellingResultDTO"
+                oneOf:
+                - $ref: "#/components/schemas/QuestionResult"
+                - $ref: "#/components/schemas/SpellingResult"
   /api/predefined-questions/{predefinedQuestion}/toggle-approval:
     post:
       tags:
@@ -3885,6 +3889,36 @@ components:
       - answer
       - predefinedQuestion
       - recallPromptId
+    QuestionResult:
+      allOf:
+      - $ref: "#/components/schemas/RecallResult"
+      - type: object
+        properties:
+          answeredQuestion:
+            $ref: "#/components/schemas/AnsweredQuestion"
+    RecallResult:
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    SpellingResult:
+      allOf:
+      - $ref: "#/components/schemas/RecallResult"
+      - type: object
+        properties:
+          note:
+            $ref: "#/components/schemas/Note"
+          answer:
+            type: string
+          isCorrect:
+            type: boolean
+          memoryTrackerId:
+            type: integer
+            format: int32
     AnswerSpellingDTO:
       type: object
       properties:
@@ -3893,20 +3927,6 @@ components:
         thinkingTimeMs:
           type: integer
           format: int32
-    SpellingResultDTO:
-      type: object
-      properties:
-        note:
-          $ref: "#/components/schemas/Note"
-        answer:
-          type: string
-        isCorrect:
-          type: boolean
-        memoryTrackerId:
-          type: integer
-          format: int32
-      required:
-      - note
     QuestionSuggestionCreationParams:
       type: object
       properties:
