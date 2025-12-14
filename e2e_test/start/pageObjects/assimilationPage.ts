@@ -29,9 +29,77 @@ export const assumeAssimilationPage = () => ({
     cy.findByRole('button', { name: 'Keep for repetition' }).click()
     return this
   },
+  initialReviewOneNote({
+    'Review Type': reviewType,
+    Title: title,
+    'Additional Info': additionalInfo,
+    Skip: skip,
+  }: Record<string, string>) {
+    if (reviewType === 'initial done') {
+      cy.contains("You've achieved your daily assimilation goal").should(
+        'be.visible'
+      )
+    } else {
+      switch (reviewType) {
+        case 'single note': {
+          cy.findByText(title, { selector: '[role=title]' })
+          if (additionalInfo) {
+            cy.get('.note-details').should('contain', additionalInfo)
+          }
+          break
+        }
+
+        case 'image note': {
+          if (additionalInfo) {
+            const [expectedDetails, expectedImage] = commonSenseSplit(
+              additionalInfo,
+              '; '
+            )
+            cy.get('.note-details').should('contain', expectedDetails)
+            cy.get('#note-image')
+              .find('img')
+              .should('have.attr', 'src')
+              .should('include', expectedImage)
+          }
+          break
+        }
+
+        case 'link': {
+          if (additionalInfo) {
+            const [linkType, targetNote] = commonSenseSplit(
+              additionalInfo,
+              '; '
+            )
+            if (typeof title === 'string') {
+              cy.findByText(title, { selector: '[role=title] *' })
+            }
+
+            if (typeof targetNote === 'string') {
+              cy.findByText(targetNote)
+            }
+
+            if (typeof linkType === 'string') {
+              cy.get('.link-type').contains(linkType)
+            }
+          }
+          break
+        }
+
+        default:
+          expect(reviewType).equal('a known review page type')
+      }
+      if (skip === 'yes') {
+        cy.findByText('Skip repetition').click()
+        cy.findByRole('button', { name: 'OK' }).click()
+      } else {
+        cy.findByText('Keep for repetition').click()
+      }
+    }
+    return this
+  },
   assimilate(assimilations: Record<string, string>[]) {
     assimilations.forEach((assimilation) => {
-      cy.initialReviewOneNoteIfThereIs(assimilation)
+      this.initialReviewOneNote(assimilation)
     })
   },
   assimilateNotes(noteTitles: string) {

@@ -20,12 +20,6 @@ declare namespace Cypress {
     formField(label: string): Chainable<any>
     assignFieldValue(value: string): Chainable<any>
     fieldShouldHaveValue(value: string): Chainable<any>
-    initialReviewOneNoteIfThereIs({
-      review_type,
-      title,
-      additional_info,
-      skip,
-    }: any): Chainable<any>
     noteByTitle(noteTopology: string): Chainable<any>
     pageIsNotLoading(): Chainable<any>
     clearFocusedText(): Chainable<any>
