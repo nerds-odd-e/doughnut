@@ -2,9 +2,13 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
+import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.entities.MemoryTracker;
+import com.odde.doughnut.entities.QuestionType;
+import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
+import com.odde.doughnut.entities.repositories.RecallPromptRepository;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -18,11 +22,16 @@ public class RecallService {
 
   private final UserService userService;
   private final MemoryTrackerRepository memoryTrackerRepository;
+  private final RecallPromptRepository recallPromptRepository;
 
   @Autowired
-  public RecallService(UserService userService, MemoryTrackerRepository memoryTrackerRepository) {
+  public RecallService(
+      UserService userService,
+      MemoryTrackerRepository memoryTrackerRepository,
+      RecallPromptRepository recallPromptRepository) {
     this.userService = userService;
     this.memoryTrackerRepository = memoryTrackerRepository;
+    this.recallPromptRepository = recallPromptRepository;
   }
 
   private int totalAssimilatedCount(User user) {
@@ -63,5 +72,28 @@ public class RecallService {
 
   public int getToRecallCount(User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
     return (int) getMemoryTrackersNeedToRepeat(user, currentUTCTimestamp, timeZone, 0).count();
+  }
+
+  public List<RecallResult> getPreviouslyAnsweredRecallPrompts(
+      User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    Timestamp startTime = TimestampOperations.startOfHalfADay(currentUTCTimestamp, timeZone);
+    Timestamp endTime = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
+
+    return recallPromptRepository
+        .findAnsweredRecallPromptsInTimeRange(user.getId(), startTime, endTime)
+        .stream()
+        .map(this::toRecallResult)
+        .toList();
+  }
+
+  private RecallResult toRecallResult(RecallPrompt recallPrompt) {
+    if (recallPrompt.getQuestionType() == QuestionType.SPELLING) {
+      return new RecallResult.SpellingResult(
+          recallPrompt.getMemoryTracker().getNote(),
+          recallPrompt.getAnswer().getSpellingAnswer(),
+          recallPrompt.getAnswer().getCorrect(),
+          recallPrompt.getMemoryTracker().getId());
+    }
+    return new RecallResult.QuestionResult(recallPrompt.getAnsweredQuestion());
   }
 }

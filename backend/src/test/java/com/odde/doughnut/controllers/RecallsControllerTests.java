@@ -2,12 +2,16 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
+import com.odde.doughnut.controllers.dto.RecallResult;
+import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.utils.TimestampOperations;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -125,6 +129,98 @@ class RecallsControllerTests extends ControllerTestBase {
       assertEquals(1, dueMemoryTrackers.getToRepeat().size());
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
       assertThat(dueMemoryTrackers.getToRepeat(), hasSize(1));
+    }
+  }
+
+  @Nested
+  class PreviouslyAnswered {
+    @Test
+    void shouldNotBeAbleToAccessWithoutLogin() {
+      assertThrows(
+          ResponseStatusException.class,
+          () -> nullUserController().previouslyAnswered("Asia/Shanghai"));
+    }
+
+    @Test
+    void shouldReturnEmptyListWhenNoAnsweredRecallPrompts() {
+      List<RecallResult> results = controller.previouslyAnswered("Asia/Shanghai");
+      assertThat(results, hasSize(0));
+    }
+
+    @Test
+    void shouldReturnAnsweredRecallPromptsInCurrentWindow() {
+      // Set current time to 10:00 AM Shanghai time (window: 0:00-12:00)
+      Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      // Create an answered recall prompt with answer timestamp within current window
+      makeMe
+          .aRecallPrompt()
+          .approvedQuestionOf(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(currentTime)
+          .please();
+
+      List<RecallResult> results = controller.previouslyAnswered("Asia/Shanghai");
+
+      assertThat(results, hasSize(1));
+      assertThat(results.get(0), instanceOf(RecallResult.QuestionResult.class));
+    }
+
+    @Test
+    void shouldNotReturnAnsweredRecallPromptsFromPreviousWindow() {
+      // Answer a question in a previous window (yesterday at 10:00 AM)
+      Timestamp previousWindowTime = makeMe.aTimestamp().of(0, 2).fromShanghai().please();
+      testabilitySettings.timeTravelTo(previousWindowTime);
+
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      makeMe
+          .aRecallPrompt()
+          .approvedQuestionOf(note)
+          .forMemoryTracker(memoryTracker)
+          .answerChoiceIndex(0)
+          .answerTimestamp(previousWindowTime)
+          .please();
+
+      // Move to current window (next day at 10:00 AM)
+      Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      List<RecallResult> results = controller.previouslyAnswered("Asia/Shanghai");
+
+      assertThat(results, hasSize(0));
+    }
+
+    @Test
+    void shouldReturnSpellingResultsInCurrentWindow() {
+      Timestamp currentTime = makeMe.aTimestamp().of(1, 2).fromShanghai().please();
+      testabilitySettings.timeTravelTo(currentTime);
+
+      Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
+      MemoryTracker memoryTracker =
+          makeMe.aMemoryTrackerFor(note).by(currentUser.getUser()).please();
+
+      // Create an answered spelling recall prompt
+      makeMe
+          .aRecallPrompt()
+          .forMemoryTracker(memoryTracker)
+          .spelling()
+          .answerSpelling("test answer")
+          .answerTimestamp(currentTime)
+          .please();
+
+      List<RecallResult> results = controller.previouslyAnswered("Asia/Shanghai");
+
+      assertThat(results, hasSize(1));
+      assertThat(results.get(0), instanceOf(RecallResult.SpellingResult.class));
     }
   }
 }

@@ -1,12 +1,14 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
+import com.odde.doughnut.controllers.dto.RecallResult;
 import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.RecallService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import com.odde.doughnut.utils.TimezoneUtils;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,5 +49,15 @@ class RecallsController {
         currentUTCTimestamp,
         timeZone,
         dueInDays == null ? 0 : dueInDays);
+  }
+
+  @GetMapping(value = {"/previously-answered"})
+  @Transactional
+  public List<RecallResult> previouslyAnswered(@RequestParam(value = "timezone") String timezone) {
+    authorizationService.assertLoggedIn();
+    ZoneId timeZone = TimezoneUtils.parseTimezone(timezone);
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    return recallService.getPreviouslyAnsweredRecallPrompts(
+        authorizationService.getCurrentUser(), currentUTCTimestamp, timeZone);
   }
 }

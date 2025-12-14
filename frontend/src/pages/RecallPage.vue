@@ -82,7 +82,14 @@ import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
-import { computed, ref, onActivated, onDeactivated, watch } from "vue"
+import {
+  computed,
+  ref,
+  onActivated,
+  onDeactivated,
+  onMounted,
+  watch,
+} from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 type RecallResult = QuestionResult | SpellingResult
@@ -344,6 +351,20 @@ const handleTreadmillModeChanged = () => {
   }
 }
 
+const loadPreviouslyAnsweredRecallPrompts = async () => {
+  const { data: response, error } = await RecallsController.previouslyAnswered({
+    query: {
+      timezone: timezoneParam(),
+    },
+  })
+  if (!error && response) {
+    previousAnsweredQuestions.value = [
+      ...response,
+      ...previousAnsweredQuestions.value,
+    ]
+  }
+}
+
 const loadCurrentDueRecalls = async () => {
   setToRepeat(undefined)
   const response = await loadMore(0)
@@ -351,6 +372,10 @@ const loadCurrentDueRecalls = async () => {
     setCurrentRecallWindowEndAt(response.currentRecallWindowEndAt)
   }
 }
+
+onMounted(() => {
+  loadPreviouslyAnsweredRecallPrompts()
+})
 
 onActivated(() => {
   isProgressBarVisible.value = true

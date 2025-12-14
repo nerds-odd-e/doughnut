@@ -3512,6 +3512,33 @@ export type RecallingResponses = {
 
 export type RecallingResponse = RecallingResponses[keyof RecallingResponses];
 
+export type PreviouslyAnsweredData = {
+    body?: never;
+    path?: never;
+    query: {
+        timezone: string;
+    };
+    url: '/api/recalls/previously-answered';
+};
+
+export type PreviouslyAnsweredErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type PreviouslyAnsweredError = PreviouslyAnsweredErrors[keyof PreviouslyAnsweredErrors];
+
+export type PreviouslyAnsweredResponses = {
+    /**
+     * OK
+     */
+    200: Array<QuestionResult | SpellingResult>;
+};
+
+export type PreviouslyAnsweredResponse = PreviouslyAnsweredResponses[keyof PreviouslyAnsweredResponses];
+
 export type ExportQuestionGenerationData = {
     body?: never;
     path: {

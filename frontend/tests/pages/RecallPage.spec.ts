@@ -10,7 +10,11 @@ import helper, {
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import type { SpellingResult, MemoryTrackerLite } from "@generated/backend"
+import type {
+  SpellingResult,
+  MemoryTrackerLite,
+  QuestionResult,
+} from "@generated/backend"
 import { useRecallData } from "@/composables/useRecallData"
 import { computed, ref } from "vue"
 
@@ -34,6 +38,9 @@ useRouter().currentRoute.value.name = "recall"
 
 let renderer: RenderingHelper<typeof RecallPage>
 let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
+let previouslyAnsweredSpy: ReturnType<
+  typeof mockSdkService<"previouslyAnswered">
+>
 let toRepeatRef: ReturnType<typeof ref<MemoryTrackerLite[] | undefined>>
 
 // Helper to create useRecallData mock return value
@@ -94,6 +101,7 @@ beforeEach(() => {
     "recalling",
     makeMe.aDueMemoryTrackersList.please()
   )
+  previouslyAnsweredSpy = mockSdkService("previouslyAnswered", [])
   mockSdkService(
     "askAQuestion",
     makeMe.aRecallPrompt.withQuestionType("SPELLING").please()
@@ -121,6 +129,39 @@ describe("repeat page", () => {
   }
 
   mockBrowserTimeZone("Asia/Shanghai", beforeEach, afterEach)
+
+  describe("loading previously answered recall prompts", () => {
+    it("should call previouslyAnswered on mount", async () => {
+      await mountPage()
+      expect(previouslyAnsweredSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          query: { timezone: "Asia/Shanghai" },
+        })
+      )
+    })
+
+    it("should prepend previously answered recall prompts to the list", async () => {
+      const note = makeMe.aNote.please()
+      const previousQuestionResult: QuestionResult = {
+        type: "QuestionResult",
+        answeredQuestion: {
+          note,
+          predefinedQuestion: makeMe.aPredefinedQuestion.please(),
+          answer: { id: 1, correct: true, choiceIndex: 0 },
+          answerDisplay: "test",
+          recallPromptId: 1,
+          memoryTrackerId: 1,
+        },
+      }
+      previouslyAnsweredSpy.mockResolvedValueOnce(
+        wrapSdkResponse([previousQuestionResult])
+      )
+
+      const wrapper = await mountPage()
+      const globalBar = wrapper.findComponent({ name: "GlobalBar" })
+      expect(globalBar.text()).toContain("1/")
+    })
+  })
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueMemoryTrackersList.please()

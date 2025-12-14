@@ -10,12 +10,15 @@ import com.odde.doughnut.entities.RecallPrompt;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import java.sql.Timestamp;
 import java.util.List;
 
 public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
   private final PredefinedQuestionBuilder predefinedQuestionBuilder;
   private AnswerDTO answerDTO = null;
   private MemoryTracker memoryTracker = null;
+  private String spellingAnswerText = null;
+  private Timestamp answerTimestamp = null;
 
   public RecallPromptBuilder(MakeMe makeMe, RecallPrompt recallPrompt) {
     super(makeMe, recallPrompt);
@@ -32,9 +35,21 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
         entity.setQuestionType(QuestionType.MCQ);
       }
     }
-    if (answerDTO != null) {
-      entity.setAnswer(
-          Answer.buildAnswer(answerDTO, entity.getPredefinedQuestion(), entity.getAnswer()));
+    if (answerDTO != null && entity.getQuestionType() != QuestionType.SPELLING) {
+      Answer answer =
+          Answer.buildAnswer(answerDTO, entity.getPredefinedQuestion(), entity.getAnswer());
+      if (answerTimestamp != null) {
+        answer.setCreatedAt(answerTimestamp);
+      }
+      entity.setAnswer(answer);
+    } else if (spellingAnswerText != null) {
+      Answer answer = new Answer();
+      answer.setSpellingAnswer(spellingAnswerText);
+      answer.setCorrect(true);
+      if (answerTimestamp != null) {
+        answer.setCreatedAt(answerTimestamp);
+      }
+      entity.setAnswer(answer);
     }
     // Set MemoryTracker if not already set
     if (entity.getMemoryTracker() == null && memoryTracker == null) {
@@ -100,6 +115,16 @@ public class RecallPromptBuilder extends EntityBuilder<RecallPrompt> {
 
   public RecallPromptBuilder contested() {
     this.predefinedQuestionBuilder.contested();
+    return this;
+  }
+
+  public RecallPromptBuilder answerSpelling(String spellingAnswer) {
+    this.spellingAnswerText = spellingAnswer;
+    return this;
+  }
+
+  public RecallPromptBuilder answerTimestamp(Timestamp timestamp) {
+    this.answerTimestamp = timestamp;
     return this;
   }
 }

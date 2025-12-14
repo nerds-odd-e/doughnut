@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.RecallPrompt;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
@@ -33,4 +34,19 @@ public interface RecallPromptRepository extends CrudRepository<RecallPrompt, Int
       @Param("memoryTrackerId") Integer memoryTrackerId);
 
   List<RecallPrompt> findAllByMemoryTrackerIdOrderByIdDesc(Integer memoryTrackerId);
+
+  @Query(
+      value =
+          "SELECT rp.* FROM recall_prompt rp "
+              + "JOIN quiz_answer qa ON rp.quiz_answer_id = qa.id "
+              + "JOIN memory_tracker mt ON rp.memory_tracker_id = mt.id "
+              + "WHERE mt.user_id = :userId "
+              + "AND qa.created_at >= :startTime "
+              + "AND qa.created_at < :endTime "
+              + "ORDER BY qa.created_at ASC",
+      nativeQuery = true)
+  List<RecallPrompt> findAnsweredRecallPromptsInTimeRange(
+      @Param("userId") Integer userId,
+      @Param("startTime") Timestamp startTime,
+      @Param("endTime") Timestamp endTime);
 }

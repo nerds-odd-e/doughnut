@@ -26,6 +26,13 @@ public abstract class TimestampOperations {
     return Timestamp.from(alignedZonedDt.withMinute(0).withSecond(0).toInstant());
   }
 
+  public static Timestamp startOfHalfADay(Timestamp currentUTCTimestamp, ZoneId timeZone) {
+    final ZonedDateTime zonedDateTime = getZonedDateTime(currentUTCTimestamp, timeZone);
+    ZonedDateTime startZonedDt =
+        zonedDateTime.getHour() < 12 ? zonedDateTime.withHour(0) : zonedDateTime.withHour(12);
+    return Timestamp.from(startZonedDt.withMinute(0).withSecond(0).withNano(0).toInstant());
+  }
+
   private static ZonedDateTime alignDayAndHourByHalfADay(
       Timestamp currentUTCTimestamp, ZoneId timeZone) {
     final ZonedDateTime zonedDateTime =

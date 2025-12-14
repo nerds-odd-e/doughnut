@@ -2716,6 +2716,34 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/DueMemoryTrackers"
+  /api/recalls/previously-answered:
+    get:
+      tags:
+      - recalls-controller
+      operationId: previouslyAnswered
+      parameters:
+      - name: timezone
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  oneOf:
+                  - $ref: "#/components/schemas/QuestionResult"
+                  - $ref: "#/components/schemas/SpellingResult"
   /api/predefined-questions/{note}/export-question-generation:
     get:
       tags:

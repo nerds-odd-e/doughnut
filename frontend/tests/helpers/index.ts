@@ -172,6 +172,7 @@ const methodToController: Record<string, any> = {
   fetchWikidataEntityDataById: WikidataController,
   currentUserInfo: CurrentUserInfoController,
   recalling: RecallsController,
+  previouslyAnswered: RecallsController,
   overview: RecallsController,
   ping: HealthCheckController,
   dataUpgrade: HealthCheckController,
