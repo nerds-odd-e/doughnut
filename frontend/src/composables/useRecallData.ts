@@ -11,7 +11,11 @@ const treadmillMode = ref<boolean>(false)
 const currentIndex = ref(0)
 const diligentMode = ref<boolean>(false)
 
-const toRepeatCount = computed(() => toRepeat.value?.length ?? 0)
+const toRepeatCount = computed(() => {
+  const length = toRepeat.value?.length ?? 0
+  const index = currentIndex.value
+  return Math.max(0, length - index)
+})
 
 export function useRecallData() {
   const router = useRouter()
