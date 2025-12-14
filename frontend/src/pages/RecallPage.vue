@@ -78,14 +78,7 @@ import {} from "@/managedApi/clientSetup"
 import getEnvironment from "@/managedApi/window/getEnvironment"
 import timezoneParam from "@/managedApi/window/timezoneParam"
 import { shuffle } from "es-toolkit"
-import {
-  computed,
-  onMounted,
-  ref,
-  onActivated,
-  onDeactivated,
-  watch,
-} from "vue"
+import { computed, ref, onActivated, onDeactivated, watch } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 
 export type SpellingResult = SpellingResultDto & { type: "spelling" }
@@ -105,13 +98,14 @@ const {
   clearShouldResumeRecall,
   treadmillMode,
   setCurrentIndex,
+  toRepeat,
+  setToRepeat,
 } = useRecallData()
 
 defineProps({
   eagerFetchCount: Number,
 })
 
-const toRepeat = ref<MemoryTrackerLite[] | undefined>(undefined)
 const currentIndex = ref(0)
 const previousAnsweredQuestions = ref<(RecallResult | undefined)[]>([])
 const previousAnsweredQuestionCursor = ref<number | undefined>(undefined)
@@ -241,14 +235,16 @@ const loadMore = async (dueInDays?: number) => {
     },
   })
   if (!error && response) {
-    toRepeat.value = response.toRepeat
+    let trackers = response.toRepeat
     currentIndex.value = 0
-    if (toRepeat.value?.length === 0) {
+    if (trackers?.length === 0) {
+      setToRepeat(trackers)
       return response
     }
-    if (getEnvironment() !== "testing" && toRepeat.value) {
-      toRepeat.value = shuffle(toRepeat.value)
+    if (getEnvironment() !== "testing" && trackers) {
+      trackers = shuffle(trackers)
     }
+    setToRepeat(trackers)
     return response
   }
   return undefined
@@ -304,11 +300,11 @@ const moveMemoryTrackerToEnd = (index: number) => {
 
   const item = currentToRepeat[index]
   if (item === undefined) return
-  toRepeat.value = [
+  setToRepeat([
     ...currentToRepeat.slice(0, index),
     ...currentToRepeat.slice(index + 1),
     item,
-  ]
+  ])
 }
 
 const handleTreadmillModeChanged = () => {
@@ -344,27 +340,23 @@ const handleTreadmillModeChanged = () => {
 
       // Rebuild the list: answered trackers (before currentIndex) + non-spelling trackers + spelling trackers
       if (unansweredSpellingTrackers.length > 0) {
-        toRepeat.value = [
+        setToRepeat([
           ...toRepeat.value.slice(0, currentIndex.value),
           ...nonSpellingTrackers,
           ...unansweredSpellingTrackers,
-        ]
+        ])
       }
     }
   }
 }
 
 const loadCurrentDueRecalls = async () => {
-  toRepeat.value = undefined
+  setToRepeat(undefined)
   const response = await loadMore(0)
   if (response) {
     setRecallWindowEndAt(response.recallWindowEndAt)
   }
 }
-
-onMounted(() => {
-  loadCurrentDueRecalls()
-})
 
 onActivated(() => {
   isProgressBarVisible.value = true

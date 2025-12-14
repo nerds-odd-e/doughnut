@@ -11,6 +11,10 @@ import helper, {
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import type { SpellingResultDto, MemoryTrackerLite } from "@generated/backend"
+import { useRecallData } from "@/composables/useRecallData"
+import { computed, ref } from "vue"
+
+vi.mock("@/composables/useRecallData")
 
 vitest.mock("vue-router", () => ({
   useRoute: () => ({
@@ -30,6 +34,46 @@ useRouter().currentRoute.value.name = "recall"
 
 let renderer: RenderingHelper<typeof RecallPage>
 let recallingSpy: ReturnType<typeof mockSdkService<"recalling">>
+let toRepeatRef: ReturnType<typeof ref<MemoryTrackerLite[] | undefined>>
+
+// Helper to create useRecallData mock return value
+const createUseRecallDataMock = (overrides?: {
+  toRepeat?: MemoryTrackerLite[]
+  recallWindowEndAt?: string
+  totalAssimilatedCount?: number
+  isRecallPaused?: boolean
+  shouldResumeRecall?: boolean
+  treadmillMode?: boolean
+  currentIndex?: number
+}) => {
+  toRepeatRef = ref<MemoryTrackerLite[] | undefined>(overrides?.toRepeat)
+  const treadmillModeRef = ref(overrides?.treadmillMode ?? false)
+  const currentIndexRef = ref(overrides?.currentIndex ?? 0)
+  return {
+    toRepeatCount: computed(() => toRepeatRef.value?.length ?? 0),
+    toRepeat: toRepeatRef,
+    recallWindowEndAt: ref(overrides?.recallWindowEndAt),
+    totalAssimilatedCount: ref(overrides?.totalAssimilatedCount ?? 0),
+    isRecallPaused: ref(overrides?.isRecallPaused ?? false),
+    shouldResumeRecall: ref(overrides?.shouldResumeRecall ?? false),
+    treadmillMode: treadmillModeRef,
+    currentIndex: currentIndexRef,
+    setToRepeat: vi.fn((trackers: MemoryTrackerLite[] | undefined) => {
+      toRepeatRef.value = trackers
+    }),
+    setRecallWindowEndAt: vi.fn(),
+    setTotalAssimilatedCount: vi.fn(),
+    setIsRecallPaused: vi.fn(),
+    resumeRecall: vi.fn(),
+    clearShouldResumeRecall: vi.fn(),
+    setTreadmillMode: vi.fn((enabled: boolean) => {
+      treadmillModeRef.value = enabled
+    }),
+    setCurrentIndex: vi.fn((index: number) => {
+      currentIndexRef.value = index
+    }),
+  }
+}
 
 afterEach(() => {
   document.body.innerHTML = ""
@@ -48,6 +92,7 @@ beforeEach(() => {
     "askAQuestion",
     makeMe.aRecallPrompt.withQuestionType("SPELLING").please()
   )
+  vi.mocked(useRecallData).mockReturnValue(createUseRecallDataMock())
   renderer = helper
     .component(RecallPage)
     .withCleanStorage()
@@ -73,14 +118,12 @@ describe("repeat page", () => {
 
   it("redirect to review page if nothing to repeat", async () => {
     const repetition = makeMe.aDueMemoryTrackersList.please()
-    recallingSpy.mockResolvedValue(wrapSdkResponse(repetition))
+    vi.mocked(useRecallData).mockReturnValue(
+      createUseRecallDataMock({ toRepeat: repetition.toRepeat })
+    )
     await mountPage()
-    expect(recallingSpy).toHaveBeenCalledWith({
-      query: {
-        timezone: "Asia/Shanghai",
-        dueindays: 0,
-      },
-    })
+    // Should not call recalling on mount anymore since data comes from useRecallData
+    expect(recallingSpy).not.toHaveBeenCalled()
   })
 
   describe('repeat page with "just review" quiz', () => {
@@ -96,16 +139,13 @@ describe("repeat page", () => {
         makeMe.aRecallPrompt.please()
       )
       askAQuestionSpy.mockResolvedValueOnce(wrapSdkError("API Error"))
-      recallingSpy.mockResolvedValue(
-        wrapSdkResponse(
-          makeMe.aDueMemoryTrackersList
-            .toRepeat([
-              createMemoryTrackerLite(firstMemoryTrackerId),
-              createMemoryTrackerLite(secondMemoryTrackerId),
-              createMemoryTrackerLite(3),
-            ])
-            .please()
-        )
+      const trackers = [
+        createMemoryTrackerLite(firstMemoryTrackerId),
+        createMemoryTrackerLite(secondMemoryTrackerId),
+        createMemoryTrackerLite(3),
+      ]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
       )
     })
 
@@ -201,12 +241,9 @@ describe("repeat page", () => {
       mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
       mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
 
-      recallingSpy.mockResolvedValue(
-        wrapSdkResponse(
-          makeMe.aDueMemoryTrackersList
-            .toRepeat([createMemoryTrackerLite(firstMemoryTrackerId, true)])
-            .please()
-        )
+      const trackers = [createMemoryTrackerLite(firstMemoryTrackerId, true)]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
       )
     })
 
@@ -276,16 +313,13 @@ describe("repeat page", () => {
         "askAQuestion",
         makeMe.aRecallPrompt.please()
       )
-      recallingSpy.mockResolvedValue(
-        wrapSdkResponse(
-          makeMe.aDueMemoryTrackersList
-            .toRepeat([
-              createMemoryTrackerLite(normalMemoryTrackerId, false),
-              createMemoryTrackerLite(spellingMemoryTrackerId, true),
-              createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
-            ])
-            .please()
-        )
+      const trackers = [
+        createMemoryTrackerLite(normalMemoryTrackerId, false),
+        createMemoryTrackerLite(spellingMemoryTrackerId, true),
+        createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
+      ]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
       )
     })
 
@@ -390,16 +424,13 @@ describe("repeat page", () => {
     })
 
     it("should update progress bar to exclude spelling memory trackers", async () => {
-      recallingSpy.mockResolvedValue(
-        wrapSdkResponse(
-          makeMe.aDueMemoryTrackersList
-            .toRepeat([
-              createMemoryTrackerLite(normalMemoryTrackerId, false),
-              createMemoryTrackerLite(spellingMemoryTrackerId, true),
-              createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
-            ])
-            .please()
-        )
+      const trackers = [
+        createMemoryTrackerLite(normalMemoryTrackerId, false),
+        createMemoryTrackerLite(spellingMemoryTrackerId, true),
+        createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
+      ]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
       )
       const wrapper = await mountPage()
       await flushPromises()
@@ -466,17 +497,14 @@ describe("repeat page", () => {
     it("should move unanswered spelling memory trackers to the end when treadmill mode is turned off", async () => {
       // Setup: normal, normal, spelling, normal
       const fourthNormalTrackerId = 111
-      recallingSpy.mockResolvedValue(
-        wrapSdkResponse(
-          makeMe.aDueMemoryTrackersList
-            .toRepeat([
-              createMemoryTrackerLite(normalMemoryTrackerId, false),
-              createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
-              createMemoryTrackerLite(spellingMemoryTrackerId, true),
-              createMemoryTrackerLite(fourthNormalTrackerId, false),
-            ])
-            .please()
-        )
+      const trackers = [
+        createMemoryTrackerLite(normalMemoryTrackerId, false),
+        createMemoryTrackerLite(anotherNormalMemoryTrackerId, false),
+        createMemoryTrackerLite(spellingMemoryTrackerId, true),
+        createMemoryTrackerLite(fourthNormalTrackerId, false),
+      ]
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({ toRepeat: trackers })
       )
 
       const wrapper = await mountPage()
