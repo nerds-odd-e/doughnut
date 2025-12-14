@@ -10,19 +10,20 @@ const recallPage = () => {
         'contain',
         `Recalling: ${recalledTodayCount}/${toRecallCountForToday}`
       )
-      // Click progress bar to show tooltip
+      // Click progress bar to show recall session options dialog
       cy.get('.daisy-progress-bar').first().click()
 
-      // Check tooltip content
-      cy.get('.tooltip-content').within(() => {
+      // Check dialog content
+      cy.contains('Recall Session Options').should('be.visible')
+      cy.get('.modal-body').within(() => {
         cy.contains(
           `Daily Progress: ${recalledTodayCount} / ${toRecallCountForToday}`
         )
         cy.contains(`Total assimilated: ${recalledTodayCount} / ${totalCount}`)
       })
 
-      // Close tooltip
-      cy.get('.tooltip-popup').click()
+      // Close dialog
+      cy.get('.close-button').click()
     },
     repeatMore() {
       cy.findByRole('button', { name: 'Load more from next 3 days' }).click()

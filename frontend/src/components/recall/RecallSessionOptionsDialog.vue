@@ -1,7 +1,7 @@
 <template>
   <Modal :isPopup="true" @close_request="closeDialog">
     <template #header>
-      <h2>Recall Settings</h2>
+      <h2>Recall Session Options</h2>
     </template>
     <template #body>
       <div class="daisy-flex daisy-flex-col daisy-gap-4">

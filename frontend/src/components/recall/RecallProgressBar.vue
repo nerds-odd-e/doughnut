@@ -33,7 +33,7 @@
             <SvgPause />
           </button>
         </div>
-        <RecallSettingsDialog
+        <RecallSessionOptionsDialog
           v-if="showSettings"
           v-bind="{
             canMoveToEnd,
@@ -61,7 +61,7 @@ import ProgressBar from "../commons/ProgressBar.vue"
 import SvgPause from "../svgs/SvgPause.vue"
 import SvgBackward from "../svgs/SvgBackward.vue"
 import SvgCog from "../svgs/SvgCog.vue"
-import RecallSettingsDialog from "./RecallSettingsDialog.vue"
+import RecallSessionOptionsDialog from "./RecallSessionOptionsDialog.vue"
 
 const props = defineProps({
   finished: { type: Number, required: true },
