@@ -44,10 +44,12 @@ const createUseRecallDataMock = (overrides?: {
   shouldResumeRecall?: boolean
   treadmillMode?: boolean
   currentIndex?: number
+  diligentMode?: boolean
 }) => {
   toRepeatRef = ref<MemoryTrackerLite[] | undefined>(overrides?.toRepeat)
   const treadmillModeRef = ref(overrides?.treadmillMode ?? false)
   const currentIndexRef = ref(overrides?.currentIndex ?? 0)
+  const diligentModeRef = ref(overrides?.diligentMode ?? false)
   return {
     toRepeatCount: computed(() => toRepeatRef.value?.length ?? 0),
     toRepeat: toRepeatRef,
@@ -56,6 +58,7 @@ const createUseRecallDataMock = (overrides?: {
     shouldResumeRecall: ref(overrides?.shouldResumeRecall ?? false),
     treadmillMode: treadmillModeRef,
     currentIndex: currentIndexRef,
+    diligentMode: diligentModeRef,
     setToRepeat: vi.fn((trackers: MemoryTrackerLite[] | undefined) => {
       toRepeatRef.value = trackers
     }),
@@ -68,6 +71,9 @@ const createUseRecallDataMock = (overrides?: {
     }),
     setCurrentIndex: vi.fn((index: number) => {
       currentIndexRef.value = index
+    }),
+    setDiligentMode: vi.fn((enabled: boolean) => {
+      diligentModeRef.value = enabled
     }),
   }
 }
@@ -538,6 +544,109 @@ describe("repeat page", () => {
         fourthNormalTrackerId,
         spellingMemoryTrackerId,
       ])
+    })
+  })
+
+  describe("diligent mode", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+      mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
+      mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
+    })
+
+    it("should set diligent mode to true when loadMore is called with dueInDays > 0", async () => {
+      const trackers = [createMemoryTrackerLite(123)]
+      const mockData = createUseRecallDataMock({ toRepeat: trackers })
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+
+      const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+      await flushPromises()
+
+      recallingSpy.mockResolvedValueOnce(
+        wrapSdkResponse(makeMe.aDueMemoryTrackersList.please())
+      )
+
+      type ExposedVM = { loadMore: (dueInDays?: number) => Promise<unknown> }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      await vm.loadMore(3)
+      await flushPromises()
+
+      expect(mockData.setDiligentMode).toHaveBeenCalledWith(true)
+    })
+
+    it("should set diligent mode to false when loadMore is called with dueInDays = 0", async () => {
+      const trackers = [createMemoryTrackerLite(123)]
+      const mockData = createUseRecallDataMock({ toRepeat: trackers })
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+
+      const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+      await flushPromises()
+
+      recallingSpy.mockResolvedValueOnce(
+        wrapSdkResponse(makeMe.aDueMemoryTrackersList.please())
+      )
+
+      type ExposedVM = { loadMore: (dueInDays?: number) => Promise<unknown> }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      await vm.loadMore(0)
+      await flushPromises()
+
+      expect(mockData.setDiligentMode).toHaveBeenCalledWith(false)
+    })
+
+    it("should set diligent mode to false when loadMore is called with undefined dueInDays", async () => {
+      const trackers = [createMemoryTrackerLite(123)]
+      const mockData = createUseRecallDataMock({ toRepeat: trackers })
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+
+      const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+      await flushPromises()
+
+      recallingSpy.mockResolvedValueOnce(
+        wrapSdkResponse(makeMe.aDueMemoryTrackersList.please())
+      )
+
+      type ExposedVM = { loadMore: (dueInDays?: number) => Promise<unknown> }
+      const vm = wrapper.vm as unknown as ExposedVM
+
+      await vm.loadMore()
+      await flushPromises()
+
+      expect(mockData.setDiligentMode).toHaveBeenCalledWith(false)
+    })
+
+    it("should show red background on progress bar when in diligent mode", async () => {
+      const trackers = [createMemoryTrackerLite(123)]
+      const mockData = createUseRecallDataMock({
+        toRepeat: trackers,
+        diligentMode: true,
+      })
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+
+      const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+      await flushPromises()
+
+      const progressBar = wrapper.find(".daisy-progress-bar")
+      expect(progressBar.exists()).toBe(true)
+      expect(progressBar.classes()).toContain("diligent-mode")
+    })
+
+    it("should show gray background on progress bar when not in diligent mode", async () => {
+      const trackers = [createMemoryTrackerLite(123)]
+      const mockData = createUseRecallDataMock({
+        toRepeat: trackers,
+        diligentMode: false,
+      })
+      vi.mocked(useRecallData).mockReturnValue(mockData)
+
+      const wrapper = renderer.currentRoute({ name: "recall" }).mount()
+      await flushPromises()
+
+      const progressBar = wrapper.find(".daisy-progress-bar")
+      expect(progressBar.exists()).toBe(true)
+      expect(progressBar.classes()).not.toContain("diligent-mode")
     })
   })
 })

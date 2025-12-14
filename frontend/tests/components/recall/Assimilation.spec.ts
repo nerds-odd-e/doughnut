@@ -50,6 +50,7 @@ beforeEach(() => {
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
     currentIndex: ref(0),
+    diligentMode: ref(false),
     setToRepeat: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
@@ -57,6 +58,7 @@ beforeEach(() => {
     clearShouldResumeRecall: vi.fn(),
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),
+    setDiligentMode: vi.fn(),
   })
 
   vi.mocked(useAssimilationCount).mockReturnValue({

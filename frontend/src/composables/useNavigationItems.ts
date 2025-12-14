@@ -14,7 +14,8 @@ import { messageCenterConversations } from "@/store/messageStore"
 export function useNavigationItems() {
   const route = useRoute()
   const { dueCount } = useAssimilationCount()
-  const { toRepeatCount, isRecallPaused, currentIndex } = useRecallData()
+  const { toRepeatCount, isRecallPaused, currentIndex, diligentMode } =
+    useRecallData()
 
   const upperNavItems = computed(() => {
     const baseItems = [
@@ -39,7 +40,9 @@ export function useNavigationItems() {
         label: "Recall",
         icon: SvgCalendarCheck,
         badge: toRepeatCount.value,
-        badgeClass: "recall-count",
+        badgeClass: diligentMode.value
+          ? "recall-count diligent-mode"
+          : "recall-count",
         isActive: ["recall"].includes(route.name as string),
       },
     ]
@@ -58,7 +61,9 @@ export function useNavigationItems() {
           label: "Resume",
           icon: SvgResume,
           badge: toRepeatCount.value,
-          badgeClass: "recall-count",
+          badgeClass: diligentMode.value
+            ? "recall-count diligent-mode"
+            : "recall-count",
           isActive: true,
         },
         ...baseItems,

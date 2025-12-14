@@ -1,6 +1,6 @@
 <template>
   <ProgressBar
-    v-bind="{ title: `Recalling: `, finished, toRepeatCount }"
+    v-bind="{ title: `Recalling: `, finished, toRepeatCount, diligentMode }"
     @showSettings="showSettings = !showSettings"
   >
     <template #buttons>
@@ -70,6 +70,7 @@ const props = defineProps({
   canMoveToEnd: { type: Boolean, required: true },
   currentIndex: { type: Number, required: true },
   totalAssimilatedCount: { type: Number, default: 0 },
+  diligentMode: { type: Boolean, default: false },
 })
 
 const emit = defineEmits<{

@@ -59,6 +59,7 @@ const createUseRecallDataMock = (overrides?: {
   isRecallPaused?: boolean
   currentIndex?: number
   resumeRecall?: () => void
+  diligentMode?: boolean
 }) => {
   const toRepeat = ref<
     Array<{ memoryTrackerId?: number; spelling?: boolean }> | undefined
@@ -71,6 +72,7 @@ const createUseRecallDataMock = (overrides?: {
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
     currentIndex: ref(overrides?.currentIndex ?? 0),
+    diligentMode: ref(overrides?.diligentMode ?? false),
     setToRepeat: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
@@ -78,6 +80,7 @@ const createUseRecallDataMock = (overrides?: {
     clearShouldResumeRecall: vi.fn(),
     setTreadmillMode: vi.fn(),
     setCurrentIndex: vi.fn(),
+    setDiligentMode: vi.fn(),
   }
 }
 
@@ -569,6 +572,72 @@ describe("main menu", () => {
 
       const resumeRecallLink = screen.getByLabelText("Resume")
       expect(resumeRecallLink).toBeInTheDocument()
+    })
+  })
+
+  describe("diligent mode", () => {
+    it("should show red background on recall badge when in diligent mode", async () => {
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
+          diligentMode: true,
+        })
+      )
+
+      await renderComponent()
+
+      const recallLink = screen.getByLabelText("Recall")
+      const recallNavItem = recallLink.closest(".nav-item")
+      const recallCount = recallNavItem?.querySelector(".recall-count")
+      expect(recallCount).toBeInTheDocument()
+      expect(recallCount).toHaveClass("recall-count")
+      expect(recallCount).toHaveClass("diligent-mode")
+    })
+
+    it("should show green background on recall badge when not in diligent mode", async () => {
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
+          diligentMode: false,
+        })
+      )
+
+      await renderComponent()
+
+      const recallLink = screen.getByLabelText("Recall")
+      const recallNavItem = recallLink.closest(".nav-item")
+      const recallCount = recallNavItem?.querySelector(".recall-count")
+      expect(recallCount).toBeInTheDocument()
+      expect(recallCount).toHaveClass("recall-count")
+      expect(recallCount).not.toHaveClass("diligent-mode")
+    })
+
+    it("should show red background on resume recall badge when in diligent mode", async () => {
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: true,
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
+          diligentMode: true,
+        })
+      )
+
+      await renderComponent()
+
+      const resumeLink = screen.getByLabelText("Resume")
+      const resumeNavItem = resumeLink.closest(".nav-item")
+      const resumeCount = resumeNavItem?.querySelector(".recall-count")
+      expect(resumeCount).toBeInTheDocument()
+      expect(resumeCount).toHaveClass("recall-count")
+      expect(resumeCount).toHaveClass("diligent-mode")
     })
   })
 })

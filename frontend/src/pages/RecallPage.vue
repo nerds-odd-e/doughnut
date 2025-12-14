@@ -15,6 +15,7 @@
           canMoveToEnd: toRepeatCount > 0 && currentIndex < (toRepeat?.length ?? 0) - 1,
           currentIndex,
           totalAssimilatedCount: totalAssimilatedCount ?? 0,
+          diligentMode: diligentMode,
         }"
         @view-last-answered-question="viewLastAnsweredQuestion($event)"
         @move-to-end="moveMemoryTrackerToEnd($event)"
@@ -98,6 +99,8 @@ const {
   setCurrentIndex,
   toRepeat,
   setToRepeat,
+  diligentMode,
+  setDiligentMode,
 } = useRecallData()
 
 defineProps({
@@ -235,6 +238,7 @@ const loadMore = async (dueInDays?: number) => {
   if (!error && response) {
     let trackers = response.toRepeat
     currentIndex.value = 0
+    setDiligentMode((dueInDays ?? 0) > 0)
     if (trackers?.length === 0) {
       setToRepeat(trackers)
       return response

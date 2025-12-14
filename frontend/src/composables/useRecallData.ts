@@ -8,6 +8,7 @@ const isRecallPaused = ref(false)
 const shouldResumeRecall = ref(false)
 const treadmillMode = ref<boolean>(false)
 const currentIndex = ref(0)
+const diligentMode = ref<boolean>(false)
 
 const toRepeatCount = computed(() => toRepeat.value?.length ?? 0)
 
@@ -43,6 +44,10 @@ export function useRecallData() {
     currentIndex.value = index
   }
 
+  const setDiligentMode = (enabled: boolean) => {
+    diligentMode.value = enabled
+  }
+
   return {
     toRepeatCount,
     toRepeat,
@@ -51,6 +56,7 @@ export function useRecallData() {
     shouldResumeRecall,
     treadmillMode,
     currentIndex,
+    diligentMode,
     setToRepeat,
     setTotalAssimilatedCount,
     setIsRecallPaused,
@@ -58,5 +64,6 @@ export function useRecallData() {
     clearShouldResumeRecall,
     setTreadmillMode,
     setCurrentIndex,
+    setDiligentMode,
   }
 }

@@ -4,7 +4,7 @@
   </div>
   <div class="daisy-flex-grow" @click.prevent="$emit('showSettings')">
     <div
-      :class="['daisy-progress-bar', { thin : $slots.default !== undefined }]"
+      :class="['daisy-progress-bar', { thin : $slots.default !== undefined, 'diligent-mode': diligentMode }]"
       v-if="toRepeatCount !== null"
     >
       <span
@@ -27,6 +27,7 @@ defineProps({
   finished: { type: Number, required: true },
   toRepeatCount: { type: Number, required: true },
   title: String,
+  diligentMode: { type: Boolean, default: false },
 })
 
 defineEmits(["resume", "showSettings"])
@@ -52,6 +53,10 @@ defineSlots<{
     .progress-text {
       display: none;
     }
+  }
+
+  &.diligent-mode {
+    background-color: #dc2626;
   }
 }
 

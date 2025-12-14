@@ -165,6 +165,10 @@ onUnmounted(() => {
 
 .recall-count {
   background: #4CAF50;
+
+  &.diligent-mode {
+    background: #dc2626;
+  }
 }
 
 .unread-count {
