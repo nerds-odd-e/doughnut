@@ -82,7 +82,7 @@ const methodToController: Record<string, any> = {
   createNoteAfter: NoteCreationController,
   createNoteUnderParent: NoteCreationController,
   updateWikidataId: NoteController,
-  updateRecallSetting: NoteController,
+  updateNoteRecallSetting: NoteController,
   updateNoteType: NoteController,
   deleteNote: NoteController,
   moveAfter: NoteController,

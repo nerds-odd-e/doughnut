@@ -1019,7 +1019,7 @@ paths:
     post:
       tags:
       - note-controller
-      operationId: updateRecallSetting
+      operationId: updateNoteRecallSetting
       parameters:
       - name: note
         in: path
@@ -1030,7 +1030,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/RecallSetting"
+              $ref: "#/components/schemas/NoteRecallSetting"
         required: true
       responses:
         "500":
@@ -4013,7 +4013,7 @@ components:
       required:
       - noteTopology
       - notebookId
-    RecallSetting:
+    NoteRecallSetting:
       type: object
       properties:
         rememberSpelling:
@@ -4505,7 +4505,7 @@ components:
           type: string
           format: date-time
         recallSetting:
-          $ref: "#/components/schemas/RecallSetting"
+          $ref: "#/components/schemas/NoteRecallSetting"
         noteType:
           type: string
           enum:

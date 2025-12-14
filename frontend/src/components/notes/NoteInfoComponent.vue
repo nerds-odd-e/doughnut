@@ -11,8 +11,8 @@
       @update:model-value="updateNoteType"
     />
   </div>
-  <RecallSettingForm
-    v-bind="{ noteId: noteInfo.note.id, recallSetting }"
+  <NoteRecallSettingForm
+    v-bind="{ noteId: noteInfo.note.id, noteRecallSetting: recallSetting }"
     @level-changed="$emit('levelChanged', $event)"
   />
   <h6 v-if="memoryTrackers.length">Memory Trackers</h6>
@@ -47,7 +47,7 @@ import { NoteController } from "@generated/backend/sdk.gen"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import { ref, computed, watch } from "vue"
 import { useRouter } from "vue-router"
-import RecallSettingForm from "../recall/RecallSettingForm.vue"
+import NoteRecallSettingForm from "../recall/NoteRecallSettingForm.vue"
 import NoteInfoMemoryTracker from "./NoteInfoMemoryTracker.vue"
 import Select from "../form/Select.vue"
 import { noteTypeOptions } from "@/models/noteTypeOptions"

@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Embeddable
-public class RecallSetting {
+public class NoteRecallSetting {
   public static final Integer defaultLevel = 0;
 
   @Column(name = "remember_spelling")

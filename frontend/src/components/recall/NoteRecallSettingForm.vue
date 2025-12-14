@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-import type { RecallSetting } from "@generated/backend"
+import type { NoteRecallSetting } from "@generated/backend"
 import { NoteController } from "@generated/backend/sdk.gen"
 import { toOpenApiError } from "@/managedApi/openApiError"
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
@@ -37,15 +37,15 @@ export default defineComponent({
   components: { CheckInput, RadioButtons },
   props: {
     noteId: { type: Number, required: true },
-    recallSetting: {
-      type: Object as PropType<RecallSetting>,
+    noteRecallSetting: {
+      type: Object as PropType<NoteRecallSetting>,
       required: false,
     },
   },
   emits: ["levelChanged"],
   setup(props, { emit }) {
-    const formData = ref<RecallSetting>(props.recallSetting || {})
-    const errors = ref<Partial<Record<keyof RecallSetting, string>>>({})
+    const formData = ref<NoteRecallSetting>(props.noteRecallSetting || {})
+    const errors = ref<Partial<Record<keyof NoteRecallSetting, string>>>({})
 
     const levelAsString = computed(() =>
       formData.value.level !== undefined
@@ -58,13 +58,13 @@ export default defineComponent({
       label: level.toString(),
     }))
 
-    const updateModelValue = async (newValue: Partial<RecallSetting>) => {
+    const updateModelValue = async (newValue: Partial<NoteRecallSetting>) => {
       formData.value = {
         ...formData.value,
         ...newValue,
       }
       const { error } = await apiCallWithLoading(() =>
-        NoteController.updateRecallSetting({
+        NoteController.updateNoteRecallSetting({
           path: { note: props.noteId },
           body: formData.value,
         })

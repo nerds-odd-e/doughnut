@@ -160,18 +160,19 @@ class NoteController {
 
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
-  public RedirectToNoteResponse updateRecallSetting(
+  public RedirectToNoteResponse updateNoteRecallSetting(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @Valid @RequestBody RecallSetting recallSetting)
+      @Valid @RequestBody NoteRecallSetting noteRecallSetting)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    BeanUtils.copyProperties(recallSetting, note.getRecallSetting());
+    BeanUtils.copyProperties(noteRecallSetting, note.getRecallSetting());
     entityPersister.save(note);
     note.getLinksAndRefers()
         .forEach(
             link -> {
               link.getRecallSetting()
-                  .setLevel(Math.max(link.getRecallSetting().getLevel(), recallSetting.getLevel()));
+                  .setLevel(
+                      Math.max(link.getRecallSetting().getLevel(), noteRecallSetting.getLevel()));
               entityPersister.save(link);
             });
     return new RedirectToNoteResponse(note.getId());

@@ -415,7 +415,7 @@ class NoteControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class UpdateRecallSetting {
+  class UpdateNoteRecallSetting {
     Note source;
     Note target;
     Note link;
@@ -429,17 +429,17 @@ class NoteControllerTests extends ControllerTestBase {
 
     @Test
     void shouldUpdateLinkLevel() throws UnexpectedNoAccessRightException {
-      @Valid RecallSetting recallSetting = new RecallSetting();
-      recallSetting.setLevel(4);
-      controller.updateRecallSetting(source, recallSetting);
+      @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
+      noteRecallSetting.setLevel(4);
+      controller.updateNoteRecallSetting(source, noteRecallSetting);
       assertThat(getLevel(link), is(4));
     }
 
     @Test
     void shouldUpdateReferenceLevel() throws UnexpectedNoAccessRightException {
-      @Valid RecallSetting recallSetting = new RecallSetting();
-      recallSetting.setLevel(4);
-      controller.updateRecallSetting(target, recallSetting);
+      @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
+      noteRecallSetting.setLevel(4);
+      controller.updateNoteRecallSetting(target, noteRecallSetting);
       assertThat(getLevel(link), is(4));
     }
 

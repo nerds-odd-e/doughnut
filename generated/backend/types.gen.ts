@@ -272,7 +272,7 @@ export type NoteSearchResult = {
     distance?: number;
 };
 
-export type RecallSetting = {
+export type NoteRecallSetting = {
     rememberSpelling?: boolean;
     skipMemoryTracking?: boolean;
     level?: number;
@@ -510,7 +510,7 @@ export type NoteInfo = {
     memoryTrackers?: Array<MemoryTracker>;
     note: NoteRealm;
     createdAt: string;
-    recallSetting?: RecallSetting;
+    recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
@@ -710,7 +710,7 @@ export type NoteInfoWritable = {
     memoryTrackers?: Array<MemoryTrackerWritable>;
     note: NoteRealmWritable;
     createdAt: string;
-    recallSetting?: RecallSetting;
+    recallSetting?: NoteRecallSetting;
     noteType?: 'concept' | 'category' | 'vocab' | 'journal' | 'unassigned';
 };
 
@@ -1760,8 +1760,8 @@ export type SearchForLinkTargetWithinResponses = {
 
 export type SearchForLinkTargetWithinResponse = SearchForLinkTargetWithinResponses[keyof SearchForLinkTargetWithinResponses];
 
-export type UpdateRecallSettingData = {
-    body: RecallSetting;
+export type UpdateNoteRecallSettingData = {
+    body: NoteRecallSetting;
     path: {
         note: number;
     };
@@ -1769,23 +1769,23 @@ export type UpdateRecallSettingData = {
     url: '/api/notes/{note}/review-setting';
 };
 
-export type UpdateRecallSettingErrors = {
+export type UpdateNoteRecallSettingErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type UpdateRecallSettingError = UpdateRecallSettingErrors[keyof UpdateRecallSettingErrors];
+export type UpdateNoteRecallSettingError = UpdateNoteRecallSettingErrors[keyof UpdateNoteRecallSettingErrors];
 
-export type UpdateRecallSettingResponses = {
+export type UpdateNoteRecallSettingResponses = {
     /**
      * OK
      */
     200: RedirectToNoteResponse;
 };
 
-export type UpdateRecallSettingResponse = UpdateRecallSettingResponses[keyof UpdateRecallSettingResponses];
+export type UpdateNoteRecallSettingResponse = UpdateNoteRecallSettingResponses[keyof UpdateNoteRecallSettingResponses];
 
 export type DeleteNoteData = {
     body?: never;
