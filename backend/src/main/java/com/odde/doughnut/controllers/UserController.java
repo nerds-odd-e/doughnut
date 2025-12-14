@@ -133,7 +133,7 @@ class UserController {
         new AssimilationService(
             user, userService, subscriptionService, currentUTCTimestamp, timeZone);
     var assimilationCount = assimilationService.getCounts();
-    var recallStatus = recallService.getRecallStatus(user, currentUTCTimestamp, timeZone);
+    var recallStatus = recallService.getDueMemoryTrackers(user, currentUTCTimestamp, timeZone, 0);
     var unreadConversations = conversationService.getUnreadConversations(user);
 
     return new MenuDataDTO(assimilationCount, recallStatus, unreadConversations);

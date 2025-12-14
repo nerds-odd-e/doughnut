@@ -4429,39 +4429,6 @@ components:
         totalUnassimilatedCount:
           type: integer
           format: int32
-    MenuDataDTO:
-      type: object
-      properties:
-        assimilationCount:
-          $ref: "#/components/schemas/AssimilationCountDTO"
-        recallStatus:
-          $ref: "#/components/schemas/RecallStatus"
-        unreadConversations:
-          type: array
-          items:
-            $ref: "#/components/schemas/ConversationMessage"
-    RecallStatus:
-      type: object
-      properties:
-        toRepeatCount:
-          type: integer
-          format: int32
-        totalAssimilatedCount:
-          type: integer
-          format: int32
-        recallWindowEndAt:
-          type: string
-          format: date-time
-      required:
-      - toRepeatCount
-      - totalAssimilatedCount
-    CurrentUserInfo:
-      type: object
-      properties:
-        user:
-          $ref: "#/components/schemas/User"
-        externalIdentifier:
-          type: string
     DueMemoryTrackers:
       type: object
       properties:
@@ -4492,6 +4459,24 @@ components:
           format: int32
         spelling:
           type: boolean
+    MenuDataDTO:
+      type: object
+      properties:
+        assimilationCount:
+          $ref: "#/components/schemas/AssimilationCountDTO"
+        recallStatus:
+          $ref: "#/components/schemas/DueMemoryTrackers"
+        unreadConversations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ConversationMessage"
+    CurrentUserInfo:
+      type: object
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        externalIdentifier:
+          type: string
     NoteInfo:
       type: object
       properties:

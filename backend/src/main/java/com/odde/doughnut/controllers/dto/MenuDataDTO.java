@@ -9,6 +9,6 @@ import lombok.Data;
 @AllArgsConstructor
 public class MenuDataDTO {
   private AssimilationCountDTO assimilationCount;
-  private RecallStatus recallStatus;
+  private DueMemoryTrackers recallStatus;
   private List<ConversationMessage> unreadConversations;
 }

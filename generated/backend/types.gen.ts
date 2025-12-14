@@ -476,23 +476,6 @@ export type AssimilationCountDto = {
     totalUnassimilatedCount?: number;
 };
 
-export type MenuDataDto = {
-    assimilationCount?: AssimilationCountDto;
-    recallStatus?: RecallStatus;
-    unreadConversations?: Array<ConversationMessage>;
-};
-
-export type RecallStatus = {
-    toRepeatCount: number;
-    totalAssimilatedCount: number;
-    recallWindowEndAt?: string;
-};
-
-export type CurrentUserInfo = {
-    user?: User;
-    externalIdentifier?: string;
-};
-
 export type DueMemoryTrackers = {
     toRepeatCount: number;
     totalAssimilatedCount: number;
@@ -504,6 +487,17 @@ export type DueMemoryTrackers = {
 export type MemoryTrackerLite = {
     memoryTrackerId?: number;
     spelling?: boolean;
+};
+
+export type MenuDataDto = {
+    assimilationCount?: AssimilationCountDto;
+    recallStatus?: DueMemoryTrackers;
+    unreadConversations?: Array<ConversationMessage>;
+};
+
+export type CurrentUserInfo = {
+    user?: User;
+    externalIdentifier?: string;
 };
 
 export type NoteInfo = {

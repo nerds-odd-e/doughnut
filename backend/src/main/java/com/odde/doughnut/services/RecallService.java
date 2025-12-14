@@ -2,7 +2,6 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.DueMemoryTrackers;
 import com.odde.doughnut.controllers.dto.MemoryTrackerLite;
-import com.odde.doughnut.controllers.dto.RecallStatus;
 import com.odde.doughnut.entities.MemoryTracker;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.MemoryTrackerRepository;
@@ -38,15 +37,6 @@ public class RecallService {
         timeZone);
   }
 
-  public RecallStatus getRecallStatus(User user, Timestamp currentUTCTimestamp, ZoneId timeZone) {
-    RecallStatus recallStatus = new RecallStatus();
-    recallStatus.toRepeatCount = getToRecallCount(user, currentUTCTimestamp, timeZone);
-    recallStatus.totalAssimilatedCount = totalAssimilatedCount(user);
-    recallStatus.setRecallWindowEndAt(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
-    return recallStatus;
-  }
-
   public DueMemoryTrackers getDueMemoryTrackers(
       User user, Timestamp currentUTCTimestamp, ZoneId timeZone, int dueInDays) {
     List<MemoryTrackerLite> toRepeat =
@@ -64,10 +54,10 @@ public class RecallService {
     dueMemoryTrackers.setToRepeat(toRepeat);
 
     // Set recall status (always based on dueInDays=0)
-    RecallStatus status = getRecallStatus(user, currentUTCTimestamp, timeZone);
-    dueMemoryTrackers.toRepeatCount = status.toRepeatCount;
-    dueMemoryTrackers.totalAssimilatedCount = status.totalAssimilatedCount;
-    dueMemoryTrackers.setRecallWindowEndAt(status.getRecallWindowEndAt());
+    dueMemoryTrackers.toRepeatCount = getToRecallCount(user, currentUTCTimestamp, timeZone);
+    dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);
+    dueMemoryTrackers.setRecallWindowEndAt(
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
 
     return dueMemoryTrackers;
   }

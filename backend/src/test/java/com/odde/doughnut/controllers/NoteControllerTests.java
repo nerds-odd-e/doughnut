@@ -317,9 +317,9 @@ class NoteControllerTests extends ControllerTestBase {
         controller.deleteNote(subject);
 
         Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
-        RecallStatus status =
-            recallService.getRecallStatus(
-                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"));
+        var status =
+            recallService.getDueMemoryTrackers(
+                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"), 0);
         assertThat(status.totalAssimilatedCount, is(1));
       }
 
@@ -344,9 +344,9 @@ class NoteControllerTests extends ControllerTestBase {
 
         assertThat(userService.getMemoryTrackersFor(currentUser.getUser(), subject), hasSize(1));
         Timestamp currentTime = testabilitySettings.getCurrentUTCTimestamp();
-        RecallStatus status =
-            recallService.getRecallStatus(
-                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"));
+        var status =
+            recallService.getDueMemoryTrackers(
+                currentUser.getUser(), currentTime, java.time.ZoneId.of("Asia/Shanghai"), 0);
         assertThat(status.totalAssimilatedCount, is(2));
       }
     }
