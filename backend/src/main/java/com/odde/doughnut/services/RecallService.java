@@ -55,8 +55,6 @@ public class RecallService {
 
     // Set recall status (always based on dueInDays=0)
     dueMemoryTrackers.totalAssimilatedCount = totalAssimilatedCount(user);
-    dueMemoryTrackers.setRecallWindowEndAt(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 24));
 
     return dueMemoryTrackers;
   }

@@ -15,7 +15,6 @@ class DueMemoryTrackersBuilder extends Builder<DueMemoryTrackers> {
       toRepeat: this.memoryTrackersToRepeat,
       dueInDays: 0,
       totalAssimilatedCount: 100,
-      recallWindowEndAt: new Date().toISOString(),
     }
   }
 }

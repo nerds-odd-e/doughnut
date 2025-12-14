@@ -43,7 +43,6 @@ const defaultMenuData = {
   },
   recallStatus: {
     toRepeat: [] as Array<{ memoryTrackerId?: number; spelling?: boolean }>,
-    recallWindowEndAt: "",
     totalAssimilatedCount: 0,
   },
   unreadConversations: [],
@@ -67,14 +66,12 @@ const createUseRecallDataMock = (overrides?: {
   return {
     toRepeatCount: computed(() => toRepeat.value?.length ?? 0),
     toRepeat,
-    recallWindowEndAt: ref(undefined),
     totalAssimilatedCount: ref(0),
     isRecallPaused: ref(overrides?.isRecallPaused ?? false),
     shouldResumeRecall: ref(false),
     treadmillMode: ref(false),
     currentIndex: ref(overrides?.currentIndex ?? 0),
     setToRepeat: vi.fn(),
-    setRecallWindowEndAt: vi.fn(),
     setTotalAssimilatedCount: vi.fn(),
     setIsRecallPaused: vi.fn(),
     resumeRecall: (overrides?.resumeRecall ?? vi.fn()) as () => void,
@@ -255,7 +252,6 @@ describe("main menu", () => {
               memoryTrackerId?: number
               spelling?: boolean
             }>,
-            recallWindowEndAt: "",
             totalAssimilatedCount: 0,
           },
         })
@@ -471,7 +467,6 @@ describe("main menu", () => {
               memoryTrackerId?: number
               spelling?: boolean
             }>,
-            recallWindowEndAt: "",
             totalAssimilatedCount: 0,
           },
         })

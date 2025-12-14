@@ -74,9 +74,6 @@ class RecallsControllerTests extends ControllerTestBase {
 
       assertEquals(1, dueMemoryTrackers.getToRepeat().size());
       assertEquals(1, dueMemoryTrackers.totalAssimilatedCount);
-      assertEquals(
-          TimestampOperations.addHoursToTimestamp(currentTime, 24),
-          dueMemoryTrackers.getRecallWindowEndAt());
     }
 
     @Test
