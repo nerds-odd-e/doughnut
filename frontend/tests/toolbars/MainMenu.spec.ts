@@ -408,6 +408,10 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
         })
       )
     })
@@ -487,6 +491,10 @@ describe("main menu", () => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
           isRecallPaused: true,
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
           resumeRecall: resumeRecallSpy,
         })
       )
@@ -565,6 +573,10 @@ describe("main menu", () => {
         createUseRecallDataMock({
           isRecallPaused: false,
           currentIndex: 1,
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
         })
       )
 
@@ -610,6 +622,10 @@ describe("main menu", () => {
         createUseRecallDataMock({
           isRecallPaused: true,
           currentIndex: 2,
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
         })
       )
 
@@ -617,6 +633,42 @@ describe("main menu", () => {
 
       const resumeRecallLink = screen.getByLabelText("Resume")
       expect(resumeRecallLink).toBeInTheDocument()
+    })
+
+    it("does not show resume recall menu item when toRepeatCount is 0 even if recall is paused", async () => {
+      useRouteValue.name = "notebooks"
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: true,
+          currentIndex: 0,
+          toRepeat: [],
+        })
+      )
+
+      await renderComponent()
+
+      const resumeRecallLink = screen.queryByLabelText("Resume")
+      expect(resumeRecallLink).not.toBeInTheDocument()
+    })
+
+    it("does not show resume recall menu item when toRepeatCount is 0 even if currentIndex > 0", async () => {
+      useRouteValue.name = "notebooks"
+      // When currentIndex equals the length of toRepeat, toRepeatCount becomes 0
+      vi.mocked(useRecallData).mockReturnValue(
+        createUseRecallDataMock({
+          isRecallPaused: false,
+          currentIndex: 5,
+          toRepeat: Array(5).fill({}) as Array<{
+            memoryTrackerId?: number
+            spelling?: boolean
+          }>,
+        })
+      )
+
+      await renderComponent()
+
+      const resumeRecallLink = screen.queryByLabelText("Resume")
+      expect(resumeRecallLink).not.toBeInTheDocument()
     })
   })
 
