@@ -16,9 +16,7 @@ import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import com.odde.doughnut.services.graphRAG.FocusNote;
 import com.odde.doughnut.services.graphRAG.GraphRAGResult;
-import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -39,7 +37,6 @@ class NoteController {
 
   private final EntityPersister entityPersister;
   private final WikidataService wikidataService;
-  private final TestabilitySettings testabilitySettings;
   private final NoteMotionService noteMotionService;
   private final NoteService noteService;
   private final AuthorizationService authorizationService;
@@ -48,22 +45,19 @@ class NoteController {
 
   public NoteController(
       EntityPersister entityPersister,
-      HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings,
+      WikidataService wikidataService,
       NoteMotionService noteMotionService,
       NoteService noteService,
       AuthorizationService authorizationService,
       UserService userService,
       GraphRAGService graphRAGService) {
     this.entityPersister = entityPersister;
-    this.testabilitySettings = testabilitySettings;
+    this.wikidataService = wikidataService;
     this.noteMotionService = noteMotionService;
     this.noteService = noteService;
     this.authorizationService = authorizationService;
     this.userService = userService;
     this.graphRAGService = graphRAGService;
-    this.wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 
   @PostMapping(value = "/{note}/updateWikidataId")

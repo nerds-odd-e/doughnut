@@ -4,8 +4,6 @@ import com.odde.doughnut.controllers.dto.WikidataEntityData;
 import com.odde.doughnut.controllers.dto.WikidataSearchEntity;
 import com.odde.doughnut.exceptions.WikidataServiceErrorException;
 import com.odde.doughnut.services.WikidataService;
-import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -22,12 +20,10 @@ import org.springframework.web.context.annotation.SessionScope;
 @RequestMapping("/api/wikidata")
 public class WikidataController {
 
-  WikidataService wikidataService;
+  private final WikidataService wikidataService;
 
-  public WikidataController(
-      TestabilitySettings testabilitySettings, HttpClientAdapter httpClientAdapter) {
-    wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+  public WikidataController(WikidataService wikidataService) {
+    this.wikidataService = wikidataService;
   }
 
   @GetMapping("/entity-data/{wikidataId}")

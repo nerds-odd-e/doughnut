@@ -11,9 +11,7 @@ import com.odde.doughnut.services.AuthorizationService;
 import com.odde.doughnut.services.NoteConstructionService;
 import com.odde.doughnut.services.NoteService;
 import com.odde.doughnut.services.WikidataService;
-import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
 import com.odde.doughnut.services.search.NoteSearchService;
-import com.odde.doughnut.testability.TestabilitySettings;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.Comparator;
@@ -38,18 +36,16 @@ public class McpNoteCreationController {
 
   @Autowired
   public McpNoteCreationController(
-      HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings,
+      WikidataService wikidataService,
       NoteConstructionService noteConstructionService,
       NoteSearchService noteSearchService,
       NoteService noteService,
       AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
-    this.wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+    this.wikidataService = wikidataService;
     this.noteConstructionService = noteConstructionService;
     this.noteSearchService = noteSearchService;
     this.noteService = noteService;
+    this.authorizationService = authorizationService;
   }
 
   @PostMapping(value = "/create")

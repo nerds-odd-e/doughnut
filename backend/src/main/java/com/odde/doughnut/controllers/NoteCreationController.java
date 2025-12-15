@@ -5,8 +5,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.*;
 import com.odde.doughnut.services.*;
 import com.odde.doughnut.services.AuthorizationService;
-import com.odde.doughnut.services.httpQuery.HttpClientAdapter;
-import com.odde.doughnut.testability.TestabilitySettings;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -26,14 +24,12 @@ class NoteCreationController {
 
   @Autowired
   public NoteCreationController(
-      HttpClientAdapter httpClientAdapter,
-      TestabilitySettings testabilitySettings,
+      WikidataService wikidataService,
       NoteConstructionService noteConstructionService,
       AuthorizationService authorizationService) {
-    this.authorizationService = authorizationService;
-    this.wikidataService =
-        new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+    this.wikidataService = wikidataService;
     this.noteConstructionService = noteConstructionService;
+    this.authorizationService = authorizationService;
   }
 
   @PostMapping(value = "/{parentNote}/create")
