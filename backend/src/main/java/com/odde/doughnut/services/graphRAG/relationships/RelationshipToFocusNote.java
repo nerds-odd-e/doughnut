@@ -31,10 +31,13 @@ public enum RelationshipToFocusNote {
 
   // Reference + relationship
   ReferencedTargetOfRelationship,
+
+  // Parent neighborhood
   ParentSibling,
   TargetParentSibling,
   ParentSiblingChild,
   TargetParentSiblingChild,
+
   SiblingOfReferencingNote,
   RemotelyRelated
 }
