@@ -1,12 +1,15 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
 import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteAccessory;
 import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -36,7 +39,9 @@ public class NoteService {
     return noteRepository.findById(id);
   }
 
-  public void destroy(Note note, Timestamp currentUTCTimestamp) {
+  public void destroy(Note note) {
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    note.setUpdatedAt(currentUTCTimestamp);
     if (note.getNotebook() != null) {
       if (note.getNotebook().getHeadNote() == note) {
         note.getNotebook().setDeletedAt(currentUTCTimestamp);
@@ -172,5 +177,13 @@ public class NoteService {
     note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.setNoteType(noteType);
     entityPersister.merge(note);
+  }
+
+  public NoteAccessory updateNoteAccessories(
+      Note note, NoteAccessoriesDTO noteAccessoriesDTO, User user) throws IOException {
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
+    entityPersister.save(note);
+    return note.getNoteAccessory();
   }
 }

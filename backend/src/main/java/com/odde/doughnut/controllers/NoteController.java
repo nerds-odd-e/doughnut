@@ -104,12 +104,8 @@ class NoteController {
       @Valid @ModelAttribute NoteAccessoriesDTO noteAccessoriesDTO)
       throws UnexpectedNoAccessRightException, IOException {
     authorizationService.assertAuthorization(note);
-
-    final User user = authorizationService.getCurrentUser();
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-    note.getOrInitializeNoteAccessory().setFromDTO(noteAccessoriesDTO, user);
-    entityPersister.save(note);
-    return note.getNoteAccessory();
+    return noteService.updateNoteAccessories(
+        note, noteAccessoriesDTO, authorizationService.getCurrentUser());
   }
 
   @GetMapping("/{note}/accessory")
@@ -138,7 +134,7 @@ class NoteController {
   public List<NoteRealm> deleteNote(@PathVariable("note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    noteService.destroy(note, testabilitySettings.getCurrentUTCTimestamp());
+    noteService.destroy(note);
     entityPersister.flush();
     Note parentNote = note.getParent();
     if (parentNote != null) {
