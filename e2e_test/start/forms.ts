@@ -6,12 +6,18 @@ const form = {
         cy.formField(propName)
           .then(($input) => {
             const isFileInput = $input.attr('type') === 'file'
-            return { $input, isFileInput }
+            const isSelect = $input.prop('tagName') === 'SELECT'
+            return { $input, isFileInput, isSelect }
           })
-          .then(({ $input, isFileInput }) => {
-            cy.wrap($input).assignFieldValue(value)
-            if (!isFileInput) {
+          .then(({ $input, isFileInput, isSelect }) => {
+            if (isSelect) {
+              cy.wrap($input).select(value)
               cy.wrap($input).fieldShouldHaveValue(value)
+            } else {
+              cy.wrap($input).assignFieldValue(value)
+              if (!isFileInput) {
+                cy.wrap($input).fieldShouldHaveValue(value)
+              }
             }
           })
       } else {
