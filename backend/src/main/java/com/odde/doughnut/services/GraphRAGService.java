@@ -43,7 +43,7 @@ public class GraphRAGService {
     List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
     priorityTwoHandlers.add(
         new ChildRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer));
-    priorityTwoHandlers.add(new PriorSiblingRelationshipHandler(focusNote));
+    priorityTwoHandlers.add(new OlderSiblingRelationshipHandler(focusNote));
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote));
     priorityTwoHandlers.add(
         new InboundReferenceRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer));

@@ -10,7 +10,7 @@ import lombok.Getter;
 public class FocusNote extends BareNote {
   private final List<String> contextualPath = new ArrayList<>();
   private final List<String> children = new ArrayList<>();
-  private final List<String> priorSiblings = new ArrayList<>();
+  private final List<String> olderSiblings = new ArrayList<>();
   private final List<String> youngerSiblings = new ArrayList<>();
   private final List<String> inboundReferences = new ArrayList<>();
 

@@ -36,13 +36,13 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
   - Contextual path: `List<String>` of ancestor URIs
   - Lists of related note URIs: `List<String>` for:
     - `children`: Direct child note URIs
-    - `priorSiblings`: Prior sibling note URIs
+    - `olderSiblings`: Older sibling note URIs
     - `youngerSiblings`: Younger sibling note URIs
     - `inboundReferences`: Inbound reference note URIs
 
 - **RelationshipToFocusNote**: Enumeration of possible relationships:
   - Direct: Self, Parent, Target, Child
-  - Sibling: PriorSibling, YoungerSibling
+  - Sibling: OlderSibling, YoungerSibling
   - Reference: InboundReference, SubjectOfInboundReference
   - Contextual: AncestorInContextualPath, AncestorInTargetContextualPath
   - Relation: TargetOfRelatedChild
@@ -67,7 +67,7 @@ The system uses a layered priority approach with configurable notes-before-switc
 
 2. **Direct Relations** (Priority 2) - 3 notes before switching
    - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelatedChild handlers to Priority 3)
-   - `PriorSiblingRelationshipHandler`: Prior siblings
+   - `OlderSiblingRelationshipHandler`: Older siblings
    - `YoungerSiblingRelationshipHandler`: Younger siblings
    - `InboundReferenceRelationshipHandler`: Inbound references (dynamically adds SubjectOfInboundReference to Priority 3, InboundReferenceContextualPath to Priority 4)
    - `AncestorInTargetContextualPathRelationshipHandler`: Ancestors in target's contextual path

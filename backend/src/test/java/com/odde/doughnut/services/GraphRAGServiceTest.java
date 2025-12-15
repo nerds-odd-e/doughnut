@@ -506,22 +506,22 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasPriorSiblings {
-    private Note priorSibling1;
-    private Note priorSibling2;
+  class WhenNoteHasOlderSiblings {
+    private Note olderSibling1;
+    private Note olderSibling2;
     private Note focusNote;
 
     @BeforeEach
     void setup() {
       Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      priorSibling1 =
+      olderSibling1 =
           makeMe
               .aNote()
               .under(parent)
               .titleConstructor("Prior One")
               .details("Sibling 1 Details")
               .please();
-      priorSibling2 =
+      olderSibling2 =
           makeMe
               .aNote()
               .under(parent)
@@ -532,27 +532,27 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludePriorSiblingsInFocusNoteListInOrder() {
+    void shouldIncludeOlderSiblingsInFocusNoteListInOrder() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       assertThat(
-          result.getFocusNote().getPriorSiblings(),
-          contains(priorSibling1.getUri(), priorSibling2.getUri()));
+          result.getFocusNote().getOlderSiblings(),
+          contains(olderSibling1.getUri(), olderSibling2.getUri()));
     }
 
     @Test
-    void shouldIncludePriorSiblingsInRelatedNotes() {
+    void shouldIncludeOlderSiblingsInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       List<BareNote> siblingNotes =
           result.getRelatedNotes().stream()
-              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.PriorSibling)
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.OlderSibling)
               .collect(Collectors.toList());
 
       assertThat(siblingNotes, hasSize(2));
       assertThat(
           siblingNotes.stream().map(BareNote::getUriAndTitle).collect(Collectors.toList()),
-          containsInAnyOrder(priorSibling1, priorSibling2));
+          containsInAnyOrder(olderSibling1, olderSibling2));
     }
   }
 

@@ -2,10 +2,12 @@ package com.odde.doughnut.services.graphRAG.relationships;
 
 public enum RelationshipToFocusNote {
   Self,
+
+  // Core structure
   Parent,
   Target,
   Child,
-  PriorSibling,
+  OlderSibling,
   YoungerSibling,
   InboundReference,
   SubjectOfInboundReference,

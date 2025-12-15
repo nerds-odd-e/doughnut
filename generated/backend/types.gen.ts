@@ -526,7 +526,7 @@ export type BareNote = {
     title?: string;
     targetUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Target' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInTargetContextualPath' | 'TargetOfRelatedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToTargetOfRelatedChild' | 'TargetSibling' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Target' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInTargetContextualPath' | 'TargetOfRelatedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToTargetOfRelatedChild' | 'TargetSibling' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -539,13 +539,13 @@ export type FocusNote = {
     title?: string;
     targetUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Target' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInTargetContextualPath' | 'TargetOfRelatedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToTargetOfRelatedChild' | 'TargetSibling' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Target' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInTargetContextualPath' | 'TargetOfRelatedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToTargetOfRelatedChild' | 'TargetSibling' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
     contextualPath?: Array<string>;
     children?: Array<string>;
-    priorSiblings?: Array<string>;
+    olderSiblings?: Array<string>;
     youngerSiblings?: Array<string>;
     inboundReferences?: Array<string>;
 };

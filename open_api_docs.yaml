@@ -4568,7 +4568,7 @@ components:
           - Parent
           - Target
           - Child
-          - PriorSibling
+          - OlderSibling
           - YoungerSibling
           - InboundReference
           - SubjectOfInboundReference
@@ -4614,7 +4614,7 @@ components:
           - Parent
           - Target
           - Child
-          - PriorSibling
+          - OlderSibling
           - YoungerSibling
           - InboundReference
           - SubjectOfInboundReference
@@ -4646,7 +4646,7 @@ components:
           type: array
           items:
             type: string
-        priorSiblings:
+        olderSiblings:
           type: array
           items:
             type: string
