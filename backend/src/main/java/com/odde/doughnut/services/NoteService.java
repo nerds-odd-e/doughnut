@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -16,10 +17,15 @@ import org.springframework.stereotype.Service;
 public class NoteService {
   private final NoteRepository noteRepository;
   private final EntityPersister entityPersister;
+  private final TestabilitySettings testabilitySettings;
 
-  public NoteService(NoteRepository noteRepository, EntityPersister entityPersister) {
+  public NoteService(
+      NoteRepository noteRepository,
+      EntityPersister entityPersister,
+      TestabilitySettings testabilitySettings) {
     this.noteRepository = noteRepository;
     this.entityPersister = entityPersister;
+    this.testabilitySettings = testabilitySettings;
   }
 
   public List<Note> findRecentNotesByUser(Integer userId) {
@@ -163,6 +169,7 @@ public class NoteService {
   }
 
   public void setNoteType(Note note, NoteType noteType) {
+    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.setNoteType(noteType);
     entityPersister.merge(note);
   }

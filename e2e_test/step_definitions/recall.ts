@@ -267,14 +267,8 @@ Then(
   }
 )
 
-Given('there is a note {string}', (noteTitle: string) => {
-  cy.get<string>('@currentLoginUser').then((username) => {
-    start.testability().injectNotes([{ Title: noteTitle }], username)
-  })
-})
-
 When('I start assimilating {string}', (noteTitle: string) => {
-  start.assimilation().goToAssimilationPage().waitForNote(noteTitle)
+  start.assimilation().goToAssimilationPage().expectNoteTitle(noteTitle)
 })
 
 Then('I should be able to select a note type', () => {

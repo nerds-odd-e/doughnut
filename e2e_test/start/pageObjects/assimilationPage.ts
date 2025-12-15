@@ -113,7 +113,7 @@ export const assumeAssimilationPage = () => ({
       })
     )
   },
-  waitForNote(noteTitle: string) {
+  expectNoteTitle(noteTitle: string) {
     cy.findByText(noteTitle, { selector: 'main *' }).should('be.visible')
     cy.pageIsNotLoading()
     return this

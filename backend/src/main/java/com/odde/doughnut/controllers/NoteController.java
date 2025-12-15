@@ -185,7 +185,6 @@ class NoteController {
       @NotNull @Valid @RequestBody NoteType noteType)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
-    note.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     noteService.setNoteType(note, noteType);
     return note.toNoteRealm(authorizationService.getCurrentUser());
   }
