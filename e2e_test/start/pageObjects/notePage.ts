@@ -2,30 +2,11 @@ import { commonSenseSplit } from '../../support/string_util'
 import audioToolsPage from './audioToolsPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
-import { questionListPage } from './questionListPage'
 import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { noteSidebar } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { toolbarButton } from './toolbarButton'
 import { makeSureNoteMoreOptionsDialogIsOpen } from './noteMoreOptionsDialog'
-
-function filterAttributes(
-  attributes: Record<string, string>,
-  keysToKeep: string[]
-) {
-  return Object.keys(attributes)
-    .filter((key) => keysToKeep.includes(key))
-    .reduce(
-      (obj, key) => {
-        const val = attributes[key]
-        if (val) {
-          obj[key] = val
-        }
-        return obj
-      },
-      {} as Record<string, string>
-    )
-}
 
 export const assumeNotePage = (noteTopology?: string) => {
   const findNoteTitle = (title) =>
@@ -185,32 +166,18 @@ export const assumeNotePage = (noteTopology?: string) => {
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)
       cy.get('#note-image').should('not.exist')
-      this.moreOptions()
-        .toolbarButton('Edit Note Image')
-        .click()
-        .submitWith(
-          filterAttributes(attributes, [
-            'Upload Image',
-            'Image Url',
-            'Use Parent Image',
-          ])
-        )
+      this.moreOptions().editNoteImage(attributes)
       // After upload and dialog closes, the image should be visible
       cy.get('#note-image').should('be.visible')
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {
-      this.moreOptions()
-        .toolbarButton('Edit Note URL')
-        .click()
-        .submitWith(filterAttributes(attributes, ['Url']))
+      this.moreOptions().editNoteUrl(attributes)
       return this
     },
 
     updateNoteType(noteType: string) {
-      this.moreOptions()
-      cy.get('#note-noteType').select(noteType)
-      cy.pageIsNotLoading()
+      this.moreOptions().updateNoteType(noteType)
       return this
     },
 
@@ -232,16 +199,13 @@ export const assumeNotePage = (noteTopology?: string) => {
       return noteCreationForm
     },
     aiGenerateImage() {
-      this.moreOptions().toolbarButton('Generate Image with DALL-E').click()
+      this.moreOptions().generateImageWithDALLE()
     },
     deleteNote() {
-      this.moreOptions().toolbarButton('Delete note').click()
-      cy.findByRole('button', { name: 'OK' }).click()
-      cy.pageIsNotLoading()
+      this.moreOptions().deleteNote()
     },
     openQuestionList() {
-      this.moreOptions().toolbarButton('Questions for the note').click()
-      return questionListPage()
+      return this.moreOptions().openQuestionList()
     },
     addQuestion(row: Record<string, string>) {
       this.openQuestionList().addQuestionPage().addQuestion(row)
@@ -329,18 +293,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     associateWikidataDialog() {
       toolbarButton('associate wikidata').click()
       return assumeAssociateWikidataDialog()
-    },
-    importObsidianData(filename: string) {
-      this.moreOptions().toolbarButton('more options').click()
-      // Find the label containing "Import from Obsidian" text
-      cy.contains('label', 'Import from Obsidian').within(() => {
-        cy.get('input[type="file"]').selectFile(
-          `e2e_test/fixtures/${filename}`,
-          { force: true }
-        )
-      })
-      cy.pageIsNotLoading()
-      return this
     },
   }
 }

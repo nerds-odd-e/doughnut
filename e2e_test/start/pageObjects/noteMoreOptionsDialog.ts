@@ -1,5 +1,24 @@
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
 import { toolbarButton } from './toolbarButton'
+import { questionListPage } from './questionListPage'
+
+function filterAttributes(
+  attributes: Record<string, string>,
+  keysToKeep: string[]
+) {
+  return Object.keys(attributes)
+    .filter((key) => keysToKeep.includes(key))
+    .reduce(
+      (obj, key) => {
+        const val = attributes[key]
+        if (val) {
+          obj[key] = val
+        }
+        return obj
+      },
+      {} as Record<string, string>
+    )
+}
 
 export const makeSureNoteMoreOptionsDialogIsOpen = () => {
   cy.findByRole('button', { name: 'more options' }).then(($button) => {
@@ -7,6 +26,11 @@ export const makeSureNoteMoreOptionsDialogIsOpen = () => {
       cy.wrap($button).click()
     }
   })
+
+  return noteMoreOptionsDialog()
+}
+
+const noteMoreOptionsDialog = () => {
   return {
     toolbarButton,
     expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
@@ -25,6 +49,38 @@ export const makeSureNoteMoreOptionsDialogIsOpen = () => {
       cy.url().should('include', '/d/memory-trackers/')
       cy.pageIsNotLoading()
       return assumeMemoryTrackerPage().removeFromReview()
+    },
+    editNoteImage(attributes: Record<string, string>) {
+      toolbarButton('Edit Note Image')
+        .click()
+        .submitWith(
+          filterAttributes(attributes, [
+            'Upload Image',
+            'Image Url',
+            'Use Parent Image',
+          ])
+        )
+    },
+    editNoteUrl(attributes: Record<string, string>) {
+      toolbarButton('Edit Note URL')
+        .click()
+        .submitWith(filterAttributes(attributes, ['Url']))
+    },
+    updateNoteType(noteType: string) {
+      cy.get('#note-noteType').select(noteType)
+      cy.pageIsNotLoading()
+    },
+    generateImageWithDALLE() {
+      toolbarButton('Generate Image with DALL-E').click()
+    },
+    deleteNote() {
+      toolbarButton('Delete note').click()
+      cy.findByRole('button', { name: 'OK' }).click()
+      cy.pageIsNotLoading()
+    },
+    openQuestionList() {
+      toolbarButton('Questions for the note').click()
+      return questionListPage()
     },
   }
 }
