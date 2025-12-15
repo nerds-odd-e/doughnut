@@ -29,11 +29,12 @@ public enum RelationshipToFocusNote {
   TargetOfRelationship,
   RelationshipOfTargetSibling,
 
-  SiblingOfParent,
-  SiblingOfParentOfTarget,
-  ChildOfSiblingOfParent,
-  ChildOfSiblingOfParentOfTarget,
+  // Reference + relationship
+  ReferencedTargetOfRelationship,
+  ParentSibling,
+  TargetParentSibling,
+  ParentSiblingChild,
+  TargetParentSiblingChild,
   SiblingOfReferencingNote,
-  ReferenceByToTargetOfRelatedChild,
   RemotelyRelated
 }

@@ -5,12 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class ChildOfSiblingOfParentOfTargetRelationshipHandler extends RelationshipHandler {
+public class TargetParentSiblingChildRelationshipHandler extends RelationshipHandler {
   private final List<Note> children;
   private int currentIndex = 0;
 
-  public ChildOfSiblingOfParentOfTargetRelationshipHandler(Note targetParentSibling) {
-    super(RelationshipToFocusNote.ChildOfSiblingOfParentOfTarget, targetParentSibling);
+  public TargetParentSiblingChildRelationshipHandler(Note targetParentSibling) {
+    super(RelationshipToFocusNote.TargetParentSiblingChild, targetParentSibling);
     this.children = new ArrayList<>(targetParentSibling.getChildren());
     Collections.shuffle(this.children);
   }

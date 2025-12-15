@@ -4579,12 +4579,12 @@ components:
           - ReferenceContextAncestor
           - TargetOfRelationship
           - RelationshipOfTargetSibling
-          - SiblingOfParent
-          - SiblingOfParentOfTarget
-          - ChildOfSiblingOfParent
-          - ChildOfSiblingOfParentOfTarget
+          - ReferencedTargetOfRelationship
+          - ParentSibling
+          - TargetParentSibling
+          - ParentSiblingChild
+          - TargetParentSiblingChild
           - SiblingOfReferencingNote
-          - ReferenceByToTargetOfRelatedChild
           - RemotelyRelated
         details:
           type: string
@@ -4626,12 +4626,12 @@ components:
           - ReferenceContextAncestor
           - TargetOfRelationship
           - RelationshipOfTargetSibling
-          - SiblingOfParent
-          - SiblingOfParentOfTarget
-          - ChildOfSiblingOfParent
-          - ChildOfSiblingOfParentOfTarget
+          - ReferencedTargetOfRelationship
+          - ParentSibling
+          - TargetParentSibling
+          - ParentSiblingChild
+          - TargetParentSiblingChild
           - SiblingOfReferencingNote
-          - ReferenceByToTargetOfRelatedChild
           - RemotelyRelated
         details:
           type: string

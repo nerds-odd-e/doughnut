@@ -46,10 +46,10 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
   - Reference: ReferenceBy, ReferencingNote
   - Contextual: ContextAncestor, TargetContextAncestor
   - Relation: TargetOfRelationship
-  - Extended Family: SiblingOfParent, SiblingOfParentOfTarget
-  - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfTarget
+  - Extended Family: ParentSibling, TargetParentSibling
+  - Cousins: ParentSiblingChild, TargetParentSiblingChild
   - Reference Context: ReferenceContextAncestor, SiblingOfReferencingNote
-  - Related Child References: ReferenceByToTargetOfRelatedChild
+  - Related Child References: ReferencedTargetOfRelationship
 
 - **GraphRAGResult**: Complete result containing:
   - Focus note
@@ -71,21 +71,21 @@ The system uses a layered priority approach with configurable notes-before-switc
    - `YoungerSiblingRelationshipHandler`: Younger siblings
    - `ReferenceByRelationshipHandler`: Reference by notes (dynamically adds ReferencingNote to Priority 3, ReferenceContextAncestor to Priority 4)
    - `TargetContextAncestorRelationshipHandler`: Ancestors in target's contextual path
-   - `SiblingOfParentRelationshipHandler`: Siblings of parent (dynamically adds ChildOfSiblingOfParent to Priority 4)
-   - `SiblingOfParentOfTargetRelationshipHandler`: Siblings of parent of target (dynamically adds ChildOfSiblingOfParentOfTarget to Priority 4)
+   - `ParentSiblingRelationshipHandler`: Siblings of parent (dynamically adds ParentSiblingChild to Priority 4)
+   - `TargetParentSiblingRelationshipHandler`: Siblings of parent of target (dynamically adds TargetParentSiblingChild to Priority 4)
 
 3. **Extended Relations** (Priority 3) - 2 notes before switching
    - Dynamically populated by Priority 2 handlers:
-   - `TargetOfRelationshipRelationshipHandler`: Targets of relationships (dynamically adds ReferenceByToTargetOfRelatedChild to Priority 4)
+   - `TargetOfRelationshipRelationshipHandler`: Targets of relationships (dynamically adds ReferencedTargetOfRelationship to Priority 4)
    - `ReferencingNoteRelationshipHandler`: Referencing notes (dynamically adds SiblingOfReferencingNote to Priority 4)
 
 4. **Distant Relations** (Priority 4) - 2 notes before switching
    - Dynamically populated by Priority 2 and Priority 3 handlers:
-   - `ChildOfSiblingOfParentRelationshipHandler`: Children of parent's siblings (cousins)
-   - `ChildOfSiblingOfParentOfTargetRelationshipHandler`: Children of target's parent's siblings
+   - `ParentSiblingChildRelationshipHandler`: Children of parent's siblings (cousins)
+   - `TargetParentSiblingChildRelationshipHandler`: Children of target's parent's siblings
    - `ReferenceContextAncestorRelationshipHandler`: Contextual path of reference by notes
    - `SiblingOfReferencingNoteRelationshipHandler`: Siblings of referencing notes
-   - `ReferenceByToTargetOfRelatedChildHandler`: Reference by notes to targets of related children
+   - `ReferencedTargetOfRelationshipHandler`: Reference by notes to targets of relationships
 
 ## Retrieval Algorithm
 
@@ -132,11 +132,11 @@ The system manages complex relationship dependencies through dynamic handler inj
 
 - **Priority 2 → Priority 4 Dependencies**
   - `ReferenceByRelationshipHandler` → adds `ReferenceContextAncestorRelationshipHandler`
-  - `SiblingOfParentRelationshipHandler` → adds `ChildOfSiblingOfParentRelationshipHandler`
-  - `SiblingOfParentOfTargetRelationshipHandler` → adds `ChildOfSiblingOfParentOfTargetRelationshipHandler`
+  - `ParentSiblingRelationshipHandler` → adds `ParentSiblingChildRelationshipHandler`
+  - `TargetParentSiblingRelationshipHandler` → adds `TargetParentSiblingChildRelationshipHandler`
 
 - **Priority 3 → Priority 4 Dependencies**
-  - `TargetOfRelationshipRelationshipHandler` → adds `ReferenceByToTargetOfRelatedChildHandler`
+  - `TargetOfRelationshipRelationshipHandler` → adds `ReferencedTargetOfRelationshipHandler`
   - `ReferencingNoteRelationshipHandler` → adds `SiblingOfReferencingNoteRelationshipHandler`
 
 ## Implementation Considerations
