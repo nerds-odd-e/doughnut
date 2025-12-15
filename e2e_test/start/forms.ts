@@ -1,4 +1,4 @@
-const submittableForm = {
+const form = {
   fill(noteAttributes: Record<string, string | undefined>) {
     for (const propName in noteAttributes) {
       const value = noteAttributes[propName]
@@ -20,6 +20,13 @@ const submittableForm = {
     }
     return this
   },
+}
+
+const submittableForm = {
+  fill(noteAttributes: Record<string, string | undefined>) {
+    form.fill(noteAttributes)
+    return submittableForm
+  },
   submit() {
     cy.get('input[value="Submit"]').click()
     cy.pageIsNotLoading()
@@ -29,4 +36,4 @@ const submittableForm = {
   },
 }
 
-export default submittableForm
+export { form, submittableForm }

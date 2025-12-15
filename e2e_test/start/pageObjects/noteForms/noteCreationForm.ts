@@ -1,4 +1,4 @@
-import submittableForm from '../../forms'
+import { submittableForm } from '../../forms'
 import { assumeAssociateWikidataDialog } from '../associateWikidataDialog'
 
 const noteCreationForm = {
