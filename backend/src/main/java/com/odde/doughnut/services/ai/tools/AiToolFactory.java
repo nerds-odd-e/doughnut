@@ -31,7 +31,7 @@ public class AiToolFactory {
     String baseInstruction =
         """
         Please act as a Question Designer, testing my memory, mastery and understanding of my focus note.
-        My notes are atomic pieces of knowledge organized hierarchically and can include reifications to form lateral links.
+        My notes are atomic pieces of knowledge organized hierarchically and can include relations to form lateral links.
         Your task is to create a memory-stimulating question by adhering to these guidelines:
 
         1. **Focus on the Focus Note**: Formulate one question EXCLUSIVELY around the focus note (its title / subject-predicate-target and details).

@@ -113,8 +113,8 @@ public class MakeMe extends MakeMeWithoutDB {
     return new SubscriptionBuilder(this, new Subscription());
   }
 
-  public ReificationBuilder aReification() {
-    return new ReificationBuilder(this);
+  public RelationBuilder aRelation() {
+    return new RelationBuilder(this);
   }
 
   public PredefinedQuestionBuilder aPredefinedQuestion() {

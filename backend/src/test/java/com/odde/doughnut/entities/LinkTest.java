@@ -33,14 +33,14 @@ public class LinkTest {
     @Test
     void shouldGetSourceLevelWhenItIsHigher() {
       makeMe.theNote(subject).level(5).please();
-      Note link = makeMe.aReification().between(subject, target).inMemoryPlease();
+      Note link = makeMe.aRelation().between(subject, target).inMemoryPlease();
       assertThat(link.getRecallSetting().getLevel(), is(5));
     }
 
     @Test
     void shouldGetTargetLevelWhenItIsHigher() {
       makeMe.theNote(target).level(5).please();
-      Note link = makeMe.aReification().between(subject, target).inMemoryPlease();
+      Note link = makeMe.aRelation().between(subject, target).inMemoryPlease();
       assertThat(link.getRecallSetting().getLevel(), is(5));
     }
   }

@@ -118,8 +118,8 @@ class ObsidianFormatServiceTest {
     Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
 
     // Create tag links from both taggers to the target
-    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
-    makeMe.aReification().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aRelation().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aRelation().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
 
     makeMe.refresh(headNote.getNotebook());
 
@@ -141,8 +141,8 @@ class ObsidianFormatServiceTest {
     Note childWithTags = makeMe.aNote("Tagger 1").under(headNote).please();
 
     // Create tag links from both taggers to the target
-    makeMe.aReification().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
-    makeMe.aReification().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aRelation().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aRelation().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
 
     makeMe.refresh(headNote.getNotebook());
 

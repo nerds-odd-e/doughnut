@@ -59,7 +59,7 @@ public class NoteTest {
     void setup() {
       parent = makeMe.aNote().titleConstructor("parent").please();
       target = makeMe.aNote().please();
-      linkingNote = makeMe.aReification().between(parent, target).please();
+      linkingNote = makeMe.aRelation().between(parent, target).please();
     }
 
     @Test
@@ -71,7 +71,7 @@ public class NoteTest {
 
     @Test
     void linkOfLink() {
-      Note linkOfLink = makeMe.aReification().between(parent, linkingNote).please();
+      Note linkOfLink = makeMe.aRelation().between(parent, linkingNote).please();
       assertThat(
           linkOfLink.getNoteTopology().getTargetNoteTopology().getTargetNoteTopology().getId(),
           equalTo(target.getId()));

@@ -18,12 +18,12 @@ Every edge in the traversal is one of the following six relationships:
 	1.	parent
 The structural parent in the contextual path.
 	2.	target
-The note's reification target.
+The note's relation target.
 (The note represents a relationship between its parent and this target.)
 	3.	sibling
 The nearest structural sibling (in left-to-right or right-to-left order).
 	4.	target-sibling
-The nearest co-reifier sharing the same reification target.
+The nearest co-relator sharing the same relation target.
 	5.	child
 One child note of the current note.
 This is a seed; additional children emerge later via sibling expansion.
@@ -124,7 +124,7 @@ For a chosen relationship rel:
 
 Relationship	Neighbor Definition
 parent	ParentOf(node)
-target	ReificationTargetOf(node)
+target	RelationTargetOf(node)
 sibling	NearestStructuralSibling(node)
 target-sibling	NearestTargetSibling(node)
 child	PickOneChild(node) (seed)

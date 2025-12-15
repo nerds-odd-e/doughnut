@@ -12,7 +12,7 @@ import org.apache.logging.log4j.util.Strings;
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
 
-  List<NoteBuilder> reificationBuilders = new ArrayList<>();
+  List<NoteBuilder> relationBuilders = new ArrayList<>();
   private List<PredefinedQuestionBuilder> predefinedQuestionBuilders = new ArrayList<>();
   private List<NoteBuilder> childrenBuilders = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder linkTo(Note referTo, LinkType linkType) {
-    reificationBuilders.add(makeMe.aReification().between(entity, referTo, linkType));
+    relationBuilders.add(makeMe.aRelation().between(entity, referTo, linkType));
     return this;
   }
 
@@ -95,10 +95,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void afterCreate(boolean needPersist) {
-    reificationBuilders.forEach(reificationBuilder -> reificationBuilder.please(needPersist));
+    relationBuilders.forEach(relationBuilder -> relationBuilder.please(needPersist));
     predefinedQuestionBuilders.forEach(bu -> bu.please(needPersist));
     childrenBuilders.forEach(bu -> bu.please(needPersist));
-    if (reificationBuilders.isEmpty()
+    if (relationBuilders.isEmpty()
         && predefinedQuestionBuilders.isEmpty()
         && childrenBuilders.isEmpty()
         && !needPersist) return;

@@ -216,7 +216,7 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldDeleteLinksWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
       Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
-      Note link = makeMe.aReification().between(subject, targetNote).please();
+      Note link = makeMe.aRelation().between(subject, targetNote).please();
       makeMe.refresh(subject);
 
       controller.deleteNote(subject);
@@ -228,7 +228,7 @@ class NoteControllerTests extends ControllerTestBase {
     @Test
     void shouldDeleteReferencesWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
       Note sourceNote = makeMe.aNote("source").creatorAndOwner(currentUser.getUser()).please();
-      Note reference = makeMe.aReification().between(sourceNote, subject).please();
+      Note reference = makeMe.aRelation().between(sourceNote, subject).please();
       makeMe.refresh(subject);
 
       controller.deleteNote(subject);
@@ -241,7 +241,7 @@ class NoteControllerTests extends ControllerTestBase {
     void shouldDeleteDescendantsReferencesWhenNoteIsDeleted()
         throws UnexpectedNoAccessRightException {
       Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
-      Note referenceToChild = makeMe.aReification().between(targetNote, child).please();
+      Note referenceToChild = makeMe.aRelation().between(targetNote, child).please();
       makeMe.refresh(subject);
 
       controller.deleteNote(subject);
@@ -424,7 +424,7 @@ class NoteControllerTests extends ControllerTestBase {
     void setup() {
       source = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       target = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      link = makeMe.aReification().between(source, target).please();
+      link = makeMe.aRelation().between(source, target).please();
     }
 
     @Test

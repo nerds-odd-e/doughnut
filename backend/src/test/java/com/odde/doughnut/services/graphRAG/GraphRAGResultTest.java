@@ -46,7 +46,7 @@ class GraphRAGResultTest {
   }
 
   @Nested
-  class ReifiedNoteTest {
+  class RelatedNoteTest {
     private Note parent;
     private Note targetNote;
     private Note note;
@@ -57,14 +57,14 @@ class GraphRAGResultTest {
       parent = makeMe.aNote().titleConstructor("Parent Note").please();
       targetNote =
           makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
-      note = makeMe.aReification().between(parent, targetNote).please();
+      note = makeMe.aRelation().between(parent, targetNote).please();
 
       BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
       jsonNode = objectMapper.valueToTree(bareNote);
     }
 
     @Test
-    void shouldIncludeSubjectUriAndTitleButNotParentUriAndTitleWhenNoteIsReified() {
+    void shouldIncludeSubjectUriAndTitleButNotParentUriAndTitleWhenNoteIsRelated() {
       // Assert
       assertThat(jsonNode.has(PARENT_URI_AND_TITLE), is(false));
       assertThat(jsonNode.has("subjectUriAndTitle"), is(true));
@@ -74,14 +74,14 @@ class GraphRAGResultTest {
     }
 
     @Test
-    void shouldHavePredicateFieldInsteadOfTitleWhenNoteIsReified() {
+    void shouldHavePredicateFieldInsteadOfTitleWhenNoteIsRelated() {
       assertThat(jsonNode.has("title"), is(false));
       assertThat(jsonNode.has("predicate"), is(true));
       assertThat(jsonNode.get("predicate").asText(), is(":a specialization of"));
     }
 
     @Test
-    void shouldHaveCorrectPropertyOrderForReifiedNote() throws Exception {
+    void shouldHaveCorrectPropertyOrderForRelatedNote() throws Exception {
       // Act
       String jsonString = objectMapper.writeValueAsString(jsonNode);
 

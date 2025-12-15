@@ -4,12 +4,12 @@
 
 In Doughnut, notes are atomic knowledge points organized hierarchically within notebooks. Each note (except root notes) has a parent and contains a title, details, and a unique URI. In the Graph RAG system, notes are represented as JSON objects with separate `uri` and `title` fields.
 
-A note becomes a reification when it links to a target note, with its parent becoming the subject and its title serving as the predicate. Reification notes can still contain details, and their target notes may come from different notebooks.
+A note becomes a relation when it links to a target note, with its parent becoming the subject and its title serving as the predicate. Relation notes can still contain details, and their target notes may come from different notebooks.
 
 Key relationships in the note graph include:
-- Parent-child relationships (including reified children)
+- Parent-child relationships (including related children)
 - Sibling relationships (prior and younger siblings)
-- Target relationships (for reification notes)
+- Target relationships (for relation notes)
 - Reference relationships (inbound references to the current note)
 - Extended relationships (parent siblings, cousins, etc.)
 
@@ -45,11 +45,11 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
   - Sibling: PriorSibling, YoungerSibling
   - Reference: InboundReference, SubjectOfInboundReference
   - Contextual: AncestorInContextualPath, AncestorInTargetContextualPath
-  - Reification: TargetOfReifiedChild
+  - Relation: TargetOfRelatedChild
   - Extended Family: SiblingOfParent, SiblingOfParentOfTarget
   - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfTarget
   - Reference Context: InboundReferenceContextualPath, SiblingOfSubjectOfInboundReference
-  - Reified Child References: InboundReferenceToTargetOfReifiedChild
+  - Related Child References: InboundReferenceToTargetOfRelatedChild
 
 - **GraphRAGResult**: Complete result containing:
   - Focus note
@@ -61,12 +61,12 @@ The system uses a layered priority approach with configurable notes-before-switc
 
 1. **Core Context** (Priority 1) - 3 notes before switching
    - `ParentRelationshipHandler`: Parent relationship
-   - `TargetRelationshipHandler`: Target relationship (for reification notes)
+   - `TargetRelationshipHandler`: Target relationship (for relation notes)
    - `AncestorInContextualPathRelationshipHandler`: Ancestors in contextual path
    - Essential for understanding the note's immediate context
 
 2. **Direct Relations** (Priority 2) - 3 notes before switching
-   - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfReifiedChild handlers to Priority 3)
+   - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelatedChild handlers to Priority 3)
    - `PriorSiblingRelationshipHandler`: Prior siblings
    - `YoungerSiblingRelationshipHandler`: Younger siblings
    - `InboundReferenceRelationshipHandler`: Inbound references (dynamically adds SubjectOfInboundReference to Priority 3, InboundReferenceContextualPath to Priority 4)
@@ -76,7 +76,7 @@ The system uses a layered priority approach with configurable notes-before-switc
 
 3. **Extended Relations** (Priority 3) - 2 notes before switching
    - Dynamically populated by Priority 2 handlers:
-   - `TargetOfReifiedChildRelationshipHandler`: Targets of reified children (dynamically adds InboundReferenceToTargetOfReifiedChild to Priority 4)
+   - `TargetOfRelatedChildRelationshipHandler`: Targets of related children (dynamically adds InboundReferenceToTargetOfRelatedChild to Priority 4)
    - `SubjectOfInboundReferenceRelationshipHandler`: Subjects of inbound references (dynamically adds SiblingOfSubjectOfInboundReference to Priority 4)
 
 4. **Distant Relations** (Priority 4) - 2 notes before switching
@@ -85,7 +85,7 @@ The system uses a layered priority approach with configurable notes-before-switc
    - `ChildOfSiblingOfParentOfTargetRelationshipHandler`: Children of target's parent's siblings
    - `InboundReferenceContextualPathRelationshipHandler`: Contextual path of inbound references
    - `SiblingOfSubjectOfInboundReferenceRelationshipHandler`: Siblings of subjects of inbound references
-   - `InboundReferenceToTargetOfReifiedChildHandler`: Inbound references to targets of reified children
+   - `InboundReferenceToTargetOfRelatedChildHandler`: Inbound references to targets of related children
 
 ## Retrieval Algorithm
 
@@ -127,7 +127,7 @@ The system uses a layered priority approach with configurable notes-before-switc
 The system manages complex relationship dependencies through dynamic handler injection:
 
 - **Priority 2 → Priority 3 Dependencies**
-  - `ChildRelationshipHandler` → adds `TargetOfReifiedChildRelationshipHandler` (when child is reified)
+  - `ChildRelationshipHandler` → adds `TargetOfRelatedChildRelationshipHandler` (when child is related)
   - `InboundReferenceRelationshipHandler` → adds `SubjectOfInboundReferenceRelationshipHandler`
 
 - **Priority 2 → Priority 4 Dependencies**
@@ -136,7 +136,7 @@ The system manages complex relationship dependencies through dynamic handler inj
   - `SiblingOfParentOfTargetRelationshipHandler` → adds `ChildOfSiblingOfParentOfTargetRelationshipHandler`
 
 - **Priority 3 → Priority 4 Dependencies**
-  - `TargetOfReifiedChildRelationshipHandler` → adds `InboundReferenceToTargetOfReifiedChildHandler`
+  - `TargetOfRelatedChildRelationshipHandler` → adds `InboundReferenceToTargetOfRelatedChildHandler`
   - `SubjectOfInboundReferenceRelationshipHandler` → adds `SiblingOfSubjectOfInboundReferenceRelationshipHandler`
 
 ## Implementation Considerations
