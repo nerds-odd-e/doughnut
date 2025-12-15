@@ -50,9 +50,11 @@ export function useNavigationItems() {
     // Recall is paused if:
     // 1. previousAnsweredQuestionCursor is set (viewing answered question), OR
     // 2. currentIndex > 0 (not at first memory tracker) AND not on recall page
+    // Resume button should only show when there are memory trackers to recall (toRepeatCount > 0)
     const isPausedByCursor = isRecallPaused.value
     const isPausedByIndex = currentIndex.value > 0 && route.name !== "recall"
-    const shouldShowResume = isPausedByCursor || isPausedByIndex
+    const shouldShowResume =
+      (isPausedByCursor || isPausedByIndex) && toRepeatCount.value > 0
 
     if (shouldShowResume) {
       return [
