@@ -59,10 +59,6 @@ export const assumeNotePage = (noteTopology?: string) => {
     return notePageMoreOptions().privateToolbarButton(btnTextOrTitle)
   }
 
-  const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
-    return toolbarButtonInNotePageMoreOptions(btnTextOrTitle).click()
-  }
-
   return {
     navigateToChild: (noteTopology: string) => {
       cy.get('main').within(() => {
@@ -189,9 +185,6 @@ export const assumeNotePage = (noteTopology?: string) => {
       }
       cy.pageIsNotLoading()
     },
-    editNoteImage() {
-      return toolbarButtonInNotePageMoreOptions('Edit Note Image')
-    },
     audioTools() {
       this.toolbarButton('Audio tools').click()
       return audioToolsPage()
@@ -214,7 +207,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)
       cy.get('#note-image').should('not.exist')
-      this.editNoteImage()
+      toolbarButtonInNotePageMoreOptions('Edit Note Image')
         .click()
         .submitWith(
           filterAttributes(attributes, [
@@ -228,9 +221,9 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {
-      clickNotePageMoreOptionsButton('Edit Note URL').submitWith(
-        filterAttributes(attributes, ['Url'])
-      )
+      toolbarButtonInNotePageMoreOptions('Edit Note URL')
+        .click()
+        .submitWith(filterAttributes(attributes, ['Url']))
       return this
     },
 
@@ -268,15 +261,15 @@ export const assumeNotePage = (noteTopology?: string) => {
       return noteCreationForm
     },
     aiGenerateImage() {
-      clickNotePageMoreOptionsButton('Generate Image with DALL-E')
+      toolbarButtonInNotePageMoreOptions('Generate Image with DALL-E').click()
     },
     deleteNote() {
-      clickNotePageMoreOptionsButton('Delete note')
+      toolbarButtonInNotePageMoreOptions('Delete note').click()
       cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
     openQuestionList() {
-      clickNotePageMoreOptionsButton('Questions for the note')
+      toolbarButtonInNotePageMoreOptions('Questions for the note').click()
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
@@ -389,7 +382,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return assumeAssociateWikidataDialog()
     },
     importObsidianData(filename: string) {
-      clickNotePageMoreOptionsButton('more options')
+      toolbarButtonInNotePageMoreOptions('more options').click()
       // Find the label containing "Import from Obsidian" text
       cy.contains('label', 'Import from Obsidian').within(() => {
         cy.get('input[type="file"]').selectFile(
