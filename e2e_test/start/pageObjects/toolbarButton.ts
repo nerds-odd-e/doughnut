@@ -1,4 +1,4 @@
-import submittableForm from '../submittableForm'
+import submittableForm from '../forms'
 
 export const toolbarButton = (btnTextOrTitle: string) => {
   const getButton = () => cy.findByRole('button', { name: btnTextOrTitle })

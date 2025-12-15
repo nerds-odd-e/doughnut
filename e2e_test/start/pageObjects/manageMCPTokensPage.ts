@@ -1,4 +1,4 @@
-import submittableForm from 'start/submittableForm'
+import submittableForm from 'start/forms'
 
 export const manageMCPTokensPage = () => {
   return {
