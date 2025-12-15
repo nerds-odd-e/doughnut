@@ -20,7 +20,7 @@ public class TargetOfRelatedChildRelationshipHandler extends RelationshipHandler
     if (!handled && targetNote != null) {
       handled = true;
       if (priorityFourLayer != null) {
-        priorityFourLayer.addHandler(new InboundReferenceToTargetOfRelatedChildHandler(targetNote));
+        priorityFourLayer.addHandler(new ReferenceByToTargetOfRelatedChildHandler(targetNote));
       }
       return targetNote;
     }

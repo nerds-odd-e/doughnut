@@ -704,7 +704,7 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasInboundReferenceNotes {
+  class WhenNoteHasReferenceByNotes {
     private Note focusNote;
     private Note inboundReferenceParent1;
     private Note inboundReferenceNote1;
@@ -729,7 +729,7 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeInboundReferenceNotesAndTheirSubjectsWhenBudgetIsEnough() {
+    void shouldIncludeReferenceByNotesAndTheirSubjectsWhenBudgetIsEnough() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       // Verify inbound reference notes are in focus note's list
@@ -740,20 +740,20 @@ public class GraphRAGServiceTest {
       // Verify inbound reference notes are in related notes
       assertRelatedNotesContain(
           result,
-          RelationshipToFocusNote.InboundReference,
+          RelationshipToFocusNote.ReferenceBy,
           inboundReferenceNote1,
           inboundReferenceNote2);
 
       // Verify inbound reference subjects are in related notes
       assertRelatedNotesContain(
           result,
-          RelationshipToFocusNote.SubjectOfInboundReference,
+          RelationshipToFocusNote.ReferencingNote,
           inboundReferenceParent1,
           inboundReferenceParent2);
     }
 
     @Test
-    void shouldNotIncludeInboundReferenceSubjectsWhenBudgetIsLimited() {
+    void shouldNotIncludeReferencingNoteSubjectsWhenBudgetIsLimited() {
       // Set budget to only allow inbound reference notes
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
@@ -763,12 +763,11 @@ public class GraphRAGServiceTest {
           result.getRelatedNotes().stream()
               .map(BareNote::getRelationToFocusNote)
               .collect(Collectors.toList()),
-          everyItem(equalTo(RelationshipToFocusNote.InboundReference)));
+          everyItem(equalTo(RelationshipToFocusNote.ReferenceBy)));
 
       // Verify no inbound reference subjects are included
       assertThat(
-          getNotesWithRelationship(result, RelationshipToFocusNote.SubjectOfInboundReference),
-          empty());
+          getNotesWithRelationship(result, RelationshipToFocusNote.ReferencingNote), empty());
     }
   }
 
@@ -890,7 +889,7 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenTargetOfRelatedChildHasInboundReferences {
+  class WhenTargetOfRelatedChildHasReferenceBy {
     private Note focusNote;
     private Note relatedChild;
     private Note targetNote;
@@ -919,26 +918,26 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeInboundReferencesToTargetOfRelatedChild() {
+    void shouldIncludeReferenceByToTargetOfRelatedChild() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       // Verify inbound references to target are included
       assertRelatedNotesContain(
           result,
-          RelationshipToFocusNote.InboundReferenceToTargetOfRelatedChild,
+          RelationshipToFocusNote.ReferenceByToTargetOfRelatedChild,
           inboundReference1,
           inboundReference2);
     }
 
     @Test
-    void shouldNotIncludeInboundReferencesToTargetWhenBudgetIsLimited() {
+    void shouldNotIncludeReferenceByToTargetWhenBudgetIsLimited() {
       // Set budget to only allow up to target of related child
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
       // Verify no inbound references to target are included
       assertThat(
           getNotesWithRelationship(
-              result, RelationshipToFocusNote.InboundReferenceToTargetOfRelatedChild),
+              result, RelationshipToFocusNote.ReferenceByToTargetOfRelatedChild),
           empty());
     }
   }

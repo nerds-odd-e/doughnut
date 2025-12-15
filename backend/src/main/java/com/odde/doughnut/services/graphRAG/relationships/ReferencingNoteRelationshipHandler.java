@@ -24,7 +24,7 @@ public class ReferencingNoteRelationshipHandler extends RelationshipHandler {
       // Push cousins (children of referring subject) to layer 4
       if (priorityFourLayer != null) {
         priorityFourLayer.addHandler(
-            new SiblingOfSubjectOfInboundReferenceRelationshipHandler(referringSubject));
+            new SiblingOfReferencingNoteRelationshipHandler(referringSubject));
       }
 
       return referringSubject;

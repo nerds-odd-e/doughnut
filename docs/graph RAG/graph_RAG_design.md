@@ -43,13 +43,13 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
 - **RelationshipToFocusNote**: Enumeration of possible relationships:
   - Direct: Self, Parent, RelationshipTarget, Child
   - Sibling: OlderSibling, YoungerSibling
-  - Reference: InboundReference, SubjectOfInboundReference
+  - Reference: ReferenceBy, ReferencingNote
   - Contextual: AncestorInContextualPath, AncestorInTargetContextualPath
   - Relation: TargetOfRelatedChild
   - Extended Family: SiblingOfParent, SiblingOfParentOfTarget
   - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfTarget
-  - Reference Context: InboundReferenceContextualPath, SiblingOfSubjectOfInboundReference
-  - Related Child References: InboundReferenceToTargetOfRelatedChild
+  - Reference Context: ReferenceByContextualPath, SiblingOfReferencingNote
+  - Related Child References: ReferenceByToTargetOfRelatedChild
 
 - **GraphRAGResult**: Complete result containing:
   - Focus note
@@ -69,23 +69,23 @@ The system uses a layered priority approach with configurable notes-before-switc
    - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelatedChild handlers to Priority 3)
    - `OlderSiblingRelationshipHandler`: Older siblings
    - `YoungerSiblingRelationshipHandler`: Younger siblings
-   - `InboundReferenceRelationshipHandler`: Inbound references (dynamically adds SubjectOfInboundReference to Priority 3, InboundReferenceContextualPath to Priority 4)
+   - `ReferenceByRelationshipHandler`: Reference by notes (dynamically adds ReferencingNote to Priority 3, ReferenceByContextualPath to Priority 4)
    - `AncestorInTargetContextualPathRelationshipHandler`: Ancestors in target's contextual path
    - `SiblingOfParentRelationshipHandler`: Siblings of parent (dynamically adds ChildOfSiblingOfParent to Priority 4)
    - `SiblingOfParentOfTargetRelationshipHandler`: Siblings of parent of target (dynamically adds ChildOfSiblingOfParentOfTarget to Priority 4)
 
 3. **Extended Relations** (Priority 3) - 2 notes before switching
    - Dynamically populated by Priority 2 handlers:
-   - `TargetOfRelatedChildRelationshipHandler`: Targets of related children (dynamically adds InboundReferenceToTargetOfRelatedChild to Priority 4)
-   - `SubjectOfInboundReferenceRelationshipHandler`: Subjects of inbound references (dynamically adds SiblingOfSubjectOfInboundReference to Priority 4)
+   - `TargetOfRelatedChildRelationshipHandler`: Targets of related children (dynamically adds ReferenceByToTargetOfRelatedChild to Priority 4)
+   - `ReferencingNoteRelationshipHandler`: Referencing notes (dynamically adds SiblingOfReferencingNote to Priority 4)
 
 4. **Distant Relations** (Priority 4) - 2 notes before switching
    - Dynamically populated by Priority 2 and Priority 3 handlers:
    - `ChildOfSiblingOfParentRelationshipHandler`: Children of parent's siblings (cousins)
    - `ChildOfSiblingOfParentOfTargetRelationshipHandler`: Children of target's parent's siblings
-   - `InboundReferenceContextualPathRelationshipHandler`: Contextual path of inbound references
-   - `SiblingOfSubjectOfInboundReferenceRelationshipHandler`: Siblings of subjects of inbound references
-   - `InboundReferenceToTargetOfRelatedChildHandler`: Inbound references to targets of related children
+   - `ReferenceByContextualPathRelationshipHandler`: Contextual path of reference by notes
+   - `SiblingOfReferencingNoteRelationshipHandler`: Siblings of referencing notes
+   - `ReferenceByToTargetOfRelatedChildHandler`: Reference by notes to targets of related children
 
 ## Retrieval Algorithm
 
@@ -128,16 +128,16 @@ The system manages complex relationship dependencies through dynamic handler inj
 
 - **Priority 2 → Priority 3 Dependencies**
   - `ChildRelationshipHandler` → adds `TargetOfRelatedChildRelationshipHandler` (when child is related)
-  - `InboundReferenceRelationshipHandler` → adds `SubjectOfInboundReferenceRelationshipHandler`
+  - `ReferenceByRelationshipHandler` → adds `ReferencingNoteRelationshipHandler`
 
 - **Priority 2 → Priority 4 Dependencies**
-  - `InboundReferenceRelationshipHandler` → adds `InboundReferenceContextualPathRelationshipHandler`
+  - `ReferenceByRelationshipHandler` → adds `ReferenceByContextualPathRelationshipHandler`
   - `SiblingOfParentRelationshipHandler` → adds `ChildOfSiblingOfParentRelationshipHandler`
   - `SiblingOfParentOfTargetRelationshipHandler` → adds `ChildOfSiblingOfParentOfTargetRelationshipHandler`
 
 - **Priority 3 → Priority 4 Dependencies**
-  - `TargetOfRelatedChildRelationshipHandler` → adds `InboundReferenceToTargetOfRelatedChildHandler`
-  - `SubjectOfInboundReferenceRelationshipHandler` → adds `SiblingOfSubjectOfInboundReferenceRelationshipHandler`
+  - `TargetOfRelatedChildRelationshipHandler` → adds `ReferenceByToTargetOfRelatedChildHandler`
+  - `ReferencingNoteRelationshipHandler` → adds `SiblingOfReferencingNoteRelationshipHandler`
 
 ## Implementation Considerations
 

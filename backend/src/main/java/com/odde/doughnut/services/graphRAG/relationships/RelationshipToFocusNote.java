@@ -15,8 +15,8 @@ public enum RelationshipToFocusNote {
 
   // Target neighborhood
   SiblingOfTarget,
-  InboundReference,
-  SubjectOfInboundReference,
+  ReferenceBy,
+  ReferencingNote,
   AncestorInContextualPath,
   AncestorInTargetContextualPath,
   TargetOfRelatedChild,
@@ -24,9 +24,9 @@ public enum RelationshipToFocusNote {
   SiblingOfParentOfTarget,
   ChildOfSiblingOfParent,
   ChildOfSiblingOfParentOfTarget,
-  InboundReferenceContextualPath,
-  SiblingOfSubjectOfInboundReference,
-  InboundReferenceToTargetOfRelatedChild,
+  ReferenceByContextualPath,
+  SiblingOfReferencingNote,
+  ReferenceByToTargetOfRelatedChild,
   SubjectOfTargetSibling,
   RemotelyRelated
 }
