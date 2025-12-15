@@ -46,17 +46,21 @@ export const assumeNotePage = (noteTopology?: string) => {
     }
   }
 
-  const notePageMoreOptionsButton = (btnTextOrTitle: string) => {
+  const notePageMoreOptions = () => {
     cy.findByRole('button', { name: 'more options' }).then(($button) => {
       if (!$button.hasClass('daisy-btn-active')) {
         cy.wrap($button).click()
       }
     })
-    return privateToolbarButton(btnTextOrTitle)
+    return { privateToolbarButton }
+  }
+
+  const toolbarButtonInNotePageMoreOptions = (btnTextOrTitle: string) => {
+    return notePageMoreOptions().privateToolbarButton(btnTextOrTitle)
   }
 
   const clickNotePageMoreOptionsButton = (btnTextOrTitle: string) => {
-    return notePageMoreOptionsButton(btnTextOrTitle).click()
+    return toolbarButtonInNotePageMoreOptions(btnTextOrTitle).click()
   }
 
   return {
@@ -186,7 +190,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       cy.pageIsNotLoading()
     },
     editNoteImage() {
-      return notePageMoreOptionsButton('Edit Note Image')
+      return toolbarButtonInNotePageMoreOptions('Edit Note Image')
     },
     audioTools() {
       this.toolbarButton('Audio tools').click()
