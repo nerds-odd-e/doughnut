@@ -526,7 +526,7 @@ export type BareNote = {
     title?: string;
     targetUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelatedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'SiblingOfReferencingNote' | 'ReferenceByToTargetOfRelatedChild' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelationship' | 'RelationshipOfTargetSibling' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'SiblingOfReferencingNote' | 'ReferenceByToTargetOfRelatedChild' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -539,7 +539,7 @@ export type FocusNote = {
     title?: string;
     targetUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelatedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'SiblingOfReferencingNote' | 'ReferenceByToTargetOfRelatedChild' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Child' | 'OlderSibling' | 'YoungerSibling' | 'RelationshipTarget' | 'Relationship' | 'SiblingOfTarget' | 'ReferenceBy' | 'ReferencingNote' | 'ContextAncestor' | 'TargetContextAncestor' | 'ReferenceContextAncestor' | 'TargetOfRelationship' | 'RelationshipOfTargetSibling' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'SiblingOfReferencingNote' | 'ReferenceByToTargetOfRelatedChild' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;

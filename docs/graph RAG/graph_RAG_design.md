@@ -45,7 +45,7 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
   - Sibling: OlderSibling, YoungerSibling
   - Reference: ReferenceBy, ReferencingNote
   - Contextual: ContextAncestor, TargetContextAncestor
-  - Relation: TargetOfRelatedChild
+  - Relation: TargetOfRelationship
   - Extended Family: SiblingOfParent, SiblingOfParentOfTarget
   - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfTarget
   - Reference Context: ReferenceContextAncestor, SiblingOfReferencingNote
@@ -66,7 +66,7 @@ The system uses a layered priority approach with configurable notes-before-switc
    - Essential for understanding the note's immediate context
 
 2. **Direct Relations** (Priority 2) - 3 notes before switching
-   - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelatedChild handlers to Priority 3)
+   - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelationship handlers to Priority 3)
    - `OlderSiblingRelationshipHandler`: Older siblings
    - `YoungerSiblingRelationshipHandler`: Younger siblings
    - `ReferenceByRelationshipHandler`: Reference by notes (dynamically adds ReferencingNote to Priority 3, ReferenceContextAncestor to Priority 4)
@@ -76,7 +76,7 @@ The system uses a layered priority approach with configurable notes-before-switc
 
 3. **Extended Relations** (Priority 3) - 2 notes before switching
    - Dynamically populated by Priority 2 handlers:
-   - `TargetOfRelatedChildRelationshipHandler`: Targets of related children (dynamically adds ReferenceByToTargetOfRelatedChild to Priority 4)
+   - `TargetOfRelationshipRelationshipHandler`: Targets of relationships (dynamically adds ReferenceByToTargetOfRelatedChild to Priority 4)
    - `ReferencingNoteRelationshipHandler`: Referencing notes (dynamically adds SiblingOfReferencingNote to Priority 4)
 
 4. **Distant Relations** (Priority 4) - 2 notes before switching
@@ -127,7 +127,7 @@ The system uses a layered priority approach with configurable notes-before-switc
 The system manages complex relationship dependencies through dynamic handler injection:
 
 - **Priority 2 → Priority 3 Dependencies**
-  - `ChildRelationshipHandler` → adds `TargetOfRelatedChildRelationshipHandler` (when child is related)
+  - `ChildRelationshipHandler` → adds `TargetOfRelationshipRelationshipHandler` (when child is related)
   - `ReferenceByRelationshipHandler` → adds `ReferencingNoteRelationshipHandler`
 
 - **Priority 2 → Priority 4 Dependencies**
@@ -136,7 +136,7 @@ The system manages complex relationship dependencies through dynamic handler inj
   - `SiblingOfParentOfTargetRelationshipHandler` → adds `ChildOfSiblingOfParentOfTargetRelationshipHandler`
 
 - **Priority 3 → Priority 4 Dependencies**
-  - `TargetOfRelatedChildRelationshipHandler` → adds `ReferenceByToTargetOfRelatedChildHandler`
+  - `TargetOfRelationshipRelationshipHandler` → adds `ReferenceByToTargetOfRelatedChildHandler`
   - `ReferencingNoteRelationshipHandler` → adds `SiblingOfReferencingNoteRelationshipHandler`
 
 ## Implementation Considerations

@@ -24,13 +24,16 @@ public enum RelationshipToFocusNote {
   ContextAncestor,
   TargetContextAncestor,
   ReferenceContextAncestor,
-  TargetOfRelatedChild,
+
+  // Relationship-derived
+  TargetOfRelationship,
+  RelationshipOfTargetSibling,
+
   SiblingOfParent,
   SiblingOfParentOfTarget,
   ChildOfSiblingOfParent,
   ChildOfSiblingOfParentOfTarget,
   SiblingOfReferencingNote,
   ReferenceByToTargetOfRelatedChild,
-  SubjectOfTargetSibling,
   RemotelyRelated
 }

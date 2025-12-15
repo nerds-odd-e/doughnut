@@ -284,7 +284,10 @@ public class GraphRAGServiceTest {
         Note siblingParent2 = targetSibling2.getParent();
 
         assertRelatedNotesContain(
-            result, RelationshipToFocusNote.SubjectOfTargetSibling, siblingParent1, siblingParent2);
+            result,
+            RelationshipToFocusNote.RelationshipOfTargetSibling,
+            siblingParent1,
+            siblingParent2);
       }
 
       @Test
@@ -294,7 +297,7 @@ public class GraphRAGServiceTest {
 
         // Verify no subjects of target siblings are included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.SubjectOfTargetSibling),
+            getNotesWithRelationship(result, RelationshipToFocusNote.RelationshipOfTargetSibling),
             empty());
       }
     }
@@ -573,7 +576,7 @@ public class GraphRAGServiceTest {
     void shouldIncludeChildTargetInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelatedChild, targetNote);
+      assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
 
       // Child should still be in children list
       assertThat(result.getFocusNote().getChildren(), contains(relatedChild.getUri()));
@@ -640,10 +643,10 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Relationship,
-                RelationshipToFocusNote.TargetOfRelatedChild));
+                RelationshipToFocusNote.TargetOfRelationship));
 
         // Verify the related child target is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelatedChild, targetNote);
+        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
       }
 
       @Test
@@ -661,7 +664,7 @@ public class GraphRAGServiceTest {
                 relatedChild.getUri()));
 
         // Verify the related child target is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelatedChild, targetNote);
+        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfRelationship, targetNote);
       }
 
       @Test
@@ -690,7 +693,7 @@ public class GraphRAGServiceTest {
 
         // Verify no related child target is included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelatedChild),
+            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfRelationship),
             empty());
       }
     }
@@ -882,7 +885,7 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenTargetOfRelatedChildHasReferenceBy {
+  class WhenTargetOfRelationshipHasReferenceBy {
     private Note focusNote;
     private Note relatedChild;
     private Note targetNote;
@@ -911,7 +914,7 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeReferenceByToTargetOfRelatedChild() {
+    void shouldIncludeReferenceByToTargetOfRelationship() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       // Verify inbound references to target are included

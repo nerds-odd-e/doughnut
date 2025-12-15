@@ -37,7 +37,8 @@ public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
 
       // Add subject of target sibling to priority 3
       if (priorityThreeLayer != null) {
-        priorityThreeLayer.addHandler(new SubjectOfTargetSiblingRelationshipHandler(targetSibling));
+        priorityThreeLayer.addHandler(
+            new RelationshipOfTargetSiblingRelationshipHandler(targetSibling));
       }
 
       return targetSibling;

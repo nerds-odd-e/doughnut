@@ -27,8 +27,8 @@ public class ChildRelationshipHandler extends RelationshipHandler {
 
       // If this child is a related note, add its target to priority 3
       if (child.getTargetNote() != null && priorityThreeLayer != null) {
-        TargetOfRelatedChildRelationshipHandler handler =
-            new TargetOfRelatedChildRelationshipHandler(child, priorityFourLayer);
+        TargetOfRelationshipRelationshipHandler handler =
+            new TargetOfRelationshipRelationshipHandler(child, priorityFourLayer);
         priorityThreeLayer.addHandler(handler);
       }
 
