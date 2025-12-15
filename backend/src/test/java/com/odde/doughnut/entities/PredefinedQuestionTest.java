@@ -91,6 +91,18 @@ class PredefinedQuestionTest {
     }
 
     @Test
+    void shouldReturnOriginalQuestionWhenEvaluationApiFails() {
+      when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);
+      // Simulate evaluation API failure by returning null
+      when(aiQuestionGenerator.getQuestionContestResult(any(), any())).thenReturn(null);
+
+      PredefinedQuestion result = predefinedQuestionService.generateAFeasibleQuestion(note);
+
+      // Should still return the generated question even when evaluation fails
+      assertThat(result.getMcqWithAnswer(), equalTo(mcqWithAnswer));
+    }
+
+    @Test
     void shouldRegenerateQuestionWhenEvaluationShowsNotFeasible() {
       MCQWithAnswer regeneratedQuestion = makeMe.aMCQWithAnswer().please();
       when(aiQuestionGenerator.getAiGeneratedQuestion(any(), any())).thenReturn(mcqWithAnswer);

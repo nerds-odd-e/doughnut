@@ -103,7 +103,7 @@ public class NoteQuestionGenerationService {
             AiToolFactory.questionEvaluationAiTool(question), chatRequestBuilder);
 
     if (result.isEmpty()) {
-      throw new RuntimeException("Failed to evaluate question: No valid response from API");
+      return Optional.empty();
     }
 
     return result.map(

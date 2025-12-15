@@ -10,10 +10,12 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.NotebookAiAssistant;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
+import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -779,6 +781,60 @@ class NoteQuestionGenerationServiceTests {
           "Request should contain both link type and note type instructions",
           hasLinkTypeInstruction && hasNoteTypeInstruction,
           is(true));
+    }
+  }
+
+  @Nested
+  class EvaluateQuestion {
+    @Test
+    void shouldReturnEmptyWhenEvaluationFails() throws Exception {
+      // Mock AI response for question generation
+      MCQWithAnswer mcqWithAnswer =
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the capital of France?")
+              .choices("Paris", "London", "Berlin")
+              .correctChoiceIndex(0)
+              .please();
+
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
+
+      // Mock null response for evaluation (simulating API failure)
+      openAIChatCompletionMock.mockNullChatCompletion();
+
+      // Execute
+      Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
+
+      // Verify that evaluation failure returns empty Optional instead of throwing
+      assertThat(result, is(Optional.empty()));
+    }
+
+    @Test
+    void shouldReturnEvaluationWhenEvaluationSucceeds() throws Exception {
+      // Mock AI response for question generation
+      MCQWithAnswer mcqWithAnswer =
+          makeMe
+              .aMCQWithAnswer()
+              .stem("What is the capital of France?")
+              .choices("Paris", "London", "Berlin")
+              .correctChoiceIndex(0)
+              .please();
+
+      // Mock successful evaluation response
+      QuestionEvaluation evaluation = new QuestionEvaluation();
+      evaluation.feasibleQuestion = true;
+      evaluation.correctChoices = new int[] {0};
+      evaluation.improvementAdvices = "Good question";
+
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
+
+      // Execute
+      Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
+
+      // Verify that evaluation returns the result
+      assertThat(result.isPresent(), is(true));
+      assertThat(result.get().feasibleQuestion, is(true));
+      assertThat(result.get().correctChoices, equalTo(new int[] {0}));
     }
   }
 }
