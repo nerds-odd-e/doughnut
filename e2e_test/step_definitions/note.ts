@@ -573,10 +573,6 @@ Then('the note details should contain a line break', () => {
   start.assumeNotePage().expectNoteDetailsContainLineBreak()
 })
 
-When('I add note type {string} to my note', (noteType: string) => {
-  start.assumeNotePage().updateNoteType(noteType)
-})
-
 Given('AI will generate question for note with type:', (data: DataTable) => {
   const noteTypeToQuestion: Record<string, string> = {}
   data.hashes().forEach((row) => {

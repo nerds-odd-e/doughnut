@@ -4,26 +4,16 @@ Feature: Note type
   Background:
     Given I am logged in as an existing user
     And I have a notebook with the head note "Reservoirs" and details "The most popular reservoir to hike in is Macritchie"
-
-  Scenario: Adding note type to my new note
-    When I navigate to "Reservoirs" note
-    And I add note type "concept" to my note
-
-    
-  Scenario: Changing note type of existing note
-    When I navigate to "Reservoirs" note
-    And I add note type "concept" to my note
-    And I add note type "journal" to my note
-
-  @usingMockedOpenAiService
-  Scenario Outline: AI will interpret note type when generating questions
-    Given AI will generate question for note with type:
+    And AI will generate question for note with type:
      | note type | question                                       |
      | journal   | What is the most popular reservoir to hike in? |
      | vocab     | What does the word reservoir mean?             |
-    And I learned one note "Reservoirs" on day 1
-    When I assign note type "<Note Type>" for note "Reservoirs"
-    And I am recalling my note on day 2
+
+  @usingMockedOpenAiService
+  Scenario Outline: AI will interpret note type when generating questions
+    Given I learned one note "Reservoirs" on day 1
+    And I assign note type "<Note Type>" for note "Reservoirs"
+    When I am recalling my note on day 2
     Then I should be asked "<Question>"
 
     Examples:
