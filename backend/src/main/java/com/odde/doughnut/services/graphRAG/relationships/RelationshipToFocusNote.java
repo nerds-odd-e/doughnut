@@ -5,11 +5,16 @@ public enum RelationshipToFocusNote {
 
   // Core structure
   Parent,
-  Target,
   Child,
-  Relationship,
   OlderSibling,
   YoungerSibling,
+
+  // Core relationships
+  RelationshipTarget,
+  Relationship,
+
+  // Target neighborhood
+  TargetSibling,
   InboundReference,
   SubjectOfInboundReference,
   AncestorInContextualPath,
@@ -22,7 +27,6 @@ public enum RelationshipToFocusNote {
   InboundReferenceContextualPath,
   SiblingOfSubjectOfInboundReference,
   InboundReferenceToTargetOfRelatedChild,
-  TargetSibling,
   SubjectOfTargetSibling,
   RemotelyRelated
 }

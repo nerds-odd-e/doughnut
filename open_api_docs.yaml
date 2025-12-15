@@ -4566,11 +4566,11 @@ components:
           enum:
           - Self
           - Parent
-          - Target
           - Child
-          - Relationship
           - OlderSibling
           - YoungerSibling
+          - RelationshipTarget
+          - Relationship
           - InboundReference
           - SubjectOfInboundReference
           - AncestorInContextualPath
@@ -4613,11 +4613,11 @@ components:
           enum:
           - Self
           - Parent
-          - Target
           - Child
-          - Relationship
           - OlderSibling
           - YoungerSibling
+          - RelationshipTarget
+          - Relationship
           - InboundReference
           - SubjectOfInboundReference
           - AncestorInContextualPath

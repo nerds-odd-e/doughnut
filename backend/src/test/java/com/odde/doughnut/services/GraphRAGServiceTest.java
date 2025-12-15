@@ -143,7 +143,7 @@ public class GraphRAGServiceTest {
       assertThat(result.getRelatedNotes(), hasSize(2));
       assertThat(
           result.getRelatedNotes().stream()
-              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Target)
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.RelationshipTarget)
               .findFirst()
               .get(),
           equalTo(target));
@@ -215,7 +215,7 @@ public class GraphRAGServiceTest {
             result.getRelatedNotes().stream()
                 .map(BareNote::getRelationToFocusNote)
                 .collect(Collectors.toList()),
-            contains(RelationshipToFocusNote.Parent, RelationshipToFocusNote.Target));
+            contains(RelationshipToFocusNote.Parent, RelationshipToFocusNote.RelationshipTarget));
 
         // Verify no target contextual path notes are included
         assertThat(

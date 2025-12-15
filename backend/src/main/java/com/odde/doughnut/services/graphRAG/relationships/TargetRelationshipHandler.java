@@ -6,7 +6,7 @@ public class TargetRelationshipHandler extends RelationshipHandler {
   private boolean exhausted = false;
 
   public TargetRelationshipHandler(Note relatingNote) {
-    super(RelationshipToFocusNote.Target, relatingNote);
+    super(RelationshipToFocusNote.RelationshipTarget, relatingNote);
   }
 
   @Override

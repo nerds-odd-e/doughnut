@@ -41,7 +41,7 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
     - `inboundReferences`: Inbound reference note URIs
 
 - **RelationshipToFocusNote**: Enumeration of possible relationships:
-  - Direct: Self, Parent, Target, Child
+  - Direct: Self, Parent, RelationshipTarget, Child
   - Sibling: OlderSibling, YoungerSibling
   - Reference: InboundReference, SubjectOfInboundReference
   - Contextual: AncestorInContextualPath, AncestorInTargetContextualPath
