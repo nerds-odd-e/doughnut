@@ -126,7 +126,7 @@ Relationship	Neighbor Definition
 parent	ParentOf(node)
 target	RelationTargetOf(node)
 sibling	NearestStructuralSibling(node)
-target-sibling	NearestTargetSibling(node)
+target-sibling	NearestSiblingOfTarget(node)
 child	PickOneChild(node) (seed)
 inbound-ref	PickOneInbound(node) (seed)
 

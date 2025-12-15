@@ -227,7 +227,7 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasTargetSiblings {
+  class WhenNoteHasSiblingsOfTarget {
     private Note target;
     private Note focusNote;
     private Note targetSibling1;
@@ -248,19 +248,19 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldIncludeTargetSiblingsInRelatedNotes() {
+    void shouldIncludeSiblingsOfTargetInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       assertRelatedNotesContain(
-          result, RelationshipToFocusNote.TargetSibling, targetSibling1, targetSibling2);
+          result, RelationshipToFocusNote.SiblingOfTarget, targetSibling1, targetSibling2);
     }
 
     @Test
-    void shouldNotIncludeFocusNoteAsTargetSibling() {
+    void shouldNotIncludeFocusNoteAsSiblingOfTarget() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       List<BareNote> targetSiblings =
-          getNotesWithRelationship(result, RelationshipToFocusNote.TargetSibling);
+          getNotesWithRelationship(result, RelationshipToFocusNote.SiblingOfTarget);
       assertThat(targetSiblings, hasSize(2));
       assertThat(
           targetSiblings.stream().map(BareNote::getUri).collect(Collectors.toList()),
@@ -268,18 +268,19 @@ public class GraphRAGServiceTest {
     }
 
     @Test
-    void shouldNotIncludeTargetSiblingsWhenBudgetIsLimited() {
+    void shouldNotIncludeSiblingsOfTargetWhenBudgetIsLimited() {
       // Set budget to only allow parent and target
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
       // Verify no target siblings are included
-      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.TargetSibling), empty());
+      assertThat(
+          getNotesWithRelationship(result, RelationshipToFocusNote.SiblingOfTarget), empty());
     }
 
     @Nested
-    class WhenTargetSiblingsHaveSubjects {
+    class WhenSiblingsOfTargetHaveSubjects {
       @Test
-      void shouldIncludeSubjectsOfTargetSiblingsInRelatedNotes() {
+      void shouldIncludeSubjectsOfSiblingsOfTargetInRelatedNotes() {
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
         // Get the parent notes of target siblings
@@ -291,7 +292,7 @@ public class GraphRAGServiceTest {
       }
 
       @Test
-      void shouldNotIncludeSubjectsOfTargetSiblingsWhenBudgetIsLimited() {
+      void shouldNotIncludeSubjectsOfSiblingsOfTargetWhenBudgetIsLimited() {
         // Set budget to only allow parent, target, and target siblings
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
 

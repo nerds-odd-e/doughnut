@@ -4571,6 +4571,7 @@ components:
           - YoungerSibling
           - RelationshipTarget
           - Relationship
+          - SiblingOfTarget
           - InboundReference
           - SubjectOfInboundReference
           - AncestorInContextualPath
@@ -4583,7 +4584,6 @@ components:
           - InboundReferenceContextualPath
           - SiblingOfSubjectOfInboundReference
           - InboundReferenceToTargetOfRelatedChild
-          - TargetSibling
           - SubjectOfTargetSibling
           - RemotelyRelated
         details:
@@ -4618,6 +4618,7 @@ components:
           - YoungerSibling
           - RelationshipTarget
           - Relationship
+          - SiblingOfTarget
           - InboundReference
           - SubjectOfInboundReference
           - AncestorInContextualPath
@@ -4630,7 +4631,6 @@ components:
           - InboundReferenceContextualPath
           - SiblingOfSubjectOfInboundReference
           - InboundReferenceToTargetOfRelatedChild
-          - TargetSibling
           - SubjectOfTargetSibling
           - RemotelyRelated
         details:

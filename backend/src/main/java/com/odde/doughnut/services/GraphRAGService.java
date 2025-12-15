@@ -52,7 +52,7 @@ public class GraphRAGService {
     priorityTwoHandlers.add(
         new SiblingOfParentOfTargetRelationshipHandler(focusNote, priorityFourLayer));
     priorityTwoHandlers.add(
-        new TargetSiblingRelationshipHandler(focusNote, noteRepository, priorityThreeLayer));
+        new SiblingOfTargetRelationshipHandler(focusNote, noteRepository, priorityThreeLayer));
     PriorityLayer priorityTwoLayer =
         new PriorityLayer(3, priorityTwoHandlers.toArray(new RelationshipHandler[0]));
 

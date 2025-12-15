@@ -14,7 +14,7 @@ public enum RelationshipToFocusNote {
   Relationship,
 
   // Target neighborhood
-  TargetSibling,
+  SiblingOfTarget,
   InboundReference,
   SubjectOfInboundReference,
   AncestorInContextualPath,

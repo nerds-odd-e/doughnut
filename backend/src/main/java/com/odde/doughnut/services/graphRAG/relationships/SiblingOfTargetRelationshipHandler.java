@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class TargetSiblingRelationshipHandler extends RelationshipHandler {
+public class SiblingOfTargetRelationshipHandler extends RelationshipHandler {
   private final List<Note> targetSiblings;
   private int currentIndex = 0;
   private final PriorityLayer priorityThreeLayer;
 
-  public TargetSiblingRelationshipHandler(
+  public SiblingOfTargetRelationshipHandler(
       Note relatingNote, NoteRepository noteRepository, PriorityLayer priorityThreeLayer) {
-    super(RelationshipToFocusNote.TargetSibling, relatingNote);
+    super(RelationshipToFocusNote.SiblingOfTarget, relatingNote);
     this.priorityThreeLayer = priorityThreeLayer;
     if (relatingNote.getTargetNote() != null) {
       List<Note> allNotesWithSameTarget =
