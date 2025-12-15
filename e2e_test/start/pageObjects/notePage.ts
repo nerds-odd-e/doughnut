@@ -52,14 +52,32 @@ export const assumeNotePage = (noteTopology?: string) => {
         cy.wrap($button).click()
       }
     })
-    return { privateToolbarButton }
-  }
-
-  const toolbarButtonInNotePageMoreOptions = (btnTextOrTitle: string) => {
-    return notePageMoreOptions().privateToolbarButton(btnTextOrTitle)
+    return {
+      privateToolbarButton,
+      expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
+        for (const k in expected) {
+          cy.contains('tr', expected[k]?.type ?? '').within(() => {
+            for (const attr in expected[k]) {
+              if (expected[k][attr] !== undefined) {
+                cy.contains('td', expected[k][attr])
+              }
+            }
+          })
+        }
+      },
+      removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
+        cy.contains('tr', type).click()
+        cy.url().should('include', '/d/memory-trackers/')
+        cy.pageIsNotLoading()
+        return assumeMemoryTrackerPage().removeFromReview()
+      },
+    }
   }
 
   return {
+    moreOptions: () => {
+      return notePageMoreOptions()
+    },
     navigateToChild: (noteTopology: string) => {
       cy.get('main').within(() => {
         cy.findCardTitle(noteTopology).click()
@@ -207,7 +225,8 @@ export const assumeNotePage = (noteTopology?: string) => {
     updateNoteImage(attributes: Record<string, string>) {
       // Before upload, the image should not be visible (simulate new upload)
       cy.get('#note-image').should('not.exist')
-      toolbarButtonInNotePageMoreOptions('Edit Note Image')
+      this.moreOptions()
+        .privateToolbarButton('Edit Note Image')
         .click()
         .submitWith(
           filterAttributes(attributes, [
@@ -221,25 +240,17 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
     updateNoteUrl(attributes: Record<string, string>) {
-      toolbarButtonInNotePageMoreOptions('Edit Note URL')
+      this.moreOptions()
+        .privateToolbarButton('Edit Note URL')
         .click()
         .submitWith(filterAttributes(attributes, ['Url']))
       return this
     },
 
     updateNoteType(noteType: string) {
-      cy.findByRole('button', { name: 'more options' }).then(($button) => {
-        if (!$button.hasClass('daisy-btn-active')) {
-          cy.wrap($button).click()
-        }
-      })
+      this.moreOptions()
       cy.get('#note-noteType').select(noteType)
       cy.pageIsNotLoading()
-      return this
-    },
-
-    selectNoteType(noteType: string) {
-      cy.get('#note-noteType').should('be.visible').select(noteType)
       return this
     },
 
@@ -261,15 +272,17 @@ export const assumeNotePage = (noteTopology?: string) => {
       return noteCreationForm
     },
     aiGenerateImage() {
-      toolbarButtonInNotePageMoreOptions('Generate Image with DALL-E').click()
+      this.moreOptions()
+        .privateToolbarButton('Generate Image with DALL-E')
+        .click()
     },
     deleteNote() {
-      toolbarButtonInNotePageMoreOptions('Delete note').click()
+      this.moreOptions().privateToolbarButton('Delete note').click()
       cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
     openQuestionList() {
-      toolbarButtonInNotePageMoreOptions('Questions for the note').click()
+      this.moreOptions().privateToolbarButton('Questions for the note').click()
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
@@ -355,34 +368,12 @@ export const assumeNotePage = (noteTopology?: string) => {
           cy.get('@currentNote').trigger('dragend')
         })
     },
-    memoryTracker() {
-      privateToolbarButton('more options').click()
-      return {
-        expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
-          for (const k in expected) {
-            cy.contains('tr', expected[k]?.type ?? '').within(() => {
-              for (const attr in expected[k]) {
-                if (expected[k][attr] !== undefined) {
-                  cy.contains('td', expected[k][attr])
-                }
-              }
-            })
-          }
-        },
-        removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
-          cy.contains('tr', type).click()
-          cy.url().should('include', '/d/memory-trackers/')
-          cy.pageIsNotLoading()
-          return assumeMemoryTrackerPage().removeFromReview()
-        },
-      }
-    },
     associateWikidataDialog() {
       privateToolbarButton('associate wikidata').click()
       return assumeAssociateWikidataDialog()
     },
     importObsidianData(filename: string) {
-      toolbarButtonInNotePageMoreOptions('more options').click()
+      this.moreOptions().privateToolbarButton('more options').click()
       // Find the label containing "Import from Obsidian" text
       cy.contains('label', 'Import from Obsidian').within(() => {
         cy.get('input[type="file"]').selectFile(
