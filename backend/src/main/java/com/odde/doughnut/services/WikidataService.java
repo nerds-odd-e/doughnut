@@ -12,23 +12,28 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 public class WikidataService {
-  private final WikidataApi wikidataApi;
+  private final HttpClientAdapter httpClientAdapter;
+  private final TestabilitySettings testabilitySettings;
 
   public WikidataService(
       HttpClientAdapter httpClientAdapter, TestabilitySettings testabilitySettings) {
-    this.wikidataApi =
-        new WikidataApi(
-            new QueryBuilder(
-                httpClientAdapter,
-                UriComponentsBuilder.fromHttpUrl(testabilitySettings.getWikidataServiceUrl())));
+    this.httpClientAdapter = httpClientAdapter;
+    this.testabilitySettings = testabilitySettings;
+  }
+
+  private WikidataApi getWikidataApi() {
+    return new WikidataApi(
+        new QueryBuilder(
+            httpClientAdapter,
+            UriComponentsBuilder.fromHttpUrl(testabilitySettings.getWikidataServiceUrl())));
   }
 
   public List<WikidataSearchEntity> searchWikidata(String search)
       throws IOException, InterruptedException {
-    return wikidataApi.getWikidataSearchEntities(search).getWikidataSearchEntities();
+    return getWikidataApi().getWikidataSearchEntities(search).getWikidataSearchEntities();
   }
 
   public WikidataIdWithApi wrapWikidataIdWithApi(String wikidataId) {
-    return new WikidataId(wikidataId).withApi(wikidataApi);
+    return new WikidataId(wikidataId).withApi(getWikidataApi());
   }
 }
