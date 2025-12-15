@@ -35,7 +35,7 @@ public class ReferenceByRelationshipHandler extends RelationshipHandler {
       // Add referring contextual path to priority 4
       if (priorityFourLayer != null) {
         priorityFourLayer.addHandler(
-            new ReferenceByContextualPathRelationshipHandler(referringNote));
+            new ReferenceContextAncestorRelationshipHandler(referringNote));
       }
 
       return referringNote;

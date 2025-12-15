@@ -199,10 +199,7 @@ public class GraphRAGServiceTest {
 
         // Verify target's contextual path notes are in related notes
         assertRelatedNotesContain(
-            result,
-            RelationshipToFocusNote.AncestorInTargetContextualPath,
-            targetGrandParent,
-            targetParent);
+            result, RelationshipToFocusNote.TargetContextAncestor, targetGrandParent, targetParent);
       }
 
       @Test
@@ -219,8 +216,7 @@ public class GraphRAGServiceTest {
 
         // Verify no target contextual path notes are included
         assertThat(
-            getNotesWithRelationship(
-                result, RelationshipToFocusNote.AncestorInTargetContextualPath),
+            getNotesWithRelationship(result, RelationshipToFocusNote.TargetContextAncestor),
             empty());
       }
     }
@@ -494,10 +490,7 @@ public class GraphRAGServiceTest {
 
       List<BareNote> contextualNotes =
           result.getRelatedNotes().stream()
-              .filter(
-                  n ->
-                      n.getRelationToFocusNote()
-                          == RelationshipToFocusNote.AncestorInContextualPath)
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.ContextAncestor)
               .collect(Collectors.toList());
 
       assertThat(
@@ -856,7 +849,7 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.Parent,
                 RelationshipToFocusNote.SiblingOfParent,
                 RelationshipToFocusNote.SiblingOfParent,
-                RelationshipToFocusNote.AncestorInContextualPath));
+                RelationshipToFocusNote.ContextAncestor));
 
         // Verify no parent sibling children are included
         assertThat(

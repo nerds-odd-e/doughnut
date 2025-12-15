@@ -44,11 +44,11 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
   - Direct: Self, Parent, RelationshipTarget, Child
   - Sibling: OlderSibling, YoungerSibling
   - Reference: ReferenceBy, ReferencingNote
-  - Contextual: AncestorInContextualPath, AncestorInTargetContextualPath
+  - Contextual: ContextAncestor, TargetContextAncestor
   - Relation: TargetOfRelatedChild
   - Extended Family: SiblingOfParent, SiblingOfParentOfTarget
   - Cousins: ChildOfSiblingOfParent, ChildOfSiblingOfParentOfTarget
-  - Reference Context: ReferenceByContextualPath, SiblingOfReferencingNote
+  - Reference Context: ReferenceContextAncestor, SiblingOfReferencingNote
   - Related Child References: ReferenceByToTargetOfRelatedChild
 
 - **GraphRAGResult**: Complete result containing:
@@ -62,15 +62,15 @@ The system uses a layered priority approach with configurable notes-before-switc
 1. **Core Context** (Priority 1) - 3 notes before switching
    - `ParentRelationshipHandler`: Parent relationship
    - `TargetRelationshipHandler`: Target relationship (for relation notes)
-   - `AncestorInContextualPathRelationshipHandler`: Ancestors in contextual path
+   - `ContextAncestorRelationshipHandler`: Ancestors in contextual path
    - Essential for understanding the note's immediate context
 
 2. **Direct Relations** (Priority 2) - 3 notes before switching
    - `ChildRelationshipHandler`: Direct children (dynamically adds TargetOfRelatedChild handlers to Priority 3)
    - `OlderSiblingRelationshipHandler`: Older siblings
    - `YoungerSiblingRelationshipHandler`: Younger siblings
-   - `ReferenceByRelationshipHandler`: Reference by notes (dynamically adds ReferencingNote to Priority 3, ReferenceByContextualPath to Priority 4)
-   - `AncestorInTargetContextualPathRelationshipHandler`: Ancestors in target's contextual path
+   - `ReferenceByRelationshipHandler`: Reference by notes (dynamically adds ReferencingNote to Priority 3, ReferenceContextAncestor to Priority 4)
+   - `TargetContextAncestorRelationshipHandler`: Ancestors in target's contextual path
    - `SiblingOfParentRelationshipHandler`: Siblings of parent (dynamically adds ChildOfSiblingOfParent to Priority 4)
    - `SiblingOfParentOfTargetRelationshipHandler`: Siblings of parent of target (dynamically adds ChildOfSiblingOfParentOfTarget to Priority 4)
 
@@ -83,7 +83,7 @@ The system uses a layered priority approach with configurable notes-before-switc
    - Dynamically populated by Priority 2 and Priority 3 handlers:
    - `ChildOfSiblingOfParentRelationshipHandler`: Children of parent's siblings (cousins)
    - `ChildOfSiblingOfParentOfTargetRelationshipHandler`: Children of target's parent's siblings
-   - `ReferenceByContextualPathRelationshipHandler`: Contextual path of reference by notes
+   - `ReferenceContextAncestorRelationshipHandler`: Contextual path of reference by notes
    - `SiblingOfReferencingNoteRelationshipHandler`: Siblings of referencing notes
    - `ReferenceByToTargetOfRelatedChildHandler`: Reference by notes to targets of related children
 
@@ -131,7 +131,7 @@ The system manages complex relationship dependencies through dynamic handler inj
   - `ReferenceByRelationshipHandler` → adds `ReferencingNoteRelationshipHandler`
 
 - **Priority 2 → Priority 4 Dependencies**
-  - `ReferenceByRelationshipHandler` → adds `ReferenceByContextualPathRelationshipHandler`
+  - `ReferenceByRelationshipHandler` → adds `ReferenceContextAncestorRelationshipHandler`
   - `SiblingOfParentRelationshipHandler` → adds `ChildOfSiblingOfParentRelationshipHandler`
   - `SiblingOfParentOfTargetRelationshipHandler` → adds `ChildOfSiblingOfParentOfTargetRelationshipHandler`
 

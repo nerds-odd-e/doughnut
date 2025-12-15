@@ -4,12 +4,12 @@ import com.odde.doughnut.entities.Note;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AncestorInContextualPathRelationshipHandler extends RelationshipHandler {
+public class ContextAncestorRelationshipHandler extends RelationshipHandler {
   private final List<Note> ancestors;
   private int currentIndex;
 
-  public AncestorInContextualPathRelationshipHandler(Note relatingNote) {
-    super(RelationshipToFocusNote.AncestorInContextualPath, relatingNote);
+  public ContextAncestorRelationshipHandler(Note relatingNote) {
+    super(RelationshipToFocusNote.ContextAncestor, relatingNote);
     ancestors = new ArrayList<>(relatingNote.getAncestors());
     // Start from the end (closest ancestor/parent) and work backwards to root
     this.currentIndex = ancestors.size() - 1;

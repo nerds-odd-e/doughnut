@@ -38,7 +38,7 @@ public class GraphRAGService {
             new RelationshipHandler[] {
               new ParentRelationshipHandler(focusNote),
               new TargetRelationshipHandler(focusNote),
-              new AncestorInContextualPathRelationshipHandler(focusNote)
+              new ContextAncestorRelationshipHandler(focusNote)
             });
     List<RelationshipHandler> priorityTwoHandlers = new ArrayList<>();
     priorityTwoHandlers.add(
@@ -47,7 +47,7 @@ public class GraphRAGService {
     priorityTwoHandlers.add(new YoungerSiblingRelationshipHandler(focusNote));
     priorityTwoHandlers.add(
         new ReferenceByRelationshipHandler(focusNote, priorityThreeLayer, priorityFourLayer));
-    priorityTwoHandlers.add(new AncestorInTargetContextualPathRelationshipHandler(focusNote));
+    priorityTwoHandlers.add(new TargetContextAncestorRelationshipHandler(focusNote));
     priorityTwoHandlers.add(new SiblingOfParentRelationshipHandler(focusNote, priorityFourLayer));
     priorityTwoHandlers.add(
         new SiblingOfParentOfTargetRelationshipHandler(focusNote, priorityFourLayer));

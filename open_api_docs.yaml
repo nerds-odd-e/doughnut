@@ -4574,14 +4574,14 @@ components:
           - SiblingOfTarget
           - ReferenceBy
           - ReferencingNote
-          - AncestorInContextualPath
-          - AncestorInTargetContextualPath
+          - ContextAncestor
+          - TargetContextAncestor
+          - ReferenceContextAncestor
           - TargetOfRelatedChild
           - SiblingOfParent
           - SiblingOfParentOfTarget
           - ChildOfSiblingOfParent
           - ChildOfSiblingOfParentOfTarget
-          - ReferenceByContextualPath
           - SiblingOfReferencingNote
           - ReferenceByToTargetOfRelatedChild
           - SubjectOfTargetSibling
@@ -4621,14 +4621,14 @@ components:
           - SiblingOfTarget
           - ReferenceBy
           - ReferencingNote
-          - AncestorInContextualPath
-          - AncestorInTargetContextualPath
+          - ContextAncestor
+          - TargetContextAncestor
+          - ReferenceContextAncestor
           - TargetOfRelatedChild
           - SiblingOfParent
           - SiblingOfParentOfTarget
           - ChildOfSiblingOfParent
           - ChildOfSiblingOfParentOfTarget
-          - ReferenceByContextualPath
           - SiblingOfReferencingNote
           - ReferenceByToTargetOfRelatedChild
           - SubjectOfTargetSibling
