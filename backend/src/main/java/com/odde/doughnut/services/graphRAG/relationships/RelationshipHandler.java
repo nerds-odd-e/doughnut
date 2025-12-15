@@ -17,5 +17,9 @@ public abstract class RelationshipHandler {
 
   public abstract Note handle();
 
+  public RelationshipToFocusNote getRelationshipToFocusNoteFor(Note note) {
+    return relationshipToFocusNote;
+  }
+
   public void afterHandledSuccessfully(FocusNote focusNote, BareNote addedNote) {}
 }

@@ -7,6 +7,7 @@ public enum RelationshipToFocusNote {
   Parent,
   Target,
   Child,
+  Relationship,
   OlderSibling,
   YoungerSibling,
   InboundReference,

@@ -4568,6 +4568,7 @@ components:
           - Parent
           - Target
           - Child
+          - Relationship
           - OlderSibling
           - YoungerSibling
           - InboundReference
@@ -4614,6 +4615,7 @@ components:
           - Parent
           - Target
           - Child
+          - Relationship
           - OlderSibling
           - YoungerSibling
           - InboundReference

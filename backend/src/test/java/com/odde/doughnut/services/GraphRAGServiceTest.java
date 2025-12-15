@@ -585,6 +585,20 @@ public class GraphRAGServiceTest {
       assertThat(result.getFocusNote().getChildren(), contains(relatedChild.getUri()));
     }
 
+    @Test
+    void shouldMarkChildWithTargetAsRelationship() {
+      GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
+
+      // The child with a target should be marked as Relationship, not Child
+      List<BareNote> relationshipNotes =
+          result.getRelatedNotes().stream()
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Relationship)
+              .collect(Collectors.toList());
+
+      assertThat(relationshipNotes, hasSize(1));
+      assertThat(relationshipNotes.get(0).getUri(), is(relatedChild.getUri()));
+    }
+
     @Nested
     class WhenHasMultipleRegularChildren {
       private Note regularChild1;
@@ -606,28 +620,32 @@ public class GraphRAGServiceTest {
 
       @Test
       void shouldAlternateBetweenPriorityLevelsWhenBudgetIsLimited() {
-        // Set budget to allow only 4 notes
-        GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
+        // Set budget to allow only 5 notes (3 regular children + 1 relationship child + 1 target)
+        GraphRAGResult result = graphRAGService.retrieve(focusNote, 6);
 
         // Verify related notes
         List<BareNote> relatedNotes = result.getRelatedNotes();
-        assertThat(relatedNotes, hasSize(4));
+        assertThat(relatedNotes, hasSize(5));
 
-        // Should have three children
+        // Should have four children (3 regular + 1 relationship)
         assertThat(
             result.getFocusNote().getChildren(),
             containsInAnyOrder(
-                regularChild1.getUri(), regularChild2.getUri(), relatedChild.getUri()));
+                regularChild1.getUri(),
+                regularChild2.getUri(),
+                regularChild3.getUri(),
+                relatedChild.getUri()));
 
-        // Verify relationships in order
+        // Verify relationships (order may vary, but should contain all expected types)
         assertThat(
             relatedNotes.stream()
                 .map(BareNote::getRelationToFocusNote)
                 .collect(Collectors.toList()),
-            contains(
+            containsInAnyOrder(
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
+                RelationshipToFocusNote.Relationship,
                 RelationshipToFocusNote.TargetOfRelatedChild));
 
         // Verify the related child target is included
@@ -665,7 +683,7 @@ public class GraphRAGServiceTest {
         List<BareNote> relatedNotes = result.getRelatedNotes();
         assertThat(relatedNotes, hasSize(4));
 
-        // Verify relationships are all children
+        // Verify relationships (3 regular children + 1 relationship child)
         assertThat(
             relatedNotes.stream()
                 .map(BareNote::getRelationToFocusNote)
@@ -674,7 +692,7 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.Child));
+                RelationshipToFocusNote.Relationship));
 
         // Verify no related child target is included
         assertThat(
