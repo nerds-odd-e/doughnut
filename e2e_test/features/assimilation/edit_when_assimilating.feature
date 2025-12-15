@@ -12,7 +12,7 @@ Feature: Editing when assimilating
   Scenario: Update recall setting
     Given I am assimilating new note on day 1
     When I set the level of "hard" to be 2
-    Then I learned one note "easy" on day 1
-    And I learned one note "hard" on day 2
+    Then I assimilated one note "easy" on day 1
+    And I assimilated one note "hard" on day 2
 
 

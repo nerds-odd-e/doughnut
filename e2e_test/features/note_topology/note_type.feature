@@ -1,5 +1,5 @@
 Feature: Note type
-  As a learner, I want to add note type to my note
+  As a learner, I want to have note type for my note. It will be used to generate questions for my note.
 
   Background:
     Given I am logged in as an existing user
@@ -11,7 +11,7 @@ Feature: Note type
 
   @usingMockedOpenAiService
   Scenario Outline: AI will interpret note type when generating questions
-    Given I learned one note "Reservoirs" on day 1
+    Given I assimilated one note "Reservoirs" on day 1
     And I assign note type "<Note Type>" for note "Reservoirs"
     When I am recalling my note on day 2
     Then I should be asked "<Question>"

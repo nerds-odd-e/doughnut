@@ -14,7 +14,7 @@ Feature: User Contests Question generation by AI
 
   Scenario Outline: The generated question should be contested internally
     Given OpenAI evaluates the question as <Legitimate Question>
-    And I learned one note "Scuba Diving" on day 1
+    And I assimilated one note "Scuba Diving" on day 1
     When I am recalling my note on day 2
     And I should be asked "<Current Question>"
 
@@ -29,7 +29,7 @@ Feature: User Contests Question generation by AI
     # Moving the "OpenAI evaluates the question as not legitamate" to right before "I contest the question" fixes the issue.
     # But it passes the test in CI server.
     And OpenAI evaluates the question as not legitamate
-    Given I learned one note "Scuba Diving" on day 1
+    Given I assimilated one note "Scuba Diving" on day 1
     And I am recalling my note on day 2
     When I contest the question
     Then I should be asked "Second question"

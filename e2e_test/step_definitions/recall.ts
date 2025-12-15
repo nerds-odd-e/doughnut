@@ -86,7 +86,7 @@ Then(
 )
 
 Then(
-  'I learned one note {string} on day {int}',
+  'I assimilated one note {string} on day {int}',
   (noteTopology: string, day: number) => {
     start.testability().backendTimeTravelTo(day, 8)
     start.assimilation().goToAssimilationPage().assimilateNotes(noteTopology)
