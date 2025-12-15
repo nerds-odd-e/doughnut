@@ -416,25 +416,11 @@ describe("main menu", () => {
       )
     })
 
-    it("shows resume recall menu item when recall is paused", async () => {
+    it("shows and highlights resume recall menu item when recall is paused", async () => {
       await renderComponent()
 
       const resumeRecallLink = screen.getByLabelText("Resume")
       expect(resumeRecallLink).toBeInTheDocument()
-    })
-
-    it("highlights resume recall menu item when recall is paused", async () => {
-      await renderComponent()
-
-      const resumeRecallLink = screen.getByLabelText("Resume")
-      const navItem = resumeRecallLink.closest(".nav-item")
-      expect(navItem).toHaveClass("resume-recall-active")
-    })
-
-    it("applies green background to resume recall menu item when recall is paused", async () => {
-      await renderComponent()
-
-      const resumeRecallLink = screen.getByLabelText("Resume")
       const navItem = resumeRecallLink.closest(".nav-item")
       expect(navItem).toHaveClass("resume-recall-active")
     })
@@ -567,174 +553,152 @@ describe("main menu", () => {
       expect(resumeCount).not.toBeInTheDocument()
     })
 
-    it("shows resume recall menu item when currentIndex > 0 and not on recall page", async () => {
-      useRouteValue.name = "notebooks"
+    it.each([
+      {
+        description:
+          "shows resume recall menu item when currentIndex > 0 and not on recall page",
+        routeName: "notebooks",
+        isRecallPaused: false,
+        currentIndex: 1,
+        toRepeat: Array(5).fill({}) as Array<{
+          memoryTrackerId?: number
+          spelling?: boolean
+        }>,
+        shouldShow: true,
+      },
+      {
+        description:
+          "does not show resume recall menu item when currentIndex > 0 but on recall page",
+        routeName: "recall",
+        isRecallPaused: false,
+        currentIndex: 1,
+        toRepeat: undefined,
+        shouldShow: false,
+      },
+      {
+        description:
+          "does not show resume recall menu item when currentIndex is 0 and not on recall page",
+        routeName: "notebooks",
+        isRecallPaused: false,
+        currentIndex: 0,
+        toRepeat: undefined,
+        shouldShow: false,
+      },
+      {
+        description:
+          "shows resume recall menu item when both isRecallPaused and currentIndex > 0 conditions are true",
+        routeName: "notebooks",
+        isRecallPaused: true,
+        currentIndex: 2,
+        toRepeat: Array(5).fill({}) as Array<{
+          memoryTrackerId?: number
+          spelling?: boolean
+        }>,
+        shouldShow: true,
+      },
+      {
+        description:
+          "does not show resume recall menu item when toRepeatCount is 0 even if recall is paused",
+        routeName: "notebooks",
+        isRecallPaused: true,
+        currentIndex: 0,
+        toRepeat: [],
+        shouldShow: false,
+      },
+      {
+        description:
+          "does not show resume recall menu item when toRepeatCount is 0 even if currentIndex > 0",
+        routeName: "notebooks",
+        isRecallPaused: false,
+        currentIndex: 5,
+        toRepeat: Array(5).fill({}) as Array<{
+          memoryTrackerId?: number
+          spelling?: boolean
+        }>,
+        shouldShow: false,
+      },
+    ])("$description", async ({
+      routeName,
+      isRecallPaused,
+      currentIndex,
+      toRepeat,
+      shouldShow,
+    }) => {
+      useRouteValue.name = routeName
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
-          isRecallPaused: false,
-          currentIndex: 1,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
-        })
-      )
-
-      await renderComponent()
-
-      const resumeRecallLink = screen.getByLabelText("Resume")
-      expect(resumeRecallLink).toBeInTheDocument()
-    })
-
-    it("does not show resume recall menu item when currentIndex > 0 but on recall page", async () => {
-      useRouteValue.name = "recall"
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: false,
-          currentIndex: 1,
-        })
-      )
-
-      await renderComponent()
-
-      const resumeRecallLink = screen.queryByLabelText("Resume")
-      expect(resumeRecallLink).not.toBeInTheDocument()
-    })
-
-    it("does not show resume recall menu item when currentIndex is 0 and not on recall page", async () => {
-      useRouteValue.name = "notebooks"
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: false,
-          currentIndex: 0,
-        })
-      )
-
-      await renderComponent()
-
-      const resumeRecallLink = screen.queryByLabelText("Resume")
-      expect(resumeRecallLink).not.toBeInTheDocument()
-    })
-
-    it("shows resume recall menu item when both isRecallPaused and currentIndex > 0 conditions are true", async () => {
-      useRouteValue.name = "notebooks"
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: true,
-          currentIndex: 2,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
-        })
-      )
-
-      await renderComponent()
-
-      const resumeRecallLink = screen.getByLabelText("Resume")
-      expect(resumeRecallLink).toBeInTheDocument()
-    })
-
-    it("does not show resume recall menu item when toRepeatCount is 0 even if recall is paused", async () => {
-      useRouteValue.name = "notebooks"
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: true,
-          currentIndex: 0,
-          toRepeat: [],
-        })
-      )
-
-      await renderComponent()
-
-      const resumeRecallLink = screen.queryByLabelText("Resume")
-      expect(resumeRecallLink).not.toBeInTheDocument()
-    })
-
-    it("does not show resume recall menu item when toRepeatCount is 0 even if currentIndex > 0", async () => {
-      useRouteValue.name = "notebooks"
-      // When currentIndex equals the length of toRepeat, toRepeatCount becomes 0
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: false,
-          currentIndex: 5,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
+          isRecallPaused,
+          currentIndex,
+          toRepeat,
         })
       )
 
       await renderComponent()
 
       const resumeRecallLink = screen.queryByLabelText("Resume")
-      expect(resumeRecallLink).not.toBeInTheDocument()
+      if (shouldShow) {
+        expect(resumeRecallLink).toBeInTheDocument()
+      } else {
+        expect(resumeRecallLink).not.toBeInTheDocument()
+      }
     })
   })
 
   describe("diligent mode", () => {
-    it("should show red background on recall badge when in diligent mode", async () => {
+    it.each([
+      {
+        description:
+          "should show red background on recall badge when in diligent mode",
+        linkLabel: "Recall",
+        isRecallPaused: false,
+        diligentMode: true,
+        shouldHaveDiligentMode: true,
+      },
+      {
+        description:
+          "should show green background on recall badge when not in diligent mode",
+        linkLabel: "Recall",
+        isRecallPaused: false,
+        diligentMode: false,
+        shouldHaveDiligentMode: false,
+      },
+      {
+        description:
+          "should show red background on resume recall badge when in diligent mode",
+        linkLabel: "Resume",
+        isRecallPaused: true,
+        diligentMode: true,
+        shouldHaveDiligentMode: true,
+      },
+    ])("$description", async ({
+      linkLabel,
+      isRecallPaused,
+      diligentMode,
+      shouldHaveDiligentMode,
+    }) => {
       vi.mocked(useRecallData).mockReturnValue(
         createUseRecallDataMock({
+          isRecallPaused,
           toRepeat: Array(5).fill({}) as Array<{
             memoryTrackerId?: number
             spelling?: boolean
           }>,
-          diligentMode: true,
+          diligentMode,
         })
       )
 
       await renderComponent()
 
-      const recallLink = screen.getByLabelText("Recall")
-      const recallNavItem = recallLink.closest(".nav-item")
-      const recallCount = recallNavItem?.querySelector(".recall-count")
-      expect(recallCount).toBeInTheDocument()
-      expect(recallCount).toHaveClass("recall-count")
-      expect(recallCount).toHaveClass("diligent-mode")
-    })
-
-    it("should show green background on recall badge when not in diligent mode", async () => {
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
-          diligentMode: false,
-        })
-      )
-
-      await renderComponent()
-
-      const recallLink = screen.getByLabelText("Recall")
-      const recallNavItem = recallLink.closest(".nav-item")
-      const recallCount = recallNavItem?.querySelector(".recall-count")
-      expect(recallCount).toBeInTheDocument()
-      expect(recallCount).toHaveClass("recall-count")
-      expect(recallCount).not.toHaveClass("diligent-mode")
-    })
-
-    it("should show red background on resume recall badge when in diligent mode", async () => {
-      vi.mocked(useRecallData).mockReturnValue(
-        createUseRecallDataMock({
-          isRecallPaused: true,
-          toRepeat: Array(5).fill({}) as Array<{
-            memoryTrackerId?: number
-            spelling?: boolean
-          }>,
-          diligentMode: true,
-        })
-      )
-
-      await renderComponent()
-
-      const resumeLink = screen.getByLabelText("Resume")
-      const resumeNavItem = resumeLink.closest(".nav-item")
-      const resumeCount = resumeNavItem?.querySelector(".recall-count")
-      expect(resumeCount).toBeInTheDocument()
-      expect(resumeCount).toHaveClass("recall-count")
-      expect(resumeCount).toHaveClass("diligent-mode")
+      const link = screen.getByLabelText(linkLabel)
+      const navItem = link.closest(".nav-item")
+      const count = navItem?.querySelector(".recall-count")
+      expect(count).toBeInTheDocument()
+      expect(count).toHaveClass("recall-count")
+      if (shouldHaveDiligentMode) {
+        expect(count).toHaveClass("diligent-mode")
+      } else {
+        expect(count).not.toHaveClass("diligent-mode")
+      }
     })
   })
 })
