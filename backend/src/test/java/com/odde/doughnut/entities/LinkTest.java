@@ -22,25 +22,25 @@ public class LinkTest {
   @Nested
   class LevelOfLink {
     Note subject;
-    Note object;
+    Note target;
 
     @BeforeEach
     void setup() {
       subject = makeMe.aNote().please();
-      object = makeMe.aNote().please();
+      target = makeMe.aNote().please();
     }
 
     @Test
     void shouldGetSourceLevelWhenItIsHigher() {
       makeMe.theNote(subject).level(5).please();
-      Note link = makeMe.aReification().between(subject, object).inMemoryPlease();
+      Note link = makeMe.aReification().between(subject, target).inMemoryPlease();
       assertThat(link.getRecallSetting().getLevel(), is(5));
     }
 
     @Test
     void shouldGetTargetLevelWhenItIsHigher() {
-      makeMe.theNote(object).level(5).please();
-      Note link = makeMe.aReification().between(subject, object).inMemoryPlease();
+      makeMe.theNote(target).level(5).please();
+      Note link = makeMe.aReification().between(subject, target).inMemoryPlease();
       assertThat(link.getRecallSetting().getLevel(), is(5));
     }
   }

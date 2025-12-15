@@ -17,19 +17,19 @@ Traversal is driven by:
 Every edge in the traversal is one of the following six relationships:
 	1.	parent
 The structural parent in the contextual path.
-	2.	object
-The note’s reification object.
-(The note represents a relationship between its parent and this object.)
+	2.	target
+The note's reification target.
+(The note represents a relationship between its parent and this target.)
 	3.	sibling
 The nearest structural sibling (in left-to-right or right-to-left order).
-	4.	object-sibling
-The nearest co-reifier sharing the same reification object.
+	4.	target-sibling
+The nearest co-reifier sharing the same reification target.
 	5.	child
 One child note of the current note.
 This is a seed; additional children emerge later via sibling expansion.
 	6.	inbound-ref
-One note that has this note as its object.
-Also a seed; additional inbound refs emerge via object-sibling expansion.
+One note that has this note as its target.
+Also a seed; additional inbound refs emerge via target-sibling expansion.
 
 These six are the only primitive edges.
 All extended relationships appear as multi-hop paths.
@@ -46,7 +46,7 @@ Examples:
 	•	[] → focus note
 	•	["parent"]
 	•	["child", "sibling"] → another child of the focus
-	•	["inbound-ref", "object-sibling"] → another inbound reference to the focus
+	•	["inbound-ref", "target-sibling"] → another inbound reference to the focus
 
 The path:
 	•	affects which relationships are allowed at the next step
@@ -88,7 +88,7 @@ When expanding a candidate:
 	•	weight (descending)
 	•	tie-break using a fixed base order
 
-parent, object, sibling, object-sibling, child, inbound-ref
+parent, target, sibling, target-sibling, child, inbound-ref
 
 
 	4.	Try relationships in this final ordered list; use the first one that yields a neighbor.
@@ -97,21 +97,21 @@ Weighting Policy (Example)
 	•	Focus note (path is empty)
 Prefer structural and semantic anchors:
 	•	parent ↑↑
-	•	object ↑↑
+	•	target ↑↑
 	•	sibling ↑
-	•	object-sibling ↑
+	•	target-sibling ↑
 	•	child ↑
 	•	inbound-ref (default)
 	•	When lastRel = child
 Prefer pulling in other children of the same parent via siblings:
 	•	sibling ↑↑↑
-	•	object-sibling ↑
+	•	target-sibling ↑
 	•	When lastRel = inbound-ref
-Prefer other inbound refs via object-siblings:
-	•	object-sibling ↑↑↑
+Prefer other inbound refs via target-siblings:
+	•	target-sibling ↑↑↑
 	•	Default
 	•	parent ↑
-	•	object ↑
+	•	target ↑
 	•	others default
 
 This policy is deterministic, but easy to tweak.
@@ -124,9 +124,9 @@ For a chosen relationship rel:
 
 Relationship	Neighbor Definition
 parent	ParentOf(node)
-object	ReificationObjectOf(node)
+target	ReificationTargetOf(node)
 sibling	NearestStructuralSibling(node)
-object-sibling	NearestObjectSibling(node)
+target-sibling	NearestTargetSibling(node)
 child	PickOneChild(node) (seed)
 inbound-ref	PickOneInbound(node) (seed)
 
@@ -172,7 +172,7 @@ Properties
 	•	Balanced: each candidate expands exactly once per depth.
 	•	Compact: graph size ≈ total nodes across wavefronts.
 	•	Deterministic: given the same graph + focus, results are identical.
-	•	Lateral growth: children/inbounds appear as sparse seeds; siblings and object-siblings propagate them.
+	•	Lateral growth: children/inbounds appear as sparse seeds; siblings and target-siblings propagate them.
 
 ⸻
 

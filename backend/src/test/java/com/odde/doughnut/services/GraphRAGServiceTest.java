@@ -639,7 +639,7 @@ public class GraphRAGServiceTest {
         // Set budget to allow all notes
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-        // Verify related notes include all children and the reified child object
+        // Verify related notes include all children and the reified child target
         assertThat(
             result.getFocusNote().getChildren(),
             containsInAnyOrder(
@@ -676,7 +676,7 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child));
 
-        // Verify no reified child object is included
+        // Verify no reified child target is included
         assertThat(
             getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfReifiedChild),
             empty());

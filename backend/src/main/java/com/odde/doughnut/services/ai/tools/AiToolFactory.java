@@ -34,7 +34,7 @@ public class AiToolFactory {
         My notes are atomic pieces of knowledge organized hierarchically and can include reifications to form lateral links.
         Your task is to create a memory-stimulating question by adhering to these guidelines:
 
-        1. **Focus on the Focus Note**: Formulate one question EXCLUSIVELY around the focus note (its title / subject-predicate-object and details).
+        1. **Focus on the Focus Note**: Formulate one question EXCLUSIVELY around the focus note (its title / subject-predicate-target and details).
         2. **Leverage the Extended Graph**:
            - Use other focus note info and related notes to enrich the question formulation.
            - Avoid accidental bias by ensuring the focus note isn't falsely assumed to be the sole specialization of a general concept.
