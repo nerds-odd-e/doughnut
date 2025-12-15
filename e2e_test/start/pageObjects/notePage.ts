@@ -1,5 +1,4 @@
 import { commonSenseSplit } from '../../support/string_util'
-import submittableForm from '../submittableForm'
 import audioToolsPage from './audioToolsPage'
 import { assumeConversationAboutNotePage } from './conversationAboutNotePage'
 import noteCreationForm from './noteForms/noteCreationForm'
@@ -8,6 +7,35 @@ import { assumeNoteTargetSearchDialog } from './noteTargetSearchDialog'
 import { noteSidebar } from './noteSidebar'
 import { assumeAssociateWikidataDialog } from './associateWikidataDialog'
 import { assumeMemoryTrackerPage } from './memoryTrackerPage'
+import { toolbarButton } from './toolbarButton'
+
+const notePageMoreOptions = () => {
+  cy.findByRole('button', { name: 'more options' }).then(($button) => {
+    if (!$button.hasClass('daisy-btn-active')) {
+      cy.wrap($button).click()
+    }
+  })
+  return {
+    toolbarButton,
+    expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
+      for (const k in expected) {
+        cy.contains('tr', expected[k]?.type ?? '').within(() => {
+          for (const attr in expected[k]) {
+            if (expected[k][attr] !== undefined) {
+              cy.contains('td', expected[k][attr])
+            }
+          }
+        })
+      }
+    },
+    removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
+      cy.contains('tr', type).click()
+      cy.url().should('include', '/d/memory-trackers/')
+      cy.pageIsNotLoading()
+      return assumeMemoryTrackerPage().removeFromReview()
+    },
+  }
+}
 
 function filterAttributes(
   attributes: Record<string, string>,
@@ -34,46 +62,6 @@ export const assumeNotePage = (noteTopology?: string) => {
   if (noteTopology) {
     findNoteTitle(noteTopology)
   }
-
-  const privateToolbarButton = (btnTextOrTitle: string) => {
-    const getButton = () => cy.findByRole('button', { name: btnTextOrTitle })
-    return {
-      click: () => {
-        getButton().click()
-        return { ...submittableForm }
-      },
-      shouldNotExist: () => getButton().should('not.exist'),
-    }
-  }
-
-  const notePageMoreOptions = () => {
-    cy.findByRole('button', { name: 'more options' }).then(($button) => {
-      if (!$button.hasClass('daisy-btn-active')) {
-        cy.wrap($button).click()
-      }
-    })
-    return {
-      privateToolbarButton,
-      expectMemoryTrackerInfo(expected: { [key: string]: string }[]) {
-        for (const k in expected) {
-          cy.contains('tr', expected[k]?.type ?? '').within(() => {
-            for (const attr in expected[k]) {
-              if (expected[k][attr] !== undefined) {
-                cy.contains('td', expected[k][attr])
-              }
-            }
-          })
-        }
-      },
-      removeMemoryTrackerFromReview(type: 'normal' | 'spelling') {
-        cy.contains('tr', type).click()
-        cy.url().should('include', '/d/memory-trackers/')
-        cy.pageIsNotLoading()
-        return assumeMemoryTrackerPage().removeFromReview()
-      },
-    }
-  }
-
   return {
     moreOptions: () => {
       return notePageMoreOptions()
@@ -178,7 +166,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
     },
     toolbarButton: (btnTextOrTitle: string) => {
-      return privateToolbarButton(btnTextOrTitle)
+      return toolbarButton(btnTextOrTitle)
     },
     undo(undoType: string) {
       this.toolbarButton(`undo ${undoType}`).click()
@@ -226,7 +214,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       // Before upload, the image should not be visible (simulate new upload)
       cy.get('#note-image').should('not.exist')
       this.moreOptions()
-        .privateToolbarButton('Edit Note Image')
+        .toolbarButton('Edit Note Image')
         .click()
         .submitWith(
           filterAttributes(attributes, [
@@ -241,7 +229,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
     updateNoteUrl(attributes: Record<string, string>) {
       this.moreOptions()
-        .privateToolbarButton('Edit Note URL')
+        .toolbarButton('Edit Note URL')
         .click()
         .submitWith(filterAttributes(attributes, ['Url']))
       return this
@@ -272,17 +260,15 @@ export const assumeNotePage = (noteTopology?: string) => {
       return noteCreationForm
     },
     aiGenerateImage() {
-      this.moreOptions()
-        .privateToolbarButton('Generate Image with DALL-E')
-        .click()
+      this.moreOptions().toolbarButton('Generate Image with DALL-E').click()
     },
     deleteNote() {
-      this.moreOptions().privateToolbarButton('Delete note').click()
+      this.moreOptions().toolbarButton('Delete note').click()
       cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
     openQuestionList() {
-      this.moreOptions().privateToolbarButton('Questions for the note').click()
+      this.moreOptions().toolbarButton('Questions for the note').click()
       return questionListPage()
     },
     addQuestion(row: Record<string, string>) {
@@ -369,11 +355,11 @@ export const assumeNotePage = (noteTopology?: string) => {
         })
     },
     associateWikidataDialog() {
-      privateToolbarButton('associate wikidata').click()
+      toolbarButton('associate wikidata').click()
       return assumeAssociateWikidataDialog()
     },
     importObsidianData(filename: string) {
-      this.moreOptions().privateToolbarButton('more options').click()
+      this.moreOptions().toolbarButton('more options').click()
       // Find the label containing "Import from Obsidian" text
       cy.contains('label', 'Import from Obsidian').within(() => {
         cy.get('input[type="file"]').selectFile(
