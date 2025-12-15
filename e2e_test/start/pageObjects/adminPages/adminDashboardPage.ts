@@ -1,4 +1,5 @@
 import { adminFineTuningPage } from './adminFineTuningPage'
+import { submittableForm } from '../../forms'
 
 export function assumeAdminDashboardPage() {
   return {
@@ -40,8 +41,7 @@ export function assumeAdminDashboardPage() {
       this.goToTabInAdminDashboard('Manage Models')
       return {
         chooseModel(model: string, task: string) {
-          cy.findByLabelText(task).select(model)
-          cy.findByRole('button', { name: 'Save' }).click()
+          submittableForm.submitWith({ [task]: model })
         },
       }
     },

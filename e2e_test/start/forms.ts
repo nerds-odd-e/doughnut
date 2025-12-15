@@ -34,8 +34,14 @@ const submittableForm = {
     return submittableForm
   },
   submit() {
-    cy.get('input[value="Submit"]').click()
-    cy.pageIsNotLoading()
+    cy.get('body').then(($body) => {
+      if ($body.find('input[value="Submit"]').length > 0) {
+        cy.get('input[value="Submit"]').click()
+      } else {
+        cy.findByRole('button', { name: 'Save' }).click()
+      }
+      cy.pageIsNotLoading()
+    })
   },
   submitWith(noteAttributes: Record<string, string | undefined>) {
     return this.fill(noteAttributes).submit()

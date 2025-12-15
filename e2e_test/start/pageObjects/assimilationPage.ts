@@ -1,4 +1,5 @@
 import { commonSenseSplit } from 'support/string_util'
+import { form } from '../forms'
 
 export const assumeAssimilationPage = () => ({
   expectToAssimilateAndTotal(toAssimilateAndTotal: string) {
@@ -118,10 +119,8 @@ export const assumeAssimilationPage = () => ({
     return this
   },
   selectNoteType(noteType: string) {
-    cy.get('[data-test="note-type-selection-dialog"]').within(() => {
-      cy.get('select').select(noteType)
-      cy.pageIsNotLoading()
-    })
+    form.fill({ 'Note Type': noteType })
+    cy.pageIsNotLoading()
     return this
   },
   expectNoteTypePrompt() {
