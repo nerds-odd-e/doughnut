@@ -282,13 +282,6 @@ Then('I should be able to select a note type', () => {
 })
 
 Then(
-  'the note {string} should be saved with note type {string}',
-  (noteTitle: string, noteType: string) => {
-    start.jumpToNotePage(noteTitle).expectNoteType(noteType)
-  }
-)
-
-Then(
   'I should see a summary of the note broken down into two points: {string} and {string}',
   (point1: string, point2: string) => {
     start.assumeAssimilationPage().expectSummaryPoints([point1, point2])

@@ -246,16 +246,6 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
 
-    expectNoteType(noteType: string) {
-      cy.findByRole('button', { name: 'more options' }).then(($button) => {
-        if (!$button.hasClass('daisy-btn-active')) {
-          cy.wrap($button).click()
-        }
-      })
-      cy.get('#note-noteType').should('have.value', noteType)
-      return this
-    },
-
     startSearchingAndLinkNote() {
       this.toolbarButton('search and link note').click()
       return assumeNoteTargetSearchDialog()
