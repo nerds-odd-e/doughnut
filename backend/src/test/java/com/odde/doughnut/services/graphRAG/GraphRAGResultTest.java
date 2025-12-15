@@ -94,7 +94,7 @@ class GraphRAGResultTest {
           jsonString.indexOf("\"predicate\":"),
           is(greaterThan(jsonString.indexOf("\"subjectUriAndTitle\":"))));
       assertThat(
-          jsonString.indexOf("\"objectUriAndTitle\":"),
+          jsonString.indexOf("\"targetUriAndTitle\":"),
           is(greaterThan(jsonString.indexOf("\"predicate\":"))));
     }
   }

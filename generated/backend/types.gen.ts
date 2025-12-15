@@ -127,7 +127,7 @@ export type NoteTopology = {
     titleOrPredicate: string;
     shortDetails?: string;
     linkType?: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
-    objectNoteTopology?: NoteTopology;
+    targetNoteTopology?: NoteTopology;
     parentOrSubjectNoteTopology?: NoteTopology;
 };
 
@@ -524,9 +524,9 @@ export type BareNote = {
     subjectUriAndTitle?: UriAndTitle;
     predicate?: string;
     title?: string;
-    objectUriAndTitle?: UriAndTitle;
+    targetUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild' | 'ObjectSibling' | 'SubjectOfObjectSibling' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Target' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInTargetContextualPath' | 'TargetOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToTargetOfReifiedChild' | 'TargetSibling' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;
@@ -537,9 +537,9 @@ export type FocusNote = {
     subjectUriAndTitle?: UriAndTitle;
     predicate?: string;
     title?: string;
-    objectUriAndTitle?: UriAndTitle;
+    targetUriAndTitle?: UriAndTitle;
     parentUriAndTitle?: UriAndTitle;
-    relationToFocusNote?: 'Self' | 'Parent' | 'Object' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInObjectContextualPath' | 'ObjectOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfObject' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfObject' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToObjectOfReifiedChild' | 'ObjectSibling' | 'SubjectOfObjectSibling' | 'RemotelyRelated';
+    relationToFocusNote?: 'Self' | 'Parent' | 'Target' | 'Child' | 'PriorSibling' | 'YoungerSibling' | 'InboundReference' | 'SubjectOfInboundReference' | 'AncestorInContextualPath' | 'AncestorInTargetContextualPath' | 'TargetOfReifiedChild' | 'SiblingOfParent' | 'SiblingOfParentOfTarget' | 'ChildOfSiblingOfParent' | 'ChildOfSiblingOfParentOfTarget' | 'InboundReferenceContextualPath' | 'SiblingOfSubjectOfInboundReference' | 'InboundReferenceToTargetOfReifiedChild' | 'TargetSibling' | 'SubjectOfTargetSibling' | 'RemotelyRelated';
     details?: string;
     detailsTruncated?: boolean;
     createdAt?: string;

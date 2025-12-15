@@ -280,7 +280,7 @@ describe("in place edit on title", () => {
     it("should dispay target", async () => {
       const wrapper = mountComponent(linkingNote)
       expect(wrapper.text()).toContain(
-        linkingNote.noteTopology.objectNoteTopology?.titleOrPredicate
+        linkingNote.noteTopology.targetNoteTopology?.titleOrPredicate
       )
     })
 

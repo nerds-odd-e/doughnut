@@ -26,7 +26,7 @@ const props = defineProps<{
 const noteTopology = computed(() => {
   return props.reverse
     ? props.note.noteTopology.parentOrSubjectNoteTopology!
-    : props.note.noteTopology.objectNoteTopology!
+    : props.note.noteTopology.targetNoteTopology!
 })
 
 const fontColor = computed(() => {

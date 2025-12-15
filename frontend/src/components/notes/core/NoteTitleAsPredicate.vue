@@ -3,8 +3,8 @@
     <NoteTitleComponent v-bind="{ noteTopology: noteTopology, full: true }" />
   </h2>
   <Breadcrumb
-    v-if="noteTopology.objectNoteTopology"
-    v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
+    v-if="noteTopology.targetNoteTopology"
+    v-bind="{ noteTopology: noteTopology.targetNoteTopology }"
   />
   <Modal v-if="!readonly && editingLink" @close_request="editingLink = false">
     <template #body>

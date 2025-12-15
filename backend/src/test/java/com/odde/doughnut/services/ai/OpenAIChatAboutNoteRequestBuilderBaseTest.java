@@ -35,7 +35,7 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
     Note from = makeMe.aNote().inMemoryPlease();
     Note note = makeMe.aReification().between(from, to).inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
-    assertThat(content, containsString("object"));
+    assertThat(content, containsString("target"));
   }
 
   private static String getNoteOfFocusDescription(Note note) {

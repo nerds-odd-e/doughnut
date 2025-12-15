@@ -3,7 +3,7 @@
     This note has been deleted
   </div>
   <NoteTitleAsPredicate
-    v-if="note.noteTopology.objectNoteTopology"
+    v-if="note.noteTopology.targetNoteTopology"
     v-bind="{ noteTopology: note.noteTopology, readonly }"
   />
   <NoteEditableTitle

@@ -12,7 +12,7 @@ public class NoteTopology {
   @NonNull private String titleOrPredicate;
   private String shortDetails;
   private LinkType linkType;
-  private NoteTopology objectNoteTopology;
+  private NoteTopology targetNoteTopology;
   private NoteTopology parentOrSubjectNoteTopology;
 
   public int getId() {

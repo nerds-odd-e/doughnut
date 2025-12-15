@@ -118,43 +118,43 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasObject {
-    private Note object;
+  class WhenNoteHasTarget {
+    private Note target;
     private Note note;
 
     @BeforeEach
     void setup() {
       Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      object = makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
-      note = makeMe.aReification().between(parent, object).please();
+      target = makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      note = makeMe.aReification().between(parent, target).please();
     }
 
     @Test
-    void shouldIncludeObjectInFocusNote() {
+    void shouldIncludeTargetInFocusNote() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
+      assertThat(result.getFocusNote().getTargetUriAndTitle(), equalTo(target));
     }
 
     @Test
-    void shouldIncludeObjectInRelatedNotes() {
+    void shouldIncludeTargetInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
       assertThat(result.getRelatedNotes(), hasSize(2));
       assertThat(
           result.getRelatedNotes().stream()
-              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Object)
+              .filter(n -> n.getRelationToFocusNote() == RelationshipToFocusNote.Target)
               .findFirst()
               .get(),
-          equalTo(object));
+          equalTo(target));
     }
 
     @Test
-    void shouldKeepObjectInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
+    void shouldKeepTargetInFocusNoteEvenWhenBudgetOnlyAllowsParent() {
       GraphRAGResult result = graphRAGService.retrieve(note, 2); // Only enough for parent
 
-      // Object URI should still be in focus note
-      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
+      // Target URI should still be in focus note
+      assertThat(result.getFocusNote().getTargetUriAndTitle(), equalTo(target));
 
       // Only parent should be in related notes
       assertThat(result.getRelatedNotes(), hasSize(1));
@@ -165,139 +165,139 @@ public class GraphRAGServiceTest {
 
     @Test
     void shouldNotDuplicateNoteInRelatedNotesWhenItIsAlsoAChild() {
-      // Create a child note that is also the object of the focus note
-      makeMe.theNote(object).under(note).please();
+      // Create a child note that is also the target of the focus note
+      makeMe.theNote(target).under(note).please();
       makeMe.refresh(note);
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      // Should be in both object and children lists of focus note
-      assertThat(result.getFocusNote().getObjectUriAndTitle(), equalTo(object));
-      assertThat(result.getFocusNote().getChildren(), contains(object.getUri()));
+      // Should be in both target and children lists of focus note
+      assertThat(result.getFocusNote().getTargetUriAndTitle(), equalTo(target));
+      assertThat(result.getFocusNote().getChildren(), contains(target.getUri()));
 
       // But should appear only once in related notes
-      assertThat(result.getRelatedNotes(), hasSize(3)); // parent and child/object
+      assertThat(result.getRelatedNotes(), hasSize(3)); // parent and child/target
     }
 
     @Nested
-    class WhenObjectHasContextualPath {
-      private Note objectGrandParent;
-      private Note objectParent;
+    class WhenTargetHasContextualPath {
+      private Note targetGrandParent;
+      private Note targetParent;
 
       @BeforeEach
       void setup() {
-        objectGrandParent = makeMe.aNote().titleConstructor("Object Grand Parent").please();
-        objectParent =
-            makeMe.aNote().under(objectGrandParent).titleConstructor("Object Parent").please();
-        makeMe.theNote(object).under(objectParent).please();
-        makeMe.refresh(object);
+        targetGrandParent = makeMe.aNote().titleConstructor("Target Grand Parent").please();
+        targetParent =
+            makeMe.aNote().under(targetGrandParent).titleConstructor("Target Parent").please();
+        makeMe.theNote(target).under(targetParent).please();
+        makeMe.refresh(target);
       }
 
       @Test
-      void shouldIncludeObjectContextualPathInRelatedNotes() {
+      void shouldIncludeTargetContextualPathInRelatedNotes() {
         GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-        // Verify object's contextual path notes are in related notes
+        // Verify target's contextual path notes are in related notes
         assertRelatedNotesContain(
             result,
-            RelationshipToFocusNote.AncestorInObjectContextualPath,
-            objectGrandParent,
-            objectParent);
+            RelationshipToFocusNote.AncestorInTargetContextualPath,
+            targetGrandParent,
+            targetParent);
       }
 
       @Test
-      void shouldNotIncludeObjectContextualPathWhenBudgetIsLimited() {
-        // Set budget to only allow object
+      void shouldNotIncludeTargetContextualPathWhenBudgetIsLimited() {
+        // Set budget to only allow target
         GraphRAGResult result = graphRAGService.retrieve(note, 3);
 
-        // Verify object is included but not its contextual path
+        // Verify target is included but not its contextual path
         assertThat(
             result.getRelatedNotes().stream()
                 .map(BareNote::getRelationToFocusNote)
                 .collect(Collectors.toList()),
-            contains(RelationshipToFocusNote.Parent, RelationshipToFocusNote.Object));
+            contains(RelationshipToFocusNote.Parent, RelationshipToFocusNote.Target));
 
-        // Verify no object contextual path notes are included
+        // Verify no target contextual path notes are included
         assertThat(
             getNotesWithRelationship(
-                result, RelationshipToFocusNote.AncestorInObjectContextualPath),
+                result, RelationshipToFocusNote.AncestorInTargetContextualPath),
             empty());
       }
     }
   }
 
   @Nested
-  class WhenNoteHasObjectSiblings {
-    private Note object;
+  class WhenNoteHasTargetSiblings {
+    private Note target;
     private Note focusNote;
-    private Note objectSibling1;
-    private Note objectSibling2;
+    private Note targetSibling1;
+    private Note targetSibling2;
 
     @BeforeEach
     void setup() {
       Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      object = makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
-      focusNote = makeMe.aReification().between(parent, object).please();
+      target = makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      focusNote = makeMe.aReification().between(parent, target).please();
 
-      // Create other notes that share the same object
+      // Create other notes that share the same target
       Note siblingParent1 = makeMe.aNote().titleConstructor("Sibling Parent 1").please();
-      objectSibling1 = makeMe.aReification().between(siblingParent1, object).please();
+      targetSibling1 = makeMe.aReification().between(siblingParent1, target).please();
 
       Note siblingParent2 = makeMe.aNote().titleConstructor("Sibling Parent 2").please();
-      objectSibling2 = makeMe.aReification().between(siblingParent2, object).please();
+      targetSibling2 = makeMe.aReification().between(siblingParent2, target).please();
     }
 
     @Test
-    void shouldIncludeObjectSiblingsInRelatedNotes() {
+    void shouldIncludeTargetSiblingsInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
       assertRelatedNotesContain(
-          result, RelationshipToFocusNote.ObjectSibling, objectSibling1, objectSibling2);
+          result, RelationshipToFocusNote.TargetSibling, targetSibling1, targetSibling2);
     }
 
     @Test
-    void shouldNotIncludeFocusNoteAsObjectSibling() {
+    void shouldNotIncludeFocusNoteAsTargetSibling() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      List<BareNote> objectSiblings =
-          getNotesWithRelationship(result, RelationshipToFocusNote.ObjectSibling);
-      assertThat(objectSiblings, hasSize(2));
+      List<BareNote> targetSiblings =
+          getNotesWithRelationship(result, RelationshipToFocusNote.TargetSibling);
+      assertThat(targetSiblings, hasSize(2));
       assertThat(
-          objectSiblings.stream().map(BareNote::getUri).collect(Collectors.toList()),
+          targetSiblings.stream().map(BareNote::getUri).collect(Collectors.toList()),
           not(hasItem(focusNote.getUri())));
     }
 
     @Test
-    void shouldNotIncludeObjectSiblingsWhenBudgetIsLimited() {
-      // Set budget to only allow parent and object
+    void shouldNotIncludeTargetSiblingsWhenBudgetIsLimited() {
+      // Set budget to only allow parent and target
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
-      // Verify no object siblings are included
-      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.ObjectSibling), empty());
+      // Verify no target siblings are included
+      assertThat(getNotesWithRelationship(result, RelationshipToFocusNote.TargetSibling), empty());
     }
 
     @Nested
-    class WhenObjectSiblingsHaveSubjects {
+    class WhenTargetSiblingsHaveSubjects {
       @Test
-      void shouldIncludeSubjectsOfObjectSiblingsInRelatedNotes() {
+      void shouldIncludeSubjectsOfTargetSiblingsInRelatedNotes() {
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-        // Get the parent notes of object siblings
-        Note siblingParent1 = objectSibling1.getParent();
-        Note siblingParent2 = objectSibling2.getParent();
+        // Get the parent notes of target siblings
+        Note siblingParent1 = targetSibling1.getParent();
+        Note siblingParent2 = targetSibling2.getParent();
 
         assertRelatedNotesContain(
-            result, RelationshipToFocusNote.SubjectOfObjectSibling, siblingParent1, siblingParent2);
+            result, RelationshipToFocusNote.SubjectOfTargetSibling, siblingParent1, siblingParent2);
       }
 
       @Test
-      void shouldNotIncludeSubjectsOfObjectSiblingsWhenBudgetIsLimited() {
-        // Set budget to only allow parent, object, and object siblings
+      void shouldNotIncludeSubjectsOfTargetSiblingsWhenBudgetIsLimited() {
+        // Set budget to only allow parent, target, and target siblings
         GraphRAGResult result = graphRAGService.retrieve(focusNote, 5);
 
-        // Verify no subjects of object siblings are included
+        // Verify no subjects of target siblings are included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.SubjectOfObjectSibling),
+            getNotesWithRelationship(result, RelationshipToFocusNote.SubjectOfTargetSibling),
             empty());
       }
     }
@@ -557,29 +557,29 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenNoteHasReifiedChildObject {
+  class WhenNoteHasReifiedChildTarget {
     private Note focusNote;
     private Note reifiedChild;
-    private Note objectNote;
+    private Note targetNote;
 
     @BeforeEach
     void setup() {
       focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
 
-      // Create the object note first
-      objectNote =
-          makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
+      // Create the target note first
+      targetNote =
+          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
 
-      // Create a link between parent and object
-      reifiedChild = makeMe.aReification().between(focusNote, objectNote).please();
+      // Create a link between parent and target
+      reifiedChild = makeMe.aReification().between(focusNote, targetNote).please();
       makeMe.refresh(reifiedChild);
     }
 
     @Test
-    void shouldIncludeChildObjectInRelatedNotes() {
+    void shouldIncludeChildTargetInRelatedNotes() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
+      assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfReifiedChild, targetNote);
 
       // Child should still be in children list
       assertThat(result.getFocusNote().getChildren(), contains(reifiedChild.getUri()));
@@ -628,10 +628,10 @@ public class GraphRAGServiceTest {
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
                 RelationshipToFocusNote.Child,
-                RelationshipToFocusNote.ObjectOfReifiedChild));
+                RelationshipToFocusNote.TargetOfReifiedChild));
 
-        // Verify the reified child object is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
+        // Verify the reified child target is included
+        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfReifiedChild, targetNote);
       }
 
       @Test
@@ -648,8 +648,8 @@ public class GraphRAGServiceTest {
                 regularChild3.getUri(),
                 reifiedChild.getUri()));
 
-        // Verify the reified child object is included
-        assertRelatedNotesContain(result, RelationshipToFocusNote.ObjectOfReifiedChild, objectNote);
+        // Verify the reified child target is included
+        assertRelatedNotesContain(result, RelationshipToFocusNote.TargetOfReifiedChild, targetNote);
       }
 
       @Test
@@ -678,7 +678,7 @@ public class GraphRAGServiceTest {
 
         // Verify no reified child object is included
         assertThat(
-            getNotesWithRelationship(result, RelationshipToFocusNote.ObjectOfReifiedChild),
+            getNotesWithRelationship(result, RelationshipToFocusNote.TargetOfReifiedChild),
             empty());
       }
     }
@@ -871,10 +871,10 @@ public class GraphRAGServiceTest {
   }
 
   @Nested
-  class WhenObjectOfReifiedChildHasInboundReferences {
+  class WhenTargetOfReifiedChildHasInboundReferences {
     private Note focusNote;
     private Note reifiedChild;
-    private Note objectNote;
+    private Note targetNote;
     private Note inboundReference1;
     private Note inboundReference2;
 
@@ -882,44 +882,44 @@ public class GraphRAGServiceTest {
     void setup() {
       focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
 
-      // Create the object note first
-      objectNote =
-          makeMe.aNote().titleConstructor("Object Note").details("Object Details").please();
+      // Create the target note first
+      targetNote =
+          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
 
-      // Create a link between parent and object
-      reifiedChild = makeMe.aReification().between(focusNote, objectNote).please();
+      // Create a link between parent and target
+      reifiedChild = makeMe.aReification().between(focusNote, targetNote).please();
 
-      // Create inbound references to the object note
+      // Create inbound references to the target note
       Note referenceParent1 = makeMe.aNote().titleConstructor("Reference Parent 1").please();
-      inboundReference1 = makeMe.aReification().between(referenceParent1, objectNote).please();
+      inboundReference1 = makeMe.aReification().between(referenceParent1, targetNote).please();
 
       Note referenceParent2 = makeMe.aNote().titleConstructor("Reference Parent 2").please();
-      inboundReference2 = makeMe.aReification().between(referenceParent2, objectNote).please();
+      inboundReference2 = makeMe.aReification().between(referenceParent2, targetNote).please();
 
-      makeMe.refresh(objectNote);
+      makeMe.refresh(targetNote);
     }
 
     @Test
-    void shouldIncludeInboundReferencesToObjectOfReifiedChild() {
+    void shouldIncludeInboundReferencesToTargetOfReifiedChild() {
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 1000);
 
-      // Verify inbound references to object are included
+      // Verify inbound references to target are included
       assertRelatedNotesContain(
           result,
-          RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild,
+          RelationshipToFocusNote.InboundReferenceToTargetOfReifiedChild,
           inboundReference1,
           inboundReference2);
     }
 
     @Test
-    void shouldNotIncludeInboundReferencesToObjectWhenBudgetIsLimited() {
-      // Set budget to only allow up to object of reified child
+    void shouldNotIncludeInboundReferencesToTargetWhenBudgetIsLimited() {
+      // Set budget to only allow up to target of reified child
       GraphRAGResult result = graphRAGService.retrieve(focusNote, 3);
 
-      // Verify no inbound references to object are included
+      // Verify no inbound references to target are included
       assertThat(
           getNotesWithRelationship(
-              result, RelationshipToFocusNote.InboundReferenceToObjectOfReifiedChild),
+              result, RelationshipToFocusNote.InboundReferenceToTargetOfReifiedChild),
           empty());
     }
   }

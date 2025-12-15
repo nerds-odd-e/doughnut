@@ -12,9 +12,9 @@
     Target:
     <strong>
       <NoteTitleWithLink
-        v-if="noteTopology.objectNoteTopology"
+        v-if="noteTopology.targetNoteTopology"
         class="link-title"
-        v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
+        v-bind="{ noteTopology: noteTopology.targetNoteTopology }"
       />
     </strong>
   </div>

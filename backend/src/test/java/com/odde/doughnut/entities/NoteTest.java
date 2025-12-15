@@ -65,7 +65,7 @@ public class NoteTest {
     @Test
     void replaceParentPlaceholder() {
       assertThat(
-          linkingNote.getNoteTopology().getObjectNoteTopology().getTitleOrPredicate(),
+          linkingNote.getNoteTopology().getTargetNoteTopology().getTitleOrPredicate(),
           equalTo(target.getTitleConstructor()));
     }
 
@@ -73,7 +73,7 @@ public class NoteTest {
     void linkOfLink() {
       Note linkOfLink = makeMe.aReification().between(parent, linkingNote).please();
       assertThat(
-          linkOfLink.getNoteTopology().getObjectNoteTopology().getObjectNoteTopology().getId(),
+          linkOfLink.getNoteTopology().getTargetNoteTopology().getTargetNoteTopology().getId(),
           equalTo(target.getId()));
     }
   }

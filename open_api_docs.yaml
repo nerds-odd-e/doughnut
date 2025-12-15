@@ -3740,7 +3740,7 @@ components:
           - before
           - similar to
           - confused with
-        objectNoteTopology:
+        targetNoteTopology:
           $ref: "#/components/schemas/NoteTopology"
         parentOrSubjectNoteTopology:
           $ref: "#/components/schemas/NoteTopology"
@@ -4557,7 +4557,7 @@ components:
           type: string
         title:
           type: string
-        objectUriAndTitle:
+        targetUriAndTitle:
           $ref: "#/components/schemas/UriAndTitle"
         parentUriAndTitle:
           $ref: "#/components/schemas/UriAndTitle"
@@ -4566,24 +4566,24 @@ components:
           enum:
           - Self
           - Parent
-          - Object
+          - Target
           - Child
           - PriorSibling
           - YoungerSibling
           - InboundReference
           - SubjectOfInboundReference
           - AncestorInContextualPath
-          - AncestorInObjectContextualPath
-          - ObjectOfReifiedChild
+          - AncestorInTargetContextualPath
+          - TargetOfReifiedChild
           - SiblingOfParent
-          - SiblingOfParentOfObject
+          - SiblingOfParentOfTarget
           - ChildOfSiblingOfParent
-          - ChildOfSiblingOfParentOfObject
+          - ChildOfSiblingOfParentOfTarget
           - InboundReferenceContextualPath
           - SiblingOfSubjectOfInboundReference
-          - InboundReferenceToObjectOfReifiedChild
-          - ObjectSibling
-          - SubjectOfObjectSibling
+          - InboundReferenceToTargetOfReifiedChild
+          - TargetSibling
+          - SubjectOfTargetSibling
           - RemotelyRelated
         details:
           type: string
@@ -4603,7 +4603,7 @@ components:
           type: string
         title:
           type: string
-        objectUriAndTitle:
+        targetUriAndTitle:
           $ref: "#/components/schemas/UriAndTitle"
         parentUriAndTitle:
           $ref: "#/components/schemas/UriAndTitle"
@@ -4612,24 +4612,24 @@ components:
           enum:
           - Self
           - Parent
-          - Object
+          - Target
           - Child
           - PriorSibling
           - YoungerSibling
           - InboundReference
           - SubjectOfInboundReference
           - AncestorInContextualPath
-          - AncestorInObjectContextualPath
-          - ObjectOfReifiedChild
+          - AncestorInTargetContextualPath
+          - TargetOfReifiedChild
           - SiblingOfParent
-          - SiblingOfParentOfObject
+          - SiblingOfParentOfTarget
           - ChildOfSiblingOfParent
-          - ChildOfSiblingOfParentOfObject
+          - ChildOfSiblingOfParentOfTarget
           - InboundReferenceContextualPath
           - SiblingOfSubjectOfInboundReference
-          - InboundReferenceToObjectOfReifiedChild
-          - ObjectSibling
-          - SubjectOfObjectSibling
+          - InboundReferenceToTargetOfReifiedChild
+          - TargetSibling
+          - SubjectOfTargetSibling
           - RemotelyRelated
         details:
           type: string

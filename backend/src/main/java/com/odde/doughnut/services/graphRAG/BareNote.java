@@ -17,7 +17,7 @@ import lombok.Getter;
   "subjectUriAndTitle",
   "predicate",
   "title",
-  "objectUriAndTitle",
+  "targetUriAndTitle",
   "parentUriAndTitle",
   "relationToFocusNote",
   "details",
@@ -50,29 +50,29 @@ public class BareNote {
 
   @JsonProperty("title")
   public String getTitle() {
-    return getObjectUriAndTitle() != null ? null : note.getTitleConstructor();
+    return getTargetUriAndTitle() != null ? null : note.getTitleConstructor();
   }
 
   @JsonProperty("predicate")
   public String getPredicate() {
-    return getObjectUriAndTitle() != null ? note.getTitleConstructor() : null;
+    return getTargetUriAndTitle() != null ? note.getTitleConstructor() : null;
   }
 
-  @JsonProperty("objectUriAndTitle")
-  public UriAndTitle getObjectUriAndTitle() {
+  @JsonProperty("targetUriAndTitle")
+  public UriAndTitle getTargetUriAndTitle() {
     return note.getTargetNote() != null ? UriAndTitle.fromNote(note.getTargetNote()) : null;
   }
 
   @JsonProperty("parentUriAndTitle")
   public UriAndTitle getParentUriAndTitle() {
-    return getObjectUriAndTitle() == null && note.getParent() != null
+    return getTargetUriAndTitle() == null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
   }
 
   @JsonProperty("subjectUriAndTitle")
   public UriAndTitle getSubjectUriAndTitle() {
-    return getObjectUriAndTitle() != null && note.getParent() != null
+    return getTargetUriAndTitle() != null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
   }

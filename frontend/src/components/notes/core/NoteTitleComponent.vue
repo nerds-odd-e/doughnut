@@ -1,5 +1,5 @@
 <template>
-  <template v-if="noteTopology.objectNoteTopology">
+  <template v-if="noteTopology.targetNoteTopology">
     <template v-if="full">
       <NoteTitleWithLink
         v-if="noteTopology.parentOrSubjectNoteTopology"
@@ -18,12 +18,12 @@
     <span>
       <NoteTitleComponent
         v-if="iconizedTarget"
-        v-bind="{ noteTopology: noteTopology.objectNoteTopology }"
+        v-bind="{ noteTopology: noteTopology.targetNoteTopology }"
       />
       <NoteTitleWithLink
         class="hover-underline"
         v-bind="{
-          noteTopology: noteTopology.objectNoteTopology,
+          noteTopology: noteTopology.targetNoteTopology,
           iconized: iconizedTarget,
         }"
       />
