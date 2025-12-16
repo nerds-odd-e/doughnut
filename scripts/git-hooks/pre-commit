@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+#
+# Git pre-commit hook
+# Runs code formatting before allowing commit
+#
+# This hook is installed from scripts/git-hooks/pre-commit to .git/hooks/pre-commit
+# Run: ./scripts/setup-git-hooks.sh to install
+
+set -e
+
+# Get the directory of this script (git hooks directory)
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$HOOK_DIR/../.." && pwd)"
+
+cd "$REPO_ROOT"
+
+# Run formatter
+./scripts/run.sh pnpm format:all
+
+# Stage any files that were modified by the formatter
+# This ensures formatted changes are included in the commit
+git add -u
+
+# If formatting succeeded, allow the commit
+exit 0
+

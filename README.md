@@ -123,15 +123,18 @@ pnpm backend:verify
 A pre-commit hook is configured to automatically format code before each commit. The hook runs `./scripts/run.sh pnpm format:all` to ensure all code is properly formatted.
 
 **Setup:**
-The pre-commit hook is located at `.git/hooks/pre-commit` and is automatically active once created. If you need to set it up manually:
+The git hooks are version-controlled in `scripts/git-hooks/`. To install them, run:
 
 ```bash
-chmod +x .git/hooks/pre-commit
+./scripts/setup-git-hooks.sh
 ```
+
+This will copy the hooks from `scripts/git-hooks/` to `.git/hooks/` and make them executable. You only need to run this once after cloning the repository, or whenever hooks are updated.
 
 **Behavior:**
 - The hook runs automatically on every `git commit`
 - It formats all code (backend, frontend, MCP server, Cypress, and OpenAPI)
+- Any files modified by the formatter are automatically staged for commit
 - If formatting succeeds, the commit proceeds
 - If formatting fails, the commit is blocked
 
