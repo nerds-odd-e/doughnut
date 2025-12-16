@@ -14,6 +14,19 @@ MYSQL_PKG_PATH="$2"
 REDIS_PKG_PATH="$3"
 POETRY_PATH="$4"
 
+# Check if running in CURSOR_DEV mode (quiet mode)
+CURSOR_DEV_MODE="${CURSOR_DEV:-}"
+if [ "$CURSOR_DEV_MODE" = "true" ]; then
+  # Quiet mode: show minimal one-liner, suppress all other output
+  echo "<<running within nix env>>"
+  # Save original stdout and stderr
+  exec 3>&1
+  exec 4>&2
+  # Redirect hook output to /dev/null (command output will use original descriptors)
+  exec 1>/dev/null
+  exec 2>/dev/null
+fi
+
 # Source helper scripts
 source ./scripts/shell_setup.sh
 source ./scripts/dev_setup.sh
@@ -47,8 +60,10 @@ if [ "${PYTHON_DEV:-}" = "true" ] && command -v python >/dev/null 2>&1; then
   setup_python "${POETRY_PATH}"
 fi
 
-echo "CURSOR_DEV: ${CURSOR_DEV:-}"
-if [ "${CURSOR_DEV:-}" != "true" ]; then
+if [ "$CURSOR_DEV_MODE" != "true" ]; then
+  # Full output mode: show all setup information
+  echo "CURSOR_DEV: ${CURSOR_DEV:-}"
+  
   # Setup development environment
   setup_pnpm_and_biome
   setup_cypress
@@ -70,11 +85,20 @@ if [ "${CURSOR_DEV:-}" != "true" ]; then
   else
     log "Redis is running on port 6380 & ready to go! 🗄️"
   fi
+
+  # Print environment information
+  print_env_info
+
+  log "Environment setup complete! 🎉"
 fi
 
-# Print environment information
-print_env_info
+# Restore original stdout/stderr if in CURSOR_DEV mode
+if [ "$CURSOR_DEV_MODE" = "true" ]; then
+  exec 1>&3
+  exec 2>&4
+  exec 3>&-
+  exec 4>&-
+fi
 
-log "Environment setup complete! 🎉"
 return 0
 
