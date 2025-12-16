@@ -7,8 +7,7 @@ public enum NoteType {
   CONCEPT("concept"),
   CATEGORY("category"),
   VOCAB("vocab"),
-  JOURNAL("journal"),
-  UNASSIGNED("unassigned");
+  JOURNAL("journal");
 
   @JsonValue public final String label;
 
@@ -19,7 +18,7 @@ public enum NoteType {
   @JsonCreator
   public static NoteType fromLabel(String text) {
     if (text == null || text.isEmpty()) {
-      return UNASSIGNED; // Default type
+      return null;
     }
     for (NoteType type : NoteType.values()) {
       if (type.label.equalsIgnoreCase(text)) {

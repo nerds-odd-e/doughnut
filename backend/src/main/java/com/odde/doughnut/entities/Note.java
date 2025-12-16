@@ -121,7 +121,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   @Getter
   @Setter
-  private NoteType noteType = NoteType.UNASSIGNED;
+  private NoteType noteType;
 
   @OneToMany(mappedBy = "note")
   @Getter

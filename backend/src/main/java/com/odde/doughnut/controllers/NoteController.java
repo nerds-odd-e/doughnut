@@ -19,7 +19,6 @@ import com.odde.doughnut.services.graphRAG.GraphRAGResult;
 import com.odde.doughnut.services.wikidataApis.WikidataIdWithApi;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
@@ -174,7 +173,7 @@ class NoteController {
   @Transactional
   public NoteRealm updateNoteType(
       @PathVariable("note") @Schema(type = "integer") Note note,
-      @NotNull @Valid @RequestBody NoteType noteType)
+      @RequestBody(required = false) NoteType noteType)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(note);
     noteService.setNoteType(note, noteType);

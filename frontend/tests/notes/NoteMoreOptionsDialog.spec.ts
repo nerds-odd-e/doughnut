@@ -26,7 +26,7 @@ const mockNoteInfo: NoteInfo = {
   },
   memoryTrackers: [],
   createdAt: "",
-  noteType: "unassigned",
+  noteType: undefined,
 }
 
 afterEach(() => {
@@ -81,13 +81,13 @@ describe("NoteMoreOptionsDialog", () => {
       expect((select.element as HTMLSelectElement).value).toBe("concept")
     })
 
-    it("defaults to unassigned when noteType is not set", async () => {
+    it("defaults to empty when noteType is not set", async () => {
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
 
       const select = wrapper.find('select[id="note-noteType"]')
-      expect((select.element as HTMLSelectElement).value).toBe("unassigned")
+      expect((select.element as HTMLSelectElement).value).toBe("")
     })
   })
 

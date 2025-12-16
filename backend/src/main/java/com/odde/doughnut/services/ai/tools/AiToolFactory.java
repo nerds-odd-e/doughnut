@@ -73,7 +73,7 @@ public class AiToolFactory {
   }
 
   private static String getNoteTypeInstruction(NoteType noteType) {
-    if (noteType == null || noteType == NoteType.UNASSIGNED) {
+    if (noteType == null) {
       return null;
     }
     return switch (noteType) {

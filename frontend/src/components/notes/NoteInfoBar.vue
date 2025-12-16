@@ -21,7 +21,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "levelChanged", value: unknown): void
   (e: "noteTypeUpdated", noteType: NoteType): void
-  (e: "noteInfoLoaded", noteType: NoteType): void
+  (e: "noteInfoLoaded", noteType: NoteType | undefined): void
 }>()
 
 const noteInfo = ref<NoteInfo | undefined>(undefined)
@@ -32,9 +32,7 @@ const fetchData = async () => {
   })
   if (!error) {
     noteInfo.value = noteInfoData!
-    if (noteInfoData?.noteType) {
-      emit("noteInfoLoaded", noteInfoData.noteType)
-    }
+    emit("noteInfoLoaded", noteInfoData?.noteType)
   }
 }
 

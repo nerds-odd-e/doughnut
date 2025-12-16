@@ -122,7 +122,7 @@ class NoteControllerTests extends ControllerTestBase {
       Note note = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
 
       NoteInfo noteInfo = controller.getNoteInfo(note);
-      assertThat(noteInfo.getNoteType(), equalTo(NoteType.UNASSIGNED));
+      assertThat(noteInfo.getNoteType(), nullValue());
     }
   }
 

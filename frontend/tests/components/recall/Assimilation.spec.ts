@@ -35,7 +35,7 @@ beforeEach(() => {
   mockSdkService("getNoteInfo", {
     note: makeMe.aNoteRealm.please(),
     createdAt: "",
-    noteType: "unassigned",
+    noteType: undefined,
   })
   mockSdkService("generateSummary", {
     points: [],

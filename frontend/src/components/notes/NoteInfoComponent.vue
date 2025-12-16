@@ -4,8 +4,8 @@
     class="daisy-mb-4"
   >
     <Select
-      v-model="localNoteType"
-      :options="noteTypeOptions"
+      v-model="localNoteTypeForSelect"
+      :options="noteTypeOptionsWithEmpty"
       scope-name="note"
       field="noteType"
       @update:model-value="updateNoteType"
@@ -69,16 +69,25 @@ const router = useRouter()
 
 // Reactive state
 const memoryTrackers = ref(props.noteInfo.memoryTrackers ?? [])
-const localNoteType = ref<NoteType>(props.noteInfo.noteType ?? "unassigned")
+const localNoteType = ref<NoteType | undefined>(props.noteInfo.noteType)
 
 // Computed
 const recallSetting = computed(() => props.noteInfo.recallSetting)
+const noteTypeOptionsWithEmpty = computed(
+  () => ["", ...noteTypeOptions] as string[]
+)
+const localNoteTypeForSelect = computed({
+  get: () => localNoteType.value ?? "",
+  set: (value: string) => {
+    localNoteType.value = value === "" ? undefined : (value as NoteType)
+  },
+})
 
 // Watch for external changes to noteInfo.noteType
 watch(
   () => props.noteInfo.noteType,
   (newNoteType) => {
-    localNoteType.value = newNoteType ?? "unassigned"
+    localNoteType.value = newNoteType
   }
 )
 
@@ -97,25 +106,29 @@ const navigateToMemoryTracker = (memoryTrackerId: number) => {
   })
 }
 
-const updateNoteType = async (newType: NoteType) => {
+const updateNoteType = async (newTypeString: string) => {
   const previousValue = localNoteType.value
+  const newType = newTypeString === "" ? undefined : (newTypeString as NoteType)
   localNoteType.value = newType
 
   if (newType === props.noteInfo.noteType) {
     return
   }
 
-  const { error } = await apiCallWithLoading(() =>
-    NoteController.updateNoteType({
-      path: { note: props.noteInfo.note.id },
-      body: newType,
-    })
-  )
+  // Only send update if a type is selected (not empty/undefined)
+  if (newType !== undefined) {
+    const { error } = await apiCallWithLoading(() =>
+      NoteController.updateNoteType({
+        path: { note: props.noteInfo.note.id },
+        body: newType,
+      })
+    )
 
-  if (error) {
-    localNoteType.value = previousValue
-  } else {
-    emit("noteTypeUpdated", newType)
+    if (error) {
+      localNoteType.value = previousValue
+    } else {
+      emit("noteTypeUpdated", newType)
+    }
   }
 }
 </script>

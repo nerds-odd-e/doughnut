@@ -80,7 +80,7 @@ const { totalAssimilatedCount } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
-const currentNoteType = ref<NoteType>("unassigned")
+const currentNoteType = ref<NoteType | undefined>(undefined)
 
 const buttonKey = computed(() => note.id)
 
@@ -129,12 +129,12 @@ const generateSummary = async () => {
   }
 }
 
-const onNoteInfoLoaded = (noteType: NoteType) => {
+const onNoteInfoLoaded = (noteType: NoteType | undefined) => {
   currentNoteType.value = noteType
   generateSummary()
 }
 
-const onNoteTypeUpdated = (newType: NoteType) => {
+const onNoteTypeUpdated = (newType: NoteType | undefined) => {
   currentNoteType.value = newType
   // Regenerate summary after note type is updated (to handle category exclusion)
   generateSummary()

@@ -729,7 +729,7 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldNotIncludeNoteTypeInstructionForUnassigned() {
       Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.UNASSIGNED);
+      note.setNoteType(null);
       makeMe.aNote().under(note).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
@@ -745,7 +745,7 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should not contain note type instruction for UNASSIGNED",
+          "Request should not contain note type instruction for null",
           hasNoteTypeInstruction,
           is(false));
     }

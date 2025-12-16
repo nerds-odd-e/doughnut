@@ -24,7 +24,7 @@ describe("NoteInfoComponent", () => {
       ],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
-      noteType: "unassigned",
+      noteType: undefined,
     }
 
     const wrapper = helper
@@ -49,7 +49,7 @@ describe("NoteInfoComponent", () => {
       memoryTrackers: [skippedMemoryTracker],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
-      noteType: "unassigned",
+      noteType: undefined,
     }
 
     const wrapper = helper
@@ -79,7 +79,7 @@ describe("NoteInfoComponent", () => {
       memoryTrackers: [makeMe.aMemoryTracker.please()],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
-      noteType: "unassigned",
+      noteType: undefined,
     }
 
     const wrapper = helper
@@ -102,7 +102,7 @@ describe("NoteInfoComponent", () => {
       memoryTrackers: [],
       note: makeMe.aNoteRealm.please(),
       createdAt: "",
-      noteType: "unassigned",
+      noteType: undefined,
     }
 
     const wrapper = helper
@@ -151,7 +151,7 @@ describe("NoteInfoComponent", () => {
         memoryTrackers: [],
         note: makeMe.aNoteRealm.please(),
         createdAt: "",
-        noteType: "unassigned",
+        noteType: undefined,
       }
 
       const wrapper = helper
@@ -181,7 +181,7 @@ describe("NoteInfoComponent", () => {
         memoryTrackers: [],
         note: makeMe.aNoteRealm.please(),
         createdAt: "",
-        noteType: "unassigned",
+        noteType: undefined,
       }
 
       const wrapper = helper

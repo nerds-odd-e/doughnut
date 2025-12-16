@@ -2370,8 +2370,6 @@ paths:
               - category
               - vocab
               - journal
-              - unassigned
-        required: true
       responses:
         "500":
           description: Internal Server Error
@@ -4540,7 +4538,6 @@ components:
           - category
           - vocab
           - journal
-          - unassigned
       required:
       - createdAt
       - note
