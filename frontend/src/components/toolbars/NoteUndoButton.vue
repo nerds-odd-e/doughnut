@@ -56,8 +56,8 @@ const getNoteTopology = () => {
 
 const getNoteIdentifier = (noteId: Doughnut.ID): string => {
   const noteRealm = storageAccessor.value.refOfNoteRealm(noteId).value
-  if (noteRealm?.note?.noteTopology?.titleOrPredicate) {
-    return `"${noteRealm.note.noteTopology.titleOrPredicate}"`
+  if (noteRealm?.note?.noteTopology?.title) {
+    return `"${noteRealm.note.noteTopology.title}"`
   }
   return `note id: ${noteId}`
 }
@@ -70,7 +70,7 @@ const getCurrentContent = (): string => {
   if (!noteRealm) return ""
 
   if (history.value.type === "edit title") {
-    return noteRealm.note.noteTopology.titleOrPredicate || ""
+    return noteRealm.note.noteTopology.title || ""
   }
   if (history.value.type === "edit details") {
     return noteRealm.note.details || ""

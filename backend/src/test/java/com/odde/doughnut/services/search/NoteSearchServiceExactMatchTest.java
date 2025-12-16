@@ -48,7 +48,7 @@ class NoteSearchServiceExactMatchTest {
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(4));
-      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("Pam"));
+      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
       assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
@@ -65,8 +65,8 @@ class NoteSearchServiceExactMatchTest {
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(5));
-      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("Pam"));
-      assertThat(results.get(1).getNoteTopology().getTitleOrPredicate(), equalTo("pam"));
+      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
+      assertThat(results.get(1).getNoteTopology().getTitle(), equalTo("pam"));
       assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch1.getId()));
       assertThat(results.get(1).getNoteTopology().getId(), equalTo(exactMatch2.getId()));
     }
@@ -83,7 +83,7 @@ class NoteSearchServiceExactMatchTest {
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(greaterThan(20)));
-      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("Pam"));
+      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("Pam"));
       assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 
@@ -98,7 +98,7 @@ class NoteSearchServiceExactMatchTest {
           noteSearchService.searchForNotesInRelationTo(user, searchTerm, parentNote);
 
       assertThat(results, hasSize(3));
-      assertThat(results.get(0).getNoteTopology().getTitleOrPredicate(), equalTo("PAM"));
+      assertThat(results.get(0).getNoteTopology().getTitle(), equalTo("PAM"));
       assertThat(results.get(0).getNoteTopology().getId(), equalTo(exactMatch.getId()));
     }
 

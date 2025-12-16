@@ -22,7 +22,7 @@ The Graph RAG system aims to retrieve a focused view of a note and its most rele
 ### Core Components
 - **BareNote**: Basic note representation containing:
   - URI (string)
-  - Title or predicate (string, depending on note type)
+  - Title (string)
   - Details (truncated for non-focus notes)
   - Parent and target references as `UriAndTitle` objects
   - Relationship to focus note

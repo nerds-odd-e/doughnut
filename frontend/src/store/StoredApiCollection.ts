@@ -351,7 +351,7 @@ export default class StoredApiCollection implements StoredApi {
     if (currentNote) {
       const old =
         field === "edit title"
-          ? currentNote.noteTopology.titleOrPredicate
+          ? currentNote.noteTopology.title
           : currentNote.details
       if (old === value) {
         return

@@ -16,7 +16,7 @@ class NoteBuilder extends Builder<Note> {
       id,
       noteTopology: {
         id,
-        titleOrPredicate: "Note1.1.1",
+        title: "Note1.1.1",
       },
       details: "<p>Desc</p>",
       wikidataId: "",
@@ -34,7 +34,7 @@ class NoteBuilder extends Builder<Note> {
   }
 
   title(value: string): NoteBuilder {
-    this.data.noteTopology.titleOrPredicate = value
+    this.data.noteTopology.title = value
     return this
   }
 
@@ -78,7 +78,7 @@ class NoteBuilder extends Builder<Note> {
     this.data.noteTopology.targetNoteTopology = {
       id: generateId(),
       relationType: value,
-      titleOrPredicate: "a target",
+      title: "a target",
     }
     return this
   }

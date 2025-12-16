@@ -11,16 +11,8 @@ import makeMe from "@tests/fixtures/makeMe"
 
 // Test fixtures
 const recentNotes: NoteSearchResult[] = [
-  makeMe.aNoteSearchResult
-    .id(1)
-    .titleOrPredicate("Recent Note 1")
-    .distance(null)
-    .please(),
-  makeMe.aNoteSearchResult
-    .id(2)
-    .titleOrPredicate("Recent Note 2")
-    .distance(null)
-    .please(),
+  makeMe.aNoteSearchResult.id(1).title("Recent Note 1").distance(null).please(),
+  makeMe.aNoteSearchResult.id(2).title("Recent Note 2").distance(null).please(),
 ]
 
 const searchResult = (
@@ -28,11 +20,7 @@ const searchResult = (
   title: string,
   distance?: number
 ): NoteSearchResult =>
-  makeMe.aNoteSearchResult
-    .id(id)
-    .titleOrPredicate(title)
-    .distance(distance)
-    .please()
+  makeMe.aNoteSearchResult.id(id).title(title).distance(distance).please()
 
 // Test helpers
 function setupSearchMocks(
@@ -372,7 +360,7 @@ describe("SearchResults.vue", () => {
       const recentNotesWithCurrent: NoteSearchResult[] = [
         makeMe.aNoteSearchResult
           .id(999)
-          .titleOrPredicate("Current Note")
+          .title("Current Note")
           .distance(null)
           .please(),
         ...recentNotes,

@@ -61,7 +61,7 @@ const relationTypeSelected = async (
   if (props.note.parentId === null) {
     if (
       !(await popups.confirm(
-        `"${props.note.noteTopology.titleOrPredicate}" is a top level notebook. Do you want to move it under other notebook?`
+        `"${props.note.noteTopology.title}" is a top level notebook. Do you want to move it under other notebook?`
       ))
     ) {
       return

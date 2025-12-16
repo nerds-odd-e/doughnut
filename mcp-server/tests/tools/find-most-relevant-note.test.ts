@@ -32,7 +32,7 @@ describe('find_most_relevant_note tool', () => {
     const findMostRelevantNoteTool = findTool('find_most_relevant_note')
 
     const searchResult = shouldFindNote
-      ? [{ noteTopology: { id: 123, titleOrPredicate: 'Test Note' } }]
+      ? [{ noteTopology: { id: 123, title: 'Test Note' } }]
       : []
 
     // Mock the service response

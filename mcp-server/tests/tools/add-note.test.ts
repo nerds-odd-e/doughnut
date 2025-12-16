@@ -33,14 +33,14 @@ describe('add_note tool', () => {
       created: {
         note: {
           noteTopology: {
-            titleOrPredicate: 'Test Note',
+            title: 'Test Note',
           },
         },
       },
       parent: {
         note: {
           noteTopology: {
-            titleOrPredicate: 'Parent Note',
+            title: 'Parent Note',
           },
         },
       },

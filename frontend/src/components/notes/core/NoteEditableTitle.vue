@@ -1,6 +1,6 @@
 <template>
   <TextContentWrapper
-    :value="noteTopology.titleOrPredicate"
+    :value="noteTopology.title"
     field="edit title"
   >
     <template #default="{ value, update, blur, errors }">

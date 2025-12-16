@@ -8,7 +8,7 @@ describe("SearchResultCard", () => {
   it("renders the card with title", async () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
-      .titleOrPredicate("Test Note")
+      .title("Test Note")
       .notebookId(10)
       .please()
 
@@ -20,7 +20,7 @@ describe("SearchResultCard", () => {
   it("does not add border when notebookId is not provided", async () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
-      .titleOrPredicate("Test Note")
+      .title("Test Note")
       .notebookId(10)
       .please()
 
@@ -36,7 +36,7 @@ describe("SearchResultCard", () => {
   it("does not add border when notebookId matches", async () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
-      .titleOrPredicate("Test Note")
+      .title("Test Note")
       .notebookId(10)
       .please()
 
@@ -52,7 +52,7 @@ describe("SearchResultCard", () => {
   it("adds border when notebookId does not match", async () => {
     const searchResult: NoteSearchResult = makeMe.aNoteSearchResult
       .id(1)
-      .titleOrPredicate("Test Note")
+      .title("Test Note")
       .notebookId(10)
       .please()
 

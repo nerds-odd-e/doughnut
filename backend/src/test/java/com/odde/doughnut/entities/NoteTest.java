@@ -65,7 +65,7 @@ public class NoteTest {
     @Test
     void replaceParentPlaceholder() {
       assertThat(
-          relationNote.getNoteTopology().getTargetNoteTopology().getTitleOrPredicate(),
+          relationNote.getNoteTopology().getTargetNoteTopology().getTitle(),
           equalTo(target.getTitle()));
     }
 

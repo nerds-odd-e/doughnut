@@ -34,7 +34,7 @@ describe("all in note show page", () => {
         .withRouter(router)
         .render()
 
-      await screen.findByText(noteRealm.note.noteTopology.titleOrPredicate)
+      await screen.findByText(noteRealm.note.noteTopology.title)
 
       expect(showNoteSpy).toHaveBeenCalledWith({
         path: { note: noteRealm.id },

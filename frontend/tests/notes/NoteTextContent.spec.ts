@@ -167,7 +167,7 @@ describe("in place edit on title", () => {
         ...note,
         noteTopology: {
           ...note.noteTopology,
-          titleOrPredicate: "ABC",
+          title: "ABC",
         },
       },
     })
@@ -183,7 +183,7 @@ describe("in place edit on title", () => {
         ...note,
         noteTopology: {
           ...note.noteTopology,
-          titleOrPredicate: "different value",
+          title: "different value",
         },
       },
     })
@@ -280,13 +280,13 @@ describe("in place edit on title", () => {
     it("should dispay target", async () => {
       const wrapper = mountComponent(relationNote)
       expect(wrapper.text()).toContain(
-        relationNote.noteTopology.targetNoteTopology?.titleOrPredicate
+        relationNote.noteTopology.targetNoteTopology?.title
       )
     })
 
     it("should dispay breadcrumbs", async () => {
       const wrapper = mountComponent(relationNote)
-      expect(wrapper.text()).toContain(note.noteTopology.titleOrPredicate)
+      expect(wrapper.text()).toContain(note.noteTopology.title)
     })
   })
 })

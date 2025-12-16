@@ -10,7 +10,7 @@ describe("storeUndoCommand", () => {
       histories.addEditingToUndoHistory(
         note.id,
         "edit title",
-        note.note.noteTopology.titleOrPredicate
+        note.note.noteTopology.title
       )
 
       expect(histories.noteUndoHistories.length).toEqual(1)

@@ -6,14 +6,14 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
   data: Partial<NoteSearchResult> = {
     noteTopology: {
       id: generateId(),
-      titleOrPredicate: "Untitled",
+      title: "Untitled",
     },
     notebookId: generateId(),
   }
 
   id(value: number): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
-      this.data.noteTopology = { id: value, titleOrPredicate: "Untitled" }
+      this.data.noteTopology = { id: value, title: "Untitled" }
     } else {
       this.data.noteTopology.id = value
     }
@@ -25,11 +25,11 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return this
   }
 
-  titleOrPredicate(value: string): NoteSearchResultBuilder {
+  title(value: string): NoteSearchResultBuilder {
     if (!this.data.noteTopology) {
-      this.data.noteTopology = { id: generateId(), titleOrPredicate: value }
+      this.data.noteTopology = { id: generateId(), title: value }
     } else {
-      this.data.noteTopology.titleOrPredicate = value
+      this.data.noteTopology.title = value
     }
     return this
   }
@@ -49,7 +49,7 @@ class NoteSearchResultBuilder extends Builder<NoteSearchResult> {
     return {
       noteTopology: this.data.noteTopology ?? {
         id,
-        titleOrPredicate: "Untitled",
+        title: "Untitled",
       },
       notebookId: this.data.notebookId ?? generateId(),
       distance: this.data.distance,

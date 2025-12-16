@@ -21,7 +21,7 @@ const props = defineProps({
   note: { type: Object as PropType<Note>, required: true },
 })
 
-const prompt = ref(props.note.noteTopology.titleOrPredicate)
+const prompt = ref(props.note.noteTopology.title)
 const b64Json = ref<string | undefined>(undefined)
 const promptError = ref<string | undefined>(undefined)
 

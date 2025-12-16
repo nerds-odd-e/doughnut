@@ -49,12 +49,12 @@ const props = defineProps({
 const reactiveProps = ref(props)
 
 const relationType = computed(() =>
-  reactiveProps.value.noteTopology.titleOrPredicate.substring(1)
+  reactiveProps.value.noteTopology.title.substring(1)
 )
 const title = computed(() =>
-  reactiveProps.value.noteTopology.titleOrPredicate?.replace(
+  reactiveProps.value.noteTopology.title?.replace(
     "%P",
-    `[${reactiveProps.value.noteTopology.parentOrSubjectNoteTopology?.titleOrPredicate}]`
+    `[${reactiveProps.value.noteTopology.parentOrSubjectNoteTopology?.title}]`
   )
 )
 const iconizedTarget = computed(

@@ -3718,7 +3718,7 @@ components:
         id:
           type: integer
           format: int32
-        titleOrPredicate:
+        title:
           type: string
         shortDetails:
           type: string
@@ -3746,7 +3746,7 @@ components:
           $ref: "#/components/schemas/NoteTopology"
       required:
       - id
-      - titleOrPredicate
+      - title
     Notebook:
       type: object
       properties:
