@@ -39,7 +39,7 @@ class TextContentController {
       @PathVariable(name = "note") @Schema(type = "integer") Note note,
       @Valid @RequestBody NoteUpdateTitleDTO titleDTO)
       throws UnexpectedNoAccessRightException {
-    return updateNote(note, n -> n.setTitleConstructor(titleDTO.getNewTitle()));
+    return updateNote(note, n -> n.setTitle(titleDTO.getNewTitle()));
   }
 
   @PatchMapping(path = "/{note}/details")

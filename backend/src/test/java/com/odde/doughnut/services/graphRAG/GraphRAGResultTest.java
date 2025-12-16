@@ -29,8 +29,8 @@ class GraphRAGResultTest {
   @Test
   void shouldIncludeParentUriAndTitleWhenSerializedToJson() throws Exception {
     // Arrange
-    Note parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
-    Note note = makeMe.aNote().under(parent).titleConstructor("Child Note").please();
+    Note parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
+    Note note = makeMe.aNote().under(parent).title("Child Note").please();
 
     BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
 
@@ -54,9 +54,8 @@ class GraphRAGResultTest {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      targetNote =
-          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      parent = makeMe.aNote().title("Parent Note").please();
+      targetNote = makeMe.aNote().title("Target Note").details("Target Details").please();
       note = makeMe.aRelation().between(parent, targetNote).please();
 
       BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
@@ -102,7 +101,7 @@ class GraphRAGResultTest {
   @Test
   void shouldHaveExpectedFieldNamesForNoteWithoutParent() throws Exception {
     // Arrange
-    Note note = makeMe.aNote().titleConstructor("Root Note").details("Some details").please();
+    Note note = makeMe.aNote().title("Root Note").details("Some details").please();
     BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
 
     // Act
@@ -124,7 +123,7 @@ class GraphRAGResultTest {
     Note note =
         makeMe
             .aNote()
-            .titleConstructor("Test Note")
+            .title("Test Note")
             .details("Test Details")
             .createdAt(createdAt)
             .updatedAt(updatedAt)
@@ -148,9 +147,8 @@ class GraphRAGResultTest {
     @Test
     void shouldIncludeParentUriAndTitleWhenSerializedToJson() throws Exception {
       // Arrange
-      Note parent =
-          makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
-      Note note = makeMe.aNote().under(parent).titleConstructor("Child Note").please();
+      Note parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
+      Note note = makeMe.aNote().under(parent).title("Child Note").please();
 
       FocusNote focusNote = FocusNote.fromNote(note);
 
@@ -179,7 +177,7 @@ class GraphRAGResultTest {
       Note note =
           makeMe
               .aNote()
-              .titleConstructor("Focus Note")
+              .title("Focus Note")
               .details("Focus Details")
               .createdAt(createdAt)
               .updatedAt(updatedAt)
@@ -204,7 +202,7 @@ class GraphRAGResultTest {
     @Test
     void shouldNotIncludeDetailsTruncatedWhenDetailsAreNotTruncated() throws Exception {
       // Arrange - details shorter than truncation limit
-      Note note = makeMe.aNote().titleConstructor("Short Note").details("Short details").please();
+      Note note = makeMe.aNote().title("Short Note").details("Short details").please();
       BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
 
       // Act
@@ -219,7 +217,7 @@ class GraphRAGResultTest {
     void shouldIncludeDetailsTruncatedAsTrueWhenDetailsAreTruncated() throws Exception {
       // Arrange - create details longer than truncation limit (250 bytes)
       String longDetails = "x".repeat(300); // 300 characters should exceed 250 bytes
-      Note note = makeMe.aNote().titleConstructor("Long Note").details(longDetails).please();
+      Note note = makeMe.aNote().title("Long Note").details(longDetails).please();
       BareNote bareNote = BareNote.fromNote(note, RelationshipToFocusNote.Child);
 
       // Act
@@ -234,7 +232,7 @@ class GraphRAGResultTest {
     @Test
     void shouldNotIncludeDetailsTruncatedForFocusNote() throws Exception {
       // Arrange
-      Note note = makeMe.aNote().titleConstructor("Focus Note").details("Some details").please();
+      Note note = makeMe.aNote().title("Focus Note").details("Some details").please();
       FocusNote focusNote = FocusNote.fromNote(note);
 
       // Act

@@ -117,7 +117,7 @@ class TestabilityRestController {
       note.initialize(user, null, currentUTCTimestamp, title);
       NoteAccessory content = note.getOrInitializeNoteAccessory();
 
-      note.setTitleConstructor(title);
+      note.setTitle(title);
       note.setDetails(details);
       note.setUpdatedAt(currentUTCTimestamp);
       if (skipMemoryTracking != null) {
@@ -140,7 +140,7 @@ class TestabilityRestController {
     private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
       return noteTestData.stream()
           .map(noteTestData -> noteTestData.buildNote(user, currentUTCTimestamp))
-          .collect(Collectors.toMap(note -> note.getTitleConstructor(), n -> n));
+          .collect(Collectors.toMap(note -> note.getTitle(), n -> n));
     }
 
     private void buildNoteTree(
@@ -191,7 +191,7 @@ class TestabilityRestController {
         user, ownership, titleNoteMap, this.noteRepository, this.entityPersister);
     notesTestData.saveByOriginalOrder(titleNoteMap, this.entityPersister);
     return titleNoteMap.values().stream()
-        .collect(Collectors.toMap(note -> note.getTitleConstructor(), Note::getId));
+        .collect(Collectors.toMap(note -> note.getTitle(), Note::getId));
   }
 
   @PostMapping("/inject-predefined-questions")

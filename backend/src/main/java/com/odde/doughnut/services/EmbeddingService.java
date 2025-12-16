@@ -115,13 +115,13 @@ public class EmbeddingService {
   }
 
   private String combineNoteContent(Note note) {
-    String title = note.getTitleConstructor() != null ? note.getTitleConstructor() : "";
+    String title = note.getTitle() != null ? note.getTitle() : "";
     String details = note.getDetails() != null ? note.getDetails() : "";
 
     // Build ancestor path like: A/B/C
     String ancestorPath =
         note.getAncestors().stream()
-            .map(n -> n.getTitleConstructor() == null ? "" : n.getTitleConstructor())
+            .map(n -> n.getTitle() == null ? "" : n.getTitle())
             .filter(s -> !s.isBlank())
             .collect(java.util.stream.Collectors.joining(" \u203A "));
 

@@ -6,7 +6,7 @@ import helper from "@tests/helpers"
 describe("Card", () => {
   it("renders the card with title and details", async () => {
     const note = makeMe.aNote
-      .titleConstructor("this is a note")
+      .title("this is a note")
       .details("the details")
       .please()
     helper

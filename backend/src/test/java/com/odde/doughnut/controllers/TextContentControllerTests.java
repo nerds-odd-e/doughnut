@@ -38,7 +38,7 @@ class TextContentControllerTests extends ControllerTestBase {
     void shouldBeAbleToSaveNoteTitle() throws UnexpectedNoAccessRightException {
       NoteRealm response = controller.updateNoteTitle(note, noteUpdateTitleDTO);
       assertThat(response.getId(), equalTo(note.getId()));
-      assertThat(response.getNote().getTitleConstructor(), equalTo("new title"));
+      assertThat(response.getNote().getTitle(), equalTo("new title"));
     }
 
     @Test

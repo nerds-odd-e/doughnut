@@ -48,7 +48,7 @@ public class GraphRAGServiceTest {
   class SimpleNoteWithNoParentOrChild {
     @Test
     void shouldRetrieveJustTheFocusNoteWithZeroBudget() {
-      Note note = makeMe.aNote().titleConstructor("Test Note").details("Test Details").please();
+      Note note = makeMe.aNote().title("Test Note").details("Test Details").please();
 
       GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
@@ -59,7 +59,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldNotTruncateFocusNoteDetailsEvenIfItIsVeryLong() {
       String longDetails = "a".repeat(2000);
-      Note note = makeMe.aNote().titleConstructor("Test Note").details(longDetails).please();
+      Note note = makeMe.aNote().title("Test Note").details(longDetails).please();
 
       GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
@@ -74,7 +74,7 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("Parent Note").details("Parent Details").please();
+      parent = makeMe.aNote().title("Parent Note").details("Parent Details").please();
       note = makeMe.aNote().under(parent).please();
     }
 
@@ -124,8 +124,8 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      target = makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      Note parent = makeMe.aNote().title("Parent Note").please();
+      target = makeMe.aNote().title("Target Note").details("Target Details").please();
       note = makeMe.aRelation().between(parent, target).please();
     }
 
@@ -186,9 +186,8 @@ public class GraphRAGServiceTest {
 
       @BeforeEach
       void setup() {
-        targetGrandParent = makeMe.aNote().titleConstructor("Target Grand Parent").please();
-        targetParent =
-            makeMe.aNote().under(targetGrandParent).titleConstructor("Target Parent").please();
+        targetGrandParent = makeMe.aNote().title("Target Grand Parent").please();
+        targetParent = makeMe.aNote().under(targetGrandParent).title("Target Parent").please();
         makeMe.theNote(target).under(targetParent).please();
         makeMe.refresh(target);
       }
@@ -231,15 +230,15 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      target = makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      Note parent = makeMe.aNote().title("Parent Note").please();
+      target = makeMe.aNote().title("Target Note").details("Target Details").please();
       focusNote = makeMe.aRelation().between(parent, target).please();
 
       // Create other notes that share the same target
-      Note siblingParent1 = makeMe.aNote().titleConstructor("Sibling Parent 1").please();
+      Note siblingParent1 = makeMe.aNote().title("Sibling Parent 1").please();
       targetSibling1 = makeMe.aRelation().between(siblingParent1, target).please();
 
-      Note siblingParent2 = makeMe.aNote().titleConstructor("Sibling Parent 2").please();
+      Note siblingParent2 = makeMe.aNote().title("Sibling Parent 2").please();
       targetSibling2 = makeMe.aRelation().between(siblingParent2, target).please();
     }
 
@@ -311,21 +310,9 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      child1 =
-          makeMe
-              .aNote()
-              .under(parent)
-              .titleConstructor("Child One")
-              .details("Child 1 Details")
-              .please();
-      child2 =
-          makeMe
-              .aNote()
-              .under(parent)
-              .titleConstructor("Child Two")
-              .details("Child 2 Details")
-              .please();
+      parent = makeMe.aNote().title("Parent Note").please();
+      child1 = makeMe.aNote().under(parent).title("Child One").details("Child 1 Details").please();
+      child2 = makeMe.aNote().under(parent).title("Child Two").details("Child 2 Details").please();
     }
 
     @Test
@@ -377,22 +364,12 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
-      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
+      Note parent = makeMe.aNote().title("Parent Note").please();
+      focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
       youngerSibling1 =
-          makeMe
-              .aNote()
-              .under(parent)
-              .titleConstructor("Younger One")
-              .details("Sibling 1 Details")
-              .please();
+          makeMe.aNote().under(parent).title("Younger One").details("Sibling 1 Details").please();
       youngerSibling2 =
-          makeMe
-              .aNote()
-              .under(parent)
-              .titleConstructor("Younger Two")
-              .details("Sibling 2 Details")
-              .please();
+          makeMe.aNote().under(parent).title("Younger Two").details("Sibling 2 Details").please();
     }
 
     @Test
@@ -419,18 +396,8 @@ public class GraphRAGServiceTest {
       @BeforeEach
       void setup() {
         child1 =
-            makeMe
-                .aNote()
-                .under(focusNote)
-                .titleConstructor("Child One")
-                .details("Child 1 Details")
-                .please();
-        makeMe
-            .aNote()
-            .under(focusNote)
-            .titleConstructor("Child Two")
-            .details("Child 2 Details")
-            .please();
+            makeMe.aNote().under(focusNote).title("Child One").details("Child 1 Details").please();
+        makeMe.aNote().under(focusNote).title("Child Two").details("Child 2 Details").please();
       }
 
       @Test
@@ -466,15 +433,9 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      grandParent = makeMe.aNote().titleConstructor("Grand Parent").details("GP Details").please();
-      parent =
-          makeMe
-              .aNote()
-              .under(grandParent)
-              .titleConstructor("Parent")
-              .details("Parent Details")
-              .please();
-      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus").please();
+      grandParent = makeMe.aNote().title("Grand Parent").details("GP Details").please();
+      parent = makeMe.aNote().under(grandParent).title("Parent").details("Parent Details").please();
+      focusNote = makeMe.aNote().under(parent).title("Focus").please();
     }
 
     @Test
@@ -510,22 +471,12 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      Note parent = makeMe.aNote().titleConstructor("Parent Note").please();
+      Note parent = makeMe.aNote().title("Parent Note").please();
       olderSibling1 =
-          makeMe
-              .aNote()
-              .under(parent)
-              .titleConstructor("Prior One")
-              .details("Sibling 1 Details")
-              .please();
+          makeMe.aNote().under(parent).title("Prior One").details("Sibling 1 Details").please();
       olderSibling2 =
-          makeMe
-              .aNote()
-              .under(parent)
-              .titleConstructor("Prior Two")
-              .details("Sibling 2 Details")
-              .please();
-      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
+          makeMe.aNote().under(parent).title("Prior Two").details("Sibling 2 Details").please();
+      focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
     }
 
     @Test
@@ -561,11 +512,10 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+      focusNote = makeMe.aNote().title("Focus Note").please();
 
       // Create the target note first
-      targetNote =
-          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      targetNote = makeMe.aNote().title("Target Note").details("Target Details").please();
 
       // Create a relationship between parent and target
       relatedChild = makeMe.aRelation().between(focusNote, targetNote).please();
@@ -605,12 +555,9 @@ public class GraphRAGServiceTest {
       @BeforeEach
       void setup() {
         // Add three regular children
-        regularChild1 =
-            makeMe.aNote().under(focusNote).titleConstructor("Regular Child 1").please();
-        regularChild2 =
-            makeMe.aNote().under(focusNote).titleConstructor("Regular Child 2").please();
-        regularChild3 =
-            makeMe.aNote().under(focusNote).titleConstructor("Regular Child 3").please();
+        regularChild1 = makeMe.aNote().under(focusNote).title("Regular Child 1").please();
+        regularChild2 = makeMe.aNote().under(focusNote).title("Regular Child 2").please();
+        regularChild3 = makeMe.aNote().under(focusNote).title("Regular Child 3").please();
 
         makeMe.refresh(focusNote);
       }
@@ -709,17 +656,15 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().titleConstructor("Focus Note").details("Focus Details").please();
+      focusNote = makeMe.aNote().title("Focus Note").details("Focus Details").please();
 
       // Create first inbound reference note
-      inboundReferenceParent1 =
-          makeMe.aNote().titleConstructor("Inbound Reference Parent 1").please();
+      inboundReferenceParent1 = makeMe.aNote().title("Inbound Reference Parent 1").please();
       inboundReferenceNote1 =
           makeMe.aRelation().between(inboundReferenceParent1, focusNote).please();
 
       // Create second inbound reference note
-      inboundReferenceParent2 =
-          makeMe.aNote().titleConstructor("Inbound Reference Parent 2").please();
+      inboundReferenceParent2 = makeMe.aNote().title("Inbound Reference Parent 2").please();
       inboundReferenceNote2 =
           makeMe.aRelation().between(inboundReferenceParent2, focusNote).please();
     }
@@ -775,13 +720,11 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      Note grandParent = makeMe.aNote().titleConstructor("Grand Parent").please();
-      Note parent = makeMe.aNote().under(grandParent).titleConstructor("Parent").please();
-      parentSibling1 =
-          makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 1").please();
-      parentSibling2 =
-          makeMe.aNote().under(grandParent).titleConstructor("Parent Sibling 2").please();
-      focusNote = makeMe.aNote().under(parent).titleConstructor("Focus Note").please();
+      Note grandParent = makeMe.aNote().title("Grand Parent").please();
+      Note parent = makeMe.aNote().under(grandParent).title("Parent").please();
+      parentSibling1 = makeMe.aNote().under(grandParent).title("Parent Sibling 1").please();
+      parentSibling2 = makeMe.aNote().under(grandParent).title("Parent Sibling 2").please();
+      focusNote = makeMe.aNote().under(parent).title("Focus Note").please();
     }
 
     @Test
@@ -816,12 +759,9 @@ public class GraphRAGServiceTest {
 
       @BeforeEach
       void setup() {
-        parentSibling1Child1 =
-            makeMe.aNote().under(parentSibling1).titleConstructor("PS1 Child 1").please();
-        parentSibling1Child2 =
-            makeMe.aNote().under(parentSibling1).titleConstructor("PS1 Child 2").please();
-        parentSibling2Child1 =
-            makeMe.aNote().under(parentSibling2).titleConstructor("PS2 Child 1").please();
+        parentSibling1Child1 = makeMe.aNote().under(parentSibling1).title("PS1 Child 1").please();
+        parentSibling1Child2 = makeMe.aNote().under(parentSibling1).title("PS1 Child 2").please();
+        parentSibling2Child1 = makeMe.aNote().under(parentSibling2).title("PS2 Child 1").please();
       }
 
       @Test
@@ -864,8 +804,8 @@ public class GraphRAGServiceTest {
   class JsonSerialization {
     @Test
     void shouldIncludeRelatedNotesFieldInJson() throws Exception {
-      Note note = makeMe.aNote().titleConstructor("Test Note").please();
-      Note child = makeMe.aNote().under(note).titleConstructor("Child Note").please();
+      Note note = makeMe.aNote().title("Test Note").please();
+      Note child = makeMe.aNote().under(note).title("Child Note").please();
 
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
@@ -892,20 +832,19 @@ public class GraphRAGServiceTest {
 
     @BeforeEach
     void setup() {
-      focusNote = makeMe.aNote().titleConstructor("Focus Note").please();
+      focusNote = makeMe.aNote().title("Focus Note").please();
 
       // Create the target note first
-      targetNote =
-          makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
+      targetNote = makeMe.aNote().title("Target Note").details("Target Details").please();
 
       // Create a relationship between parent and target
       relatedChild = makeMe.aRelation().between(focusNote, targetNote).please();
 
       // Create inbound references to the target note
-      Note referenceParent1 = makeMe.aNote().titleConstructor("Reference Parent 1").please();
+      Note referenceParent1 = makeMe.aNote().title("Reference Parent 1").please();
       inboundReference1 = makeMe.aRelation().between(referenceParent1, targetNote).please();
 
-      Note referenceParent2 = makeMe.aNote().titleConstructor("Reference Parent 2").please();
+      Note referenceParent2 = makeMe.aNote().title("Reference Parent 2").please();
       inboundReference2 = makeMe.aRelation().between(referenceParent2, targetNote).please();
 
       makeMe.refresh(targetNote);
@@ -940,7 +879,7 @@ public class GraphRAGServiceTest {
     @Test
     void shouldTruncateASCIICharactersCorrectly() {
       String longDetails = "a".repeat(2000);
-      Note note = makeMe.aNote().titleConstructor("Test Note").details(longDetails).please();
+      Note note = makeMe.aNote().title("Test Note").details(longDetails).please();
       Note child = makeMe.aNote().under(note).please();
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000);
@@ -955,7 +894,7 @@ public class GraphRAGServiceTest {
     void shouldTruncateCJKCharactersCorrectly() {
       // Each CJK character takes 3 bytes in UTF-8
       String cjkText = "你好世界".repeat(500); // 2000 bytes (500 * 4 chars * 3 bytes)
-      Note note = makeMe.aNote().titleConstructor("Test Note").details(cjkText).please();
+      Note note = makeMe.aNote().title("Test Note").details(cjkText).please();
       Note child = makeMe.aNote().under(note).please();
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000);
@@ -984,7 +923,7 @@ public class GraphRAGServiceTest {
     void shouldTruncateMixedASCIIAndCJKCorrectly() {
       // Mix of ASCII (1 byte) and CJK (3 bytes)
       String mixedText = "Hello你好World世界".repeat(200);
-      Note note = makeMe.aNote().titleConstructor("Test Note").details(mixedText).please();
+      Note note = makeMe.aNote().title("Test Note").details(mixedText).please();
       Note child = makeMe.aNote().under(note).please();
 
       GraphRAGResult result = graphRAGService.retrieve(child, 1000);
@@ -1013,8 +952,8 @@ public class GraphRAGServiceTest {
   class GetGraphRAGDescriptionTests {
     @Test
     void shouldNotContainNewlinesInJson() {
-      Note note = makeMe.aNote().titleConstructor("Test Note").details("Test Details").please();
-      Note child = makeMe.aNote().under(note).titleConstructor("Child Note").please();
+      Note note = makeMe.aNote().title("Test Note").details("Test Details").please();
+      Note child = makeMe.aNote().under(note).title("Child Note").please();
 
       String description = graphRAGService.getGraphRAGDescription(child);
 

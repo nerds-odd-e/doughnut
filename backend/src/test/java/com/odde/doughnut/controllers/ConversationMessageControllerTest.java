@@ -386,7 +386,7 @@ class ConversationMessageControllerTest extends ControllerTestBase {
           makeMe
               .aNote()
               .creatorAndOwner(noteOwner)
-              .titleConstructor("There are 42 prefectures in Japan")
+              .title("There are 42 prefectures in Japan")
               .please();
       conversation = makeMe.aConversation().forANote(note).from(currentUser.getUser()).please();
     }

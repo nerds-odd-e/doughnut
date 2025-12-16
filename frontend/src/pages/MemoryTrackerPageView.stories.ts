@@ -25,7 +25,7 @@ const createRecallPromptWithAnswer = (
   isCorrect: boolean
 ) => {
   const note = makeMe.aNote
-    .titleConstructor("France")
+    .title("France")
     .details(
       "France is a country in Western Europe. Paris is its capital and largest city."
     )
@@ -89,17 +89,17 @@ export const NoteWithManyAncestors: Story = {
     recallPrompts: [
       (() => {
         // Create a chain of 10 ancestor notes
-        let currentNote = makeMe.aNote.titleConstructor("Ancestor 1").please()
+        let currentNote = makeMe.aNote.title("Ancestor 1").please()
         for (let i = 2; i <= 10; i++) {
           currentNote = makeMe.aNote
-            .titleConstructor(`Ancestor ${i}`)
+            .title(`Ancestor ${i}`)
             .underNote(currentNote)
             .please()
         }
 
         // Create the final note with all ancestors
         const note = makeMe.aNote
-          .titleConstructor("TypeScript")
+          .title("TypeScript")
           .underNote(currentNote)
           .details(
             "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript."

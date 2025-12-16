@@ -41,7 +41,7 @@ class EmbeddingServiceTest {
 
     Note note = new Note();
     String longChunk = "你".repeat(10000) + "a".repeat(80000);
-    note.setTitleConstructor("Title");
+    note.setTitle("Title");
     note.setDetails(longChunk);
 
     // Trigger one batch call

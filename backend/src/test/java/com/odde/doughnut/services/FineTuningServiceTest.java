@@ -52,7 +52,7 @@ class FineTuningServiceTest {
 
     @Test
     void shouldReturnGoodTrainingDataIfHavingReadingAuth_whenCallGetGoodTrainingData() {
-      Note note = makeMe.aNote().titleConstructor("Test Title").please();
+      Note note = makeMe.aNote().title("Test Title").please();
       makeMe.aQuestionSuggestionForFineTunining().ofNote(note).positive().please();
       List<OpenAIChatGPTFineTuningExample> goodOpenAIChatGPTFineTuningExampleList =
           fineTuningService.getQuestionGenerationTrainingExamples();

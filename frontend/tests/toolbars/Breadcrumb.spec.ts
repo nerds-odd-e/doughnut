@@ -4,11 +4,8 @@ import makeMe from "@tests/fixtures/makeMe"
 import helper from "@tests/helpers"
 
 describe("breadcrumb with circles", () => {
-  const parentNote = makeMe.aNote.titleConstructor("parent").please()
-  const child = makeMe.aNote
-    .titleConstructor("child")
-    .underNote(parentNote)
-    .please()
+  const parentNote = makeMe.aNote.title("parent").please()
+  const child = makeMe.aNote.title("child").underNote(parentNote).please()
   const grandChild = makeMe.aNote.underNote(child).please()
 
   it("view note belongs to other people in bazaar", async () => {

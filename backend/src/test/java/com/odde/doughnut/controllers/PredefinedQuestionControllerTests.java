@@ -267,7 +267,7 @@ class PredefinedQuestionControllerTests extends ControllerTestBase {
           makeMe
               .aNote()
               .creatorAndOwner(currentUser.getUser())
-              .titleConstructor("There are 42 prefectures in Japan")
+              .title("There are 42 prefectures in Japan")
               .please();
     }
 

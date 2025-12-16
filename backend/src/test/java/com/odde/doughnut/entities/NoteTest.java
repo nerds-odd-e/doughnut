@@ -57,7 +57,7 @@ public class NoteTest {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().titleConstructor("parent").please();
+      parent = makeMe.aNote().title("parent").please();
       target = makeMe.aNote().please();
       relationNote = makeMe.aRelation().between(parent, target).please();
     }
@@ -66,7 +66,7 @@ public class NoteTest {
     void replaceParentPlaceholder() {
       assertThat(
           relationNote.getNoteTopology().getTargetNoteTopology().getTitleOrPredicate(),
-          equalTo(target.getTitleConstructor()));
+          equalTo(target.getTitle()));
     }
 
     @Test

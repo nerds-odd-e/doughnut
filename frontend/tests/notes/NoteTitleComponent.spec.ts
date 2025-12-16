@@ -20,7 +20,7 @@ describe("note title", () => {
   })
 
   describe("relationship note", () => {
-    const note = makeMe.aNote.titleConstructor("Dummy Title").please()
+    const note = makeMe.aNote.title("Dummy Title").please()
     const target = makeMe.aNote.underNote(note).please()
     const relationNote = makeMe.aRelationship.to(target).please()
 

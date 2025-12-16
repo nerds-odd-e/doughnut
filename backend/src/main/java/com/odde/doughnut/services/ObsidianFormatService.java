@@ -63,14 +63,13 @@ public class ObsidianFormatService {
     zos.write(fileContent.getBytes());
 
     for (Note child : note.getChildren()) {
-      String newPath =
-          path.isEmpty() ? note.getTitleConstructor() : path + "/" + note.getTitleConstructor();
+      String newPath = path.isEmpty() ? note.getTitle() : path + "/" + note.getTitle();
       writeNoteToZip(child, zos, newPath);
     }
   }
 
   private String generateFilePath(String path, Note note) {
-    String sanitizedTitle = sanitizeFileName(note.getTitleConstructor());
+    String sanitizedTitle = sanitizeFileName(note.getTitle());
     String fileName =
         note.getChildren().isEmpty() ? sanitizedTitle + ".md" : sanitizedTitle + "/__index.md";
     return path.isEmpty() ? fileName : path + "/" + fileName;
@@ -95,7 +94,7 @@ public class ObsidianFormatService {
     return """
            # %s
            %s"""
-        .formatted(note.getTitleConstructor(), note.getDetails());
+        .formatted(note.getTitle(), note.getDetails());
   }
 
   private String sanitizeFileName(String fileName) {
@@ -185,7 +184,7 @@ public class ObsidianFormatService {
 
   private Note findExistingNote(Note parent, String noteName) {
     return parent.getChildren().stream()
-        .filter(note -> note.getTitleConstructor().equals(noteName))
+        .filter(note -> note.getTitle().equals(noteName))
         .findFirst()
         .orElse(null);
   }
@@ -206,7 +205,7 @@ public class ObsidianFormatService {
 
         if (existingNote != null) {
           // Update existing note instead of creating new one
-          updateExistingNote(existingNote, parts[2].trim(), note.getTitleConstructor());
+          updateExistingNote(existingNote, parts[2].trim(), note.getTitle());
           // Copy the children to the existing note
           note.getChildren().forEach(child -> child.setParentNote(existingNote));
           // Remove the temporary note
@@ -243,7 +242,7 @@ public class ObsidianFormatService {
   }
 
   private void updateExistingNote(Note existingNote, String content, String newTitle) {
-    existingNote.setTitleConstructor(newTitle);
+    existingNote.setTitle(newTitle);
     if (content.startsWith("# ")) {
       int nextLineIndex = content.indexOf('\n');
       if (nextLineIndex != -1) {

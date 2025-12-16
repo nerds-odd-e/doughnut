@@ -25,7 +25,7 @@ class UriAndTitleTest {
   @Test
   void shouldGetTitleFromNote() {
     Note note = mock(Note.class);
-    when(note.getTitleConstructor()).thenReturn("Test Note");
+    when(note.getTitle()).thenReturn("Test Note");
 
     UriAndTitle uriAndTitle = UriAndTitle.fromNote(note);
     assertThat(uriAndTitle.getTitle(), equalTo("Test Note"));
@@ -34,7 +34,7 @@ class UriAndTitleTest {
   @Test
   void shouldSerializeToObject() throws Exception {
     Note note = mock(Note.class);
-    when(note.getTitleConstructor()).thenReturn("Test Note");
+    when(note.getTitle()).thenReturn("Test Note");
     when(note.getUri()).thenReturn("/n123");
 
     UriAndTitle uriAndTitle = UriAndTitle.fromNote(note);

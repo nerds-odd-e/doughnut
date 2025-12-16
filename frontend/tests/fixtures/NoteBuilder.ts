@@ -33,7 +33,7 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  titleConstructor(value: string): NoteBuilder {
+  title(value: string): NoteBuilder {
     this.data.noteTopology.titleOrPredicate = value
     return this
   }
@@ -73,7 +73,7 @@ class NoteBuilder extends Builder<Note> {
   }
 
   relationType(value: NoteTopologyType["relationType"]): NoteBuilder {
-    this.titleConstructor(`:${value}`)
+    this.title(`:${value}`)
     // default target
     this.data.noteTopology.targetNoteTopology = {
       id: generateId(),

@@ -318,12 +318,12 @@ class RecallPromptControllerTests extends ControllerTestBase {
               .spelling()
               .please();
       recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
-      answerDTO.setSpellingAnswer(answerNote.getTitleConstructor());
+      answerDTO.setSpellingAnswer(answerNote.getTitle());
     }
 
     @Test
     void answerOneOfTheTitles() throws UnexpectedNoAccessRightException {
-      makeMe.theNote(answerNote).titleConstructor("this / that").please();
+      makeMe.theNote(answerNote).title("this / that").please();
       answerDTO.setSpellingAnswer("this");
       assertTrue(
           ((RecallResult.SpellingResult) controller.answerSpelling(recallPrompt, answerDTO))
@@ -364,14 +364,14 @@ class RecallPromptControllerTests extends ControllerTestBase {
 
     @Test
     void shouldCreateAnswerEntityForSpellingQuestion() throws UnexpectedNoAccessRightException {
-      answerDTO.setSpellingAnswer(answerNote.getTitleConstructor());
+      answerDTO.setSpellingAnswer(answerNote.getTitle());
       answerDTO.setThinkingTimeMs(3000);
       controller.answerSpelling(recallPrompt, answerDTO);
 
       RecallPrompt reloadedPrompt = makeMe.refresh(recallPrompt);
       Answer answer = reloadedPrompt.getAnswer();
       assertNotNull(answer);
-      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTitleConstructor()));
+      assertThat(answer.getSpellingAnswer(), equalTo(answerNote.getTitle()));
       assertThat(answer.getThinkingTimeMs(), equalTo(3000));
       assertTrue(answer.getCorrect());
     }
@@ -413,7 +413,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     void shouldValidateRecallPromptIsSpellingType() {
       RecallPrompt mcqPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).please();
       AnswerSpellingDTO answer = new AnswerSpellingDTO();
-      answer.setSpellingAnswer(answerNote.getTitleConstructor());
+      answer.setSpellingAnswer(answerNote.getTitle());
       assertThrows(
           IllegalArgumentException.class, () -> controller.answerSpelling(mcqPrompt, answer));
     }

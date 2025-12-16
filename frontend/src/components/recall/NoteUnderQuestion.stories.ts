@@ -19,8 +19,7 @@ type Story = StoryObj<typeof meta>
 // Simple note with no ancestors
 export const Simple: Story = {
   args: {
-    noteTopology: makeMe.aNote.titleConstructor("TypeScript").please()
-      .noteTopology,
+    noteTopology: makeMe.aNote.title("TypeScript").please().noteTopology,
   },
 }
 
@@ -28,13 +27,13 @@ export const Simple: Story = {
 export const WithAncestors: Story = {
   args: {
     noteTopology: (() => {
-      let currentNote = makeMe.aNote.titleConstructor("Programming").please()
+      let currentNote = makeMe.aNote.title("Programming").please()
       currentNote = makeMe.aNote
-        .titleConstructor("Languages")
+        .title("Languages")
         .underNote(currentNote)
         .please()
       currentNote = makeMe.aNote
-        .titleConstructor("TypeScript")
+        .title("TypeScript")
         .underNote(currentNote)
         .please()
       return currentNote.noteTopology
@@ -47,16 +46,16 @@ export const WithManyAncestors: Story = {
   args: {
     noteTopology: (() => {
       // Create a chain of 10 ancestor notes
-      let currentNote = makeMe.aNote.titleConstructor("Ancestor 1").please()
+      let currentNote = makeMe.aNote.title("Ancestor 1").please()
       for (let i = 2; i <= 10; i++) {
         currentNote = makeMe.aNote
-          .titleConstructor(`Ancestor ${i}`)
+          .title(`Ancestor ${i}`)
           .underNote(currentNote)
           .please()
       }
       // Create the final note with all ancestors
       currentNote = makeMe.aNote
-        .titleConstructor("TypeScript")
+        .title("TypeScript")
         .underNote(currentNote)
         .please()
       return currentNote.noteTopology

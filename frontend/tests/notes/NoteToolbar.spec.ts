@@ -6,7 +6,7 @@ import { mockSdkService } from "@tests/helpers"
 import type { NoteInfo } from "@generated/backend"
 
 it("displays menu items when dropdown is open", async () => {
-  const noteRealm = makeMe.aNoteRealm.titleConstructor("Dummy Title").please()
+  const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
   const mockNoteInfo: NoteInfo = {
     note: noteRealm,
     recallSetting: {
@@ -45,7 +45,7 @@ it("displays menu items when dropdown is open", async () => {
 })
 
 it("closes more options dialog when note id changes", async () => {
-  const noteRealm = makeMe.aNoteRealm.titleConstructor("Dummy Title").please()
+  const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
   const mockNoteInfo: NoteInfo = {
     note: noteRealm,
     recallSetting: {
@@ -78,7 +78,7 @@ it("closes more options dialog when note id changes", async () => {
   expect(dialog.exists()).toBe(true)
 
   // Change the note id
-  const newNote = makeMe.aNoteRealm.titleConstructor("New Note").please()
+  const newNote = makeMe.aNoteRealm.title("New Note").please()
   await wrapper.setProps({
     note: newNote.note,
   })

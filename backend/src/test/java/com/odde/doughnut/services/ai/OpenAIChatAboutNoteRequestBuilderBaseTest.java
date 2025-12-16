@@ -17,7 +17,7 @@ class OpenAIChatAboutNoteRequestBuilderBaseTest {
   void messageShouldContainTitle() {
     Note note = makeMe.aNote().inMemoryPlease();
     String content = getNoteOfFocusDescription(note);
-    assertThat(content, containsString(note.getTitleConstructor()));
+    assertThat(content, containsString(note.getTitle()));
   }
 
   @Test

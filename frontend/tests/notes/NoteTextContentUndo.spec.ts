@@ -10,7 +10,7 @@ describe("undo editing", () => {
     const storageAccessor = useStorageAccessor()
     storageAccessor.value = createNoteStorage()
 
-    const noteRealm = makeMe.aNoteRealm.titleConstructor("Dummy Title").please()
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please()
     storageAccessor.value.refreshNoteRealm(noteRealm)
 
     const updatedTitle = "updated"

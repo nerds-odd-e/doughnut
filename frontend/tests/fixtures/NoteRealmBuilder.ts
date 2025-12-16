@@ -22,8 +22,8 @@ class NoteRealmBuilder extends Builder<NoteRealm> {
     }
   }
 
-  titleConstructor(value: string): NoteRealmBuilder {
-    this.noteBuilder.titleConstructor(value)
+  title(value: string): NoteRealmBuilder {
+    this.noteBuilder.title(value)
     return this
   }
 

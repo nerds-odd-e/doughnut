@@ -227,9 +227,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
         noteCreation.setNewTitle("Johnny boy");
         NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
 
-        assertEquals("Johnny boy", note.getNote().getTitleConstructor());
+        assertEquals("Johnny boy", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("Canada", note.getNote().getChildren().get(0).getTitleConstructor());
+        assertEquals("Canada", note.getNote().getChildren().get(0).getTitle());
       }
     }
 
@@ -253,9 +253,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
             "Q8337", makeMe.wikidataClaimsJson("Q8337").asABookWithSingleAuthor("Q34660").please());
         NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
 
-        assertEquals("Harry Potter", note.getNote().getTitleConstructor());
+        assertEquals("Harry Potter", note.getNote().getTitle());
         assertEquals("Q8337", note.getNote().getWikidataId());
-        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTitleConstructor());
+        assertEquals("J. K. Rowling", note.getNote().getChildren().get(0).getTitle());
       }
 
       @Test
@@ -273,8 +273,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         NoteRealm note = controller.createNoteUnderParent(parent, noteCreation).getCreated();
 
         assertEquals(
-            "The girl sat next to the window",
-            note.getNote().getChildren().get(1).getTitleConstructor());
+            "The girl sat next to the window", note.getNote().getChildren().get(1).getTitle());
       }
     }
   }
@@ -297,7 +296,7 @@ class NoteCreationControllerTests extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, BindException, InterruptedException, IOException {
       NoteRealm response = controller.createNoteAfter(referenceNote, noteCreation).getCreated();
       assertThat(response.getId(), not(nullValue()));
-      assertThat(response.getNote().getTitleConstructor(), equalTo("new note"));
+      assertThat(response.getNote().getTitle(), equalTo("new note"));
     }
 
     @Test
@@ -327,10 +326,9 @@ class NoteCreationControllerTests extends ControllerTestBase {
       List<Note> siblings = createdNote.getParent().getChildren();
 
       // Verify order: referenceNote -> createdNote -> "next sibling"
-      assertThat(
-          siblings.get(0).getTitleConstructor(), equalTo(referenceNote.getTitleConstructor()));
-      assertThat(siblings.get(1).getTitleConstructor(), equalTo("new note"));
-      assertThat(siblings.get(2).getTitleConstructor(), equalTo("next sibling"));
+      assertThat(siblings.get(0).getTitle(), equalTo(referenceNote.getTitle()));
+      assertThat(siblings.get(1).getTitle(), equalTo("new note"));
+      assertThat(siblings.get(2).getTitle(), equalTo("next sibling"));
     }
   }
 }

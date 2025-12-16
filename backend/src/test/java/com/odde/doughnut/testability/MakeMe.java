@@ -40,11 +40,11 @@ public class MakeMe extends MakeMeWithoutDB {
   }
 
   public NoteBuilder aNote(String title) {
-    return aNote().titleConstructor(title);
+    return aNote().title(title);
   }
 
   public NoteBuilder aHeadNote(String title) {
-    return aNote().titleConstructor(title);
+    return aNote().title(title);
   }
 
   public NotebookBuilder aNotebook() {

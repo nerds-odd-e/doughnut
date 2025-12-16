@@ -35,10 +35,10 @@ class EmbeddingServiceTests {
   @Test
   void shouldStreamEmbeddingsForNotes() {
     // Build a small ancestor chain to verify separator rendering
-    Note root = makeMe.aNote().titleConstructor("Root").please();
-    Note parent = makeMe.aNote().under(root).titleConstructor("Parent").please();
-    Note note1 = makeMe.aNote().under(parent).titleConstructor("T1").details("D1").please();
-    Note note2 = makeMe.aNote().titleConstructor("T2").details("D2").please();
+    Note root = makeMe.aNote().title("Root").please();
+    Note parent = makeMe.aNote().under(root).title("Parent").please();
+    Note note1 = makeMe.aNote().under(parent).title("T1").details("D1").please();
+    Note note2 = makeMe.aNote().title("T2").details("D2").please();
 
     Embedding embedding1 = Embedding.builder().index(0L).embedding(List.of(1.0f, 2.0f)).build();
     Embedding embedding2 = Embedding.builder().index(1L).embedding(List.of(3.0f, 4.0f)).build();

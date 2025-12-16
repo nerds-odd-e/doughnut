@@ -61,7 +61,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Column(name = "title")
   @NotNull
   @JsonIgnore
-  private String titleConstructor = "";
+  private String title = "";
 
   @Column(name = "created_at")
   @Setter
@@ -151,7 +151,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTitleConstructor());
+    return new NoteTitle(getTitle());
   }
 
   @JsonIgnore
@@ -176,13 +176,13 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public RelationType getRelationType() {
-    if (!getTitleConstructor().startsWith(":")) return null;
-    return RelationType.fromLabel(getTitleConstructor().substring(1));
+    if (!getTitle().startsWith(":")) return null;
+    return RelationType.fromLabel(getTitle().substring(1));
   }
 
   @JsonIgnore
   public void setRelationType(RelationType relationType) {
-    setTitleConstructor(":" + relationType.label);
+    setTitle(":" + relationType.label);
   }
 
   @JsonIgnore
@@ -198,7 +198,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @Override
   public String toString() {
-    return "Note{" + "id=" + id + ", title='" + getTitleConstructor() + '\'' + '}';
+    return "Note{" + "id=" + id + ", title='" + getTitle() + '\'' + '}';
   }
 
   @JsonIgnore
@@ -289,7 +289,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   public NoteTopology getNoteTopology() {
     NoteTopology noteTopology = new NoteTopology();
     noteTopology.setId(getId());
-    noteTopology.setTitleOrPredicate(getTitleConstructor());
+    noteTopology.setTitleOrPredicate(getTitle());
     noteTopology.setShortDetails(getShortDetails());
     noteTopology.setRelationType(getRelationType());
     if (getParent() != null) {
@@ -344,11 +344,10 @@ public class Note extends EntityIdentifiedByIdOnly {
     return "/n" + getId();
   }
 
-  public void initialize(
-      User user, Note parentNote, Timestamp currentUTCTimestamp, String titleConstructor) {
+  public void initialize(User user, Note parentNote, Timestamp currentUTCTimestamp, String title) {
     setParentNote(parentNote);
     setUpdatedAt(currentUTCTimestamp);
-    setTitleConstructor(titleConstructor);
+    setTitle(title);
     setCreatedAt(currentUTCTimestamp);
     setUpdatedAt(currentUTCTimestamp);
     setCreator(user);
