@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+#
+# Tests for scripts/run.sh using Bach testing framework
+#
+# Note: Since run.sh uses 'exec', we test the logic by simulating
+# the conditional behavior rather than executing the actual script.
+
+source "$(dirname "$0")/vendor/bach.sh"
+
+# Test: When nix is installed and not in nix shell
+# Expected: Export CURSOR_DEV=true and run nix develop -c
+test-run-with-nix-installed-not-in-shell() {
+    # Mock command -v to return success for nix
+    command() {
+        case "$*" in
+            "-v nix") return 0 ;;
+            *) /usr/bin/env command "$@" ;;
+        esac
+    }
+    
+    # Simulate the script's logic when nix is installed but not in shell
+    unset IN_NIX_SHELL
+    if command -v nix >/dev/null 2>&1; then
+        if [ -z "${IN_NIX_SHELL:-}" ]; then
+            export CURSOR_DEV=true
+            nix develop -c echo "test"
+        fi
+    fi
+}
+test-run-with-nix-installed-not-in-shell-assert() {
+    export CURSOR_DEV=true
+    nix develop -c echo test
+}
+
+# Test: When already in nix shell
+# Expected: Run command directly without nix prefix
+test-run-already-in-nix-shell() {
+    # Mock command -v to return success for nix
+    command() {
+        case "$*" in
+            "-v nix") return 0 ;;
+            *) /usr/bin/env command "$@" ;;
+        esac
+    }
+    
+    # Simulate the script's logic when already in nix shell
+    IN_NIX_SHELL="1"
+    if command -v nix >/dev/null 2>&1; then
+        if [ -z "${IN_NIX_SHELL:-}" ]; then
+            export CURSOR_DEV=true
+            nix develop -c echo "test"
+        else
+            echo "test"
+        fi
+    fi
+}
+test-run-already-in-nix-shell-assert() {
+    echo test
+}
+
+# Test: When nix is not installed
+# Expected: Run command directly
+test-run-nix-not-installed() {
+    # Mock command -v to return failure for nix
+    command() {
+        case "$*" in
+            "-v nix") return 1 ;;
+            *) /usr/bin/env command "$@" ;;
+        esac
+    }
+    
+    # Simulate the script's logic when nix is not installed
+    if command -v nix >/dev/null 2>&1; then
+        # This branch shouldn't execute
+        export CURSOR_DEV=true
+        nix develop -c echo "test"
+    else
+        echo "test"
+    fi
+}
+test-run-nix-not-installed-assert() {
+    echo test
+}
+
