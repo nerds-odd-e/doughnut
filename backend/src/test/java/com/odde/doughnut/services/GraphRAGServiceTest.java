@@ -82,7 +82,7 @@ public class GraphRAGServiceTest {
     void shouldIncludeParentInFocusNoteAndContextualPath() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(parent));
+      assertThat(result.getFocusNote().getParent(), equalTo(parent));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class GraphRAGServiceTest {
     void shouldNotIncludeParentInRelatedNotesWhenBudgetIsTooSmall() {
       GraphRAGResult result = graphRAGService.retrieve(note, 0);
 
-      assertThat(result.getFocusNote().getParentUriAndTitle(), equalTo(parent));
+      assertThat(result.getFocusNote().getParent(), equalTo(parent));
       assertThat(result.getRelatedNotes(), empty());
     }
 
@@ -133,7 +133,7 @@ public class GraphRAGServiceTest {
     void shouldIncludeTargetInFocusNote() {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
-      assertThat(result.getFocusNote().getTargetUriAndTitle(), equalTo(target));
+      assertThat(result.getFocusNote().getTarget(), equalTo(target));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(note, 2); // Only enough for parent
 
       // Target URI should still be in focus note
-      assertThat(result.getFocusNote().getTargetUriAndTitle(), equalTo(target));
+      assertThat(result.getFocusNote().getTarget(), equalTo(target));
 
       // Only parent should be in related notes
       assertThat(result.getRelatedNotes(), hasSize(1));
@@ -172,7 +172,7 @@ public class GraphRAGServiceTest {
       GraphRAGResult result = graphRAGService.retrieve(note, 1000);
 
       // Should be in both target and children lists of focus note
-      assertThat(result.getFocusNote().getTargetUriAndTitle(), equalTo(target));
+      assertThat(result.getFocusNote().getTarget(), equalTo(target));
       assertThat(result.getFocusNote().getChildren(), contains(target.getUri()));
 
       // But should appear only once in related notes

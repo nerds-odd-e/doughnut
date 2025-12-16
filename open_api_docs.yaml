@@ -4546,15 +4546,30 @@ components:
       properties:
         uri:
           type: string
-        subjectUriAndTitle:
+        subject:
           $ref: "#/components/schemas/UriAndTitle"
-        predicate:
+        relation_type:
           type: string
+          enum:
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
         title:
           type: string
-        targetUriAndTitle:
+        target:
           $ref: "#/components/schemas/UriAndTitle"
-        parentUriAndTitle:
+        parent:
           $ref: "#/components/schemas/UriAndTitle"
         relationToFocusNote:
           type: string
@@ -4593,15 +4608,30 @@ components:
       properties:
         uri:
           type: string
-        subjectUriAndTitle:
+        subject:
           $ref: "#/components/schemas/UriAndTitle"
-        predicate:
+        relation_type:
           type: string
+          enum:
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
         title:
           type: string
-        targetUriAndTitle:
+        target:
           $ref: "#/components/schemas/UriAndTitle"
-        parentUriAndTitle:
+        parent:
           $ref: "#/components/schemas/UriAndTitle"
         relationToFocusNote:
           type: string

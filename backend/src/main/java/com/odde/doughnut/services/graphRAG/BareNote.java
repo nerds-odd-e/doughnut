@@ -14,11 +14,11 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
   "uri",
-  "subjectUriAndTitle",
-  "predicate",
+  "subject",
+  "relation_type",
   "title",
-  "targetUriAndTitle",
-  "parentUriAndTitle",
+  "target",
+  "parent",
   "relationToFocusNote",
   "details",
   "detailsTruncated",
@@ -50,29 +50,29 @@ public class BareNote {
 
   @JsonProperty("title")
   public String getTitle() {
-    return getTargetUriAndTitle() != null ? null : note.getTitle();
+    return getTarget() != null ? null : note.getTitle();
   }
 
-  @JsonProperty("predicate")
-  public String getPredicate() {
-    return getTargetUriAndTitle() != null ? note.getTitle() : null;
+  @JsonProperty("relation_type")
+  public com.odde.doughnut.entities.RelationType getRelationType() {
+    return note.getRelationType();
   }
 
-  @JsonProperty("targetUriAndTitle")
-  public UriAndTitle getTargetUriAndTitle() {
+  @JsonProperty("target")
+  public UriAndTitle getTarget() {
     return note.getTargetNote() != null ? UriAndTitle.fromNote(note.getTargetNote()) : null;
   }
 
-  @JsonProperty("parentUriAndTitle")
-  public UriAndTitle getParentUriAndTitle() {
-    return getTargetUriAndTitle() == null && note.getParent() != null
+  @JsonProperty("parent")
+  public UriAndTitle getParent() {
+    return getTarget() == null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
   }
 
-  @JsonProperty("subjectUriAndTitle")
-  public UriAndTitle getSubjectUriAndTitle() {
-    return getTargetUriAndTitle() != null && note.getParent() != null
+  @JsonProperty("subject")
+  public UriAndTitle getSubject() {
+    return getTarget() != null && note.getParent() != null
         ? UriAndTitle.fromNote(note.getParent())
         : null;
   }
