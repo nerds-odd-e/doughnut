@@ -38,8 +38,8 @@ importers:
         specifier: 2.3.9
         version: 2.3.9
       '@cucumber/cucumber':
-        specifier: ^12.3.0
-        version: 12.3.0
+        specifier: ^12.4.0
+        version: 12.4.0
       '@hey-api/openapi-ts':
         specifier: 0.89.0
         version: 0.89.0(typescript@5.9.3)
@@ -103,6 +103,9 @@ importers:
       wait-on:
         specifier: ^9.0.3
         version: 9.0.3
+      yaml:
+        specifier: ^2.8.2
+        version: 2.8.2
 
   frontend:
     dependencies:
@@ -606,8 +609,8 @@ packages:
   '@cucumber/cucumber-expressions@18.0.1':
     resolution: {integrity: sha512-NSid6bI+7UlgMywl5octojY5NXnxR9uq+JisjOrO52VbFsQM6gTWuQFE8syI10KnIBEdPzuEUSVEeZ0VFzRnZA==}
 
-  '@cucumber/cucumber@12.3.0':
-    resolution: {integrity: sha512-36cIyplE1iDl12s4k6lBVpceua8tKLklFTf7CUITPrNHTLlQ/KBr7NYUUHviPzCbj2Ox3BPTZ6qkSLd6WMvVQg==}
+  '@cucumber/cucumber@12.4.0':
+    resolution: {integrity: sha512-zGtGIx4Q/+AMbZclgCOvlbJzQxFd35/gpnB+bbpRGarsQks8nL4MxoHz9qn/sYzqBiFPgnv29wcL8r4nOb8r3g==}
     engines: {node: 20 || 22 || >=24}
     hasBin: true
 
@@ -6269,11 +6272,6 @@ packages:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
 
-  yaml@2.8.1:
-    resolution: {integrity: sha512-lcYcMxX2PO9XMGvAJkJ3OsNMw+/7FKes7/hgerGUYWIoWu5j/+YQqcZr5JnPZWzOsEBgMbSbiSTn/dv/69Mkpw==}
-    engines: {node: '>= 14.6'}
-    hasBin: true
-
   yaml@2.8.2:
     resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==}
     engines: {node: '>= 14.6'}
@@ -6658,13 +6656,13 @@ snapshots:
   '@badeball/cypress-cucumber-preprocessor@24.0.0(@babel/core@7.28.5)(cypress@15.7.1)(typescript@5.9.3)':
     dependencies:
       '@cucumber/ci-environment': 12.0.0
-      '@cucumber/cucumber': 12.3.0
+      '@cucumber/cucumber': 12.4.0
       '@cucumber/cucumber-expressions': 18.0.1
       '@cucumber/gherkin': 37.0.0
       '@cucumber/html-formatter': 22.2.0(@cucumber/messages@31.0.0)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.0.0)
       '@cucumber/messages': 31.0.0
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.3.0)(@cucumber/messages@31.0.0)
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.0.0)
       '@cucumber/tag-expressions': 8.1.0
       '@jridgewell/trace-mapping': 0.3.31
       base64-js: 1.5.1
@@ -6765,7 +6763,7 @@ snapshots:
     dependencies:
       regexp-match-indices: 1.0.2
 
-  '@cucumber/cucumber@12.3.0':
+  '@cucumber/cucumber@12.4.0':
     dependencies:
       '@cucumber/ci-environment': 12.0.0
       '@cucumber/cucumber-expressions': 18.0.1
@@ -6776,7 +6774,7 @@ snapshots:
       '@cucumber/junit-xml-formatter': 0.9.0(@cucumber/messages@31.0.0)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.0.0)
       '@cucumber/messages': 31.0.0
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.3.0)(@cucumber/messages@31.0.0)
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.0.0)
       '@cucumber/tag-expressions': 8.1.0
       assertion-error-formatter: 3.0.0
       capital-case: 1.0.4
@@ -6805,7 +6803,7 @@ snapshots:
       supports-color: 8.1.1
       type-fest: 4.41.0
       util-arity: 1.1.0
-      yaml: 2.8.1
+      yaml: 2.8.2
       yup: 1.7.1
 
   '@cucumber/gherkin-streams@6.0.0(@cucumber/gherkin@37.0.0)(@cucumber/message-streams@4.0.1(@cucumber/messages@31.0.0))(@cucumber/messages@31.0.0)':
@@ -6865,9 +6863,9 @@ snapshots:
       class-transformer: 0.5.1
       reflect-metadata: 0.2.2
 
-  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@12.3.0)(@cucumber/messages@31.0.0)':
+  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.0.0)':
     dependencies:
-      '@cucumber/cucumber': 12.3.0
+      '@cucumber/cucumber': 12.4.0
       '@cucumber/messages': 31.0.0
       ansi-styles: 5.2.0
       cli-table3: 0.6.5
@@ -9950,7 +9948,7 @@ snapshots:
 
   hosted-git-info@9.0.2:
     dependencies:
-      lru-cache: 11.2.2
+      lru-cache: 11.2.4
 
   html-encoding-sniffer@3.0.0:
     dependencies:
@@ -12890,8 +12888,6 @@ snapshots:
   yaml-ast-parser@0.0.43: {}
 
   yaml@1.10.2: {}
-
-  yaml@2.8.1: {}
 
   yaml@2.8.2: {}
 
