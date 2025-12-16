@@ -9,11 +9,11 @@ Feature: link edit and remove
       | Mars  | Space        |
     And there is "a part of" link between note "Moon" and "Earth"
 
-  Scenario: change link type
+  Scenario: change relation type
     When I change the link from "Moon" to "Earth" to "a specialization of"
     And I should see "Moon" has link "a specialization of" "Earth"
 
-  Scenario: change link type of a reverse link
+  Scenario: change relation type of a reverse link
     When I change the reference from "Earth" to "Moon" to "a specialization of"
     And I should see "Moon" has link "a specialization of" "Earth"
 

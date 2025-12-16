@@ -266,7 +266,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (related to)");
+                    return content.contains("Special Instruction for Relation Note (related to)");
                   });
 
       assertThat(
@@ -292,7 +292,7 @@ class NoteQuestionGenerationServiceTests {
                   message -> {
                     String content = message.system().get().content().toString();
                     return content.contains(
-                        "Special Instruction for Linking Note (a specialization of)");
+                        "Special Instruction for Relation Note (a specialization of)");
                   });
 
       assertThat(
@@ -318,7 +318,7 @@ class NoteQuestionGenerationServiceTests {
                   message -> {
                     String content = message.system().get().content().toString();
                     return content.contains(
-                        "Special Instruction for Linking Note (an application of)");
+                        "Special Instruction for Relation Note (an application of)");
                   });
 
       assertThat(
@@ -344,7 +344,7 @@ class NoteQuestionGenerationServiceTests {
                   message -> {
                     String content = message.system().get().content().toString();
                     return content.contains(
-                        "Special Instruction for Linking Note (an instance of)");
+                        "Special Instruction for Relation Note (an instance of)");
                   });
 
       assertThat(
@@ -369,7 +369,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (a part of)");
+                    return content.contains("Special Instruction for Relation Note (a part of)");
                   });
 
       assertThat(
@@ -394,7 +394,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (tagged by)");
+                    return content.contains("Special Instruction for Relation Note (tagged by)");
                   });
 
       assertThat(
@@ -420,7 +420,7 @@ class NoteQuestionGenerationServiceTests {
                   message -> {
                     String content = message.system().get().content().toString();
                     return content.contains(
-                        "Special Instruction for Linking Note (an attribute of)");
+                        "Special Instruction for Relation Note (an attribute of)");
                   });
 
       assertThat(
@@ -446,7 +446,7 @@ class NoteQuestionGenerationServiceTests {
                   message -> {
                     String content = message.system().get().content().toString();
                     return content.contains(
-                        "Special Instruction for Linking Note (the opposite of)");
+                        "Special Instruction for Relation Note (the opposite of)");
                   });
 
       assertThat(
@@ -471,7 +471,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (author of)");
+                    return content.contains("Special Instruction for Relation Note (author of)");
                   });
 
       assertThat(
@@ -496,7 +496,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (using)");
+                    return content.contains("Special Instruction for Relation Note (using)");
                   });
 
       assertThat(
@@ -521,7 +521,8 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (an example of)");
+                    return content.contains(
+                        "Special Instruction for Relation Note (an example of)");
                   });
 
       assertThat(
@@ -546,7 +547,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (before)");
+                    return content.contains("Special Instruction for Relation Note (before)");
                   });
 
       assertThat(
@@ -571,7 +572,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (similar to)");
+                    return content.contains("Special Instruction for Relation Note (similar to)");
                   });
 
       assertThat(
@@ -596,7 +597,8 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note (confused with)");
+                    return content.contains(
+                        "Special Instruction for Relation Note (confused with)");
                   });
 
       assertThat(
@@ -616,7 +618,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note");
+                    return content.contains("Special Instruction for Relation Note");
                   });
 
       assertThat(
@@ -765,7 +767,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Linking Note");
+                    return content.contains("Special Instruction for Relation Note");
                   });
 
       boolean hasNoteTypeInstruction =

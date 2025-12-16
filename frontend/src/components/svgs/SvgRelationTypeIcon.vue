@@ -13,20 +13,20 @@
 import { defineComponent } from "vue"
 // Using string literals for relationType values
 import SvgFolder from "./link_types/SvgFolder.vue"
-import SvgLinkTypeApplication from "./link_types/SvgLinkTypeApplication.vue"
-import SvgLinkTypeAttr from "./link_types/SvgLinkTypeAttr.vue"
-import SvgLinkTypeAuthor from "./link_types/SvgLinkTypeAuthor.vue"
-import SvgLinkTypePrecede from "./link_types/SvgLinkTypeBefore.vue"
-import SvgLinkTypeConfuse from "./link_types/SvgLinkTypeConfuse.vue"
-import SvgLinkTypeExample from "./link_types/SvgLinkTypeExample.vue"
-import SvgLinkTypeInstance from "./link_types/SvgLinkTypeInstance.vue"
-import SvgLinkTypeOpposite from "./link_types/SvgLinkTypeOpposite.vue"
-import SvgLinkTypePart from "./link_types/SvgLinkTypePart.vue"
-import SvgLinkTypeRelated from "./link_types/SvgLinkTypeRelated.vue"
-import SvgLinkTypeSimilar from "./link_types/SvgLinkTypeSimilar.vue"
-import SvgLinkTypeSpecialize from "./link_types/SvgLinkTypeSpecialize.vue"
-import SvgLinkTypeTagged from "./link_types/SvgLinkTypeTag.vue"
-import SvgLinkTypeUse from "./link_types/SvgLinkTypeUse.vue"
+import SvgRelationTypeApplication from "./link_types/SvgRelationTypeApplication.vue"
+import SvgRelationTypeAttr from "./link_types/SvgRelationTypeAttr.vue"
+import SvgRelationTypeAuthor from "./link_types/SvgRelationTypeAuthor.vue"
+import SvgRelationTypePrecede from "./link_types/SvgRelationTypeBefore.vue"
+import SvgRelationTypeConfuse from "./link_types/SvgRelationTypeConfuse.vue"
+import SvgRelationTypeExample from "./link_types/SvgRelationTypeExample.vue"
+import SvgRelationTypeInstance from "./link_types/SvgRelationTypeInstance.vue"
+import SvgRelationTypeOpposite from "./link_types/SvgRelationTypeOpposite.vue"
+import SvgRelationTypePart from "./link_types/SvgRelationTypePart.vue"
+import SvgRelationTypeRelated from "./link_types/SvgRelationTypeRelated.vue"
+import SvgRelationTypeSimilar from "./link_types/SvgRelationTypeSimilar.vue"
+import SvgRelationTypeSpecialize from "./link_types/SvgRelationTypeSpecialize.vue"
+import SvgRelationTypeTagged from "./link_types/SvgRelationTypeTag.vue"
+import SvgRelationTypeUse from "./link_types/SvgRelationTypeUse.vue"
 
 export default defineComponent({
   props: {
@@ -39,20 +39,22 @@ export default defineComponent({
   computed: {
     iconComponent() {
       const { relationType } = this
-      if (relationType === "related to") return SvgLinkTypeRelated
-      if (relationType === "a specialization of") return SvgLinkTypeSpecialize
-      if (relationType === "an application of") return SvgLinkTypeApplication
-      if (relationType === "an instance of") return SvgLinkTypeInstance
-      if (relationType === "a part of") return SvgLinkTypePart
-      if (relationType === "tagged by") return SvgLinkTypeTagged
-      if (relationType === "an attribute of") return SvgLinkTypeAttr
-      if (relationType === "the opposite of") return SvgLinkTypeOpposite
-      if (relationType === "author of") return SvgLinkTypeAuthor
-      if (relationType === "using") return SvgLinkTypeUse
-      if (relationType === "an example of") return SvgLinkTypeExample
-      if (relationType === "before") return SvgLinkTypePrecede
-      if (relationType === "similar to") return SvgLinkTypeSimilar
-      if (relationType === "confused with") return SvgLinkTypeConfuse
+      if (relationType === "related to") return SvgRelationTypeRelated
+      if (relationType === "a specialization of")
+        return SvgRelationTypeSpecialize
+      if (relationType === "an application of")
+        return SvgRelationTypeApplication
+      if (relationType === "an instance of") return SvgRelationTypeInstance
+      if (relationType === "a part of") return SvgRelationTypePart
+      if (relationType === "tagged by") return SvgRelationTypeTagged
+      if (relationType === "an attribute of") return SvgRelationTypeAttr
+      if (relationType === "the opposite of") return SvgRelationTypeOpposite
+      if (relationType === "author of") return SvgRelationTypeAuthor
+      if (relationType === "using") return SvgRelationTypeUse
+      if (relationType === "an example of") return SvgRelationTypeExample
+      if (relationType === "before") return SvgRelationTypePrecede
+      if (relationType === "similar to") return SvgRelationTypeSimilar
+      if (relationType === "confused with") return SvgRelationTypeConfuse
       return SvgFolder
     },
   },
