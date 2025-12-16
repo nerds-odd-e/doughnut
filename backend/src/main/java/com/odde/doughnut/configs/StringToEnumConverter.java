@@ -1,12 +1,12 @@
 package com.odde.doughnut.configs;
 
-import com.odde.doughnut.entities.LinkType;
+import com.odde.doughnut.entities.RelationType;
 import org.springframework.core.convert.converter.Converter;
 
-public class StringToEnumConverter implements Converter<String, LinkType> {
+public class StringToEnumConverter implements Converter<String, RelationType> {
 
   @Override
-  public LinkType convert(String source) {
-    return LinkType.fromLabel(source);
+  public RelationType convert(String source) {
+    return RelationType.fromLabel(source);
   }
 }

@@ -2,12 +2,12 @@
   <InputWithType v-bind="{ scopeName, field: '', errorMessage, title: titlized }">
     <PopButton :aria-label="titlized">
       <template #button_face>
-        <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
+        <SvgRelationTypeIcon :relation-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
       </template>
       <!-- prettier-ignore -->
       <template #default="{ closer }">
-        <LinkTypeSelect
+        <RelationTypeSelect
           v-bind="{
             scopeName,
             modelValue,
@@ -28,24 +28,24 @@
 
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/backend"
-// Using string literals for linkType values
+// Using string literals for relationType values
 import { camelCase, startCase } from "es-toolkit"
 import type { PropType } from "vue"
 import { computed } from "vue"
 import PopButton from "../commons/Popups/PopButton.vue"
 import InputWithType from "../form/InputWithType.vue"
-import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
-import LinkTypeSelect from "./LinkTypeSelect.vue"
+import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
+import RelationTypeSelect from "./RelationTypeSelect.vue"
 
 const props = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopology["linkType"]>,
-    default: () => "no link" as NoteTopology["linkType"],
+    type: String as PropType<NoteTopology["relationType"]>,
+    default: () => "no link" as NoteTopology["relationType"],
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },
-  field: { type: String, default: "linkType" },
+  field: { type: String, default: "relationType" },
   inverseIcon: Boolean,
 })
 

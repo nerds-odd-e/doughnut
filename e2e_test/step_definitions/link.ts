@@ -22,23 +22,23 @@ When(
 
 When(
   'I link note {string} as {string} note {string}',
-  (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
+  (fromNoteTopic: string, relationType: string, toNoteTopic: string) => {
     start
       .jumpToNotePage(fromNoteTopic)
       .startSearchingAndLinkNote()
       .findTarget(toNoteTopic)
-      .linkToTargetAs(toNoteTopic, linkType)
+      .linkToTargetAs(toNoteTopic, relationType)
   }
 )
 
 When(
   'I link top level note {string} as {string} note {string}',
-  (fromNoteTopic: string, linkType: string, toNoteTopic: string) => {
+  (fromNoteTopic: string, relationType: string, toNoteTopic: string) => {
     start
       .jumpToNotePage(fromNoteTopic)
       .startSearchingAndLinkNote()
       .findTarget(toNoteTopic)
-      .linkTopLevelNoteToTargetAs(toNoteTopic, linkType)
+      .linkTopLevelNoteToTargetAs(toNoteTopic, relationType)
   }
 )
 
@@ -55,8 +55,8 @@ When(
 
 When(
   'there is {string} link between note {string} and {string}',
-  (linkType: string, fromNoteTopic: string, toNoteTopic: string) => {
-    start.testability().injectLink(linkType, fromNoteTopic, toNoteTopic)
+  (relationType: string, fromNoteTopic: string, toNoteTopic: string) => {
+    start.testability().injectLink(relationType, fromNoteTopic, toNoteTopic)
   }
 )
 
@@ -123,20 +123,20 @@ Then('I should not see the recently updated notes section', () => {
 
 Then(
   'I should see {string} has link {string} {string}',
-  (noteTopology: string, linkType: string, targetNoteTopics: string) => {
+  (noteTopology: string, relationType: string, targetNoteTopics: string) => {
     start
       .jumpToNotePage(noteTopology)
-      .expectLinkingChildren(linkType, targetNoteTopics)
+      .expectLinkingChildren(relationType, targetNoteTopics)
   }
 )
 
 Then(
   'I should see note {notepath} has link {string} {string}',
-  (notePath: NotePath, linkType: string, targetNoteTopics: string) => {
+  (notePath: NotePath, relationType: string, targetNoteTopics: string) => {
     start
       .routerToNotebooksPage()
       .navigateToPath(notePath)
-      .expectLinkingChildren(linkType, targetNoteTopics)
+      .expectLinkingChildren(relationType, targetNoteTopics)
   }
 )
 
@@ -150,21 +150,21 @@ Then(
 
 Then(
   'I change the link from {string} to {string} to {string}',
-  (noteTopology: string, targetTitle: string, linkType: string) => {
+  (noteTopology: string, targetTitle: string, relationType: string) => {
     start
       .jumpToNotePage(noteTopology)
       .navigateToLinkingChild(targetTitle)
-      .changeLinkType(linkType, targetTitle)
+      .changeRelationType(relationType, targetTitle)
   }
 )
 
 Then(
   'I change the reference from {string} to {string} to {string}',
-  (noteTopology: string, referenceTitle: string, linkType: string) => {
+  (noteTopology: string, referenceTitle: string, relationType: string) => {
     start
       .jumpToNotePage(noteTopology)
       .navigateToReference(referenceTitle)
-      .changeLinkType(linkType, noteTopology)
+      .changeRelationType(relationType, noteTopology)
   }
 )
 

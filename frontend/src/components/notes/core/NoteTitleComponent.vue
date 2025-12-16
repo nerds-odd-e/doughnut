@@ -10,10 +10,10 @@
       />
       &nbsp;
     </template>
-    <span class="link-type" style="font-size: 50%">
-      {{ linkType }}
+    <span class="relation-type" style="font-size: 50%">
+      {{ relationType }}
     </span>
-    <SvgLinkTypeIcon :link-type="linkType" :inverse-icon="true" />
+    <SvgRelationTypeIcon :relation-type="relationType" :inverse-icon="true" />
     &nbsp;
     <span>
       <NoteTitleComponent
@@ -38,7 +38,7 @@
 import type { PropType } from "vue"
 import { computed, ref } from "vue"
 import type { NoteTopology } from "@generated/backend"
-import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
+import SvgRelationTypeIcon from "@/components/svgs/SvgRelationTypeIcon.vue"
 import NoteTitleWithLink from "../NoteTitleWithLink.vue"
 
 const props = defineProps({
@@ -48,7 +48,7 @@ const props = defineProps({
 
 const reactiveProps = ref(props)
 
-const linkType = computed(() =>
+const relationType = computed(() =>
   reactiveProps.value.noteTopology.titleOrPredicate.substring(1)
 )
 const title = computed(() =>

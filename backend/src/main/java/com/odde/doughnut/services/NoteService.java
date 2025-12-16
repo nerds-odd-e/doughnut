@@ -1,10 +1,10 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteAccessoriesDTO;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessory;
 import com.odde.doughnut.entities.NoteType;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.EntityPersister;
@@ -147,9 +147,9 @@ public class NoteService {
       Note sourceNote,
       Note targetNote,
       User creator,
-      LinkType type,
+      RelationType type,
       Timestamp currentUTCTimestamp) {
-    if (type == null || type == LinkType.NO_LINK) return null;
+    if (type == null || type == RelationType.NO_LINK) return null;
     Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     entityPersister.save(link);
     return link;
@@ -159,7 +159,7 @@ public class NoteService {
       Note sourceNote,
       Note targetNote,
       User creator,
-      LinkType type,
+      RelationType type,
       Timestamp currentUTCTimestamp) {
     final Note note = new Note();
     note.initialize(creator, sourceNote, currentUTCTimestamp, ":" + type.label);

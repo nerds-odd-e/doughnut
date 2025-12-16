@@ -26,7 +26,7 @@ import org.springframework.lang.NonNull;
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "note")
-@JsonPropertyOrder({"noteTopology", "details", "parentId", "linkType", "updatedAt"})
+@JsonPropertyOrder({"noteTopology", "details", "parentId", "relationType", "updatedAt"})
 public class Note extends EntityIdentifiedByIdOnly {
   public static final int MAX_TITLE_LENGTH = 150;
   public static final String NOTE_OF_CURRENT_FOCUS = "note of current focus";
@@ -175,14 +175,14 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public LinkType getLinkType() {
+  public RelationType getRelationType() {
     if (!getTitleConstructor().startsWith(":")) return null;
-    return LinkType.fromLabel(getTitleConstructor().substring(1));
+    return RelationType.fromLabel(getTitleConstructor().substring(1));
   }
 
   @JsonIgnore
-  public void setLinkType(LinkType linkType) {
-    setTitleConstructor(":" + linkType.label);
+  public void setRelationType(RelationType relationType) {
+    setTitleConstructor(":" + relationType.label);
   }
 
   @JsonIgnore
@@ -291,7 +291,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     noteTopology.setId(getId());
     noteTopology.setTitleOrPredicate(getTitleConstructor());
     noteTopology.setShortDetails(getShortDetails());
-    noteTopology.setLinkType(getLinkType());
+    noteTopology.setRelationType(getRelationType());
     if (getParent() != null) {
       noteTopology.setParentOrSubjectNoteTopology(getParent().getNoteTopology());
     }

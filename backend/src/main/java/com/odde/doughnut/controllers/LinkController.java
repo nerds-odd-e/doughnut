@@ -54,7 +54,7 @@ class LinkController {
       @PathVariable @Schema(type = "integer") Note link, @RequestBody LinkCreation linkCreation)
       throws UnexpectedNoAccessRightException {
     authorizationService.assertAuthorization(link);
-    link.setLinkType(linkCreation.linkType);
+    link.setRelationType(linkCreation.relationType);
     entityPersister.save(link);
     return getNoteRealm(link, authorizationService.getCurrentUser());
   }
@@ -92,7 +92,7 @@ class LinkController {
             sourceNote,
             targetNote,
             user,
-            linkCreation.linkType,
+            linkCreation.relationType,
             testabilitySettings.getCurrentUTCTimestamp());
 
     return getNoteRealm(link, user);

@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue"
-// Using string literals for linkType values
+// Using string literals for relationType values
 import SvgFolder from "./link_types/SvgFolder.vue"
 import SvgLinkTypeApplication from "./link_types/SvgLinkTypeApplication.vue"
 import SvgLinkTypeAttr from "./link_types/SvgLinkTypeAttr.vue"
@@ -30,7 +30,7 @@ import SvgLinkTypeUse from "./link_types/SvgLinkTypeUse.vue"
 
 export default defineComponent({
   props: {
-    linkType: { type: String, required: true },
+    relationType: { type: String, required: true },
     width: String,
     height: String,
     inverseIcon: Boolean,
@@ -38,21 +38,21 @@ export default defineComponent({
 
   computed: {
     iconComponent() {
-      const { linkType } = this
-      if (linkType === "related to") return SvgLinkTypeRelated
-      if (linkType === "a specialization of") return SvgLinkTypeSpecialize
-      if (linkType === "an application of") return SvgLinkTypeApplication
-      if (linkType === "an instance of") return SvgLinkTypeInstance
-      if (linkType === "a part of") return SvgLinkTypePart
-      if (linkType === "tagged by") return SvgLinkTypeTagged
-      if (linkType === "an attribute of") return SvgLinkTypeAttr
-      if (linkType === "the opposite of") return SvgLinkTypeOpposite
-      if (linkType === "author of") return SvgLinkTypeAuthor
-      if (linkType === "using") return SvgLinkTypeUse
-      if (linkType === "an example of") return SvgLinkTypeExample
-      if (linkType === "before") return SvgLinkTypePrecede
-      if (linkType === "similar to") return SvgLinkTypeSimilar
-      if (linkType === "confused with") return SvgLinkTypeConfuse
+      const { relationType } = this
+      if (relationType === "related to") return SvgLinkTypeRelated
+      if (relationType === "a specialization of") return SvgLinkTypeSpecialize
+      if (relationType === "an application of") return SvgLinkTypeApplication
+      if (relationType === "an instance of") return SvgLinkTypeInstance
+      if (relationType === "a part of") return SvgLinkTypePart
+      if (relationType === "tagged by") return SvgLinkTypeTagged
+      if (relationType === "an attribute of") return SvgLinkTypeAttr
+      if (relationType === "the opposite of") return SvgLinkTypeOpposite
+      if (relationType === "author of") return SvgLinkTypeAuthor
+      if (relationType === "using") return SvgLinkTypeUse
+      if (relationType === "an example of") return SvgLinkTypeExample
+      if (relationType === "before") return SvgLinkTypePrecede
+      if (relationType === "similar to") return SvgLinkTypeSimilar
+      if (relationType === "confused with") return SvgLinkTypeConfuse
       return SvgFolder
     },
   },

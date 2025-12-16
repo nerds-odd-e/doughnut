@@ -1,12 +1,12 @@
 <template>
   <div>
-    <LinkTypeSelect
-      field="linkType"
+    <RelationTypeSelect
+      field="relationType"
       scope-name="link"
-      v-model="formData.linkType"
-      :error-message="linkFormErrors.linkType"
+      v-model="formData.relationType"
+      :error-message="linkFormErrors.relationType"
       :inverse-icon="true"
-      @update:model-value="linkTypeSelected"
+      @update:model-value="relationTypeSelected"
     />
     <div>
       Target:
@@ -28,7 +28,7 @@ import { ref } from "vue"
 import type { Note } from "@generated/backend"
 import type { LinkCreation } from "@generated/backend"
 import type { NoteTopology } from "@generated/backend"
-import LinkTypeSelect from "./LinkTypeSelect.vue"
+import RelationTypeSelect from "./RelationTypeSelect.vue"
 import NoteTitleComponent from "../notes/core/NoteTitleComponent.vue"
 import SvgGoBack from "../svgs/SvgGoBack.vue"
 import usePopups from "../commons/Popups/usePopups"
@@ -48,14 +48,16 @@ const props = defineProps({
 const emit = defineEmits(["success", "goBack"])
 
 const formData = ref<LinkCreation>({
-  linkType: "no link",
+  relationType: "no link",
 })
 
 const linkFormErrors = ref({
-  linkType: undefined as string | undefined,
+  relationType: undefined as string | undefined,
 })
 
-const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
+const relationTypeSelected = async (
+  relationType: LinkCreation["relationType"]
+) => {
   if (props.note.parentId === null) {
     if (
       !(await popups.confirm(
@@ -67,11 +69,11 @@ const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
   }
 
   try {
-    if (linkType !== "no link") {
+    if (relationType !== "no link") {
       await storageAccessor.value
         .storedApi()
         .createLink(props.note.id, props.targetNoteTopology.id, {
-          linkType: formData.value.linkType,
+          relationType: formData.value.relationType,
         })
     }
 
@@ -79,7 +81,7 @@ const linkTypeSelected = async (linkType: LinkCreation["linkType"]) => {
   } catch (res) {
     linkFormErrors.value = res as {
       asFirstChild: string | undefined
-      linkType: string | undefined
+      relationType: string | undefined
       moveUnder: string | undefined
     }
   }

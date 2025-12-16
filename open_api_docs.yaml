@@ -3722,7 +3722,7 @@ components:
           type: string
         shortDetails:
           type: string
-        linkType:
+        relationType:
           type: string
           enum:
           - no link
@@ -4132,7 +4132,7 @@ components:
     LinkCreation:
       type: object
       properties:
-        linkType:
+        relationType:
           type: string
           enum:
           - no link
@@ -4151,7 +4151,7 @@ components:
           - similar to
           - confused with
       required:
-      - linkType
+      - relationType
     NoteMoveDTO:
       type: object
       properties:

@@ -2,8 +2,8 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.controllers.dto.NoteCreationDTO;
 import com.odde.doughnut.controllers.dto.NoteCreationResult;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.DuplicateWikidataIdException;
@@ -82,7 +82,11 @@ public class NoteConstructionService {
                 .ifPresentOrElse(
                     existingNote -> {
                       noteService.createLink(
-                          parentNote, existingNote, user, LinkType.RELATED_TO, currentUTCTimestamp);
+                          parentNote,
+                          existingNote,
+                          user,
+                          RelationType.RELATED_TO,
+                          currentUTCTimestamp);
                     },
                     () -> {
                       try {

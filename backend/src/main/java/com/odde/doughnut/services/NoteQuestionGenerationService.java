@@ -3,9 +3,9 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteType;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
@@ -60,9 +60,9 @@ public class NoteQuestionGenerationService {
       chatRequestBuilder.addUserMessage(additionalMessage);
     }
 
-    LinkType linkType = note.isLink() ? note.getLinkType() : null;
+    RelationType relationType = note.isLink() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
-    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(linkType, noteType);
+    InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType, noteType);
     chatRequestBuilder.responseJsonSchema(tool);
 
     return openAiApiHandler

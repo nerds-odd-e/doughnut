@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.controllers.dto.LinkCreation;
 import com.odde.doughnut.controllers.dto.NoteMoveDTO;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
@@ -79,7 +79,7 @@ class LinkControllerTests extends ControllerTestBase {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note2 = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
-      linkCreation.linkType = LinkType.APPLICATION;
+      linkCreation.relationType = RelationType.APPLICATION;
     }
 
     @Test

@@ -1,10 +1,10 @@
 <template>
   <h3>Link</h3>
-  <LinkTypeSelect
-    field="linkType"
+  <RelationTypeSelect
+    field="relationType"
     scope-name="link"
-    v-model="formData.linkType"
-    :error-message="linkFormErrors.linkType"
+    v-model="formData.relationType"
+    :error-message="linkFormErrors.relationType"
     :inverse-icon="true"
     @update:model-value="updateLink"
   />
@@ -24,7 +24,7 @@
 import { ref } from "vue"
 import type { LinkCreation, NoteTopology } from "@generated/backend"
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
-import LinkTypeSelect from "./LinkTypeSelect.vue"
+import RelationTypeSelect from "./RelationTypeSelect.vue"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 const storageAccessor = useStorageAccessor()
@@ -41,10 +41,12 @@ const emit = defineEmits<{
 
 // Reactive state
 const formData = ref<LinkCreation>({
-  linkType: props.noteTopology.linkType!,
+  relationType: props.noteTopology.relationType!,
 })
 
-const linkFormErrors = ref<{ linkType?: string }>({ linkType: undefined })
+const linkFormErrors = ref<{ relationType?: string }>({
+  relationType: undefined,
+})
 
 // Methods
 const updateLink = () => {

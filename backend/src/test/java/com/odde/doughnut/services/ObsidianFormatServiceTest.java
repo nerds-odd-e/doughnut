@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasItems;
 import static org.mockito.Mockito.when;
 
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -118,8 +118,8 @@ class ObsidianFormatServiceTest {
     Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
 
     // Create tag links from both taggers to the target
-    makeMe.aRelation().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
-    makeMe.aRelation().between(tagger1, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aRelation().between(tagger1, targetNote, RelationType.TAGGED_BY).please();
+    makeMe.aRelation().between(tagger1, targetNote, RelationType.TAGGED_BY).please();
 
     makeMe.refresh(headNote.getNotebook());
 
@@ -141,8 +141,8 @@ class ObsidianFormatServiceTest {
     Note childWithTags = makeMe.aNote("Tagger 1").under(headNote).please();
 
     // Create tag links from both taggers to the target
-    makeMe.aRelation().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
-    makeMe.aRelation().between(childWithTags, targetNote, LinkType.TAGGED_BY).please();
+    makeMe.aRelation().between(childWithTags, targetNote, RelationType.TAGGED_BY).please();
+    makeMe.aRelation().between(childWithTags, targetNote, RelationType.TAGGED_BY).please();
 
     makeMe.refresh(headNote.getNotebook());
 

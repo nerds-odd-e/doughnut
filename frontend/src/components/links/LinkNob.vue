@@ -1,8 +1,8 @@
 <template>
-  <span class="link-nob" :title="noteTopology.linkType">
-    <SvgLinkTypeIcon
-      v-if="noteTopology.linkType"
-      :link-type="noteTopology.linkType"
+  <span class="link-nob" :title="noteTopology.relationType">
+    <SvgRelationTypeIcon
+      v-if="noteTopology.relationType"
+      :relation-type="noteTopology.relationType"
       :inverse-icon="inverseIcon"
     />
   </span>
@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import type { PropType } from "vue"
 import type { NoteTopology } from "@generated/backend"
-import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
+import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 
 defineProps({
   noteTopology: {

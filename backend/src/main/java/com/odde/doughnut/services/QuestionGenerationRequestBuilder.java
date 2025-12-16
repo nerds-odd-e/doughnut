@@ -1,8 +1,8 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteType;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
 import com.openai.models.chat.completions.ChatCompletionCreateParams;
@@ -30,11 +30,12 @@ public class QuestionGenerationRequestBuilder {
       chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
-    // Include link type specific instructions if the note is a linking note
+    // Include relation type specific instructions if the note is a linking note
     // Include note type specific instructions if the note has a type (not UNASSIGNED)
-    LinkType linkType = note.isLink() ? note.getLinkType() : null;
+    RelationType relationType = note.isLink() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
-    chatRequestBuilder.responseJsonSchema(AiToolFactory.mcqWithAnswerAiTool(linkType, noteType));
+    chatRequestBuilder.responseJsonSchema(
+        AiToolFactory.mcqWithAnswerAiTool(relationType, noteType));
     // Add any additional message if provided (after the question generation instruction)
     if (additionalMessage != null) {
       chatRequestBuilder.addUserMessage(additionalMessage);

@@ -49,12 +49,12 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
-    linkToTargetAs(toNoteTopic: string, linkType: string) {
+    linkToTargetAs(toNoteTopic: string, relationType: string) {
       cy.clickButtonOnCardBody(toNoteTopic, 'Link')
-      cy.clickRadioByLabel(linkType)
+      cy.clickRadioByLabel(relationType)
     },
-    linkTopLevelNoteToTargetAs(toNoteTopic: string, linkType: string) {
-      this.linkToTargetAs(toNoteTopic, linkType)
+    linkTopLevelNoteToTargetAs(toNoteTopic: string, relationType: string) {
+      this.linkToTargetAs(toNoteTopic, relationType)
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {

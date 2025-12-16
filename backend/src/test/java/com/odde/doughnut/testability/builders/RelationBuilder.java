@@ -16,13 +16,14 @@ public class RelationBuilder extends EntityBuilder<Note> {
     throw new UnsupportedOperationException("Please use between method");
   }
 
-  public NoteBuilder between(Note from, Note to, LinkType linkType) {
+  public NoteBuilder between(Note from, Note to, RelationType relationType) {
     this.entity =
-        NoteService.buildALink(from, to, null, linkType, new Timestamp(System.currentTimeMillis()));
+        NoteService.buildALink(
+            from, to, null, relationType, new Timestamp(System.currentTimeMillis()));
     return new NoteBuilder(entity, makeMe);
   }
 
   public NoteBuilder between(Note from, Note to) {
-    return between(from, to, LinkType.SPECIALIZE);
+    return between(from, to, RelationType.SPECIALIZE);
   }
 }

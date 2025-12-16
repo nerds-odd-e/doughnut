@@ -46,19 +46,19 @@ export const assumeNotePage = (noteTopology?: string) => {
           .parent()
           .parent()
       return {
-        linkType: (linkType: string) => {
-          findLink().findAllByText(linkType, {
-            selector: '.link-type',
+        relationType: (relationType: string) => {
+          findLink().findAllByText(relationType, {
+            selector: '.relation-type',
           })
         },
         goto: () => {
-          findLink().find('.link-type').click()
+          findLink().find('.relation-type').click()
         },
       }
     },
 
-    expectLinkingTopic: function (linkType: string, target: string) {
-      this.linkNoteTo(target).linkType(linkType)
+    expectLinkingTopic: function (relationType: string, target: string) {
+      this.linkNoteTo(target).relationType(relationType)
     },
 
     navigateToLinkingChild: function (targetNoteTopic: string) {
@@ -66,22 +66,22 @@ export const assumeNotePage = (noteTopology?: string) => {
       return assumeNotePage()
     },
     expectLinkingChildren: function (
-      linkType: string,
+      relationType: string,
       targetNoteTopics: string
     ) {
       cy.get('main').within(() => {
         commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
-          this.expectLinkingTopic(linkType, target)
+          this.expectLinkingTopic(relationType, target)
         })
       })
     },
-    changeLinkType: function (linkType: string, target: string) {
+    changeRelationType: function (relationType: string, target: string) {
       cy.findByRole('title').within(() => {
-        cy.get('.link-type').click()
+        cy.get('.relation-type').click()
       })
-      cy.clickRadioByLabel(linkType)
+      cy.clickRadioByLabel(relationType)
       cy.pageIsNotLoading()
-      this.expectLinkingTopic(linkType, target)
+      this.expectLinkingTopic(relationType, target)
     },
 
     navigateToReference: (referenceTopic: string) => {

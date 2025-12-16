@@ -67,7 +67,7 @@ export const assumeAssimilationPage = () => ({
 
         case 'link': {
           if (additionalInfo) {
-            const [linkType, targetNote] = commonSenseSplit(
+            const [relationType, targetNote] = commonSenseSplit(
               additionalInfo,
               '; '
             )
@@ -79,8 +79,8 @@ export const assumeAssimilationPage = () => ({
               cy.findByText(targetNote)
             }
 
-            if (typeof linkType === 'string') {
-              cy.get('.link-type').contains(linkType)
+            if (typeof relationType === 'string') {
+              cy.get('.relation-type').contains(relationType)
             }
           }
           break

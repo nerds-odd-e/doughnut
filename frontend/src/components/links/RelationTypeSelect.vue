@@ -9,7 +9,7 @@
   >
     <template #labelAddition="{ value }">
       <div class="daisy-text-center">
-        <SvgLinkTypeIcon :link-type="value" :inverse-icon="inverseIcon" />
+        <SvgRelationTypeIcon :relation-type="value" :inverse-icon="inverseIcon" />
       </div>
     </template>
   </RadioButtons>
@@ -17,22 +17,22 @@
 
 <script setup lang="ts">
 import type { NoteTopology } from "@generated/backend"
-// Using string literals for linkType values
+// Using string literals for relationType values
 import type { PropType } from "vue"
 import { computed } from "vue"
-import { linkTypeOptions } from "../../models/linkTypeOptions"
+import { relationTypeOptions } from "../../models/relationTypeOptions"
 import RadioButtons from "../form/RadioButtons.vue"
-import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
+import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 
 const { allowEmpty } = defineProps({
   scopeName: String,
   modelValue: {
-    type: String as PropType<NoteTopology["linkType"]>,
+    type: String as PropType<NoteTopology["relationType"]>,
     required: true,
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },
-  field: { type: String, default: "linkType" },
+  field: { type: String, default: "relationType" },
   inverseIcon: Boolean,
 })
 
@@ -40,8 +40,8 @@ defineEmits(["update:modelValue"])
 
 const options = computed(() => {
   const filteredOptions = allowEmpty
-    ? linkTypeOptions
-    : linkTypeOptions.filter(({ label }) => label !== "no link")
+    ? relationTypeOptions
+    : relationTypeOptions.filter(({ label }) => label !== "no link")
 
   return filteredOptions.map(({ label }) => ({
     value: label as string,

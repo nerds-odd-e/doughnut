@@ -5,10 +5,10 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteType;
 import com.odde.doughnut.entities.NotebookAiAssistant;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.MCQWithAnswer;
 import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
@@ -249,18 +249,18 @@ class NoteQuestionGenerationServiceTests {
   }
 
   @Nested
-  class LinkTypeInstructions {
+  class RelationTypeInstructions {
     @Test
-    void shouldIncludeLinkTypeInstructionForRelatedTo() {
+    void shouldIncludeRelationTypeInstructionForRelatedTo() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.RELATED_TO).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.RELATED_TO).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -270,22 +270,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for RELATED_TO",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for RELATED_TO",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForSpecialize() {
+    void shouldIncludeRelationTypeInstructionForSpecialize() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.SPECIALIZE).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.SPECIALIZE).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -296,22 +296,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for SPECIALIZE",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for SPECIALIZE",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForApplication() {
+    void shouldIncludeRelationTypeInstructionForApplication() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.APPLICATION).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.APPLICATION).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -322,22 +322,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for APPLICATION",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for APPLICATION",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForInstance() {
+    void shouldIncludeRelationTypeInstructionForInstance() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.INSTANCE).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.INSTANCE).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -348,22 +348,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for INSTANCE",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for INSTANCE",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForPart() {
+    void shouldIncludeRelationTypeInstructionForPart() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.PART).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.PART).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -373,22 +373,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for PART",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for PART",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForTaggedBy() {
+    void shouldIncludeRelationTypeInstructionForTaggedBy() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.TAGGED_BY).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.TAGGED_BY).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -398,22 +398,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for TAGGED_BY",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for TAGGED_BY",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForAttribute() {
+    void shouldIncludeRelationTypeInstructionForAttribute() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.ATTRIBUTE).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.ATTRIBUTE).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -424,22 +424,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for ATTRIBUTE",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for ATTRIBUTE",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForOppositeOf() {
+    void shouldIncludeRelationTypeInstructionForOppositeOf() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.OPPOSITE_OF).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.OPPOSITE_OF).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -450,22 +450,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for OPPOSITE_OF",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for OPPOSITE_OF",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForAuthorOf() {
+    void shouldIncludeRelationTypeInstructionForAuthorOf() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.AUTHOR_OF).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.AUTHOR_OF).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -475,22 +475,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for AUTHOR_OF",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for AUTHOR_OF",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForUses() {
+    void shouldIncludeRelationTypeInstructionForUses() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.USES).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.USES).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -500,22 +500,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for USES",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for USES",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForExampleOf() {
+    void shouldIncludeRelationTypeInstructionForExampleOf() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.EXAMPLE_OF).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.EXAMPLE_OF).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -525,22 +525,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for EXAMPLE_OF",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for EXAMPLE_OF",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForPrecedes() {
+    void shouldIncludeRelationTypeInstructionForPrecedes() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.PRECEDES).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.PRECEDES).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -550,22 +550,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for PRECEDES",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for PRECEDES",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForSimilarTo() {
+    void shouldIncludeRelationTypeInstructionForSimilarTo() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.SIMILAR_TO).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.SIMILAR_TO).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -575,22 +575,22 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for SIMILAR_TO",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for SIMILAR_TO",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeLinkTypeInstructionForConfuseWith() {
+    void shouldIncludeRelationTypeInstructionForConfuseWith() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.CONFUSE_WITH).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.CONFUSE_WITH).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       makeMe.aNote().under(linkingNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -600,17 +600,17 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain link type instruction for CONFUSE_WITH",
-          hasLinkTypeInstruction,
+          "Request should contain relation type instruction for CONFUSE_WITH",
+          hasRelationTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldNotIncludeLinkTypeInstructionForNonLinkingNote() {
+    void shouldNotIncludeRelationTypeInstructionForNonLinkingNote() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(testNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -620,8 +620,8 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should not contain link type instruction for non-linking note",
-          hasLinkTypeInstruction,
+          "Request should not contain relation type instruction for non-linking note",
+          hasRelationTypeInstruction,
           is(false));
     }
   }
@@ -749,9 +749,9 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldIncludeBothLinkTypeAndNoteTypeInstructions() {
+    void shouldIncludeBothRelationTypeAndNoteTypeInstructions() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, LinkType.RELATED_TO).please();
+      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.RELATED_TO).please();
       Note linkingNote = sourceNote.getLinks().get(0);
       linkingNote.setNoteType(NoteType.VOCAB);
       makeMe.aNote().under(linkingNote).please();
@@ -759,7 +759,7 @@ class NoteQuestionGenerationServiceTests {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(linkingNote, null);
 
-      boolean hasLinkTypeInstruction =
+      boolean hasRelationTypeInstruction =
           request.messages().stream()
               .filter(message -> message.system().isPresent())
               .anyMatch(
@@ -778,8 +778,8 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should contain both link type and note type instructions",
-          hasLinkTypeInstruction && hasNoteTypeInstruction,
+          "Request should contain both relation type and note type instructions",
+          hasRelationTypeInstruction && hasNoteTypeInstruction,
           is(true));
     }
   }

@@ -72,12 +72,12 @@ class NoteBuilder extends Builder<Note> {
     return this
   }
 
-  linkType(value: NoteTopologyType["linkType"]): NoteBuilder {
+  relationType(value: NoteTopologyType["relationType"]): NoteBuilder {
     this.titleConstructor(`:${value}`)
     // default target
     this.data.noteTopology.targetNoteTopology = {
       id: generateId(),
-      linkType: value,
+      relationType: value,
       titleOrPredicate: "a target",
     }
     return this

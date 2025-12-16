@@ -3,8 +3,8 @@ package com.odde.doughnut.services.ai.tools;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.QuestionContestResult;
-import com.odde.doughnut.entities.LinkType;
 import com.odde.doughnut.entities.NoteType;
+import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.services.ai.*;
 import java.util.List;
 
@@ -18,12 +18,13 @@ public class AiToolFactory {
     return mcqWithAnswerAiTool(null, null);
   }
 
-  public static InstructionAndSchema mcqWithAnswerAiTool(LinkType linkType) {
-    return mcqWithAnswerAiTool(linkType, null);
+  public static InstructionAndSchema mcqWithAnswerAiTool(RelationType relationType) {
+    return mcqWithAnswerAiTool(relationType, null);
   }
 
-  public static InstructionAndSchema mcqWithAnswerAiTool(LinkType linkType, NoteType noteType) {
-    String linkTypeInstruction = getLinkTypeInstruction(linkType);
+  public static InstructionAndSchema mcqWithAnswerAiTool(
+      RelationType relationType, NoteType noteType) {
+    String relationTypeInstruction = getRelationTypeInstruction(relationType);
     String noteTypeInstruction = getNoteTypeInstruction(noteType);
 
     // 5. **Empty Stems When Necessary**: Leave the question stem empty if there's insufficient
@@ -55,8 +56,8 @@ public class AiToolFactory {
 
       """;
     String fullInstruction = baseInstruction;
-    if (linkTypeInstruction != null) {
-      fullInstruction = fullInstruction + "\n" + linkTypeInstruction;
+    if (relationTypeInstruction != null) {
+      fullInstruction = fullInstruction + "\n" + relationTypeInstruction;
     }
     if (noteTypeInstruction != null) {
       fullInstruction = fullInstruction + "\n" + noteTypeInstruction;
@@ -64,11 +65,11 @@ public class AiToolFactory {
     return new InstructionAndSchema(fullInstruction, askSingleAnswerMultipleChoiceQuestion());
   }
 
-  private static String getLinkTypeInstruction(LinkType linkType) {
-    if (linkType == null) {
+  private static String getRelationTypeInstruction(RelationType relationType) {
+    if (relationType == null) {
       return null;
     }
-    return linkType.getQuestionGenerationInstruction();
+    return relationType.getQuestionGenerationInstruction();
   }
 
   private static String getNoteTypeInstruction(NoteType noteType) {

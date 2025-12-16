@@ -62,11 +62,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder linkTo(Note referTo) {
-    return linkTo(referTo, LinkType.SPECIALIZE);
+    return linkTo(referTo, RelationType.SPECIALIZE);
   }
 
-  public NoteBuilder linkTo(Note referTo, LinkType linkType) {
-    relationBuilders.add(makeMe.aRelation().between(entity, referTo, linkType));
+  public NoteBuilder linkTo(Note referTo, RelationType relationType) {
+    relationBuilders.add(makeMe.aRelation().between(entity, referTo, relationType));
     return this;
   }
 
