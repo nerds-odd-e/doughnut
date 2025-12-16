@@ -71,8 +71,8 @@ jobs:
       - run: backend/gradlew -p backend migrateTestDB -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
 
-  Frontend-and-MCP-unit-tests:
-    name: Frontend & MCP Unit Tests
+  Other-unit-tests:
+    name: Other Unit Tests
     runs-on: ${{ vars.RUNNER }}
     env:
       FRONTEND_UT_CONSOLE_OUTPUT_AS_FAILURE: true
@@ -84,6 +84,8 @@ jobs:
           pnpm_version: ${{ vars.PNPM_VERSION }}
       - run: pnpm frontend:test
       - run: pnpm mcp-server:test
+      - name: Run script unit tests
+        run: bash scripts/test/run_all_script_tests.sh
 
   Package-artifacts:
     name: Package backend & frontend artifacts for deployment
@@ -183,7 +185,7 @@ jobs:
       [
         Lint-N-Backend-Generated-Types-For-Frontend,
         Backend-unit-tests,
-        Frontend-and-MCP-unit-tests,
+        Other-unit-tests,
         Package-artifacts,
         E2E-tests,
       ]
@@ -210,7 +212,7 @@ jobs:
       [
         Lint-N-Backend-Generated-Types-For-Frontend,
         Backend-unit-tests,
-        Frontend-and-MCP-unit-tests,
+        Other-unit-tests,
         Package-artifacts,
         E2E-tests,
         Deploy,
