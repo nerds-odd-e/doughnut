@@ -1,22 +1,22 @@
+import { useRecallData } from "@/composables/useRecallData"
 import RecallPage from "@/pages/RecallPage.vue"
-import { flushPromises } from "@vue/test-utils"
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
-import { useRouter } from "vue-router"
+import type {
+  MemoryTrackerLite,
+  QuestionResult,
+  SpellingResult,
+} from "@generated/backend"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
   mockSdkService,
-  wrapSdkResponse,
   wrapSdkError,
+  wrapSdkResponse,
 } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
-import type {
-  SpellingResult,
-  MemoryTrackerLite,
-  QuestionResult,
-} from "@generated/backend"
-import { useRecallData } from "@/composables/useRecallData"
+import { flushPromises } from "@vue/test-utils"
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { computed, ref } from "vue"
+import { useRouter } from "vue-router"
 
 vi.mock("@/composables/useRecallData")
 
@@ -90,12 +90,10 @@ const createUseRecallDataMock = (overrides?: {
 
 afterEach(() => {
   document.body.innerHTML = ""
-  localStorage.clear()
 })
 
 beforeEach(() => {
   vitest.resetAllMocks()
-  localStorage.clear()
   mockSdkService("showNote", makeMe.aNoteRealm.please())
   recallingSpy = mockSdkService(
     "recalling",
@@ -283,7 +281,6 @@ describe("repeat page", () => {
     const firstMemoryTrackerId = 123
 
     beforeEach(() => {
-      localStorage.clear()
       vi.useFakeTimers()
       mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
       mockSdkService("askAQuestion", makeMe.aRecallPrompt.please())
@@ -354,7 +351,6 @@ describe("repeat page", () => {
     let askAQuestionSpy: ReturnType<typeof mockSdkService<"askAQuestion">>
 
     beforeEach(() => {
-      localStorage.clear()
       vi.useFakeTimers()
       mockSdkService("showMemoryTracker", makeMe.aMemoryTracker.please())
       askAQuestionSpy = mockSdkService(

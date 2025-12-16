@@ -1,4 +1,4 @@
-import { expect, vi } from "vitest";
+import { vi } from "vitest";
 import "vitest-dom/extend-expect";
 import createFetchMock from "vitest-fetch-mock";
 
