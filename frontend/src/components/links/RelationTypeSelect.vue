@@ -28,7 +28,8 @@ defineProps({
   scopeName: String,
   modelValue: {
     type: String as PropType<NoteTopology["relationType"]>,
-    required: true,
+    required: false,
+    default: undefined,
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },
