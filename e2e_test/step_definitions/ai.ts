@@ -135,7 +135,7 @@ Given(
         role: 'user',
         content: `.*${data.hashes()[0]!['request contains']}.*`,
       })
-      .stubAudioTranscriptToText(data.hashes()[0]!.response!)
+      .stubAudioTranscriptToText(data.hashes()[0].response!)
   }
 )
 

@@ -41,7 +41,7 @@ Then(
       .navigateToMessageCenter()
       .expectConversation(subject, partner)
       .conversation(subject)
-      .expectMessage(data.hashes()[0]!.message!)
+      .expectMessage(data.hashes()[0].message!)
   }
 )
 
