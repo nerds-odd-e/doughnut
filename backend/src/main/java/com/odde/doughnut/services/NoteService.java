@@ -162,8 +162,9 @@ public class NoteService {
       RelationType type,
       Timestamp currentUTCTimestamp) {
     final Note note = new Note();
-    note.initialize(creator, sourceNote, currentUTCTimestamp, ":" + type.label);
+    note.initialize(creator, sourceNote, currentUTCTimestamp, null);
     note.setTargetNote(targetNote);
+    note.setRelationType(type);
     note.getRecallSetting()
         .setLevel(
             Math.max(

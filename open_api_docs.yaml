@@ -3743,7 +3743,6 @@ components:
           $ref: "#/components/schemas/NoteTopology"
       required:
       - id
-      - title
     Notebook:
       type: object
       properties:

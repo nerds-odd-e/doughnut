@@ -1,7 +1,7 @@
 <template>
   <WikidataAssociationDialog
     ref="dialogRef"
-    :search-key="note.noteTopology.title"
+    :search-key="note.noteTopology.title ?? ''"
     :model-value="localWikidataId"
     :error-message="wikidataIdError"
     :show-save-button="true"
@@ -101,7 +101,7 @@ const validateAndSaveWikidataId = async (wikidataId: string) => {
       return
     }
 
-    const noteTitleUpper = props.note.noteTopology.title.toUpperCase()
+    const noteTitleUpper = (props.note.noteTopology.title ?? "").toUpperCase()
     const wikidataTitleUpper = entityData!.WikidataTitleInEnglish.toUpperCase()
 
     if (

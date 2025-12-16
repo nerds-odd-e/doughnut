@@ -62,17 +62,29 @@ public class ObsidianFormatService {
     zos.putNextEntry(new ZipEntry(filePath));
     zos.write(fileContent.getBytes());
 
+    String noteTitle = getNoteTitleForFile(note);
     for (Note child : note.getChildren()) {
-      String newPath = path.isEmpty() ? note.getTitle() : path + "/" + note.getTitle();
+      String newPath = path.isEmpty() ? noteTitle : path + "/" + noteTitle;
       writeNoteToZip(child, zos, newPath);
     }
   }
 
   private String generateFilePath(String path, Note note) {
-    String sanitizedTitle = sanitizeFileName(note.getTitle());
+    String title = getNoteTitleForFile(note);
+    String sanitizedTitle = sanitizeFileName(title);
     String fileName =
         note.getChildren().isEmpty() ? sanitizedTitle + ".md" : sanitizedTitle + "/__index.md";
     return path.isEmpty() ? fileName : path + "/" + fileName;
+  }
+
+  private String getNoteTitleForFile(Note note) {
+    if (note.getTitle() != null) {
+      return note.getTitle();
+    }
+    if (note.getRelationType() != null) {
+      return "_" + note.getRelationType().label;
+    }
+    return "untitled";
   }
 
   private String generateMarkdownContent(Note note) {
@@ -91,13 +103,17 @@ public class ObsidianFormatService {
   }
 
   private String generateNoteContent(Note note) {
+    String title = note.getTitle() != null ? note.getTitle() : "";
     return """
            # %s
            %s"""
-        .formatted(note.getTitle(), note.getDetails());
+        .formatted(title, note.getDetails());
   }
 
   private String sanitizeFileName(String fileName) {
+    if (fileName == null) {
+      return "untitled";
+    }
     return fileName.replaceAll("[\\\\/:*?\"<>|]", "_");
   }
 

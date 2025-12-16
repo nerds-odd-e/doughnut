@@ -13,7 +13,7 @@
     <span class="relation-type" style="font-size: 50%">
       {{ relationType }}
     </span>
-    <SvgRelationTypeIcon :relation-type="relationType" :inverse-icon="true" />
+    <SvgRelationTypeIcon v-if="relationType" :relation-type="relationType" :inverse-icon="true" />
     &nbsp;
     <span>
       <NoteTitleComponent
@@ -48,10 +48,10 @@ const props = defineProps({
 
 const reactiveProps = ref(props)
 
-const relationType = computed(() =>
-  reactiveProps.value.noteTopology.title.substring(1)
+const relationType = computed(
+  () => reactiveProps.value.noteTopology.relationType
 )
-const title = computed(() => reactiveProps.value.noteTopology.title)
+const title = computed(() => reactiveProps.value.noteTopology.title ?? "")
 const iconizedTarget = computed(
   () => !!reactiveProps.value.noteTopology.shortDetails
 )

@@ -12,6 +12,7 @@ import com.odde.doughnut.configs.ObjectMapperConfig;
 import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.NoteTopology;
 import com.odde.doughnut.entities.converters.NoteTypeConverter;
+import com.odde.doughnut.entities.converters.RelationTypeConverter;
 import com.odde.doughnut.services.graphRAG.BareNote;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -59,7 +60,6 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Getter
   @Setter
   @Column(name = "title")
-  @NotNull
   @JsonIgnore
   private String title = "";
 
@@ -123,6 +123,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Setter
   private NoteType noteType;
 
+  @Convert(converter = RelationTypeConverter.class)
+  @Column(name = "relation_type")
+  @JsonIgnore
+  private RelationType relationType;
+
   @OneToMany(mappedBy = "note")
   @Getter
   @JsonIgnore
@@ -151,7 +156,7 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public NoteTitle getNoteTitle() {
-    return new NoteTitle(getTitle());
+    return new NoteTitle(getTitle() != null ? getTitle() : "");
   }
 
   @JsonIgnore
@@ -176,13 +181,12 @@ public class Note extends EntityIdentifiedByIdOnly {
 
   @JsonIgnore
   public RelationType getRelationType() {
-    if (!getTitle().startsWith(":")) return null;
-    return RelationType.fromLabel(getTitle().substring(1));
+    return relationType;
   }
 
   @JsonIgnore
   public void setRelationType(RelationType relationType) {
-    setTitle(":" + relationType.label);
+    this.relationType = relationType;
   }
 
   @JsonIgnore
@@ -289,7 +293,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   public NoteTopology getNoteTopology() {
     NoteTopology noteTopology = new NoteTopology();
     noteTopology.setId(getId());
-    noteTopology.setTitle(getTitle());
+    noteTopology.setTitle(getTitle() != null ? getTitle() : "");
     noteTopology.setShortDetails(getShortDetails());
     noteTopology.setRelationType(getRelationType());
     if (getParent() != null) {

@@ -33,7 +33,7 @@ describe("note title", () => {
         name: "noteShow",
         params: { noteId: target.id },
       })
-      expect(link.text()).toBe(target.noteTopology.title)
+      expect(link.text()).toBe(target.noteTopology.title!)
     })
 
     it("if relationship note has details the relationship is an icon", async () => {
@@ -42,7 +42,7 @@ describe("note title", () => {
       const link = wrapper.find("a.router-link")
       expect(link.exists()).toBe(true)
       expect(link.text()).toBe("🔗")
-      expect(wrapper.text()).toContain(target.noteTopology.title)
+      expect(wrapper.text()).toContain(target.noteTopology.title!)
     })
   })
 })

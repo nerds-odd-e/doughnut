@@ -286,7 +286,7 @@ describe("in place edit on title", () => {
 
     it("should dispay breadcrumbs", async () => {
       const wrapper = mountComponent(relationNote)
-      expect(wrapper.text()).toContain(note.noteTopology.title)
+      expect(wrapper.text()).toContain(note.noteTopology.title!)
     })
   })
 })

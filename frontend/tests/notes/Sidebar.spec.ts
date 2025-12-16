@@ -116,7 +116,7 @@ describe("Sidebar", () => {
 
   it("should call the api once if top note", async () => {
     render(topNoteRealm)
-    await screen.findByText(firstGeneration.note.noteTopology.title)
+    await screen.findByText(firstGeneration.note.noteTopology.title!)
   })
 
   describe("first generation", () => {
@@ -127,7 +127,7 @@ describe("Sidebar", () => {
       expect(observerDisconnected).toBe(true)
       expect(
         /* eslint-disable */
-        (await screen.findByText(firstGeneration.note.noteTopology.title))
+        (await screen.findByText(firstGeneration.note.noteTopology.title!))
           .parentNode?.parentNode?.parentNode
         /* eslint-enable */
       ).toHaveClass("active-item")
@@ -143,16 +143,16 @@ describe("Sidebar", () => {
 
     it("should have siblings", async () => {
       render(firstGeneration)
-      await screen.findByText(firstGenerationSibling.note.noteTopology.title)
+      await screen.findByText(firstGenerationSibling.note.noteTopology.title!)
     })
 
     it("should have child note of active first gen", async () => {
       render(firstGeneration)
       const secondGen = await screen.findByText(
-        secondGeneration.note.noteTopology.title
+        secondGeneration.note.noteTopology.title!
       )
       const sibling = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
       expect(isBefore(secondGen, sibling)).toBe(true)
     })
@@ -160,8 +160,8 @@ describe("Sidebar", () => {
 
   it("should start from notebook top", async () => {
     render(secondGeneration)
-    await screen.findByText(firstGeneration.note.noteTopology.title)
-    await screen.findByText(secondGeneration.note.noteTopology.title)
+    await screen.findByText(firstGeneration.note.noteTopology.title!)
+    await screen.findByText(secondGeneration.note.noteTopology.title!)
   })
 
   it("should disable the menu and keep the content when loading", async () => {
@@ -169,7 +169,7 @@ describe("Sidebar", () => {
     await flushPromises()
     await rerender({ noteRealm: undefined })
     await flushPromises()
-    await screen.findByText(firstGeneration.note.noteTopology.title)
+    await screen.findByText(firstGeneration.note.noteTopology.title!)
   })
 
   describe("drag and drop functionality", () => {
@@ -184,10 +184,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag
@@ -210,7 +210,7 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
 
       // Get the li element (parent of the div containing the text)
@@ -231,10 +231,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag
@@ -262,7 +262,7 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const note = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
 
       // Clear any calls from setup
@@ -281,10 +281,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const firstGenNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const secondGenNote = await screen.findByText(
-        secondGeneration.note.noteTopology.title
+        secondGeneration.note.noteTopology.title!
       )
 
       // Clear any calls from setup
@@ -302,10 +302,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag
@@ -329,10 +329,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const secondGenNote = await screen.findByText(
-        secondGeneration.note.noteTopology.title
+        secondGeneration.note.noteTopology.title!
       )
       const firstGenNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
 
       // Start drag from second generation
@@ -351,7 +351,7 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const note = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
 
       // Start drag
@@ -370,10 +370,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag
@@ -398,10 +398,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag
@@ -426,10 +426,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const draggedNote = await screen.findByText(
-        firstGeneration.note.noteTopology.title
+        firstGeneration.note.noteTopology.title!
       )
       const dropTarget = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag
@@ -459,10 +459,10 @@ describe("Sidebar", () => {
       await flushPromises()
 
       const secondGenNote = await screen.findByText(
-        secondGeneration.note.noteTopology.title
+        secondGeneration.note.noteTopology.title!
       )
       const firstGenNote = await screen.findByText(
-        firstGenerationSibling.note.noteTopology.title
+        firstGenerationSibling.note.noteTopology.title!
       )
 
       // Start drag from second generation
