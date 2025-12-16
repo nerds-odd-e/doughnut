@@ -3,10 +3,9 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RelationType {
-  NO_LINK(0, "no link", "no link", "", null),
+  NO_LINK(0, "no link", "", null),
   RELATED_TO(
       1,
-      "related note",
       "related to",
       "related to",
       """
@@ -17,7 +16,6 @@ public enum RelationType {
       """),
   SPECIALIZE(
       2,
-      "specification",
       "a specialization of",
       "a generalization of",
       """
@@ -29,7 +27,6 @@ public enum RelationType {
       """),
   APPLICATION(
       3,
-      "application",
       "an application of",
       "applied to",
       """
@@ -40,7 +37,6 @@ public enum RelationType {
       """),
   INSTANCE(
       4,
-      "instance",
       "an instance of",
       "has instances",
       """
@@ -52,7 +48,6 @@ public enum RelationType {
       """),
   PART(
       6,
-      "part",
       "a part of",
       "has parts",
       """
@@ -63,7 +58,6 @@ public enum RelationType {
       """),
   TAGGED_BY(
       8,
-      "tag target",
       "tagged by",
       "tagging",
       """
@@ -75,7 +69,6 @@ public enum RelationType {
       """),
   ATTRIBUTE(
       10,
-      "attribute",
       "an attribute of",
       "has attributes",
       """
@@ -87,7 +80,6 @@ public enum RelationType {
       """),
   OPPOSITE_OF(
       12,
-      "opposition",
       "the opposite of",
       "the opposite of",
       """
@@ -98,7 +90,6 @@ public enum RelationType {
       """),
   AUTHOR_OF(
       14,
-      "author",
       "author of",
       "brought by",
       """
@@ -110,7 +101,6 @@ public enum RelationType {
       """),
   USES(
       15,
-      "user",
       "using",
       "used by",
       """
@@ -121,7 +111,6 @@ public enum RelationType {
       """),
   EXAMPLE_OF(
       17,
-      "example",
       "an example of",
       "has examples",
       """
@@ -132,7 +121,6 @@ public enum RelationType {
       """),
   PRECEDES(
       19,
-      "precedence",
       "before",
       "after",
       """
@@ -143,7 +131,6 @@ public enum RelationType {
       """),
   SIMILAR_TO(
       22,
-      "note",
       "similar to",
       "similar to",
       """
@@ -154,7 +141,6 @@ public enum RelationType {
       """),
   CONFUSE_WITH(
       23,
-      "note",
       "confused with",
       "confused with",
       """
@@ -165,18 +151,12 @@ public enum RelationType {
       """);
 
   @JsonValue public final String label;
-  public final String nameOfSource;
   public final Integer id;
   public final String reversedLabel;
   public final String questionGenerationInstruction;
 
   RelationType(
-      Integer id,
-      String nameOfSource,
-      String label,
-      String reversedLabel,
-      String questionGenerationInstruction) {
-    this.nameOfSource = nameOfSource;
+      Integer id, String label, String reversedLabel, String questionGenerationInstruction) {
     this.label = label;
     this.id = id;
     this.reversedLabel = reversedLabel;
