@@ -35,5 +35,5 @@ Feature: Note creation should have details if wikidata is a person
   @usingMockedWikidataService
   Scenario: link to the country of orgin note if it already exists
     When I create a note belonging to "People" with title "Wang Chien-ming" and wikidata id "Q706446"
-    Then I should see note "People/Wang Chien-ming" has link "related to" "Taiwan"
+    Then I should see note "People/Wang Chien-ming" has relationship "related to" "Taiwan"
 # this check is not sufficient, should check new note is not create for taiwan

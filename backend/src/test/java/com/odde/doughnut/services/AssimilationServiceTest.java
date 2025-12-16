@@ -76,7 +76,7 @@ public class AssimilationServiceTest {
 
     @Test
     void shouldNotIncludeNoteThatIsSkippedForReview() {
-      makeMe.theNote(note1).skipMemoryTracking().linkTo(note2).please();
+      makeMe.theNote(note1).skipMemoryTracking().relateTo(note2).please();
       assertThat(getFirstInitialMemoryTracker(assimilationService), equalTo(note2));
     }
 
@@ -222,7 +222,7 @@ public class AssimilationServiceTest {
     @Test
     void shouldReturnMemoryTrackerForLink() {
       makeMe.theNote(note2).skipMemoryTracking().please();
-      makeMe.theNote(note1).skipMemoryTracking().linkTo(note2).please();
+      makeMe.theNote(note1).skipMemoryTracking().relateTo(note2).please();
       Note noteToReview = getFirstInitialMemoryTracker(assimilationService);
       assertThat(noteToReview.getParent(), equalTo(note1));
     }

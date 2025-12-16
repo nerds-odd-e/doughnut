@@ -14,14 +14,14 @@ Feature: Note deletion
     Then I should see the note "TDD" is marked as deleted
 
   Scenario: Delete a note will delete its links
-    Given there is "a part of" link between note "TDD" and "tech"
-    And I should see "TDD" has link "a part of" "tech"
+    Given there is "a part of" relationship between note "TDD" and "tech"
+    And I should see "TDD" has relationship "a part of" "tech"
     When I delete note "TDD"
     Then I should see "LeSS in Action/tech" with these children
       | note-title |
       | CI System  |
     When I undo "delete note"
-    Then I should see "TDD" has link "a part of" "tech"
+    Then I should see "TDD" has relationship "a part of" "tech"
 
   Scenario: Delete a note then delete its parent and undo
     Given I delete note "TDD" at 13:00
@@ -53,8 +53,8 @@ Feature: Note deletion
       | Title       | Parent Title     |
       | source      | References Test  |
       | target      | References Test  |
-    And there is "a part of" link between note "source" and "target"
-    And I should see "source" has link "a part of" "target"
+    And there is "a part of" relationship between note "source" and "target"
+    And I should see "source" has relationship "a part of" "target"
     When I delete note "target"
     And I navigate to References Test note
     Then I should see "References Test" with these children

@@ -68,6 +68,6 @@ Then("I should see I've not subscribed to {string}", (noteTopology: string) => {
     .expectNotebookNotPresent(noteTopology)
 })
 
-Then('I should see it has link to {string}', (noteTopology: string) => {
+Then('I should see it has relationship to {string}', (noteTopology: string) => {
   start.assumeNotePage().navigateToReference(noteTopology)
 })

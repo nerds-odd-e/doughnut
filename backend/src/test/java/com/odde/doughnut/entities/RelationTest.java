@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class LinkTest {
+public class RelationTest {
 
   @Autowired MakeMe makeMe;
 
   @Nested
-  class LevelOfLink {
+  class LevelOfRelation {
     Note subject;
     Note target;
 
@@ -33,15 +33,15 @@ public class LinkTest {
     @Test
     void shouldGetSourceLevelWhenItIsHigher() {
       makeMe.theNote(subject).level(5).please();
-      Note link = makeMe.aRelation().between(subject, target).inMemoryPlease();
-      assertThat(link.getRecallSetting().getLevel(), is(5));
+      Note relation = makeMe.aRelation().between(subject, target).inMemoryPlease();
+      assertThat(relation.getRecallSetting().getLevel(), is(5));
     }
 
     @Test
     void shouldGetTargetLevelWhenItIsHigher() {
       makeMe.theNote(target).level(5).please();
-      Note link = makeMe.aRelation().between(subject, target).inMemoryPlease();
-      assertThat(link.getRecallSetting().getLevel(), is(5));
+      Note relation = makeMe.aRelation().between(subject, target).inMemoryPlease();
+      assertThat(relation.getRecallSetting().getLevel(), is(5));
     }
   }
 }

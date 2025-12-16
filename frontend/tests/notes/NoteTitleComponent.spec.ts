@@ -22,10 +22,10 @@ describe("note title", () => {
   describe("linking note", () => {
     const note = makeMe.aNote.titleConstructor("Dummy Title").please()
     const target = makeMe.aNote.underNote(note).please()
-    const linkingNote = makeMe.aLink.to(target).please()
+    const relationNote = makeMe.aRelationship.to(target).please()
 
     it("should have link to target", async () => {
-      const wrapper = mountComponent(linkingNote)
+      const wrapper = mountComponent(relationNote)
       const links = wrapper.findAll("a.router-link")
       const link = links[0]!
       expect(link.exists()).toBe(true)
@@ -37,8 +37,8 @@ describe("note title", () => {
     })
 
     it("if linking note has details the link is an icon", async () => {
-      linkingNote.noteTopology.shortDetails = "exist"
-      const wrapper = mountComponent(linkingNote)
+      relationNote.noteTopology.shortDetails = "exist"
+      const wrapper = mountComponent(relationNote)
       const link = wrapper.find("a.router-link")
       expect(link.exists()).toBe(true)
       expect(link.text()).toBe("🔗")

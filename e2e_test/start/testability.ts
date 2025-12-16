@@ -160,7 +160,11 @@ const testability = () => {
         )
         .then(() => this.shareToBazaar(notebook))
     },
-    injectLink(type: string, fromNoteTopic: string, toNoteTopic: string) {
+    injectRelationship(
+      type: string,
+      fromNoteTopic: string,
+      toNoteTopic: string
+    ) {
       return cy
         .get(`@${injectedNoteIdMapAliasName}`)
         .then((injectedNoteIdMap) => {
@@ -175,7 +179,7 @@ const testability = () => {
             target_id: toNoteId.toString(),
           }
 
-          const promise = TestabilityRestController.linkNotes({
+          const promise = TestabilityRestController.createRelationships({
             body: requestBody,
           })
           return cy.wrap(promise, { log: false })

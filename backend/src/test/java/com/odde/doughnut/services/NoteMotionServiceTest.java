@@ -135,22 +135,22 @@ public class NoteMotionServiceTest {
 
     @Nested
     class WhenThereIsALinkingNote {
-      Note linkingNote;
+      Note relationNote;
 
       @BeforeEach
       void setup() {
-        linkingNote = makeMe.aRelation().between(topNote, secondChild).please();
-        makeMe.theNote(linkingNote).after(firstChild).please();
+        relationNote = makeMe.aRelation().between(topNote, secondChild).please();
+        makeMe.theNote(relationNote).after(firstChild).please();
         makeMe.refresh(topNote);
       }
 
       @Test
       void moveSecondToAfterFirstAndBeforeLinkNote()
           throws CyclicLinkDetectedException, MovementNotPossibleException {
-        assertThat(linkingNote.getSiblingOrder(), lessThan(secondChild.getSiblingOrder()));
+        assertThat(relationNote.getSiblingOrder(), lessThan(secondChild.getSiblingOrder()));
         move(secondChild, firstChild, false);
         assertOrder(firstChild, secondChild);
-        assertThat(linkingNote.getSiblingOrder(), greaterThan(secondChild.getSiblingOrder()));
+        assertThat(relationNote.getSiblingOrder(), greaterThan(secondChild.getSiblingOrder()));
       }
     }
   }
@@ -187,17 +187,17 @@ public class NoteMotionServiceTest {
     @Test
     void shouldUpdateNotebookForAllDescendantsIncludingLinks()
         throws CyclicLinkDetectedException, MovementNotPossibleException {
-      // Create a linking note under secondChild
+      // Create a relationship note under secondChild
       Note targetNote = makeMe.aNote("targetNote").please();
-      Note linkingNote = makeMe.aRelation().between(secondChild, targetNote).please();
+      Note relationNote = makeMe.aRelation().between(secondChild, targetNote).please();
 
       move(secondChild, otherNotebook, true);
 
       makeMe.refresh(secondChild);
-      makeMe.refresh(linkingNote);
+      makeMe.refresh(relationNote);
 
       assertThat(secondChild.getNotebook(), equalTo(otherNotebook.getNotebook()));
-      assertThat(linkingNote.getNotebook(), equalTo(otherNotebook.getNotebook()));
+      assertThat(relationNote.getNotebook(), equalTo(otherNotebook.getNotebook()));
     }
   }
 }

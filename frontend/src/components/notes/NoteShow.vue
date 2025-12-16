@@ -59,18 +59,18 @@
 	      >
                 <h3 class="daisy-text-lg daisy-font-medium daisy-mb-2">Referenced by</h3>
                 <ul class="daisy-menu daisy-rounded-lg daisy-shadow-sm">
-                  <li v-for="link in noteRealm.inboundReferences"
-                      :key="link.id"
+                  <li v-for="relation in noteRealm.inboundReferences"
+                      :key="relation.id"
                       class="daisy-menu-item daisy-hover:daisy-bg-base-200 daisy-transition-colors daisy-py-2"
                   >
                     <div class="daisy-flex daisy-items-center daisy-gap-2">
                       <span class="daisy-text-sm daisy-text-base-content/70">
-                        {{ reverseLabel(link.noteTopology.relationType) }}
+                        {{ reverseLabel(relation.noteTopology.relationType) }}
                       </span>
-                      <LinkOfNote
-                        class="link-multi"
-                        :key="link.id"
-                        v-bind="{ note: link }"
+                      <RelationshipOfNote
+                        class="relationship-multi"
+                        :key="relation.id"
+                        v-bind="{ note: relation }"
                         :reverse="true"
                       />
                     </div>
@@ -100,7 +100,7 @@ import ChildrenNotes from "./ChildrenNotes.vue"
 import NoteAccessoryAsync from "./accessory/NoteAccessoryAsync.vue"
 import NoteToolbar from "./core/NoteToolbar.vue"
 import NoteRecentUpdateIndicator from "./NoteRecentUpdateIndicator.vue"
-import LinkOfNote from "../links/LinkOfNote.vue"
+import RelationshipOfNote from "../links/RelationshipOfNote.vue"
 import { reverseLabel } from "../../models/relationTypeOptions"
 
 defineProps({

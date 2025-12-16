@@ -317,7 +317,7 @@ export type McpNoteAddDto = {
     noteCreationDTO?: NoteCreationDto;
 };
 
-export type LinkCreation = {
+export type RelationshipCreation = {
     relationType: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
 };
 
@@ -1033,7 +1033,7 @@ export type LinkNotesData = {
     };
     path?: never;
     query?: never;
-    url: '/api/testability/link_notes';
+    url: '/api/testability/create_relationships';
 };
 
 export type LinkNotesErrors = {
@@ -2255,32 +2255,32 @@ export type CreateNoteViaMcpResponses = {
 
 export type CreateNoteViaMcpResponse = CreateNoteViaMcpResponses[keyof CreateNoteViaMcpResponses];
 
-export type UpdateLinkData = {
-    body: LinkCreation;
+export type UpdateRelationshipData = {
+    body: RelationshipCreation;
     path: {
-        link: number;
+        relation: number;
     };
     query?: never;
-    url: '/api/links/{link}';
+    url: '/api/relations/{relation}';
 };
 
-export type UpdateLinkErrors = {
+export type UpdateRelationshipErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type UpdateLinkError = UpdateLinkErrors[keyof UpdateLinkErrors];
+export type UpdateRelationshipError = UpdateRelationshipErrors[keyof UpdateRelationshipErrors];
 
-export type UpdateLinkResponses = {
+export type UpdateRelationshipResponses = {
     /**
      * OK
      */
     200: Array<NoteRealm>;
 };
 
-export type UpdateLinkResponse = UpdateLinkResponses[keyof UpdateLinkResponses];
+export type UpdateRelationshipResponse = UpdateRelationshipResponses[keyof UpdateRelationshipResponses];
 
 export type MoveNoteData = {
     body: NoteMoveDto;
@@ -2289,7 +2289,7 @@ export type MoveNoteData = {
         targetNote: number;
     };
     query?: never;
-    url: '/api/links/move/{sourceNote}/{targetNote}';
+    url: '/api/relations/move/{sourceNote}/{targetNote}';
 };
 
 export type MoveNoteErrors = {
@@ -2310,33 +2310,33 @@ export type MoveNoteResponses = {
 
 export type MoveNoteResponse = MoveNoteResponses[keyof MoveNoteResponses];
 
-export type LinkNoteFinalizeData = {
-    body: LinkCreation;
+export type AddRelationshipFinalizeData = {
+    body: RelationshipCreation;
     path: {
         sourceNote: number;
         targetNote: number;
     };
     query?: never;
-    url: '/api/links/create/{sourceNote}/{targetNote}';
+    url: '/api/relations/create/{sourceNote}/{targetNote}';
 };
 
-export type LinkNoteFinalizeErrors = {
+export type AddRelationshipFinalizeErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type LinkNoteFinalizeError = LinkNoteFinalizeErrors[keyof LinkNoteFinalizeErrors];
+export type AddRelationshipFinalizeError = AddRelationshipFinalizeErrors[keyof AddRelationshipFinalizeErrors];
 
-export type LinkNoteFinalizeResponses = {
+export type AddRelationshipFinalizeResponses = {
     /**
      * OK
      */
     200: Array<NoteRealm>;
 };
 
-export type LinkNoteFinalizeResponse = LinkNoteFinalizeResponses[keyof LinkNoteFinalizeResponses];
+export type AddRelationshipFinalizeResponse = AddRelationshipFinalizeResponses[keyof AddRelationshipFinalizeResponses];
 
 export type DuplicateData = {
     body?: never;

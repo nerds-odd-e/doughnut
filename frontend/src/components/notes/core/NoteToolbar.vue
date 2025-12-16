@@ -26,12 +26,12 @@
         <SvgAddSibling />
       </NoteNewButton>
 
-      <PopButton v-if="!readonly" title="search and link note">
+      <PopButton v-if="!readonly" title="search and add relationship">
         <template #button_face>
           <SvgSearchForLink />
         </template>
         <template #default="{ closer }">
-          <LinkNoteDialog
+          <AddRelationshipDialog
             v-bind="{ note }"
             @close-dialog="closer"
           />
@@ -107,7 +107,7 @@ import NoteNewButton from "./NoteNewButton.vue"
 import SvgAddChild from "../../svgs/SvgAddChild.vue"
 import SvgAddSibling from "../../svgs/SvgAddSibling.vue"
 import SvgSearchForLink from "../../svgs/SvgSearchForLink.vue"
-import LinkNoteDialog from "../../links/LinkNoteDialog.vue"
+import AddRelationshipDialog from "../../links/AddRelationshipDialog.vue"
 import SvgCog from "../../svgs/SvgCog.vue"
 import SvgMarkdown from "@/components/svgs/SvgMarkdown.vue"
 import SvgRichContent from "@/components/svgs/SvgRichContent.vue"

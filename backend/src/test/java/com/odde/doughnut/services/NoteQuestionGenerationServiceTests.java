@@ -253,12 +253,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForRelatedTo() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.RELATED_TO).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.RELATED_TO).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -278,12 +278,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForSpecialize() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.SPECIALIZE).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.SPECIALIZE).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -304,12 +304,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForApplication() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.APPLICATION).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.APPLICATION).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -330,12 +330,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForInstance() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.INSTANCE).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.INSTANCE).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -356,12 +356,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForPart() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.PART).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.PART).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -381,12 +381,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForTaggedBy() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.TAGGED_BY).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.TAGGED_BY).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -406,12 +406,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForAttribute() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.ATTRIBUTE).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.ATTRIBUTE).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -432,12 +432,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForOppositeOf() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.OPPOSITE_OF).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.OPPOSITE_OF).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -458,12 +458,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForAuthorOf() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.AUTHOR_OF).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.AUTHOR_OF).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -483,12 +483,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForUses() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.USES).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.USES).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -508,12 +508,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForExampleOf() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.EXAMPLE_OF).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.EXAMPLE_OF).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -534,12 +534,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForPrecedes() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.PRECEDES).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.PRECEDES).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -559,12 +559,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForSimilarTo() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.SIMILAR_TO).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.SIMILAR_TO).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -584,12 +584,12 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeRelationTypeInstructionForConfuseWith() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.CONFUSE_WITH).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.CONFUSE_WITH).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()
@@ -622,7 +622,7 @@ class NoteQuestionGenerationServiceTests {
                   });
 
       assertThat(
-          "Request should not contain relation type instruction for non-linking note",
+          "Request should not contain relation type instruction for non-relationship note",
           hasRelationTypeInstruction,
           is(false));
     }
@@ -753,13 +753,13 @@ class NoteQuestionGenerationServiceTests {
     @Test
     void shouldIncludeBothRelationTypeAndNoteTypeInstructions() {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().linkTo(targetNote, RelationType.RELATED_TO).please();
-      Note linkingNote = sourceNote.getLinks().get(0);
-      linkingNote.setNoteType(NoteType.VOCAB);
-      makeMe.aNote().under(linkingNote).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.RELATED_TO).please();
+      Note relationNote = sourceNote.getRelationships().get(0);
+      relationNote.setNoteType(NoteType.VOCAB);
+      makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(linkingNote, null);
+          service.buildQuestionGenerationRequest(relationNote, null);
 
       boolean hasRelationTypeInstruction =
           request.messages().stream()

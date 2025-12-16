@@ -60,7 +60,7 @@ public class NoteQuestionGenerationService {
       chatRequestBuilder.addUserMessage(additionalMessage);
     }
 
-    RelationType relationType = note.isLink() ? note.getRelationType() : null;
+    RelationType relationType = note.isRelation() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType, noteType);
     chatRequestBuilder.responseJsonSchema(tool);

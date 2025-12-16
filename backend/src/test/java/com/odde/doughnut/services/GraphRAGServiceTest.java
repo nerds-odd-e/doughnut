@@ -567,7 +567,7 @@ public class GraphRAGServiceTest {
       targetNote =
           makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
 
-      // Create a link between parent and target
+      // Create a relationship between parent and target
       relatedChild = makeMe.aRelation().between(focusNote, targetNote).please();
       makeMe.refresh(relatedChild);
     }
@@ -898,7 +898,7 @@ public class GraphRAGServiceTest {
       targetNote =
           makeMe.aNote().titleConstructor("Target Note").details("Target Details").please();
 
-      // Create a link between parent and target
+      // Create a relationship between parent and target
       relatedChild = makeMe.aRelation().between(focusNote, targetNote).please();
 
       // Create inbound references to the target note

@@ -18,7 +18,7 @@ public class RelationBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder between(Note from, Note to, RelationType relationType) {
     this.entity =
-        NoteService.buildALink(
+        NoteService.buildARelation(
             from, to, null, relationType, new Timestamp(System.currentTimeMillis()));
     return new NoteBuilder(entity, makeMe);
   }

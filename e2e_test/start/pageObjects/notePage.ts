@@ -38,8 +38,8 @@ export const assumeNotePage = (noteTopology?: string) => {
         cy.expectNoteCards(children)
       })
     },
-    linkNoteTo: (target: string) => {
-      const findLink = () =>
+    addRelationshipTo: (target: string) => {
+      const findRelationship = () =>
         cy
           .findByText(target, { selector: 'main .title-text' })
           .parent()
@@ -47,31 +47,31 @@ export const assumeNotePage = (noteTopology?: string) => {
           .parent()
       return {
         relationType: (relationType: string) => {
-          findLink().findAllByText(relationType, {
+          findRelationship().findAllByText(relationType, {
             selector: '.relation-type',
           })
         },
         goto: () => {
-          findLink().find('.relation-type').click()
+          findRelationship().find('.relation-type').click()
         },
       }
     },
 
-    expectLinkingTopic: function (relationType: string, target: string) {
-      this.linkNoteTo(target).relationType(relationType)
+    expectRelationshipTopic: function (relationType: string, target: string) {
+      this.addRelationshipTo(target).relationType(relationType)
     },
 
-    navigateToLinkingChild: function (targetNoteTopic: string) {
-      this.linkNoteTo(targetNoteTopic).goto()
+    navigateToRelationshipChild: function (targetNoteTopic: string) {
+      this.addRelationshipTo(targetNoteTopic).goto()
       return assumeNotePage()
     },
-    expectLinkingChildren: function (
+    expectRelationshipChildren: function (
       relationType: string,
       targetNoteTopics: string
     ) {
       cy.get('main').within(() => {
         commonSenseSplit(targetNoteTopics, ',').forEach((target) => {
-          this.expectLinkingTopic(relationType, target)
+          this.expectRelationshipTopic(relationType, target)
         })
       })
     },
@@ -81,7 +81,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       })
       cy.clickRadioByLabel(relationType)
       cy.pageIsNotLoading()
-      this.expectLinkingTopic(relationType, target)
+      this.expectRelationshipTopic(relationType, target)
     },
 
     navigateToReference: (referenceTopic: string) => {
@@ -182,7 +182,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     },
 
     startSearchingAndLinkNote() {
-      this.toolbarButton('search and link note').click()
+      this.toolbarButton('search and add relationship').click()
       return assumeNoteTargetSearchDialog()
     },
     addingChildNoteButton() {

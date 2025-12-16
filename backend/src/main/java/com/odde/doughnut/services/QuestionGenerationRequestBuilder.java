@@ -30,9 +30,9 @@ public class QuestionGenerationRequestBuilder {
       chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
-    // Include relation type specific instructions if the note is a linking note
+    // Include relation type specific instructions if the note is a relationship note
     // Include note type specific instructions if the note has a type (not UNASSIGNED)
-    RelationType relationType = note.isLink() ? note.getRelationType() : null;
+    RelationType relationType = note.isRelation() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
     chatRequestBuilder.responseJsonSchema(
         AiToolFactory.mcqWithAnswerAiTool(relationType, noteType));

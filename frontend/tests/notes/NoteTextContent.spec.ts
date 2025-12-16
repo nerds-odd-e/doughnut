@@ -275,17 +275,17 @@ describe("in place edit on title", () => {
   })
   describe("for a linking note", () => {
     const target = makeMe.aNote.underNote(note).please()
-    const linkingNote = makeMe.aLink.to(target).please()
+    const relationNote = makeMe.aRelationship.to(target).please()
 
     it("should dispay target", async () => {
-      const wrapper = mountComponent(linkingNote)
+      const wrapper = mountComponent(relationNote)
       expect(wrapper.text()).toContain(
-        linkingNote.noteTopology.targetNoteTopology?.titleOrPredicate
+        relationNote.noteTopology.targetNoteTopology?.titleOrPredicate
       )
     })
 
     it("should dispay breadcrumbs", async () => {
-      const wrapper = mountComponent(linkingNote)
+      const wrapper = mountComponent(relationNote)
       expect(wrapper.text()).toContain(note.noteTopology.titleOrPredicate)
     })
   })

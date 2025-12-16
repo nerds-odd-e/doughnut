@@ -9,7 +9,7 @@ Feature: Review Pages
       | Sedition | Incite violence |             | English      |
       | Sedation | Put to sleep    |             | English      |
       | Sedative | Sleep medicine  | a_slide.jpg | English      |
-    And there is "similar to" link between note "Sedition" and "Sedation"
+    And there is "similar to" relationship between note "Sedition" and "Sedation"
 
   Scenario: Different review pages for different notes
     * I assimilate these in sequence:

@@ -136,8 +136,8 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public List<Note> getLinks() {
-    return getChildren().stream().filter(Note::isLink).toList();
+  public List<Note> getRelationships() {
+    return getChildren().stream().filter(Note::isRelation).toList();
   }
 
   @JsonIgnore
@@ -267,13 +267,13 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public Stream<Note> getAllNoneLinkDescendants() {
-    return getAllDescendants().filter(n -> !n.isLink());
+  public Stream<Note> getAllNoneRelationDescendants() {
+    return getAllDescendants().filter(n -> !n.isRelation());
   }
 
   @JsonIgnore
-  public Stream<Note> getLinksAndRefers() {
-    return Stream.concat(getLinks().stream(), getInboundReferences().stream());
+  public Stream<Note> getRelationshipsAndRefers() {
+    return Stream.concat(getRelationships().stream(), getInboundReferences().stream());
   }
 
   @JsonIgnore
@@ -321,7 +321,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   }
 
   @JsonIgnore
-  public boolean isLink() {
+  public boolean isRelation() {
     return getTargetNote() != null;
   }
 

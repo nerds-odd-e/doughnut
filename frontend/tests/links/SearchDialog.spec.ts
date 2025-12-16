@@ -1,11 +1,11 @@
-import LinkNoteDialog from "@/components/links/LinkNoteDialog.vue"
+import AddRelationshipDialog from "@/components/links/AddRelationshipDialog.vue"
 import { screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import MakeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { beforeEach, vi } from "vitest"
 
-describe("LinkNoteDialog", () => {
+describe("AddRelationshipDialog", () => {
   beforeEach(() => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
@@ -17,7 +17,7 @@ describe("LinkNoteDialog", () => {
   })
   it("Search at the top level with no note", async () => {
     helper
-      .component(LinkNoteDialog)
+      .component(AddRelationshipDialog)
       .withCleanStorage()
       .withProps({ note: null })
       .render()
@@ -30,7 +30,7 @@ describe("LinkNoteDialog", () => {
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please()
     helper
-      .component(LinkNoteDialog)
+      .component(AddRelationshipDialog)
       .withCleanStorage()
       .withProps({ note })
       .render()

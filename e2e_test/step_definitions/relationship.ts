@@ -80,7 +80,7 @@ When(
     start
       .assumeNoteTargetSearchDialog()
       .findTargetWithinNotebook(searchKey)
-      .expectExactLinkTargets(
+      .expectExactRelationshipTargets(
         commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
       )
   }
@@ -92,7 +92,7 @@ When(
     start
       .assumeNoteTargetSearchDialog()
       .findTarget(searchKey)
-      .expectExactLinkTargets(
+      .expectExactRelationshipTargets(
         commonSenseSplit(noteTopicsAsString, ',').map((i: string) => i.trim())
       )
   }

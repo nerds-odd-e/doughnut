@@ -53,27 +53,31 @@ public class NoteTest {
   class TargetNote {
     Note parent;
     Note target;
-    Note linkingNote;
+    Note relationNote;
 
     @BeforeEach
     void setup() {
       parent = makeMe.aNote().titleConstructor("parent").please();
       target = makeMe.aNote().please();
-      linkingNote = makeMe.aRelation().between(parent, target).please();
+      relationNote = makeMe.aRelation().between(parent, target).please();
     }
 
     @Test
     void replaceParentPlaceholder() {
       assertThat(
-          linkingNote.getNoteTopology().getTargetNoteTopology().getTitleOrPredicate(),
+          relationNote.getNoteTopology().getTargetNoteTopology().getTitleOrPredicate(),
           equalTo(target.getTitleConstructor()));
     }
 
     @Test
-    void linkOfLink() {
-      Note linkOfLink = makeMe.aRelation().between(parent, linkingNote).please();
+    void relationOfRelation() {
+      Note relationOfRelation = makeMe.aRelation().between(parent, relationNote).please();
       assertThat(
-          linkOfLink.getNoteTopology().getTargetNoteTopology().getTargetNoteTopology().getId(),
+          relationOfRelation
+              .getNoteTopology()
+              .getTargetNoteTopology()
+              .getTargetNoteTopology()
+              .getId(),
           equalTo(target.getId()));
     }
   }

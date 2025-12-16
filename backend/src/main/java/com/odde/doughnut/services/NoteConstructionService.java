@@ -81,7 +81,7 @@ public class NoteConstructionService {
                 .findFirst()
                 .ifPresentOrElse(
                     existingNote -> {
-                      noteService.createLink(
+                      noteService.createRelationship(
                           parentNote,
                           existingNote,
                           user,

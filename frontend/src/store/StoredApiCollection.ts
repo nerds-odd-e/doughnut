@@ -4,9 +4,9 @@ import type {
   NoteRealm,
   WikidataAssociationCreation,
 } from "@generated/backend"
-import type { LinkCreation, NoteCreationDto } from "@generated/backend"
+import type { RelationshipCreation, NoteCreationDto } from "@generated/backend"
 import {
-  LinkController,
+  RelationController,
   NoteController,
   NoteCreationController,
   TextContentController,
@@ -44,13 +44,16 @@ export interface StoredApi {
     data: NoteCreationDto
   ): Promise<NoteRealm>
 
-  createLink(
+  createRelationship(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: LinkCreation
+    data: RelationshipCreation
   ): Promise<void>
 
-  updateLink(linkId: Doughnut.ID, data: LinkCreation): Promise<void>
+  updateRelationship(
+    relationId: Doughnut.ID,
+    data: RelationshipCreation
+  ): Promise<void>
 
   moveAfter(
     noteId: number,
@@ -278,13 +281,13 @@ export default class StoredApiCollection implements StoredApi {
     return focus
   }
 
-  async createLink(
+  async createRelationship(
     sourceId: Doughnut.ID,
     targetId: Doughnut.ID,
-    data: LinkCreation
+    data: RelationshipCreation
   ) {
     const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      LinkController.linkNoteFinalize({
+      RelationController.addRelationshipFinalize({
         path: {
           sourceNote: sourceId,
           targetNote: targetId,
@@ -293,20 +296,23 @@ export default class StoredApiCollection implements StoredApi {
       })
     )
     if (error || !noteRealms) {
-      throw new Error(error || "Failed to create link")
+      throw new Error(error || "Failed to create relationship")
     }
     this.refreshNoteRealms(noteRealms)
   }
 
-  async updateLink(linkId: Doughnut.ID, data: LinkCreation) {
+  async updateRelationship(
+    relationId: Doughnut.ID,
+    data: RelationshipCreation
+  ) {
     const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      LinkController.updateLink({
-        path: { link: linkId },
+      RelationController.updateRelationship({
+        path: { relation: relationId },
         body: data,
       })
     )
     if (error || !noteRealms) {
-      throw new Error(error || "Failed to update link")
+      throw new Error(error || "Failed to update relationship")
     }
     this.refreshNoteRealms(noteRealms)
   }
@@ -425,7 +431,7 @@ export default class StoredApiCollection implements StoredApi {
     data: NoteMoveDto
   ) {
     const { data: noteRealms, error } = await apiCallWithLoading(() =>
-      LinkController.moveNote({
+      RelationController.moveNote({
         path: {
           sourceNote: sourceId,
           targetNote: targetId,

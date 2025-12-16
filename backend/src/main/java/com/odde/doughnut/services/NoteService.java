@@ -143,19 +143,19 @@ public class NoteService {
     return (existingNotes.stream().anyMatch(n -> !n.equals(note)));
   }
 
-  public Note createLink(
+  public Note createRelationship(
       Note sourceNote,
       Note targetNote,
       User creator,
       RelationType type,
       Timestamp currentUTCTimestamp) {
     if (type == null || type == RelationType.NO_LINK) return null;
-    Note link = buildALink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
-    entityPersister.save(link);
-    return link;
+    Note relation = buildARelation(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    entityPersister.save(relation);
+    return relation;
   }
 
-  public static Note buildALink(
+  public static Note buildARelation(
       Note sourceNote,
       Note targetNote,
       User creator,

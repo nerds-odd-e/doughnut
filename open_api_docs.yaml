@@ -264,32 +264,6 @@ paths:
                 type: array
                 items:
                   type: object
-  /api/testability/link_notes:
-    post:
-      tags:
-      - testability-rest-controller
-      operationId: linkNotes
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: string
   /api/testability/inject_suggested_questions:
     post:
       tags:
@@ -438,6 +412,32 @@ paths:
                 type: array
                 items:
                   type: object
+  /api/testability/create_relationships:
+    post:
+      tags:
+      - testability-rest-controller
+      operationId: createRelationships
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
   /api/testability/clean_db_and_reset_testability_settings:
     post:
       tags:
@@ -584,6 +584,112 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GlobalAiModelSettings"
+  /api/relations/{relation}:
+    post:
+      tags:
+      - relation-controller
+      operationId: updateRelationship
+      parameters:
+      - name: relation
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipCreation"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
+  /api/relations/move/{sourceNote}/{targetNote}:
+    post:
+      tags:
+      - relation-controller
+      operationId: moveNote
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: targetNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteMoveDTO"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
+  /api/relations/create/{sourceNote}/{targetNote}:
+    post:
+      tags:
+      - relation-controller
+      operationId: addRelationshipFinalize
+      parameters:
+      - name: sourceNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      - name: targetNote
+        in: path
+        required: true
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelationshipCreation"
+        required: true
+      responses:
+        "500":
+          description: Internal Server Error
+          content:
+            '*/*':
+              schema:
+                type: string
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NoteRealm"
   /api/recall-prompts/{recallPrompt}/regenerate:
     post:
       tags:
@@ -1483,112 +1589,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/NoteCreationResult"
-  /api/links/{link}:
-    post:
-      tags:
-      - link-controller
-      operationId: updateLink
-      parameters:
-      - name: link
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LinkCreation"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
-  /api/links/move/{sourceNote}/{targetNote}:
-    post:
-      tags:
-      - link-controller
-      operationId: moveNote
-      parameters:
-      - name: sourceNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/NoteMoveDTO"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
-  /api/links/create/{sourceNote}/{targetNote}:
-    post:
-      tags:
-      - link-controller
-      operationId: linkNoteFinalize
-      parameters:
-      - name: sourceNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      - name: targetNote
-        in: path
-        required: true
-        schema:
-          type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LinkCreation"
-        required: true
-      responses:
-        "500":
-          description: Internal Server Error
-          content:
-            '*/*':
-              schema:
-                type: string
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/NoteRealm"
   /api/fine-tuning/{suggestedQuestion}/duplicate:
     post:
       tags:
@@ -3820,6 +3820,57 @@ components:
           type: string
         othersModel:
           type: string
+    RelationshipCreation:
+      type: object
+      properties:
+        relationType:
+          type: string
+          enum:
+          - no link
+          - related to
+          - a specialization of
+          - an application of
+          - an instance of
+          - a part of
+          - tagged by
+          - an attribute of
+          - the opposite of
+          - author of
+          - using
+          - an example of
+          - before
+          - similar to
+          - confused with
+      required:
+      - relationType
+    NoteRealm:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        note:
+          $ref: "#/components/schemas/Note"
+        fromBazaar:
+          type: boolean
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
+        inboundReferences:
+          type: array
+          items:
+            $ref: "#/components/schemas/Note"
+        notebook:
+          $ref: "#/components/schemas/Notebook"
+      required:
+      - id
+      - note
+    NoteMoveDTO:
+      type: object
+      properties:
+        asFirstChild:
+          type: boolean
     QuestionContestResult:
       type: object
       properties:
@@ -4006,29 +4057,6 @@ components:
       required:
       - created
       - parent
-    NoteRealm:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        note:
-          $ref: "#/components/schemas/Note"
-        fromBazaar:
-          type: boolean
-        children:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
-        inboundReferences:
-          type: array
-          items:
-            $ref: "#/components/schemas/Note"
-        notebook:
-          $ref: "#/components/schemas/Notebook"
-      required:
-      - id
-      - note
     WikidataAssociationCreation:
       type: object
       properties:
@@ -4129,34 +4157,6 @@ components:
           type: string
         noteCreationDTO:
           $ref: "#/components/schemas/NoteCreationDTO"
-    LinkCreation:
-      type: object
-      properties:
-        relationType:
-          type: string
-          enum:
-          - no link
-          - related to
-          - a specialization of
-          - an application of
-          - an instance of
-          - a part of
-          - tagged by
-          - an attribute of
-          - the opposite of
-          - author of
-          - using
-          - an example of
-          - before
-          - similar to
-          - confused with
-      required:
-      - relationType
-    NoteMoveDTO:
-      type: object
-      properties:
-        asFirstChild:
-          type: boolean
     ConversationMessage:
       type: object
       properties:

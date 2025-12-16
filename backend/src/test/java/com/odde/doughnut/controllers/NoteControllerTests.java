@@ -198,7 +198,7 @@ class NoteControllerTests extends ControllerTestBase {
       makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
       assertThat(parent.getChildren(), hasSize(1));
-      assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
+      assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(1));
     }
 
     @Test
@@ -214,15 +214,15 @@ class NoteControllerTests extends ControllerTestBase {
     }
 
     @Test
-    void shouldDeleteLinksWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
+    void shouldDeleteRelationshipsWhenNoteIsDeleted() throws UnexpectedNoAccessRightException {
       Note targetNote = makeMe.aNote("target").creatorAndOwner(currentUser.getUser()).please();
-      Note link = makeMe.aRelation().between(subject, targetNote).please();
+      Note relation = makeMe.aRelation().between(subject, targetNote).please();
       makeMe.refresh(subject);
 
       controller.deleteNote(subject);
 
       assertThat(subject.getDeletedAt(), is(not(nullValue())));
-      assertThat(link.getDeletedAt(), is(not(nullValue())));
+      assertThat(relation.getDeletedAt(), is(not(nullValue())));
     }
 
     @Test
@@ -358,7 +358,7 @@ class NoteControllerTests extends ControllerTestBase {
         controller.deleteNote(subject);
         controller.undoDeleteNote(subject);
         assertThat(parent.getChildren(), hasSize(1));
-        assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(2));
+        assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(2));
       }
 
       @Test
@@ -372,7 +372,7 @@ class NoteControllerTests extends ControllerTestBase {
         controller.deleteNote(subject);
 
         controller.undoDeleteNote(subject);
-        assertThat(parent.getAllNoneLinkDescendants().toList(), hasSize(1));
+        assertThat(parent.getAllNoneRelationDescendants().toList(), hasSize(1));
       }
     }
   }
@@ -418,21 +418,21 @@ class NoteControllerTests extends ControllerTestBase {
   class UpdateNoteRecallSetting {
     Note source;
     Note target;
-    Note link;
+    Note relation;
 
     @BeforeEach
     void setup() {
       source = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       target = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
-      link = makeMe.aRelation().between(source, target).please();
+      relation = makeMe.aRelation().between(source, target).please();
     }
 
     @Test
-    void shouldUpdateLinkLevel() throws UnexpectedNoAccessRightException {
+    void shouldUpdateRelationshipLevel() throws UnexpectedNoAccessRightException {
       @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
       noteRecallSetting.setLevel(4);
       controller.updateNoteRecallSetting(source, noteRecallSetting);
-      assertThat(getLevel(link), is(4));
+      assertThat(getLevel(relation), is(4));
     }
 
     @Test
@@ -440,11 +440,11 @@ class NoteControllerTests extends ControllerTestBase {
       @Valid NoteRecallSetting noteRecallSetting = new NoteRecallSetting();
       noteRecallSetting.setLevel(4);
       controller.updateNoteRecallSetting(target, noteRecallSetting);
-      assertThat(getLevel(link), is(4));
+      assertThat(getLevel(relation), is(4));
     }
 
-    private static Integer getLevel(Note link) {
-      return link.getRecallSetting().getLevel();
+    private static Integer getLevel(Note relation) {
+      return relation.getRecallSetting().getLevel();
     }
   }
 

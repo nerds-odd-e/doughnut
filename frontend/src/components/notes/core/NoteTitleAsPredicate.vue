@@ -1,16 +1,16 @@
 <template>
-  <h2 role="title" @click="editingLink = true">
+  <h2 role="title" @click="editingRelationship = true">
     <NoteTitleComponent v-bind="{ noteTopology: noteTopology, full: true }" />
   </h2>
   <Breadcrumb
     v-if="noteTopology.targetNoteTopology"
     v-bind="{ noteTopology: noteTopology.targetNoteTopology }"
   />
-  <Modal v-if="!readonly && editingLink" @close_request="editingLink = false">
+  <Modal v-if="!readonly && editingRelationship" @close_request="editingRelationship = false">
     <template #body>
-      <LinkNobDialog
+      <RelationNobDialog
         v-bind="{ noteTopology, inverseIcon: false }"
-        @close-dialog="editingLink = false"
+        @close-dialog="editingRelationship = false"
       />
     </template>
   </Modal>
@@ -22,7 +22,7 @@ import { ref } from "vue"
 import type { NoteTopology } from "@generated/backend"
 import NoteTitleComponent from "./NoteTitleComponent.vue"
 import Modal from "../../commons/Modal.vue"
-import LinkNobDialog from "../../links/LinkNobDialog.vue"
+import RelationNobDialog from "../../links/RelationNobDialog.vue"
 import Breadcrumb from "../../toolbars/Breadcrumb.vue"
 
 defineProps({
@@ -30,7 +30,7 @@ defineProps({
   readonly: { type: Boolean, default: false },
 })
 
-const editingLink = ref<boolean>(false)
+const editingRelationship = ref<boolean>(false)
 </script>
 
 <style scoped>

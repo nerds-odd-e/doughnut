@@ -157,13 +157,15 @@ class NoteController {
     authorizationService.assertAuthorization(note);
     BeanUtils.copyProperties(noteRecallSetting, note.getRecallSetting());
     entityPersister.save(note);
-    note.getLinksAndRefers()
+    note.getRelationshipsAndRefers()
         .forEach(
-            link -> {
-              link.getRecallSetting()
+            relation -> {
+              relation
+                  .getRecallSetting()
                   .setLevel(
-                      Math.max(link.getRecallSetting().getLevel(), noteRecallSetting.getLevel()));
-              entityPersister.save(link);
+                      Math.max(
+                          relation.getRecallSetting().getLevel(), noteRecallSetting.getLevel()));
+              entityPersister.save(relation);
             });
     return new RedirectToNoteResponse(note.getId());
   }

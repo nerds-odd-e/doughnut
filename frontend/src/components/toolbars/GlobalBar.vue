@@ -10,7 +10,7 @@
           <SvgSearch />
         </template>
         <template #default="{ closer }">
-          <LinkNoteDialog
+          <AddRelationshipDialog
             v-bind="{ storageAccessor }"
             @close-dialog="closer"
           />

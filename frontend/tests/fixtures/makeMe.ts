@@ -8,7 +8,7 @@ import CircleBuilder from "./CircleBuilder"
 import CircleNoteBuilder from "./CircleNoteBuilder"
 import ConversationBuilder from "./ConversationBuilder"
 import DueMemoryTrackersBuilder from "./DueMemoryTrackersBuilder"
-import LinkBuilder from "./LinkBuilder"
+import RelationshipBuilder from "./RelationshipBuilder"
 import MemoryTrackerBuilder from "./MemoryTrackerBuilder"
 import NoteBuilder from "./NoteBuilder"
 import NoteRealmBuilder from "./NoteRealmBuilder"
@@ -38,8 +38,8 @@ class MakeMe {
     return new MemoryTrackerBuilder()
   }
 
-  static get aLink(): LinkBuilder {
-    return new LinkBuilder()
+  static get aRelationship(): RelationshipBuilder {
+    return new RelationshipBuilder()
   }
 
   static get aDueMemoryTrackersList(): DueMemoryTrackersBuilder {

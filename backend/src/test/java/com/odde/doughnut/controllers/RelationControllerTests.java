@@ -5,8 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.odde.doughnut.controllers.dto.LinkCreation;
 import com.odde.doughnut.controllers.dto.NoteMoveDTO;
+import com.odde.doughnut.controllers.dto.RelationshipCreation;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.RelationType;
 import com.odde.doughnut.entities.User;
@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindException;
 
-class LinkControllerTests extends ControllerTestBase {
+class RelationControllerTests extends ControllerTestBase {
   @Autowired NoteRepository noteRepository;
-  @Autowired LinkController controller;
+  @Autowired RelationController controller;
 
   @BeforeEach
   void setup() {
@@ -68,18 +68,18 @@ class LinkControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class CreateLinkTest {
+  class CreateRelationshipTest {
     User anotherUser;
     Note note1;
     Note note2;
-    LinkCreation linkCreation = new LinkCreation();
+    RelationshipCreation relationshipCreation = new RelationshipCreation();
 
     @BeforeEach
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note2 = makeMe.aNote("flower").creatorAndOwner(currentUser.getUser()).please();
-      linkCreation.relationType = RelationType.APPLICATION;
+      relationshipCreation.relationType = RelationType.APPLICATION;
     }
 
     @Test
@@ -87,7 +87,8 @@ class LinkControllerTests extends ControllerTestBase {
         throws CyclicLinkDetectedException, BindException, UnexpectedNoAccessRightException {
       Note note3 = makeMe.aNote().creatorAndOwner(currentUser.getUser()).please();
       long beforeThingCount = noteRepository.count();
-      controller.linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
+      controller.addRelationshipFinalize(
+          note3, note2, relationshipCreation, makeMe.successfulBindingResult());
       long afterThingCount = noteRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }

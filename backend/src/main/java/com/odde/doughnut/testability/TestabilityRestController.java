@@ -229,15 +229,17 @@ class TestabilityRestController {
     return user.getOwnership();
   }
 
-  @PostMapping("/link_notes")
+  @PostMapping("/create_relationships")
   @Transactional
-  public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
-    Note sourceNote = entityPersister.find(Note.class, Integer.valueOf(linkInfo.get("source_id")));
-    Note targetNote = entityPersister.find(Note.class, Integer.valueOf(linkInfo.get("target_id")));
-    RelationType type = RelationType.fromLabel(linkInfo.get("type"));
+  public String createRelationships(@RequestBody HashMap<String, String> relationshipInfo) {
+    Note sourceNote =
+        entityPersister.find(Note.class, Integer.valueOf(relationshipInfo.get("source_id")));
+    Note targetNote =
+        entityPersister.find(Note.class, Integer.valueOf(relationshipInfo.get("target_id")));
+    RelationType type = RelationType.fromLabel(relationshipInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     User creator = sourceNote.getCreator();
-    noteService.createLink(sourceNote, targetNote, creator, type, currentUTCTimestamp);
+    noteService.createRelationship(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     return "OK";
   }
 

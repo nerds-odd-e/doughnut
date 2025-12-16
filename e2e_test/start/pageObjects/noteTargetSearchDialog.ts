@@ -14,7 +14,7 @@ export const assumeNoteTargetSearchDialog = () => {
       searchNote(target, [])
       return this
     },
-    expectExactLinkTargets: (targets: string[]) => {
+    expectExactRelationshipTargets: (targets: string[]) => {
       if (targets.length === 0) {
         cy.findByText('Search result', { selector: '.result-title' }).should(
           'be.visible'
@@ -49,12 +49,15 @@ export const assumeNoteTargetSearchDialog = () => {
       cy.findByRole('button', { name: 'OK' }).click()
       cy.pageIsNotLoading()
     },
-    linkToTargetAs(toNoteTopic: string, relationType: string) {
-      cy.clickButtonOnCardBody(toNoteTopic, 'Link')
+    createRelationshipToTargetAs(toNoteTopic: string, relationType: string) {
+      cy.clickButtonOnCardBody(toNoteTopic, 'Add Relationship')
       cy.clickRadioByLabel(relationType)
     },
-    linkTopLevelNoteToTargetAs(toNoteTopic: string, relationType: string) {
-      this.linkToTargetAs(toNoteTopic, relationType)
+    createRelationshipToTopLevelNoteAs(
+      toNoteTopic: string,
+      relationType: string
+    ) {
+      this.createRelationshipToTargetAs(toNoteTopic, relationType)
     },
     expectNoteInRecentlyUpdatedSection(noteTitle: string) {
       cy.findByText('Recently updated notes', {
