@@ -51,12 +51,7 @@ const reactiveProps = ref(props)
 const relationType = computed(() =>
   reactiveProps.value.noteTopology.title.substring(1)
 )
-const title = computed(() =>
-  reactiveProps.value.noteTopology.title?.replace(
-    "%P",
-    `[${reactiveProps.value.noteTopology.parentOrSubjectNoteTopology?.title}]`
-  )
-)
+const title = computed(() => reactiveProps.value.noteTopology.title)
 const iconizedTarget = computed(
   () => !!reactiveProps.value.noteTopology.shortDetails
 )
