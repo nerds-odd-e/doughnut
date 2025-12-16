@@ -58,7 +58,7 @@ public class Note extends EntityIdentifiedByIdOnly {
   @Size(min = 1, max = Note.MAX_TITLE_LENGTH)
   @Getter
   @Setter
-  @Column(name = "title_constructor")
+  @Column(name = "title")
   @NotNull
   @JsonIgnore
   private String titleConstructor = "";
