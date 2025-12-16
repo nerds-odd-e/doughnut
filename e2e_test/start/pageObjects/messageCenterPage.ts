@@ -22,6 +22,7 @@ export const assumeMessageCenterPage = () => {
     },
     conversation(conversationSubject: string) {
       cy.findByText(conversationSubject).parent().should('be.visible').click()
+      cy.pageIsNotLoading()
       return {
         expectMessage(message: string) {
           cy.findByText(message).should('be.visible')
