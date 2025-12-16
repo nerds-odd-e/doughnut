@@ -1,0 +1,60 @@
+---
+description: Shell script development and unit testing guidelines
+---
+
+# Shell Script Development
+
+## Script Location
+
+- Place scripts in the `scripts/` directory
+- Use descriptive names with `.sh` extension
+- Make scripts executable: `chmod +x scripts/script_name.sh`
+
+## Unit Testing
+
+### Test Framework
+
+- Use **Bach** testing framework for shell script unit tests
+- Bach is located at `scripts/test/vendor/bach.sh`
+- Bach requires Bash 4.3+ (available in nix environment)
+
+### Test File Structure
+
+- Test files should be in `scripts/test/` directory
+- Use `.test` extension (e.g., `scripts/test/run.sh.test`)
+- Test files must be executable
+
+### Writing Tests
+
+1. Source Bach framework:
+   ```bash
+   source "$(dirname "$0")/vendor/bach.sh"
+   ```
+
+2. Create test functions with `test-` prefix:
+   ```bash
+   test-my-feature() {
+       # Test implementation
+   }
+   ```
+
+3. Create assertion functions with `-assert` suffix:
+   ```bash
+   test-my-feature-assert() {
+       @out "expected output"
+   }
+   ```
+
+4. Bach uses dry-run testing - it compares commands executed in test functions with expected commands in assert functions
+
+### Running Tests
+
+- Run all tests: `bash scripts/test/run_all_script_tests.sh`
+- Run individual test: `bash scripts/test/script_name.test`
+- In nix environment: `./scripts/run.sh bash scripts/test/run_all_script_tests.sh`
+
+### Test Requirements
+
+- All scripts in `scripts/` should have corresponding tests in `scripts/test/`
+- Tests are automatically discovered and run in CI
+- Tests must pass before merging
