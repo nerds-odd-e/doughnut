@@ -31,5 +31,8 @@ Feature: Message Center with Unread Message Count
     And notebook "Critical Thinking" is shared to the Bazaar
     And "another_old_learner" start a conversation about the note "Critical Thinking" with a message "Hi"
     Then "old_learner" should have 1 unread messages
+    Given I am re-logged in as "a_trainer" and reload the page
+    When I read the conversation with "Old Learner" for the subject "Rocket Science" in the message center
+    Given I am re-logged in as "old_learner" and reload the page
     When I read the conversation with "Another Old Learner" for the subject "Critical Thinking" in the message center
     Then there should be no unread message for the user "a_trainer"

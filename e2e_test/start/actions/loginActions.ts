@@ -44,7 +44,7 @@ export const loginActions = {
       .split('_')
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
       .join(' ')
-    mainMenu().userOptions().userSettings(displayName)
+    mainMenu().userOptions().userSettingsButton(displayName)
     return loginPromise
   },
 

@@ -67,7 +67,7 @@ Then('I should see {string} in the page', (content) => {
 })
 
 Then('My name {string} is in the user action menu', (name: string) => {
-  start.mainMenu().userOptions().userSettings(name)
+  start.mainMenu().userOptions().userSettingsButton(name)
 })
 
 Then('my daily new notes to review is set to {int}', (number: string) => {

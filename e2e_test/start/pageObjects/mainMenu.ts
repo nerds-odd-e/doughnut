@@ -19,10 +19,13 @@ export const mainMenu = () => {
           cy.findByText('Admin Dashboard').click({ force: true })
           return assumeAdminDashboardPage()
         },
+
+        userSettingsButton(userName: string) {
+          return cy.findByRole('link', { name: `Settings for ${userName}` })
+        },
+
         userSettings(userName: string) {
-          cy.findByRole('link', { name: `Settings for ${userName}` }).click({
-            force: true,
-          })
+          this.userSettingsButton(userName).click()
           return {
             changeName(name: string) {
               cy.formField('Name').assignFieldValue(name)
@@ -30,6 +33,7 @@ export const mainMenu = () => {
             },
           }
         },
+
         logout() {
           cy.findByRole('link', { name: 'Logout' }).click({ force: true })
         },
