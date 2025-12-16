@@ -40,6 +40,11 @@ export const loginActions = {
   reloginAndEnsureHomePage(username: string) {
     const loginPromise = this.reloginAs(username)
     cy.visit('/')
+    const displayName = username
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+    mainMenu().userOptions().userSettings(displayName)
     return loginPromise
   },
 
