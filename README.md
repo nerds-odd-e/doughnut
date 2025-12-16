@@ -118,9 +118,28 @@ pnpm backend:sut
 pnpm backend:verify
 ```
 
-### 3. [IntelliJ IDEA settings](./docs/idea.md)
+### 3. Git Pre-commit Hook
 
-### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
+A pre-commit hook is configured to automatically format code before each commit. The hook runs `./scripts/run.sh pnpm format:all` to ensure all code is properly formatted.
+
+**Setup:**
+The pre-commit hook is located at `.git/hooks/pre-commit` and is automatically active once created. If you need to set it up manually:
+
+```bash
+chmod +x .git/hooks/pre-commit
+```
+
+**Behavior:**
+- The hook runs automatically on every `git commit`
+- It formats all code (backend, frontend, MCP server, Cypress, and OpenAPI)
+- If formatting succeeds, the commit proceeds
+- If formatting fails, the commit is blocked
+
+**Note:** The hook uses `./scripts/run.sh` which automatically handles the nix environment, so it works whether you're in a nix shell or not.
+
+### 4. [IntelliJ IDEA settings](./docs/idea.md)
+
+### 5. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver)
 Javascript/Typescript framework to drive the end-to-end test suite.
@@ -179,7 +198,7 @@ For MS Windows WSL2 users:
 | cypress config   | `e2e_test/config/*.json`                   |
 | cypress plugins  | `e2e_test/plugins/index.ts`                |
 
-### 5. Database migrations
+### 6. Database migrations
 
 You can find the database migrations in `backend/src/main/resources/db/migration/`.
 The migrations are run automatically when the backend app starts up.
@@ -187,7 +206,7 @@ It will also run the migrations for test when you run `pnpm backend:test`.
 To trigger the test DB migration manually, run `backend/gradlew migrateTestDB`.
 To connect to the local DB: `mysql -S $MYSQL_HOME/mysql.sock -u doughnut -p` (password=doughnut).
 
-### 6. Vue3 web-app frontend
+### 7. Vue3 web-app frontend
 
 We chose Vue3 + Vite to build our frontend.
 
@@ -246,19 +265,19 @@ directory:
 1 directory, 6 files
 ```
 
-### 7. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
+### 8. [Integrating MCP server for IDE](./\.cursor/rules/mcp-server.mdc#how-to-use-this-mcp-server)
 
-### 8. [Manual testing locally](./.cursor/rules/manual-testing.mdc)
+### 9. [Manual testing locally](./.cursor/rules/manual-testing.mdc)
 
-### 9. [Style Guide & Code linting/formating](./docs/linting_formating.md)
+### 10. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 
-### 10. [Production environment](./docs/prod_env.md)
+### 11. [Production environment](./docs/prod_env.md)
 
-### 11. [Doughnut source code secrets management](./docs/secrets_management.md)
+### 12. [Doughnut source code secrets management](./docs/secrets_management.md)
 
-### 12. Architecture and Design documentation
+### 13. Architecture and Design documentation
 
-### 13. Teardown and cleanup
+### 14. Teardown and cleanup
 
 - pnpm: To clean up packages installed by pnpm, you can run pnpm store prune to remove unused packages from the store. To remove all packages for a specific project, navigate to the project directory and run pnpm recursive uninstall to uninstall all dependencies in the project and its subdirectories.
 - direnv: To stop direnv from automatically loading the environment, you can simply delete the .envrc/ file in the project directory or run direnv deny in the project directory. To uninstall direnv, use the package manager you installed it with (e.g., brew uninstall direnv for macOS).
