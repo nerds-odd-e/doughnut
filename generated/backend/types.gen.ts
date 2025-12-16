@@ -1829,7 +1829,7 @@ export type SemanticSearchWithinResponses = {
 
 export type SemanticSearchWithinResponse = SemanticSearchWithinResponses[keyof SemanticSearchWithinResponses];
 
-export type SearchForLinkTargetWithinData = {
+export type SearchForRelationshipTargetWithinData = {
     body: SearchTerm;
     path: {
         note: number;
@@ -1838,23 +1838,23 @@ export type SearchForLinkTargetWithinData = {
     url: '/api/notes/{note}/search';
 };
 
-export type SearchForLinkTargetWithinErrors = {
+export type SearchForRelationshipTargetWithinErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type SearchForLinkTargetWithinError = SearchForLinkTargetWithinErrors[keyof SearchForLinkTargetWithinErrors];
+export type SearchForRelationshipTargetWithinError = SearchForRelationshipTargetWithinErrors[keyof SearchForRelationshipTargetWithinErrors];
 
-export type SearchForLinkTargetWithinResponses = {
+export type SearchForRelationshipTargetWithinResponses = {
     /**
      * OK
      */
     200: Array<NoteSearchResult>;
 };
 
-export type SearchForLinkTargetWithinResponse = SearchForLinkTargetWithinResponses[keyof SearchForLinkTargetWithinResponses];
+export type SearchForRelationshipTargetWithinResponse = SearchForRelationshipTargetWithinResponses[keyof SearchForRelationshipTargetWithinResponses];
 
 export type UpdateNoteRecallSettingData = {
     body: NoteRecallSetting;
@@ -1935,30 +1935,30 @@ export type SemanticSearchResponses = {
 
 export type SemanticSearchResponse = SemanticSearchResponses[keyof SemanticSearchResponses];
 
-export type SearchForLinkTargetData = {
+export type SearchForRelationshipTargetData = {
     body: SearchTerm;
     path?: never;
     query?: never;
     url: '/api/notes/search';
 };
 
-export type SearchForLinkTargetErrors = {
+export type SearchForRelationshipTargetErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type SearchForLinkTargetError = SearchForLinkTargetErrors[keyof SearchForLinkTargetErrors];
+export type SearchForRelationshipTargetError = SearchForRelationshipTargetErrors[keyof SearchForRelationshipTargetErrors];
 
-export type SearchForLinkTargetResponses = {
+export type SearchForRelationshipTargetResponses = {
     /**
      * OK
      */
     200: Array<NoteSearchResult>;
 };
 
-export type SearchForLinkTargetResponse = SearchForLinkTargetResponses[keyof SearchForLinkTargetResponses];
+export type SearchForRelationshipTargetResponse = SearchForRelationshipTargetResponses[keyof SearchForRelationshipTargetResponses];
 
 export type MoveAfterData = {
     body?: never;

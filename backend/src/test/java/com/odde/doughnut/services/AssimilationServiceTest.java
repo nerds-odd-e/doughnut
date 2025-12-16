@@ -125,13 +125,13 @@ public class AssimilationServiceTest {
         }
 
         @Test
-        void shouldReturnLinksOrderedByLevels() {
-          Note aLevel2Link = makeMe.aRelation().between(anotherNote, note2).please();
+        void shouldReturnRelationshipsOrderedByLevels() {
+          Note aLevel2Relation = makeMe.aRelation().between(anotherNote, note2).please();
           List<Note> memoryTrackers = getAllDueMemoryTrackers();
           assertThat(memoryTrackers, hasSize(5));
           assertThat(memoryTrackers.get(0), equalTo(anotherNote));
           assertThat(memoryTrackers.get(1), equalTo(note2));
-          assertThat(memoryTrackers.get(2), equalTo(aLevel2Link));
+          assertThat(memoryTrackers.get(2), equalTo(aLevel2Relation));
           assertThat(memoryTrackers.get(4), equalTo(note1ToNote2));
         }
 

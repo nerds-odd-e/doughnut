@@ -10,8 +10,8 @@ describe("AddRelationshipDialog", () => {
     vi.clearAllMocks()
     // Mock services used by SearchResults component
     mockSdkService("getRecentNotes", [])
-    mockSdkService("searchForLinkTarget", [])
-    mockSdkService("searchForLinkTargetWithin", [])
+    mockSdkService("searchForRelationshipTarget", [])
+    mockSdkService("searchForRelationshipTargetWithin", [])
     mockSdkService("semanticSearch", [])
     mockSdkService("semanticSearchWithin", [])
   })

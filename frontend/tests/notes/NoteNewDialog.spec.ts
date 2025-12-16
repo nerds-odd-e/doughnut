@@ -18,8 +18,8 @@ vitest.mock("vue-router", () => ({
   }),
 }))
 
-let searchForLinkTargetWithinSpy: ReturnType<
-  typeof mockSdkService<"searchForLinkTargetWithin">
+let searchForRelationshipTargetWithinSpy: ReturnType<
+  typeof mockSdkService<"searchForRelationshipTargetWithin">
 >
 let mockedCreateNote: ReturnType<typeof mockSdkService<"createNoteUnderParent">>
 
@@ -27,9 +27,9 @@ describe("adding new note", () => {
   beforeEach(() => {
     vi.useFakeTimers()
     vi.resetAllMocks()
-    mockSdkService("searchForLinkTarget", [])
-    searchForLinkTargetWithinSpy = mockSdkService(
-      "searchForLinkTargetWithin",
+    mockSdkService("searchForRelationshipTarget", [])
+    searchForRelationshipTargetWithinSpy = mockSdkService(
+      "searchForRelationshipTargetWithin",
       []
     )
     mockSdkService("semanticSearch", [])
@@ -50,7 +50,7 @@ describe("adding new note", () => {
   const note = makeMe.aNote.titleConstructor("mythical").please()
 
   it("does not search for initial default 'Untitled' title", async () => {
-    searchForLinkTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
     helper
       .component(NoteNewDialog)
       .withCleanStorage()
@@ -62,11 +62,11 @@ describe("adding new note", () => {
     await flushPromises()
 
     // Search should not be called for the initial "Untitled" title
-    expect(searchForLinkTargetWithinSpy).not.toHaveBeenCalled()
+    expect(searchForRelationshipTargetWithinSpy).not.toHaveBeenCalled()
   })
 
   it("searches when user edits title back to 'Untitled'", async () => {
-    searchForLinkTargetWithinSpy.mockResolvedValue(
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([
         { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
       ])
@@ -83,7 +83,7 @@ describe("adding new note", () => {
     await flushPromises()
 
     // Clear previous calls
-    searchForLinkTargetWithinSpy.mockClear()
+    searchForRelationshipTargetWithinSpy.mockClear()
 
     // Now change it back to "Untitled"
     await wrapper.find("input#note-title").setValue("Untitled")
@@ -91,14 +91,14 @@ describe("adding new note", () => {
     await flushPromises()
 
     // Search should be called when user edits back to "Untitled"
-    expect(searchForLinkTargetWithinSpy).toHaveBeenCalledWith({
+    expect(searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "Untitled" }),
     })
   })
 
   it("search for duplicate", async () => {
-    searchForLinkTargetWithinSpy.mockResolvedValue(
+    searchForRelationshipTargetWithinSpy.mockResolvedValue(
       wrapSdkResponse([
         { noteTopology: note.noteTopology, notebookId: 1, distance: 0.9 },
       ])
@@ -114,7 +114,7 @@ describe("adding new note", () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain("mythical")
-    expect(searchForLinkTargetWithinSpy).toHaveBeenCalledWith({
+    expect(searchForRelationshipTargetWithinSpy).toHaveBeenCalledWith({
       path: { note: note.id },
       body: expect.objectContaining({ searchKey: "myth" }),
     })
@@ -154,7 +154,9 @@ describe("adding new note", () => {
     let searchWikidataSpy: ReturnType<typeof mockSdkService<"searchWikidata">>
 
     beforeEach(() => {
-      searchForLinkTargetWithinSpy.mockResolvedValue(wrapSdkResponse([]))
+      searchForRelationshipTargetWithinSpy.mockResolvedValue(
+        wrapSdkResponse([])
+      )
       searchWikidataSpy = mockSdkService("searchWikidata", [])
       wrapper = helper
         .component(NoteNewDialog)

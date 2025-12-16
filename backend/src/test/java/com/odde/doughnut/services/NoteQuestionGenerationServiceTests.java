@@ -608,7 +608,7 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldNotIncludeRelationTypeInstructionForNonLinkingNote() {
+    void shouldNotIncludeRelationTypeInstructionForNonRelationshipNote() {
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(testNote, null);
 

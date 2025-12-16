@@ -19,12 +19,12 @@ describe("note title", () => {
     vi.resetAllMocks()
   })
 
-  describe("linking note", () => {
+  describe("relationship note", () => {
     const note = makeMe.aNote.titleConstructor("Dummy Title").please()
     const target = makeMe.aNote.underNote(note).please()
     const relationNote = makeMe.aRelationship.to(target).please()
 
-    it("should have link to target", async () => {
+    it("should have relationship to target", async () => {
       const wrapper = mountComponent(relationNote)
       const links = wrapper.findAll("a.router-link")
       const link = links[0]!
@@ -36,7 +36,7 @@ describe("note title", () => {
       expect(link.text()).toBe(target.noteTopology.titleOrPredicate)
     })
 
-    it("if linking note has details the link is an icon", async () => {
+    it("if relationship note has details the relationship is an icon", async () => {
       relationNote.noteTopology.shortDetails = "exist"
       const wrapper = mountComponent(relationNote)
       const link = wrapper.find("a.router-link")

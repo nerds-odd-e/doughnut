@@ -134,7 +134,7 @@ public class NoteMotionServiceTest {
     }
 
     @Nested
-    class WhenThereIsALinkingNote {
+    class WhenThereIsARelationshipNote {
       Note relationNote;
 
       @BeforeEach
@@ -185,7 +185,7 @@ public class NoteMotionServiceTest {
     }
 
     @Test
-    void shouldUpdateNotebookForAllDescendantsIncludingLinks()
+    void shouldUpdateNotebookForAllDescendantsIncludingRelationships()
         throws CyclicLinkDetectedException, MovementNotPossibleException {
       // Create a relationship note under secondChild
       Note targetNote = makeMe.aNote("targetNote").please();

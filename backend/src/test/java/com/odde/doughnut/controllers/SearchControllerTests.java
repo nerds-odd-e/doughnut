@@ -22,14 +22,14 @@ class SearchControllerTests extends ControllerTestBase {
   }
 
   @Nested
-  class SearchForLinkTarget {
+  class SearchForRelationshipTarget {
     @Test
     void shouldReturnEmptyListWhenNoMatchingNotes() throws UnexpectedNoAccessRightException {
       SearchTerm searchTerm = new SearchTerm();
       searchTerm.setSearchKey("nonexistent");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTarget(searchTerm);
+      var result = controller.searchForRelationshipTarget(searchTerm);
 
       assertThat(result, empty());
     }
@@ -48,7 +48,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("Java");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTarget(searchTerm);
+      var result = controller.searchForRelationshipTarget(searchTerm);
 
       assertThat(result, hasSize(2));
       assertThat(
@@ -68,7 +68,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("Java");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTarget(searchTerm);
+      var result = controller.searchForRelationshipTarget(searchTerm);
 
       assertThat(result, hasSize(greaterThanOrEqualTo(2)));
       assertThat(
@@ -93,7 +93,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
       searchTerm.setAllMyCircles(false);
 
-      var result = controller.searchForLinkTarget(searchTerm);
+      var result = controller.searchForRelationshipTarget(searchTerm);
 
       assertThat(result, hasSize(2));
     }
@@ -106,19 +106,21 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("test");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      assertThrows(ResponseStatusException.class, () -> controller.searchForLinkTarget(searchTerm));
+      assertThrows(
+          ResponseStatusException.class, () -> controller.searchForRelationshipTarget(searchTerm));
     }
 
     @Test
-    void shouldNotAllowSearchForLinkTargetWhenNotLoggedIn() {
+    void shouldNotAllowSearchForRelationshipTargetWhenNotLoggedIn() {
       currentUser.setUser(null);
       SearchTerm searchTerm = new SearchTerm();
-      assertThrows(ResponseStatusException.class, () -> controller.searchForLinkTarget(searchTerm));
+      assertThrows(
+          ResponseStatusException.class, () -> controller.searchForRelationshipTarget(searchTerm));
     }
   }
 
   @Nested
-  class SearchForLinkTargetWithin {
+  class SearchForRelationshipTargetWithin {
     Note referenceNote;
 
     @BeforeEach
@@ -134,7 +136,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("nonexistent");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTargetWithin(referenceNote, searchTerm);
+      var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
       assertThat(result, empty());
     }
@@ -150,7 +152,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("Java");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTargetWithin(referenceNote, searchTerm);
+      var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
       // The search service searches in all user's notebooks, not just the reference note's children
       // So it will find "Child Java Note", "Unrelated Java Note", and potentially the reference
@@ -171,7 +173,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
       searchTerm.setAllMyCircles(false);
 
-      var result = controller.searchForLinkTargetWithin(referenceNote, searchTerm);
+      var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
       assertThat(result, hasSize(2));
     }
@@ -186,17 +188,17 @@ class SearchControllerTests extends ControllerTestBase {
 
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.searchForLinkTargetWithin(referenceNote, searchTerm));
+          () -> controller.searchForRelationshipTargetWithin(referenceNote, searchTerm));
     }
 
     @Test
-    void shouldNotAllowSearchForLinkTargetWithinWhenNotLoggedIn() {
+    void shouldNotAllowSearchForRelationshipTargetWithinWhenNotLoggedIn() {
       currentUser.setUser(null);
       Note note = makeMe.aNote().please();
       SearchTerm searchTerm = new SearchTerm();
       assertThrows(
           ResponseStatusException.class,
-          () -> controller.searchForLinkTargetWithin(note, searchTerm));
+          () -> controller.searchForRelationshipTargetWithin(note, searchTerm));
     }
 
     @Test
@@ -205,7 +207,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTargetWithin(referenceNote, searchTerm);
+      var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
       assertThat(result, empty());
     }
@@ -216,7 +218,7 @@ class SearchControllerTests extends ControllerTestBase {
       searchTerm.setSearchKey("   ");
       searchTerm.setAllMyNotebooksAndSubscriptions(true);
 
-      var result = controller.searchForLinkTargetWithin(referenceNote, searchTerm);
+      var result = controller.searchForRelationshipTargetWithin(referenceNote, searchTerm);
 
       assertThat(result, empty());
     }
@@ -234,14 +236,15 @@ class SearchControllerTests extends ControllerTestBase {
 
     @Test
     void shouldHandleNullSearchTerm() {
-      assertThrows(IllegalArgumentException.class, () -> controller.searchForLinkTarget(null));
+      assertThrows(
+          IllegalArgumentException.class, () -> controller.searchForRelationshipTarget(null));
     }
 
     @Test
     void shouldHandleNullSearchTermInRelation() {
       assertThrows(
           IllegalArgumentException.class,
-          () -> controller.searchForLinkTargetWithin(referenceNote, null));
+          () -> controller.searchForRelationshipTargetWithin(referenceNote, null));
     }
   }
 }

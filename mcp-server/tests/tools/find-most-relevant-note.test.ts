@@ -2,12 +2,12 @@ import { describe, test, expect, vi, beforeEach } from 'vitest'
 import { createMockContext, findTool } from '../helpers/index.js'
 import { SearchController } from '@generated/backend/sdk.gen'
 import { client } from '@generated/backend/client.gen'
-import type { SearchForLinkTargetResponse } from '@generated/backend'
+import type { SearchForRelationshipTargetResponse } from '@generated/backend'
 
 // Mock the generated services
 vi.mock('@generated/backend/sdk.gen', () => ({
   SearchController: {
-    searchForLinkTarget: vi.fn(),
+    searchForRelationshipTarget: vi.fn(),
   },
 }))
 
@@ -36,14 +36,16 @@ describe('find_most_relevant_note tool', () => {
       : []
 
     // Mock the service response
-    const mockSearchForLinkTarget = vi.mocked(
-      SearchController.searchForLinkTarget
+    const mockSearchForRelationshipTarget = vi.mocked(
+      SearchController.searchForRelationshipTarget
     )
     // OpenAPI client returns { data, error, request, response } structure
-    mockSearchForLinkTarget.mockResolvedValue({
-      data: searchResult as SearchForLinkTargetResponse,
+    mockSearchForRelationshipTarget.mockResolvedValue({
+      data: searchResult as SearchForRelationshipTargetResponse,
       error: undefined,
-    } as Awaited<ReturnType<typeof SearchController.searchForLinkTarget>>)
+    } as Awaited<
+      ReturnType<typeof SearchController.searchForRelationshipTarget>
+    >)
 
     const ctx = createMockContext()
 
@@ -54,7 +56,7 @@ describe('find_most_relevant_note tool', () => {
     )
 
     // Assert search was called with correct arguments
-    expect(mockSearchForLinkTarget).toHaveBeenCalledWith({
+    expect(mockSearchForRelationshipTarget).toHaveBeenCalledWith({
       body: {
         searchKey: expectedSearchKey,
         allMyNotebooksAndSubscriptions: true,

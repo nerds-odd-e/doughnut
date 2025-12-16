@@ -117,7 +117,7 @@ class ObsidianFormatServiceTest {
     // Create two different notes that both tag the same target note
     Note tagger1 = makeMe.aNote("Tagger 1").under(headNote).please();
 
-    // Create tag links from both taggers to the target
+    // Create tag relationships from both taggers to the target
     makeMe.aRelation().between(tagger1, targetNote, RelationType.TAGGED_BY).please();
     makeMe.aRelation().between(tagger1, targetNote, RelationType.TAGGED_BY).please();
 
@@ -140,7 +140,7 @@ class ObsidianFormatServiceTest {
     // Create two different notes that both tag the same target note
     Note childWithTags = makeMe.aNote("Tagger 1").under(headNote).please();
 
-    // Create tag links from both taggers to the target
+    // Create tag relationships from both taggers to the target
     makeMe.aRelation().between(childWithTags, targetNote, RelationType.TAGGED_BY).please();
     makeMe.aRelation().between(childWithTags, targetNote, RelationType.TAGGED_BY).please();
 

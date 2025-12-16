@@ -39,9 +39,9 @@ function setupSearchMocks(
   literalResults: NoteSearchResult[] = [],
   semanticResults: NoteSearchResult[] = []
 ) {
-  mockSdkService("searchForLinkTarget", literalResults)
+  mockSdkService("searchForRelationshipTarget", literalResults)
   mockSdkService("semanticSearch", semanticResults)
-  mockSdkService("searchForLinkTargetWithin", literalResults)
+  mockSdkService("searchForRelationshipTargetWithin", literalResults)
   mockSdkService("semanticSearchWithin", semanticResults)
 }
 
@@ -50,7 +50,7 @@ function setupDelayedSearchMocks() {
     setTimeout(() => resolve([]), 1)
   )
 
-  const searchSpy = mockSdkService("searchForLinkTarget", [])
+  const searchSpy = mockSdkService("searchForRelationshipTarget", [])
   const semanticSpy = mockSdkService("semanticSearch", [])
   searchSpy.mockReturnValue(
     delayed.then((data) => wrapSdkResponse(data)) as never
@@ -133,8 +133,11 @@ describe("SearchResults.vue", () => {
       const semanticSpy = vitest.fn().mockResolvedValue([])
       const semanticWithinSpy = vitest.fn().mockResolvedValue([])
 
-      mockSdkServiceWithImplementation("searchForLinkTarget", firstSpy)
-      mockSdkServiceWithImplementation("searchForLinkTargetWithin", withinSpy)
+      mockSdkServiceWithImplementation("searchForRelationshipTarget", firstSpy)
+      mockSdkServiceWithImplementation(
+        "searchForRelationshipTargetWithin",
+        withinSpy
+      )
       mockSdkServiceWithImplementation("semanticSearch", semanticSpy)
       mockSdkServiceWithImplementation(
         "semanticSearchWithin",
@@ -176,8 +179,11 @@ describe("SearchResults.vue", () => {
       const mockSemanticTop = vitest.fn().mockResolvedValueOnce([])
       const mockSemanticWithin = vitest.fn().mockResolvedValueOnce([])
 
-      mockSdkServiceWithImplementation("searchForLinkTarget", mockTop)
-      mockSdkServiceWithImplementation("searchForLinkTargetWithin", mockWithin)
+      mockSdkServiceWithImplementation("searchForRelationshipTarget", mockTop)
+      mockSdkServiceWithImplementation(
+        "searchForRelationshipTargetWithin",
+        mockWithin
+      )
       mockSdkServiceWithImplementation("semanticSearch", mockSemanticTop)
       mockSdkServiceWithImplementation(
         "semanticSearchWithin",
@@ -346,7 +352,7 @@ describe("SearchResults.vue", () => {
       vi.useRealTimers()
     })
 
-    it("shows recent notes for link target search with noteId", async () => {
+    it("shows recent notes for relationship target search with noteId", async () => {
       const getRecentNotesSpy = mockSdkService("getRecentNotes", recentNotes)
       setupSearchMocks()
 
@@ -394,7 +400,7 @@ describe("SearchResults.vue", () => {
         setTimeout(() => resolve([]), 2000)
       )
 
-      const searchSpy = mockSdkService("searchForLinkTarget", [])
+      const searchSpy = mockSdkService("searchForRelationshipTarget", [])
       searchSpy.mockResolvedValueOnce(wrapSdkResponse(firstSearchResults))
       searchSpy.mockReturnValue(
         secondSearchDelayed.then((data) => wrapSdkResponse(data)) as never

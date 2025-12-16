@@ -1097,7 +1097,7 @@ paths:
     post:
       tags:
       - search-controller
-      operationId: searchForLinkTargetWithin
+      operationId: searchForRelationshipTargetWithin
       parameters:
       - name: note
         in: path
@@ -1211,7 +1211,7 @@ paths:
     post:
       tags:
       - search-controller
-      operationId: searchForLinkTarget
+      operationId: searchForRelationshipTarget
       requestBody:
         content:
           application/json:

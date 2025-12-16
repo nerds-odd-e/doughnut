@@ -33,8 +33,8 @@ class SearchController {
 
   @PostMapping("/search")
   @Transactional
-  public List<NoteSearchResult> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm)
-      throws UnexpectedNoAccessRightException {
+  public List<NoteSearchResult> searchForRelationshipTarget(
+      @Valid @RequestBody SearchTerm searchTerm) throws UnexpectedNoAccessRightException {
     if (searchTerm == null) {
       throw new IllegalArgumentException("SearchTerm cannot be null");
     }
@@ -44,7 +44,7 @@ class SearchController {
 
   @PostMapping("/{note}/search")
   @Transactional
-  public List<NoteSearchResult> searchForLinkTargetWithin(
+  public List<NoteSearchResult> searchForRelationshipTargetWithin(
       @PathVariable("note") @Schema(type = "integer") Note note,
       @Valid @RequestBody SearchTerm searchTerm)
       throws UnexpectedNoAccessRightException {

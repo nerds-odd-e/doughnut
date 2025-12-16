@@ -10,7 +10,7 @@ Feature: add relationship
     And I have a notebook with the head note "Sedative" and details "Sleep medicine"
 
   @mockBrowserTime
-  Scenario: View all linkable notes for a note when no relationship exists
+  Scenario: View all notes that can be related for a note when no relationship exists
     When I am creating a relationship under note "Sedition"
     Then I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
     And I should see note cannot be found when searching in all my notebooks "Sedition"

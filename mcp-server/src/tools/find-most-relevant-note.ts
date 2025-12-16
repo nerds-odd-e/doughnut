@@ -43,7 +43,7 @@ For broader search results, consider breaking down complex queries into specific
   }
 
   try {
-    const response = await SearchController.searchForLinkTarget({
+    const response = await SearchController.searchForRelationshipTarget({
       body: searchTerm,
     })
 

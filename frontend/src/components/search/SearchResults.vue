@@ -140,11 +140,11 @@ const displayState = computed(() =>
 const performSearch = async (noteId: number | undefined, term: SearchTerm) => {
   const [literalRes, semanticRes] = await Promise.all([
     noteId
-      ? SearchController.searchForLinkTargetWithin({
+      ? SearchController.searchForRelationshipTargetWithin({
           path: { note: noteId },
           body: term,
         })
-      : SearchController.searchForLinkTarget({
+      : SearchController.searchForRelationshipTarget({
           body: term,
         }),
     noteId

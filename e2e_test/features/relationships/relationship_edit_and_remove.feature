@@ -13,7 +13,7 @@ Feature: relationship edit and remove
     When I change the relationship from "Moon" to "Earth" to "a specialization of"
     And I should see "Moon" has relationship "a specialization of" "Earth"
 
-  Scenario: change relation type of a reverse link
+  Scenario: change relation type of a reverse relationship
     When I change the reference from "Earth" to "Moon" to "a specialization of"
     And I should see "Moon" has relationship "a specialization of" "Earth"
 

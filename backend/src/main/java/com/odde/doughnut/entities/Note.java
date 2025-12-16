@@ -206,7 +206,7 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (parentNote == null) return;
     setNotebook(parentNote.getNotebook());
     this.parent = parentNote;
-    // Update notebook for all descendants including links
+    // Update notebook for all descendants including relationships
     getAllDescendants().forEach(descendant -> descendant.setNotebook(parentNote.getNotebook()));
   }
 

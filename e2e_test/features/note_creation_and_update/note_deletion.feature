@@ -13,7 +13,7 @@ Feature: Note deletion
     When I delete note "TDD"
     Then I should see the note "TDD" is marked as deleted
 
-  Scenario: Delete a note will delete its links
+  Scenario: Delete a note will delete its relationships
     Given there is "a part of" relationship between note "TDD" and "tech"
     And I should see "TDD" has relationship "a part of" "tech"
     When I delete note "TDD"
