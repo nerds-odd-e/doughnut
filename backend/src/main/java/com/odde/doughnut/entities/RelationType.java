@@ -3,7 +3,6 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum RelationType {
-  NO_LINK("no link", null),
   RELATED_TO(
       "related to",
       """

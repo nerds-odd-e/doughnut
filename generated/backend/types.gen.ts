@@ -126,7 +126,7 @@ export type NoteTopology = {
     id: number;
     title: string;
     shortDetails?: string;
-    relationType?: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
+    relationType?: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
     targetNoteTopology?: NoteTopology;
     parentOrSubjectNoteTopology?: NoteTopology;
 };
@@ -165,7 +165,7 @@ export type GlobalAiModelSettings = {
 };
 
 export type RelationshipCreation = {
-    relationType: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
+    relationType: 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
 };
 
 export type NoteRealm = {

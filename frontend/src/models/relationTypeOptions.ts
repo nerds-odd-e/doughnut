@@ -8,10 +8,6 @@ interface RelationTypeOption {
 
 const relationTypeOptions = [
   {
-    reversedLabel: "no link",
-    label: "no link" as NoteTopology["relationType"],
-  },
-  {
     reversedLabel: "related to",
     label: "related to" as NoteTopology["relationType"],
   },
@@ -69,7 +65,8 @@ const relationTypeOptions = [
   },
 ] as RelationTypeOption[]
 
-const reverseLabel = (lbl) => {
+const reverseLabel = (lbl: NoteTopology["relationType"] | undefined) => {
+  if (!lbl) return undefined
   const relationType = relationTypeOptions.find(({ label }) => lbl === label)
   if (relationType) return relationType.reversedLabel
   return "*unknown relation type*"

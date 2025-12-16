@@ -24,7 +24,7 @@ import { relationTypeOptions } from "../../models/relationTypeOptions"
 import RadioButtons from "../form/RadioButtons.vue"
 import SvgRelationTypeIcon from "../svgs/SvgRelationTypeIcon.vue"
 
-const { allowEmpty } = defineProps({
+defineProps({
   scopeName: String,
   modelValue: {
     type: String as PropType<NoteTopology["relationType"]>,
@@ -39,9 +39,7 @@ const { allowEmpty } = defineProps({
 defineEmits(["update:modelValue"])
 
 const options = computed(() => {
-  const filteredOptions = allowEmpty
-    ? relationTypeOptions
-    : relationTypeOptions.filter(({ label }) => label !== "no link")
+  const filteredOptions = relationTypeOptions
 
   return filteredOptions.map(({ label }) => ({
     value: label as string,

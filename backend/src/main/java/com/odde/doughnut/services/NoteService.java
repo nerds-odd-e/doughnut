@@ -149,7 +149,7 @@ public class NoteService {
       User creator,
       RelationType type,
       Timestamp currentUTCTimestamp) {
-    if (type == null || type == RelationType.NO_LINK) return null;
+    if (type == null) return null;
     Note relation = buildARelation(sourceNote, targetNote, creator, type, currentUTCTimestamp);
     entityPersister.save(relation);
     return relation;

@@ -2,7 +2,11 @@
   <InputWithType v-bind="{ scopeName, field: '', errorMessage, title: titlized }">
     <PopButton :aria-label="titlized">
       <template #button_face>
-        <SvgRelationTypeIcon :relation-type="modelValue" :inverse-icon="inverseIcon" />
+        <SvgRelationTypeIcon
+          v-if="modelValue"
+          :relation-type="modelValue"
+          :inverse-icon="inverseIcon"
+        />
         {{ label }}
       </template>
       <!-- prettier-ignore -->
@@ -41,7 +45,7 @@ const props = defineProps({
   scopeName: String,
   modelValue: {
     type: String as PropType<NoteTopology["relationType"]>,
-    default: () => "no link" as NoteTopology["relationType"],
+    default: undefined,
   },
   errorMessage: String,
   allowEmpty: { type: Boolean, default: false },

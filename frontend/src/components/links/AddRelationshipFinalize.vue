@@ -47,8 +47,8 @@ const props = defineProps({
 
 const emit = defineEmits(["success", "goBack"])
 
-const formData = ref<RelationshipCreation>({
-  relationType: "no link",
+const formData = ref<Partial<RelationshipCreation>>({
+  relationType: undefined,
 })
 
 const relationshipFormErrors = ref({
@@ -69,11 +69,11 @@ const relationTypeSelected = async (
   }
 
   try {
-    if (relationType !== "no link") {
+    if (relationType !== undefined) {
       await storageAccessor.value
         .storedApi()
         .createRelationship(props.note.id, props.targetNoteTopology.id, {
-          relationType: formData.value.relationType,
+          relationType: relationType,
         })
     }
 

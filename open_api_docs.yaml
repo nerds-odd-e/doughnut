@@ -3725,7 +3725,6 @@ components:
         relationType:
           type: string
           enum:
-          - no link
           - related to
           - a specialization of
           - an application of
@@ -3826,7 +3825,6 @@ components:
         relationType:
           type: string
           enum:
-          - no link
           - related to
           - a specialization of
           - an application of
