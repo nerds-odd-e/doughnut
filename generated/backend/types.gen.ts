@@ -164,6 +164,23 @@ export type GlobalAiModelSettings = {
     othersModel?: string;
 };
 
+export type RelationshipCreation = {
+    relationType: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
+};
+
+export type NoteRealm = {
+    id: number;
+    note: Note;
+    fromBazaar?: boolean;
+    children?: Array<Note>;
+    inboundReferences?: Array<Note>;
+    notebook?: Notebook;
+};
+
+export type NoteMoveDto = {
+    asFirstChild?: boolean;
+};
+
 export type QuestionContestResult = {
     advice?: string;
     rejected?: boolean;
@@ -259,15 +276,6 @@ export type NoteCreationResult = {
     parent: NoteRealm;
 };
 
-export type NoteRealm = {
-    id: number;
-    note: Note;
-    fromBazaar?: boolean;
-    children?: Array<Note>;
-    inboundReferences?: Array<Note>;
-    notebook?: Notebook;
-};
-
 export type WikidataAssociationCreation = {
     wikidataId: string;
 };
@@ -315,14 +323,6 @@ export type MemoryTracker = {
 export type McpNoteAddDto = {
     parentNote?: string;
     noteCreationDTO?: NoteCreationDto;
-};
-
-export type RelationshipCreation = {
-    relationType: 'no link' | 'related to' | 'a specialization of' | 'an application of' | 'an instance of' | 'a part of' | 'tagged by' | 'an attribute of' | 'the opposite of' | 'author of' | 'using' | 'an example of' | 'before' | 'similar to' | 'confused with';
-};
-
-export type NoteMoveDto = {
-    asFirstChild?: boolean;
 };
 
 export type ConversationMessage = {
@@ -640,6 +640,15 @@ export type SubscriptionWritable = {
     fromDTO?: SubscriptionDto;
 };
 
+export type NoteRealmWritable = {
+    id: number;
+    note: NoteWritable;
+    fromBazaar?: boolean;
+    children?: Array<NoteWritable>;
+    inboundReferences?: Array<NoteWritable>;
+    notebook?: Notebook;
+};
+
 export type RecallPromptWritable = {
     id: number;
     questionType: 'MCQ' | 'SPELLING';
@@ -681,15 +690,6 @@ export type SpellingResultWritable = RecallResult & {
 export type NoteCreationResultWritable = {
     created: NoteRealmWritable;
     parent: NoteRealmWritable;
-};
-
-export type NoteRealmWritable = {
-    id: number;
-    note: NoteWritable;
-    fromBazaar?: boolean;
-    children?: Array<NoteWritable>;
-    inboundReferences?: Array<NoteWritable>;
-    notebook?: Notebook;
 };
 
 export type MemoryTrackerWritable = {
@@ -1027,33 +1027,6 @@ export type RandomizerResponses = {
 
 export type RandomizerResponse = RandomizerResponses[keyof RandomizerResponses];
 
-export type LinkNotesData = {
-    body: {
-        [key: string]: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/testability/create_relationships';
-};
-
-export type LinkNotesErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type LinkNotesError = LinkNotesErrors[keyof LinkNotesErrors];
-
-export type LinkNotesResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type LinkNotesResponse = LinkNotesResponses[keyof LinkNotesResponses];
-
 export type InjectSuggestedQuestionData = {
     body: SuggestedQuestionsDataWritable;
     path?: never;
@@ -1212,6 +1185,33 @@ export type EnableFeatureToggleResponses = {
 
 export type EnableFeatureToggleResponse = EnableFeatureToggleResponses[keyof EnableFeatureToggleResponses];
 
+export type CreateRelationshipsData = {
+    body: {
+        [key: string]: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/testability/create_relationships';
+};
+
+export type CreateRelationshipsErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type CreateRelationshipsError = CreateRelationshipsErrors[keyof CreateRelationshipsErrors];
+
+export type CreateRelationshipsResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type CreateRelationshipsResponse = CreateRelationshipsResponses[keyof CreateRelationshipsResponses];
+
 export type ResetDbAndTestabilitySettingsData = {
     body?: never;
     path?: never;
@@ -1367,6 +1367,89 @@ export type SetCurrentModelVersionsResponses = {
 };
 
 export type SetCurrentModelVersionsResponse = SetCurrentModelVersionsResponses[keyof SetCurrentModelVersionsResponses];
+
+export type UpdateRelationshipData = {
+    body: RelationshipCreation;
+    path: {
+        relation: number;
+    };
+    query?: never;
+    url: '/api/relations/{relation}';
+};
+
+export type UpdateRelationshipErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type UpdateRelationshipError = UpdateRelationshipErrors[keyof UpdateRelationshipErrors];
+
+export type UpdateRelationshipResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type UpdateRelationshipResponse = UpdateRelationshipResponses[keyof UpdateRelationshipResponses];
+
+export type MoveNoteData = {
+    body: NoteMoveDto;
+    path: {
+        sourceNote: number;
+        targetNote: number;
+    };
+    query?: never;
+    url: '/api/relations/move/{sourceNote}/{targetNote}';
+};
+
+export type MoveNoteErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type MoveNoteError = MoveNoteErrors[keyof MoveNoteErrors];
+
+export type MoveNoteResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type MoveNoteResponse = MoveNoteResponses[keyof MoveNoteResponses];
+
+export type AddRelationshipFinalizeData = {
+    body: RelationshipCreation;
+    path: {
+        sourceNote: number;
+        targetNote: number;
+    };
+    query?: never;
+    url: '/api/relations/create/{sourceNote}/{targetNote}';
+};
+
+export type AddRelationshipFinalizeErrors = {
+    /**
+     * Internal Server Error
+     */
+    500: string;
+};
+
+export type AddRelationshipFinalizeError = AddRelationshipFinalizeErrors[keyof AddRelationshipFinalizeErrors];
+
+export type AddRelationshipFinalizeResponses = {
+    /**
+     * OK
+     */
+    200: Array<NoteRealm>;
+};
+
+export type AddRelationshipFinalizeResponse = AddRelationshipFinalizeResponses[keyof AddRelationshipFinalizeResponses];
 
 export type RegenerateData = {
     body: QuestionContestResult;
@@ -2254,89 +2337,6 @@ export type CreateNoteViaMcpResponses = {
 };
 
 export type CreateNoteViaMcpResponse = CreateNoteViaMcpResponses[keyof CreateNoteViaMcpResponses];
-
-export type UpdateRelationshipData = {
-    body: RelationshipCreation;
-    path: {
-        relation: number;
-    };
-    query?: never;
-    url: '/api/relations/{relation}';
-};
-
-export type UpdateRelationshipErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type UpdateRelationshipError = UpdateRelationshipErrors[keyof UpdateRelationshipErrors];
-
-export type UpdateRelationshipResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type UpdateRelationshipResponse = UpdateRelationshipResponses[keyof UpdateRelationshipResponses];
-
-export type MoveNoteData = {
-    body: NoteMoveDto;
-    path: {
-        sourceNote: number;
-        targetNote: number;
-    };
-    query?: never;
-    url: '/api/relations/move/{sourceNote}/{targetNote}';
-};
-
-export type MoveNoteErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type MoveNoteError = MoveNoteErrors[keyof MoveNoteErrors];
-
-export type MoveNoteResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type MoveNoteResponse = MoveNoteResponses[keyof MoveNoteResponses];
-
-export type AddRelationshipFinalizeData = {
-    body: RelationshipCreation;
-    path: {
-        sourceNote: number;
-        targetNote: number;
-    };
-    query?: never;
-    url: '/api/relations/create/{sourceNote}/{targetNote}';
-};
-
-export type AddRelationshipFinalizeErrors = {
-    /**
-     * Internal Server Error
-     */
-    500: string;
-};
-
-export type AddRelationshipFinalizeError = AddRelationshipFinalizeErrors[keyof AddRelationshipFinalizeErrors];
-
-export type AddRelationshipFinalizeResponses = {
-    /**
-     * OK
-     */
-    200: Array<NoteRealm>;
-};
-
-export type AddRelationshipFinalizeResponse = AddRelationshipFinalizeResponses[keyof AddRelationshipFinalizeResponses];
 
 export type DuplicateData = {
     body?: never;

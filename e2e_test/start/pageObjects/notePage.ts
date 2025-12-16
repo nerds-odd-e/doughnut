@@ -87,7 +87,7 @@ export const assumeNotePage = (noteTopology?: string) => {
     navigateToReference: (referenceTopic: string) => {
       cy.get('main').within(() => {
         cy.findByText(referenceTopic, {
-          selector: '.link-container .title-text',
+          selector: '.relationship-container .title-text',
         }).click()
       })
       return assumeNotePage()
@@ -181,7 +181,7 @@ export const assumeNotePage = (noteTopology?: string) => {
       return this
     },
 
-    startSearchingAndLinkNote() {
+    startSearchingAndAddRelationship() {
       this.toolbarButton('search and add relationship').click()
       return assumeNoteTargetSearchDialog()
     },

@@ -14,7 +14,7 @@
             class="daisy-btn daisy-btn-primary daisy-btn-sm daisy-join-item"
             @click.prevent="emit('selected', noteTopology)"
           >
-            Link
+            Add Relationship
           </button>
           <button
             class="daisy-btn daisy-btn-secondary daisy-btn-sm daisy-join-item"
