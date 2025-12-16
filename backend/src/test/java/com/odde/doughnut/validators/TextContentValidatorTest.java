@@ -53,6 +53,55 @@ public class TextContentValidatorTest {
     assertThat(getViolations(), is(not(empty())));
   }
 
+  @Test
+  public void noteWithTargetNoteAndNullTitleIsValid() {
+    Note parent = makeMe.aNote().inMemoryPlease();
+    Note target = makeMe.aNote().inMemoryPlease();
+    Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
+    relationNote.setTitle(null);
+    assertThat(validator.validate(relationNote), is(empty()));
+  }
+
+  @Test
+  public void noteWithTargetNoteAndEmptyTitleIsInvalid() {
+    Note parent = makeMe.aNote().inMemoryPlease();
+    Note target = makeMe.aNote().inMemoryPlease();
+    Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
+    relationNote.setTitle("");
+    Set<ConstraintViolation<Note>> violations = validator.validate(relationNote);
+    assertThat(violations, is(not(empty())));
+    assertThat(
+        violations.stream()
+            .anyMatch(
+                v ->
+                    v.getMessage().equals("Note with targetNote must have null title")
+                        && v.getPropertyPath().toString().equals("title")),
+        is(true));
+  }
+
+  @Test
+  public void noteWithTargetNoteAndNonEmptyTitleIsInvalid() {
+    Note parent = makeMe.aNote().inMemoryPlease();
+    Note target = makeMe.aNote().inMemoryPlease();
+    Note relationNote = makeMe.aRelation().between(parent, target).inMemoryPlease();
+    relationNote.setTitle("Some Title");
+    Set<ConstraintViolation<Note>> violations = validator.validate(relationNote);
+    assertThat(violations, is(not(empty())));
+    assertThat(
+        violations.stream()
+            .anyMatch(
+                v ->
+                    v.getMessage().equals("Note with targetNote must have null title")
+                        && v.getPropertyPath().toString().equals("title")),
+        is(true));
+  }
+
+  @Test
+  public void noteWithoutTargetNoteCanHaveTitle() {
+    newNote.setTitle("Valid Title");
+    assertThat(getViolations(), is(empty()));
+  }
+
   private Set<ConstraintViolation<Note>> getViolations() {
     return validator.validate(newNote);
   }
