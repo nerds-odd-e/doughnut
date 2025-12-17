@@ -76,33 +76,7 @@ public class AiToolFactory {
     if (noteType == null) {
       return null;
     }
-    return switch (noteType) {
-      case CONCEPT ->
-          """
-          **Special Instruction for Concept Note**: Test meaning, correct interpretation, or correct application. Prefer scenario/implication questions. Avoid trivia, dates, or verbatim wording recall unless ambiguity is the point.
-          """;
-      case SOURCE ->
-          """
-          **Special Instruction for Source Note**: Test the source's key idea/argument (or what it supports/claims), not bibliographic trivia. Use distractors that plausibly misstate the argument. Do not treat the source as unquestionable truth.
-          """;
-      case PERSON ->
-          """
-          **Special Instruction for Person Note**: Test attribution: which ideas/roles/stances/actions are associated with the person. Use distractors from nearby thinkers or similar concepts. Avoid pure biographical trivia unless it matters.
-          """;
-      case EXPERIENCE ->
-          """
-          **Special Instruction for Experience Note**: Test the lesson, observation, or takeaway from the experience (what was learned and why). Avoid pure event recall (date/location/attendees) unless essential to the lesson.
-          """;
-      case INITIATIVE ->
-          """
-          **Special Instruction for Initiative Note**: Test purpose, problem framing, guiding constraints, strategy, or trade-offs. Use distractors as plausible alternative goals/framings. Avoid outcome/success questions unless stated.
-          """;
-      case QUEST ->
-          """
-          **Special Instruction for Quest Note**: Do NOT ask for 'the answer'. Test the inquiry's shape: what is being asked, why it matters, key assumptions, what evidence would move it forward, or what would invalidate it. Avoid premature closure.
-          """;
-      default -> null;
-    };
+    return noteType.getQuestionGenerationInstruction();
   }
 
   public static InstructionAndSchema questionEvaluationAiTool(MCQWithAnswer question) {
