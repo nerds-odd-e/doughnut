@@ -17,28 +17,23 @@
     @note-info-loaded="onNoteInfoLoaded"
   />
   <div
-    v-if="noteSummaryPoints.length > 0 || shouldShowCategoryMessage"
+    v-if="noteSummaryPoints.length > 0"
     data-test="note-details-summary"
     class="daisy-mb-4 daisy-alert daisy-alert-info"
   >
     <div class="daisy-text-sm">
-      <div v-if="shouldShowCategoryMessage" class="daisy-text-base-content">
-        No summary requested for initiative notes.
+      <div class="daisy-font-semibold daisy-mb-2 daisy-text-base-content">
+        Summary:
       </div>
-      <template v-else>
-        <div class="daisy-font-semibold daisy-mb-2 daisy-text-base-content">
-          Summary:
-        </div>
-        <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
-          <li
-            v-for="(point, index) in noteSummaryPoints"
-            :key="index"
-            class="daisy-text-base-content"
-          >
-            {{ point }}
-          </li>
-        </ul>
-      </template>
+      <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
+        <li
+          v-for="(point, index) in noteSummaryPoints"
+          :key="index"
+          class="daisy-text-base-content"
+        >
+          {{ point }}
+        </li>
+      </ul>
     </div>
   </div>
   <AssimilationButtons
@@ -62,7 +57,6 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
-import type { NoteType } from "@/models/noteTypeOptions"
 
 const { note } = defineProps<{
   note: Note
@@ -80,30 +74,14 @@ const { totalAssimilatedCount } = useRecallData()
 const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
-const currentNoteType = ref<NoteType | undefined>(undefined)
-
 const buttonKey = computed(() => note.id)
 
 // Summary from backend
 const noteSummaryPoints = ref<string[]>([])
 const isLoadingSummary = ref(false)
 
-const shouldShowCategoryMessage = computed(() => {
-  return (
-    currentNoteType.value === "initiative" &&
-    note.details &&
-    note.details.trim().length > 0
-  )
-})
-
 const generateSummary = async () => {
   if (!note.details || note.details.trim().length === 0) {
-    noteSummaryPoints.value = []
-    return
-  }
-
-  // Skip summary generation for initiative note type
-  if (currentNoteType.value === "initiative") {
     noteSummaryPoints.value = []
     return
   }
@@ -129,14 +107,11 @@ const generateSummary = async () => {
   }
 }
 
-const onNoteInfoLoaded = (noteType: NoteType | undefined) => {
-  currentNoteType.value = noteType
+const onNoteInfoLoaded = () => {
   generateSummary()
 }
 
-const onNoteTypeUpdated = (newType: NoteType | undefined) => {
-  currentNoteType.value = newType
-  // Regenerate summary after note type is updated (to handle initiative exclusion)
+const onNoteTypeUpdated = () => {
   generateSummary()
 }
 
