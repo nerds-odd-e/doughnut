@@ -12,7 +12,7 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "syncpack fix-mismatches",
-    "start:mb": "mb",
+    "start:mb": "scripts/start_mb.sh",
     "mcp-server:bundle": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server bundle",
     "mcp-server:test": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server test",
     "mcp-server:format": "pnpm --frozen-lockfile --silent recursive install && pnpm -C mcp-server format",
