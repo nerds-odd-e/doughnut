@@ -6,8 +6,8 @@ Feature: Note type
     And I have a notebook with the head note "Reservoirs" and details "The most popular reservoir to hike in is Macritchie"
     And AI will generate question for note with type:
      | note type | question                                       |
-     | journal   | What is the most popular reservoir to hike in? |
-     | vocab     | What does the word reservoir mean?             |
+     | experience | What is the most popular reservoir to hike in? |
+     | source     | What does the word reservoir mean?             |
 
   @usingMockedOpenAiService
   Scenario Outline: AI will interpret note type when generating questions
@@ -18,7 +18,7 @@ Feature: Note type
 
     Examples:
     | Note Type | Question                                       |
-    | journal   | What is the most popular reservoir to hike in? |
-    | vocab     | What does the word reservoir mean?             |
+    | experience | What is the most popular reservoir to hike in? |
+    | source     | What does the word reservoir mean?             |
 
     

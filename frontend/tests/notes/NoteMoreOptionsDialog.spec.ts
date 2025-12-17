@@ -98,12 +98,12 @@ describe("NoteMoreOptionsDialog", () => {
       await flushPromises()
 
       const select = wrapper.find('select[id="note-noteType"]')
-      await select.setValue("vocab")
+      await select.setValue("source")
       await flushPromises()
 
       expect(updateNoteTypeSpy).toHaveBeenCalledWith({
         path: { note: mockNoteInfo.note.id },
-        body: "vocab",
+        body: "source",
       })
     })
 
@@ -114,7 +114,7 @@ describe("NoteMoreOptionsDialog", () => {
       getNoteInfoSpy.mockClear()
 
       const select = wrapper.find('select[id="note-noteType"]')
-      await select.setValue("category")
+      await select.setValue("initiative")
       await flushPromises()
 
       expect(getNoteInfoSpy).toHaveBeenCalledWith({

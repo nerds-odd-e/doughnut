@@ -23,7 +23,7 @@
   >
     <div class="daisy-text-sm">
       <div v-if="shouldShowCategoryMessage" class="daisy-text-base-content">
-        No summary requested for category notes.
+        No summary requested for initiative notes.
       </div>
       <template v-else>
         <div class="daisy-font-semibold daisy-mb-2 daisy-text-base-content">
@@ -90,7 +90,7 @@ const isLoadingSummary = ref(false)
 
 const shouldShowCategoryMessage = computed(() => {
   return (
-    currentNoteType.value === "category" &&
+    currentNoteType.value === "initiative" &&
     note.details &&
     note.details.trim().length > 0
   )
@@ -102,8 +102,8 @@ const generateSummary = async () => {
     return
   }
 
-  // Skip summary generation for category note type
-  if (currentNoteType.value === "category") {
+  // Skip summary generation for initiative note type
+  if (currentNoteType.value === "initiative") {
     noteSummaryPoints.value = []
     return
   }
@@ -136,7 +136,7 @@ const onNoteInfoLoaded = (noteType: NoteType | undefined) => {
 
 const onNoteTypeUpdated = (newType: NoteType | undefined) => {
   currentNoteType.value = newType
-  // Regenerate summary after note type is updated (to handle category exclusion)
+  // Regenerate summary after note type is updated (to handle initiative exclusion)
   generateSummary()
 }
 

@@ -516,7 +516,7 @@ export type NoteInfo = {
     note: NoteRealm;
     createdAt: string;
     recallSetting?: NoteRecallSetting;
-    noteType?: 'concept' | 'category' | 'vocab' | 'journal';
+    noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
 };
 
 export type BareNote = {
@@ -724,7 +724,7 @@ export type NoteInfoWritable = {
     note: NoteRealmWritable;
     createdAt: string;
     recallSetting?: NoteRecallSetting;
-    noteType?: 'concept' | 'category' | 'vocab' | 'journal';
+    noteType?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
 };
 
 export type NotebooksViewedByUserWritable = {
@@ -3133,7 +3133,7 @@ export type UndoDeleteNoteResponses = {
 export type UndoDeleteNoteResponse = UndoDeleteNoteResponses[keyof UndoDeleteNoteResponses];
 
 export type UpdateNoteTypeData = {
-    body?: 'concept' | 'category' | 'vocab' | 'journal';
+    body?: 'concept' | 'source' | 'person' | 'experience' | 'initiative' | 'quest';
     path: {
         note: number;
     };

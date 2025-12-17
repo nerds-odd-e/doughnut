@@ -5,9 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NoteType {
   CONCEPT("concept"),
-  CATEGORY("category"),
-  VOCAB("vocab"),
-  JOURNAL("journal");
+  SOURCE("source"),
+  PERSON("person"),
+  EXPERIENCE("experience"),
+  INITIATIVE("initiative"),
+  QUEST("quest");
 
   @JsonValue public final String label;
 

@@ -77,26 +77,6 @@ public class AiToolFactory {
       return null;
     }
     return switch (noteType) {
-      case VOCAB ->
-          """
-          **Special Instruction for Vocab Note**: The focus note is a vocabulary/word note. Generate questions that test word-level knowledge:
-          - Ask for the definition, meaning, or translation of the word
-          - Test understanding of how the word is used in context or sentences
-          - Ask about word forms (noun, verb, adjective), etymology, or linguistic properties
-          - Test recognition of the word's spelling, pronunciation, or related words (synonyms, antonyms)
-          - Avoid questions that require deep conceptual understanding beyond the word itself
-          The question should focus on the word as a linguistic unit, not as a concept.
-          """;
-      case CATEGORY ->
-          """
-          **Special Instruction for Category Note**: The focus note represents a category or classification. Generate questions that test classification and membership knowledge:
-          - Ask what belongs to this category or what examples fit within it
-          - Test understanding of category boundaries: what is included vs excluded
-          - Ask about the defining characteristics or criteria for category membership
-          - Test ability to distinguish category members from non-members
-          - Ask about hierarchical relationships: what subcategories exist, or what broader category this belongs to
-          The question should focus on classification logic and membership rules, not on understanding individual items.
-          """;
       case CONCEPT ->
           """
           **Special Instruction for Concept Note**: The focus note represents a concept or idea. Generate questions that test conceptual understanding:
@@ -107,15 +87,55 @@ public class AiToolFactory {
           - Ask about the concept's significance, implications, or role in a broader context
           The question should require reasoning and understanding, not just recall of facts or definitions.
           """;
-      case JOURNAL ->
+      case SOURCE ->
           """
-          **Special Instruction for Journal Note**: The focus note is a journal entry or personal note. Generate questions that test recall of personal experiences and events:
+          **Special Instruction for Source Note**: The focus note represents a source of information (book, article, website, etc.). Generate questions that test knowledge of the source:
+          - Ask about key information, ideas, or content from the source
+          - Test understanding of the source's main arguments, themes, or contributions
+          - Ask about the source's author, publication details, or context
+          - Test recall of specific details, quotes, or examples from the source
+          - Ask about how the source relates to other notes or concepts
+          The question should focus on what can be learned from or about the source.
+          """;
+      case PERSON ->
+          """
+          **Special Instruction for Person Note**: The focus note represents a person. Generate questions that test knowledge about the person:
+          - Ask about the person's background, achievements, or contributions
+          - Test understanding of the person's role, significance, or impact
+          - Ask about the person's relationships, connections, or associations with other notes
+          - Test recall of specific details about the person's life, work, or characteristics
+          - Ask about the person's relevance to other concepts or events
+          The question should focus on what makes this person notable or important.
+          """;
+      case EXPERIENCE ->
+          """
+          **Special Instruction for Experience Note**: The focus note represents a personal experience or event. Generate questions that test recall of the experience:
           - Ask about what happened: specific events, actions, or occurrences described in the note
           - Test temporal recall: when events occurred, sequence of events, or chronological details
           - Ask about who was involved, where events took place, or other factual details from the experience
           - Test recall of personal insights, reflections, emotions, or significance described in the note
           - Ask about connections: how this experience relates to other events or what it led to
-          The question should focus on recalling the specific personal experience documented, not on general knowledge.
+          The question should focus on recalling the specific experience documented, not on general knowledge.
+          """;
+      case INITIATIVE ->
+          """
+          **Special Instruction for Initiative Note**: The focus note represents a project, initiative, or undertaking. Generate questions that test knowledge of the initiative:
+          - Ask about the initiative's goals, objectives, or purpose
+          - Test understanding of the initiative's scope, timeline, or key milestones
+          - Ask about the initiative's outcomes, results, or impact
+          - Test recall of specific details about how the initiative was executed or managed
+          - Ask about the initiative's relationship to other notes, concepts, or people
+          The question should focus on what the initiative is, what it achieved, or how it was carried out.
+          """;
+      case QUEST ->
+          """
+          **Special Instruction for Quest Note**: The focus note represents a quest, goal, or objective. Generate questions that test knowledge of the quest:
+          - Ask about the quest's purpose, goals, or desired outcomes
+          - Test understanding of the quest's requirements, steps, or milestones
+          - Ask about progress, status, or completion of the quest
+          - Test recall of specific details about the quest's context, challenges, or strategies
+          - Ask about the quest's relationship to other notes, experiences, or initiatives
+          The question should focus on what the quest is, what it aims to achieve, or how it progresses.
           """;
       default -> null;
     };

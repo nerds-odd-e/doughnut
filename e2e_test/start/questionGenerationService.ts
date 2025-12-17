@@ -51,10 +51,12 @@ export const questionGenerationService = () => ({
       await mock_services.openAi().restartImposter()
 
       const noteTypeInstructionMap: Record<string, string> = {
-        vocab: 'Special Instruction for Vocab Note',
-        category: 'Special Instruction for Category Note',
         concept: 'Special Instruction for Concept Note',
-        journal: 'Special Instruction for Journal Note',
+        source: 'Special Instruction for Source Note',
+        person: 'Special Instruction for Person Note',
+        experience: 'Special Instruction for Experience Note',
+        initiative: 'Special Instruction for Initiative Note',
+        quest: 'Special Instruction for Quest Note',
       }
 
       for (const [noteType, question] of Object.entries(noteTypeToQuestion)) {

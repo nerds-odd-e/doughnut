@@ -118,11 +118,11 @@ public class NoteTest {
     }
 
     @Test
-    void shouldSetNoteTypeToJournal() {
-      noteService.setNoteType(note, NoteType.JOURNAL);
+    void shouldSetNoteTypeToExperience() {
+      noteService.setNoteType(note, NoteType.EXPERIENCE);
 
       makeMe.refresh(note);
-      assertThat(note.getNoteType(), equalTo(NoteType.JOURNAL));
+      assertThat(note.getNoteType(), equalTo(NoteType.EXPERIENCE));
     }
 
     @Test
@@ -130,18 +130,18 @@ public class NoteTest {
       noteService.setNoteType(note, NoteType.CONCEPT);
       makeMe.refresh(note);
 
-      noteService.setNoteType(note, NoteType.VOCAB);
+      noteService.setNoteType(note, NoteType.SOURCE);
 
       makeMe.refresh(note);
-      assertThat(note.getNoteType(), equalTo(NoteType.VOCAB));
+      assertThat(note.getNoteType(), equalTo(NoteType.SOURCE));
     }
 
     @Test
     void shouldPersistNoteTypeChange() {
-      noteService.setNoteType(note, NoteType.CATEGORY);
+      noteService.setNoteType(note, NoteType.INITIATIVE);
 
       Note retrievedNote = noteService.findById(note.getId()).orElseThrow();
-      assertThat(retrievedNote.getNoteType(), equalTo(NoteType.CATEGORY));
+      assertThat(retrievedNote.getNoteType(), equalTo(NoteType.INITIATIVE));
     }
   }
 }

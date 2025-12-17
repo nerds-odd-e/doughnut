@@ -9,6 +9,6 @@ Feature: Summary Generation
   Scenario: Generate a summary of a note
     Then I should see a summary of the note broken down into a maximum of 5 points
 
-  Scenario: Exclude summary generation for note type "Category"
-    And the note type is "category"
-    Then I should see a text "No summary requested for category notes." in the summary section
+  Scenario: Exclude summary generation for note type "Initiative"
+    And the note type is "initiative"
+    Then I should see a text "No summary requested for initiative notes." in the summary section

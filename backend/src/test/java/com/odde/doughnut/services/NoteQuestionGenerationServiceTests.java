@@ -631,9 +631,9 @@ class NoteQuestionGenerationServiceTests {
   @Nested
   class NoteTypeInstructions {
     @Test
-    void shouldIncludeNoteTypeInstructionForVocab() {
+    void shouldIncludeNoteTypeInstructionForSource() {
       Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.VOCAB);
+      note.setNoteType(NoteType.SOURCE);
       makeMe.aNote().under(note).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
@@ -645,19 +645,19 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Vocab Note");
+                    return content.contains("Special Instruction for Source Note");
                   });
 
       assertThat(
-          "Request should contain note type instruction for VOCAB",
+          "Request should contain note type instruction for SOURCE",
           hasNoteTypeInstruction,
           is(true));
     }
 
     @Test
-    void shouldIncludeNoteTypeInstructionForCategory() {
+    void shouldIncludeNoteTypeInstructionForPerson() {
       Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.CATEGORY);
+      note.setNoteType(NoteType.PERSON);
       makeMe.aNote().under(note).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
@@ -669,11 +669,11 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Category Note");
+                    return content.contains("Special Instruction for Person Note");
                   });
 
       assertThat(
-          "Request should contain note type instruction for CATEGORY",
+          "Request should contain note type instruction for PERSON",
           hasNoteTypeInstruction,
           is(true));
     }
@@ -703,9 +703,9 @@ class NoteQuestionGenerationServiceTests {
     }
 
     @Test
-    void shouldIncludeNoteTypeInstructionForJournal() {
+    void shouldIncludeNoteTypeInstructionForExperience() {
       Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.JOURNAL);
+      note.setNoteType(NoteType.EXPERIENCE);
       makeMe.aNote().under(note).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
@@ -717,11 +717,59 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Journal Note");
+                    return content.contains("Special Instruction for Experience Note");
                   });
 
       assertThat(
-          "Request should contain note type instruction for JOURNAL",
+          "Request should contain note type instruction for EXPERIENCE",
+          hasNoteTypeInstruction,
+          is(true));
+    }
+
+    @Test
+    void shouldIncludeNoteTypeInstructionForInitiative() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.INITIATIVE);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Initiative Note");
+                  });
+
+      assertThat(
+          "Request should contain note type instruction for INITIATIVE",
+          hasNoteTypeInstruction,
+          is(true));
+    }
+
+    @Test
+    void shouldIncludeNoteTypeInstructionForQuest() {
+      Note note = makeMe.aNote().details("description long enough.").please();
+      note.setNoteType(NoteType.QUEST);
+      makeMe.aNote().under(note).please();
+
+      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(note, null);
+
+      boolean hasNoteTypeInstruction =
+          request.messages().stream()
+              .filter(message -> message.system().isPresent())
+              .anyMatch(
+                  message -> {
+                    String content = message.system().get().content().toString();
+                    return content.contains("Special Instruction for Quest Note");
+                  });
+
+      assertThat(
+          "Request should contain note type instruction for QUEST",
           hasNoteTypeInstruction,
           is(true));
     }
@@ -755,7 +803,7 @@ class NoteQuestionGenerationServiceTests {
       Note targetNote = makeMe.aNote().please();
       Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.RELATED_TO).please();
       Note relationNote = sourceNote.getRelationships().get(0);
-      relationNote.setNoteType(NoteType.VOCAB);
+      relationNote.setNoteType(NoteType.SOURCE);
       makeMe.aNote().under(relationNote).please();
 
       com.openai.models.chat.completions.ChatCompletionCreateParams request =
@@ -776,7 +824,7 @@ class NoteQuestionGenerationServiceTests {
               .anyMatch(
                   message -> {
                     String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Vocab Note");
+                    return content.contains("Special Instruction for Source Note");
                   });
 
       assertThat(

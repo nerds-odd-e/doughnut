@@ -167,12 +167,12 @@ describe("NoteInfoComponent", () => {
       const select = wrapper.find(
         '[data-test="note-type-selection-dialog"] select'
       )
-      await select.setValue("vocab")
+      await select.setValue("source")
       await flushPromises()
 
       expect(updateNoteTypeSpy).toHaveBeenCalledWith({
         path: { note: noteInfo.note.id },
-        body: "vocab",
+        body: "source",
       })
     })
 
@@ -197,11 +197,11 @@ describe("NoteInfoComponent", () => {
       const select = wrapper.find(
         '[data-test="note-type-selection-dialog"] select'
       )
-      await select.setValue("journal")
+      await select.setValue("experience")
       await flushPromises()
 
       expect(wrapper.emitted()).toHaveProperty("noteTypeUpdated")
-      expect(wrapper.emitted("noteTypeUpdated")?.[0]).toEqual(["journal"])
+      expect(wrapper.emitted("noteTypeUpdated")?.[0]).toEqual(["experience"])
     })
 
     it("should revert selection on error", async () => {
@@ -227,7 +227,7 @@ describe("NoteInfoComponent", () => {
       const select = wrapper.find(
         '[data-test="note-type-selection-dialog"] select'
       )
-      await select.setValue("category")
+      await select.setValue("initiative")
       await flushPromises()
 
       expect(updateNoteTypeSpy).toHaveBeenCalled()
@@ -240,7 +240,7 @@ describe("NoteInfoComponent", () => {
         memoryTrackers: [],
         note: makeMe.aNoteRealm.please(),
         createdAt: "",
-        noteType: "category",
+        noteType: "initiative",
       }
 
       const wrapper = helper
@@ -257,7 +257,7 @@ describe("NoteInfoComponent", () => {
       const select = wrapper.find(
         '[data-test="note-type-selection-dialog"] select'
       )
-      await select.setValue("category")
+      await select.setValue("initiative")
       await flushPromises()
 
       expect(updateNoteTypeSpy).not.toHaveBeenCalled()

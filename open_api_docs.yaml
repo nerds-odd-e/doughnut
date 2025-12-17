@@ -2367,9 +2367,11 @@ paths:
               type: string
               enum:
               - concept
-              - category
-              - vocab
-              - journal
+              - source
+              - person
+              - experience
+              - initiative
+              - quest
       responses:
         "500":
           description: Internal Server Error
@@ -4534,9 +4536,11 @@ components:
           type: string
           enum:
           - concept
-          - category
-          - vocab
-          - journal
+          - source
+          - person
+          - experience
+          - initiative
+          - quest
       required:
       - createdAt
       - note

@@ -4,7 +4,9 @@ export type NoteType = UpdateNoteTypeData["body"]
 
 export const noteTypeOptions: NoteType[] = [
   "concept",
-  "category",
-  "vocab",
-  "journal",
+  "source",
+  "person",
+  "experience",
+  "initiative",
+  "quest",
 ]
