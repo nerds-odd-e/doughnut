@@ -100,7 +100,8 @@
       "js-yaml": ">=4.1.1",
       "glob": ">=11.1.0",
       "body-parser": ">=2.2.1",
-      "express": ">=5.2.0"
+      "express": ">=5.2.0",
+      "systeminformation": ">=5.27.14"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
