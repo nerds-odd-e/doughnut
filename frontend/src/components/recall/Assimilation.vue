@@ -17,17 +17,17 @@
     @note-info-loaded="onNoteInfoLoaded"
   />
   <div
-    v-if="noteSummaryPoints.length > 0"
-    data-test="note-details-summary"
+    v-if="understandingPoints.length > 0"
+    data-test="understanding-checklist"
     class="daisy-mb-4 daisy-alert daisy-alert-info"
   >
     <div class="daisy-text-sm">
       <div class="daisy-font-semibold daisy-mb-2 daisy-text-base-content">
-        Summary:
+        Understanding Checklist:
       </div>
       <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
         <li
-          v-for="(point, index) in noteSummaryPoints"
+          v-for="(point, index) in understandingPoints"
           :key="index"
           class="daisy-text-base-content"
         >
@@ -76,43 +76,43 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 // State
 const buttonKey = computed(() => note.id)
 
-// Summary from backend
-const noteSummaryPoints = ref<string[]>([])
-const isLoadingSummary = ref(false)
+// Understanding checklist from backend
+const understandingPoints = ref<string[]>([])
+const isLoadingChecklist = ref(false)
 
-const generateSummary = async () => {
+const generateUnderstandingChecklist = async () => {
   if (!note.details || note.details.trim().length === 0) {
-    noteSummaryPoints.value = []
+    understandingPoints.value = []
     return
   }
 
-  isLoadingSummary.value = true
+  isLoadingChecklist.value = true
   try {
     const result = await apiCallWithLoading(() =>
-      AiController.generateSummary({
+      AiController.generateUnderstandingChecklist({
         path: { note: note.id },
       })
     )
 
     if (!result.error && result.data) {
-      noteSummaryPoints.value = result.data.points || []
+      understandingPoints.value = result.data.points || []
     } else {
-      noteSummaryPoints.value = []
+      understandingPoints.value = []
     }
   } catch (err) {
-    console.error("Failed to generate summary:", err)
-    noteSummaryPoints.value = []
+    console.error("Failed to generate understanding checklist:", err)
+    understandingPoints.value = []
   } finally {
-    isLoadingSummary.value = false
+    isLoadingChecklist.value = false
   }
 }
 
 const onNoteInfoLoaded = () => {
-  generateSummary()
+  generateUnderstandingChecklist()
 }
 
 const onNoteTypeUpdated = () => {
-  generateSummary()
+  generateUnderstandingChecklist()
 }
 
 // Methods

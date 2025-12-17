@@ -63,18 +63,20 @@ public class AiController {
     return new SuggestedTitleDTO(title);
   }
 
-  @PostMapping("/generate-summary/{note}")
+  @PostMapping("/generate-understanding-checklist/{note}")
   @Transactional
-  public NoteSummaryDTO generateSummary(
+  public UnderstandingChecklistDTO generateUnderstandingChecklist(
       @PathVariable(value = "note") @Schema(type = "integer") Note note)
       throws UnexpectedNoAccessRightException, JsonProcessingException {
     authorizationService.assertAuthorization(note);
     String details = note.getDetails();
     if (details == null || details.trim().isEmpty()) {
-      return new NoteSummaryDTO(List.of());
+      return new UnderstandingChecklistDTO(List.of());
     }
     List<String> points =
-        notebookAssistantForNoteServiceFactory.createNoteAutomationService(note).generateSummary();
-    return new NoteSummaryDTO(points);
+        notebookAssistantForNoteServiceFactory
+            .createNoteAutomationService(note)
+            .generateUnderstandingChecklist();
+    return new UnderstandingChecklistDTO(points);
   }
 }

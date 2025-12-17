@@ -415,7 +415,7 @@ export type SuggestedTitleDto = {
     title?: string;
 };
 
-export type NoteSummaryDto = {
+export type UnderstandingChecklistDto = {
     points?: Array<string>;
 };
 
@@ -2918,32 +2918,32 @@ export type SuggestTitleResponses = {
 
 export type SuggestTitleResponse = SuggestTitleResponses[keyof SuggestTitleResponses];
 
-export type GenerateSummaryData = {
+export type GenerateUnderstandingChecklistData = {
     body?: never;
     path: {
         note: number;
     };
     query?: never;
-    url: '/api/ai/generate-summary/{note}';
+    url: '/api/ai/generate-understanding-checklist/{note}';
 };
 
-export type GenerateSummaryErrors = {
+export type GenerateUnderstandingChecklistErrors = {
     /**
      * Internal Server Error
      */
     500: string;
 };
 
-export type GenerateSummaryError = GenerateSummaryErrors[keyof GenerateSummaryErrors];
+export type GenerateUnderstandingChecklistError = GenerateUnderstandingChecklistErrors[keyof GenerateUnderstandingChecklistErrors];
 
-export type GenerateSummaryResponses = {
+export type GenerateUnderstandingChecklistResponses = {
     /**
      * OK
      */
-    200: NoteSummaryDto;
+    200: UnderstandingChecklistDto;
 };
 
-export type GenerateSummaryResponse = GenerateSummaryResponses[keyof GenerateSummaryResponses];
+export type GenerateUnderstandingChecklistResponse = GenerateUnderstandingChecklistResponses[keyof GenerateUnderstandingChecklistResponses];
 
 export type GenerateImageData = {
     body: string;

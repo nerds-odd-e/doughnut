@@ -49,18 +49,18 @@ class ChatCompletionNoteAutomationServiceTest {
   }
 
   @Nested
-  class GenerateSummary {
+  class GenerateUnderstandingChecklist {
     @Test
-    void shouldReturnSummaryPoints() throws JsonProcessingException {
+    void shouldReturnUnderstandingPoints() throws JsonProcessingException {
       // Mock chat completion with JSON schema response
-      NoteSummary noteSummary = new NoteSummary();
-      noteSummary.setPoints(
+      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
+      understandingChecklist.setPoints(
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
 
-      List<String> result = service.generateSummary();
+      List<String> result = service.generateUnderstandingChecklist();
 
       assertThat(result, hasSize(2));
       assertThat(
@@ -75,37 +75,37 @@ class ChatCompletionNoteAutomationServiceTest {
       // Mock chat completion with no tool calls (empty response)
       openAIChatCompletionMock.mockNullChatCompletion();
 
-      List<String> result = service.generateSummary();
+      List<String> result = service.generateUnderstandingChecklist();
 
       assertThat(result, is(empty()));
     }
 
     @Test
-    void shouldReturnEmptyListWhenSummaryIsEmpty() throws JsonProcessingException {
-      // Mock chat completion with empty summary
-      NoteSummary noteSummary = new NoteSummary();
-      noteSummary.setPoints(List.of());
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+    void shouldReturnEmptyListWhenChecklistIsEmpty() throws JsonProcessingException {
+      // Mock chat completion with empty checklist
+      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
+      understandingChecklist.setPoints(List.of());
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
 
-      List<String> result = service.generateSummary();
+      List<String> result = service.generateUnderstandingChecklist();
 
       assertThat(result, is(empty()));
     }
 
     @Test
-    void shouldHandleSummaryWithMultiplePoints() throws JsonProcessingException {
-      // Mock chat completion with multiple summary points
-      NoteSummary noteSummary = new NoteSummary();
-      noteSummary.setPoints(
+    void shouldHandleChecklistWithMultiplePoints() throws JsonProcessingException {
+      // Mock chat completion with multiple understanding points
+      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
+      understandingChecklist.setPoints(
           List.of(
               "Point 1: First important aspect.",
               "Point 2: Second important aspect.",
               "Point 3: Third important aspect.",
               "Point 4: Fourth important aspect.",
               "Point 5: Fifth important aspect."));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
 
-      List<String> result = service.generateSummary();
+      List<String> result = service.generateUnderstandingChecklist();
 
       assertThat(result, hasSize(5));
       assertThat(result, hasItem("Point 1: First important aspect."));
@@ -116,12 +116,12 @@ class ChatCompletionNoteAutomationServiceTest {
     void shouldRespectMaximumOfFivePoints() throws JsonProcessingException {
       // Mock chat completion with more than 5 points to verify the service doesn't limit
       // (The limitation should be enforced by the AI tool instruction, not the service)
-      NoteSummary noteSummary = new NoteSummary();
-      noteSummary.setPoints(
+      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
+      understandingChecklist.setPoints(
           List.of("Point 1", "Point 2", "Point 3", "Point 4", "Point 5", "Point 6", "Point 7"));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
 
-      List<String> result = service.generateSummary();
+      List<String> result = service.generateUnderstandingChecklist();
 
       // Service should return whatever the AI returns (limiting is done by AI instruction)
       assertThat(result, hasSize(7));

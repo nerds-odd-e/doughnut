@@ -2135,11 +2135,11 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/SuggestedTitleDTO"
-  /api/ai/generate-summary/{note}:
+  /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:
       - ai-controller
-      operationId: generateSummary
+      operationId: generateUnderstandingChecklist
       parameters:
       - name: note
         in: path
@@ -2158,7 +2158,7 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/NoteSummaryDTO"
+                $ref: "#/components/schemas/UnderstandingChecklistDTO"
   /api/ai/generate-image:
     post:
       tags:
@@ -4337,7 +4337,7 @@ components:
       properties:
         title:
           type: string
-    NoteSummaryDTO:
+    UnderstandingChecklistDTO:
       type: object
       properties:
         points:

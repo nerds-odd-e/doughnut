@@ -7,12 +7,12 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.odde.doughnut.controllers.dto.NoteSummaryDTO;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
+import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.UnexpectedNoAccessRightException;
-import com.odde.doughnut.services.ai.NoteSummary;
 import com.odde.doughnut.services.ai.TitleReplacement;
+import com.odde.doughnut.services.ai.UnderstandingChecklist;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
 import com.openai.models.images.Image;
@@ -181,7 +181,7 @@ class AiControllerTest extends ControllerTestBase {
   }
 
   @Nested
-  class GenerateSummary {
+  class GenerateUnderstandingChecklist {
     Note testNote;
     OpenAIChatCompletionMock openAIChatCompletionMock;
 
@@ -192,17 +192,17 @@ class AiControllerTest extends ControllerTestBase {
     }
 
     @Test
-    void shouldReturnSummaryPoints()
+    void shouldReturnUnderstandingPoints()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      NoteSummary noteSummary = new NoteSummary();
-      noteSummary.setPoints(
+      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
+      understandingChecklist.setPoints(
           List.of(
               "English is a language that is spoken in many countries.",
               "It is also the most widely spoken language in the world."));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
       testNote.setDetails("English is a language that is spoken in many countries.");
 
-      NoteSummaryDTO result = controller.generateSummary(testNote);
+      UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
       assertThat(result.getPoints())
           .containsExactly(
@@ -215,7 +215,7 @@ class AiControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setDetails(null);
 
-      NoteSummaryDTO result = controller.generateSummary(testNote);
+      UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
       assertThat(result.getPoints()).isEmpty();
     }
@@ -225,7 +225,7 @@ class AiControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setDetails("");
 
-      NoteSummaryDTO result = controller.generateSummary(testNote);
+      UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
       assertThat(result.getPoints()).isEmpty();
     }
@@ -235,7 +235,7 @@ class AiControllerTest extends ControllerTestBase {
         throws UnexpectedNoAccessRightException, JsonProcessingException {
       testNote.setDetails("   ");
 
-      NoteSummaryDTO result = controller.generateSummary(testNote);
+      UnderstandingChecklistDTO result = controller.generateUnderstandingChecklist(testNote);
 
       assertThat(result.getPoints()).isEmpty();
     }
@@ -243,12 +243,12 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldCallChatCompletionWithRightMessage()
         throws UnexpectedNoAccessRightException, JsonProcessingException {
-      NoteSummary noteSummary = new NoteSummary();
-      noteSummary.setPoints(List.of("Point 1", "Point 2"));
-      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(noteSummary);
+      UnderstandingChecklist understandingChecklist = new UnderstandingChecklist();
+      understandingChecklist.setPoints(List.of("Point 1", "Point 2"));
+      openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(understandingChecklist);
       testNote.setDetails("Some note details");
 
-      controller.generateSummary(testNote);
+      controller.generateUnderstandingChecklist(testNote);
 
       ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
           ArgumentCaptor.forClass(
@@ -262,7 +262,7 @@ class AiControllerTest extends ControllerTestBase {
               .anyMatch(
                   msg ->
                       msg.contains(
-                          "Please generate a summary of the note details broken down into key points"));
+                          "Please generate an understanding checklist of the note details broken down into key points"));
       MatcherAssert.assertThat(
           "A message should contain the instruction", hasInstruction, is(true));
       MatcherAssert.assertThat(
@@ -278,7 +278,8 @@ class AiControllerTest extends ControllerTestBase {
     @Test
     void shouldRequireUserToBeLoggedIn() {
       currentUser.setUser(null);
-      assertThrows(ResponseStatusException.class, () -> controller.generateSummary(testNote));
+      assertThrows(
+          ResponseStatusException.class, () -> controller.generateUnderstandingChecklist(testNote));
     }
   }
 }

@@ -163,7 +163,7 @@ const methodToController: Record<string, any> = {
   getMyAssessments: AssessmentController,
   suggestTitle: AiController,
   generateImage: AiController,
-  generateSummary: AiController,
+  generateUnderstandingChecklist: AiController,
   dummyEntryToGenerateDataTypesThatAreRequiredInEventStream: AiController,
   getAvailableGptModels: AiController,
   updateNoteTitle: TextContentController,

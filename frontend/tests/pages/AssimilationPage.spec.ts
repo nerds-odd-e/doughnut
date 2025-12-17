@@ -34,7 +34,7 @@ beforeEach(() => {
     createdAt: "",
   })
   showNoteSpy = mockSdkService("showNote", makeMe.aNoteRealm.please())
-  mockSdkService("generateSummary", {
+  mockSdkService("generateUnderstandingChecklist", {
     points: [],
   })
   mockShowNoteAccessory()

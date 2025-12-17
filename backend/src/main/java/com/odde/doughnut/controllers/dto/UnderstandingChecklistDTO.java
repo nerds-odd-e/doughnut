@@ -6,10 +6,10 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public class NoteSummaryDTO {
+public class UnderstandingChecklistDTO {
   private List<String> points;
 
-  public NoteSummaryDTO(List<String> points) {
+  public UnderstandingChecklistDTO(List<String> points) {
     this.points = points;
   }
 }

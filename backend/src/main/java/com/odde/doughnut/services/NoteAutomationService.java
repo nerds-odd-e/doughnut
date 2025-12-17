@@ -15,7 +15,7 @@ public final class NoteAutomationService {
     return chatCompletionNoteAutomationService.suggestTitle();
   }
 
-  public java.util.List<String> generateSummary() throws JsonProcessingException {
-    return chatCompletionNoteAutomationService.generateSummary();
+  public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
+    return chatCompletionNoteAutomationService.generateUnderstandingChecklist();
   }
 }

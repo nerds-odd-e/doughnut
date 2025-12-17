@@ -37,7 +37,7 @@ beforeEach(() => {
     createdAt: "",
     noteType: undefined,
   })
-  mockSdkService("generateSummary", {
+  mockSdkService("generateUnderstandingChecklist", {
     points: [],
   })
   mockSdkService("updateNoteType", undefined)

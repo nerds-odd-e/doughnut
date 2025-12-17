@@ -50,7 +50,7 @@ public class ChatCompletionNoteAutomationService {
         .orElse(null);
   }
 
-  public java.util.List<String> generateSummary() throws JsonProcessingException {
+  public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     OpenAIChatRequestBuilder chatRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
@@ -60,7 +60,7 @@ public class ChatCompletionNoteAutomationService {
       chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
-    var tool = AiToolFactory.generateSummaryAiTool();
+    var tool = AiToolFactory.generateUnderstandingChecklistAiTool();
     chatRequestBuilder.responseJsonSchema(tool);
 
     return openAiApiHandler
@@ -68,11 +68,11 @@ public class ChatCompletionNoteAutomationService {
         .map(
             jsonNode -> {
               try {
-                NoteSummary noteSummary =
+                UnderstandingChecklist understandingChecklist =
                     new ObjectMapperConfig()
                         .objectMapper()
-                        .treeToValue(jsonNode, NoteSummary.class);
-                return noteSummary.getPoints();
+                        .treeToValue(jsonNode, UnderstandingChecklist.class);
+                return understandingChecklist.getPoints();
               } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
               }

@@ -276,16 +276,16 @@ Then('I should be able to select a note type', () => {
 })
 
 Then(
-  'I should see a summary of the note broken down into two points: {string} and {string}',
+  'I should see an understanding checklist with two points: {string} and {string}',
   (point1: string, point2: string) => {
-    start.assumeAssimilationPage().expectSummaryPoints([point1, point2])
+    start.assumeAssimilationPage().expectUnderstandingPoints([point1, point2])
   }
 )
 
 Then(
-  'I should see a summary of the note broken down into a maximum of {int} points',
+  'I should see an understanding checklist with a maximum of {int} points',
   (maxPoints: number) => {
-    start.assumeAssimilationPage().expectSummaryPointsAtMost(maxPoints)
+    start.assumeAssimilationPage().expectUnderstandingPointsAtMost(maxPoints)
   }
 )
 
