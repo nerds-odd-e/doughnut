@@ -14,11 +14,16 @@ import com.odde.doughnut.services.ai.QuestionEvaluation;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.OpenAIChatCompletionMock;
 import com.openai.client.OpenAIClient;
+import com.openai.models.chat.completions.ChatCompletionCreateParams;
 import java.sql.Timestamp;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,28 +46,33 @@ class NoteQuestionGenerationServiceTests {
 
   @BeforeEach
   void setup() {
-    // Initialize OpenAIChatCompletionMock
     openAIChatCompletionMock = new OpenAIChatCompletionMock(officialClient);
-
-    // Create common test data
-    testNote = makeMe.aNote().details("description long enough.").please();
+    testNote = makeMe.aNote().please();
     makeMe.aNote().under(testNote).please();
+  }
+
+  private boolean systemMessageContains(ChatCompletionCreateParams request, String text) {
+    return request.messages().stream()
+        .filter(message -> message.system().isPresent())
+        .anyMatch(message -> message.system().get().content().toString().contains(text));
+  }
+
+  private boolean userMessageContains(ChatCompletionCreateParams request, String text) {
+    return request.messages().stream()
+        .filter(message -> message.user().isPresent())
+        .anyMatch(message -> message.toString().contains(text));
   }
 
   @Nested
   class GenerateQuestion {
     @Test
     void shouldGenerateQuestionWithCorrectStem() throws Exception {
-      // Mock AI response
       MCQWithAnswer jsonQuestion =
           makeMe.aMCQWithAnswer().stem("What is the first color in the rainbow?").please();
-
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(jsonQuestion);
 
-      // Execute
       MCQWithAnswer generatedQuestion = service.generateQuestion(testNote, null);
 
-      // Verify
       assertThat(
           generatedQuestion.getF0__multipleChoicesQuestion().getF0__stem(),
           containsString("What is the first color in the rainbow?"));
@@ -70,71 +80,39 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldPassQuestionGenerationInstructionAsUserMessage() throws JsonProcessingException {
-      // Mock AI response
-      MCQWithAnswer mcqWithAnswer =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the capital of France?")
-              .choices("Paris", "London", "Berlin")
-              .correctChoiceIndex(0)
-              .please();
-
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
-      // Execute
       service.generateQuestion(testNote, null);
 
-      // Verify
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-
-      boolean hasQuestionDesignerInstruction =
-          paramsCaptor.getValue().messages().stream()
-              .map(Object::toString)
-              .anyMatch(msg -> msg.contains("Please act as a Question Designer"));
-
       assertThat(
-          "A message should contain the Question Designer instruction",
-          hasQuestionDesignerInstruction,
+          systemMessageContains(paramsCaptor.getValue(), "Please act as a Question Designer"),
           is(true));
     }
 
     @Test
     void shouldUseModelNameFromGlobalSettings() throws JsonProcessingException {
-      MCQWithAnswer mcqWithAnswer =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the capital of France?")
-              .choices("Paris", "London", "Berlin")
-              .correctChoiceIndex(0)
-              .please();
-
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
 
-      // Act
       service.generateQuestion(testNote, null);
 
-      // Verify
-      ArgumentCaptor<com.openai.models.chat.completions.ChatCompletionCreateParams> paramsCaptor =
-          ArgumentCaptor.forClass(
-              com.openai.models.chat.completions.ChatCompletionCreateParams.class);
+      ArgumentCaptor<ChatCompletionCreateParams> paramsCaptor =
+          ArgumentCaptor.forClass(ChatCompletionCreateParams.class);
       verify(openAIChatCompletionMock.completionService()).create(paramsCaptor.capture());
-
       assertThat(
           paramsCaptor.getValue().model().asString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
     }
 
     @Test
     void shouldHandleNullChatCompletion() throws JsonProcessingException {
-      // Mock AI response for null completion
       openAIChatCompletionMock.mockNullChatCompletion();
 
-      // Execute and verify
       MCQWithAnswer result = service.generateQuestion(testNote, null);
 
-      // Verify that a null completion returns null
       assertThat(result, is(nullValue()));
     }
   }
@@ -144,49 +122,25 @@ class NoteQuestionGenerationServiceTests {
 
     @Test
     void shouldBuildRequestWithNoteDescription() {
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, null);
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+
       assertThat(request, is(notNullValue()));
       assertThat(request.model().toString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
-      boolean hasNoteDescription =
-          request.messages().stream()
-              .filter(message -> message.user().isPresent())
-              .anyMatch(
-                  message ->
-                      message.toString().contains("Focus Note and the notes related to it:"));
-      assertThat("Request should contain note description", hasNoteDescription, is(true));
+      assertThat(userMessageContains(request, "Focus Note and the notes related to it:"), is(true));
     }
 
     @Test
     void shouldBuildRequestWithNoteInstructions() {
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, null);
-      assertThat(request, is(notNullValue()));
-      assertThat(request.model().toString(), is(GlobalSettingsService.DEFAULT_CHAT_MODEL));
-      boolean hasNoteDescription =
-          request.messages().stream()
-              .filter(message -> message.user().isPresent())
-              .anyMatch(
-                  message ->
-                      message.toString().contains("The JSON below is available only to you"));
-      assertThat("Request should contain note description", hasNoteDescription, is(true));
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
+
+      assertThat(userMessageContains(request, "The JSON below is available only to you"), is(true));
     }
 
     @Test
     void shouldBuildRequestWithQuestionGenerationInstruction() {
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, null);
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
-      boolean hasQuestionDesignerInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> message.toString().contains("Please act as a Question Designer"));
-
-      assertThat(
-          "Request should contain Question Designer instruction",
-          hasQuestionDesignerInstruction,
-          is(true));
+      assertThat(systemMessageContains(request, "Please act as a Question Designer"), is(true));
     }
 
     @Test
@@ -200,602 +154,101 @@ class NoteQuestionGenerationServiceTests {
       makeMe.entityPersister.save(notebookAiAssistant);
       makeMe.refresh(testNote.getNotebook());
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, null);
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
-      boolean hasNotebookInstructions =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(message -> message.toString().contains("Custom notebook instructions"));
-
-      assertThat(
-          "Request should contain notebook assistant instructions",
-          hasNotebookInstructions,
-          is(true));
+      assertThat(systemMessageContains(request, "Custom notebook instructions"), is(true));
     }
 
     @Test
     void shouldIncludeAdditionalMessageWhenProvided() {
-      String additionalMessage = "Generate a question about the capital city";
+      ChatCompletionCreateParams request =
+          service.buildQuestionGenerationRequest(
+              testNote, "Generate a question about the capital city");
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, additionalMessage);
-
-      boolean hasAdditionalMessage =
-          request.messages().stream()
-              .filter(message -> message.user().isPresent())
-              .anyMatch(
-                  message ->
-                      message.toString().contains("Generate a question about the capital city"));
-
-      assertThat("Request should contain additional message", hasAdditionalMessage, is(true));
+      assertThat(
+          userMessageContains(request, "Generate a question about the capital city"), is(true));
     }
 
     @Test
     void shouldNotIncludeNotebookAssistantInstructionsWhenEmpty() {
-      // No NotebookAiAssistant created, so instructions should be null/empty
-      // But there will be a system message with the tool instruction
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, null);
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
       long systemMessageCount =
           request.messages().stream().filter(message -> message.system().isPresent()).count();
-
-      assertThat(
-          "Request should have one system message with tool instruction",
-          systemMessageCount,
-          is(1L));
+      assertThat(systemMessageCount, is(1L));
     }
   }
 
   @Nested
   class RelationTypeInstructions {
-    @Test
-    void shouldIncludeRelationTypeInstructionForRelatedTo() {
+
+    private Note createRelationNote(RelationType relationType) {
       Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.RELATED_TO).please();
+      Note sourceNote = makeMe.aNote().relateTo(targetNote, relationType).please();
       Note relationNote = sourceNote.getRelationships().get(0);
       makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (related to)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for RELATED_TO",
-          hasRelationTypeInstruction,
-          is(true));
+      return relationNote;
     }
 
-    @Test
-    void shouldIncludeRelationTypeInstructionForSpecialize() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.SPECIALIZE).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
+    @ParameterizedTest
+    @EnumSource(RelationType.class)
+    void shouldIncludeRelationTypeInstruction(RelationType relationType) {
+      Note relationNote = createRelationNote(relationType);
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+      ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(relationNote, null);
 
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (a specialization of)");
-                  });
-
       assertThat(
-          "Request should contain relation type instruction for SPECIALIZE",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForApplication() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.APPLICATION).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (an application of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for APPLICATION",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForInstance() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.INSTANCE).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (an instance of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for INSTANCE",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForPart() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.PART).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (a part of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for PART",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForTaggedBy() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.TAGGED_BY).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (tagged by)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for TAGGED_BY",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForAttribute() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.ATTRIBUTE).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (an attribute of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for ATTRIBUTE",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForOppositeOf() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.OPPOSITE_OF).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (the opposite of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for OPPOSITE_OF",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForAuthorOf() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.AUTHOR_OF).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (author of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for AUTHOR_OF",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForUses() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.USES).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (using)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for USES",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForExampleOf() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.EXAMPLE_OF).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (an example of)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for EXAMPLE_OF",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForPrecedes() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.PRECEDES).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (before)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for PRECEDES",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForSimilarTo() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.SIMILAR_TO).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note (similar to)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for SIMILAR_TO",
-          hasRelationTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeRelationTypeInstructionForConfuseWith() {
-      Note targetNote = makeMe.aNote().please();
-      Note sourceNote = makeMe.aNote().relateTo(targetNote, RelationType.CONFUSE_WITH).please();
-      Note relationNote = sourceNote.getRelationships().get(0);
-      makeMe.aNote().under(relationNote).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(relationNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains(
-                        "Special Instruction for Relation Note (confused with)");
-                  });
-
-      assertThat(
-          "Request should contain relation type instruction for CONFUSE_WITH",
-          hasRelationTypeInstruction,
+          "Request should contain instruction for " + relationType,
+          systemMessageContains(request, relationType.getQuestionGenerationInstruction().trim()),
           is(true));
     }
 
     @Test
     void shouldNotIncludeRelationTypeInstructionForNonRelationshipNote() {
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(testNote, null);
-
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note");
-                  });
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(testNote, null);
 
       assertThat(
-          "Request should not contain relation type instruction for non-relationship note",
-          hasRelationTypeInstruction,
-          is(false));
+          systemMessageContains(request, "Special Instruction for Relation Note"), is(false));
     }
   }
 
   @Nested
   class NoteTypeInstructions {
-    @Test
-    void shouldIncludeNoteTypeInstructionForSource() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.SOURCE);
-      makeMe.aNote().under(note).please();
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Source Note");
-                  });
-
-      assertThat(
-          "Request should contain note type instruction for SOURCE",
-          hasNoteTypeInstruction,
-          is(true));
+    static Stream<NoteType> noteTypesWithInstructions() {
+      return Stream.of(NoteType.values());
     }
 
-    @Test
-    void shouldIncludeNoteTypeInstructionForPerson() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.PERSON);
+    private Note createNoteWithType(NoteType noteType) {
+      Note note = makeMe.aNote().please();
+      note.setNoteType(noteType);
       makeMe.aNote().under(note).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Person Note");
-                  });
-
-      assertThat(
-          "Request should contain note type instruction for PERSON",
-          hasNoteTypeInstruction,
-          is(true));
+      return note;
     }
 
-    @Test
-    void shouldIncludeNoteTypeInstructionForConcept() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.CONCEPT);
-      makeMe.aNote().under(note).please();
+    @ParameterizedTest
+    @MethodSource("noteTypesWithInstructions")
+    void shouldIncludeNoteTypeInstruction(NoteType noteType) {
+      Note note = createNoteWithType(noteType);
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Concept Note");
-                  });
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(note, null);
 
       assertThat(
-          "Request should contain note type instruction for CONCEPT",
-          hasNoteTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeNoteTypeInstructionForExperience() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.EXPERIENCE);
-      makeMe.aNote().under(note).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Experience Note");
-                  });
-
-      assertThat(
-          "Request should contain note type instruction for EXPERIENCE",
-          hasNoteTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeNoteTypeInstructionForInitiative() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.INITIATIVE);
-      makeMe.aNote().under(note).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Initiative Note");
-                  });
-
-      assertThat(
-          "Request should contain note type instruction for INITIATIVE",
-          hasNoteTypeInstruction,
-          is(true));
-    }
-
-    @Test
-    void shouldIncludeNoteTypeInstructionForQuest() {
-      Note note = makeMe.aNote().details("description long enough.").please();
-      note.setNoteType(NoteType.QUEST);
-      makeMe.aNote().under(note).please();
-
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Quest Note");
-                  });
-
-      assertThat(
-          "Request should contain note type instruction for QUEST",
-          hasNoteTypeInstruction,
+          "Request should contain instruction for " + noteType,
+          systemMessageContains(request, noteType.getQuestionGenerationInstruction().trim()),
           is(true));
     }
 
     @Test
     void shouldNotIncludeNoteTypeInstructionForUnassigned() {
-      Note note = makeMe.aNote().details("description long enough.").please();
+      Note note = makeMe.aNote().please();
       note.setNoteType(null);
       makeMe.aNote().under(note).please();
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
-          service.buildQuestionGenerationRequest(note, null);
+      ChatCompletionCreateParams request = service.buildQuestionGenerationRequest(note, null);
 
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for");
-                  });
-
-      assertThat(
-          "Request should not contain note type instruction for null",
-          hasNoteTypeInstruction,
-          is(false));
+      assertThat(systemMessageContains(request, "Special Instruction for"), is(false));
     }
 
     @Test
@@ -806,31 +259,11 @@ class NoteQuestionGenerationServiceTests {
       relationNote.setNoteType(NoteType.SOURCE);
       makeMe.aNote().under(relationNote).please();
 
-      com.openai.models.chat.completions.ChatCompletionCreateParams request =
+      ChatCompletionCreateParams request =
           service.buildQuestionGenerationRequest(relationNote, null);
 
-      boolean hasRelationTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Relation Note");
-                  });
-
-      boolean hasNoteTypeInstruction =
-          request.messages().stream()
-              .filter(message -> message.system().isPresent())
-              .anyMatch(
-                  message -> {
-                    String content = message.system().get().content().toString();
-                    return content.contains("Special Instruction for Source Note");
-                  });
-
-      assertThat(
-          "Request should contain both relation type and note type instructions",
-          hasRelationTypeInstruction && hasNoteTypeInstruction,
-          is(true));
+      assertThat(systemMessageContains(request, "Special Instruction for Relation Note"), is(true));
+      assertThat(systemMessageContains(request, "Special Instruction for Source Note"), is(true));
     }
   }
 
@@ -838,50 +271,26 @@ class NoteQuestionGenerationServiceTests {
   class EvaluateQuestion {
     @Test
     void shouldReturnEmptyWhenEvaluationFails() throws Exception {
-      // Mock AI response for question generation
-      MCQWithAnswer mcqWithAnswer =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the capital of France?")
-              .choices("Paris", "London", "Berlin")
-              .correctChoiceIndex(0)
-              .please();
-
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(mcqWithAnswer);
-
-      // Mock null response for evaluation (simulating API failure)
       openAIChatCompletionMock.mockNullChatCompletion();
 
-      // Execute
       Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
 
-      // Verify that evaluation failure returns empty Optional instead of throwing
       assertThat(result, is(Optional.empty()));
     }
 
     @Test
     void shouldReturnEvaluationWhenEvaluationSucceeds() throws Exception {
-      // Mock AI response for question generation
-      MCQWithAnswer mcqWithAnswer =
-          makeMe
-              .aMCQWithAnswer()
-              .stem("What is the capital of France?")
-              .choices("Paris", "London", "Berlin")
-              .correctChoiceIndex(0)
-              .please();
-
-      // Mock successful evaluation response
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       QuestionEvaluation evaluation = new QuestionEvaluation();
       evaluation.feasibleQuestion = true;
       evaluation.correctChoices = new int[] {0};
       evaluation.improvementAdvices = "Good question";
-
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(evaluation);
 
-      // Execute
       Optional<QuestionEvaluation> result = service.evaluateQuestion(testNote, mcqWithAnswer);
 
-      // Verify that evaluation returns the result
       assertThat(result.isPresent(), is(true));
       assertThat(result.get().feasibleQuestion, is(true));
       assertThat(result.get().correctChoices, equalTo(new int[] {0}));
