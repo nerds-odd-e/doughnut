@@ -293,13 +293,6 @@ Given('the note type is {string}', (noteType: string) => {
   start.assumeAssimilationPage().selectNoteType(noteType)
 })
 
-Then(
-  'I should see a text {string} in the summary section',
-  (expectedText: string) => {
-    start.assumeAssimilationPage().expectSummaryText(expectedText)
-  }
-)
-
 Then('I can continue with the assimilation', () => {
   // Verify we're still on the assimilation page or moved to the next note
   cy.url().should('satisfy', (url: string) => {
