@@ -247,8 +247,8 @@ importers:
         specifier: ^0.12.0
         version: 0.12.0(@biomejs/biome@2.3.10)(optionator@0.9.4)(typescript@5.9.3)(vite@7.3.0(@types/node@24.10.2)(jiti@1.21.7)(sass@1.97.0)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))(vue-tsc@3.1.8(typescript@5.9.3))
       vite-tsconfig-paths:
-        specifier: ^6.0.1
-        version: 6.0.1(typescript@5.9.3)(vite@7.3.0(@types/node@24.10.2)(jiti@1.21.7)(sass@1.97.0)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))
+        specifier: ^6.0.2
+        version: 6.0.2(typescript@5.9.3)(vite@7.3.0(@types/node@24.10.2)(jiti@1.21.7)(sass@1.97.0)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2))
       vitest:
         specifier: 4.0.16
         version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@24.10.2)(jiti@1.21.7)(jsdom@27.3.0(postcss@8.5.6))(sass@1.97.0)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)
@@ -5959,8 +5959,8 @@ packages:
     peerDependencies:
       vite: ^3.0.0-0 || ^4.0.0-0 || ^5.0.0-0 || ^6.0.0-0 || ^7.0.0-0
 
-  vite-tsconfig-paths@6.0.1:
-    resolution: {integrity: sha512-OQuYkfCQhc2T+n//0N7/oogTosgiSyZQ7dydrpUlH5SbnFTtplpekdY4GMi6jDwEpiwWlqeUJMyPfC2ePM1+2A==}
+  vite-tsconfig-paths@6.0.2:
+    resolution: {integrity: sha512-c06LOO8fWB5RuEPpEIHXU9t7Dt4DoiPIljnKws9UygIaQo6PoFKawTftz5/QVcO+6pOs/HHWycnq4UrZkWVYnQ==}
     peerDependencies:
       vite: '*'
     peerDependenciesMeta:
@@ -12551,7 +12551,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-tsconfig-paths@6.0.1(typescript@5.9.3)(vite@7.3.0(@types/node@24.10.2)(jiti@1.21.7)(sass@1.97.0)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)):
+  vite-tsconfig-paths@6.0.2(typescript@5.9.3)(vite@7.3.0(@types/node@24.10.2)(jiti@1.21.7)(sass@1.97.0)(terser@5.44.1)(tsx@4.20.6)(yaml@2.8.2)):
     dependencies:
       debug: 4.4.3(supports-color@8.1.1)
       globrex: 0.1.2
