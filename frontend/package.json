@@ -50,7 +50,7 @@
     "autoprefixer": "^10.4.23",
     "daisyui": "^4.12.23",
     "es-toolkit": "^1.43.0",
-    "esbuild": "0.27.1",
+    "esbuild": "0.27.2",
     "gsap": "^3.14.2",
     "jsdom": "^27.3.0",
     "optionator": "^0.9.4",
