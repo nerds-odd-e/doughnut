@@ -1,6 +1,9 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-max-w-6xl daisy-mx-auto" data-test="question-section">
     <QuestionStem :stem="multipleChoicesQuestion.f0__stem" />
+    <div v-if="!disabled && currentTimeMs > 0" class="daisy-text-sm daisy-text-base-content/70 daisy-mt-2">
+      Thinking time: {{ formatThinkingTime(currentTimeMs) }}
+    </div>
     <QuestionChoices
       v-if="multipleChoicesQuestion.f1__choices"
       :choices="multipleChoicesQuestion.f1__choices"
@@ -36,7 +39,20 @@ defineProps({
 
 const emits = defineEmits(["answer"])
 
-const { start, stop } = useThinkingTimeTracker()
+const { start, stop, currentTimeMs } = useThinkingTimeTracker()
+
+const formatThinkingTime = (ms: number): string => {
+  if (ms < 1000) {
+    return `${ms}ms`
+  }
+  const seconds = ms / 1000
+  if (seconds < 60) {
+    return `${seconds.toFixed(1)}s`
+  }
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  return `${minutes}m ${remainingSeconds}s`
+}
 
 onMounted(() => {
   start()
