@@ -228,9 +228,8 @@ export type AnsweredQuestion = {
 };
 
 export type QuestionResult = RecallResult & {
-    type: 'QuestionResult';
-} & {
     answeredQuestion?: AnsweredQuestion;
+    type: 'QuestionResult';
 };
 
 export type RecallResult = {
@@ -238,12 +237,11 @@ export type RecallResult = {
 };
 
 export type SpellingResult = RecallResult & {
-    type: 'SpellingResult';
-} & {
     note?: Note;
     answer?: string;
     isCorrect?: boolean;
     memoryTrackerId?: number;
+    type: 'SpellingResult';
 };
 
 export type AnswerSpellingDto = {
@@ -673,18 +671,16 @@ export type AnsweredQuestionWritable = {
 };
 
 export type QuestionResultWritable = RecallResult & {
-    type: 'QuestionResultWritable';
-} & {
     answeredQuestion?: AnsweredQuestionWritable;
+    type: 'QuestionResultWritable';
 };
 
 export type SpellingResultWritable = RecallResult & {
-    type: 'SpellingResultWritable';
-} & {
     note?: NoteWritable;
     answer?: string;
     isCorrect?: boolean;
     memoryTrackerId?: number;
+    type: 'SpellingResultWritable';
 };
 
 export type NoteCreationResultWritable = {
