@@ -1,7 +1,7 @@
 <template>
   <div class="quiz-instruction daisy-relative daisy-max-w-6xl daisy-mx-auto" data-test="question-section">
     <QuestionStem :stem="multipleChoicesQuestion.f0__stem" />
-    <div class="daisy-text-xs daisy-text-gray-500 daisy-mt-2">
+    <div v-if="isActiveQuestion" class="daisy-text-xs daisy-text-gray-500 daisy-mt-2">
       Thinking time: {{ displayTime }}
     </div>
     <QuestionChoices
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue"
+import { ref, computed, onMounted, onUnmounted, watch } from "vue"
 import type { PropType } from "vue"
 import type {
   Answer,
@@ -27,7 +27,7 @@ import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
 
-defineProps({
+const props = defineProps({
   multipleChoicesQuestion: {
     type: Object as PropType<MultipleChoicesQuestion>,
     required: true,
@@ -39,20 +39,41 @@ defineProps({
 
 const emits = defineEmits(["answer"])
 
+const isActiveQuestion = computed(() => !props.disabled && !props.answer)
+
 const { start, stop, updateAccumulatedTime } = useThinkingTimeTracker()
 const displayTime = ref("0.0s")
 let animationFrameId: number | null = null
 
 const updateDisplay = () => {
+  if (!isActiveQuestion.value) {
+    return
+  }
   const ms = updateAccumulatedTime()
   const seconds = (ms / 1000).toFixed(1)
   displayTime.value = `${seconds}s`
   animationFrameId = requestAnimationFrame(updateDisplay)
 }
 
+watch(
+  isActiveQuestion,
+  (isActive) => {
+    if (isActive) {
+      start()
+      updateDisplay()
+    } else if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId)
+      animationFrameId = null
+    }
+  },
+  { immediate: true }
+)
+
 onMounted(() => {
-  start()
-  updateDisplay()
+  if (isActiveQuestion.value) {
+    start()
+    updateDisplay()
+  }
 })
 
 onUnmounted(() => {
