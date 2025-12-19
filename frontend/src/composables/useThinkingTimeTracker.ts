@@ -88,7 +88,5 @@ export function useThinkingTimeTracker() {
   return {
     start,
     stop,
-    accumulatedMs,
-    isRunning,
   }
 }
