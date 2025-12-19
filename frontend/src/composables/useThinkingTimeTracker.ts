@@ -5,6 +5,8 @@ export function useThinkingTimeTracker() {
   const runningStart = ref<number | null>(null)
   const isRunning = ref(false)
   const hasStopped = ref(false)
+  const currentTimeMs = ref(0)
+  let updateInterval: number | null = null
 
   const pause = () => {
     if (!isRunning.value || runningStart.value === null) return
@@ -29,11 +31,14 @@ export function useThinkingTimeTracker() {
     requestAnimationFrame(() => {
       if (!hasStopped.value) {
         resume()
+        startUpdateInterval()
       }
     })
   }
 
   const stop = (): number => {
+    stopUpdateInterval()
+
     if (hasStopped.value) {
       return accumulatedMs.value
     }
@@ -47,6 +52,7 @@ export function useThinkingTimeTracker() {
       isRunning.value = false
     }
 
+    updateCurrentTime()
     return Math.round(accumulatedMs.value)
   }
 
@@ -66,6 +72,18 @@ export function useThinkingTimeTracker() {
     resume()
   }
 
+  const updateCurrentTime = () => {
+    if (hasStopped.value) {
+      currentTimeMs.value = Math.round(accumulatedMs.value)
+    } else if (isRunning.value && runningStart.value !== null) {
+      currentTimeMs.value = Math.round(
+        accumulatedMs.value + (performance.now() - runningStart.value)
+      )
+    } else {
+      currentTimeMs.value = Math.round(accumulatedMs.value)
+    }
+  }
+
   const setupEventListeners = () => {
     document.addEventListener("visibilitychange", handleVisibilityChange)
     window.addEventListener("blur", handleBlur)
@@ -78,10 +96,25 @@ export function useThinkingTimeTracker() {
     window.removeEventListener("focus", handleFocus)
   }
 
+  const startUpdateInterval = () => {
+    if (updateInterval !== null) return
+    updateInterval = window.setInterval(() => {
+      updateCurrentTime()
+    }, 100)
+  }
+
+  const stopUpdateInterval = () => {
+    if (updateInterval !== null) {
+      clearInterval(updateInterval)
+      updateInterval = null
+    }
+  }
+
   setupEventListeners()
 
   onUnmounted(() => {
     removeEventListeners()
+    stopUpdateInterval()
     pause()
   })
 
@@ -90,5 +123,6 @@ export function useThinkingTimeTracker() {
     stop,
     accumulatedMs,
     isRunning,
+    currentTimeMs,
   }
 }
