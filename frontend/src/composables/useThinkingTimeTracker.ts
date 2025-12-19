@@ -33,6 +33,15 @@ export function useThinkingTimeTracker() {
     })
   }
 
+  const updateAccumulatedTime = (): number => {
+    if (isRunning.value && runningStart.value !== null) {
+      const now = performance.now()
+      accumulatedMs.value += now - runningStart.value
+      runningStart.value = now
+    }
+    return Math.round(accumulatedMs.value)
+  }
+
   const stop = (): number => {
     if (hasStopped.value) {
       return accumulatedMs.value
@@ -40,12 +49,9 @@ export function useThinkingTimeTracker() {
 
     hasStopped.value = true
 
-    if (isRunning.value && runningStart.value !== null) {
-      const now = performance.now()
-      accumulatedMs.value += now - runningStart.value
-      runningStart.value = null
-      isRunning.value = false
-    }
+    updateAccumulatedTime()
+    runningStart.value = null
+    isRunning.value = false
 
     return Math.round(accumulatedMs.value)
   }
