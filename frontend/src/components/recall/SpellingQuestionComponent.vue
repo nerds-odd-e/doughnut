@@ -7,9 +7,6 @@
           <NotebookLink :notebook="recallPrompt.spellingQuestion.notebook" />
         </div>
         <QuestionStem :stem="stem" />
-        <div v-if="currentTimeMs > 0" class="daisy-text-sm daisy-text-base-content/70 daisy-mt-2">
-          Thinking time: {{ formatThinkingTime(currentTimeMs) }}
-        </div>
       </div>
       <form @submit.prevent="submitAnswer" class="daisy-sticky daisy-bottom-0 daisy-bg-base-100 daisy-pt-4 daisy-pb-4">
         <TextInput
@@ -54,24 +51,11 @@ const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
 const loading = ref(true)
 
-const { start, stop, currentTimeMs } = useThinkingTimeTracker()
+const { start, stop } = useThinkingTimeTracker()
 
 const stem = computed(() => {
   return recallPrompt.value?.spellingQuestion?.stem || ""
 })
-
-const formatThinkingTime = (ms: number): string => {
-  if (ms < 1000) {
-    return `${ms}ms`
-  }
-  const seconds = ms / 1000
-  if (seconds < 60) {
-    return `${seconds.toFixed(1)}s`
-  }
-  const minutes = Math.floor(seconds / 60)
-  const remainingSeconds = Math.floor(seconds % 60)
-  return `${minutes}m ${remainingSeconds}s`
-}
 
 const fetchSpellingQuestion = async () => {
   loading.value = true
