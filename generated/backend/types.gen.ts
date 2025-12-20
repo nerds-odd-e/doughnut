@@ -227,7 +227,7 @@ export type AnsweredQuestion = {
     memoryTrackerId?: number;
 };
 
-export type QuestionResult = RecallResult & {
+export type QuestionResult = Omit<RecallResult, 'type'> & {
     answeredQuestion?: AnsweredQuestion;
     type: 'QuestionResult';
 };
@@ -236,7 +236,7 @@ export type RecallResult = {
     type: string;
 };
 
-export type SpellingResult = RecallResult & {
+export type SpellingResult = Omit<RecallResult, 'type'> & {
     note?: Note;
     answer?: string;
     isCorrect?: boolean;
@@ -670,12 +670,12 @@ export type AnsweredQuestionWritable = {
     memoryTrackerId?: number;
 };
 
-export type QuestionResultWritable = RecallResult & {
+export type QuestionResultWritable = Omit<RecallResult, 'type'> & {
     answeredQuestion?: AnsweredQuestionWritable;
     type: 'QuestionResultWritable';
 };
 
-export type SpellingResultWritable = RecallResult & {
+export type SpellingResultWritable = Omit<RecallResult, 'type'> & {
     note?: NoteWritable;
     answer?: string;
     isCorrect?: boolean;
