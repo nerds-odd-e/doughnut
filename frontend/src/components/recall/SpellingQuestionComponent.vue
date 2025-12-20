@@ -7,9 +7,6 @@
           <NotebookLink :notebook="recallPrompt.spellingQuestion.notebook" />
         </div>
         <QuestionStem :stem="stem" />
-        <div class="daisy-text-xs daisy-text-gray-500 daisy-mt-2">
-          Thinking time: {{ displayTime }}
-        </div>
       </div>
       <form @submit.prevent="submitAnswer" class="daisy-sticky daisy-bottom-0 daisy-bg-base-100 daisy-pt-4 daisy-pb-4">
         <TextInput
@@ -33,14 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  ref,
-  onMounted,
-  computed,
-  onUnmounted,
-  onActivated,
-  onDeactivated,
-} from "vue"
+import { ref, onMounted, computed } from "vue"
 import type { RecallPrompt } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
@@ -61,17 +51,7 @@ const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
 const loading = ref(true)
 
-const { start, stop, pause, resume, updateAccumulatedTime } =
-  useThinkingTimeTracker()
-const displayTime = ref("0.0s")
-let animationFrameId: number | null = null
-
-const updateDisplay = () => {
-  const ms = updateAccumulatedTime()
-  const seconds = (ms / 1000).toFixed(1)
-  displayTime.value = `${seconds}s`
-  animationFrameId = requestAnimationFrame(updateDisplay)
-}
+const { start, stop } = useThinkingTimeTracker()
 
 const stem = computed(() => {
   return recallPrompt.value?.spellingQuestion?.stem || ""
@@ -101,25 +81,5 @@ const submitAnswer = () => {
 onMounted(() => {
   fetchSpellingQuestion()
   start()
-  updateDisplay()
-})
-
-onActivated(() => {
-  resume()
-  updateDisplay()
-})
-
-onDeactivated(() => {
-  pause()
-  if (animationFrameId !== null) {
-    cancelAnimationFrame(animationFrameId)
-    animationFrameId = null
-  }
-})
-
-onUnmounted(() => {
-  if (animationFrameId !== null) {
-    cancelAnimationFrame(animationFrameId)
-  }
 })
 </script>
