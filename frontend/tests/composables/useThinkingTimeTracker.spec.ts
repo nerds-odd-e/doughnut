@@ -213,12 +213,13 @@ describe("useThinkingTimeTracker", () => {
   it("pauses when component is deactivated (KeepAlive)", async () => {
     const TestComponent = defineComponent({
       setup() {
-        const { start, stop } = useThinkingTimeTracker()
+        const { start, stop, pause, resume } = useThinkingTimeTracker()
         onActivated(() => {
           start()
+          resume()
         })
         onDeactivated(() => {
-          // pause/resume removed as part of revert
+          pause()
         })
         start()
         return { stop }
@@ -261,12 +262,13 @@ describe("useThinkingTimeTracker", () => {
   it("resumes when component is reactivated (KeepAlive)", async () => {
     const TestComponent = defineComponent({
       setup() {
-        const { start, stop } = useThinkingTimeTracker()
+        const { start, stop, pause, resume } = useThinkingTimeTracker()
         onActivated(() => {
           start()
+          resume()
         })
         onDeactivated(() => {
-          // pause/resume removed as part of revert
+          pause()
         })
         start()
         return { stop }
