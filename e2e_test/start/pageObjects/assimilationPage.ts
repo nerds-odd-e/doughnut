@@ -140,30 +140,33 @@ export const assumeAssimilationPage = () => ({
   },
   expectUnderstandingPoints(points: string[]) {
     cy.pageIsNotLoading()
-    // Wait for the understanding checklist to be generated and displayed
-    cy.get('[data-test="understanding-checklist"]', { timeout: 10000 }).should(
-      'be.visible'
-    )
+    // Find the understanding checklist by its heading text
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-alert')
+      .should('be.visible')
     points.forEach((point) => {
-      cy.get('[data-test="understanding-checklist"]').should('contain', point)
+      cy.contains('Understanding Checklist:')
+        .closest('.daisy-alert')
+        .should('contain', point)
     })
     return this
   },
   expectUnderstandingPointsAtMost(maxPoints: number) {
     cy.pageIsNotLoading()
-    // Wait for the understanding checklist to be generated and displayed
-    cy.get('[data-test="understanding-checklist"]', { timeout: 10000 }).should(
-      'be.visible'
-    )
+    // Find the understanding checklist by its heading text
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-alert')
+      .should('be.visible')
     // Count the number of list items (understanding points) in the checklist
-    cy.get('[data-test="understanding-checklist"]')
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-alert')
       .find('ul li')
       .should('have.length.at.most', maxPoints)
     return this
   },
   expectUnderstandingChecklistNotShown() {
     cy.pageIsNotLoading()
-    cy.get('[data-test="understanding-checklist"]').should('not.exist')
+    cy.contains('Understanding Checklist:').should('not.exist')
     return this
   },
 })

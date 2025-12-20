@@ -18,7 +18,6 @@
   />
   <div
     v-if="understandingPoints.length > 0"
-    data-test="understanding-checklist"
     class="daisy-mb-4 daisy-alert daisy-alert-info"
   >
     <div class="daisy-text-sm">
