@@ -112,6 +112,9 @@ const openAiChatCompletionStubber = (
         ],
       })
     },
+    stubUnderstandingChecklist(argumentsString: string) {
+      return stubJsonSchemaResponse(argumentsString)
+    },
   }
 }
 

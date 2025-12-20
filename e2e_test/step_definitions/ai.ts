@@ -177,3 +177,26 @@ When('I accept the suggested completion', () => {
 When('I reject the suggested completion', () => {
   start.assumeConversationAboutNotePage().cancelCompletion()
 })
+
+Given(
+  'OpenAI generates understanding checklist with points:',
+  (data: DataTable) => {
+    const points = data
+      .raw()
+      .flat()
+      .filter((point) => point.trim().length > 0)
+    const understandingChecklist = { points }
+    const reply = JSON.stringify(understandingChecklist)
+    cy.then(async () => {
+      await mock_services.openAi().restartImposter()
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMessageMatches({
+          role: 'system',
+          content: '.*Please generate an understanding checklist.*',
+        })
+        .stubUnderstandingChecklist(reply)
+    })
+  }
+)
