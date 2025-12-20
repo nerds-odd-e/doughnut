@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { mount } from "@vue/test-utils"
-import { defineComponent } from "vue"
+import { defineComponent, KeepAlive, onActivated, onDeactivated } from "vue"
 import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
 
 describe("useThinkingTimeTracker", () => {
@@ -208,5 +208,110 @@ describe("useThinkingTimeTracker", () => {
 
     const time = wrapper.vm.stop()
     expect(time).toBe(1235)
+  })
+
+  it("pauses when component is deactivated (KeepAlive)", async () => {
+    const TestComponent = defineComponent({
+      setup() {
+        const { start, stop, pause, resume } = useThinkingTimeTracker()
+        onActivated(() => {
+          start()
+          resume()
+        })
+        onDeactivated(() => {
+          pause()
+        })
+        start()
+        return { stop }
+      },
+      template: "<div>Test</div>",
+    })
+
+    const WrapperComponent = defineComponent({
+      components: { TestComponent, KeepAlive },
+      data() {
+        return { show: true }
+      },
+      template: `
+        <KeepAlive>
+          <TestComponent v-if="show" key="test" />
+        </KeepAlive>
+      `,
+    })
+
+    const wrapper = mount(WrapperComponent)
+    const testComponent = wrapper.findComponent(TestComponent)
+    await testComponent.vm.$nextTick()
+    flushRAF()
+
+    performanceNowSpy.mockReturnValue(1000)
+    vi.advanceTimersByTime(1000)
+
+    // Simulate component deactivation (switching away)
+    await wrapper.setData({ show: false })
+    await wrapper.vm.$nextTick()
+
+    performanceNowSpy.mockReturnValue(2000)
+    vi.advanceTimersByTime(1000)
+
+    // Component is still alive but deactivated, so timer should be paused
+    const time = testComponent.vm.stop()
+    expect(time).toBe(1000)
+  })
+
+  it("resumes when component is reactivated (KeepAlive)", async () => {
+    const TestComponent = defineComponent({
+      setup() {
+        const { start, stop, pause, resume } = useThinkingTimeTracker()
+        onActivated(() => {
+          start()
+          resume()
+        })
+        onDeactivated(() => {
+          pause()
+        })
+        start()
+        return { stop }
+      },
+      template: "<div>Test</div>",
+    })
+
+    const WrapperComponent = defineComponent({
+      components: { TestComponent, KeepAlive },
+      data() {
+        return { show: true }
+      },
+      template: `
+        <KeepAlive>
+          <TestComponent v-if="show" key="test" />
+        </KeepAlive>
+      `,
+    })
+
+    const wrapper = mount(WrapperComponent)
+    const testComponent = wrapper.findComponent(TestComponent)
+    await testComponent.vm.$nextTick()
+    flushRAF()
+
+    performanceNowSpy.mockReturnValue(1000)
+    vi.advanceTimersByTime(1000)
+
+    // Simulate component deactivation
+    await wrapper.setData({ show: false })
+    await wrapper.vm.$nextTick()
+
+    performanceNowSpy.mockReturnValue(2000)
+    vi.advanceTimersByTime(1000)
+
+    // Simulate component reactivation
+    await wrapper.setData({ show: true })
+    await testComponent.vm.$nextTick()
+    flushRAF()
+
+    performanceNowSpy.mockReturnValue(3000)
+    vi.advanceTimersByTime(1000)
+
+    const time = testComponent.vm.stop()
+    expect(time).toBe(2000)
   })
 })

@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
-import { vi, beforeEach, afterEach } from "vitest"
+import { vi, beforeEach, afterEach, describe, it, expect } from "vitest"
+import { defineComponent, KeepAlive } from "vue"
 import helper from "@tests/helpers"
 import QuestionDisplay from "@/components/recall/QuestionDisplay.vue"
 import makeMe from "@tests/fixtures/makeMe"
@@ -169,5 +170,96 @@ describe("QuestionDisplay", () => {
     // but the composable tests verify that stop() returns the same value when called multiple times
     expect(firstTime).toBeDefined()
     expect(firstTime).toBeGreaterThanOrEqual(1000)
+  })
+
+  it("pauses timer when component is deactivated (KeepAlive scenario)", async () => {
+    const multipleChoicesQuestion = makeMe.aMultipleChoicesQuestion
+      .withStem("Test question")
+      .withChoices(["A", "B", "C"])
+      .please()
+
+    let rafCallbacks: Array<FrameRequestCallback> = []
+    global.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
+      rafCallbacks.push(callback)
+      return 1
+    }) as unknown as typeof requestAnimationFrame
+
+    const WrapperComponent = defineComponent({
+      components: { QuestionDisplay, KeepAlive },
+      data() {
+        return { show: true }
+      },
+      template: `
+        <KeepAlive>
+          <QuestionDisplay
+            v-if="show"
+            key="question"
+            :multipleChoicesQuestion="multipleChoicesQuestion"
+            @answer="handleAnswer"
+          />
+        </KeepAlive>
+      `,
+      methods: {
+        handleAnswer() {
+          // noop
+        },
+      },
+      computed: {
+        multipleChoicesQuestion() {
+          return multipleChoicesQuestion
+        },
+      },
+    })
+
+    const wrapper = helper.component(WrapperComponent).mount()
+    await flushPromises()
+
+    const questionComponent = wrapper.findComponent(QuestionDisplay)
+    await questionComponent.vm.$nextTick()
+
+    // Flush RAF callbacks
+    const callbacks = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks.forEach((cb) => cb(performance.now()))
+
+    // Timer runs for 1 second
+    performanceNowSpy.mockReturnValue(1000)
+    vi.advanceTimersByTime(1000)
+
+    // Simulate component deactivation (user navigates away, but component is kept alive)
+    await wrapper.setData({ show: false })
+    await wrapper.vm.$nextTick()
+
+    // Time passes while component is deactivated
+    performanceNowSpy.mockReturnValue(2000)
+    vi.advanceTimersByTime(1000)
+
+    // Component is still alive but deactivated, timer should be paused
+    // We need to access the stop function from the component instance
+    // Since we can't directly access it, we'll trigger an answer to see the thinking time
+    await wrapper.setData({ show: true })
+    await questionComponent.vm.$nextTick()
+
+    // Flush RAF again after reactivation
+    const callbacks2 = [...rafCallbacks]
+    rafCallbacks = []
+    callbacks2.forEach((cb) => cb(performance.now()))
+
+    // Wait a bit more
+    performanceNowSpy.mockReturnValue(2500)
+    vi.advanceTimersByTime(500)
+
+    // Submit answer - should only include time from before deactivation + after reactivation
+    const choiceButton = questionComponent.find("li.choice button")
+    await choiceButton.trigger("click")
+    await flushPromises()
+
+    const emitted = questionComponent.emitted("answer")
+    expect(emitted).toBeTruthy()
+    const answerData = emitted?.[0]?.[0] as { thinkingTimeMs?: number }
+    // Should be approximately 1500ms (1000ms before deactivation + 500ms after reactivation)
+    // Not 2500ms (which would be if timer continued during deactivation)
+    expect(answerData?.thinkingTimeMs).toBeLessThan(2000)
+    expect(answerData?.thinkingTimeMs).toBeGreaterThanOrEqual(1000)
   })
 })

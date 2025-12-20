@@ -16,7 +16,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from "vue"
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  onActivated,
+  onDeactivated,
+  watch,
+} from "vue"
 import type { PropType } from "vue"
 import type {
   Answer,
@@ -41,7 +49,8 @@ const emits = defineEmits(["answer"])
 
 const isActiveQuestion = computed(() => !props.disabled && !props.answer)
 
-const { start, stop, updateAccumulatedTime } = useThinkingTimeTracker()
+const { start, stop, pause, resume, updateAccumulatedTime } =
+  useThinkingTimeTracker()
 const displayTime = ref("0.0s")
 let animationFrameId: number | null = null
 
@@ -73,6 +82,21 @@ onMounted(() => {
   if (isActiveQuestion.value) {
     start()
     updateDisplay()
+  }
+})
+
+onActivated(() => {
+  if (isActiveQuestion.value) {
+    resume()
+    updateDisplay()
+  }
+})
+
+onDeactivated(() => {
+  pause()
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
   }
 })
 

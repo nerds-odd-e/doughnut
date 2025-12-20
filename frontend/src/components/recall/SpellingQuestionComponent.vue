@@ -33,7 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onUnmounted } from "vue"
+import {
+  ref,
+  onMounted,
+  computed,
+  onUnmounted,
+  onActivated,
+  onDeactivated,
+} from "vue"
 import type { RecallPrompt } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
 import {} from "@/managedApi/clientSetup"
@@ -54,7 +61,8 @@ const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
 const loading = ref(true)
 
-const { start, stop, updateAccumulatedTime } = useThinkingTimeTracker()
+const { start, stop, pause, resume, updateAccumulatedTime } =
+  useThinkingTimeTracker()
 const displayTime = ref("0.0s")
 let animationFrameId: number | null = null
 
@@ -94,6 +102,19 @@ onMounted(() => {
   fetchSpellingQuestion()
   start()
   updateDisplay()
+})
+
+onActivated(() => {
+  resume()
+  updateDisplay()
+})
+
+onDeactivated(() => {
+  pause()
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId)
+    animationFrameId = null
+  }
 })
 
 onUnmounted(() => {
