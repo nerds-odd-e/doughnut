@@ -96,6 +96,5 @@ export function useThinkingTimeTracker() {
     stop,
     pause,
     resume,
-    updateAccumulatedTime,
   }
 }

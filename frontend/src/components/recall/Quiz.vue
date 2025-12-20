@@ -3,7 +3,7 @@
     <ContentLoader v-if="!currentQuestionFetched || isCurrentMemoryTrackerFetching" />
     <template v-else>
       <div class="daisy-pt-5 daisy-h-full">
-      <SpellingQuestionComponent
+      <SpellingQuestionDisplay
         v-if="currentMemoryTracker?.spelling"
         v-bind="{
           memoryTrackerId: currentMemoryTrackerId!,
@@ -56,7 +56,7 @@ import {
 import { apiCallWithLoading } from "@/managedApi/clientSetup"
 import ContestableQuestion from "./ContestableQuestion.vue"
 import JustReview from "./JustReview.vue"
-import SpellingQuestionComponent from "./SpellingQuestionComponent.vue"
+import SpellingQuestionDisplay from "./SpellingQuestionDisplay.vue"
 import NotebookLink from "../notes/NotebookLink.vue"
 
 // Interface definitions for better type safety

@@ -30,14 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, onActivated, onDeactivated } from "vue"
+import { ref, onMounted, computed } from "vue"
 import type { RecallPrompt } from "@generated/backend"
 import { MemoryTrackerController } from "@generated/backend/sdk.gen"
-import {} from "@/managedApi/clientSetup"
 import TextInput from "../form/TextInput.vue"
 import QuestionStem from "./QuestionStem.vue"
 import ContentLoader from "../commons/ContentLoader.vue"
-import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
+import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
 
 const props = defineProps({
   memoryTrackerId: {
@@ -51,7 +50,8 @@ const spellingAnswer = ref("")
 const recallPrompt = ref<RecallPrompt>()
 const loading = ref(true)
 
-const { start, stop, pause, resume } = useThinkingTimeTracker()
+const isActiveQuestion = computed(() => !loading.value)
+const { stop } = useQuestionThinkingTime(isActiveQuestion)
 
 const stem = computed(() => {
   return recallPrompt.value?.spellingQuestion?.stem || ""
@@ -80,14 +80,5 @@ const submitAnswer = () => {
 
 onMounted(() => {
   fetchSpellingQuestion()
-  start()
-})
-
-onActivated(() => {
-  resume()
-})
-
-onDeactivated(() => {
-  pause()
 })
 </script>

@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onActivated, onDeactivated, watch } from "vue"
+import { computed } from "vue"
 import type { PropType } from "vue"
 import type {
   Answer,
@@ -22,7 +22,7 @@ import type {
 } from "@generated/backend"
 import QuestionChoices from "./QuestionChoices.vue"
 import QuestionStem from "./QuestionStem.vue"
-import { useThinkingTimeTracker } from "@/composables/useThinkingTimeTracker"
+import { useQuestionThinkingTime } from "@/composables/useQuestionThinkingTime"
 
 const props = defineProps({
   multipleChoicesQuestion: {
@@ -38,33 +38,7 @@ const emits = defineEmits(["answer"])
 
 const isActiveQuestion = computed(() => !props.disabled && !props.answer)
 
-const { start, stop, pause, resume } = useThinkingTimeTracker()
-
-watch(
-  isActiveQuestion,
-  (isActive) => {
-    if (isActive) {
-      start()
-    }
-  },
-  { immediate: true }
-)
-
-onMounted(() => {
-  if (isActiveQuestion.value) {
-    start()
-  }
-})
-
-onActivated(() => {
-  if (isActiveQuestion.value) {
-    resume()
-  }
-})
-
-onDeactivated(() => {
-  pause()
-})
+const { stop } = useQuestionThinkingTime(isActiveQuestion)
 
 const submitAnswer = async (answerData: AnswerDto) => {
   const thinkingTimeMs = stop()
