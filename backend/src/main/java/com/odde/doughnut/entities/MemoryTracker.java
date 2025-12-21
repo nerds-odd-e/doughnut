@@ -65,7 +65,7 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
   @Column(name = "forgetting_curve_index")
   @Getter
   @Setter
-  private Integer forgettingCurveIndex = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
+  private Float forgettingCurveIndex = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
 
   @Column(name = "removed_from_tracking")
   @Getter

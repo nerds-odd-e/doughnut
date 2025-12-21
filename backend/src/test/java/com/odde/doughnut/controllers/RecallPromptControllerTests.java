@@ -72,7 +72,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           makeMe
               .aMemoryTrackerFor(answerNote)
               .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200)
+              .forgettingCurveAndNextRecallAt(200.0f)
               .please();
       MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
       recallPrompt =
@@ -100,7 +100,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldNoteIncreaseIndexIfRepeatImmediately() {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
-      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
@@ -108,7 +108,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldIncreaseTheIndex() {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerQuiz(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
@@ -118,13 +118,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer() {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Float baseIndex = memoryTracker.getForgettingCurveIndex();
       Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
       // Fast answer (10 seconds)
       answerDTO.setThinkingTimeMs(10000);
       controller.answerQuiz(recallPrompt, answerDTO);
-      Integer indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
+      Float indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
 
       // Reset and try slow answer (40 seconds)
       memoryTracker.setForgettingCurveIndex(baseIndex);
@@ -139,7 +139,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       answerDTO.setThinkingTimeMs(40000);
       answerDTO.setChoiceIndex(0);
       controller.answerQuiz(secondRecallPrompt, answerDTO);
-      Integer indexWithSlowAnswer = memoryTracker.getForgettingCurveIndex();
+      Float indexWithSlowAnswer = memoryTracker.getForgettingCurveIndex();
 
       assertThat(indexWithFastAnswer, greaterThan(indexWithSlowAnswer));
     }
@@ -147,13 +147,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment() {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Float baseIndex = memoryTracker.getForgettingCurveIndex();
       Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
       // Answer with base thinking time (base case)
       answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
       controller.answerQuiz(recallPrompt, answerDTO);
-      Integer indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
+      Float indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
 
       // Reset and answer without thinking time
       memoryTracker.setForgettingCurveIndex(baseIndex);
@@ -168,7 +168,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       answerDTO.setThinkingTimeMs(null);
       answerDTO.setChoiceIndex(0);
       controller.answerQuiz(secondRecallPrompt, answerDTO);
-      Integer indexWithoutThinkingTime = memoryTracker.getForgettingCurveIndex();
+      Float indexWithoutThinkingTime = memoryTracker.getForgettingCurveIndex();
 
       assertThat(indexWithBaseThinkingTime, equalTo(indexWithoutThinkingTime));
     }
@@ -202,7 +202,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldNotChangeTheLastRecalledAtTime() {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
-        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+        Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
         controller.answerQuiz(recallPrompt, answerDTO);
         assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));
@@ -372,7 +372,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
           makeMe
               .aMemoryTrackerFor(answerNote)
               .by(currentUser.getUser())
-              .forgettingCurveAndNextRecallAt(200)
+              .forgettingCurveAndNextRecallAt(200.0f)
               .spelling()
               .please();
       recallPrompt = makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
@@ -444,7 +444,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldNoteIncreaseIndexIfRepeatImmediately() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getLastRecalledAt());
-      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerSpelling(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
@@ -452,7 +452,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
     @Test
     void shouldIncreaseTheIndex() throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+      Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
       controller.answerSpelling(recallPrompt, answerDTO);
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
@@ -463,13 +463,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
     void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer()
         throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Float baseIndex = memoryTracker.getForgettingCurveIndex();
       Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
       // Fast answer (10 seconds)
       answerDTO.setThinkingTimeMs(10000);
       controller.answerSpelling(recallPrompt, answerDTO);
-      Integer indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
+      Float indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
 
       // Reset and try slow answer (40 seconds)
       memoryTracker.setForgettingCurveIndex(baseIndex);
@@ -481,7 +481,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       secondAnswerDTO.setSpellingAnswer(answerNote.getTitle());
       secondAnswerDTO.setThinkingTimeMs(40000);
       controller.answerSpelling(secondRecallPrompt, secondAnswerDTO);
-      Integer indexWithSlowAnswer = memoryTracker.getForgettingCurveIndex();
+      Float indexWithSlowAnswer = memoryTracker.getForgettingCurveIndex();
 
       assertThat(indexWithFastAnswer, greaterThan(indexWithSlowAnswer));
     }
@@ -490,13 +490,13 @@ class RecallPromptControllerTests extends ControllerTestBase {
     void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
         throws UnexpectedNoAccessRightException {
       testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
-      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Float baseIndex = memoryTracker.getForgettingCurveIndex();
       Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
 
       // Answer with base thinking time (base case)
       answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
       controller.answerSpelling(recallPrompt, answerDTO);
-      Integer indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
+      Float indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
 
       // Reset and answer without thinking time
       memoryTracker.setForgettingCurveIndex(baseIndex);
@@ -508,7 +508,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       secondAnswerDTO.setSpellingAnswer(answerNote.getTitle());
       secondAnswerDTO.setThinkingTimeMs(null);
       controller.answerSpelling(secondRecallPrompt, secondAnswerDTO);
-      Integer indexWithoutThinkingTime = memoryTracker.getForgettingCurveIndex();
+      Float indexWithoutThinkingTime = memoryTracker.getForgettingCurveIndex();
 
       assertThat(indexWithBaseThinkingTime, equalTo(indexWithoutThinkingTime));
     }
@@ -551,7 +551,7 @@ class RecallPromptControllerTests extends ControllerTestBase {
       void shouldNotChangeTheLastRecalledAtTime() throws UnexpectedNoAccessRightException {
         testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
         Timestamp lastRecalledAt = memoryTracker.getLastRecalledAt();
-        Integer oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
+        Float oldForgettingCurveIndex = memoryTracker.getForgettingCurveIndex();
         controller.answerSpelling(recallPrompt, answerDTO);
         assertThat(memoryTracker.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
         assertThat(memoryTracker.getLastRecalledAt(), equalTo(lastRecalledAt));

@@ -100,15 +100,15 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
     class EarlyAndLateReview {
       @ParameterizedTest
       @CsvSource({
-        "0, 0,  100",
-        "0, 1,  110",
-        "2, -1,  115",
-        "2, 0, 120",
-        "2, 1, 115",
-        "2, 100, 100",
+        "0, 0,  100.0",
+        "0, 1,  110.0",
+        "2, -1,  115.0",
+        "2, 0, 120.0",
+        "2, 1, 115.0",
+        "2, 100, 100.0",
       })
       void aMemoryTrackerHasBeenReviewedStrictly(
-          int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
+          int ntimes, Integer daysDelay, float expectedForgettingCurveIndex) {
         MemoryTracker memoryTracker =
             makeMe.aMemoryTrackerFor(note).by(user).afterNthStrictRepetition(ntimes).please();
         Timestamp currentUTCTimestamp =

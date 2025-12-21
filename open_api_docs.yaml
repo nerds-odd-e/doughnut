@@ -4137,8 +4137,8 @@ components:
           type: integer
           format: int32
         forgettingCurveIndex:
-          type: integer
-          format: int32
+          type: number
+          format: float
         removedFromTracking:
           type: boolean
         spelling:

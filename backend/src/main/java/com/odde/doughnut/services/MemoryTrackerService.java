@@ -83,11 +83,11 @@ public class MemoryTrackerService {
     memoryTracker.setUser(currentUser);
     memoryTracker.setAssimilatedAt(currentTime);
     memoryTracker.setLastRecalledAt(currentTime);
-    updateForgettingCurve(memoryTracker, 0);
+    updateForgettingCurve(memoryTracker, 0.0f);
     return memoryTracker;
   }
 
-  public void updateForgettingCurve(MemoryTracker memoryTracker, int adjustment) {
+  public void updateForgettingCurve(MemoryTracker memoryTracker, float adjustment) {
     memoryTracker.setForgettingCurveIndex(memoryTracker.getForgettingCurveIndex() + adjustment);
     memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
     entityPersister.save(memoryTracker);

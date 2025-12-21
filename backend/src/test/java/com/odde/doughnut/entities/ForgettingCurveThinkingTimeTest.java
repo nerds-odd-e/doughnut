@@ -14,73 +14,73 @@ import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import org.junit.jupiter.api.Test;
 
 public class ForgettingCurveThinkingTimeTest {
-  private ForgettingCurve createForgettingCurve(int forgettingCurveIndex) {
+  private ForgettingCurve createForgettingCurve(float forgettingCurveIndex) {
     return new ForgettingCurve(new SpacedRepetitionAlgorithm(null), forgettingCurveIndex);
   }
 
   @Test
   void baseCase_shouldHaveZeroAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithoutThinkingTime = curve.succeeded(0, null);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWithoutThinkingTime = curve.succeeded(0, null);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
     assertThat(indexWithBaseThinkingTime, equalTo(indexWithoutThinkingTime));
   }
 
   @Test
   void fastAnswer_shouldHavePositiveAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    int indexWith10Seconds = curve.succeeded(0, 10000);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWith10Seconds = curve.succeeded(0, 10000);
     assertThat(indexWith10Seconds, greaterThan(indexWithBaseThinkingTime));
   }
 
   @Test
   void slowAnswer_shouldHaveNegativeAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    int indexWith40Seconds = curve.succeeded(0, 40000);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWith40Seconds = curve.succeeded(0, 40000);
     assertThat(indexWith40Seconds, lessThan(indexWithBaseThinkingTime));
   }
 
   @Test
   void verySlowAnswer_shouldHaveNegativeAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    int indexWithMaxThinkingTime = curve.succeeded(0, MAX_THINKING_TIME_MS);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWithMaxThinkingTime = curve.succeeded(0, MAX_THINKING_TIME_MS);
     assertThat(indexWithMaxThinkingTime, lessThan(indexWithBaseThinkingTime));
   }
 
   @Test
   void veryFastAnswer_shouldHavePositiveAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    int indexWith0Seconds = curve.succeeded(0, 0);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWith0Seconds = curve.succeeded(0, 0);
     assertThat(indexWith0Seconds, greaterThan(indexWithBaseThinkingTime));
   }
 
   @Test
   void thinkingTimeAboveMax_shouldBeClamped() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithMaxThinkingTime = curve.succeeded(0, MAX_THINKING_TIME_MS);
-    int indexWith100Seconds = curve.succeeded(0, 100000);
+    float indexWithMaxThinkingTime = curve.succeeded(0, MAX_THINKING_TIME_MS);
+    float indexWith100Seconds = curve.succeeded(0, 100000);
     assertThat(indexWith100Seconds, equalTo(indexWithMaxThinkingTime));
   }
 
   @Test
   void nullThinkingTime_shouldHaveNoAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithNull = curve.succeeded(0, null);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWithNull = curve.succeeded(0, null);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
     assertThat(indexWithNull, equalTo(indexWithBaseThinkingTime));
   }
 
   @Test
   void thinkingTimeAdjustmentCombinedWithDelayAdjustment() {
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexOnTimeWithBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
-    int indexOnTimeWith10Seconds = curve.succeeded(0, 10000);
-    int indexLateWithBase = curve.succeeded(24, BASE_THINKING_TIME_MS);
-    int indexLateWith10Seconds = curve.succeeded(24, 10000);
+    float indexOnTimeWithBase = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexOnTimeWith10Seconds = curve.succeeded(0, 10000);
+    float indexLateWithBase = curve.succeeded(24, BASE_THINKING_TIME_MS);
+    float indexLateWith10Seconds = curve.succeeded(24, 10000);
 
     // Fast thinking time should increase index more than base thinking time
     assertThat(indexOnTimeWith10Seconds, greaterThan(indexOnTimeWithBase));
@@ -96,11 +96,11 @@ public class ForgettingCurveThinkingTimeTest {
     // This test ensures that when BASE_THINKING_TIME_MS is changed in the future,
     // developers will be reminded to adjust the scale if needed
     ForgettingCurve curve = createForgettingCurve(DEFAULT_FORGETTING_CURVE_INDEX + 20);
-    int indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
+    float indexWithBaseThinkingTime = curve.succeeded(0, BASE_THINKING_TIME_MS);
     // 0.001 seconds = 1 millisecond
-    int indexWithVeryFastThinkingTime = curve.succeeded(0, 1);
-    int adjustment = indexWithVeryFastThinkingTime - indexWithBaseThinkingTime;
+    float indexWithVeryFastThinkingTime = curve.succeeded(0, 1);
+    float adjustment = indexWithVeryFastThinkingTime - indexWithBaseThinkingTime;
     // When BASE_THINKING_TIME_MS is changed, the scale may need adjustment
-    assertThat(adjustment, lessThanOrEqualTo(DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / 2));
+    assertThat(adjustment, lessThanOrEqualTo((float) DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / 2));
   }
 }
