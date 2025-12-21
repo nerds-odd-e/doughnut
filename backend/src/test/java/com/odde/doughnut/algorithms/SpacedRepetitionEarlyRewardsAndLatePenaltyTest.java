@@ -17,65 +17,65 @@ import com.odde.doughnut.utils.TimestampOperations;
 import org.junit.jupiter.api.Test;
 
 public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
-  final int currentForgettingCurveIndex =
+  final float currentForgettingCurveIndex =
       DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2;
-  final int baselineForgettingCurveIndex =
+  final float baselineForgettingCurveIndex =
       DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 3;
 
   @Test
   void repeatOnTime() {
-    int index = getNextForgettingCurveIndexWithDelay(0);
+    float index = getNextForgettingCurveIndexWithDelay(0);
     assertThat(index, equalTo(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_immediatelyWhichIsImpossible() {
-    int index = getNextForgettingCurveIndexWithDelay(-9 * 24);
+    float index = getNextForgettingCurveIndexWithDelay(-9 * 24);
     assertThat(index, equalTo(currentForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_inOneHour() {
-    int index = getNextForgettingCurveIndexWithDelay(-9 * 24 + 1);
+    float index = getNextForgettingCurveIndexWithDelay(-9 * 24 + 1);
     assertThat(index, greaterThanOrEqualTo(currentForgettingCurveIndex));
     assertThat(index, lessThan(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_OneHourEarlier() {
-    int index = getNextForgettingCurveIndexWithDelay(-1);
+    float index = getNextForgettingCurveIndexWithDelay(-1);
     assertThat(index, greaterThan(currentForgettingCurveIndex));
     assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatLate_byOneHour() {
-    int index = getNextForgettingCurveIndexWithDelay(1);
+    float index = getNextForgettingCurveIndexWithDelay(1);
     assertThat(index, greaterThan(currentForgettingCurveIndex));
     assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatLate_byOneDay() {
-    int index = getNextForgettingCurveIndexWithDelay(24);
+    float index = getNextForgettingCurveIndexWithDelay(24);
     assertThat(index, greaterThan(currentForgettingCurveIndex));
     assertThat(index, lessThan(baselineForgettingCurveIndex));
   }
 
   @Test
   void repeatLate_by10Days() {
-    int index = getNextForgettingCurveIndexWithDelay(10 * 24);
+    float index = getNextForgettingCurveIndexWithDelay(10 * 24);
     assertThat(index, lessThan(currentForgettingCurveIndex));
     assertThat(index, greaterThan(DEFAULT_FORGETTING_CURVE_INDEX));
   }
 
   @Test
   void repeatLate_byOneHundredDays() {
-    int index = getNextForgettingCurveIndexWithDelay(100 * 24);
+    float index = getNextForgettingCurveIndexWithDelay(100 * 24);
     assertThat(index, equalTo(DEFAULT_FORGETTING_CURVE_INDEX));
   }
 
-  private int getNextForgettingCurveIndexWithDelay(int delayInHours) {
+  private float getNextForgettingCurveIndexWithDelay(int delayInHours) {
     MakeMe makeMe = MakeMe.makeMeWithoutFactoryService();
     User user = makeMe.aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
     Note note = makeMe.aNote().inMemoryPlease();

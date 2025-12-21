@@ -3,21 +3,21 @@ package com.odde.doughnut.entities;
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 
 public class ForgettingCurve {
-  public static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
+  public static final Float DEFAULT_FORGETTING_CURVE_INDEX = 100.0f;
   public static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
   public static final Integer BASE_THINKING_TIME_MS = 25000; // 25 seconds
   public static final Integer MAX_THINKING_TIME_MS = 60000; // 60 seconds
   private SpacedRepetitionAlgorithm spacedRepetitionAlgorithm;
-  private Integer forgettingCurveIndex;
+  private Float forgettingCurveIndex;
 
   public ForgettingCurve(
-      SpacedRepetitionAlgorithm spacedRepetitionAlgorithm, Integer forgettingCurveIndex) {
+      SpacedRepetitionAlgorithm spacedRepetitionAlgorithm, Float forgettingCurveIndex) {
     this.spacedRepetitionAlgorithm = spacedRepetitionAlgorithm;
     this.forgettingCurveIndex = forgettingCurveIndex;
   }
 
-  private int add(int adjustment) {
-    int newIndex = forgettingCurveIndex + adjustment;
+  private float add(float adjustment) {
+    float newIndex = forgettingCurveIndex + adjustment;
     if (newIndex < DEFAULT_FORGETTING_CURVE_INDEX) {
       newIndex = DEFAULT_FORGETTING_CURVE_INDEX;
     }
@@ -31,24 +31,23 @@ public class ForgettingCurve {
     return spacedRepetitionAlgorithm.getRepeatInHours(index);
   }
 
-  int succeeded(long delayInHours, Integer thinkingTimeMs) {
-    int delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+  float succeeded(long delayInHours, Integer thinkingTimeMs) {
+    float delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     Integer oldRepeatInHours = getRepeatInHours();
     if (oldRepeatInHours > 0) {
       delayAdjustment =
-          (int)
-              (DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
-                  - Math.abs(delayInHours)
-                      * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
-                      / oldRepeatInHours);
+          DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
+              - Math.abs(delayInHours)
+                  * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
+                  / (float) oldRepeatInHours;
     }
-    int thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
+    float thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
     return add(delayAdjustment + thinkingTimeAdjustment);
   }
 
-  private int calculateThinkingTimeAdjustment(Integer thinkingTimeMs) {
+  private float calculateThinkingTimeAdjustment(Integer thinkingTimeMs) {
     if (thinkingTimeMs == null) {
-      return 0;
+      return 0.0f;
     }
     // Clamp thinking time to 0-MAX_THINKING_TIME_MS
     int clampedMs = Math.max(0, Math.min(MAX_THINKING_TIME_MS, thinkingTimeMs));
@@ -64,10 +63,10 @@ public class ForgettingCurve {
       adjustmentValue = -adjustmentValue;
     }
 
-    return (int) Math.round(adjustmentValue);
+    return (float) adjustmentValue;
   }
 
-  public int failed() {
+  public float failed() {
     return add(-DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2);
   }
 }
