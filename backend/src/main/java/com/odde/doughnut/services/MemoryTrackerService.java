@@ -97,6 +97,8 @@ public class MemoryTrackerService {
       User user, Timestamp currentUTCTimestamp, Boolean correct, RecallPrompt recallPrompt) {
     List<MemoryTracker> memoryTrackers =
         userService.getMemoryTrackersFor(user, recallPrompt.getPredefinedQuestion().getNote());
+    Integer thinkingTimeMs =
+        recallPrompt.getAnswer() != null ? recallPrompt.getAnswer().getThinkingTimeMs() : null;
     memoryTrackers.stream()
         .filter(
             tracker -> {
@@ -104,12 +106,17 @@ public class MemoryTrackerService {
               return !Boolean.TRUE.equals(trackerSpelling);
             })
         .findFirst()
-        .ifPresent(memoryTracker -> markAsRepeated(currentUTCTimestamp, correct, memoryTracker));
+        .ifPresent(
+            memoryTracker ->
+                markAsRepeated(currentUTCTimestamp, correct, memoryTracker, thinkingTimeMs));
   }
 
   public void markAsRepeated(
-      Timestamp currentUTCTimestamp, Boolean correct, MemoryTracker memoryTracker) {
-    memoryTracker.markAsRepeated(currentUTCTimestamp, correct);
+      Timestamp currentUTCTimestamp,
+      Boolean correct,
+      MemoryTracker memoryTracker,
+      Integer thinkingTimeMs) {
+    memoryTracker.markAsRepeated(currentUTCTimestamp, correct, thinkingTimeMs);
     entityPersister.save(memoryTracker);
   }
 
@@ -121,7 +128,8 @@ public class MemoryTrackerService {
     String spellingAnswer = answerSpellingDTO.getSpellingAnswer();
     Note note = memoryTracker.getNote();
     Boolean correct = note.matchAnswer(spellingAnswer);
-    markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
+    markAsRepeated(
+        currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
   }
 
@@ -172,7 +180,8 @@ public class MemoryTrackerService {
     recallPrompt.setAnswer(answer);
     entityPersister.save(recallPrompt);
 
-    markAsRepeated(currentUTCTimestamp, correct, memoryTracker);
+    markAsRepeated(
+        currentUTCTimestamp, correct, memoryTracker, answerSpellingDTO.getThinkingTimeMs());
     return new SpellingResultDTO(note, spellingAnswer, correct, memoryTracker.getId());
   }
 }

@@ -5,6 +5,8 @@ import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 public class ForgettingCurve {
   public static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
   public static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
+  public static final Integer BASE_THINKING_TIME_MS = 25000; // 25 seconds
+  public static final Integer MAX_THINKING_TIME_MS = 60000; // 60 seconds
   private SpacedRepetitionAlgorithm spacedRepetitionAlgorithm;
   private Integer forgettingCurveIndex;
 
@@ -29,7 +31,7 @@ public class ForgettingCurve {
     return spacedRepetitionAlgorithm.getRepeatInHours(index);
   }
 
-  int succeeded(long delayInHours) {
+  int succeeded(long delayInHours, Integer thinkingTimeMs) {
     int delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     Integer oldRepeatInHours = getRepeatInHours();
     if (oldRepeatInHours > 0) {
@@ -40,7 +42,29 @@ public class ForgettingCurve {
                       * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
                       / oldRepeatInHours);
     }
-    return add(delayAdjustment);
+    int thinkingTimeAdjustment = calculateThinkingTimeAdjustment(thinkingTimeMs);
+    return add(delayAdjustment + thinkingTimeAdjustment);
+  }
+
+  private int calculateThinkingTimeAdjustment(Integer thinkingTimeMs) {
+    if (thinkingTimeMs == null) {
+      return 0;
+    }
+    // Clamp thinking time to 0-MAX_THINKING_TIME_MS
+    int clampedMs = Math.max(0, Math.min(MAX_THINKING_TIME_MS, thinkingTimeMs));
+    double thinkingTimeSeconds = clampedMs / 1000.0;
+    double baseThinkingTimeSeconds = BASE_THINKING_TIME_MS / 1000.0;
+
+    // Base is BASE_THINKING_TIME_MS, adjustment = 0 at that point
+    double diff = Math.abs(thinkingTimeSeconds - baseThinkingTimeSeconds);
+    double adjustmentValue = Math.sqrt(diff);
+
+    // Negative when thinking time > base thinking time
+    if (thinkingTimeSeconds > baseThinkingTimeSeconds) {
+      adjustmentValue = -adjustmentValue;
+    }
+
+    return (int) Math.round(adjustmentValue);
   }
 
   public int failed() {

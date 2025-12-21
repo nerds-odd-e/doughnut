@@ -114,7 +114,7 @@ public class RecallServiceWithSpacedRepetitionAlgorithmTest {
         Timestamp currentUTCTimestamp =
             TimestampOperations.addHoursToTimestamp(
                 memoryTracker.getNextRecallAt(), daysDelay * 24);
-        memoryTracker.markAsRepeated(currentUTCTimestamp, true);
+        memoryTracker.markAsRepeated(currentUTCTimestamp, true, null);
         assertThat(memoryTracker.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
       }
     }

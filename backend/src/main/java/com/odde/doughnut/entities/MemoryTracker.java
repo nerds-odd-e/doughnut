@@ -93,20 +93,21 @@ public class MemoryTracker extends EntityIdentifiedByIdOnly {
     setNextRecallAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
   }
 
-  public void reviewedSuccessfully(Timestamp currentUTCTimestamp) {
+  public void reviewedSuccessfully(Timestamp currentUTCTimestamp, Integer thinkingTimeMs) {
     long delayInHours =
         TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextRecallAt());
 
-    setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours));
+    setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours, thinkingTimeMs));
 
     setLastRecalledAt(currentUTCTimestamp);
     setNextRecallAt(calculateNextRecallAt());
   }
 
-  public void markAsRepeated(Timestamp currentUTCTimestamp, boolean successful) {
+  public void markAsRepeated(
+      Timestamp currentUTCTimestamp, boolean successful, Integer thinkingTimeMs) {
     setRepetitionCount(getRepetitionCount() + 1);
     if (successful) {
-      reviewedSuccessfully(currentUTCTimestamp);
+      reviewedSuccessfully(currentUTCTimestamp, thinkingTimeMs);
     } else {
       reviewFailed(currentUTCTimestamp);
     }

@@ -116,6 +116,64 @@ class RecallPromptControllerTests extends ControllerTestBase {
     }
 
     @Test
+    void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer() {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
+
+      // Fast answer (10 seconds)
+      answerDTO.setThinkingTimeMs(10000);
+      controller.answerQuiz(recallPrompt, answerDTO);
+      Integer indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
+
+      // Reset and try slow answer (40 seconds)
+      memoryTracker.setForgettingCurveIndex(baseIndex);
+      memoryTracker.setLastRecalledAt(baseLastRecalledAt);
+      memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      RecallPrompt secondRecallPrompt =
+          makeMe
+              .aRecallPrompt()
+              .ofAIGeneratedQuestion(mcqWithAnswer, memoryTracker.getNote())
+              .please();
+      answerDTO.setThinkingTimeMs(40000);
+      answerDTO.setChoiceIndex(0);
+      controller.answerQuiz(secondRecallPrompt, answerDTO);
+      Integer indexWithSlowAnswer = memoryTracker.getForgettingCurveIndex();
+
+      assertThat(indexWithFastAnswer, greaterThan(indexWithSlowAnswer));
+    }
+
+    @Test
+    void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment() {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
+
+      // Answer with base thinking time (base case)
+      answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
+      controller.answerQuiz(recallPrompt, answerDTO);
+      Integer indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
+
+      // Reset and answer without thinking time
+      memoryTracker.setForgettingCurveIndex(baseIndex);
+      memoryTracker.setLastRecalledAt(baseLastRecalledAt);
+      memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+      MCQWithAnswer mcqWithAnswer = makeMe.aMCQWithAnswer().please();
+      RecallPrompt secondRecallPrompt =
+          makeMe
+              .aRecallPrompt()
+              .ofAIGeneratedQuestion(mcqWithAnswer, memoryTracker.getNote())
+              .please();
+      answerDTO.setThinkingTimeMs(null);
+      answerDTO.setChoiceIndex(0);
+      controller.answerQuiz(secondRecallPrompt, answerDTO);
+      Integer indexWithoutThinkingTime = memoryTracker.getForgettingCurveIndex();
+
+      assertThat(indexWithBaseThinkingTime, equalTo(indexWithoutThinkingTime));
+    }
+
+    @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       AnswerDTO answer = new AnswerDTO();
       assertThrows(
@@ -399,6 +457,60 @@ class RecallPromptControllerTests extends ControllerTestBase {
       assertThat(memoryTracker.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
       assertThat(
           memoryTracker.getLastRecalledAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
+    }
+
+    @Test
+    void fastAnswer_shouldIncreaseIndexMoreThanSlowAnswer()
+        throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
+
+      // Fast answer (10 seconds)
+      answerDTO.setThinkingTimeMs(10000);
+      controller.answerSpelling(recallPrompt, answerDTO);
+      Integer indexWithFastAnswer = memoryTracker.getForgettingCurveIndex();
+
+      // Reset and try slow answer (40 seconds)
+      memoryTracker.setForgettingCurveIndex(baseIndex);
+      memoryTracker.setLastRecalledAt(baseLastRecalledAt);
+      memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+      RecallPrompt secondRecallPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+      AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
+      secondAnswerDTO.setSpellingAnswer(answerNote.getTitle());
+      secondAnswerDTO.setThinkingTimeMs(40000);
+      controller.answerSpelling(secondRecallPrompt, secondAnswerDTO);
+      Integer indexWithSlowAnswer = memoryTracker.getForgettingCurveIndex();
+
+      assertThat(indexWithFastAnswer, greaterThan(indexWithSlowAnswer));
+    }
+
+    @Test
+    void answerWithBaseThinkingTime_shouldHaveNoThinkingTimeAdjustment()
+        throws UnexpectedNoAccessRightException {
+      testabilitySettings.timeTravelTo(memoryTracker.getNextRecallAt());
+      Integer baseIndex = memoryTracker.getForgettingCurveIndex();
+      Timestamp baseLastRecalledAt = memoryTracker.getLastRecalledAt();
+
+      // Answer with base thinking time (base case)
+      answerDTO.setThinkingTimeMs(ForgettingCurve.BASE_THINKING_TIME_MS);
+      controller.answerSpelling(recallPrompt, answerDTO);
+      Integer indexWithBaseThinkingTime = memoryTracker.getForgettingCurveIndex();
+
+      // Reset and answer without thinking time
+      memoryTracker.setForgettingCurveIndex(baseIndex);
+      memoryTracker.setLastRecalledAt(baseLastRecalledAt);
+      memoryTracker.setNextRecallAt(memoryTracker.calculateNextRecallAt());
+      RecallPrompt secondRecallPrompt =
+          makeMe.aRecallPrompt().forMemoryTracker(memoryTracker).spelling().please();
+      AnswerSpellingDTO secondAnswerDTO = new AnswerSpellingDTO();
+      secondAnswerDTO.setSpellingAnswer(answerNote.getTitle());
+      secondAnswerDTO.setThinkingTimeMs(null);
+      controller.answerSpelling(secondRecallPrompt, secondAnswerDTO);
+      Integer indexWithoutThinkingTime = memoryTracker.getForgettingCurveIndex();
+
+      assertThat(indexWithBaseThinkingTime, equalTo(indexWithoutThinkingTime));
     }
 
     @Test

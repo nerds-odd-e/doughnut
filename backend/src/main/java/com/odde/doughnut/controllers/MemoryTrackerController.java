@@ -88,7 +88,7 @@ class MemoryTrackerController {
       @RequestParam("successful") boolean successful) {
     authorizationService.assertLoggedIn();
     memoryTrackerService.markAsRepeated(
-        testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker);
+        testabilitySettings.getCurrentUTCTimestamp(), successful, memoryTracker, null);
     return memoryTracker;
   }
 
