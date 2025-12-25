@@ -51,8 +51,8 @@ importers:
         specifier: ^1.25.1
         version: 1.25.1(hono@4.11.1)(zod@4.2.1)
       '@redocly/cli':
-        specifier: ^2.14.0
-        version: 2.14.0(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
+        specifier: ^2.14.1
+        version: 2.14.1(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.8.1)
@@ -1358,8 +1358,8 @@ packages:
   '@redocly/ajv@8.17.1':
     resolution: {integrity: sha512-EDtsGZS964mf9zAUXAl9Ew16eYbeyAFWhsPr0fX6oaJxgd8rApYlPBf0joyhnUHz88WxrigyFtTaqqzXNzPgqw==}
 
-  '@redocly/cli@2.14.0':
-    resolution: {integrity: sha512-LvVYV7KJGtVqltBc8Cbw2s4QpFOzend5nCsgR1JgWvHNt70f1AzqoHr5y7GO+3ThwumrTzPvjta+Ln+n3x5NmA==}
+  '@redocly/cli@2.14.1':
+    resolution: {integrity: sha512-Fz9qSkUz/CZgO4xnlPiRBMjwTqH1VxKlO3y8gOrEHOtr2v4peO2Fvbpz30iipTHkbrCt8UorZelXM1TEqkYHSQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1373,12 +1373,12 @@ packages:
     resolution: {integrity: sha512-2+O+riuIUgVSuLl3Lyh5AplWZyVMNuG2F98/o6NrutKJfW4/GTZdPpZlIphS0HGgcOHgmWcCSHj+dWFlZaGSHw==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.14.0':
-    resolution: {integrity: sha512-GeSIesfbh5TdqoWBu7wPzCAGUvKfLBnN60rKnhZCyxrs6M0tn7GYhtET+P5HsNlXmvW4vFNDBlLDoATW/dKrrQ==}
+  '@redocly/openapi-core@2.14.1':
+    resolution: {integrity: sha512-WKjfdnUalQfNnQfbkCg+uXEDydq7/g8t1VbzK6Nm6M/4JBjQlnUdo5kV9CLWM3IcdVHm9idovIW6cej2NRb2eA==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.14.0':
-    resolution: {integrity: sha512-7HYB66oNUOcBjBZpK/i5xPpXIYXt09a98WX0subaAQZJinLGq8D3hbgLAp+pXZgosHNeZ0QKahOExsZ25JZSHw==}
+  '@redocly/respect-core@2.14.1':
+    resolution: {integrity: sha512-WhAvjiEAbfd1unNAqVCTFny2PkuVOAK1eZ5JE6p1iHgLIoLZX0tdjM1+ht56AWE2hZ/TkcKDDP45GDqfBymi0w==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/pluginutils@1.0.0-beta.53':
@@ -5489,8 +5489,8 @@ packages:
     engines: {node: '>=18.18.0'}
     hasBin: true
 
-  systeminformation@5.27.16:
-    resolution: {integrity: sha512-aimHO/bE7QFtu3uB3vtpwn7V2DXXGX7NyTY7V1g+hPa7in2k10Bp3AL+Enmg3X71n7HbgLfwy/bbf+2cBSKURQ==}
+  systeminformation@5.27.17:
+    resolution: {integrity: sha512-aWH+WoKHOGV5qBI9IPzFSwmLXrUSukF8aKXhWDZU990kKs65b+LSD69/1P0PKDweu9o8oCMW9QkJGG9R8FLi5A==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -7455,14 +7455,14 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.14.0(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
+  '@redocly/cli@2.14.1(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.14.0(ajv@8.17.1)
-      '@redocly/respect-core': 2.14.0(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.1(ajv@8.17.1)
+      '@redocly/respect-core': 2.14.1(ajv@8.17.1)
       abort-controller: 3.0.0
       chokidar: 3.6.0
       colorette: 1.4.0
@@ -7514,7 +7514,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.14.0(ajv@8.17.1)':
+  '@redocly/openapi-core@2.14.1(ajv@8.17.1)':
     dependencies:
       '@redocly/ajv': 8.17.1
       '@redocly/config': 0.41.1
@@ -7528,12 +7528,12 @@ snapshots:
     transitivePeerDependencies:
       - ajv
 
-  '@redocly/respect-core@2.14.0(ajv@8.17.1)':
+  '@redocly/respect-core@2.14.1(ajv@8.17.1)':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.17.1
-      '@redocly/openapi-core': 2.14.0(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.1(ajv@8.17.1)
       better-ajv-errors: 1.2.0(ajv@8.17.1)
       colorette: 2.0.20
       json-pointer: 0.6.2
@@ -9043,7 +9043,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.27.16
+      systeminformation: 5.27.17
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -10895,7 +10895,7 @@ snapshots:
       oas-kit-common: 1.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
 
   oas-schema-walker@1.1.5: {}
 
@@ -12078,7 +12078,7 @@ snapshots:
       oas-validator: 5.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
     transitivePeerDependencies:
       - encoding
 
@@ -12106,7 +12106,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  systeminformation@5.27.16: {}
+  systeminformation@5.27.17: {}
 
   tagged-tag@1.0.0: {}
 
