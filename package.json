@@ -61,7 +61,7 @@
     "@badeball/cypress-cucumber-preprocessor": "^24.0.0",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.8",
     "@biomejs/biome": "2.3.10",
-    "@cucumber/cucumber": "^12.4.0",
+    "@cucumber/cucumber": "^12.5.0",
     "@hey-api/openapi-ts": "0.89.2",
     "@mbtest/mountebank": "2.9.2",
     "@modelcontextprotocol/sdk": "^1.25.1",

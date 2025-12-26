@@ -39,8 +39,8 @@ importers:
         specifier: 2.3.10
         version: 2.3.10
       '@cucumber/cucumber':
-        specifier: ^12.4.0
-        version: 12.4.0
+        specifier: ^12.5.0
+        version: 12.5.0
       '@hey-api/openapi-ts':
         specifier: 0.89.2
         version: 0.89.2(typescript@5.9.3)
@@ -202,8 +202,8 @@ importers:
         specifier: ^3.14.2
         version: 3.14.2
       jsdom:
-        specifier: ^27.3.0
-        version: 27.3.0
+        specifier: ^27.4.0
+        version: 27.4.0
       optionator:
         specifier: ^0.9.4
         version: 0.9.4
@@ -254,13 +254,13 @@ importers:
         version: 6.0.3(typescript@5.9.3)(vite@7.3.0(@types/node@25.0.3)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       vitest:
         specifier: 4.0.16
-        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
       vitest-dom:
         specifier: ^0.1.1
-        version: 0.1.1(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 0.1.1(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       vitest-fetch-mock:
         specifier: ^0.4.5
-        version: 0.4.5(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 0.4.5(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
       vue:
         specifier: 3.5.26
         version: 3.5.26(typescript@5.9.3)
@@ -611,8 +611,8 @@ packages:
   '@cucumber/cucumber-expressions@18.0.1':
     resolution: {integrity: sha512-NSid6bI+7UlgMywl5octojY5NXnxR9uq+JisjOrO52VbFsQM6gTWuQFE8syI10KnIBEdPzuEUSVEeZ0VFzRnZA==}
 
-  '@cucumber/cucumber@12.4.0':
-    resolution: {integrity: sha512-zGtGIx4Q/+AMbZclgCOvlbJzQxFd35/gpnB+bbpRGarsQks8nL4MxoHz9qn/sYzqBiFPgnv29wcL8r4nOb8r3g==}
+  '@cucumber/cucumber@12.5.0':
+    resolution: {integrity: sha512-+VWxkIIpm5EWFfaF3grP1GlHobzlDBIF54FqJutdYmfpx3LJc+IS8uWdIN97m6zxizo5CPrUopTWkxzwVswUzg==}
     engines: {node: 20 || 22 || >=24}
     hasBin: true
 
@@ -631,16 +631,8 @@ packages:
   '@cucumber/gherkin@34.0.0':
     resolution: {integrity: sha512-659CCFsrsyvuBi/Eix1fnhSheMnojSfnBcqJ3IMPNawx7JlrNJDcXYSSdxcUw3n/nG05P+ptCjmiZY3i14p+tA==}
 
-  '@cucumber/gherkin@37.0.0':
-    resolution: {integrity: sha512-vKJVJ6h4HCktG870wgYUUskNpFxbFI0WmAkVLPTz1LlLwJX7/KOBqFcr2/L3u0pPoHjbLRW+IpbiXLT2T13/wg==}
-
   '@cucumber/gherkin@37.0.1':
     resolution: {integrity: sha512-VmX+PKa9vqKZiycZoQKYlCsA0N7gAfiOfrcHSjK+suEVUwvKEH2sjO47NznrFFLmVWYTRmw3DLHQnpBAznkYEA==}
-
-  '@cucumber/html-formatter@22.2.0':
-    resolution: {integrity: sha512-fUNC/KngTIz+hAQ2Yr4XjdYq+MO60PwK9SidxBQ54jNI1Vw7erlgsPq0TOWneCIvdjU3qp+YDqYG1hw3zuUuDA==}
-    peerDependencies:
-      '@cucumber/messages': '>=18'
 
   '@cucumber/html-formatter@22.3.0':
     resolution: {integrity: sha512-0s3G7kznCRDiiesQ4K0yBdswGqU9E0j2AWUug41NpedBzhaY+Hn192ANRF597GZtuWrCjE53aFb3fOyOsT8B+g==}
@@ -662,9 +654,6 @@ packages:
 
   '@cucumber/messages@29.0.1':
     resolution: {integrity: sha512-aAvIYfQD6/aBdF8KFQChC3CQ1Q+GX9orlR6GurGiX6oqaCnBkxA4WU3OQUVepDynEFrPayerqKRFcAMhdcXReQ==}
-
-  '@cucumber/messages@31.0.0':
-    resolution: {integrity: sha512-Dqhatp4AjMsH9SREfWz3Q8nlGuwJMTW7YAW5L3OzRId86ZUEu/a8vIL1RO2c0agQefuBS2SVH9fEZ66ovrMYRA==}
 
   '@cucumber/messages@31.1.0':
     resolution: {integrity: sha512-BViwUQ9YMjcGL98Ww2QHMgu3S4JLUjbTz+Jo/jsq+8ZjS47/2v3IszpD6e12Y6IzZoGfrZriauZHPQ4PAmN9XA==}
@@ -3553,10 +3542,6 @@ packages:
     resolution: {integrity: sha512-oWv4T4yJ52iKrufjnyZPkrN0CH3QnrUqdB6In1g5Fe1mia8GmF36gnfNySxoZtxD5+NmYw1EElVXiBk93UeskA==}
     engines: {node: '>=12'}
 
-  html-encoding-sniffer@4.0.0:
-    resolution: {integrity: sha512-Y22oTqIU4uuPgEemfz7NDJz6OeKf12Lsu+QC+s3BVpda64lTiMYCyGwg5ki4vFxkMwQdeZDl2adZoqUgdFuTgQ==}
-    engines: {node: '>=18'}
-
   html-encoding-sniffer@6.0.0:
     resolution: {integrity: sha512-CV9TW3Y3f8/wT0BRFc1/KAVQ3TUHiXmaAb6VW9vtiMFf7SLoMd1PdAc4W3KFOFETBJUb90KatHqlsZMWV+R9Gg==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
@@ -3941,15 +3926,6 @@ packages:
     engines: {node: '>=14'}
     peerDependencies:
       canvas: ^2.5.0
-    peerDependenciesMeta:
-      canvas:
-        optional: true
-
-  jsdom@27.3.0:
-    resolution: {integrity: sha512-GtldT42B8+jefDUC4yUKAvsaOrH7PDHmZxZXNgF2xMmymjUbRYJvpAybZAKEmXDGTM0mCsz8duOa4vTm5AY2Kg==}
-    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
-    peerDependencies:
-      canvas: ^3.0.0
     peerDependenciesMeta:
       canvas:
         optional: true
@@ -6152,10 +6128,6 @@ packages:
     resolution: {integrity: sha512-p41ogyeMUrw3jWclHWTQg1k05DSVXPLcVxRTYsXUk+ZooOCZLcoYgPZ/HL/D/N+uQPOtcp1me1WhBEaX02mhWg==}
     engines: {node: '>=12'}
 
-  whatwg-encoding@3.1.1:
-    resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
-    engines: {node: '>=18'}
-
   whatwg-mimetype@3.0.0:
     resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
     engines: {node: '>=12'}
@@ -6680,13 +6652,13 @@ snapshots:
   '@badeball/cypress-cucumber-preprocessor@24.0.0(@babel/core@7.28.5)(cypress@15.8.1)(typescript@5.9.3)':
     dependencies:
       '@cucumber/ci-environment': 12.0.0
-      '@cucumber/cucumber': 12.4.0
+      '@cucumber/cucumber': 12.5.0
       '@cucumber/cucumber-expressions': 18.0.1
       '@cucumber/gherkin': 37.0.1
       '@cucumber/html-formatter': 22.3.0(@cucumber/messages@31.1.0)
       '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.1.0)
       '@cucumber/messages': 31.1.0
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.1.0)
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.5.0)(@cucumber/messages@31.1.0)
       '@cucumber/tag-expressions': 8.1.0
       '@jridgewell/trace-mapping': 0.3.31
       base64-js: 1.5.1
@@ -6785,18 +6757,18 @@ snapshots:
     dependencies:
       regexp-match-indices: 1.0.2
 
-  '@cucumber/cucumber@12.4.0':
+  '@cucumber/cucumber@12.5.0':
     dependencies:
       '@cucumber/ci-environment': 12.0.0
       '@cucumber/cucumber-expressions': 18.0.1
-      '@cucumber/gherkin': 37.0.0
-      '@cucumber/gherkin-streams': 6.0.0(@cucumber/gherkin@37.0.0)(@cucumber/message-streams@4.0.1(@cucumber/messages@31.0.0))(@cucumber/messages@31.0.0)
+      '@cucumber/gherkin': 37.0.1
+      '@cucumber/gherkin-streams': 6.0.0(@cucumber/gherkin@37.0.1)(@cucumber/message-streams@4.0.1(@cucumber/messages@31.1.0))(@cucumber/messages@31.1.0)
       '@cucumber/gherkin-utils': 10.0.0
-      '@cucumber/html-formatter': 22.2.0(@cucumber/messages@31.0.0)
-      '@cucumber/junit-xml-formatter': 0.9.0(@cucumber/messages@31.0.0)
-      '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.0.0)
-      '@cucumber/messages': 31.0.0
-      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.0.0)
+      '@cucumber/html-formatter': 22.3.0(@cucumber/messages@31.1.0)
+      '@cucumber/junit-xml-formatter': 0.9.0(@cucumber/messages@31.1.0)
+      '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.1.0)
+      '@cucumber/messages': 31.1.0
+      '@cucumber/pretty-formatter': 1.0.1(@cucumber/cucumber@12.5.0)(@cucumber/messages@31.1.0)
       '@cucumber/tag-expressions': 8.1.0
       assertion-error-formatter: 3.0.0
       capital-case: 1.0.4
@@ -6828,11 +6800,11 @@ snapshots:
       yaml: 2.8.2
       yup: 1.7.1
 
-  '@cucumber/gherkin-streams@6.0.0(@cucumber/gherkin@37.0.0)(@cucumber/message-streams@4.0.1(@cucumber/messages@31.0.0))(@cucumber/messages@31.0.0)':
+  '@cucumber/gherkin-streams@6.0.0(@cucumber/gherkin@37.0.1)(@cucumber/message-streams@4.0.1(@cucumber/messages@31.1.0))(@cucumber/messages@31.1.0)':
     dependencies:
-      '@cucumber/gherkin': 37.0.0
-      '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.0.0)
-      '@cucumber/messages': 31.0.0
+      '@cucumber/gherkin': 37.0.1
+      '@cucumber/message-streams': 4.0.1(@cucumber/messages@31.1.0)
+      '@cucumber/messages': 31.1.0
       commander: 14.0.0
       source-map-support: 0.5.21
 
@@ -6848,33 +6820,21 @@ snapshots:
     dependencies:
       '@cucumber/messages': 28.1.0
 
-  '@cucumber/gherkin@37.0.0':
-    dependencies:
-      '@cucumber/messages': 31.0.0
-
   '@cucumber/gherkin@37.0.1':
     dependencies:
       '@cucumber/messages': 31.1.0
-
-  '@cucumber/html-formatter@22.2.0(@cucumber/messages@31.0.0)':
-    dependencies:
-      '@cucumber/messages': 31.0.0
 
   '@cucumber/html-formatter@22.3.0(@cucumber/messages@31.1.0)':
     dependencies:
       '@cucumber/messages': 31.1.0
 
-  '@cucumber/junit-xml-formatter@0.9.0(@cucumber/messages@31.0.0)':
+  '@cucumber/junit-xml-formatter@0.9.0(@cucumber/messages@31.1.0)':
     dependencies:
-      '@cucumber/messages': 31.0.0
-      '@cucumber/query': 14.7.0(@cucumber/messages@31.0.0)
+      '@cucumber/messages': 31.1.0
+      '@cucumber/query': 14.7.0(@cucumber/messages@31.1.0)
       '@teppeis/multimaps': 3.0.0
       luxon: 3.7.2
       xmlbuilder: 15.1.1
-
-  '@cucumber/message-streams@4.0.1(@cucumber/messages@31.0.0)':
-    dependencies:
-      '@cucumber/messages': 31.0.0
 
   '@cucumber/message-streams@4.0.1(@cucumber/messages@31.1.0)':
     dependencies:
@@ -6892,37 +6852,23 @@ snapshots:
       class-transformer: 0.5.1
       reflect-metadata: 0.2.2
 
-  '@cucumber/messages@31.0.0':
-    dependencies:
-      class-transformer: 0.5.1
-      reflect-metadata: 0.2.2
-
   '@cucumber/messages@31.1.0':
     dependencies:
       class-transformer: 0.5.1
       reflect-metadata: 0.2.2
 
-  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.0.0)':
+  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@12.5.0)(@cucumber/messages@31.1.0)':
     dependencies:
-      '@cucumber/cucumber': 12.4.0
-      '@cucumber/messages': 31.0.0
-      ansi-styles: 5.2.0
-      cli-table3: 0.6.5
-      figures: 3.2.0
-      ts-dedent: 2.2.0
-
-  '@cucumber/pretty-formatter@1.0.1(@cucumber/cucumber@12.4.0)(@cucumber/messages@31.1.0)':
-    dependencies:
-      '@cucumber/cucumber': 12.4.0
+      '@cucumber/cucumber': 12.5.0
       '@cucumber/messages': 31.1.0
       ansi-styles: 5.2.0
       cli-table3: 0.6.5
       figures: 3.2.0
       ts-dedent: 2.2.0
 
-  '@cucumber/query@14.7.0(@cucumber/messages@31.0.0)':
+  '@cucumber/query@14.7.0(@cucumber/messages@31.1.0)':
     dependencies:
-      '@cucumber/messages': 31.0.0
+      '@cucumber/messages': 31.1.0
       '@teppeis/multimaps': 3.0.0
       lodash.sortby: 4.7.0
 
@@ -10004,10 +9950,6 @@ snapshots:
     dependencies:
       whatwg-encoding: 2.0.0
 
-  html-encoding-sniffer@4.0.0:
-    dependencies:
-      whatwg-encoding: 3.1.1
-
   html-encoding-sniffer@6.0.0:
     dependencies:
       '@exodus/bytes': 1.6.0
@@ -10390,33 +10332,6 @@ snapshots:
       whatwg-url: 11.0.0
       ws: 8.18.3
       xml-name-validator: 4.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - supports-color
-      - utf-8-validate
-
-  jsdom@27.3.0:
-    dependencies:
-      '@acemir/cssom': 0.9.30
-      '@asamuzakjp/dom-selector': 6.7.6
-      cssstyle: 5.3.5
-      data-urls: 6.0.0
-      decimal.js: 10.6.0
-      html-encoding-sniffer: 4.0.0
-      http-proxy-agent: 7.0.2
-      https-proxy-agent: 7.0.6
-      is-potential-custom-element-name: 1.0.1
-      parse5: 8.0.0
-      saxes: 6.0.0
-      symbol-tree: 3.2.4
-      tough-cookie: 6.0.0
-      w3c-xmlserializer: 5.0.0
-      webidl-conversions: 8.0.0
-      whatwg-encoding: 3.1.1
-      whatwg-mimetype: 4.0.0
-      whatwg-url: 15.1.0
-      ws: 8.18.3
-      xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -12641,7 +12556,7 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.8.2
 
-  vitest-dom@0.1.1(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)):
+  vitest-dom@0.1.1(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       aria-query: 5.3.2
       chalk: 5.6.2
@@ -12649,13 +12564,13 @@ snapshots:
       dom-accessibility-api: 0.6.3
       lodash-es: 4.17.21
       redent: 4.0.0
-      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  vitest-fetch-mock@0.4.5(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)):
+  vitest-fetch-mock@0.4.5(vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
-      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
-  vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.3.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2):
+  vitest@4.0.16(@opentelemetry/api@1.9.0)(@types/node@25.0.3)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.16
       '@vitest/mocker': 4.0.16(vite@7.3.0(@types/node@25.0.3)(jiti@1.21.7)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2))
@@ -12680,7 +12595,7 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
       '@types/node': 25.0.3
-      jsdom: 27.3.0
+      jsdom: 27.4.0
     transitivePeerDependencies:
       - jiti
       - less
@@ -12831,10 +12746,6 @@ snapshots:
   webpack-virtual-modules@0.6.2: {}
 
   whatwg-encoding@2.0.0:
-    dependencies:
-      iconv-lite: 0.6.3
-
-  whatwg-encoding@3.1.1:
     dependencies:
       iconv-lite: 0.6.3
 
