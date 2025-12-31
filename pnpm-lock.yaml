@@ -51,8 +51,8 @@ importers:
         specifier: ^1.25.1
         version: 1.25.1(hono@4.11.1)(zod@4.2.1)
       '@redocly/cli':
-        specifier: ^2.14.1
-        version: 2.14.1(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
+        specifier: ^2.14.2
+        version: 2.14.2(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.8.1)
@@ -78,8 +78,8 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5
       got:
-        specifier: ^14.6.5
-        version: 14.6.5
+        specifier: ^14.6.6
+        version: 14.6.6
       jsdom:
         specifier: ^27.4.0
         version: 27.4.0
@@ -1356,8 +1356,8 @@ packages:
   '@redocly/ajv@8.17.1':
     resolution: {integrity: sha512-EDtsGZS964mf9zAUXAl9Ew16eYbeyAFWhsPr0fX6oaJxgd8rApYlPBf0joyhnUHz88WxrigyFtTaqqzXNzPgqw==}
 
-  '@redocly/cli@2.14.1':
-    resolution: {integrity: sha512-Fz9qSkUz/CZgO4xnlPiRBMjwTqH1VxKlO3y8gOrEHOtr2v4peO2Fvbpz30iipTHkbrCt8UorZelXM1TEqkYHSQ==}
+  '@redocly/cli@2.14.2':
+    resolution: {integrity: sha512-M1DTJgElNYfBQS2jikfkCCNaRfa4HeF+mZpQCjHbhcvJogsIZTPL5LI6lKSnovDUTAKzUMnVlLa8hji1wx3OJQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1371,12 +1371,12 @@ packages:
     resolution: {integrity: sha512-2+O+riuIUgVSuLl3Lyh5AplWZyVMNuG2F98/o6NrutKJfW4/GTZdPpZlIphS0HGgcOHgmWcCSHj+dWFlZaGSHw==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.14.1':
-    resolution: {integrity: sha512-WKjfdnUalQfNnQfbkCg+uXEDydq7/g8t1VbzK6Nm6M/4JBjQlnUdo5kV9CLWM3IcdVHm9idovIW6cej2NRb2eA==}
+  '@redocly/openapi-core@2.14.2':
+    resolution: {integrity: sha512-KXHubrwRg10rv46c9pzn0slcbK1YaqYfqR26uhc/2KrZ2+ke106kWp1qU5rCwhkuYNXhycVLd4MrXISYAOVViw==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.14.1':
-    resolution: {integrity: sha512-WhAvjiEAbfd1unNAqVCTFny2PkuVOAK1eZ5JE6p1iHgLIoLZX0tdjM1+ht56AWE2hZ/TkcKDDP45GDqfBymi0w==}
+  '@redocly/respect-core@2.14.2':
+    resolution: {integrity: sha512-QMKkzlYv12k0CXezxrVlzuIvRMy8H/Eh5E7ILuEP763ydQaOd9JPO29YDCO8CJjxBqYV2R2USOAgB0Mkn5AmvQ==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/pluginutils@1.0.0-beta.53':
@@ -2692,8 +2692,8 @@ packages:
     resolution: {integrity: sha512-AZL67abkUzIuvcHqk7c09cezpGNcxUxU4Ioi/05xHk4DQeTkWmGYftIE6ctU6AEt+Gn4n1lDStOtj7FKycP71A==}
     engines: {node: '>=8'}
 
-  cssstyle@5.3.5:
-    resolution: {integrity: sha512-GlsEptulso7Jg0VaOZ8BXQi3AkYM5BOJKEO/rjMidSCq70FkIC5y0eawrCXeYzxgt3OCf4Ls+eoxN+/05vN0Ag==}
+  cssstyle@5.3.6:
+    resolution: {integrity: sha512-legscpSpgSAeGEe0TNcai97DKt9Vd9AsAdOL7Uoetb52Ar/8eJm3LIa39qpv8wWzLFlNG4vVvppQM+teaMPj3A==}
     engines: {node: '>=20'}
 
   csstype@3.1.3:
@@ -3459,8 +3459,8 @@ packages:
     resolution: {integrity: sha512-6tfZ91bOr7bOXnK7PRDCGBLa1H4U080YHNaAQ2KsMGlLEzRbk44nsZF2E1IeRc3vtJHPVbKCYgdFbaGO2ljd8g==}
     engines: {node: '>=10.19.0'}
 
-  got@14.6.5:
-    resolution: {integrity: sha512-Su87c0NNeg97de1sO02gy9I8EmE7DCJ1gzcFLcgGpYeq2PnLg4xz73MWrp6HjqbSsjb6Glf4UBDW6JNyZA6uSg==}
+  got@14.6.6:
+    resolution: {integrity: sha512-QLV1qeYSo5l13mQzWgP/y0LbMr5Plr5fJilgAIwgnwseproEbtNym8xpLsDzeZ6MWXgNE6kdWGBjdh3zT/Qerg==}
     engines: {node: '>=20'}
 
   graceful-fs@4.2.11:
@@ -5477,8 +5477,8 @@ packages:
     engines: {node: '>=18.18.0'}
     hasBin: true
 
-  systeminformation@5.28.3:
-    resolution: {integrity: sha512-crbaZrBH3TpTbqc0PKFqnUFHdAJOxV9UhF3KCGSrf+YP+SkoMHmxU2Nr9yIG2xgCr4645Z9Ec4GHQQQ7kGX/HA==}
+  systeminformation@5.28.7:
+    resolution: {integrity: sha512-9WLwVJm2vs1m05CjSjJb0Ia9EeAVpVulWdCOVwmqcUtyW8rlujT3qDp7pCEvx1e/kfbYufMJPkcjb1E9fTo8xg==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -7416,14 +7416,14 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.14.1(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
+  '@redocly/cli@2.14.2(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.14.1(ajv@8.17.1)
-      '@redocly/respect-core': 2.14.1(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.2(ajv@8.17.1)
+      '@redocly/respect-core': 2.14.2(ajv@8.17.1)
       abort-controller: 3.0.0
       chokidar: 3.6.0
       colorette: 1.4.0
@@ -7475,7 +7475,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.14.1(ajv@8.17.1)':
+  '@redocly/openapi-core@2.14.2(ajv@8.17.1)':
     dependencies:
       '@redocly/ajv': 8.17.1
       '@redocly/config': 0.41.1
@@ -7489,12 +7489,12 @@ snapshots:
     transitivePeerDependencies:
       - ajv
 
-  '@redocly/respect-core@2.14.1(ajv@8.17.1)':
+  '@redocly/respect-core@2.14.2(ajv@8.17.1)':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.17.1
-      '@redocly/openapi-core': 2.14.1(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.2(ajv@8.17.1)
       better-ajv-errors: 1.2.0(ajv@8.17.1)
       colorette: 2.0.20
       json-pointer: 0.6.2
@@ -8929,11 +8929,12 @@ snapshots:
     dependencies:
       cssom: 0.3.8
 
-  cssstyle@5.3.5:
+  cssstyle@5.3.6:
     dependencies:
       '@asamuzakjp/css-color': 4.1.1
       '@csstools/css-syntax-patches-for-csstree': 1.0.22
       css-tree: 3.1.0
+      lru-cache: 11.2.4
 
   csstype@3.1.3: {}
 
@@ -8986,7 +8987,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.28.3
+      systeminformation: 5.28.7
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -9850,7 +9851,7 @@ snapshots:
       p-cancelable: 2.1.1
       responselike: 2.0.1
 
-  got@14.6.5:
+  got@14.6.6:
     dependencies:
       '@sindresorhus/is': 7.2.0
       byte-counter: 0.1.0
@@ -10315,7 +10316,7 @@ snapshots:
       '@acemir/cssom': 0.9.30
       '@asamuzakjp/dom-selector': 6.7.6
       '@exodus/bytes': 1.7.0
-      cssstyle: 5.3.5
+      cssstyle: 5.3.6
       data-urls: 6.0.0
       decimal.js: 10.6.0
       html-encoding-sniffer: 6.0.0
@@ -12056,7 +12057,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  systeminformation@5.28.3: {}
+  systeminformation@5.28.7: {}
 
   tagged-tag@1.0.0: {}
 
