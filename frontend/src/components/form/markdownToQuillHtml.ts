@@ -1,4 +1,8 @@
 import { marked, type Tokens } from "marked"
+import { markedCjkUnderscoreExtension } from "./markedCjkUnderscoreExtension"
+
+// Apply the CJK underscore extension globally
+marked.use(markedCjkUnderscoreExtension)
 
 export interface MarkdownToHtmlOptions {
   preserve_pre?: boolean
