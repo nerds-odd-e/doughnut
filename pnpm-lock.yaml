@@ -52,8 +52,8 @@ importers:
         specifier: ^1.25.1
         version: 1.25.1(hono@4.11.1)(zod@4.3.4)
       '@redocly/cli':
-        specifier: ^2.14.2
-        version: 2.14.2(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
+        specifier: ^2.14.3
+        version: 2.14.3(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.8.1)
@@ -980,8 +980,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@exodus/bytes@1.7.0':
-    resolution: {integrity: sha512-5i+BtvujK/vM07YCGDyz4C4AyDzLmhxHMtM5HpUyPRtJPBdFPsj290ffXW+UXY21/G7GtXeHD2nRmq0T1ShyQQ==}
+  '@exodus/bytes@1.8.0':
+    resolution: {integrity: sha512-8JPn18Bcp8Uo1T82gR8lh2guEOa5KKU/IEKvvdp0sgmi7coPBWf1Doi1EXsGZb2ehc8ym/StJCjffYV+ne7sXQ==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
     peerDependencies:
       '@exodus/crypto': ^1.0.0-rc.4
@@ -1329,8 +1329,8 @@ packages:
   '@redocly/ajv@8.17.1':
     resolution: {integrity: sha512-EDtsGZS964mf9zAUXAl9Ew16eYbeyAFWhsPr0fX6oaJxgd8rApYlPBf0joyhnUHz88WxrigyFtTaqqzXNzPgqw==}
 
-  '@redocly/cli@2.14.2':
-    resolution: {integrity: sha512-M1DTJgElNYfBQS2jikfkCCNaRfa4HeF+mZpQCjHbhcvJogsIZTPL5LI6lKSnovDUTAKzUMnVlLa8hji1wx3OJQ==}
+  '@redocly/cli@2.14.3':
+    resolution: {integrity: sha512-8sq3xvlt3roeVuMW0L4KYdiMii3PnhNuYId6xDtnEGF+ZDhlImUt/t64XwDPtjuiCdbZmSA4erUxNLRYUlB2Kw==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
@@ -1344,12 +1344,12 @@ packages:
     resolution: {integrity: sha512-2+O+riuIUgVSuLl3Lyh5AplWZyVMNuG2F98/o6NrutKJfW4/GTZdPpZlIphS0HGgcOHgmWcCSHj+dWFlZaGSHw==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.14.2':
-    resolution: {integrity: sha512-KXHubrwRg10rv46c9pzn0slcbK1YaqYfqR26uhc/2KrZ2+ke106kWp1qU5rCwhkuYNXhycVLd4MrXISYAOVViw==}
+  '@redocly/openapi-core@2.14.3':
+    resolution: {integrity: sha512-h3K19wflV6w+5uFnlo+tDjihSBe+yZvFvnxPxasC8tC78qu7YQOX+hITXYsdaS+ZZ1nxvYvLYiHHmbIplA41VA==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.14.2':
-    resolution: {integrity: sha512-QMKkzlYv12k0CXezxrVlzuIvRMy8H/Eh5E7ILuEP763ydQaOd9JPO29YDCO8CJjxBqYV2R2USOAgB0Mkn5AmvQ==}
+  '@redocly/respect-core@2.14.3':
+    resolution: {integrity: sha512-p7mTf2vp6PSIQJLpMfVCijGecJzbMJzHEZOF4Uz8Zux3qPj+CpZNFwxPahFHZ8JYsRFsalMDCklyySz1ubQE6w==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/pluginutils@1.0.0-beta.53':
@@ -4357,8 +4357,8 @@ packages:
     resolution: {integrity: sha512-DlL+XwOy3NxAQ8xuC0okPgK46iuVNAK01YN7RueYBqqFeGsBjV9XmCAzAdgt+667bCl5kPh9EqKKDwnaPG1I7A==}
     engines: {node: '>=10'}
 
-  normalize-url@8.1.0:
-    resolution: {integrity: sha512-X06Mfd/5aKsRHc0O0J5CUedwnPmnDtLF2+nq+KN9KSDlJHkPuh0JUviWjEWMe0SW/9TDdSLVPuk7L5gGTIA1/w==}
+  normalize-url@8.1.1:
+    resolution: {integrity: sha512-JYc0DPlpGWB40kH5g07gGTrYuMqV653k3uBKY6uITPWds3M0ov3GaWGp9lbE3Bzngx8+XkfzgvASb9vk9JDFXQ==}
     engines: {node: '>=14.16'}
 
   npm-normalize-package-bin@4.0.0:
@@ -5397,8 +5397,8 @@ packages:
     engines: {node: '>=18.18.0'}
     hasBin: true
 
-  systeminformation@5.28.8:
-    resolution: {integrity: sha512-W2rXK+tTIoa1svfOEfhKPzJTw2OnoJ2XS57CftQkzvwt9Hj7RC2pfHKFAk8cHH+UkDAlGMW9Sf31kdOu5PZNIA==}
+  systeminformation@5.28.9:
+    resolution: {integrity: sha512-/+QlBcOBTRTGWpZMTCvvDf32dtGlECpX5TNiqOtNJhzjflGCcRQ2ADNJ05+DAO0b7ZUv/4pwMdWWCFCTDl3VPg==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -6017,8 +6017,8 @@ packages:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
 
-  webidl-conversions@8.0.0:
-    resolution: {integrity: sha512-n4W4YFyz5JzOfQeA8oN7dUYpR+MBP3PIUsn2jLjWXwK5ASUzt0Jc/A5sAUZoCYFJRGF0FBKJ+1JjN43rNdsQzA==}
+  webidl-conversions@8.0.1:
+    resolution: {integrity: sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==}
     engines: {node: '>=20'}
 
   webpack-virtual-modules@0.6.2:
@@ -6132,8 +6132,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  wsl-utils@0.3.0:
-    resolution: {integrity: sha512-3sFIGLiaDP7rTO4xh3g+b3AzhYDIUGGywE/WsmqzJWDxus5aJXVnPTNC/6L+r2WzrwXqVOdD262OaO+cEyPMSQ==}
+  wsl-utils@0.3.1:
+    resolution: {integrity: sha512-g/eziiSUNBSsdDJtCLB8bdYEUMj4jR7AGeUo96p/3dTafgjHhpF4RiCFPiRILwjQoDXx5MqkBr4fwWtR3Ky4Wg==}
     engines: {node: '>=20'}
 
   xml-name-validator@4.0.0:
@@ -6882,7 +6882,7 @@ snapshots:
   '@esbuild/win32-x64@0.27.2':
     optional: true
 
-  '@exodus/bytes@1.7.0': {}
+  '@exodus/bytes@1.8.0': {}
 
   '@exodus/schemasafe@1.3.0': {}
 
@@ -7230,20 +7230,20 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.14.2(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
+  '@redocly/cli@2.14.3(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.14.2(ajv@8.17.1)
-      '@redocly/respect-core': 2.14.2(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.3(ajv@8.17.1)
+      '@redocly/respect-core': 2.14.3(ajv@8.17.1)
       abort-controller: 3.0.0
+      ajv-formats: 3.0.1(ajv@8.17.1)
       chokidar: 3.6.0
       colorette: 1.4.0
       cookie: 0.7.2
       dotenv: 16.4.7
-      form-data: 4.0.5
       glob: 13.0.0
       handlebars: 4.7.8
       https-proxy-agent: 7.0.6
@@ -7289,7 +7289,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.14.2(ajv@8.17.1)':
+  '@redocly/openapi-core@2.14.3(ajv@8.17.1)':
     dependencies:
       '@redocly/ajv': 8.17.1
       '@redocly/config': 0.41.1
@@ -7303,12 +7303,12 @@ snapshots:
     transitivePeerDependencies:
       - ajv
 
-  '@redocly/respect-core@2.14.2(ajv@8.17.1)':
+  '@redocly/respect-core@2.14.3(ajv@8.17.1)':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.17.1
-      '@redocly/openapi-core': 2.14.2(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.3(ajv@8.17.1)
       better-ajv-errors: 1.2.0(ajv@8.17.1)
       colorette: 2.0.20
       json-pointer: 0.6.2
@@ -8371,7 +8371,7 @@ snapshots:
       http-cache-semantics: 4.2.0
       keyv: 5.5.5
       mimic-response: 4.0.0
-      normalize-url: 8.1.0
+      normalize-url: 8.1.1
       responselike: 4.0.2
 
   cacheable-request@7.0.4:
@@ -8741,7 +8741,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.28.8
+      systeminformation: 5.28.9
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -9678,7 +9678,7 @@ snapshots:
 
   html-encoding-sniffer@6.0.0:
     dependencies:
-      '@exodus/bytes': 1.7.0
+      '@exodus/bytes': 1.8.0
     transitivePeerDependencies:
       - '@exodus/crypto'
 
@@ -10067,7 +10067,7 @@ snapshots:
     dependencies:
       '@acemir/cssom': 0.9.30
       '@asamuzakjp/dom-selector': 6.7.6
-      '@exodus/bytes': 1.7.0
+      '@exodus/bytes': 1.8.0
       cssstyle: 5.3.6
       data-urls: 6.0.0
       decimal.js: 10.6.0
@@ -10080,7 +10080,7 @@ snapshots:
       symbol-tree: 3.2.4
       tough-cookie: 6.0.0
       w3c-xmlserializer: 5.0.0
-      webidl-conversions: 8.0.0
+      webidl-conversions: 8.0.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 15.1.0
       ws: 8.18.3
@@ -10533,7 +10533,7 @@ snapshots:
 
   normalize-url@6.1.0: {}
 
-  normalize-url@8.1.0: {}
+  normalize-url@8.1.1: {}
 
   npm-normalize-package-bin@4.0.0: {}
 
@@ -10658,7 +10658,7 @@ snapshots:
       is-in-ssh: 1.0.0
       is-inside-container: 1.0.0
       powershell-utils: 0.1.0
-      wsl-utils: 0.3.0
+      wsl-utils: 0.3.1
 
   open@8.4.2:
     dependencies:
@@ -11781,7 +11781,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  systeminformation@5.28.8: {}
+  systeminformation@5.28.9: {}
 
   tagged-tag@1.0.0: {}
 
@@ -12429,7 +12429,7 @@ snapshots:
 
   webidl-conversions@7.0.0: {}
 
-  webidl-conversions@8.0.0: {}
+  webidl-conversions@8.0.1: {}
 
   webpack-virtual-modules@0.6.2: {}
 
@@ -12449,7 +12449,7 @@ snapshots:
   whatwg-url@15.1.0:
     dependencies:
       tr46: 6.0.0
-      webidl-conversions: 8.0.0
+      webidl-conversions: 8.0.1
 
   whatwg-url@5.0.0:
     dependencies:
@@ -12545,7 +12545,7 @@ snapshots:
 
   ws@8.18.3: {}
 
-  wsl-utils@0.3.0:
+  wsl-utils@0.3.1:
     dependencies:
       is-wsl: 3.1.0
       powershell-utils: 0.1.0
