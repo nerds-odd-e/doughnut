@@ -200,6 +200,65 @@ describe("Markdown and HTML Conversion Tests", () => {
       expect(html).toBe("<p>hello 世界</p>")
     })
 
+    describe("CJK underscore handling", () => {
+      it("does not treat underscores as emphasis when adjacent to CJK characters", () => {
+        const markdown = "これは_重要_なことです"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>これは_重要_なことです</p>")
+        expect(html).not.toContain("<em>")
+      })
+
+      it("does not treat underscores as emphasis after CJK opening bracket", () => {
+        const markdown = "「_水曜日_」"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>「_水曜日_」</p>")
+        expect(html).not.toContain("<em>")
+      })
+
+      it("does not treat underscores as emphasis after Japanese period", () => {
+        const markdown = "日本語。_日本語_"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>日本語。_日本語_</p>")
+        expect(html).not.toContain("<em>")
+      })
+
+      it("does not treat underscores as emphasis after Japanese comma", () => {
+        const markdown = "、_水曜日_"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>、_水曜日_</p>")
+        expect(html).not.toContain("<em>")
+      })
+
+      it("does not treat underscores as emphasis inside fullwidth parentheses", () => {
+        const markdown = "読むこと（_read_）"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>読むこと（_read_）</p>")
+        expect(html).not.toContain("<em>")
+      })
+
+      it("does not treat underscores as emphasis in the user's original example", () => {
+        const markdown = "てっきり今日は水曜日だ_とばかり思っていました_。"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe(
+          "<p>てっきり今日は水曜日だ_とばかり思っていました_。</p>"
+        )
+        expect(html).not.toContain("<em>")
+      })
+
+      it("still treats underscores as emphasis in regular English text", () => {
+        const markdown = "hello _world_ there"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>hello <em>world</em> there</p>")
+      })
+
+      it("still treats asterisk-based emphasis normally", () => {
+        const markdown = "これは*重要*です"
+        const html = markdownizer.markdownToHtml(markdown)
+        // Asterisks should still work for emphasis
+        expect(html).toContain("<em>重要</em>")
+      })
+    })
+
     it("converts markdown code block to Quill code block HTML", () => {
       const markdown = "```\nContent\n```"
       const html = markdownizer.markdownToHtml(markdown)
