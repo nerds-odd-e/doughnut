@@ -257,6 +257,39 @@ describe("Markdown and HTML Conversion Tests", () => {
         // Asterisks should still work for emphasis
         expect(html).toContain("<em>重要</em>")
       })
+
+      it("treats asterisks as bold when content contains CJK brackets", () => {
+        const markdown = "日本語**「太字」**テスト"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>日本語<strong>「太字」</strong>テスト</p>")
+      })
+
+      it("treats asterisks as bold with CJK brackets and complex content", () => {
+        const markdown =
+          "本質や内実を隠した、見かけだけの様子。多くの場合、**「中身が伴っていない」「誠実さがない」**という否定的なニュアンスで使われます。"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toContain(
+          "<strong>「中身が伴っていない」「誠実さがない」</strong>"
+        )
+      })
+
+      it("treats asterisks as bold after CJK comma", () => {
+        const markdown = "多くの場合、**「太字」**という"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toContain("<strong>「太字」</strong>")
+      })
+
+      it("treats asterisks as italic with CJK punctuation inside", () => {
+        const markdown = "日本語*「イタリック」*テスト"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toContain("<em>「イタリック」</em>")
+      })
+
+      it("still treats regular English bold normally", () => {
+        const markdown = "hello **world** there"
+        const html = markdownizer.markdownToHtml(markdown)
+        expect(html).toBe("<p>hello <strong>world</strong> there</p>")
+      })
     })
 
     it("converts markdown code block to Quill code block HTML", () => {

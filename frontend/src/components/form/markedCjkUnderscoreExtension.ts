@@ -1,4 +1,4 @@
-import type { MarkedExtension } from "marked"
+import type { MarkedExtension, Tokens } from "marked"
 
 // CJK character ranges:
 // - CJK Unified Ideographs: \u4E00-\u9FFF
@@ -16,36 +16,96 @@ const cjkPunctuationRegex = /[\u3000-\u303F\uFF00-\uFFEF]/
  * Check if a character is CJK content (character or punctuation)
  */
 function isCjkContext(char: string | undefined): boolean {
-  return (
-    char !== undefined &&
-    (cjkCharRegex.test(char) || cjkPunctuationRegex.test(char))
-  )
+  if (!char) return false
+  return cjkCharRegex.test(char) || cjkPunctuationRegex.test(char)
 }
 
 /**
- * Marked extension to handle CJK underscore emphasis correctly.
+ * Check if a string contains CJK content
+ */
+function containsCjk(str: string): boolean {
+  return cjkCharRegex.test(str) || cjkPunctuationRegex.test(str)
+}
+
+/**
+ * Marked extension to handle CJK emphasis correctly.
  *
- * In CJK text, underscores adjacent to CJK characters or punctuation
- * should NOT be treated as emphasis delimiters. This is because:
- * 1. CJK languages don't use spaces between words/characters
- * 2. Users may want to use underscores as visual markers without emphasis
- * 3. Standard markdown emphasis rules don't work well with CJK punctuation
+ * This extension addresses two issues:
  *
- * This extension prevents underscore-based emphasis when the underscore
- * is adjacent to CJK content (characters or punctuation like 「」。、（）etc.)
+ * 1. Underscore handling: In CJK text, underscores adjacent to CJK characters
+ *    or punctuation should NOT be treated as emphasis delimiters. This is because
+ *    CJK languages don't use spaces between words/characters and users may want
+ *    to use underscores as visual markers.
+ *
+ * 2. Asterisk handling: marked's default emphasis rules don't work well when
+ *    the content inside **...** starts or ends with CJK punctuation (like 「」).
+ *    This extension enables asterisk-based emphasis in CJK context where the
+ *    default rules would fail.
+ *
+ * Examples that now work correctly:
+ * - てっきり今日は水曜日だ_とばかり思っていました_。 (underscores preserved)
+ * - 日本語**「太字」**テスト (bold applied correctly)
+ * - 本質や内実を隠した、**「中身」**という (bold applied correctly)
  */
 export const markedCjkUnderscoreExtension: MarkedExtension = {
   tokenizer: {
-    emStrong(src: string, _maskedSrc: string, prevChar?: string) {
-      // Only handle underscore-based emphasis
-      if (!src.startsWith("_")) {
-        return false // Let default handle asterisk-based emphasis
+    emStrong(
+      this: { lexer: { inlineTokens: (src: string) => Tokens.Generic[] } },
+      src: string,
+      _maskedSrc: string,
+      prevChar?: string
+    ): Tokens.Strong | Tokens.Em | false | undefined {
+      // Handle ** for strong (bold) in CJK context
+      const strongMatch = /^\*\*([^*]+)\*\*/.exec(src)
+      if (strongMatch) {
+        const content = strongMatch[1] as string
+        const fullMatch = strongMatch[0]
+
+        // Check if content contains CJK
+        const hasCJK = containsCjk(content)
+        const prevIsCJK = isCjkContext(prevChar)
+        const afterMatch = src.slice(fullMatch.length)
+        const afterChar = afterMatch.length > 0 ? afterMatch[0] : undefined
+        const afterIsCJK = isCjkContext(afterChar)
+
+        // If in CJK context and content has CJK, enable emphasis
+        if (hasCJK && (prevIsCJK || afterIsCJK)) {
+          return {
+            type: "strong",
+            raw: fullMatch,
+            text: content,
+            tokens: this.lexer.inlineTokens(content),
+          }
+        }
       }
 
-      // Check if in CJK context - prevChar is CJK character or punctuation
-      if (isCjkContext(prevChar)) {
-        // Return undefined to skip emphasis parsing for this underscore
-        return undefined
+      // Handle * for em (italic) in CJK context
+      const emMatch = /^\*([^*]+)\*/.exec(src)
+      if (emMatch && !src.startsWith("**")) {
+        const content = emMatch[1] as string
+        const fullMatch = emMatch[0]
+
+        const hasCJK = containsCjk(content)
+        const prevIsCJK = isCjkContext(prevChar)
+        const afterMatch = src.slice(fullMatch.length)
+        const afterChar = afterMatch.length > 0 ? afterMatch[0] : undefined
+        const afterIsCJK = isCjkContext(afterChar)
+
+        if (hasCJK && (prevIsCJK || afterIsCJK)) {
+          return {
+            type: "em",
+            raw: fullMatch,
+            text: content,
+            tokens: this.lexer.inlineTokens(content),
+          }
+        }
+      }
+
+      // Handle underscore-based emphasis - block in CJK context
+      if (src.startsWith("_")) {
+        if (isCjkContext(prevChar)) {
+          return undefined
+        }
       }
 
       return false // Let default handle it
