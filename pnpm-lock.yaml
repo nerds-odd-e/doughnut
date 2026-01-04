@@ -43,8 +43,8 @@ importers:
         specifier: ^12.5.0
         version: 12.5.0
       '@hey-api/openapi-ts':
-        specifier: 0.89.2
-        version: 0.89.2(typescript@5.9.3)
+        specifier: 0.90.0
+        version: 0.90.0(typescript@5.9.3)
       '@mbtest/mountebank':
         specifier: 2.9.2
         version: 2.9.2
@@ -1017,8 +1017,8 @@ packages:
   '@hapi/topo@6.0.2':
     resolution: {integrity: sha512-KR3rD5inZbGMrHmgPxsJ9dbi6zEK+C3ZwUwTa+eMwWLz7oijWUTWD2pMSNNYJAU6Qq+65NkxXjqHr/7LM2Xkqg==}
 
-  '@hey-api/codegen-core@0.4.0':
-    resolution: {integrity: sha512-o8rBbEXEUhEPzrHbqImYjwIHm4Oj0r1RPS+5cp8Z66kPO7SEN7PYUgK7XpmSxoy9LPMNK1M5qmCO4cGGwT+ELQ==}
+  '@hey-api/codegen-core@0.5.0':
+    resolution: {integrity: sha512-k4A41bH0bppzn5VgruQe36oc2ENr5MTXnonCXw/N8/608n9VuI9S3PyNMYYLO6FMSIvgaByN8GOaaqAtrShA6g==}
     engines: {node: '>=20.19.0'}
     peerDependencies:
       typescript: '>=5.5.3'
@@ -1027,8 +1027,8 @@ packages:
     resolution: {integrity: sha512-oS+5yAdwnK20lSeFO1d53Ku+yaGCsY8PcrmSq2GtSs3bsBfRnHAbpPKSVzQcaxAOrzj5NB+f34WhZglVrNayBA==}
     engines: {node: '>= 16'}
 
-  '@hey-api/openapi-ts@0.89.2':
-    resolution: {integrity: sha512-iEhWfvPbzfcS7BMqHzh2FbMG1ouZVAHwHoYhq/61Rmq/r1Q1NgCZ3xy6QuXZgbTdHe9enMjWXjINLnTj57kWwA==}
+  '@hey-api/openapi-ts@0.90.0':
+    resolution: {integrity: sha512-0Fujk+3q/tEZeXRLRs/Y/lTQ9b4m1MHBsW5uGAI+tbscVDwqlkFc23MBoDcbysWyuG/aF95F39nmHdAoTCtP0Q==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -2266,8 +2266,8 @@ packages:
     resolution: {integrity: sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg==}
     engines: {node: '>= 0.8'}
 
-  c12@3.3.2:
-    resolution: {integrity: sha512-QkikB2X5voO1okL3QsES0N690Sn/K9WokXqUsDQsWy5SnYb+psYQFGA10iy1bZHj3fjISKsI67Q90gruvWWM3A==}
+  c12@3.3.3:
+    resolution: {integrity: sha512-750hTRvgBy5kcMNPdh95Qo+XUBeGo8C7nsKSmedDmaQI+E0r82DwHeM6vBewDe4rGFbnxoa4V9pw+sPh5+Iz8Q==}
     peerDependencies:
       magicast: '*'
     peerDependenciesMeta:
@@ -5394,8 +5394,8 @@ packages:
     engines: {node: '>=18.18.0'}
     hasBin: true
 
-  systeminformation@5.28.9:
-    resolution: {integrity: sha512-/+QlBcOBTRTGWpZMTCvvDf32dtGlECpX5TNiqOtNJhzjflGCcRQ2ADNJ05+DAO0b7ZUv/4pwMdWWCFCTDl3VPg==}
+  systeminformation@5.28.10:
+    resolution: {integrity: sha512-SBNOOYYKSL1NqgG8W+5pqb6654BEvR9JnM7qvWP4bgIXuCurvyZXpBMdweVKBpVPrpzUxrgl6PbZPxrmt4RpKw==}
     engines: {node: '>=8.0.0'}
     os: [darwin, linux, win32, freebsd, openbsd, netbsd, sunos, android]
     hasBin: true
@@ -5540,8 +5540,8 @@ packages:
   ts-algebra@1.2.2:
     resolution: {integrity: sha512-kloPhf1hq3JbCPOTYoOWDKxebWjNb2o/LKnNfkWhxVVisFFmMJPPdJeGoGmM+iRLyoXAR61e08Pb+vUXINg8aA==}
 
-  ts-api-utils@2.3.0:
-    resolution: {integrity: sha512-6eg3Y9SF7SsAvGzRHQvvc1skDAhwI4YQ32ui1scxD1Ccr0G5qIIbUBT3pFTKX8kmWIQClHobtUdNuaBgwdfdWg==}
+  ts-api-utils@2.4.0:
+    resolution: {integrity: sha512-3TaVTaAv2gTiMB35i3FiGJaRfwb3Pyn/j3m/bfAvGe8FB7CF6u+LMYqYlDh7reQf7UNvoTvdfAqHGmPGOSsPmA==}
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
@@ -6903,7 +6903,7 @@ snapshots:
     dependencies:
       '@hapi/hoek': 11.0.7
 
-  '@hey-api/codegen-core@0.4.0(typescript@5.9.3)':
+  '@hey-api/codegen-core@0.5.0(typescript@5.9.3)':
     dependencies:
       ansi-colors: 4.1.3
       color-support: 1.1.3
@@ -6916,12 +6916,12 @@ snapshots:
       js-yaml: 4.1.1
       lodash: 4.17.21
 
-  '@hey-api/openapi-ts@0.89.2(typescript@5.9.3)':
+  '@hey-api/openapi-ts@0.90.0(typescript@5.9.3)':
     dependencies:
-      '@hey-api/codegen-core': 0.4.0(typescript@5.9.3)
+      '@hey-api/codegen-core': 0.5.0(typescript@5.9.3)
       '@hey-api/json-schema-ref-parser': 1.2.2
       ansi-colors: 4.1.3
-      c12: 3.3.2
+      c12: 3.3.3
       color-support: 1.1.3
       commander: 14.0.2
       open: 11.0.0
@@ -7782,7 +7782,7 @@ snapshots:
       minimatch: 9.0.5
       semver: 7.7.3
       tinyglobby: 0.2.15
-      ts-api-utils: 2.3.0(typescript@5.9.3)
+      ts-api-utils: 2.4.0(typescript@5.9.3)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -8342,9 +8342,9 @@ snapshots:
 
   bytes@3.1.2: {}
 
-  c12@3.3.2:
+  c12@3.3.3:
     dependencies:
-      chokidar: 4.0.3
+      chokidar: 5.0.0
       confbox: 0.2.2
       defu: 6.1.4
       dotenv: 17.2.3
@@ -8738,7 +8738,7 @@ snapshots:
       proxy-from-env: 1.0.0
       request-progress: 3.0.0
       supports-color: 8.1.1
-      systeminformation: 5.28.9
+      systeminformation: 5.28.10
       tmp: 0.2.5
       tree-kill: 1.2.2
       untildify: 4.0.0
@@ -11778,7 +11778,7 @@ snapshots:
     transitivePeerDependencies:
       - typescript
 
-  systeminformation@5.28.9: {}
+  systeminformation@5.28.10: {}
 
   tagged-tag@1.0.0: {}
 
@@ -11915,7 +11915,7 @@ snapshots:
 
   ts-algebra@1.2.2: {}
 
-  ts-api-utils@2.3.0(typescript@5.9.3):
+  ts-api-utils@2.4.0(typescript@5.9.3):
     dependencies:
       typescript: 5.9.3
 
