@@ -18,17 +18,17 @@
   />
   <div
     v-if="understandingPoints.length > 0"
-    class="daisy-mb-4 daisy-alert daisy-alert-info"
+    class="daisy-mb-4 daisy-rounded-lg daisy-bg-accent daisy-p-4"
   >
-    <div class="daisy-text-sm">
-      <div class="daisy-font-semibold daisy-mb-2 daisy-text-base-content">
+    <div class="daisy-text-base">
+      <div class="daisy-font-semibold daisy-mb-3 daisy-text-accent-content">
         Understanding Checklist:
       </div>
-      <ul class="daisy-list-disc daisy-list-inside daisy-space-y-1">
+      <ul class="daisy-list-disc daisy-list-inside daisy-space-y-2">
         <li
           v-for="(point, index) in understandingPoints"
           :key="index"
-          class="daisy-text-base-content"
+          class="daisy-text-accent-content"
         >
           {{ point }}
         </li>
