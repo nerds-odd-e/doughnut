@@ -142,11 +142,11 @@ export const assumeAssimilationPage = () => ({
     cy.pageIsNotLoading()
     // Find the understanding checklist by its heading text
     cy.contains('Understanding Checklist:')
-      .closest('.daisy-alert')
+      .closest('.daisy-bg-accent')
       .should('be.visible')
     points.forEach((point) => {
       cy.contains('Understanding Checklist:')
-        .closest('.daisy-alert')
+        .closest('.daisy-bg-accent')
         .should('contain', point)
     })
     return this
@@ -155,11 +155,11 @@ export const assumeAssimilationPage = () => ({
     cy.pageIsNotLoading()
     // Find the understanding checklist by its heading text
     cy.contains('Understanding Checklist:')
-      .closest('.daisy-alert')
+      .closest('.daisy-bg-accent')
       .should('be.visible')
     // Count the number of list items (understanding points) in the checklist
     cy.contains('Understanding Checklist:')
-      .closest('.daisy-alert')
+      .closest('.daisy-bg-accent')
       .find('ul li')
       .should('have.length.at.most', maxPoints)
     return this
