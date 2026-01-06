@@ -7,18 +7,17 @@ Background:
 
 Scenario: Remove points from note when assimilating
     Given OpenAI generates understanding checklist with points:
-        | English is the world's most widespread lingua franca |
-        | It's vital for global communication and connects people across cultures |
-        | English is the standard language for international business, science, and diplomacy |
-        | English dominates the internet and digital world |
-        | Proficiency in English enhances career opportunities and simplifies international travel |
+      | A | English is the world's most widespread lingua franca |
+      | B | It's vital for global communication and connects people across cultures |
+      | C | English is the standard language for international business, science, and diplomacy |
+      | D | English dominates the internet and digital world |
+      | E | Proficiency in English enhances career opportunities and simplifies international travel |
     When I start assimilating "English"
     And I mark the point "English is the world's most widespread lingua franca" for removal as unrelated to the note
-    And OpenAI create a new understanding checklist with points
-    Then I should see an understanding checklist with 5 points:
-        | It's vital for global communication and connects people across cultures |
-        | English is the standard language for international business, science, and diplomacy |
-        | English dominates the internet and digital world |
-        | Proficiency in English enhances career opportunities and simplifies international travel |    
-        | The mouse is the most beautiful creature in the world |
-    And I should see the point "English is the world's most widespread lingua franca" is removed from the note
+    Then I should the note rephrased as "English plays a crucial role in global communication, enabling people from different cultures and nations to understand one another. It is the primary language used in international business, science, technology, and diplomacy, which significantly broadens professional and academic opportunities. The language is deeply embedded in the digital world, with a large majority of online content created in English. Global media—such as films, music, and entertainment—relies heavily on English, offering access to a wide range of cultures and ideas. Knowledge of English also makes international travel easier, helping people navigate foreign environments and communicate with locals more effectively. As an official language in over 60 countries and a widely taught foreign language elsewhere, English is essential for global participation and education."
+    And OpenAI generates the understanding checklist with points:
+      | A | English enables effective communication between people from different cultures and countries |
+      | B | It is the main language of international business, science, technology, and diplomacy |
+      | C | English provides strong advantages for careers and academic pursuits |
+      | D | The majority of digital and online content is available in English |
+      | E | Proficiency in English facilitates international travel and access to global media |
