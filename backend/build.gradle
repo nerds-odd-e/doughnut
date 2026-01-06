@@ -1,6 +1,11 @@
 buildscript {
   repositories {
+    gradlePluginPortal()
     mavenCentral()
+    // Google Maven mirror as fallback for CI/CD environments
+    maven {
+      url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+    }
   }
 }
 
@@ -28,7 +33,12 @@ configurations {
 }
 
 repositories {
+  gradlePluginPortal()
   mavenCentral()
+  // Google Maven mirror as fallback for CI/CD environments
+  maven {
+    url = uri("https://maven-central.storage-download.googleapis.com/maven2/")
+  }
 }
 
 dependencies {

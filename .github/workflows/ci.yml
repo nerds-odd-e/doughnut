@@ -159,7 +159,7 @@ jobs:
         with:
           node_version: ${{ vars.NODE_VERSION }}
           pnpm_version: ${{ vars.PNPM_VERSION }}
-          force_install: 'true'
+          force_install: "true"
       - uses: cypress-io/github-action@v6
         with:
           browser: chrome
