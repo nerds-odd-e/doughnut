@@ -31,7 +31,7 @@ env:
 jobs:
   Lint-N-Backend-Generated-Types-For-Frontend:
     name: Linting & Types Gen for Frontend
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-slim
     steps:
       - uses: actions/checkout@v6
       - name: Check for @focus tags in e2e test feature files
@@ -103,7 +103,7 @@ jobs:
         run: pnpm bundle:all
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
@@ -195,7 +195,7 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Upload production application jar to Google Cloud Storage
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
       - uses: google-github-actions/upload-cloud-storage@v3
