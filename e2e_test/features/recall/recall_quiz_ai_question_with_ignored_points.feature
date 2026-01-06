@@ -1,6 +1,7 @@
-
-Feature: Repetition Quiz With Ignored Points
-  As a learner, I want to ignore the points in the checklist when generating questions for my note.
+Feature: Assimilation With Ignored Points
+  As a learner, I want to select the points to ignore in the checklist when assimilating my note.
+  As a learner, I want to selected points to be ignored in the checklist when generating questions for my note.
+  So that I can focus on the important points and not be distracted by the irrelevant points.
 
   Background: 
     Given I am logged in as an existing user
@@ -9,18 +10,17 @@ Feature: Repetition Quiz With Ignored Points
       | Title    | Details                        | Skip Memory Tracking | Parent Title |
       | Netherlands | The Netherlands is a country in Europe and also called Holland| false                | Countries      |
  
-  @ignore     
-  #@usingMockedOpenAiService
+  @ignore
   Scenario: AI generated question - ignore checklist topic in question options
-    Given I assimilated one note "Netherlands" on day 1
+    When I am assimilating new note on day 1
     And one of the checklist topic is selected to ignore "also called Holland"
-    When I am recalling my note on day 2
-    Then question choices should not include "Holland"
+    Then the question generated for the note "Netherlands" should not include "Holland"
 
   @ignore
   @usingMockedOpenAiService
   Scenario: AI generated question - ignore checklist topic in question stem
-    Given  I assimilated one note "Netherlands" on day 1
+    Given I am assimilating new note on day 1
     And one of the checklist topic is selected to ignore "also called Holland"
     When I am recalling my note on day 2
     Then question stem should not include "Holland"
+
