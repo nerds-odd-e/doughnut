@@ -104,6 +104,14 @@ Then('I am assimilating new note on day {int}', (day: number) => {
   start.assimilation().goToAssimilationPage()
 })
 
+When(
+  'one of the checklist topic is selected to ignore {string} and assimilate the note',
+  (topicText: string) => {
+    // start.assumeAssimilationPage().selectChecklistTopicToIgnore(topicText)
+    start.assumeAssimilationPage().assimilateCurrentNote()
+  }
+)
+
 Then(
   'I set the level of {string} to be {int}',
   (noteTopology: string, level: number) => {

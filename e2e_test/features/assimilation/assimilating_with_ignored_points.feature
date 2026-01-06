@@ -13,7 +13,7 @@ Feature: Assimilation With Ignored Points
   @ignore
   Scenario: AI generated question - ignore checklist topic in question options
     When I am assimilating new note on day 1
-    And one of the checklist topic is selected to ignore "also called Holland"
+    And one of the checklist topic is selected to ignore "also called Holland" and assimilate the note
     Then the question generated for the note "Netherlands" should not include "Holland"
 
   @ignore
