@@ -16,11 +16,3 @@ Feature: Assimilation With Ignored Points
     And one of the checklist topic is selected to ignore "also called Holland" and assimilate the note
     Then the question generated for the note "Netherlands" should not include "Holland"
 
-  @ignore
-  @usingMockedOpenAiService
-  Scenario: AI generated question - ignore checklist topic in question stem
-    Given I am assimilating new note on day 1
-    And one of the checklist topic is selected to ignore "also called Holland"
-    When I am recalling my note on day 2
-    Then question stem should not include "Holland"
-
