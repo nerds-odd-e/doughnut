@@ -88,4 +88,71 @@ export const questionGenerationService = () => ({
       }
     })
   },
+
+  stubQuestionWhenPromptDoesNotIncludeIgnoreText: (
+    ignoreText: string,
+    record: Record<string, string>
+  ) => {
+    const mcqWithAnswer = createMcqWithAnswer(
+      record['Question Stem']!,
+      record['Correct Choice']!,
+      record['Incorrect Choice 1']!,
+      record['Incorrect Choice 2']!
+    )
+    const reply = JSON.stringify(mcqWithAnswer)
+    cy.then(async () => {
+      // Set up the less specific stub (doesn't include) - this should be registered after the "includes" stub
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMatchesWithExclusion(
+          {
+            messages: [
+              {
+                role: 'user',
+                content: '.*',
+              },
+            ],
+          },
+          {
+            messages: [
+              {
+                role: 'user',
+                content: `.*${ignoreText}.*`,
+              },
+            ],
+          }
+        )
+        .stubQuestionGenerationWithBodyMatch(reply)
+    })
+  },
+
+  stubQuestionWhenPromptIncludesIgnoreText: (
+    ignoreText: string,
+    record: Record<string, string>
+  ) => {
+    const mcqWithAnswer = createMcqWithAnswer(
+      record['Question Stem']!,
+      record['Correct Choice']!,
+      record['Incorrect Choice 1']!,
+      record['Incorrect Choice 2']!
+    )
+    const reply = JSON.stringify(mcqWithAnswer)
+    cy.then(async () => {
+      // Set up the more specific stub first (includes ignore text)
+      // The ignoreText should match literally - single quotes are not special regex chars
+      await mock_services
+        .openAi()
+        .chatCompletion()
+        .requestMatches({
+          messages: [
+            {
+              role: 'user',
+              content: `.*${ignoreText}.*`,
+            },
+          ],
+        })
+        .stubQuestionGenerationWithBodyMatch(reply)
+    })
+  },
 })

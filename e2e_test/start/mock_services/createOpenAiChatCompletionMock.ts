@@ -129,6 +129,16 @@ const createOpenAiChatCompletionMock = (serviceMocker: ServiceMocker) => {
     requestMatches(bodyToMatch: BodyToMatch) {
       return openAiChatCompletionStubber(serviceMocker, bodyToMatch)
     },
+    requestMatchesWithExclusion(
+      bodyToMatch: BodyToMatch,
+      bodyNotToMatch: BodyToMatch
+    ) {
+      return openAiChatCompletionStubber(
+        serviceMocker,
+        bodyToMatch,
+        bodyNotToMatch
+      )
+    },
   }
 }
 
