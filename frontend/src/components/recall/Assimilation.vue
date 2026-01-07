@@ -34,6 +34,7 @@
           {{ point }}
         </li>
       </ul>
+      <input type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" />
     </div>
   </div>
   <AssimilationButtons

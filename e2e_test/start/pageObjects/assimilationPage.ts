@@ -186,6 +186,16 @@ export const assumeAssimilationPage = () => ({
       })
     return this
   },
+  rephraseNoteWithIgnoredTopic() {
+    cy.pageIsNotLoading()
+    cy.contains('Understanding Checklist:')
+      .closest('.daisy-bg-accent')
+      .should('be.visible')
+      .within(() => {
+        cy.get('input[type="button"]#rephrase-note').click()
+      })
+    return this
+  },
   assimilateCurrentNote() {
     cy.pageIsNotLoading()
     cy.findByRole('button', { name: 'Keep for repetition' }).click()

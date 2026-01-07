@@ -311,7 +311,10 @@ Then('I can continue with the assimilation', () => {
 When(
   'I mark the point {string} for removal as unrelated to the note',
   (point: string) => {
-    start.assumeAssimilationPage().selectChecklistTopicToIgnore(point)
+    start
+      .assumeAssimilationPage()
+      .selectChecklistTopicToIgnore(point)
+      .rephraseNoteWithIgnoredTopic()
   }
 )
 
