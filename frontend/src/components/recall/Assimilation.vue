@@ -34,7 +34,10 @@
           {{ point }}
         </li>
       </ul>
-      <input type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" />
+      <input type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" @click="handleRephraseNote" />
+      <div v-if="isNoteRephrased" class="daisy-mt-3">
+        <span class="daisy-font-semibold">Note Rephrased</span>
+      </div>
     </div>
   </div>
   <AssimilationButtons
@@ -76,6 +79,11 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 
 // State
 const buttonKey = computed(() => note.id)
+const isNoteRephrased = ref(false)
+
+const handleRephraseNote = () => {
+  isNoteRephrased.value = true
+}
 
 // Understanding checklist from backend
 const understandingPoints = ref<string[]>([])

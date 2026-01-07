@@ -318,6 +318,10 @@ When(
   }
 )
 
+Then('I should see the note rephrased as {string}', (rephrasedNote: string) => {
+  start.assumeAssimilationPage().expectNoteRephrased(rephrasedNote)
+})
+
 Then(
   'the question generated for the note {string} should not include {string}',
   (noteTitle: string, excludedText: string) => {

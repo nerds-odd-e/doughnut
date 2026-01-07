@@ -196,6 +196,12 @@ export const assumeAssimilationPage = () => ({
       })
     return this
   },
+  expectNoteRephrased(rephrasedNote: string) {
+    cy.pageIsNotLoading()
+    cy.contains('Note Rephrased').should('be.visible')
+    cy.get('.note-details').should('contain', rephrasedNote)
+    return this
+  },
   assimilateCurrentNote() {
     cy.pageIsNotLoading()
     cy.findByRole('button', { name: 'Keep for repetition' }).click()
