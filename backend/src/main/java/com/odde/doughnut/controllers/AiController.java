@@ -79,4 +79,16 @@ public class AiController {
             .generateUnderstandingChecklist();
     return new UnderstandingChecklistDTO(points);
   }
+
+  @PostMapping("/remove-point-from-note/{note}")
+  @Transactional
+  public String removePointFromNote(
+      @PathVariable(value = "note") @Schema(type = "integer") Note note,
+      @RequestBody String pointToRemove)
+      throws UnexpectedNoAccessRightException, JsonProcessingException {
+    authorizationService.assertAuthorization(note);
+    return notebookAssistantForNoteServiceFactory
+        .createNoteAutomationService(note)
+        .removePointFromNote(pointToRemove);
+  }
 }

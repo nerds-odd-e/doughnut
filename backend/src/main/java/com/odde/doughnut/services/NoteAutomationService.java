@@ -18,4 +18,8 @@ public final class NoteAutomationService {
   public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
     return chatCompletionNoteAutomationService.generateUnderstandingChecklist();
   }
+
+  public String removePointFromNote(String pointToRemove) throws JsonProcessingException {
+    return chatCompletionNoteAutomationService.removePointFromNote(pointToRemove);
+  }
 }
