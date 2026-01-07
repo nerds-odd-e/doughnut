@@ -41,6 +41,7 @@
     "cy:lint": "pnpm --frozen-lockfile --silent install && pnpm biome check .",
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --config-file e2e_test/config/ci.ts",
+    "cy:focus": "cypress run --config-file e2e_test/config/local.ts",
     "cy:run-on-sut": "wait-on tcp:9081 && pnpm cy:run",
     "test": "pnpm --frozen-lockfile --silent recursive install && pnpm frontend:build && pnpm exec run-p -clnr backend:sut start:mb cy:run-on-sut",
     "sut": "pnpm --frozen-lockfile --silent recursive install && pnpm exec run-p -clnr backend:sut start:mb frontend:sut",
