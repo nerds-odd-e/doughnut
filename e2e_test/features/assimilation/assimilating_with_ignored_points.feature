@@ -10,7 +10,6 @@ Feature: Assimilation With Ignored Points
       | Title    | Details                        | Skip Memory Tracking | Parent Title |
       | Netherlands | The Netherlands is a country in Europe and also called Holland| false                | Countries      |
  
-  @ignore
   Scenario: AI generated question - ignore checklist topic in question options
     When I am assimilating new note on day 1
     And one of the checklist topic is selected to ignore "also called Holland" and assimilate the note

@@ -60,6 +60,10 @@ public class NoteQuestionGenerationService {
       chatRequestBuilder.addUserMessage(additionalMessage);
     }
 
+    if (note.getIgnoredChecklistTopics() != null && !note.getIgnoredChecklistTopics().isEmpty())
+      chatRequestBuilder.addUserMessage(
+          "Ignore the topic '" + note.getIgnoredChecklistTopics() + "'");
+
     RelationType relationType = note.isRelation() ? note.getRelationType() : null;
     NoteType noteType = note.getNoteType();
     InstructionAndSchema tool = AiToolFactory.mcqWithAnswerAiTool(relationType, noteType);

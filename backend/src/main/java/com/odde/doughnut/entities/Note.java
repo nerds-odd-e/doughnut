@@ -135,6 +135,11 @@ public class Note extends EntityIdentifiedByIdOnly {
   @JsonIgnore
   private List<PredefinedQuestion> predefinedQuestions = new ArrayList<>();
 
+  @Column(name = "ignored_checklist_topics")
+  @Getter
+  @Setter
+  private String ignoredChecklistTopics;
+
   @Embedded @JsonIgnore @Getter private NoteRecallSetting recallSetting = new NoteRecallSetting();
 
   @JsonIgnore
@@ -383,6 +388,14 @@ public class Note extends EntityIdentifiedByIdOnly {
     nvb.setFromBazaar(viewer == null || !viewer.owns(getNotebook()));
 
     return nvb;
+  }
+
+  public String getIgnoredChecklistTopics() {
+    return ignoredChecklistTopics;
+  }
+
+  public void setIgnoredChecklistTopics(String ignoredChecklistTopic) {
+    this.ignoredChecklistTopic = ignoredChecklistTopic;
   }
 
   private boolean allowed(Note l, User viewer) {

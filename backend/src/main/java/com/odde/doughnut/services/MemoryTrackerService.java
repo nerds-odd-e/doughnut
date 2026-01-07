@@ -46,6 +46,8 @@ public class MemoryTrackerService {
   public List<MemoryTracker> assimilate(
       InitialInfo initialInfo, User currentUser, Timestamp currentTime) {
     Note note = entityPersister.find(Note.class, initialInfo.noteId);
+    note.setIgnoredChecklistTopics(initialInfo.ignoredChecklistTopics);
+
     MemoryTracker memoryTracker =
         createMemoryTracker(
             note,

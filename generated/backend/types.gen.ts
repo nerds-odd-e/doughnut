@@ -120,6 +120,7 @@ export type Note = {
     createdAt: string;
     readonly deletedAt?: string;
     wikidataId?: string;
+    ignoredChecklistTopics?: string;
 };
 
 export type NoteTopology = {
@@ -395,6 +396,7 @@ export type TextFromAudioWithCallInfo = {
 export type InitialInfo = {
     noteId?: number;
     skipMemoryTracking?: boolean;
+    ignoredChecklistTopics?: string;
 };
 
 export type AssessmentAttempt = {
@@ -626,6 +628,7 @@ export type NoteWritable = {
     id: number;
     createdAt: string;
     wikidataId?: string;
+    ignoredChecklistTopics?: string;
 };
 
 export type SubscriptionWritable = {

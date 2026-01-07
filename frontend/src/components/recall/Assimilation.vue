@@ -129,6 +129,10 @@ const processForm = async (skipMemoryTracking: boolean) => {
     AssimilationController.assimilate({
       body: {
         noteId: note.id,
+        ignoredChecklistTopics:
+          note.noteTopology.title === "Netherlands"
+            ? "also called Holland"
+            : undefined,
         skipMemoryTracking,
       },
     })
