@@ -390,14 +390,6 @@ public class Note extends EntityIdentifiedByIdOnly {
     return nvb;
   }
 
-  public String getIgnoredChecklistTopics() {
-    return ignoredChecklistTopics;
-  }
-
-  public void setIgnoredChecklistTopics(String ignoredChecklistTopic) {
-    this.ignoredChecklistTopic = ignoredChecklistTopic;
-  }
-
   private boolean allowed(Note l, User viewer) {
     if (l.getParent().getNotebook() == l.getTargetNote().getNotebook()) return true;
     if (viewer == null) return false;
