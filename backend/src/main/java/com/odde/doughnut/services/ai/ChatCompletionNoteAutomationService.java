@@ -6,7 +6,10 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.services.GlobalSettingsService;
 import com.odde.doughnut.services.ai.builder.OpenAIChatRequestBuilder;
 import com.odde.doughnut.services.ai.tools.AiToolFactory;
+import com.odde.doughnut.services.ai.tools.InstructionAndSchema;
 import com.odde.doughnut.services.openAiApis.OpenAiApiHandler;
+import java.util.List;
+import java.util.function.Function;
 
 public class ChatCompletionNoteAutomationService {
   private final OpenAiApiHandler openAiApiHandler;
@@ -21,66 +24,51 @@ public class ChatCompletionNoteAutomationService {
   }
 
   public String suggestTitle() throws JsonProcessingException {
-    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
-
-    String instructions = note.getNotebookAssistantInstructions();
-    if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addToOverallSystemMessage(instructions);
-    }
-
-    var tool = AiToolFactory.suggestNoteTitleAiTool();
-    chatRequestBuilder.responseJsonSchema(tool);
-
-    return openAiApiHandler
-        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
-        .map(
-            jsonNode -> {
-              try {
-                TitleReplacement titleReplacement =
-                    new ObjectMapperConfig()
-                        .objectMapper()
-                        .treeToValue(jsonNode, TitleReplacement.class);
-                return titleReplacement.getNewTitle();
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .orElse(null);
+    return executeWithTool(
+        AiToolFactory.suggestNoteTitleAiTool(),
+        TitleReplacement.class,
+        TitleReplacement::getNewTitle,
+        null);
   }
 
-  public java.util.List<String> generateUnderstandingChecklist() throws JsonProcessingException {
-    String modelName = globalSettingsService.globalSettingEvaluation().getValue();
-    OpenAIChatRequestBuilder chatRequestBuilder =
-        OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
-
-    String instructions = note.getNotebookAssistantInstructions();
-    if (instructions != null && !instructions.trim().isEmpty()) {
-      chatRequestBuilder.addToOverallSystemMessage(instructions);
-    }
-
-    var tool = AiToolFactory.generateUnderstandingChecklistAiTool();
-    chatRequestBuilder.responseJsonSchema(tool);
-
-    return openAiApiHandler
-        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
-        .map(
-            jsonNode -> {
-              try {
-                UnderstandingChecklist understandingChecklist =
-                    new ObjectMapperConfig()
-                        .objectMapper()
-                        .treeToValue(jsonNode, UnderstandingChecklist.class);
-                return understandingChecklist.getPoints();
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .orElse(java.util.List.of());
+  public List<String> generateUnderstandingChecklist() throws JsonProcessingException {
+    return executeWithTool(
+        AiToolFactory.generateUnderstandingChecklistAiTool(),
+        UnderstandingChecklist.class,
+        UnderstandingChecklist::getPoints,
+        List.of());
   }
 
   public String removePointFromNote(String pointToRemove) throws JsonProcessingException {
+    return executeWithTool(
+        AiToolFactory.removePointFromNoteAiTool(pointToRemove),
+        NoteDetailsRephrase.class,
+        NoteDetailsRephrase::getDetails,
+        "");
+  }
+
+  private <T, R> R executeWithTool(
+      InstructionAndSchema tool, Class<T> resultClass, Function<T, R> extractor, R defaultValue)
+      throws JsonProcessingException {
+    OpenAIChatRequestBuilder chatRequestBuilder = createChatRequestBuilder();
+    chatRequestBuilder.responseJsonSchema(tool);
+
+    return openAiApiHandler
+        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
+        .map(
+            jsonNode -> {
+              try {
+                T result =
+                    new ObjectMapperConfig().objectMapper().treeToValue(jsonNode, resultClass);
+                return extractor.apply(result);
+              } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+              }
+            })
+        .orElse(defaultValue);
+  }
+
+  private OpenAIChatRequestBuilder createChatRequestBuilder() {
     String modelName = globalSettingsService.globalSettingEvaluation().getValue();
     OpenAIChatRequestBuilder chatRequestBuilder =
         OpenAIChatRequestBuilder.chatAboutNoteRequestBuilder(modelName, note);
@@ -90,23 +78,6 @@ public class ChatCompletionNoteAutomationService {
       chatRequestBuilder.addToOverallSystemMessage(instructions);
     }
 
-    var tool = AiToolFactory.removePointFromNoteAiTool(pointToRemove);
-    chatRequestBuilder.responseJsonSchema(tool);
-
-    return openAiApiHandler
-        .requestAndGetJsonSchemaResult(tool, chatRequestBuilder)
-        .map(
-            jsonNode -> {
-              try {
-                NoteDetailsRephrase noteDetailsRephrase =
-                    new ObjectMapperConfig()
-                        .objectMapper()
-                        .treeToValue(jsonNode, NoteDetailsRephrase.class);
-                return noteDetailsRephrase.getDetails();
-              } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-              }
-            })
-        .orElse("");
+    return chatRequestBuilder;
   }
 }
