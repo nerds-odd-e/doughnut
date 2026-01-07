@@ -65,7 +65,7 @@
     "@cucumber/cucumber": "^12.5.0",
     "@hey-api/openapi-ts": "0.90.2",
     "@mbtest/mountebank": "2.9.2",
-    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "@redocly/cli": "^2.14.3",
     "@testing-library/cypress": "10.1.0",
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
