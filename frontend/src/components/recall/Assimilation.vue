@@ -30,6 +30,7 @@
           :key="index"
           class="daisy-text-accent-content"
         >
+          <input type="checkbox" class="daisy-checkbox daisy-checkbox-xs daisy-checkbox-accent" />
           {{ point }}
         </li>
       </ul>

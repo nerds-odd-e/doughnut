@@ -308,6 +308,10 @@ Then('I can continue with the assimilation', () => {
   })
 })
 
+When('I mark the point {string} for removal as unrelated to the note', (point: string) => {
+  start.assumeAssimilationPage().selectChecklistTopicToIgnore(point)
+})
+
 Then(
   'the question generated for the note {string} should not include {string}',
   (noteTitle: string, excludedText: string) => {
