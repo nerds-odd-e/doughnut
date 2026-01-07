@@ -3,7 +3,7 @@
 **Source Quality**
 ------------------
 
-* Changes are committed to the  or  branch of the mono-repo.
+* Changes are committed to the trunk or main branch of the mono-repo.
 * The code, tests, and documentation are free of lint errors.
 * All code changes are reviewed by at least one other developer
 * Code from pair/mob programming is considered reviewed.
