@@ -307,3 +307,19 @@ Then('I can continue with the assimilation', () => {
     return url.includes('/assimilate') || url.includes('/recalls')
   })
 })
+
+Then(
+  'the question generated for the note {string} should not include {string}',
+  (noteTitle: string, excludedText: string) => {
+    start.recall().goToRecallPage().expectCurrentQuestion()
+    cy.pageIsNotLoading()
+    // Check all question stems and choices in the question table
+    cy.get('.quiz-instruction').within(() => {
+      // Assert that the entire question instruction (stem and choices) does not include the excluded text
+      cy.get('[data-test="stem"]').should('not.contain', excludedText)
+      cy.get('.choice-text').each(($choice) => {
+        cy.wrap($choice).should('not.contain', excludedText)
+      })
+    })
+  }
+)
