@@ -30,7 +30,12 @@
           :key="index"
           class="daisy-text-accent-content"
         >
-          <input type="checkbox" class="daisy-checkbox daisy-checkbox-xs daisy-checkbox-accent" />
+          <input
+            type="checkbox"
+            class="daisy-checkbox daisy-checkbox-xs daisy-checkbox-accent"
+            :checked="selectedPointsToRemove.has(index)"
+            @change="togglePointSelection(index)"
+          />
           {{ point }}
         </li>
       </ul>
@@ -80,9 +85,39 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 // State
 const buttonKey = computed(() => note.id)
 const isNoteRephrased = ref(false)
+const selectedPointsToRemove = ref<Set<number>>(new Set())
 
-const handleRephraseNote = () => {
-  isNoteRephrased.value = true
+const togglePointSelection = (index: number) => {
+  if (selectedPointsToRemove.value.has(index)) {
+    selectedPointsToRemove.value.delete(index)
+  } else {
+    selectedPointsToRemove.value.add(index)
+  }
+}
+
+const handleRephraseNote = async () => {
+  // Get the selected points to remove
+  const pointsToRemove = Array.from(selectedPointsToRemove.value)
+    .map(index => understandingPoints.value[index])
+    .join("; ")
+
+  if (!pointsToRemove) return
+
+  try {
+    const result = await apiCallWithLoading(() =>
+      AiController.removePointFromNote({
+        path: { note: note.id },
+        body: pointsToRemove,
+      })
+    )
+
+    if (!result.error && result.data) {
+      isNoteRephrased.value = true
+
+    }
+  } catch (err) {
+    console.error("Failed to rephrase note:", err)
+  }
 }
 
 // Understanding checklist from backend
