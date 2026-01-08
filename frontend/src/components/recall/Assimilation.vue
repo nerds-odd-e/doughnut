@@ -158,6 +158,13 @@ const onNoteTypeUpdated = () => {
   generateUnderstandingChecklist()
 }
 
+const getIgnoredChecklistTopics = (): string => {
+  return Array.from(selectedPointsToRemove.value)
+    .map((index) => understandingPoints.value[index])
+    .filter((point): point is string => Boolean(point))
+    .join(", ")
+}
+
 // Methods
 const processForm = async (skipMemoryTracking: boolean) => {
   if (skipMemoryTracking) {
@@ -173,10 +180,7 @@ const processForm = async (skipMemoryTracking: boolean) => {
     AssimilationController.assimilate({
       body: {
         noteId: note.id,
-        ignoredChecklistTopics:
-          note.noteTopology.title === "Netherlands"
-            ? "also called Holland"
-            : undefined,
+        ignoredChecklistTopics: getIgnoredChecklistTopics(),
         skipMemoryTracking,
       },
     })

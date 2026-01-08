@@ -107,8 +107,10 @@ Then('I am assimilating new note on day {int}', (day: number) => {
 When(
   'one of the checklist topic is selected to ignore {string} and assimilate the note',
   (topicText: string) => {
-    // start.assumeAssimilationPage().selectChecklistTopicToIgnore(topicText)
-    start.assumeAssimilationPage().assimilateCurrentNote()
+    start
+      .assumeAssimilationPage()
+      .selectChecklistTopicToIgnore(topicText)
+      .assimilateCurrentNote()
   }
 )
 
