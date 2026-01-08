@@ -14,6 +14,7 @@ import {
 } from "@generated/backend/sdk.gen"
 import getEnvironment from "./managedApi/window/getEnvironment"
 import MainMenu from "./components/toolbars/MainMenu.vue"
+import { useFeatureToggle } from "./composables/useFeatureToggle"
 
 const apiStatus: Ref<ApiStatus> = ref({
   states: [],
@@ -24,7 +25,7 @@ const user = ref<User | undefined>()
 provide("currentUser", user)
 
 const externalIdentifier = ref<string | undefined>()
-const featureToggle = ref(false)
+const { featureToggle, setFeatureToggle } = useFeatureToggle()
 const environment = ref("production")
 const userLoaded = ref(false)
 
@@ -40,7 +41,7 @@ onMounted(async () => {
         client: nonReloadingClient,
       })
     if (!toggleError) {
-      featureToggle.value = toggle!
+      setFeatureToggle(toggle!)
     }
   }
   const { data: userInfo, error: userError } =
@@ -80,7 +81,7 @@ onMounted(async () => {
     v-if="environment === 'testing'"
     :feature-toggle="featureToggle"
     :user="user"
-    @feature-toggle="featureToggle = $event"
+    @feature-toggle="setFeatureToggle($event)"
   />
 </template>
 
