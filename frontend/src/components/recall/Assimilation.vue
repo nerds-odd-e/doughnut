@@ -162,11 +162,11 @@ const getIgnoredChecklistTopics = (): string | undefined => {
   const points = Array.from(selectedPointsToRemove.value)
     .map((index) => understandingPoints.value[index])
     .filter((point): point is string => Boolean(point))
-  
+
   if (points.length === 0) {
     return undefined
   }
-  
+
   return points.join(", ")
 }
 
