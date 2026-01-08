@@ -310,18 +310,16 @@ Then('I can continue with the assimilation', () => {
   })
 })
 
-When(
-  'I mark the point {string} for removal as unrelated to the note',
-  (point: string) => {
-    start
-      .assumeAssimilationPage()
-      .selectChecklistTopicToIgnore(point)
-      .rephraseNoteWithIgnoredTopic()
-  }
-)
+When('I mark the point {string}', (point: string) => {
+  start.assumeAssimilationPage().selectChecklistTopicToIgnore(point)
+})
 
 Then('I should see the note rephrased as {string}', (rephrasedNote: string) => {
   start.assumeAssimilationPage().expectNoteRephrased(rephrasedNote)
+})
+
+When('let OpenAI rewrite the note without the marked points', () => {
+  start.assumeAssimilationPage().rephraseNoteWithIgnoredTopic()
 })
 
 Then(

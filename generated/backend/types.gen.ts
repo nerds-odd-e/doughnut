@@ -2939,7 +2939,7 @@ export type RemovePointFromNoteResponses = {
     /**
      * OK
      */
-    200: string;
+    200: NoteRealm;
 };
 
 export type RemovePointFromNoteResponse = RemovePointFromNoteResponses[keyof RemovePointFromNoteResponses];

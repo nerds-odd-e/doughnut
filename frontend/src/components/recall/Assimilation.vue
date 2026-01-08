@@ -39,7 +39,7 @@
           {{ point }}
         </li>
       </ul>
-      <input type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" @click="handleRephraseNote" />
+      <input v-if="featureToggle" type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" @click="handleRephraseNote" />
       <div v-if="isNoteRephrased" class="daisy-mt-3">
         <span class="daisy-font-semibold">Note Rephrased</span>
       </div>
@@ -66,6 +66,8 @@ import Breadcrumb from "../toolbars/Breadcrumb.vue"
 import { computed, ref } from "vue"
 import { useRecallData } from "@/composables/useRecallData"
 import { useAssimilationCount } from "@/composables/useAssimilationCount"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { useFeatureToggle } from "@/composables/useFeatureToggle"
 
 const { note } = defineProps<{
   note: Note
@@ -95,6 +97,9 @@ const togglePointSelection = (index: number) => {
   }
 }
 
+const storageAccessor = useStorageAccessor()
+const { featureToggle } = useFeatureToggle()
+
 const handleRephraseNote = async () => {
   // Get the selected points to remove
   const pointsToRemove = Array.from(selectedCheckListPoints.value)
@@ -112,6 +117,7 @@ const handleRephraseNote = async () => {
     )
 
     if (!result.error && result.data) {
+      storageAccessor.value.refreshNoteRealm(result.data)
       isNoteRephrased.value = true
     }
   } catch (err) {

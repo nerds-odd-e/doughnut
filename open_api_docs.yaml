@@ -2164,7 +2164,7 @@ paths:
           content:
             '*/*':
               schema:
-                type: string
+                $ref: "#/components/schemas/NoteRealm"
   /api/ai/generate-understanding-checklist/{note}:
     post:
       tags:
