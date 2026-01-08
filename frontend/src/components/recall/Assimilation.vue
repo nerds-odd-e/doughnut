@@ -113,7 +113,6 @@ const handleRephraseNote = async () => {
 
     if (!result.error && result.data) {
       isNoteRephrased.value = true
-
     }
   } catch (err) {
     console.error("Failed to rephrase note:", err)
