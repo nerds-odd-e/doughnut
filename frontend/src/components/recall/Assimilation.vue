@@ -98,7 +98,7 @@ const togglePointSelection = (index: number) => {
 const handleRephraseNote = async () => {
   // Get the selected points to remove
   const pointsToRemove = Array.from(selectedPointsToRemove.value)
-    .map(index => understandingPoints.value[index])
+    .map((index) => understandingPoints.value[index])
     .join("; ")
 
   if (!pointsToRemove) return
