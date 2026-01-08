@@ -49,12 +49,13 @@ public class QuestionGenerationRequestBuilder {
     String noteInstructions =
         "The JSON below is available only to you (the question generator). The user who will later answer the question does NOT see this JSON. You must NEVER refer to it explicitly or implicitly. Do NOT use words like \"this note\", \"above\", \"the focus note\", or anything revealing that the question originates from hidden context.\n";
 
-    return new OpenAIChatRequestBuilder()
-        .model(modelName)
-        .addUserMessage(noteInstructions + noteDescription)
-        .addUserMessage(
-            note.getIgnoredChecklistTopics() != null && !note.getIgnoredChecklistTopics().isEmpty()
-                ? "Ignore the topic '" + note.getIgnoredChecklistTopics() + "'"
-                : "");
+    var builder =
+        new OpenAIChatRequestBuilder()
+            .model(modelName)
+            .addUserMessage(noteInstructions + noteDescription);
+
+    if (note.ShouldIgnoreTopic())
+      builder.addUserMessage("Ignore the topic '" + note.getIgnoredChecklistTopics() + "'");
+    return builder;
   }
 }

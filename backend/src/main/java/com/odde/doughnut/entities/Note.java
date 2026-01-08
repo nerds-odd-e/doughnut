@@ -395,4 +395,11 @@ public class Note extends EntityIdentifiedByIdOnly {
     if (viewer == null) return false;
     return viewer.canReferTo(l.getParent().getNotebook());
   }
+
+  public boolean ShouldIgnoreTopic() {
+    if (ignoredChecklistTopics != null && !ignoredChecklistTopics.isEmpty()) {
+      return true;
+    }
+    return false;
+  }
 }
