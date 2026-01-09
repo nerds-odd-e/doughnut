@@ -339,6 +339,9 @@ Then(
 )
 
 Then('the understanding checklist should be updated as:', (data: DataTable) => {
-  const points = data.raw().map((row) => row[0]).filter((p): p is string => !!p)
+  const points = data
+    .raw()
+    .map((row) => row[0])
+    .filter((p): p is string => !!p)
   start.assumeAssimilationPage().expectUnderstandingPoints(points)
 })

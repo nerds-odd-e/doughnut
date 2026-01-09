@@ -249,7 +249,8 @@ Given(
         .chatCompletion()
         .requestMessageMatches({
           role: 'system',
-          content: '.*Please rephrase the note details to remove the following point.*',
+          content:
+            '.*Please rephrase the note details to remove the following point.*',
         })
         .stubNoteRephrase(reply)
     })
