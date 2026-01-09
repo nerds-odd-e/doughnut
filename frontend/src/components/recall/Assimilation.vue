@@ -16,6 +16,9 @@
     @note-type-updated="onNoteTypeUpdated"
     @note-info-loaded="onNoteInfoLoaded"
   />
+  <div v-if="isNoteRephrased" class="daisy-mb-4 daisy-p-3 daisy-rounded-lg daisy-bg-success daisy-text-success-content">
+    <span class="daisy-font-semibold">Note Rephrased</span>
+  </div>
   <div
     v-if="understandingPoints.length > 0"
     class="daisy-mb-4 daisy-rounded-lg daisy-bg-accent daisy-p-4"
@@ -40,9 +43,6 @@
         </li>
       </ul>
       <input v-if="featureToggle" type="button" class="daisy-btn daisy-btn-xs daisy-btn-accent" id="rephrase-note" value="Rephrase Note" @click="handleRephraseNote" />
-      <div v-if="isNoteRephrased" class="daisy-mt-3">
-        <span class="daisy-font-semibold">Note Rephrased</span>
-      </div>
     </div>
   </div>
   <AssimilationButtons
@@ -108,6 +108,10 @@ const handleRephraseNote = async () => {
 
   if (!pointsToRemove) return
 
+  // Clear the checklist to hide it while rephrasing
+  understandingPoints.value = []
+  selectedPointsToRemove.value = new Set()
+
   try {
     const result = await apiCallWithLoading(() =>
       AiController.removePointFromNote({
@@ -119,6 +123,7 @@ const handleRephraseNote = async () => {
     if (!result.error && result.data) {
       storageAccessor.value.refreshNoteRealm(result.data)
       isNoteRephrased.value = true
+      await generateUnderstandingChecklist()
     }
   } catch (err) {
     console.error("Failed to rephrase note:", err)
