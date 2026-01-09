@@ -33,7 +33,7 @@
           <input
             type="checkbox"
             class="daisy-checkbox daisy-checkbox-xs daisy-checkbox-accent"
-            :checked="selectedPointsToRemove.has(index)"
+            :checked="selectedCheckListPoints.has(index)"
             @change="togglePointSelection(index)"
           />
           {{ point }}
@@ -85,19 +85,19 @@ const { incrementAssimilatedCount } = useAssimilationCount()
 // State
 const buttonKey = computed(() => note.id)
 const isNoteRephrased = ref(false)
-const selectedPointsToRemove = ref<Set<number>>(new Set())
+const selectedCheckListPoints = ref<Set<number>>(new Set())
 
 const togglePointSelection = (index: number) => {
-  if (selectedPointsToRemove.value.has(index)) {
-    selectedPointsToRemove.value.delete(index)
+  if (selectedCheckListPoints.value.has(index)) {
+    selectedCheckListPoints.value.delete(index)
   } else {
-    selectedPointsToRemove.value.add(index)
+    selectedCheckListPoints.value.add(index)
   }
 }
 
 const handleRephraseNote = async () => {
   // Get the selected points to remove
-  const pointsToRemove = Array.from(selectedPointsToRemove.value)
+  const pointsToRemove = Array.from(selectedCheckListPoints.value)
     .map((index) => understandingPoints.value[index])
     .join("; ")
 
@@ -159,7 +159,7 @@ const onNoteTypeUpdated = () => {
 }
 
 const getIgnoredChecklistTopics = (): string | undefined => {
-  const points = Array.from(selectedPointsToRemove.value)
+  const points = Array.from(selectedCheckListPoints.value)
     .map((index) => understandingPoints.value[index])
     .filter((point): point is string => Boolean(point))
 
