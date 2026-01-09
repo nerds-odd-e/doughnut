@@ -110,7 +110,7 @@ const handleRephraseNote = async () => {
 
   // Clear the checklist to hide it while rephrasing
   understandingPoints.value = []
-  selectedPointsToRemove.value = new Set()
+  selectedCheckListPoints.value = new Set()
 
   try {
     const result = await apiCallWithLoading(() =>
