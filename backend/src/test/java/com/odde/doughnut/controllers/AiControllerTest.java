@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.odde.doughnut.controllers.dto.NoteRealm;
 import com.odde.doughnut.controllers.dto.SuggestedTitleDTO;
 import com.odde.doughnut.controllers.dto.UnderstandingChecklistDTO;
 import com.odde.doughnut.entities.*;
@@ -309,9 +310,9 @@ class AiControllerTest extends ControllerTestBase {
       rephrasedNote.setDetails(expectedRephrasedDetails);
       openAIChatCompletionMock.mockChatCompletionAndReturnJsonSchema(rephrasedNote);
 
-      String result = controller.removePointFromNote(testNote, pointToRemove);
+      NoteRealm result = controller.removePointFromNote(testNote, pointToRemove);
 
-      assertThat(result).isEqualTo(expectedRephrasedDetails);
+      assertThat(result.getNote().getDetails()).isEqualTo(expectedRephrasedDetails);
     }
 
     @Test
