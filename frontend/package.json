@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {
     "node": ">=24",
-    "pnpm": ">=10.27.0"
+    "pnpm": ">=10.28.0"
   },
   "scripts": {
     "preinstall": "npx only-allow pnpm",
@@ -41,7 +41,7 @@
     "@storybook/vue3-vite": "8.6.15",
     "@testing-library/user-event": "^14.6.1",
     "@testing-library/vue": "^8.1.0",
-    "@types/node": "25.0.3",
+    "@types/node": "25.0.6",
     "@types/turndown": "^5.0.6",
     "@vitejs/plugin-vue": "^6.0.3",
     "@vitejs/plugin-vue-jsx": "^5.1.3",
