@@ -40,6 +40,9 @@ const config = defineConfig({
       'node_modules/**/*.spec.js',
       'node_modules/**/*.test.js',
       'node_modules/**/test.js',
+      // Exclude browser mode test files (they use different config)
+      '**/*.browser.spec.ts',
+      '**/*.browser.spec.tsx',
     ],
     fakeTimers: {
       toFake: [
