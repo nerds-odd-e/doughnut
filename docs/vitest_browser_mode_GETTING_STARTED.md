@@ -22,11 +22,13 @@ pnpm exec playwright install chromium
 ## Running Browser Mode Tests
 
 ### Run all browser tests
+
 ```bash
 pnpm test:browser
 ```
 
 ### Run browser tests in watch mode
+
 ```bash
 pnpm test:browser:watch
 ```
@@ -43,10 +45,12 @@ Both test suites can run in parallel!
 ### Example 1: Simple Component (Modal)
 
 **Original** (`tests/commons/Modal.spec.ts`):
+
 - Mocks Vue Router
 - Uses jsdom
 
 **Browser Version** (`tests/commons/Modal.browser.spec.ts`):
+
 - Uses real Vue Router
 - Runs in real browser
 - Better CSS rendering with Tailwind/DaisyUI
@@ -54,10 +58,12 @@ Both test suites can run in parallel!
 ### Example 2: Component with IntersectionObserver (AiResponse)
 
 **Original** (`tests/components/conversation/AiResponse.spec.ts`):
+
 - Mocks `IntersectionObserver`
 - Mocks `window.performance`
 
 **Browser Version** (`tests/components/conversation/AiResponse.browser.spec.ts`):
+
 - ✅ **No IntersectionObserver mock** - uses real API!
 - ✅ **No performance mock** - uses real API!
 - Still mocks modules (`AiReplyEventSource`) - module mocks still work
@@ -65,6 +71,7 @@ Both test suites can run in parallel!
 ## Key Differences in Browser Mode
 
 ### 1. Real Browser APIs
+
 - `IntersectionObserver` - Real API, no mocking needed
 - `FormData` - Real API
 - `Canvas API` - Real API
@@ -72,15 +79,18 @@ Both test suites can run in parallel!
 - `document`, `window` - Real DOM
 
 ### 2. Module Mocks Still Work
+
 - `vi.mock()` for modules still works
 - You can mock composables, services, etc.
 - Only browser APIs don't need mocking
 
 ### 3. Async Rendering
+
 - `mount()` and `render()` may need `await` in some cases
 - Browser Mode is more async-friendly
 
 ### 4. CSS Rendering
+
 - Real CSS rendering with Tailwind and DaisyUI
 - Visual debugging available with `--ui` flag
 
@@ -90,18 +100,22 @@ Both test suites can run in parallel!
 ✅ Browser setup file (`tests/setupVitest.browser.ts`)
 ✅ Package.json scripts
 ✅ Example migrations:
-  - `tests/commons/Modal.browser.spec.ts`
-  - `tests/components/conversation/AiResponse.browser.spec.ts`
+
+- `tests/commons/Modal.browser.spec.ts`
+- `tests/components/conversation/AiResponse.browser.spec.ts`
 
 ## Next Steps
 
 1. **Install dependencies** (see Installation above)
 2. **Run the example tests** to verify setup:
+
    ```bash
    pnpm test:browser
    ```
+
 3. **Migrate more tests** following the examples
 4. **Use UI mode** for debugging:
+
    ```bash
    pnpm test:browser:watch
    ```
@@ -117,15 +131,19 @@ Both test suites can run in parallel!
 ## Troubleshooting
 
 ### "Cannot find module '@vitest/browser-playwright'"
+
 Run: `pnpm install`
 
 ### "Playwright browsers not found"
+
 Run: `pnpm exec playwright install chromium`
 
 ### "Cannot find dependency '@vitest/ui'"
+
 Run: `pnpm install` (it's already in package.json, just needs to be installed)
 
 ### Tests are slow
+
 - Browser Mode is slower than jsdom, but still fast
 - Use `headless: true` in CI (already configured)
 - Use `--ui` only for debugging
