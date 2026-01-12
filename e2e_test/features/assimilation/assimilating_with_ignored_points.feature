@@ -15,16 +15,17 @@ Feature: Assimilation With Ignored Points
       | The Netherlands is a country in Europe |
       | also called Holland                    |
     And AI will generate a question when prompt include "Ignore the topic 'also called Holland'":
-      | Question Stem               | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | Netherlands is also called? | Low country    | Germany            | France             |
+      | Question Stem                     | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | Where is the Netherlands located? | Europe         | Asia               | Africa             |
     And AI will generate a question when prompt doesn't include "Ignore the topic 'also called Holland'":
-      | Question Stem               | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
-      | Netherlands is also called? | Holland        | Germany            | France             |
+      | Question Stem                  | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
+      | What is Holland also known as? | Netherlands    | Germany            | France             |
     When I am assimilating new note on day 1
     And one of the checklist topic is selected to ignore "<ignored_point>" and assimilate the note
-    Then the question generated for the note "Netherlands" should not include "<excluded_text>"
+    And I go to the recalls page
+    Then I should be asked "<expected_question_stem>"
 
     Examples:
-      | ignored_point                          | excluded_text |
-      | also called Holland                    | Holland       |
-      | The Netherlands is a country in Europe | Low country   |
+      | ignored_point                          | expected_question_stem            |
+      | also called Holland                    | Where is the Netherlands located? |
+      | The Netherlands is a country in Europe | What is Holland also known as?    |
