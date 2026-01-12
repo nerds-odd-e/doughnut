@@ -7,6 +7,7 @@ import AssessmentAndCertificateHistoryPage from "@/pages/AssessmentAndCertificat
 import AssessmentPage from "@/pages/AssessmentPage.vue"
 import RecallPage from "@/pages/RecallPage.vue"
 import AssimilationPage from "@/pages/AssimilationPage.vue"
+import AssimilateSingleNotePage from "@/pages/AssimilateSingleNotePage.vue"
 import CircleShowPage from "@/pages/CircleShowPage.vue"
 import CircleJoinPage from "@/pages/CircleJoinPage.vue"
 import FailureReportPage from "@/pages/FailureReportPage.vue"
@@ -37,6 +38,7 @@ const componentMap: Record<string, unknown> = {
   messageCenter: MessageCenterPage,
   assessment: AssessmentPage,
   assimilate: AssimilationPage,
+  assimilateSingleNote: AssimilateSingleNotePage,
   recall: RecallPage,
   failureReport: FailureReportPage,
   nonproductionOnlyLogin: NonproductionOnlyLoginPage,

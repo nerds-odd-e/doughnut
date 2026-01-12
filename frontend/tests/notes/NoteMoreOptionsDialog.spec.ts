@@ -11,8 +11,11 @@ import RenderingHelper from "@tests/helpers/RenderingHelper"
 import type { NoteInfo } from "@generated/backend"
 import usePopups from "@/components/commons/Popups/usePopups"
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { createRouter, createWebHistory } from "vue-router"
+import routes from "@/routes/routes"
 
 let renderer: RenderingHelper<typeof NoteMoreOptionsDialog>
+let router: ReturnType<typeof createRouter>
 let getNoteInfoSpy: ReturnType<typeof mockSdkService<"getNoteInfo">>
 let updateNoteTypeSpy: ReturnType<typeof mockSdkService<"updateNoteType">>
 let deleteNoteSpy: ReturnType<typeof mockSdkService<"deleteNote">>
@@ -38,9 +41,13 @@ beforeEach(() => {
   getNoteInfoSpy = mockSdkService("getNoteInfo", mockNoteInfo)
   updateNoteTypeSpy = mockSdkService("updateNoteType", undefined)
   deleteNoteSpy = mockSdkService("deleteNote", undefined)
+  router = createRouter({
+    history: createWebHistory(),
+    routes,
+  })
   renderer = helper
     .component(NoteMoreOptionsDialog)
-    .withRouter()
+    .withRouter(router)
     .withCleanStorage()
 })
 
@@ -246,7 +253,39 @@ describe("NoteMoreOptionsDialog", () => {
       expect(
         wrapper.find('button[title="Questions for the note"]').exists()
       ).toBe(true)
+      expect(
+        wrapper.find('button[title="Assimilate this note"]').exists()
+      ).toBe(true)
       expect(wrapper.find('button[title="Delete note"]').exists()).toBe(true)
+    })
+  })
+
+  describe("assimilate note", () => {
+    it("navigates to assimilate page when assimilate button is clicked", async () => {
+      const wrapper = renderer.withProps({ note }).mount()
+
+      await flushPromises()
+
+      const assimilateButton = wrapper.find(
+        'button[title="Assimilate this note"]'
+      )
+      await assimilateButton.trigger("click")
+
+      expect(router.currentRoute.value.name).toBe("assimilateSingleNote")
+      expect(router.currentRoute.value.params.noteId).toBe(String(note.id))
+    })
+
+    it("emits close-dialog when assimilate button is clicked", async () => {
+      const wrapper = renderer.withProps({ note }).mount()
+
+      await flushPromises()
+
+      const assimilateButton = wrapper.find(
+        'button[title="Assimilate this note"]'
+      )
+      await assimilateButton.trigger("click")
+
+      expect(wrapper.emitted()).toHaveProperty("close-dialog")
     })
   })
 })

@@ -75,6 +75,12 @@ export const routeMetadata: RouteMetadata[] = [
     meta: { useNoteStorageAccessor: true },
   },
   {
+    path: "/d/assimilate/:noteId",
+    name: "assimilateSingleNote",
+    props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
+    meta: { useNoteStorageAccessor: true },
+  },
+  {
     path: "/d/recall",
     name: "recall",
     meta: { useNoteStorageAccessor: true },

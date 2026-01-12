@@ -83,6 +83,14 @@
 
       <button
         class="daisy-btn daisy-btn-ghost daisy-btn-sm"
+        title="Assimilate this note"
+        @click="assimilateNote"
+      >
+        <SvgAssimilate />
+      </button>
+
+      <button
+        class="daisy-btn daisy-btn-ghost daisy-btn-sm"
         title="Delete note"
         @click="deleteNote"
       >
@@ -104,6 +112,7 @@ import NoteEditUrlDialog from "./NoteEditUrlDialog.vue"
 import SvgExport from "../../svgs/SvgExport.vue"
 import NoteExportDialog from "../core/NoteExportDialog.vue"
 import SvgAssessment from "../../svgs/SvgAssessment.vue"
+import SvgAssimilate from "../../svgs/SvgAssimilate.vue"
 import SvgRemove from "../../svgs/SvgRemove.vue"
 import SvgRobot from "../../svgs/SvgRobot.vue"
 import SvgImage from "../../svgs/SvgImage.vue"
@@ -157,6 +166,11 @@ const noteAccessoriesUpdated = (closer: () => void, na: NoteAccessory) => {
     emit("note-accessory-updated", na)
   }
   closer()
+}
+
+const assimilateNote = () => {
+  router.push({ name: "assimilateSingleNote", params: { noteId: note.id } })
+  closeDialog()
 }
 
 const deleteNote = async () => {
