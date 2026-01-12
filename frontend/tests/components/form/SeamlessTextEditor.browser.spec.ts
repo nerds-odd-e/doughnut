@@ -44,7 +44,7 @@ describe("SeamlessTextEditor", () => {
     const clipboardData = new DataTransfer()
     clipboardData.setData("text/plain", "Bold text")
     clipboardData.setData("text/html", "<p><strong>Bold text</strong></p>")
-    
+
     const pasteEvent = new ClipboardEvent("paste", {
       bubbles: true,
       cancelable: true,

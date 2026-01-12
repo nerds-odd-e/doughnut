@@ -63,7 +63,7 @@ describe("RichMarkdownEditor", () => {
     // Create a real clipboard event with HTML data
     const clipboardData = new DataTransfer()
     clipboardData.setData("text/html", "<p><strong>Bold text</strong></p>")
-    
+
     const pasteEvent = new ClipboardEvent("paste", {
       bubbles: true,
       cancelable: true,
