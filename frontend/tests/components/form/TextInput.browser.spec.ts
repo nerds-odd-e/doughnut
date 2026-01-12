@@ -44,7 +44,9 @@ describe("TextInput.vue", () => {
     expect(selectSpy).toHaveBeenCalled()
 
     // Verify the element exists
-    const inputElement = document.getElementById("test-test") as HTMLInputElement
+    const inputElement = document.getElementById(
+      "test-test"
+    ) as HTMLInputElement
     expect(inputElement).toBeTruthy()
 
     selectSpy.mockRestore()
@@ -67,7 +69,9 @@ describe("TextInput.vue", () => {
     await new Promise((resolve) => setTimeout(resolve, 10))
 
     // Browser Mode: Use real getElementById and real select() method
-    const inputElement = document.getElementById("test-test") as HTMLInputElement
+    const inputElement = document.getElementById(
+      "test-test"
+    ) as HTMLInputElement
     expect(inputElement).toBeTruthy()
 
     // Browser Mode: Spy on the REAL select() method to verify it's NOT called
