@@ -1,12 +1,11 @@
-import { screen } from "@testing-library/vue"
 import Sidebar from "@/components/notes/Sidebar.vue"
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
 import type { NoteRealm } from "@/generated/backend"
-import { flushPromises } from "@vue/test-utils"
+import createNoteStorage from "@/store/createNoteStorage"
+import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
-import { fireEvent } from "@testing-library/vue"
-import createNoteStorage from "@/store/createNoteStorage"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import { flushPromises } from "@vue/test-utils"
 import { vi } from "vitest"
 
 function isBefore(node1: Node, node2: Node) {
