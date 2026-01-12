@@ -29,7 +29,7 @@ or, when there's no db migration needed, run the follow will be faster:
 CURSOR_DEV=true nix develop -c pnpm backend:test_only
 ```
 
-Always run all unit tests instead of just sepected file or test case, unlike for e2e test.
+Always run all unit tests instead of just selected file or test case, unlike for e2e test.
 
 ## Core Principles
 
