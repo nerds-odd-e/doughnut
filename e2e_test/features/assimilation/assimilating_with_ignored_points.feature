@@ -20,7 +20,7 @@ Feature: Assimilation With Ignored Points
     And AI will generate a question when prompt doesn't include "Ignore the topic 'also called Holland'":
       | Question Stem                  | Correct Choice | Incorrect Choice 1 | Incorrect Choice 2 |
       | What is Holland also known as? | Netherlands    | Germany            | France             |
-    When I am assimilating new note on day 1
+    When I am assimilating the note "Netherlands"
     And one of the checklist topic is selected to ignore "<ignored_point>" and assimilate the note
     And I go to the recalls page
     Then I should be asked "<expected_question_stem>"
