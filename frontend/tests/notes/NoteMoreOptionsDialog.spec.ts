@@ -262,6 +262,7 @@ describe("NoteMoreOptionsDialog", () => {
 
   describe("assimilate note", () => {
     it("navigates to assimilate page when assimilate button is clicked", async () => {
+      await router.push("/")
       const wrapper = renderer.withProps({ note }).mount()
 
       await flushPromises()
@@ -270,6 +271,8 @@ describe("NoteMoreOptionsDialog", () => {
         'button[title="Assimilate this note"]'
       )
       await assimilateButton.trigger("click")
+
+      await flushPromises()
 
       expect(router.currentRoute.value.name).toBe("assimilateSingleNote")
       expect(router.currentRoute.value.params.noteId).toBe(String(note.id))

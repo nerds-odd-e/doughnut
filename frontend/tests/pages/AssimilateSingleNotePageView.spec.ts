@@ -1,13 +1,32 @@
 import AssimilateSingleNotePageView from "@/pages/AssimilateSingleNotePageView.vue"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, describe, expect, it } from "vitest"
+import { beforeEach, describe, expect, it, vi } from "vitest"
 import makeMe from "@tests/fixtures/makeMe"
-import helper from "@tests/helpers"
+import helper, { mockSdkService } from "@tests/helpers"
 import RenderingHelper from "@tests/helpers/RenderingHelper"
 
 let renderer: RenderingHelper<typeof AssimilateSingleNotePageView>
 
 beforeEach(() => {
+  const noteRealm = makeMe.aNoteRealm.please()
+  mockSdkService("getNoteInfo", {
+    note: noteRealm,
+    recallSetting: {
+      level: 0,
+      rememberSpelling: false,
+      skipMemoryTracking: false,
+    },
+    memoryTrackers: [],
+    createdAt: "",
+    noteType: undefined,
+  })
+  mockSdkService("showNoteAccessory", {})
+  mockSdkService("showNote", noteRealm)
+  mockSdkService("generateUnderstandingChecklist", { points: [] })
+  // Suppress Vue warnings about emitted events (false positives)
+  vi.spyOn(console, "warn").mockImplementation(() => {
+    // Intentionally empty to suppress warnings
+  })
   renderer = helper
     .component(AssimilateSingleNotePageView)
     .withRouter()

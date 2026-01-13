@@ -14,6 +14,19 @@ let showNoteSpy: ReturnType<typeof mockSdkService<"showNote">>
 beforeEach(() => {
   const noteRealm = makeMe.aNoteRealm.please()
   showNoteSpy = mockSdkService("showNote", noteRealm)
+  mockSdkService("getNoteInfo", {
+    note: noteRealm,
+    recallSetting: {
+      level: 0,
+      rememberSpelling: false,
+      skipMemoryTracking: false,
+    },
+    memoryTrackers: [],
+    createdAt: "",
+    noteType: undefined,
+  })
+  mockSdkService("showNoteAccessory", {})
+  mockSdkService("generateUnderstandingChecklist", { points: [] })
   router = createRouter({
     history: createWebHistory(),
     routes,
