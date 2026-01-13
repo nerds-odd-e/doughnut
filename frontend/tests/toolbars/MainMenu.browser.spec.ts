@@ -1,15 +1,15 @@
 import MainMenu from "@/components/toolbars/MainMenu.vue"
+import { useRecallData } from "@/composables/useRecallData"
+import timezoneParam from "@/managedApi/window/timezoneParam"
+import routes from "@/routes/routes"
 import type { User } from "@generated/backend"
-import { screen, fireEvent } from "@testing-library/vue"
+import { fireEvent, screen } from "@testing-library/vue"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, { mockSdkService } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import timezoneParam from "@/managedApi/window/timezoneParam"
 import { beforeEach, vi } from "vitest"
-import { useRecallData } from "@/composables/useRecallData"
 import { computed, ref } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
-import routes from "@/routes/routes"
 
 vi.mock("@/composables/useRecallData")
 
