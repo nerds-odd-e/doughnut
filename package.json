@@ -107,7 +107,8 @@
       "body-parser": ">=2.2.1",
       "express": ">=5.2.0",
       "systeminformation": ">=5.27.14",
-      "qs": ">=6.14.1"
+      "qs": ">=6.14.1",
+      "hono": ">=4.11.4"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
