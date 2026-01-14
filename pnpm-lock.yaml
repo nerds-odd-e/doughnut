@@ -53,8 +53,8 @@ importers:
         specifier: ^1.25.2
         version: 1.25.2(hono@4.11.1)(zod@4.3.5)
       '@redocly/cli':
-        specifier: ^2.14.4
-        version: 2.14.4(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)
+        specifier: ^2.14.5
+        version: 2.14.5(@opentelemetry/api@1.9.0)(core-js@3.46.0)
       '@testing-library/cypress':
         specifier: 10.1.0
         version: 10.1.0(cypress@15.8.2)
@@ -1339,27 +1339,27 @@ packages:
   '@redocly/ajv@8.17.1':
     resolution: {integrity: sha512-EDtsGZS964mf9zAUXAl9Ew16eYbeyAFWhsPr0fX6oaJxgd8rApYlPBf0joyhnUHz88WxrigyFtTaqqzXNzPgqw==}
 
-  '@redocly/cli@2.14.4':
-    resolution: {integrity: sha512-DM6xT3hIvEc7a0z4r2DzUkusfmkPs0at6MGOiouASqxlG/k5k38KwIII51mE0c8VmMGhArhxZAFnptoycVpFoQ==}
+  '@redocly/cli@2.14.5':
+    resolution: {integrity: sha512-02Zz7YS7UwfBpbHbF64ApUkspr8Ar2XytgZ7JUljVwz+VjzCRcxkGMGE82BVYYQNKkw/YwlNOIX+lYYNbowTcw==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
     hasBin: true
 
   '@redocly/config@0.22.2':
     resolution: {integrity: sha512-roRDai8/zr2S9YfmzUfNhKjOF0NdcOIqF7bhf4MVC5UxpjIysDjyudvlAiVbpPHp3eDRWbdzUgtkK1a7YiDNyQ==}
 
-  '@redocly/config@0.41.1':
-    resolution: {integrity: sha512-LcMCzFbP/sqkCLSG3YswmeScP4fM5SjDCQizwa+psZ0PhYrKOMF7azZ6ZBkWs115uv5RfOk+jYAWLdKkZGGGXg==}
+  '@redocly/config@0.41.2':
+    resolution: {integrity: sha512-G6muhdTKcEV2TECBFzuT905p4a27OgUtwBqRVnMx1JebO6i8zlm6bPB2H3fD1Hl+MiUpk7Jx2kwGmLVgpz5nIg==}
 
   '@redocly/openapi-core@1.34.6':
     resolution: {integrity: sha512-2+O+riuIUgVSuLl3Lyh5AplWZyVMNuG2F98/o6NrutKJfW4/GTZdPpZlIphS0HGgcOHgmWcCSHj+dWFlZaGSHw==}
     engines: {node: '>=18.17.0', npm: '>=9.5.0'}
 
-  '@redocly/openapi-core@2.14.4':
-    resolution: {integrity: sha512-FqYf8pBXrZlbhjgcqEpgWrYk3E5j04I4nx0Pn2rMMlDe9S8N9T6axemJGHC6HvrzVJrTWLsUIsV6ndpBICnR2g==}
+  '@redocly/openapi-core@2.14.5':
+    resolution: {integrity: sha512-MQQR+RCG0V+jZV6msgKv1CNi/+TZUXmjMAAuTEktaTOYIsQWTCV9GYSD/2n94eMDZwxI4olr05OPzOZo9z0EMg==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
-  '@redocly/respect-core@2.14.4':
-    resolution: {integrity: sha512-b7AZVVo6XXU5DFSUFv0m0ZmaLbRGILUMEV+ZlDKzIYRd9SDUNOze6DtFNPQjz+ePJnvzu1s55ZluQXPyF0y4fQ==}
+  '@redocly/respect-core@2.14.5':
+    resolution: {integrity: sha512-zZKYwBZYfRi4/Iv2V7hq9xOYhpO3+IuzYjk8/V0CZjoHCnoW8jgGGhvoXMn/BfedZS9/3fV9n4SEskIbmCPl8Q==}
     engines: {node: '>=22.12.0 || >=20.19.0 <21.0.0', npm: '>=10'}
 
   '@rolldown/pluginutils@1.0.0-beta.53':
@@ -7296,16 +7296,17 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  '@redocly/cli@2.14.4(@opentelemetry/api@1.9.0)(ajv@8.17.1)(core-js@3.46.0)':
+  '@redocly/cli@2.14.5(@opentelemetry/api@1.9.0)(core-js@3.46.0)':
     dependencies:
       '@opentelemetry/exporter-trace-otlp-http': 0.202.0(@opentelemetry/api@1.9.0)
       '@opentelemetry/resources': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/sdk-trace-node': 2.0.1(@opentelemetry/api@1.9.0)
       '@opentelemetry/semantic-conventions': 1.34.0
-      '@redocly/openapi-core': 2.14.4(ajv@8.17.1)
-      '@redocly/respect-core': 2.14.4(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.5
+      '@redocly/respect-core': 2.14.5
       abort-controller: 3.0.0
-      ajv-formats: 3.0.1(ajv@8.17.1)
+      ajv: '@redocly/ajv@8.17.1'
+      ajv-formats: 3.0.1(@redocly/ajv@8.17.1)
       chokidar: 3.6.0
       colorette: 1.4.0
       cookie: 0.7.2
@@ -7327,7 +7328,6 @@ snapshots:
       yargs: 17.0.1
     transitivePeerDependencies:
       - '@opentelemetry/api'
-      - ajv
       - bufferutil
       - core-js
       - encoding
@@ -7337,7 +7337,7 @@ snapshots:
 
   '@redocly/config@0.22.2': {}
 
-  '@redocly/config@0.41.1':
+  '@redocly/config@0.41.2':
     dependencies:
       json-schema-to-ts: 2.7.2
 
@@ -7355,34 +7355,32 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@redocly/openapi-core@2.14.4(ajv@8.17.1)':
+  '@redocly/openapi-core@2.14.5':
     dependencies:
       '@redocly/ajv': 8.17.1
-      '@redocly/config': 0.41.1
-      ajv-formats: 3.0.1(ajv@8.17.1)
+      '@redocly/config': 0.41.2
+      ajv: '@redocly/ajv@8.17.1'
+      ajv-formats: 3.0.1(@redocly/ajv@8.17.1)
       colorette: 1.4.0
       js-levenshtein: 1.1.6
       js-yaml: 4.1.1
       picomatch: 4.0.3
       pluralize: 8.0.0
       yaml-ast-parser: 0.0.43
-    transitivePeerDependencies:
-      - ajv
 
-  '@redocly/respect-core@2.14.4(ajv@8.17.1)':
+  '@redocly/respect-core@2.14.5':
     dependencies:
       '@faker-js/faker': 7.6.0
       '@noble/hashes': 1.8.0
       '@redocly/ajv': 8.17.1
-      '@redocly/openapi-core': 2.14.4(ajv@8.17.1)
-      better-ajv-errors: 1.2.0(ajv@8.17.1)
+      '@redocly/openapi-core': 2.14.5
+      ajv: '@redocly/ajv@8.17.1'
+      better-ajv-errors: 1.2.0(@redocly/ajv@8.17.1)
       colorette: 2.0.20
       json-pointer: 0.6.2
       jsonpath-rfc9535: 1.3.0
       openapi-sampler: 1.6.2
       outdent: 0.8.0
-    transitivePeerDependencies:
-      - ajv
 
   '@rolldown/pluginutils@1.0.0-beta.53': {}
 
@@ -8011,7 +8009,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vitest: 4.0.17(@opentelemetry/api@1.9.0)(@types/node@25.0.6)(@vitest/browser-playwright@4.0.17)(@vitest/ui@4.0.17)(jiti@2.6.1)(jsdom@27.4.0)(sass@1.97.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.17(@opentelemetry/api@1.9.0)(@types/node@25.0.6)(@vitest/browser-playwright@4.0.17)(@vitest/ui@4.0.17)(jiti@1.21.7)(jsdom@27.4.0)(sass@1.97.2)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/utils@2.0.5':
     dependencies:
@@ -8270,6 +8268,10 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
+  ajv-formats@3.0.1(@redocly/ajv@8.17.1):
+    optionalDependencies:
+      ajv: '@redocly/ajv@8.17.1'
+
   ajv-formats@3.0.1(ajv@8.17.1):
     optionalDependencies:
       ajv: 8.17.1
@@ -8418,11 +8420,11 @@ snapshots:
     dependencies:
       tweetnacl: 0.14.5
 
-  better-ajv-errors@1.2.0(ajv@8.17.1):
+  better-ajv-errors@1.2.0(@redocly/ajv@8.17.1):
     dependencies:
       '@babel/code-frame': 7.27.1
       '@humanwhocodes/momoa': 2.0.4
-      ajv: 8.17.1
+      ajv: '@redocly/ajv@8.17.1'
       chalk: 4.1.2
       jsonpointer: 5.0.1
       leven: 3.1.0
@@ -10746,7 +10748,7 @@ snapshots:
       oas-kit-common: 1.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
 
   oas-schema-walker@1.1.5: {}
 
@@ -11929,7 +11931,7 @@ snapshots:
       oas-validator: 5.0.8
       reftools: 1.1.9
       yaml: 1.10.2
-      yargs: 17.0.1
+      yargs: 17.7.2
     transitivePeerDependencies:
       - encoding
 
