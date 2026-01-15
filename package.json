@@ -80,7 +80,7 @@
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.6.6",
-    "hono": "^4.11.4",
+    "hono": ">=4.11.4",
     "jsdom": "^27.4.0",
     "npm-run-all2": "^8.0.4",
     "process": "^0.11.10",
@@ -110,7 +110,8 @@
       "systeminformation": ">=5.27.14",
       "qs": ">=6.14.1",
       "hono": ">=4.11.4",
-      "undici": ">=6.23.0"
+      "undici": ">=6.23.0",
+      "diff": ">=8.0.3"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",
