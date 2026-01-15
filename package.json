@@ -75,12 +75,12 @@
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.33",
     "@types/node": "25.0.8",
-    "hono": ">=4.11.4",
     "adm-zip": "^0.5.16",
     "cypress": "15.9.0",
     "cypress-file-upload": "^5.0.8",
     "github_action_sound": "^1.0.5",
     "got": "^14.6.6",
+    "hono": "^4.11.4",
     "jsdom": "^27.4.0",
     "npm-run-all2": "^8.0.4",
     "process": "^0.11.10",
@@ -109,7 +109,8 @@
       "express": ">=5.2.0",
       "systeminformation": ">=5.27.14",
       "qs": ">=6.14.1",
-      "hono": ">=4.11.4"
+      "hono": ">=4.11.4",
+      "undici": ">=6.23.0"
     },
     "onlyBuiltDependencies": [
       "@badeball/cypress-cucumber-preprocessor",

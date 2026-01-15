@@ -19,6 +19,7 @@ overrides:
   systeminformation: '>=5.27.14'
   qs: '>=6.14.1'
   hono: '>=4.11.4'
+  undici: '>=6.23.0'
 
 importers:
 
@@ -83,7 +84,7 @@ importers:
         specifier: ^14.6.6
         version: 14.6.6
       hono:
-        specifier: '>=4.11.4'
+        specifier: ^4.11.4
         version: 4.11.4
       jsdom:
         specifier: ^27.4.0
@@ -1035,10 +1036,6 @@ packages:
   '@faker-js/faker@7.6.0':
     resolution: {integrity: sha512-XK6BTq1NDMo9Xqw/YkYyGjSsg44fbNwYRx7QK2CuoQgyy+f1rrTDHoExVM5PsyXCtfl2vs2vVJ0MN0yN6LppRw==}
     engines: {node: '>=14.0.0', npm: '>=6.0.0'}
-
-  '@fastify/busboy@2.1.1':
-    resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
-    engines: {node: '>=14'}
 
   '@hapi/address@5.1.1':
     resolution: {integrity: sha512-A+po2d/dVoY7cYajycYI43ZbYMXukuopIsqCjh5QzsBCipDtdofHntljDlpccMjIfTy6UOkg+5KPriwYch2bXA==}
@@ -5751,13 +5748,9 @@ packages:
   undici-types@7.16.0:
     resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
 
-  undici@5.29.0:
-    resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
-    engines: {node: '>=14.0'}
-
-  undici@6.23.0:
-    resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
-    engines: {node: '>=18.17'}
+  undici@7.18.2:
+    resolution: {integrity: sha512-y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==}
+    engines: {node: '>=20.18.1'}
 
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
@@ -6329,7 +6322,7 @@ snapshots:
   '@actions/http-client@3.0.1':
     dependencies:
       tunnel: 0.0.6
-      undici: 5.29.0
+      undici: 7.18.2
 
   '@actions/io@2.0.0': {}
 
@@ -7035,8 +7028,6 @@ snapshots:
 
   '@faker-js/faker@7.6.0': {}
 
-  '@fastify/busboy@2.1.1': {}
-
   '@hapi/address@5.1.1':
     dependencies:
       '@hapi/hoek': 11.0.7
@@ -7407,7 +7398,7 @@ snapshots:
       simple-websocket: 9.1.0
       styled-components: 6.3.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       ulid: 3.0.2
-      undici: 6.23.0
+      undici: 7.18.2
       yargs: 17.0.1
     transitivePeerDependencies:
       - '@opentelemetry/api'
@@ -12261,11 +12252,7 @@ snapshots:
 
   undici-types@7.16.0: {}
 
-  undici@5.29.0:
-    dependencies:
-      '@fastify/busboy': 2.1.1
-
-  undici@6.23.0: {}
+  undici@7.18.2: {}
 
   unicorn-magic@0.3.0: {}
 
