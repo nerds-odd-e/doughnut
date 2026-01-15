@@ -1,13 +1,13 @@
+import { useStorageAccessor } from "@/composables/useStorageAccessor"
+import routes from "@/routes/routes"
+import createNoteStorage from "@/store/createNoteStorage"
+import type { User } from "@generated/backend"
 import { render } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
 import { merge } from "es-toolkit"
 import { ref, type DefineComponent } from "vue"
 import type { RouteLocationRaw } from "vue-router"
 import { createRouter, createWebHistory } from "vue-router"
-import createNoteStorage from "@/store/createNoteStorage"
-import routes from "@/routes/routes"
-import type { User } from "@generated/backend"
-import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
 interface NoteStorageProps {
   [key: string]: unknown
@@ -87,10 +87,16 @@ class RenderingHelper<T = DefineComponent> {
   }
 
   mount(options: Record<string, unknown> = {}) {
+    const { global: existingGlobal = {} } = this.options
+    const { global: newGlobal = {} } = options
+
     return mount<T>(this.comp, {
       ...this.options,
       ...options,
-      global: merge(this.options.global, options.global || {}),
+      global: merge(
+        existingGlobal as Record<string, unknown>,
+        newGlobal as Record<string, unknown>
+      ),
     })
   }
 
