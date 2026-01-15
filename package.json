@@ -75,6 +75,7 @@
     "@types/cypress-cucumber-preprocessor": "^4.0.5",
     "@types/jquery": "^3.5.33",
     "@types/node": "25.0.8",
+    "hono": ">=4.11.4",
     "adm-zip": "^0.5.16",
     "cypress": "15.9.0",
     "cypress-file-upload": "^5.0.8",
