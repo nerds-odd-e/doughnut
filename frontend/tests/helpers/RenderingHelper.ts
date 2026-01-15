@@ -90,6 +90,7 @@ class RenderingHelper<T = DefineComponent> {
     return mount<T>(this.comp, {
       ...this.options,
       ...options,
+      global: merge(this.options.global, options.global || {}),
     })
   }
 

@@ -3,14 +3,14 @@ import NoteAudioTools from "@/components/notes/accessory/NoteAudioTools.vue"
 import type { AudioChunk } from "@/models/audio/audioProcessingScheduler"
 import makeMe from "@tests/fixtures/makeMe"
 import helper, {
-  mockShowNote,
   mockSdkService,
   mockSdkServiceWithImplementation,
-  wrapSdkResponse,
+  mockShowNote,
   wrapSdkError,
+  wrapSdkResponse,
 } from "@tests/helpers"
 import { flushPromises } from "@vue/test-utils"
-import { beforeEach, afterEach, vi } from "vitest"
+import { afterEach, beforeEach, vi } from "vitest"
 
 // Browser Mode: Mock audioRecorder module (application module, not browser API)
 // This mock simulates the audioRecorder's behavior while allowing us to test component logic
