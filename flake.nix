@@ -56,6 +56,7 @@
           yamllint
           nixfmt-classic
           hclfmt
+          trash-cli
         ];
 
         darwinPackages = with pkgs; lib.optionals stdenv.isDarwin [ sequelpro ];

@@ -32,7 +32,7 @@ This command starts:
 
 **CRITICAL: All services automatically restart/reload when code changes are made.**
 
-**DO NOT tell developers to restart `pnpm sut` after making code changes!** 
+**DO NOT tell developers to restart `pnpm sut` after making code changes!**
 - Backend: Uses Gradle continuous build (`-t` flag) which automatically detects changes, recompiles Java classes, and hot-reloads them into the running Spring Boot application
 - Frontend: Uses Vite with Hot Module Replacement (HMR) for instant Vue component updates
 - Developers should NEVER need to manually restart services during development
@@ -44,6 +44,8 @@ This command starts:
 **For Cloud VM setup, see the `cloud-agent-setup` rule.**
 
 Always use `CURSOR_DEV=true nix develop -c` prefix for commands (e.g., `CURSOR_DEV=true nix develop -c pnpm frontend:test`).
+
+When deleting files, instead of using `rm -f` or `rm -rf` prefer to use `trash` instead provided by `trash-cli` from flake.nix packages.
 
 # Development preferences
 
