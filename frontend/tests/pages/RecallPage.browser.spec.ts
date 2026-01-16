@@ -16,7 +16,6 @@ import mockBrowserTimeZone from "@tests/helpers/mockBrowserTimeZone"
 import { flushPromises } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { computed, ref } from "vue"
-import { useRouter } from "vue-router"
 
 vi.mock("@/composables/useRecallData")
 
