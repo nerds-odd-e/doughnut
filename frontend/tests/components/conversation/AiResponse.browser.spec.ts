@@ -164,7 +164,7 @@ const submitMessageAndSimulateRunResponse = async (wrapper, toolCallChunk) => {
 
 import { useStorageAccessor } from "@/composables/useStorageAccessor"
 
-describe("ConversationInner", () => {
+describe("AiResponse", () => {
   let wrapper
   let note
   let noteRealm
