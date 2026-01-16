@@ -20,6 +20,7 @@
     "test:jsdom:watch": "vitest",
     "test:ui": "vitest run --browser --config=vitest.browser.config.ts",
     "test:watch": "vitest --browser --config=vitest.browser.config.ts --ui",
+    "pretest": "playwright install chromium",
     "test": "CI=true vitest run --browser --config=vitest.browser.config.ts"
   },
   "dependencies": {
