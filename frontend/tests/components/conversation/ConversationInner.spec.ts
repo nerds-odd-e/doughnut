@@ -4,9 +4,11 @@ import helper, { mockShowNote, mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { type ConversationMessage } from "@generated/backend"
 import { flushPromises } from "@vue/test-utils"
-import { simulateAiResponse } from "./AiResponse.spec"
 import AiReplyEventSource from "@/managedApi/AiReplyEventSource"
-import { resetInstance } from "@tests/helpers/aiReplyEventSourceTracker"
+import {
+  getLastInstance,
+  resetInstance,
+} from "@tests/helpers/aiReplyEventSourceTracker"
 
 class MockIntersectionObserver {
   readonly root: Element | null = null
@@ -49,6 +51,29 @@ vi.mock("@/managedApi/AiReplyEventSource", async () => {
     },
   }
 })
+
+// Define simulateAiResponse locally to avoid importing from AiResponse.spec.ts
+// (which would cause Vitest to include all tests from that file)
+const simulateAiResponse = (content = "## I'm ChatGPT") => {
+  const instance = getLastInstance()
+  if (!instance) {
+    throw new Error("No AiReplyEventSource instance available")
+  }
+  const chunk = {
+    choices: [
+      {
+        index: 0,
+        message: {
+          role: "assistant",
+          content,
+        },
+        finish_reason: null,
+      },
+    ],
+  }
+
+  instance.onMessageCallback("chat.completion.chunk", JSON.stringify(chunk))
+}
 
 const setupTestData = () => {
   const note = makeMe.aNote.details("").please()
