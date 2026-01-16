@@ -16,11 +16,11 @@
     "lint": "biome check . && vue-tsc --noEmit",
     "format": "biome check --write . && vue-tsc --noEmit",
     "storybook": "storybook dev -p 6006 --no-open",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:browser": "vitest run --browser --config=vitest.browser.config.ts",
-    "test:browser:watch": "vitest --browser --config=vitest.browser.config.ts --ui",
-    "test:browser:ci": "CI=true vitest run --browser --config=vitest.browser.config.ts"
+    "test:jsom": "vitest run",
+    "test:jsdom:watch": "vitest",
+    "test:ui": "vitest run --browser --config=vitest.browser.config.ts",
+    "test:watch": "vitest --browser --config=vitest.browser.config.ts --ui",
+    "test": "CI=true vitest run --browser --config=vitest.browser.config.ts"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
