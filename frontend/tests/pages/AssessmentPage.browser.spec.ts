@@ -1,13 +1,25 @@
-import { screen } from "@testing-library/vue"
-import { describe, it, beforeEach, expect, vi } from "vitest"
 import AssessmentPage from "@/pages/AssessmentPage.vue"
-import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-import makeMe from "@tests/fixtures/makeMe"
-import { flushPromises } from "@vue/test-utils"
 import type {
   AssessmentQuestionInstance,
   RecallPrompt,
 } from "@generated/backend"
+import { screen } from "@testing-library/vue"
+import makeMe from "@tests/fixtures/makeMe"
+import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
+import { flushPromises } from "@vue/test-utils"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+
+// Helper to wait for a spy to be called (handles async timing issues)
+const waitForSpy = async (
+  spy: ReturnType<typeof mockSdkService>,
+  timeout = 1000
+) => {
+  const startTime = Date.now()
+  while (spy.mock.calls.length === 0 && Date.now() - startTime < timeout) {
+    await new Promise((resolve) => setTimeout(resolve, 10))
+    await flushPromises()
+  }
+}
 
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
@@ -127,10 +139,26 @@ describe("assessment page", () => {
         .withProps({ notebookId: notebook.id })
         .render()
       await flushPromises()
+
+      // Answer first question
       ;(await wrapper.findByText("answer1")).click()
       await flushPromises()
+      // Small delay to ensure Vue reactivity updates
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // Wait for first answer to be processed and advance to next question
+      await wrapper.findByText("answer3")
+      await flushPromises()
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // Answer second question
       ;(await wrapper.findByText("answer3")).click()
       await flushPromises()
+      await new Promise((resolve) => setTimeout(resolve, 50))
+
+      // Wait for the submission API call to complete
+      // This handles the async timing issue where checkIfQuizComplete() is called asynchronously
+      await waitForSpy(submitAssessmentResultSpy, 2000)
 
       expect(submitAssessmentResultSpy).toBeCalledWith({
         path: { assessmentAttempt: assessmentAttempt.id },
