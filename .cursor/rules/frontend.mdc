@@ -1,5 +1,5 @@
 ---
-description: Vue.js frontend development, Vue 3, TypeScript, components, testing, Vitest, DaisyUI, Tailwind, API integration, linting
+description: Vue.js frontend development, Vue 3, TypeScript, components, testing, Vitest (with playwright browser-mode), DaisyUI, Tailwind, API integration, linting
 alwaysApply: false
 ---
 # Frontend Development Cursor Rules
@@ -67,7 +67,7 @@ CURSOR_DEV=true nix develop -c pnpm format:all
 
 - Vue 3 with TypeScript
 - DaisyUI + Tailwind for styling, with "daisy-" prefix
-- Vitest for testing
+- Vitest for testing (with playwright browser mode)
 - Biome for linting/formatting
 
 ## Component Rules
@@ -279,6 +279,7 @@ if (error) {
    - Test through user interactions
    - Avoid testing implementation details
    - Use data-testid for test selectors
+   - Test with vitest-browser-mode as [mentioned here](https://howtotestfrontend.com/resources/vitest-browser-mode-guide-and-setup-info); i.e. prefer real browser rendering in tests over mocking (stop using jsdom).
 
 2. **Avoid `xxxByRole` Queries (Performance Optimization)**
    - **DO NOT use `getByRole`, `findByRole`, `queryByRole`, `getAllByRole`, etc.** - they are slow due to expensive visibility checks
@@ -291,30 +292,30 @@ if (error) {
    - Returns a spy that can be reconfigured in tests
    - Use `wrapSdkResponse` when updating mock return values
    - Only use `mockSdkServiceWithImplementation` for custom async logic based on options
-   
+
    **Simple mocking:**
    ```typescript
    import { mockSdkService } from "@tests/helpers"
-   
+
    beforeEach(() => {
      mockSdkService("getRecentNotes", [])
      mockSdkService("showNote", makeMe.aNoteRealm.please())
    })
    ```
-   
+
    **Reconfiguring mocks in tests:**
    ```typescript
    import { mockSdkService, wrapSdkResponse } from "@tests/helpers"
-   
+
    const spy = mockSdkService("showNote", makeMe.aNoteRealm.please())
    // Later in test:
    spy.mockResolvedValue(wrapSdkResponse(differentNote))
    ```
-   
+
    **Custom implementation (only when needed):**
    ```typescript
    import { mockSdkServiceWithImplementation } from "@tests/helpers"
-   
+
    mockSdkServiceWithImplementation("updateNoteDetails", async (options) => {
      // Custom logic based on options
      return await someAsyncOperation(options)

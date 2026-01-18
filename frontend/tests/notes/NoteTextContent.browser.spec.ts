@@ -249,16 +249,14 @@ describe("in place edit on title", () => {
   })
 
   describe("with mocked window.confirm", () => {
-    // eslint-disable-next-line no-alert
-    const jsdomConfirm = window.confirm
+    let confirmSpy: ReturnType<typeof vi.spyOn>
+
     beforeEach(() => {
-      // eslint-disable-next-line no-alert
-      window.confirm = () => false
+      confirmSpy = vi.spyOn(window, "confirm").mockReturnValue(false)
     })
 
     afterEach(() => {
-      // eslint-disable-next-line no-alert
-      window.confirm = jsdomConfirm
+      confirmSpy.mockRestore()
     })
 
     it("should display error when no authorization to save", async () => {
