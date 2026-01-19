@@ -2,26 +2,33 @@ import { mount } from "@vue/test-utils"
 import QuillEditor from "@/components/form/QuillEditor.vue"
 import { nextTick } from "vue"
 import type Quill from "quill"
-import { describe, it, expect } from "vitest"
+import { describe, it, expect, afterEach } from "vitest"
+import { page } from "vitest/browser"
 
 describe("QuillEditor.vue", () => {
+  let wrapper: any
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
   it("renders simple HTML content", async () => {
     const html = `<h1>Hello</h1><p>World</p>`
-    const wrapper = mount(QuillEditor, {
+    wrapper = mount(QuillEditor, {
       props: { modelValue: html },
+      attachTo: document.body,
     })
     await nextTick()
-    const h1 = wrapper.element.querySelector(".ql-editor h1")
-    const p = wrapper.element.querySelector(".ql-editor p")
-    expect(h1).not.toBeNull()
-    expect(h1?.textContent).toBe("Hello")
-    expect(p).not.toBeNull()
-    expect(p?.textContent).toBe("World")
+    await vi.waitUntil(() => document.querySelector(".ql-editor h1"))
+    expect(document.querySelector(".ql-editor h1")).toHaveTextContent("Hello")
+    expect(document.querySelector(".ql-editor p")).toHaveTextContent("World")
   })
 
   it("emits correct modelValue when typing Hello<Shift+Enter>World", async () => {
-    const wrapper = mount(QuillEditor, {
+    wrapper = mount(QuillEditor, {
       props: { modelValue: "" },
+      attachTo: document.body,
     })
     await nextTick()
     await nextTick() // Wait for Quill to fully initialize
@@ -33,14 +40,20 @@ describe("QuillEditor.vue", () => {
 
     if (quillInstance) {
       // Focus the editor
-      quillInstance.focus()
+      await vi.waitUntil(() => document.querySelector(".ql-editor"))
+      const editor = document.querySelector(".ql-editor") as HTMLElement
+      editor.focus()
       await nextTick()
 
-      quillInstance.clipboard.dangerouslyPasteHTML(
-        0,
-        "<p>Hello<br>World</p>",
-        "user"
-      )
+      // Browser Mode: Use real ClipboardEvent!
+      const clipboardData = new DataTransfer()
+      clipboardData.setData("text/html", "<p>Hello<br>World</p>")
+      const pasteEvent = new ClipboardEvent("paste", {
+        bubbles: true,
+        cancelable: true,
+        clipboardData,
+      })
+      editor.dispatchEvent(pasteEvent)
       await nextTick()
     }
 
@@ -56,8 +69,9 @@ describe("QuillEditor.vue", () => {
   })
 
   it("passes preserve_pre: true when pasting HTML with code blocks", async () => {
-    const wrapper = mount(QuillEditor, {
+    wrapper = mount(QuillEditor, {
       props: { modelValue: "", readonly: false },
+      attachTo: document.body,
     })
     await nextTick()
     await nextTick() // Wait for Quill to fully initialize
@@ -69,7 +83,10 @@ describe("QuillEditor.vue", () => {
 
     if (quillInstance) {
       // Focus the editor
-      quillInstance.focus()
+      // Wait for editor to be visible to avoid focus errors
+      await vi.waitUntil(() => document.querySelector(".ql-editor"))
+      const editor = document.querySelector(".ql-editor") as HTMLElement
+      editor.focus()
       await nextTick()
 
       // Real HTML input data with code blocks from a typical paste operation

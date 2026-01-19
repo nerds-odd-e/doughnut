@@ -4,31 +4,33 @@ import { nextTick } from "vue"
 import helper from "@tests/helpers"
 
 describe("SeamlessTextEditor", () => {
+  let wrapper: any
+
   afterEach(() => {
+    wrapper?.unmount()
     document.body.innerHTML = ""
   })
 
   const mountEditor = async (initialValue: string, options = {}) => {
-    const wrapper = helper
+    wrapper = helper
       .component(SeamlessTextEditor)
       .withProps({
         modelValue: initialValue,
         ...options,
       })
-      .mount()
+      .mount({ attachTo: document.body })
     await flushPromises()
     await nextTick()
     return wrapper
   }
 
   it("does not emit update when the change is from initial value", async () => {
-    const wrapper = await mountEditor("initial value")
+    await mountEditor("initial value")
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-    wrapper.unmount()
   })
 
   it("extracts plain text when pasting HTML content", async () => {
-    const wrapper = await mountEditor("")
+    await mountEditor("")
     await flushPromises()
     await nextTick()
 
@@ -60,11 +62,10 @@ describe("SeamlessTextEditor", () => {
     expect(emitted?.length).toBeGreaterThan(0)
     expect(emitted?.[emitted.length - 1]?.[0]).toBe("Bold text")
     expect(editor.innerText).toBe("Bold text")
-    wrapper.unmount()
   })
 
   it("pastes plain text at cursor position", async () => {
-    const wrapper = await mountEditor("existing text")
+    await mountEditor("existing text")
     await flushPromises()
     await nextTick()
 
@@ -112,11 +113,10 @@ describe("SeamlessTextEditor", () => {
     expect(finalText).toContain("text")
     expect(editor.innerText).toContain("existing")
     expect(editor.innerText).toContain("inserted")
-    wrapper.unmount()
   })
 
   it("appends plain text when no selection", async () => {
-    const wrapper = await mountEditor("existing")
+    await mountEditor("existing")
     await flushPromises()
     await nextTick()
 
@@ -147,11 +147,10 @@ describe("SeamlessTextEditor", () => {
     expect(emitted?.length).toBeGreaterThan(0)
     expect(emitted?.[emitted.length - 1]?.[0]).toBe("existing appended")
     expect(editor.innerText).toBe("existing appended")
-    wrapper.unmount()
   })
 
   it("does not handle paste when readonly", async () => {
-    const wrapper = await mountEditor("", { readonly: true })
+    await mountEditor("", { readonly: true })
     await flushPromises()
     await nextTick()
 
@@ -173,11 +172,10 @@ describe("SeamlessTextEditor", () => {
     await flushPromises()
 
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-    wrapper.unmount()
   })
 
   it("handles paste with empty clipboard", async () => {
-    const wrapper = await mountEditor("existing")
+    await mountEditor("existing")
     await flushPromises()
     await nextTick()
 
@@ -202,6 +200,5 @@ describe("SeamlessTextEditor", () => {
     const emitted = wrapper.emitted()["update:modelValue"]
     expect(emitted).toBeUndefined()
     expect(editor.innerText).toBe("existing")
-    wrapper.unmount()
   })
 })

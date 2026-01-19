@@ -4,36 +4,37 @@ import { nextTick } from "vue"
 import helper from "@tests/helpers"
 
 describe("RichMarkdownEditor", () => {
+  let wrapper: any
+
   afterEach(() => {
+    wrapper?.unmount()
     document.body.innerHTML = ""
   })
 
   const mountEditor = async (initialValue: string, options = {}) => {
-    const wrapper = helper
+    wrapper = helper
       .component(RichMarkdownEditor)
       .withProps({
         modelValue: initialValue,
         ...options,
       })
-      .mount()
+      .mount({ attachTo: document.body })
     await flushPromises()
     return wrapper
   }
 
   it("not emit update when the change is from initial value", async () => {
-    const wrapper = await mountEditor("initial value")
+    await mountEditor("initial value")
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-    wrapper.unmount()
   })
 
   it("not emit update if readonly", async () => {
-    const wrapper = await mountEditor("# Title", { readonly: true })
+    await mountEditor("# Title", { readonly: true })
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-    wrapper.unmount()
   })
 
   it("will try to unify the markdown", async () => {
-    const wrapper = await mountEditor("# Title")
+    await mountEditor("# Title")
     await flushPromises()
     await nextTick()
     await flushPromises()
@@ -41,11 +42,10 @@ describe("RichMarkdownEditor", () => {
     if (emitted?.length) {
       expect(emitted[emitted.length - 1]![0]).toContain("Title")
     }
-    wrapper.unmount()
   })
 
   it("converts HTML to markdown then back to HTML when pasting", async () => {
-    const wrapper = await mountEditor("")
+    await mountEditor("")
     await flushPromises()
     await nextTick()
 
@@ -80,11 +80,10 @@ describe("RichMarkdownEditor", () => {
     if (emitted?.length) {
       expect(emitted[emitted.length - 1]![0]).toContain("Bold text")
     }
-    wrapper.unmount()
   })
 
   it("does not handle paste when readonly", async () => {
-    const wrapper = await mountEditor("", { readonly: true })
+    await mountEditor("", { readonly: true })
     await flushPromises()
 
     const qlEditor = wrapper
@@ -104,6 +103,5 @@ describe("RichMarkdownEditor", () => {
     await flushPromises()
 
     expect(wrapper.emitted()["update:modelValue"]).toBeUndefined()
-    wrapper.unmount()
   })
 })

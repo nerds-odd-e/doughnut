@@ -1,8 +1,9 @@
 import Modal from "@/components/commons/Modal.vue"
 import routes from "@/routes/routes"
 import { mount } from "@vue/test-utils"
-import { vi } from "vitest"
+import { vi, afterEach, describe, it, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
+import { page } from "vitest/browser"
 
 // Browser Mode: Mock AiReplyEventSource to prevent import errors
 // (Modal doesn't use it, but Browser Mode hoists mocks globally)
@@ -33,26 +34,38 @@ describe("Modal", () => {
     emits: ["close_request"],
   }
 
-  const mountWithoutTeleport = () =>
-    mount(TestComponent, {
+  let wrapper: any
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
+  })
+
+  const mountModal = () => {
+    wrapper = mount(TestComponent, {
       global: {
         plugins: [router],
-        stubs: {
-          Teleport: true, // Stub the Teleport component
-        },
       },
+      attachTo: document.body,
     })
+    return wrapper
+  }
 
   it("click on note when doing review - close-button", async () => {
-    const wrapper = mountWithoutTeleport()
-    expect(wrapper.find(".close-button").exists()).toBe(true)
-    await wrapper.find(".close-button").trigger("click")
+    wrapper = mountModal()
+    await vi.waitUntil(() => document.querySelector(".close-button"), { timeout: 1000 })
+    const closeButton = document.querySelector(".close-button") as HTMLElement
+    expect(closeButton).toBeTruthy()
+    closeButton.click()
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 
   it("click on note when doing review - mouse-click", async () => {
-    const wrapper = mountWithoutTeleport()
-    await wrapper.find(".modal-wrapper").trigger("mousedown")
+    wrapper = mountModal()
+    await vi.waitUntil(() => document.querySelector(".modal-wrapper"), { timeout: 1000 })
+    const modalWrapper = document.querySelector(".modal-wrapper") as HTMLElement
+    expect(modalWrapper).toBeTruthy()
+    modalWrapper.dispatchEvent(new MouseEvent("mousedown", { bubbles: true, cancelable: true }))
     expect(wrapper.emitted().close_request).toHaveLength(1)
   })
 })
