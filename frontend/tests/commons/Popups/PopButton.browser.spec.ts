@@ -4,6 +4,7 @@ import { flushPromises } from "@vue/test-utils"
 import { createRouter, createWebHistory } from "vue-router"
 import routes from "@/routes/routes"
 import { vi } from "vitest"
+import { page } from "vitest/browser"
 
 // Browser Mode: Use real Vue Router instead of mocking
 const router = createRouter({
@@ -51,18 +52,23 @@ describe("PopButton", () => {
     const blurSpy = vi.spyOn(button, "blur")
 
     // Click button to open dialog
-    await wrapper.find("button").trigger("click")
+    await page.getByRole("button", { name: "Test Button" }).click()
     await wrapper.vm.$nextTick()
     await flushPromises()
 
-    // Browser Mode: Access the PopButton component instance
-    // The Modal component is rendered via Teleport, so we need to find it differently
+    // Browser Mode: Wait for Modal to render via Teleport
     // Since Modal uses Teleport to body, we can find it in document.body
-    // But first, let's wait for it to render
-    await new Promise((resolve) => setTimeout(resolve, 100))
-
-    // Try to find Modal in document.body (where Teleport renders it)
-    const modalInBody = document.body.querySelector(".modal-wrapper")
+    // Use a polling approach to wait for the modal to appear
+    let modalInBody: Element | null = null
+    for (let i = 0; i < 10; i++) {
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      modalInBody = document.body.querySelector(".modal-wrapper")
+      if (modalInBody) break
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => resolve(undefined))
+      )
+    }
     if (modalInBody) {
       // Find and click the close button
       const closeButton = document.body.querySelector(
@@ -98,10 +104,22 @@ describe("PopButton", () => {
     }
 
     // Click button to open dialog
-    await wrapper.find("button").trigger("click")
+    await page.getByRole("button", { name: "Test Button" }).click()
     await wrapper.vm.$nextTick()
     await flushPromises()
-    await new Promise((resolve) => setTimeout(resolve, 150)) // Wait for Modal to mount and add event listener
+
+    // Browser Mode: Wait for Modal to render via Teleport
+    // Use polling to wait for modal to appear in DOM
+    let modalInBody: Element | null = null
+    for (let i = 0; i < 20; i++) {
+      await flushPromises()
+      await wrapper.vm.$nextTick()
+      modalInBody = document.body.querySelector(".modal-wrapper")
+      if (modalInBody) break
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => resolve(undefined))
+      )
+    }
 
     // Browser Mode: Real focus() method!
     button.focus()
@@ -121,7 +139,6 @@ describe("PopButton", () => {
     document.dispatchEvent(escapeEvent)
     await wrapper.vm.$nextTick()
     await flushPromises()
-    await new Promise((resolve) => setTimeout(resolve, 100)) // Wait for event handling
 
     // Browser Mode: If Modal's ESC handler didn't trigger (Teleport may not work in test),
     // manually trigger closeDialog to verify blur behavior

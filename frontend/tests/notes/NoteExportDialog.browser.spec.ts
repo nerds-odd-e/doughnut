@@ -1,15 +1,22 @@
-import { describe, it, vi, expect, beforeEach } from "vitest"
+import { describe, it, vi, expect, beforeEach, afterEach } from "vitest"
 import helper, { mockSdkService, wrapSdkResponse } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import NoteExportDialog from "@/components/notes/core/NoteExportDialog.vue"
 import { saveAs } from "file-saver"
 import { page } from "vitest/browser"
+import { flushPromises, type VueWrapper } from "@vue/test-utils"
 
 vi.mock("file-saver", () => ({ saveAs: vi.fn() }))
 
 describe("NoteExportDialog", () => {
+  let wrapper: VueWrapper
   beforeEach(() => {
     vi.clearAllMocks()
+  })
+
+  afterEach(() => {
+    wrapper?.unmount()
+    document.body.innerHTML = ""
   })
 
   it("fetches and displays descendants JSON when expanded", async () => {
@@ -19,7 +26,10 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getDescendantsSpy = mockSdkService("getDescendants", descendantsData)
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     // Initially, textarea is not visible
     await expect
@@ -28,6 +38,7 @@ describe("NoteExportDialog", () => {
 
     // Expand the details
     await page.getByText("Export Descendants (JSON)").click()
+    await flushPromises() // Wait for async API call and DOM update
 
     const textarea = page.getByTestId("descendants-json-textarea")
     await expect.element(textarea).toBeInTheDocument()
@@ -51,9 +62,13 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     mockSdkService("getDescendants", descendantsData)
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     await page.getByText("Export Descendants (JSON)").click()
+    await flushPromises()
     const downloadBtn = page.getByTestId("download-json-btn-descendants")
     await expect.element(downloadBtn).toBeVisible()
     await downloadBtn.click()
@@ -67,12 +82,16 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getDescendantsMock = mockSdkService("getDescendants", descendantsData)
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     // Clear any calls from initial render
     getDescendantsMock.mockClear()
     const toggleBtn = page.getByText("Export Descendants (JSON)")
     await toggleBtn.click()
+    await flushPromises()
 
     await expect
       .element(page.getByTestId("descendants-json-textarea"))
@@ -96,7 +115,10 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getGraphSpy = mockSdkService("getGraph", graphData)
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     // Initially, textarea is not visible
     await expect
@@ -105,6 +127,7 @@ describe("NoteExportDialog", () => {
 
     // Expand the details
     await page.getByText("Export Note Graph (JSON)").click()
+    await flushPromises()
 
     const textarea = page.getByTestId("graph-json-textarea")
     await expect.element(textarea).toBeInTheDocument()
@@ -126,9 +149,13 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     mockSdkService("getGraph", graphData)
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     await page.getByText("Export Note Graph (JSON)").click()
+    await flushPromises()
     const downloadBtn = page.getByTestId("download-json-btn-graph")
     await expect.element(downloadBtn).toBeVisible()
     await downloadBtn.click()
@@ -142,10 +169,14 @@ describe("NoteExportDialog", () => {
       relatedNotes: [],
     } as never
     const getGraphMock = mockSdkService("getGraph", graphData)
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     const toggleBtn = page.getByText("Export Note Graph (JSON)")
     await toggleBtn.click()
+    await flushPromises()
     await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
 
     // Clear calls from initial render
@@ -175,9 +206,13 @@ describe("NoteExportDialog", () => {
       .mockResolvedValueOnce(wrapSdkResponse(graphData1))
       .mockResolvedValueOnce(wrapSdkResponse(graphData2))
 
-    helper.component(NoteExportDialog).withProps({ note }).render()
+    wrapper = helper
+      .component(NoteExportDialog)
+      .withProps({ note })
+      .mount({ attachTo: document.body })
 
     await page.getByText("Export Note Graph (JSON)").click()
+    await flushPromises()
     await expect.element(page.getByTestId("graph-json-textarea")).toBeVisible()
 
     // Change token limit

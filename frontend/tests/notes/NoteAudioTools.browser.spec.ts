@@ -913,8 +913,11 @@ describe("NoteAudioTools", () => {
       const fullscreenBtn = fullscreenComponent.find(".fullscreen-btn")
       await fullscreenBtn.trigger("click")
       await wrapper.vm.$nextTick()
-      // Browser Mode: Wait for fullscreen state to update
-      await new Promise((resolve) => setTimeout(resolve, 100))
+      // Browser Mode: Wait for fullscreen state to update using requestAnimationFrame
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => resolve(undefined))
+      )
+      await flushPromises()
 
       // Browser Mode: Error should be in fullscreen overlay
       const errorElement = document.body.querySelector(

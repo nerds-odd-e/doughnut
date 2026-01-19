@@ -391,13 +391,15 @@ describe("repeat page", () => {
         await flushPromises()
 
         // Wait for dialog to render
-        for (let i = 0; i < 10; i++) {
-          toggle = document.body.querySelector(
-            'input[type="checkbox"]'
-          ) as HTMLInputElement
-          if (toggle) break
-          await new Promise((resolve) => setTimeout(resolve, 10))
-        }
+        await vi.waitUntil(
+          () => {
+            toggle = document.body.querySelector(
+              'input[type="checkbox"]'
+            ) as HTMLInputElement
+            return !!toggle
+          },
+          { timeout: 1000 }
+        )
       }
 
       expect(toggle).toBeTruthy()

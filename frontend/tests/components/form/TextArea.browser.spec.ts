@@ -1,4 +1,6 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import { mount } from "@vue/test-utils"
+import { page } from "vitest/browser"
 import TextArea from "@/components/form/TextArea.vue"
 
 describe("TextArea.vue", () => {
@@ -34,13 +36,18 @@ describe("TextArea.vue", () => {
       value: 120, // Assuming content would require 6 rows at 20px lineHeight, but limit is 5
     })
 
-    // Trigger input or any method that recalculates the size
-    await textarea.setValue("Some long text that triggers expansion")
+    // Trigger input using page interaction
+    const textareaLocator = page.getByRole("textbox")
+    await textareaLocator.fill("Some long text that triggers expansion")
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 50)) // Wait for resize to complete
+    // No manual waiting needed, expect.element handles it
 
     // Browser Mode: Should be exactly 5 (capped at autoExtendUntil limit)
-    expect(textarea.element.rows).toBe(5)
+    // Use vi.waitUntil to wait for the rows property to update
+    await vi.waitUntil(() => textarea.element.rows === 5, {
+      timeout: 1000,
+      interval: 20,
+    })
 
     wrapper.unmount()
   })
@@ -61,10 +68,11 @@ describe("TextArea.vue", () => {
       value: 80, // Assuming content would require 4 rows at 20px lineHeight
     })
 
-    // Trigger input or any method that recalculates the size
-    await textarea.setValue("Shorter text")
+    // Trigger input using page interaction
+    const textareaLocator = page.getByRole("textbox")
+    await textareaLocator.fill("Shorter text")
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 10)) // Wait for resize to complete
+    // No manual waiting needed, expect.element handles it
 
     expect(textarea.element.rows).toBeLessThanOrEqual(5)
     expect(textarea.element.rows).toBeGreaterThan(1) // Assuming initial rows is 1 and it should expand
@@ -77,13 +85,26 @@ describe("TextArea.vue", () => {
       props: {
         enterSubmit: true,
       },
+      attachTo: document.body,
     })
 
-    const textarea = wrapper.find("textarea")
+    const textareaLocator = page.getByRole("textbox")
+    await expect.element(textareaLocator).toBeVisible()
+
     // Browser Mode: Real keyboard events work!
-    await textarea.trigger("keydown", { key: "Enter" })
+    // Use DOM dispatch since .press() might not be available on this locator type
+    const textareaEl = document.querySelector("textarea") as HTMLTextAreaElement
+    if (!textareaEl) throw new Error("Textarea not found")
+
+    const event = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+    })
+    textareaEl.dispatchEvent(event)
 
     expect(wrapper.emitted()).toHaveProperty("enterPressed")
+    wrapper.unmount()
   })
 
   it('does not emit "enterPressed" when Enter is pressed during IME composition', async () => {
@@ -91,13 +112,21 @@ describe("TextArea.vue", () => {
       props: {
         enterSubmit: true,
       },
+      attachTo: document.body,
     })
 
-    const textarea = wrapper.find("textarea")
     // Browser Mode: Real keyboard events with IME composition state!
-    // Simulate the IME composition state by setting isComposing to true
-    await textarea.trigger("keydown", { key: "Enter", isComposing: true })
+    // We need to access the element to dispatch a custom event with isComposing
+    const textareaEl = document.querySelector("textarea") as HTMLTextAreaElement
+    const event = new KeyboardEvent("keydown", {
+      key: "Enter",
+      bubbles: true,
+      cancelable: true,
+      isComposing: true,
+    })
+    textareaEl.dispatchEvent(event)
 
     expect(wrapper.emitted()).not.toHaveProperty("enterPressed")
+    wrapper.unmount()
   })
 })

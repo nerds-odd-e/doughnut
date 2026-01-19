@@ -101,7 +101,7 @@ describe("HorizontalMenu", () => {
   })
 
   describe("initial state", () => {
-    it("starts in collapsed state", () => {
+    it("starts in collapsed state", async () => {
       const navItems = createMockNavItems("assimilate")
       helper
         .component(HorizontalMenu)
@@ -113,6 +113,15 @@ describe("HorizontalMenu", () => {
           logout: noop,
         })
         .render()
+
+      // Use vi.waitUntil to wait for class change
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-collapsed"),
+        { timeout: 1000 }
+      )
 
       const menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
@@ -280,6 +289,13 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Menu should start collapsed
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-collapsed"),
+        { timeout: 1000 }
+      )
       let menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
 
@@ -288,6 +304,13 @@ describe("HorizontalMenu", () => {
       await menuIcon.click()
 
       // Menu should now be expanded
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-expanded"),
+        { timeout: 1000 }
+      )
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
     })
@@ -404,11 +427,27 @@ describe("HorizontalMenu", () => {
 
       // Expand
       await expandButton.click()
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-expanded"),
+        { timeout: 1000 }
+      )
+
       let menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
 
       // Collapse
       await expandButton.click()
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-collapsed"),
+        { timeout: 1000 }
+      )
+
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
     })
@@ -498,8 +537,15 @@ describe("HorizontalMenu", () => {
         await nextTick()
       }
 
-      // Wait for setTimeout in handleFocusLoss
-      await new Promise((resolve) => setTimeout(resolve, 10))
+      // Wait for handleFocusLoss to process
+      // Use vi.waitUntil to wait for class change
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-collapsed"),
+        { timeout: 1000 }
+      )
 
       menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
@@ -592,7 +638,7 @@ describe("HorizontalMenu", () => {
       const expandButton = page.getByLabelText("Toggle menu")
       await expandButton.click()
 
-      let menuWrapper = document.querySelector(".menu-wrapper")
+      const menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-expanded")
 
       // Simulate route change by updating the mocked route fullPath
@@ -600,10 +646,18 @@ describe("HorizontalMenu", () => {
       useRouteValue.name = "recall"
 
       // Wait for watcher to process
-      await new Promise((resolve) => setTimeout(resolve, 10))
+      // Use vi.waitUntil to wait for class change
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-collapsed"),
+        { timeout: 1000 }
+      )
 
-      menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      expect(document.querySelector(".menu-wrapper")).toHaveClass(
+        "is-collapsed"
+      )
     })
 
     it("collapses menu when route changes even if already collapsed", async () => {
@@ -620,7 +674,7 @@ describe("HorizontalMenu", () => {
         .render()
 
       // Menu should start collapsed
-      let menuWrapper = document.querySelector(".menu-wrapper")
+      const menuWrapper = document.querySelector(".menu-wrapper")
       expect(menuWrapper).toHaveClass("is-collapsed")
 
       // Simulate route change
@@ -628,11 +682,18 @@ describe("HorizontalMenu", () => {
       useRouteValue.name = "notebooks"
 
       // Wait for watcher to process
-      await new Promise((resolve) => setTimeout(resolve, 10))
+      // Use vi.waitUntil to wait for class change
+      await vi.waitUntil(
+        () =>
+          document
+            .querySelector(".menu-wrapper")
+            ?.classList.contains("is-collapsed"),
+        { timeout: 1000 }
+      )
 
-      // Menu should still be collapsed
-      menuWrapper = document.querySelector(".menu-wrapper")
-      expect(menuWrapper).toHaveClass("is-collapsed")
+      expect(document.querySelector(".menu-wrapper")).toHaveClass(
+        "is-collapsed"
+      )
     })
   })
 })

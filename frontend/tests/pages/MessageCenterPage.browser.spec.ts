@@ -4,8 +4,12 @@ import helper, { mockSdkService } from "@tests/helpers"
 import makeMe from "@tests/fixtures/makeMe"
 import { useRouter } from "vue-router"
 import { page } from "vitest/browser"
+import { flushPromises } from "@vue/test-utils"
 
-const mockedPush = vi.fn()
+const { mockedPush } = vi.hoisted(() => {
+  return { mockedPush: vi.fn() }
+})
+
 vi.mock("vue-router", async (importOriginal) => {
   const actual = await importOriginal<typeof import("vue-router")>()
   return {
@@ -49,6 +53,7 @@ describe("MessageCenterPage", () => {
       makeMe.aConversation.please(),
     ]
     beforeEach(async () => {
+      vi.clearAllMocks()
       mockSdkService("getConversationsOfCurrentUser", conversations)
       await page.viewport(1200, 800)
     })
@@ -81,6 +86,7 @@ describe("MessageCenterPage", () => {
 
       // Click on the first conversation
       await listItems.nth(0).click()
+      await flushPromises()
 
       expect(useRouter().push).toHaveBeenCalledWith({
         name: "messageCenter",

@@ -10,15 +10,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { page } from "vitest/browser"
 
 // Helper to wait for a spy to be called (handles async timing issues)
+// Browser Mode: Use vi.waitUntil for proper async waiting
 const waitForSpy = async (
   spy: ReturnType<typeof mockSdkService>,
   timeout = 1000
 ) => {
-  const startTime = Date.now()
-  while (spy.mock.calls.length === 0 && Date.now() - startTime < timeout) {
-    await new Promise((resolve) => setTimeout(resolve, 10))
-    await flushPromises()
-  }
+  await vi.waitUntil(() => spy.mock.calls.length > 0, { timeout })
+  await flushPromises()
 }
 
 vi.mock("vue-router", async (importOriginal) => {
@@ -144,7 +142,9 @@ describe("assessment page", () => {
         .render()
 
       // Answer first question
+      await expect.element(page.getByText("answer1")).toBeVisible()
       await page.getByText("answer1").click()
+      await flushPromises()
 
       // Wait for first answer to be processed and advance to next question
       await expect.element(page.getByText("answer3")).toBeVisible()

@@ -98,8 +98,11 @@ describe("Sidebar", () => {
       await flushPromises()
 
       // Browser Mode: Real IntersectionObserver checks visibility
-      // Wait for it to initialize and potentially trigger scrollIntoView
-      await new Promise((resolve) => setTimeout(resolve, 200))
+      // Wait for it to initialize
+      await flushPromises()
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => resolve(undefined))
+      )
 
       // Browser Mode: Verify the active item is rendered correctly
       const activeItem = await screen.findByText(
@@ -143,7 +146,11 @@ describe("Sidebar", () => {
 
       render(firstGeneration)
       await flushPromises()
-      await new Promise((resolve) => setTimeout(resolve, 150))
+      // Browser Mode: Use requestAnimationFrame for proper async waiting instead of setTimeout
+      await new Promise((resolve) =>
+        requestAnimationFrame(() => resolve(undefined))
+      )
+      await flushPromises()
 
       // Browser Mode: scrollIntoView should NOT be called if already visible
       expect(HTMLElement.prototype.scrollIntoView).not.toHaveBeenCalled()

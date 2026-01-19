@@ -1,5 +1,6 @@
-import { mount } from "@vue/test-utils"
+import { mount, flushPromises } from "@vue/test-utils"
 import TextInput from "@/components/form/TextInput.vue"
+import { vi } from "vitest"
 
 describe("TextInput.vue", () => {
   afterEach(() => {
@@ -38,7 +39,9 @@ describe("TextInput.vue", () => {
 
     // Wait for mounted hook to execute and select() to be called
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 50)) // Give onMounted time to execute
+    // Browser Mode: Use vi.waitUntil to wait for select() to be called
+    await vi.waitUntil(() => selectSpy.mock.calls.length > 0, { timeout: 1000 })
+    await flushPromises()
 
     // Browser Mode: Verify select() was called on the real input element
     expect(selectSpy).toHaveBeenCalled()
@@ -66,9 +69,14 @@ describe("TextInput.vue", () => {
     })
 
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 10))
+    // Browser Mode: Use requestAnimationFrame for proper async waiting instead of setTimeout
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => resolve(undefined))
+    )
+    await flushPromises()
 
-    // Browser Mode: Use real getElementById and real select() method
+    // Browser Mode: Use document.getElementById since the component is attached to body
+    // and we need to spy on the real DOM element
     const inputElement = document.getElementById(
       "test-test"
     ) as HTMLInputElement
@@ -79,7 +87,10 @@ describe("TextInput.vue", () => {
 
     // Wait a bit more to ensure onMounted has executed
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 10))
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => resolve(undefined))
+    )
+    await flushPromises()
 
     expect(selectSpy).not.toHaveBeenCalled()
 

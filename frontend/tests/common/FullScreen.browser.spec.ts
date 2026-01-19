@@ -1,6 +1,7 @@
-import FullScreen from "@/components/common/FullScreen.vue"
-import { mount } from "@vue/test-utils"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
+import { page } from "vitest/browser"
+import { mount, flushPromises } from "@vue/test-utils"
+import FullScreen from "@/components/common/FullScreen.vue"
 
 describe("FullScreen", () => {
   beforeEach(() => {
@@ -59,11 +60,11 @@ describe("FullScreen", () => {
     vi.restoreAllMocks()
   })
 
-  it("renders fullscreen button", () => {
-    const wrapper = mount(FullScreen)
-    const button = wrapper.find(".fullscreen-btn")
-    expect(button.exists()).toBe(true)
-    expect(button.attributes("title")).toBe("Toggle Full Screen")
+  it("renders fullscreen button", async () => {
+    mount(FullScreen, { attachTo: document.body })
+    const button = page.getByRole("button", { name: "Toggle Full Screen" })
+    await expect.element(button).toBeVisible()
+    expect(button.element().getAttribute("title")).toBe("Toggle Full Screen")
   })
 
   it("enters fullscreen mode when button is clicked", async () => {
@@ -71,10 +72,17 @@ describe("FullScreen", () => {
       attachTo: document.body,
     })
 
-    await wrapper.find(".fullscreen-btn").trigger("click")
+    await page.getByRole("button", { name: "Toggle Full Screen" }).click()
     // Wait for async fullscreen call to complete and component to update
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    // Browser Mode: Use vi.waitUntil to wait for fullscreen overlay
+    await vi.waitUntil(
+      () => document.body.querySelector(".fullscreen-overlay"),
+      {
+        timeout: 1000,
+        interval: 20,
+      }
+    )
 
     // Browser Mode: Real Fullscreen API is called!
     // Component checks webkitRequestFullscreen first (should be undefined due to getter)
@@ -92,19 +100,37 @@ describe("FullScreen", () => {
     })
 
     // Enter fullscreen first
-    await wrapper.find(".fullscreen-btn").trigger("click")
+    await page.getByRole("button", { name: "Toggle Full Screen" }).click()
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 50)) // Wait for fullscreen to be set
+    // Browser Mode: Use requestAnimationFrame for proper async waiting instead of setTimeout
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => resolve(undefined))
+    )
+    await flushPromises()
 
     // Verify we're in fullscreen mode
-    expect(document.body.querySelector(".fullscreen-overlay")).toBeTruthy()
+    await vi.waitUntil(
+      () => document.body.querySelector(".fullscreen-overlay"),
+      {
+        timeout: 1000,
+        interval: 20,
+      }
+    )
 
     // Exit fullscreen
     const exitButton = document.body.querySelector(".exit-fullscreen-btn")
     expect(exitButton).toBeTruthy()
     await exitButton?.dispatchEvent(new Event("click"))
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 10))
+
+    // Browser Mode: Wait for overlay to disappear
+    await vi.waitUntil(
+      () => !document.body.querySelector(".fullscreen-overlay"),
+      {
+        timeout: 1000,
+        interval: 20,
+      }
+    )
 
     // Browser Mode: Real exitFullscreen API is called!
     expect(document.exitFullscreen).toHaveBeenCalled()
@@ -117,17 +143,35 @@ describe("FullScreen", () => {
       attachTo: document.body,
     })
     // Enter fullscreen first
-    await wrapper.find(".fullscreen-btn").trigger("click")
+    await page.getByRole("button", { name: "Toggle Full Screen" }).click()
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 50)) // Wait for fullscreen to be set
+    // Browser Mode: Use requestAnimationFrame for proper async waiting instead of setTimeout
+    await new Promise((resolve) =>
+      requestAnimationFrame(() => resolve(undefined))
+    )
+    await flushPromises()
 
     // Verify we're in fullscreen mode
-    expect(document.body.querySelector(".fullscreen-overlay")).toBeTruthy()
+    await vi.waitUntil(
+      () => document.body.querySelector(".fullscreen-overlay"),
+      {
+        timeout: 1000,
+        interval: 20,
+      }
+    )
 
     // Unmount component (should trigger exitFullscreen)
     wrapper.unmount()
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 10))
+
+    // Browser Mode: Wait for overlay to disappear
+    await vi.waitUntil(
+      () => !document.body.querySelector(".fullscreen-overlay"),
+      {
+        timeout: 1000,
+        interval: 20,
+      }
+    )
 
     expect(document.exitFullscreen).toHaveBeenCalled()
     expect(document.exitPointerLock).toHaveBeenCalled()
@@ -148,7 +192,14 @@ describe("FullScreen", () => {
     })
     await wrapper.find(".fullscreen-btn").trigger("click")
     await wrapper.vm.$nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 50)) // Wait for fullscreen overlay to render
+    // Wait for fullscreen overlay to render
+    await vi.waitUntil(
+      () => document.body.querySelector(".fullscreen-overlay"),
+      {
+        timeout: 1000,
+        interval: 20,
+      }
+    )
 
     // Slot content should be rendered inside the fullscreen overlay
     const errorElement = document.body.querySelector(
