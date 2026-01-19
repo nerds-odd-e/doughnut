@@ -4,14 +4,15 @@ import { mount, flushPromises } from "@vue/test-utils"
 import FullScreen from "@/components/common/FullScreen.vue"
 
 describe("FullScreen", () => {
+  let wrapper: any
+
   beforeEach(() => {
     // Browser Mode: Use real Fullscreen API and Pointer Lock API!
-    // Component checks webkitRequestFullscreen first, then requestFullscreen
-    // We need to ensure webkitRequestFullscreen check fails so it uses requestFullscreen
+    
+    // Stateful mock for fullscreenElement
+    let currentFullscreenElement: Element | null = null
 
     // Override webkitRequestFullscreen to be undefined/falsy
-    // Component checks: if (document.documentElement.webkitRequestFullscreen)
-    // Using defineProperty with getter returning undefined makes the check fail
     Object.defineProperty(document.documentElement, "webkitRequestFullscreen", {
       get: () => undefined,
       configurable: true,
@@ -23,29 +24,28 @@ describe("FullScreen", () => {
       configurable: true,
     })
 
-    // Mock fullscreenElement - component checks this AFTER calling requestFullscreen
-    // Set it to return documentElement so component thinks fullscreen succeeded
+    // Mock fullscreenElement with state
     Object.defineProperty(document, "fullscreenElement", {
       configurable: true,
-      get: () => document.documentElement,
+      get: () => currentFullscreenElement,
     })
 
     Object.defineProperty(document, "pointerLockElement", {
       configurable: true,
-      get: () => document.documentElement,
+      get: () => currentFullscreenElement,
     })
 
-    // Browser Mode: Spy on REAL browser methods (they exist in real browser!)
-    // Key difference from jsdom: We spy on REAL APIs, not create fake ones
-    // We need to mock requestFullscreen to resolve successfully because:
-    // 1. Real API rejects with "Permissions check failed" (requires user interaction)
-    // 2. Component checks fullscreenElement AFTER calling requestFullscreen
-    // 3. If requestFullscreen rejects, component still checks fullscreenElement (we mock it)
-    // 4. But we mock requestFullscreen to resolve so component proceeds normally
-    vi.spyOn(document.documentElement, "requestFullscreen").mockResolvedValue(
-      undefined
-    )
-    vi.spyOn(document, "exitFullscreen").mockResolvedValue(undefined)
+    // Mock requestFullscreen to update state
+    vi.spyOn(document.documentElement, "requestFullscreen").mockImplementation(async function(this: Element) {
+      currentFullscreenElement = this
+    })
+
+    // Mock exitFullscreen to update state
+    vi.spyOn(document, "exitFullscreen").mockImplementation(async () => {
+      // Do not clear currentFullscreenElement to allow exitPointerLock to be called
+      // in component logic (if it checks pointerLockElement after exitFullscreen)
+    })
+
     vi.spyOn(document, "exitPointerLock")
     vi.spyOn(document.documentElement, "requestPointerLock")
 
@@ -56,19 +56,20 @@ describe("FullScreen", () => {
   })
 
   afterEach(() => {
+    wrapper?.unmount()
     document.body.innerHTML = ""
     vi.restoreAllMocks()
   })
 
   it("renders fullscreen button", async () => {
-    mount(FullScreen, { attachTo: document.body })
+    wrapper = mount(FullScreen, { attachTo: document.body })
     const button = page.getByRole("button", { name: "Toggle Full Screen" })
     await expect.element(button).toBeVisible()
     expect(button.element().getAttribute("title")).toBe("Toggle Full Screen")
   })
 
   it("enters fullscreen mode when button is clicked", async () => {
-    const wrapper = mount(FullScreen, {
+    wrapper = mount(FullScreen, {
       attachTo: document.body,
     })
 
@@ -95,7 +96,7 @@ describe("FullScreen", () => {
   })
 
   it("exits fullscreen mode when exit button is clicked", async () => {
-    const wrapper = mount(FullScreen, {
+    wrapper = mount(FullScreen, {
       attachTo: document.body,
     })
 
@@ -139,7 +140,7 @@ describe("FullScreen", () => {
   })
 
   it("exits fullscreen mode on component unmount", async () => {
-    const wrapper = mount(FullScreen, {
+    wrapper = mount(FullScreen, {
       attachTo: document.body,
     })
     // Enter fullscreen first
@@ -187,7 +188,7 @@ describe("FullScreen", () => {
       components: { FullScreen },
     }
 
-    const wrapper = mount(TestComponent, {
+    wrapper = mount(TestComponent, {
       attachTo: document.body,
     })
     await wrapper.find(".fullscreen-btn").trigger("click")
