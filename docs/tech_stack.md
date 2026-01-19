@@ -17,6 +17,7 @@
 - [vite-plugin-vue-inspector](https://github.com/webfansplz/vite-plugin-vue-inspector#readme)
 - [vue-router 4](https://router.vuejs.org/)
 - [Vitest](https://vitest.dev/)
+- [vitest-browser-mode](https://howtotestfrontend.com/resources/vitest-browser-mode-guide-and-setup-info)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [DaisyUI v4.x](https://v4.daisyui.com/)
 - [Cloud SQL for MySQL 8.4 (VECTOR enabled)](https://cloud.google.com/sql/docs/mysql/introduction)
@@ -27,4 +28,4 @@
 - [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Google Cloud Managed Instance Group](https://cloud.google.com/compute/docs/instance-groups/)
-  - VECTOR requires MySQL 8.4+ and Cloud SQL flag `cloudsql_vector=on`.
+- VECTOR requires MySQL 8.4+ and Cloud SQL flag `cloudsql_vector=on`.
